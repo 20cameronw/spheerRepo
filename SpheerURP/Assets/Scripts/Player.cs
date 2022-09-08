@@ -5,8 +5,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public static Player Instance; //this class is a singleton
-
     private float dollars;
+    private float dollarsGainedThisSecond;
+    private float passive;
 
     private void Awake()
     {
@@ -22,6 +23,8 @@ public class Player : MonoBehaviour
         Application.targetFrameRate = 60;
 
         LoadPlayerData();
+
+        InvokeRepeating("CalculateDollarsGained", 1f, 1f);
     }
 
     void Start()
@@ -40,6 +43,16 @@ public class Player : MonoBehaviour
         return dollars;
     }
 
+    public float getDollarsGainedThisSecond()
+    {
+        return dollarsGainedThisSecond;
+    }
+
+    public float getPassive()
+    {
+        return passive;
+    }
+
     private void LoadPlayerData()
     {
         if (SaveSystem.LoadPlayer() != null)
@@ -49,5 +62,15 @@ public class Player : MonoBehaviour
             //reload data from object to player
             dollars = data.dollars;
         }
+    }
+
+    private void CalculateDollarsGained()
+    {
+        SaveSystem.SavePlayer(this);
+        float previous = dollars;
+
+        dollars += passive;
+
+        dollarsGainedThisSecond = dollars - previous;
     }
 }
