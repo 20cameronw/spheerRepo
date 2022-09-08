@@ -9,6 +9,22 @@ public class Player : MonoBehaviour
     private float dollarsGainedThisSecond;
     private float passive;
 
+    public float getDollars()
+    {
+        return dollars;
+    }
+
+    public float getDollarsGainedThisSecond()
+    {
+        return dollarsGainedThisSecond;
+    }
+
+    public float getPassive()
+    {
+        return passive;
+    }
+
+
     private void Awake()
     {
         //if an instance that is not me then delete me
@@ -26,31 +42,13 @@ public class Player : MonoBehaviour
 
         InvokeRepeating("CalculateDollarsGained", 1f, 1f);
     }
+    private void OnEnable() => EventManager.OnClicked += MineResource;
 
-    void Start()
+    private void OnDisable() => EventManager.OnClicked -= MineResource;
+
+    private void MineResource()
     {
-
-    }
-
-
-    void Update()
-    {
-
-    }
-
-    public float getDollars()
-    {
-        return dollars;
-    }
-
-    public float getDollarsGainedThisSecond()
-    {
-        return dollarsGainedThisSecond;
-    }
-
-    public float getPassive()
-    {
-        return passive;
+        dollars += 1;
     }
 
     private void LoadPlayerData()
