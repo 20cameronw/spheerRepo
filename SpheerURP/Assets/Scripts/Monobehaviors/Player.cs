@@ -48,7 +48,7 @@ public class Player : MonoBehaviour
 
         LoadPlayerData();
 
-        InvokeRepeating("CalculateDollarsGained", 1f, 1f);
+        InvokeRepeating("SaveAndAddPassive", 1f, 1f);
     }
     private void OnEnable() => EventManager.OnClicked += MineResource;
 
@@ -75,13 +75,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void CalculateDollarsGained()
+    private void SaveAndAddPassive()
     {
         SaveSystem.SavePlayer(this);
-        float previous = dollars;
 
         dollars += passive;
-
-        dollarsGainedThisSecond = dollars - previous;
     }
 }
