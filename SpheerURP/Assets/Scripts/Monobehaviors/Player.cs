@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     private float dollarsGainedThisSecond;
     private float passive;
 
+    [SerializeField] private WorldSpawner worldSpawner;
+
     public float getDollars()
     {
         return dollars;
@@ -45,6 +47,11 @@ public class Player : MonoBehaviour
     private void OnEnable() => EventManager.OnClicked += MineResource;
 
     private void OnDisable() => EventManager.OnClicked -= MineResource;
+
+    private void Start()
+    {
+        worldSpawner.SetCurrentWorld(0);
+    }
 
     private void MineResource()
     {

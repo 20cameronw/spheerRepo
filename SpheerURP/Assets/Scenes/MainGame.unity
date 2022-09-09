@@ -394,7 +394,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1914055859}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1126,6 +1127,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786991456}
   m_CullTransparentMesh: 1
+--- !u!1 &1914055858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1914055859}
+  - component: {fileID: 1914055860}
+  m_Layer: 0
+  m_Name: WorldSpawnLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1914055859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914055858}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 150}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1914055860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914055858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6583d1a871c9f544c8cba924efe6a00f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WorldsList:
+  - {fileID: 919132149155446097, guid: f248725c5aa2b584385ca1f0465f0d24, type: 3}
+  - {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
+  - {fileID: 919132149155446097, guid: 50bed9f2d84fbcd499b2816257381cb8, type: 3}
 --- !u!1 &1938628145
 GameObject:
   m_ObjectHideFlags: 0
@@ -1156,6 +1205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dee496949433c4c458acc1d7e7e3a020, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  worldSpawner: {fileID: 1914055860}
 --- !u!4 &1938628147
 Transform:
   m_ObjectHideFlags: 0
