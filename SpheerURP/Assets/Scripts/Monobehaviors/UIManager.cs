@@ -20,7 +20,17 @@ public class UIManager : MonoBehaviour
 
     public void CloseMenu()
     {
-        Destroy(currentMenu);
+        if (currentMenu != null)
+            currentMenu.SetActive(false);
     }
+
+    public void OpenShop()
+    {
+        CloseMenu();
+        Shop.SetActive(true);
+        currentMenu = Shop;
+    }
+
+
 
 }
