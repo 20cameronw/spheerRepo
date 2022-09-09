@@ -42,6 +42,7 @@ public class WorldSpawner : MonoBehaviour
     }
     IEnumerator ExpandWorld()
     {
+        ResetScale();
 
         transform.localScale = new Vector3(1.05f, 1.05f, 1.05f);
 
