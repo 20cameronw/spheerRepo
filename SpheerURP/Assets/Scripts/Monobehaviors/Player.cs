@@ -5,11 +5,17 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public static Player Instance; //this class is a singleton
-    private float dollars;
+
     private float dollarsGainedThisSecond;
     private float passive;
 
+    [Header("Setup References")]
     [SerializeField] private WorldSpawner worldSpawner;
+
+    [Space(10)]
+    [Header("Modifiable Data")]
+    [SerializeField] private float dollars;
+    [SerializeField] private int[] buildingCount = new int[10];
 
     public float getDollars()
     {
@@ -42,7 +48,7 @@ public class Player : MonoBehaviour
 
         LoadPlayerData();
 
-        InvokeRepeating("CalculateDollarsGained", 1f, 1f);
+        InvokeRepeating("SaveAndAddPassive", 1f, 1f);
     }
     private void OnEnable() => EventManager.OnClicked += MineResource;
 
@@ -69,13 +75,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void CalculateDollarsGained()
+    private void SaveAndAddPassive()
     {
         SaveSystem.SavePlayer(this);
-        float previous = dollars;
 
         dollars += passive;
-
-        dollarsGainedThisSecond = dollars - previous;
     }
 }
