@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
   m_Name: Upgrade1
   m_EditorClassIdentifier: 
-  name: TESTING 123
-  description: 
+  name: Windmill
+  description: This is just a test description. What happens if its too long>>?>>???????????????????????
   upgradeIndex: 0
-  Icon: {fileID: 0}
-  cost: 0
+  Icon: {fileID: 21300000, guid: e9de6db3ac97a544f9746b7b083ba723, type: 3}
+  cost: 2
   health: 0
-  bonus: 0
+  bonus: 10

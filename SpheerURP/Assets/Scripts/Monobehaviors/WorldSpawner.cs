@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldSpawner : MonoBehaviour
 {
-    private GameObject CurrentWorld;
+    public GameObject CurrentWorld;
 
     [SerializeField] List<GameObject> WorldsList;
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
@@ -42,11 +42,9 @@ public class WorldSpawner : MonoBehaviour
     }
     IEnumerator ExpandWorld()
     {
-        ResetScale();
-
         transform.localScale = new Vector3(1.05f, 1.05f, 1.05f);
 
-        yield return new WaitForSeconds(.05f);
+        yield return new WaitForSeconds(.02f);
 
         ResetScale();
     }
@@ -57,5 +55,10 @@ public class WorldSpawner : MonoBehaviour
         {
             transform.localScale = new Vector3(1f, 1f, 1f);
         }
+    }
+
+    public void spawnObject(GameObject objectToSpawn)
+    {
+        Debug.Log("Spawning object");
     }
 }
