@@ -25,6 +25,12 @@ public class ShopPanel : MonoBehaviour
         {
             var currentShopCard = shopCards[i].GetComponent<ShopCard>();
             currentShopCard.TitleText.text = shopPanelInfo.shopItemsSO[i].name;
+            currentShopCard.description.text = shopPanelInfo.shopItemsSO[i].description;
+            currentShopCard.bonus.text = "Bonus: " + shopPanelInfo.shopItemsSO[i].bonus.ToString();
+            currentShopCard.icon.sprite = shopPanelInfo.shopItemsSO[i].Icon;
+            int index = shopPanelInfo.shopItemsSO[i].upgradeIndex;
+            currentShopCard.upgradeIndex = index;
+            currentShopCard.cost.text = "Cost: " + TransactionManager.Instance.getCostOfUpgradeStructure(index);
         }
     }
 }

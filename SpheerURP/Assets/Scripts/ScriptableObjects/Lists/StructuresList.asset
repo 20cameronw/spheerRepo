@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shopItemsSO:
   - {fileID: 11400000, guid: 4afa0bec9f49a844e9216d9595366986, type: 2}
-  cardTemplate: {fileID: 6749939105424821655, guid: 622a67abd857e16479aedc265e4d73a7,
+  cardTemplate: {fileID: 5100550789612092457, guid: 3abcaeb2d3a84d34e8ff06f8fbb579b9,
     type: 3}

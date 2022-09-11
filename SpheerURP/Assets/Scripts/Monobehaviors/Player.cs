@@ -32,6 +32,21 @@ public class Player : MonoBehaviour
         return passive;
     }
 
+    public void AddDollars(float amount)
+    {
+        dollars += amount;
+    }
+
+    public void AddBuildingCount(int index)
+    {
+        buildingCount[index]++;
+    }
+
+    public void AddPassive(int bonus)
+    {
+        passive += bonus;
+    }
+
 
     private void Awake()
     {
@@ -80,5 +95,10 @@ public class Player : MonoBehaviour
         SaveSystem.SavePlayer(this);
 
         dollars += passive;
+    }
+
+    public int getNumberBuildings(int index)
+    {
+        return buildingCount[index];
     }
 }
