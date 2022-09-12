@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     [Space(10)]
     [Header("Modifiable Data")]
     [SerializeField] private float dollars;
-    [SerializeField] private int[] buildingCount = new int[10];
+    [SerializeField] private List<int> buildingCount;
 
     public float getDollars()
     {
@@ -45,6 +45,16 @@ public class Player : MonoBehaviour
     public void AddPassive(int bonus)
     {
         passive += bonus;
+    }
+
+    public List<int> getBuildingCountList()
+    {
+        return buildingCount;
+    }
+
+    public int getNumberBuildings(int index)
+    {
+        return buildingCount[index];
     }
 
 
@@ -87,6 +97,8 @@ public class Player : MonoBehaviour
             PlayerData data = SaveSystem.LoadPlayer();
             //reload data from object to player
             dollars = data.dollars;
+            buildingCount = data.buildingCount;
+
         }
     }
 
@@ -97,8 +109,4 @@ public class Player : MonoBehaviour
         dollars += passive;
     }
 
-    public int getNumberBuildings(int index)
-    {
-        return buildingCount[index];
-    }
 }

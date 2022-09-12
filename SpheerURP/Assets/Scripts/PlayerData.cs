@@ -6,9 +6,11 @@ using UnityEngine;
 public class PlayerData
 {
     public float dollars;
+    public List<int> buildingCount;
 
     public PlayerData(Player player)
     {
         dollars = Player.Instance.getDollars();
+        buildingCount = Player.Instance.getBuildingCountList();
     }
 }
