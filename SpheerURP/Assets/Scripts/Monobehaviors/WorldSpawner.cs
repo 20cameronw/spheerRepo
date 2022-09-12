@@ -7,6 +7,9 @@ public class WorldSpawner : MonoBehaviour
     public GameObject CurrentWorld;
 
     [SerializeField] List<GameObject> WorldsList;
+
+    private int clickQ;
+    private bool cr_running;
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
 
     private void OnDisable() => EventManager.OnClicked -= ExpandAndShrink;
@@ -38,23 +41,28 @@ public class WorldSpawner : MonoBehaviour
 
     private void ExpandAndShrink()
     {
-        StartCoroutine(ExpandWorld());
+        clickQ++;
+        if (!cr_running)
+            StartCoroutine(ExpandWorld());
     }
     IEnumerator ExpandWorld()
     {
-        transform.localScale = new Vector3(1.05f, 1.05f, 1.05f);
+        cr_running = true;
+        while (clickQ > 0)
+        {
+            transform.localScale = new Vector3(1.05f, 1.05f, 1.05f);
 
-        yield return new WaitForSeconds(.02f);
+            yield return new WaitForSeconds(.05f);
 
-        ResetScale();
+            ResetScale();
+        }
+        cr_running = false;
     }
 
     private void ResetScale()
     {
-        if (transform.localScale != new Vector3(1f, 1f, 1f))
-        {
-            transform.localScale = new Vector3(1f, 1f, 1f);
-        }
+        transform.localScale = new Vector3(1f, 1f, 1f);
+        clickQ--;
     }
 
     public void spawnObject(GameObject objectToSpawn)
