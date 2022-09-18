@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class WorldSpawner : MonoBehaviour
 {
+    [HideInInspector]
+    public GameObject CurrentWorldGO;
+
+    [HideInInspector]
     public GameObject CurrentWorld;
 
     [SerializeField] List<GameObject> WorldsList;
+    [SerializeField] private List<GameObject> structuresGOList;
+    [SerializeField] private SphereCollider surface;
+
+
 
     private int clickQ;
     private bool cr_running;
@@ -16,27 +24,27 @@ public class WorldSpawner : MonoBehaviour
 
     public void SetCurrentWorld(int WorldIndex)
     {
-        if (CurrentWorld == null)
+        if (CurrentWorldGO == null)
         {
-            CurrentWorld = WorldsList[WorldIndex];
+            CurrentWorldGO = WorldsList[WorldIndex];
             SpawnWorld();
         }
         else
         {
             DeleteCurrentWorld();
-            CurrentWorld = WorldsList[WorldIndex];
+            CurrentWorldGO = WorldsList[WorldIndex];
             SpawnWorld();
         }
     }
 
     private void DeleteCurrentWorld()
     {
-        Destroy(CurrentWorld);
+        Destroy(CurrentWorldGO);
     }
 
     public void SpawnWorld()
     {
-        Instantiate(CurrentWorld, transform);
+        CurrentWorld = Instantiate(CurrentWorldGO, transform);
     }
 
     private void ExpandAndShrink()
@@ -65,8 +73,33 @@ public class WorldSpawner : MonoBehaviour
         clickQ--;
     }
 
-    public void spawnObject(GameObject objectToSpawn)
+    public void spawnObject(int index)
     {
-        Debug.Log("Spawning object");
+        //Debug.Log("Spawning object");
+        Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * surface.radius + CurrentWorld.transform.position;
+        Quaternion spawnRotation = Quaternion.identity;
+        GameObject newObject = Instantiate(structuresGOList[index], spawnPosition, spawnRotation) as GameObject;
+        newObject.transform.SetParent(CurrentWorld.transform);
+        newObject.transform.LookAt(CurrentWorld.transform.position);
+        newObject.transform.Rotate(-90, 0, 0);
+    }
+
+    public void LoadObjects(int count, int index)
+    {
+        StartCoroutine(delayLoadObjects(count, index));
+    }
+
+    private IEnumerator delayLoadObjects(int count, int index)
+    {
+        yield return new WaitForSeconds(1f);
+        SpawnManyObjects(count, index);
+    }
+
+    public void SpawnManyObjects(int count, int index)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            spawnObject(index);
+        }
     }
 }

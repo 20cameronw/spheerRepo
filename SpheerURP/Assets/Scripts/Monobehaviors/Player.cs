@@ -98,6 +98,10 @@ public class Player : MonoBehaviour
             //reload data from object to player
             dollars = data.dollars;
             buildingCount = data.buildingCount;
+            for (int i = 0; i < buildingCount.Count; i++)
+            {
+                worldSpawner.LoadObjects(buildingCount[i], i);
+            }
 
         }
     }
@@ -108,5 +112,7 @@ public class Player : MonoBehaviour
 
         dollars += passive;
     }
+
+
 
 }
