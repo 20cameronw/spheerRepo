@@ -493,7 +493,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.54038715, y: 0, z: 0, w: 0.8414165}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -501,7 +501,7 @@ Transform:
   - {fileID: 1914055859}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -65.42, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1780,6 +1780,7 @@ MonoBehaviour:
   - {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3, type: 3}
   structuresGOList:
   - {fileID: 2387481435115236454, guid: 46541eb3b5af6254998965c52579fedb, type: 3}
+  - {fileID: 4138480710187463257, guid: 79d5fdf46750c884e9c8b49855ab9796, type: 3}
   surface: {fileID: 1914055861}
 --- !u!135 &1914055861
 SphereCollider:
