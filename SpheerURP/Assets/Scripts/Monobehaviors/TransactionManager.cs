@@ -12,8 +12,6 @@ public class TransactionManager : MonoBehaviour
 
     [SerializeField] private WorldSpawner worldSpawner;
 
-    [SerializeField] private List<GameObject> structuresGOList;
-
     [SerializeField] private ShopPanel structuresPanel;
 
     private void Awake()
@@ -32,7 +30,7 @@ public class TransactionManager : MonoBehaviour
         Player.Instance.AddDollars(-cost);
         Player.Instance.AddBuildingCount(index);
         Player.Instance.AddPassive(structuresPanelInfo.shopItemsSO[index].bonus);
-        worldSpawner.spawnObject(structuresGOList[index]);
+        worldSpawner.spawnObject(index);
         structuresPanel.LoadCards();
     }
 

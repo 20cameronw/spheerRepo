@@ -1739,6 +1739,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1914055859}
   - component: {fileID: 1914055860}
+  - component: {fileID: 1914055861}
   m_Layer: 0
   m_Name: WorldSpawnLocation
   m_TagString: Untagged
@@ -1773,9 +1774,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6583d1a871c9f544c8cba924efe6a00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CurrentWorldGO: {fileID: 0}
   CurrentWorld: {fileID: 0}
   WorldsList:
   - {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3, type: 3}
+  structuresGOList:
+  - {fileID: 2387481435115236454, guid: 46541eb3b5af6254998965c52579fedb, type: 3}
+  surface: {fileID: 1914055861}
+--- !u!135 &1914055861
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914055858}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 15.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1938628145
 GameObject:
   m_ObjectHideFlags: 0
@@ -1871,8 +1889,6 @@ MonoBehaviour:
   structuresPanelInfo: {fileID: 11400000, guid: a43992bacb8e67043ac8d127c1677700,
     type: 2}
   worldSpawner: {fileID: 1914055860}
-  structuresGOList:
-  - {fileID: 2387481435115236454, guid: 46541eb3b5af6254998965c52579fedb, type: 3}
   structuresPanel: {fileID: 7551192822177846552}
 --- !u!1 &2023585712 stripped
 GameObject:
