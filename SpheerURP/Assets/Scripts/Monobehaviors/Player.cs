@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
         buildingCount[index]++;
     }
 
-    public void AddPassive(int bonus)
+    public void AddPassive(float bonus)
     {
         passive += bonus;
     }
@@ -98,6 +98,7 @@ public class Player : MonoBehaviour
             //reload data from object to player
             dollars = data.dollars;
             buildingCount = data.buildingCount;
+            passive = data.passive;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
