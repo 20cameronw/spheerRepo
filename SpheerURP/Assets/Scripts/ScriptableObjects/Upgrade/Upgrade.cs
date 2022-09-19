@@ -12,7 +12,7 @@ public class Upgrade : ScriptableObject
     public Sprite Icon;
     public int cost;
     public int health;
-    public int bonus;
+    public float bonus;
 
     public void Print()
     {
