@@ -10,6 +10,8 @@ public class PlayerData
     public float passive;
     public List<int> buildingCount;
 
+
+
     public PlayerData(Player player)
     {
         dollars = Player.Instance.getDollars();

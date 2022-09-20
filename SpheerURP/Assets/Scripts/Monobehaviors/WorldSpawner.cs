@@ -10,17 +10,34 @@ public class WorldSpawner : MonoBehaviour
     [HideInInspector]
     public GameObject CurrentWorld;
 
+    [Header("Setup Fields")]
     [SerializeField] List<GameObject> WorldsList;
     [SerializeField] private List<GameObject> structuresGOList;
     [SerializeField] private SphereCollider surface;
 
+    [Space(10)]
+    [Header("Orbit Settings")]
+    [SerializeField] private SphereCollider orbitSC;
+    [SerializeField] private float xOrbitSpeed;
+    [SerializeField] private float yOrbitSpeed;
+    [SerializeField] private float zOrbitSpeed;
 
+    private GameObject orbitGO;
 
     private int clickQ;
     private bool cr_running;
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
 
     private void OnDisable() => EventManager.OnClicked -= ExpandAndShrink;
+
+    private void Start()
+    {
+        orbitGO = new GameObject("OrbitGO");
+        orbitGO.transform.SetParent(transform);
+        orbitGO.transform.position = transform.position;
+        orbitGO.AddComponent<Rotate>();
+        orbitGO.GetComponent<Rotate>().SetSpeeds(xOrbitSpeed, yOrbitSpeed, zOrbitSpeed);
+    }
 
     public void SetCurrentWorld(int WorldIndex)
     {
@@ -101,5 +118,15 @@ public class WorldSpawner : MonoBehaviour
         {
             spawnObject(index);
         }
+    }
+
+    public void spawnInOrbit(int index)
+    {
+        Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * orbitSC.radius + orbitGO.transform.position;
+        Quaternion spawnRotation = Quaternion.identity;
+        GameObject newObject = Instantiate(structuresGOList[index], spawnPosition, spawnRotation) as GameObject;
+        newObject.transform.SetParent(orbitGO.transform);
+        newObject.transform.LookAt(orbitGO.transform.position);
+        newObject.transform.Rotate(-90, 0, 0);
     }
 }

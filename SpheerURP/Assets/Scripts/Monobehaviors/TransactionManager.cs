@@ -30,7 +30,11 @@ public class TransactionManager : MonoBehaviour
         Player.Instance.AddDollars(-cost);
         Player.Instance.AddBuildingCount(index);
         Player.Instance.AddPassive(structuresPanelInfo.shopItemsSO[index].bonus);
-        worldSpawner.spawnObject(index);
+        if (structuresPanelInfo.shopItemsSO[index].isInOrbit)
+            worldSpawner.spawnInOrbit(index);
+        else
+            worldSpawner.spawnObject(index);
+
         structuresPanel.LoadCards();
     }
 

@@ -14,6 +14,8 @@ public class Upgrade : ScriptableObject
     public int health;
     public float bonus;
 
+    public bool isInOrbit;
+
     public void Print()
     {
         Debug.Log(name + ": " + description + "\nCosts: " + cost);
