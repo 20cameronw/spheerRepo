@@ -92,6 +92,14 @@ public class WorldSpawner : MonoBehaviour
 
     public void spawnObject(int index)
     {
+        if (TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].isInOrbit)
+            spawnInOrbit(index);
+        else
+            spawnOnSurface(index);
+    }
+
+    public void spawnOnSurface(int index)
+    {
         //Debug.Log("Spawning object");
         Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * surface.radius + CurrentWorld.transform.position;
         Quaternion spawnRotation = Quaternion.identity;
@@ -108,7 +116,7 @@ public class WorldSpawner : MonoBehaviour
 
     private IEnumerator delayLoadObjects(int count, int index)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.2f);
         SpawnManyObjects(count, index);
     }
 

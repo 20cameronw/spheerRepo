@@ -8,7 +8,7 @@ public class TransactionManager : MonoBehaviour
 
     [SerializeField] private float purchaseCostIncreaseMultiplier;
 
-    [SerializeField] private ShopItemsListSO structuresPanelInfo;
+    public ShopItemsListSO structuresPanelInfo;
 
     [SerializeField] private WorldSpawner worldSpawner;
 
