@@ -10,4 +10,11 @@ public class Rotate : MonoBehaviour
     {
         transform.Rotate(x * Time.deltaTime, y * Time.deltaTime, z * Time.deltaTime);
     }
+
+    public void SetSpeeds(float _x, float _y, float _z)
+    {
+        x = _x;
+        y = _y;
+        z = _z;
+    }
 }

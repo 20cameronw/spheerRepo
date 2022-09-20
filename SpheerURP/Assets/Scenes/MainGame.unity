@@ -1740,6 +1740,7 @@ GameObject:
   - component: {fileID: 1914055859}
   - component: {fileID: 1914055860}
   - component: {fileID: 1914055861}
+  - component: {fileID: 1914055862}
   m_Layer: 0
   m_Name: WorldSpawnLocation
   m_TagString: Untagged
@@ -1782,6 +1783,10 @@ MonoBehaviour:
   - {fileID: 2387481435115236454, guid: 46541eb3b5af6254998965c52579fedb, type: 3}
   - {fileID: 4138480710187463257, guid: 79d5fdf46750c884e9c8b49855ab9796, type: 3}
   surface: {fileID: 1914055861}
+  orbitSC: {fileID: 1914055862}
+  xOrbitSpeed: -5
+  yOrbitSpeed: -8
+  zOrbitSpeed: -2
 --- !u!135 &1914055861
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1794,6 +1799,19 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 15.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &1914055862
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914055858}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 25
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1938628145
 GameObject:
