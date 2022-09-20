@@ -15,7 +15,8 @@ MonoBehaviour:
   name: Windmill
   description: This is just a test description. What happens if its too long>>?>>???????????????????????
   upgradeIndex: 0
-  Icon: {fileID: 21300000, guid: e9de6db3ac97a544f9746b7b083ba723, type: 3}
-  cost: 2
+  Icon: {fileID: 21300000, guid: e519571e25ada9541baeb666c0ee9dc8, type: 3}
+  cost: 5
   health: 0
   bonus: 10
+  isInOrbit: 0
