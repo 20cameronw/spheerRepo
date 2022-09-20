@@ -116,7 +116,7 @@ public class WorldSpawner : MonoBehaviour
 
     private IEnumerator delayLoadObjects(int count, int index)
     {
-        yield return new WaitForSeconds(.2f);
+        yield return new WaitForSeconds(.5f);
         SpawnManyObjects(count, index);
     }
 
