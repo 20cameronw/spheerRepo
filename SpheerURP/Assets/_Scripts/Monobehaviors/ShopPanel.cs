@@ -31,6 +31,7 @@ public class ShopPanel : MonoBehaviour
             int index = shopPanelInfo.shopItemsSO[i].upgradeIndex;
             currentShopCard.upgradeIndex = index;
             currentShopCard.cost.text = "Cost: " + TransactionManager.Instance.getCostOfUpgradeStructure(index);
+            currentShopCard.count.text = "x" + Player.Instance.getNumberBuildings(i);
         }
     }
 }

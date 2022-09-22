@@ -18,6 +18,8 @@ public class ShopCard : MonoBehaviour
 
     public TMP_Text description;
 
+    public TMP_Text count;
+
     public void purchase()
     {
         TransactionManager.Instance.PurchaseSomething(upgradeIndex);
