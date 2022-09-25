@@ -8,6 +8,8 @@ public class Player : MonoBehaviour
 
     private float dollarsGainedThisSecond;
     private float passive;
+    private float currentEnergy;
+
 
     [Header("Setup References")]
     [SerializeField] private WorldSpawner worldSpawner;
@@ -16,6 +18,8 @@ public class Player : MonoBehaviour
     [Header("Modifiable Data")]
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
+    [SerializeField] private float maxEnergy;
+
 
     public float getDollars()
     {
@@ -57,6 +61,25 @@ public class Player : MonoBehaviour
         return buildingCount[index];
     }
 
+    public float getCurrentEnergy()
+    {
+        return currentEnergy / maxEnergy;
+    }
+
+    public void tickDownEnergy()
+    {
+        if (currentEnergy > 0)
+            currentEnergy--;
+    }
+
+    public void AddToEnergy(int amount)
+    {
+        if (currentEnergy + amount > maxEnergy)
+            currentEnergy = maxEnergy;
+        else
+            currentEnergy += amount;
+    }
+
 
     private void Awake()
     {
@@ -87,6 +110,7 @@ public class Player : MonoBehaviour
     private void MineResource()
     {
         dollars += 1;
+        currentEnergy += 1;
     }
 
     private void LoadPlayerData()
