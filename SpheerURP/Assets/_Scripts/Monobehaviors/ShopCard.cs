@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -24,4 +22,10 @@ public class ShopCard : MonoBehaviour
     {
         TransactionManager.Instance.PurchaseSomething(upgradeIndex);
     }
+
+    public void sellItem()
+    {
+        TransactionManager.Instance.SellStructure(upgradeIndex);
+    }
+    
 }

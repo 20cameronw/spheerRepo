@@ -46,6 +46,11 @@ public class Player : MonoBehaviour
         buildingCount[index]++;
     }
 
+    public void minusBuildingCount(int index)
+    {
+        buildingCount[index]--;
+    }
+
     public void AddPassive(float bonus)
     {
         passive += bonus;
