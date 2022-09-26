@@ -2297,6 +2297,7 @@ MonoBehaviour:
     type: 2}
   worldSpawner: {fileID: 1914055860}
   structuresPanel: {fileID: 7551192822177846552}
+  sellBackMultiplier: 0.5
 --- !u!224 &2023585713 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3882205597042352549, guid: 3abcaeb2d3a84d34e8ff06f8fbb579b9,

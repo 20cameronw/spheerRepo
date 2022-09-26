@@ -24,6 +24,8 @@ public class WorldSpawner : MonoBehaviour
 
     private GameObject orbitGO;
 
+    private List<GameObject> spawnedObjects = new List<GameObject>();
+
     private int clickQ;
     private bool cr_running;
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
@@ -107,6 +109,7 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.SetParent(CurrentWorld.transform);
         newObject.transform.LookAt(CurrentWorld.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
+        spawnedObjects.Add(newObject);
     }
 
     public void LoadObjects(int count, int index)
@@ -136,5 +139,15 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.SetParent(orbitGO.transform);
         newObject.transform.LookAt(orbitGO.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
+    }
+
+    public void removeObject(int index)
+    {
+        GameObject searchTargetGO = structuresGOList[index];
+        for (int i = 0; i < spawnedObjects.Count; i++) 
+        {
+            if (spawnedObjects[i] == searchTargetGO)
+                Destroy(spawnedObjects[i]);
+        }
     }
 }

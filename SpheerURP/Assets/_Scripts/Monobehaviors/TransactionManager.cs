@@ -14,6 +14,9 @@ public class TransactionManager : MonoBehaviour
 
     [SerializeField] private ShopPanel structuresPanel;
 
+    [Range(0, 2)]
+    [SerializeField] private float sellBackMultiplier;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -36,6 +39,21 @@ public class TransactionManager : MonoBehaviour
             worldSpawner.spawnObject(index);
 
         structuresPanel.LoadCards();
+    }
+
+    public void SellStructure(int index)
+    {
+        int numberBuildings = Player.Instance.getNumberBuildings(index);
+        if (numberBuildings == 0)
+            return;
+        
+        Player.Instance.minusBuildingCount(index);
+        worldSpawner.removeObject(index);
+        Player.Instance.AddPassive(-(structuresPanelInfo.shopItemsSO[index].bonus));
+        Player.Instance.AddDollars(getCostOfUpgradeStructure(index) * sellBackMultiplier);
+        structuresPanel.LoadCards();
+        Debug.Log("Sold structure");
+
     }
 
     public float getCostOfUpgradeStructure(int index)

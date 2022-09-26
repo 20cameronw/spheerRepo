@@ -466,7 +466,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4475628610525586349}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5239183296843549248}
+        m_TargetAssemblyTypeName: ShopCard, Assembly-CSharp
+        m_MethodName: sellItem
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3882205595191340156
 GameObject:
   m_ObjectHideFlags: 0
