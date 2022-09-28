@@ -110,6 +110,7 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.LookAt(CurrentWorld.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
         spawnedObjects.Add(newObject);
+        newObject.gameObject.tag = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name;
 
         if (passive > 0)
         {
@@ -146,6 +147,8 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.SetParent(orbitGO.transform);
         newObject.transform.LookAt(orbitGO.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
+        spawnedObjects.Add(newObject);
+        newObject.gameObject.tag = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name;
         
         if (passive > 0)
         {
@@ -156,12 +159,15 @@ public class WorldSpawner : MonoBehaviour
 
     public void removeObject(int index)
     {
-        /**
         for (int i = 0; i < spawnedObjects.Count; i++) 
         {
-            if (spawnedObjects[i].tag = get)
-                Destroy(spawnedObjects[i]);
+            if (spawnedObjects[i].gameObject.CompareTag(TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name))
+            {
+                GameObject newObject = new GameObject();
+                newObject = spawnedObjects[i];
+                spawnedObjects.RemoveAt(i);
+                Destroy(newObject);
+            }
         }
-        */
     }
 }
