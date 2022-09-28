@@ -7,7 +7,6 @@ public class PlayerData
 {
     public float dollars;
 
-    public float passive;
     public List<int> buildingCount;
 
 
@@ -16,6 +15,5 @@ public class PlayerData
     {
         dollars = Player.Instance.getDollars();
         buildingCount = Player.Instance.getBuildingCountList();
-        passive = Player.Instance.getPassive();
     }
 }

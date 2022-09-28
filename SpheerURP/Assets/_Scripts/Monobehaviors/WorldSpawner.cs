@@ -92,15 +92,15 @@ public class WorldSpawner : MonoBehaviour
         clickQ--;
     }
 
-    public void spawnObject(int index)
+    public void spawnObject(int index, float passive)
     {
         if (TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].isInOrbit)
-            spawnInOrbit(index);
+            spawnInOrbit(index, passive);
         else
-            spawnOnSurface(index);
+            spawnOnSurface(index, passive);
     }
 
-    public void spawnOnSurface(int index)
+    public void spawnOnSurface(int index, float passive)
     {
         //Debug.Log("Spawning object");
         Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * surface.radius + CurrentWorld.transform.position;
@@ -110,6 +110,13 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.LookAt(CurrentWorld.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
         spawnedObjects.Add(newObject);
+
+        if (passive > 0)
+        {
+            AddsPassive passiveEarner = newObject.AddComponent<AddsPassive>();
+            passiveEarner.setAmount(passive);
+        }
+        
     }
 
     public void LoadObjects(int count, int index)
@@ -127,11 +134,11 @@ public class WorldSpawner : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            spawnObject(index);
+            spawnObject(index, TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].bonus);
         }
     }
 
-    public void spawnInOrbit(int index)
+    public void spawnInOrbit(int index, float passive)
     {
         Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * orbitSC.radius + orbitGO.transform.position;
         Quaternion spawnRotation = Quaternion.identity;
@@ -139,15 +146,22 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.SetParent(orbitGO.transform);
         newObject.transform.LookAt(orbitGO.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
+        
+        if (passive > 0)
+        {
+            AddsPassive passiveEarner = newObject.AddComponent<AddsPassive>();
+            passiveEarner.setAmount(passive);
+        }
     }
 
     public void removeObject(int index)
     {
-        GameObject searchTargetGO = structuresGOList[index];
+        /**
         for (int i = 0; i < spawnedObjects.Count; i++) 
         {
-            if (spawnedObjects[i] == searchTargetGO)
+            if (spawnedObjects[i].tag = get)
                 Destroy(spawnedObjects[i]);
         }
+        */
     }
 }

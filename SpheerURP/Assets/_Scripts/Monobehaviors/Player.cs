@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public static Player Instance; //this class is a singleton
 
     private float dollarsGainedThisSecond;
+    private float passiveSum;
     private float passive;
     private float currentEnergy;
 
@@ -85,6 +86,11 @@ public class Player : MonoBehaviour
             currentEnergy += amount;
     }
 
+    public void addToPassive(float amount)
+    {
+        passiveSum += amount;
+    }
+
 
     private void Awake()
     {
@@ -127,7 +133,6 @@ public class Player : MonoBehaviour
             //reload data from object to player
             dollars = data.dollars;
             buildingCount = data.buildingCount;
-            passive = data.passive;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
@@ -139,7 +144,8 @@ public class Player : MonoBehaviour
     private void SaveAndAddPassive()
     {
         SaveSystem.SavePlayer(this);
-
+        passive = passiveSum;
+        passiveSum = 0;
         dollars += passive;
     }
 
