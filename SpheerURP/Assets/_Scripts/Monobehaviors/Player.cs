@@ -109,6 +109,7 @@ public class Player : MonoBehaviour
 
         InvokeRepeating("SaveAndAddPassive", 1f, 1f);
     }
+    
     private void OnEnable() => EventManager.OnClicked += MineResource;
 
     private void OnDisable() => EventManager.OnClicked -= MineResource;
