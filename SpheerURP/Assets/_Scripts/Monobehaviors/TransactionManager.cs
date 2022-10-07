@@ -42,6 +42,11 @@ public class TransactionManager : MonoBehaviour
         structuresPanel.LoadCards();
     }
 
+    public void PurchaseResearch(int upgradeIndex)
+    {
+        Debug.Log(upgradeIndex);
+    }
+
     public void SellStructure(int index)
     {
         int numberBuildings = Player.Instance.getNumberBuildings(index);

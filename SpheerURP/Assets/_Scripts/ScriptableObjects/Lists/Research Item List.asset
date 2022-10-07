@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 021db8255a8e34133b7fed10458c4914, type: 3}
+  m_Name: Research Item List
+  m_EditorClassIdentifier: 
+  researchItemsSO:
+  - {fileID: 11400000, guid: 786212508b48247dfbefd4a55e56f174, type: 2}
+  cardTemplate: {fileID: 3977445391096142732, guid: da582b28369fe408aad7cc529114d8fa,
+    type: 3}
