@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: New Research Item
   m_EditorClassIdentifier: 
-  name: 
-  bonus: 
+  name: Click Power
+  bonus: x2 click power
   upgradeIndex: 0
-  Icon: {fileID: 0}
-  cost: 0
+  Icon: {fileID: 21300000, guid: bdfcd00e719df654886a535178587f29, type: 3}
+  cost: 10000

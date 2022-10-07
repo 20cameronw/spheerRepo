@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     [Header("Modifiable Data")]
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
+    [SerializeField] private List<int> researchCount;
     [SerializeField] private float maxEnergy;
 
 
@@ -91,6 +92,21 @@ public class Player : MonoBehaviour
         passiveSum += amount;
     }
 
+    public int getResearchCount(int index)
+    {
+        return researchCount[index];
+    }
+
+    public List<int> getResearchCount()
+    {
+        return researchCount;
+    }
+
+    public void addResearchCount(int index)
+    {
+        researchCount[index]++;
+    }
+
 
     private void Awake()
     {
@@ -109,7 +125,7 @@ public class Player : MonoBehaviour
 
         InvokeRepeating("SaveAndAddPassive", 1f, 1f);
     }
-    
+
     private void OnEnable() => EventManager.OnClicked += MineResource;
 
     private void OnDisable() => EventManager.OnClicked -= MineResource;
@@ -134,6 +150,7 @@ public class Player : MonoBehaviour
             //reload data from object to player
             dollars = data.dollars;
             buildingCount = data.buildingCount;
+            researchCount = data.researchCount;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);

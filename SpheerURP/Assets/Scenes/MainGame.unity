@@ -2241,6 +2241,7 @@ MonoBehaviour:
   worldSpawner: {fileID: 1914055860}
   dollars: 0
   buildingCount: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+  researchCount: 00000000
   maxEnergy: 100
 --- !u!4 &1938628147
 Transform:
@@ -2301,6 +2302,7 @@ MonoBehaviour:
   purchaseCostIncreaseMultiplier: 1.2
   structuresPanelInfo: {fileID: 11400000, guid: a43992bacb8e67043ac8d127c1677700,
     type: 2}
+  researchPanelInfo: {fileID: 11400000, guid: 8070d52b2dc6941229861aa4fd657b39, type: 2}
   worldSpawner: {fileID: 1914055860}
   structuresPanel: {fileID: 7551192822177846552}
   sellBackMultiplier: 0.5

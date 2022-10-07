@@ -10,6 +10,8 @@ public class TransactionManager : MonoBehaviour
 
     public ShopItemsListSO structuresPanelInfo;
 
+    public ResearchItemsListSO researchPanelInfo;
+
     [SerializeField] private WorldSpawner worldSpawner;
 
     [SerializeField] private ShopPanel structuresPanel;
@@ -45,6 +47,7 @@ public class TransactionManager : MonoBehaviour
     public void PurchaseResearch(int upgradeIndex)
     {
         Debug.Log(upgradeIndex);
+        Player.Instance.addResearchCount(upgradeIndex);
     }
 
     public void SellStructure(int index)
@@ -66,6 +69,17 @@ public class TransactionManager : MonoBehaviour
         int numberBuildings = Player.Instance.getNumberBuildings(index);
         float baseCost = structuresPanelInfo.shopItemsSO[index].cost;
         for (int i = 0; i < numberBuildings; i++)
+        {
+            baseCost *= purchaseCostIncreaseMultiplier;
+        }
+        return baseCost;
+    }
+
+    public float getCostOfResearchUpgrade(int index)
+    {
+        int countPurchased = Player.Instance.getResearchCount(index);
+        float baseCost = researchPanelInfo.researchItemsSO[index].cost;
+        for (int i = 0; i < countPurchased; i++)
         {
             baseCost *= purchaseCostIncreaseMultiplier;
         }
