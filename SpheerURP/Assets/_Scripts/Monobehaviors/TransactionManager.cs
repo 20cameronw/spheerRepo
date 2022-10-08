@@ -6,18 +6,29 @@ public class TransactionManager : MonoBehaviour
 {
     public static TransactionManager Instance;
 
+    [Header("Multipliers")]
+    [Range(0, 4)]
     [SerializeField] private float purchaseCostIncreaseMultiplier;
+    
+    [Range(0, 4)]
+    [SerializeField] private float researchCostIncreaseMultiplier;
 
+    [Range(0, 2)]
+    [SerializeField] private float sellBackMultiplier;
+
+    [Space(10)]
+    [Header("Scriptable Object Lists")]
     public ShopItemsListSO structuresPanelInfo;
 
     public ResearchItemsListSO researchPanelInfo;
 
+    [Space(10)]
+    [Header("Setup References")]
     [SerializeField] private WorldSpawner worldSpawner;
 
     [SerializeField] private ShopPanel structuresPanel;
 
-    [Range(0, 2)]
-    [SerializeField] private float sellBackMultiplier;
+    [SerializeField] private ResearchPanel researchPanel;
 
     private void Awake()
     {
@@ -48,6 +59,7 @@ public class TransactionManager : MonoBehaviour
     {
         Debug.Log(upgradeIndex);
         Player.Instance.addResearchCount(upgradeIndex);
+        researchPanel.LoadCards();
     }
 
     public void SellStructure(int index)
@@ -81,7 +93,7 @@ public class TransactionManager : MonoBehaviour
         float baseCost = researchPanelInfo.researchItemsSO[index].cost;
         for (int i = 0; i < countPurchased; i++)
         {
-            baseCost *= purchaseCostIncreaseMultiplier;
+            baseCost *= researchCostIncreaseMultiplier;
         }
         return baseCost;
     }

@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
 
     [Space(10)]
     [Header("Modifiable Data")]
+    [SerializeField] private bool RWFileData;
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
@@ -143,7 +144,7 @@ public class Player : MonoBehaviour
 
     private void LoadPlayerData()
     {
-        if (SaveSystem.LoadPlayer() != null)
+        if (SaveSystem.LoadPlayer() != null && RWFileData)
         {
             //load data from file to object
             PlayerData data = SaveSystem.LoadPlayer();
@@ -161,7 +162,10 @@ public class Player : MonoBehaviour
 
     private void SaveAndAddPassive()
     {
-        SaveSystem.SavePlayer(this);
+        if (RWFileData)
+        {
+            SaveSystem.SavePlayer(this);
+        }
         passive = passiveSum;
         passiveSum = 0;
         dollars += passive;
