@@ -22,7 +22,13 @@ public class Player : MonoBehaviour
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
     [SerializeField] private float maxEnergy;
+    [SerializeField] private float power = 1;
 
+    public void resetPower()
+    {
+        power = 2 * researchCount[0];
+    }
+    
 
     public float getDollars()
     {
@@ -138,7 +144,7 @@ public class Player : MonoBehaviour
 
     private void MineResource()
     {
-        dollars += 1;
+        dollars += 1 * power;
         currentEnergy += 1;
     }
 
@@ -156,7 +162,7 @@ public class Player : MonoBehaviour
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
             }
-
+            resetPower();
         }
     }
 

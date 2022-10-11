@@ -59,6 +59,20 @@ public class TransactionManager : MonoBehaviour
     {
         Debug.Log(upgradeIndex);
         Player.Instance.addResearchCount(upgradeIndex);
+
+        //hard coding the effects for each research item
+        switch (upgradeIndex)
+        {
+            case 0:
+                Player.Instance.resetPower();
+                break;
+            case 1:
+                sellBackMultiplier += .1f;
+                break;
+            default:
+                Debug.Log("No effect coded in for this research");
+                break;
+        }
         researchPanel.LoadCards();
     }
 
