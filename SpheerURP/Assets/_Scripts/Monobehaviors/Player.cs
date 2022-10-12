@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     private float dollarsGainedThisSecond;
     private float passiveSum;
     private float passive;
-    private float currentEnergy;
+    
 
 
     [Header("Setup References")]
@@ -21,7 +21,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
-    [SerializeField] private float maxEnergy;
+    [SerializeField] private float maxHealth;
+    [SerializeField] private float currentHealth;
     [SerializeField] private float power = 1;
 
     public void resetPower()
@@ -29,7 +30,6 @@ public class Player : MonoBehaviour
         power = 2 * researchCount[0];
     }
     
-
     public float getDollars()
     {
         return dollars;
@@ -75,24 +75,11 @@ public class Player : MonoBehaviour
         return buildingCount[index];
     }
 
-    public float getCurrentEnergy()
+    public float getCurrentHealth()
     {
-        return currentEnergy / maxEnergy;
+        return currentHealth / maxHealth;
     }
 
-    public void tickDownEnergy()
-    {
-        if (currentEnergy > 0)
-            currentEnergy--;
-    }
-
-    public void AddToEnergy(int amount)
-    {
-        if (currentEnergy + amount > maxEnergy)
-            currentEnergy = maxEnergy;
-        else
-            currentEnergy += amount;
-    }
 
     public void addToPassive(float amount)
     {
@@ -145,7 +132,6 @@ public class Player : MonoBehaviour
     private void MineResource()
     {
         dollars += 1 * power;
-        currentEnergy += 1;
     }
 
     private void LoadPlayerData()

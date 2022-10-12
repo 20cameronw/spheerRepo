@@ -12,7 +12,7 @@ public class TopBar : MonoBehaviour
     [SerializeField] private float dollarsUpdateTime;
 
     [SerializeField] private Image EnergyBar;
-    [SerializeField] private float energyResetTime;
+    [SerializeField] private float HealthResetTime;
 
     private float previousDollars;
     private float currentDollars;
@@ -20,7 +20,7 @@ public class TopBar : MonoBehaviour
     {
         InvokeRepeating("UpdateDollars", dollarsUpdateTime, dollarsUpdateTime);
         StartCoroutine(UpdatePassive());
-        InvokeRepeating("UpdateEnergyBar", energyResetTime, energyResetTime);
+        InvokeRepeating("UpdateHealthBar", HealthResetTime, HealthResetTime);
     }
 
     private void UpdateDollars()
@@ -39,8 +39,8 @@ public class TopBar : MonoBehaviour
         }
     }
 
-    private void UpdateEnergyBar()
+    private void UpdateHealthBar()
     {
-        EnergyBar.fillAmount = Player.Instance.getCurrentEnergy();
+        EnergyBar.fillAmount = Player.Instance.getCurrentHealth();
     }
 }
