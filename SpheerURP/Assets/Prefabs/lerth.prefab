@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4073805187169868534}
   - component: {fileID: 5377076081404281550}
   - component: {fileID: 3913551033766314357}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Icosphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7896091719774322668}
   - component: {fileID: 8060232296681678490}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: lerth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 5461157246036593773}
   - component: {fileID: 6306884244151676597}
   - component: {fileID: 3046848352857381919}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Icosphere.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
