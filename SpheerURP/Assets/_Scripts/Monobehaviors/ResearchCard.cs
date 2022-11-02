@@ -18,4 +18,5 @@ public class ResearchCard : MonoBehaviour
     {
         TransactionManager.Instance.PurchaseResearch(upgradeIndex);
     }
+
 }

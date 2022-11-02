@@ -92,7 +92,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3613301882861644003}
-  - component: {fileID: 3190900766492017962}
   m_Layer: 0
   m_Name: 'celltower '
   m_TagString: Untagged
@@ -119,19 +118,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3190900766492017962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4138480710187463257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e7194691ef96f1478ca4a25260ac1a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  costPerSecond: 1
 --- !u!1 &4675116836612781478
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +262,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 711aebcb12f425d479adb2469372741c, type: 2}
+  - {fileID: 2100000, guid: 33cb1d69c6bd0534687f44b8ff2400d3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

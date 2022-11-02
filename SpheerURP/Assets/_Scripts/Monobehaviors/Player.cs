@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     private float dollarsGainedThisSecond;
     private float passiveSum;
     private float passive;
-    private float currentEnergy;
+    
 
 
     [Header("Setup References")]
@@ -17,11 +17,19 @@ public class Player : MonoBehaviour
 
     [Space(10)]
     [Header("Modifiable Data")]
+    [SerializeField] private bool RWFileData;
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
-    [SerializeField] private float maxEnergy;
+    [SerializeField] private List<int> researchCount;
+    [SerializeField] private float maxHealth;
+    [SerializeField] private float currentHealth;
+    [SerializeField] private float power = 1;
 
-
+    public void resetPower()
+    {
+        power = 2 * researchCount[0];
+    }
+    
     public float getDollars()
     {
         return dollars;
@@ -67,28 +75,30 @@ public class Player : MonoBehaviour
         return buildingCount[index];
     }
 
-    public float getCurrentEnergy()
+    public float getCurrentHealth()
     {
-        return currentEnergy / maxEnergy;
+        return currentHealth / maxHealth;
     }
 
-    public void tickDownEnergy()
-    {
-        if (currentEnergy > 0)
-            currentEnergy--;
-    }
-
-    public void AddToEnergy(int amount)
-    {
-        if (currentEnergy + amount > maxEnergy)
-            currentEnergy = maxEnergy;
-        else
-            currentEnergy += amount;
-    }
 
     public void addToPassive(float amount)
     {
         passiveSum += amount;
+    }
+
+    public int getResearchCount(int index)
+    {
+        return researchCount[index];
+    }
+
+    public List<int> getResearchCount()
+    {
+        return researchCount;
+    }
+
+    public void addResearchCount(int index)
+    {
+        researchCount[index]++;
     }
 
 
@@ -109,7 +119,7 @@ public class Player : MonoBehaviour
 
         InvokeRepeating("SaveAndAddPassive", 1f, 1f);
     }
-    
+
     private void OnEnable() => EventManager.OnClicked += MineResource;
 
     private void OnDisable() => EventManager.OnClicked -= MineResource;
@@ -121,30 +131,33 @@ public class Player : MonoBehaviour
 
     private void MineResource()
     {
-        dollars += 1;
-        currentEnergy += 1;
+        dollars += 1 * power;
     }
 
     private void LoadPlayerData()
     {
-        if (SaveSystem.LoadPlayer() != null)
+        if (SaveSystem.LoadPlayer() != null && RWFileData)
         {
             //load data from file to object
             PlayerData data = SaveSystem.LoadPlayer();
             //reload data from object to player
             dollars = data.dollars;
             buildingCount = data.buildingCount;
+            researchCount = data.researchCount;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
             }
-
+            resetPower();
         }
     }
 
     private void SaveAndAddPassive()
     {
-        SaveSystem.SavePlayer(this);
+        if (RWFileData)
+        {
+            SaveSystem.SavePlayer(this);
+        }
         passive = passiveSum;
         passiveSum = 0;
         dollars += passive;

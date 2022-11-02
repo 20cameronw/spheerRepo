@@ -6,16 +6,29 @@ public class TransactionManager : MonoBehaviour
 {
     public static TransactionManager Instance;
 
+    [Header("Multipliers")]
+    [Range(0, 4)]
     [SerializeField] private float purchaseCostIncreaseMultiplier;
+    
+    [Range(0, 4)]
+    [SerializeField] private float researchCostIncreaseMultiplier;
 
+    [Range(0, 2)]
+    [SerializeField] private float sellBackMultiplier;
+
+    [Space(10)]
+    [Header("Scriptable Object Lists")]
     public ShopItemsListSO structuresPanelInfo;
 
+    public ResearchItemsListSO researchPanelInfo;
+
+    [Space(10)]
+    [Header("Setup References")]
     [SerializeField] private WorldSpawner worldSpawner;
 
     [SerializeField] private ShopPanel structuresPanel;
 
-    [Range(0, 2)]
-    [SerializeField] private float sellBackMultiplier;
+    [SerializeField] private ResearchPanel researchPanel;
 
     private void Awake()
     {
@@ -45,6 +58,22 @@ public class TransactionManager : MonoBehaviour
     public void PurchaseResearch(int upgradeIndex)
     {
         Debug.Log(upgradeIndex);
+        Player.Instance.addResearchCount(upgradeIndex);
+
+        //hard coding the effects for each research item
+        switch (upgradeIndex)
+        {
+            case 0:
+                Player.Instance.resetPower();
+                break;
+            case 1:
+                sellBackMultiplier += .1f;
+                break;
+            default:
+                Debug.Log("No effect coded in for this research");
+                break;
+        }
+        researchPanel.LoadCards();
     }
 
     public void SellStructure(int index)
@@ -68,6 +97,17 @@ public class TransactionManager : MonoBehaviour
         for (int i = 0; i < numberBuildings; i++)
         {
             baseCost *= purchaseCostIncreaseMultiplier;
+        }
+        return baseCost;
+    }
+
+    public float getCostOfResearchUpgrade(int index)
+    {
+        int countPurchased = Player.Instance.getResearchCount(index);
+        float baseCost = researchPanelInfo.researchItemsSO[index].cost;
+        for (int i = 0; i < countPurchased; i++)
+        {
+            baseCost *= researchCostIncreaseMultiplier;
         }
         return baseCost;
     }
