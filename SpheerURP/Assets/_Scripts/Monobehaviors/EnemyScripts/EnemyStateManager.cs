@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyStateManager : MonoBehaviour
 {
-    public EnemyState currentState;
+    [SerializeField] private EnemyState currentState;
     
     void Update()
     {
