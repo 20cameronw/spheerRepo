@@ -1,18 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 public class Drill : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private GameObject partToMove;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        LeanTween.moveSplineLocal(partToMove, new Vector3[]{new Vector3(0f, 0f, 0f),
+                                                            new Vector3(0f, -2f, 0f),
+                                                            new Vector3(0f, -1f, 0f), 
+                                                            new Vector3(0f, -2f, 0f),
+                                                            new Vector3(0f, 0f, 0f)}, 3f)
+                                                            .setEase(LeanTweenType.easeOutQuad)
+                                                            .setLoopPingPong();
     }
 }
