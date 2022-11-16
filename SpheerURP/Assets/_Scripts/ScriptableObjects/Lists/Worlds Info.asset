@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 558691aa1628e4593a54527a74dfd1a8, type: 3}
+  m_Name: Worlds Info
+  m_EditorClassIdentifier: 
+  worldsList:
+  - {fileID: 11400000, guid: dd98a953ccbfc4a2197509503329b8da, type: 2}
+  - {fileID: 11400000, guid: 02d7306c899ab4e61987d05f13f3b2b0, type: 2}
+  cardTemplate: {fileID: 4747960349853893355, guid: 60b00ae2d920c495bb41c0a9796c9b01,
+    type: 3}

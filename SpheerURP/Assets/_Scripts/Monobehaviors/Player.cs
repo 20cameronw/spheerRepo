@@ -9,7 +9,6 @@ public class Player : MonoBehaviour
     private float dollarsGainedThisSecond;
     private float passiveSum;
     private float passive;
-    
 
 
     [Header("Setup References")]
@@ -21,6 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
+    [SerializeField] private int currentWorld;
     [SerializeField] private float maxHealth;
     [SerializeField] private float currentHealth;
     [SerializeField] private float power = 1;
@@ -96,9 +96,27 @@ public class Player : MonoBehaviour
         return researchCount;
     }
 
+    public int getCurrentWorld()
+    {
+        return currentWorld;
+    }
+
+    public void setCurrentWorld(int index)
+    {
+        currentWorld = index;
+    }
+
     public void addResearchCount(int index)
     {
         researchCount[index]++;
+    }
+
+    public void resetBuildingCount()
+    {
+        for (int i = 0; i < buildingCount.Count; i++)
+        {
+            buildingCount[i] = 0;
+        }
     }
 
 
@@ -126,7 +144,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        worldSpawner.SetCurrentWorld(0);
+        worldSpawner.SetCurrentWorld(currentWorld);
     }
 
     private void MineResource()
@@ -134,7 +152,7 @@ public class Player : MonoBehaviour
         dollars += 1 * power;
     }
 
-    private void LoadPlayerData()
+    private void LoadPlayerData() //called in Awake
     {
         if (SaveSystem.LoadPlayer() != null && RWFileData)
         {
@@ -148,6 +166,7 @@ public class Player : MonoBehaviour
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
             }
+            currentWorld = data.currentWorld;
             resetPower();
         }
     }

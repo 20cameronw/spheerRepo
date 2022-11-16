@@ -11,12 +11,13 @@ public class PlayerData
 
     public List<int> researchCount;
 
-
+    public int currentWorld;
 
     public PlayerData(Player player)
     {
         dollars = Player.Instance.getDollars();
         buildingCount = Player.Instance.getBuildingCountList();
         researchCount = Player.Instance.getResearchCount();
+        currentWorld = Player.Instance.getCurrentWorld();
     }
 }

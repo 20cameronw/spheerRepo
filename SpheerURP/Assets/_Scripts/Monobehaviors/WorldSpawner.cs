@@ -34,6 +34,11 @@ public class WorldSpawner : MonoBehaviour
 
     private void Start()
     {
+        spawnOrbit();
+    }
+
+    void spawnOrbit()
+    {
         orbitGO = new GameObject("OrbitGO");
         orbitGO.transform.SetParent(transform);
         orbitGO.transform.position = transform.position;
@@ -72,6 +77,7 @@ public class WorldSpawner : MonoBehaviour
         if (!cr_running)
             StartCoroutine(ExpandWorld());
     }
+
     IEnumerator ExpandWorld()
     {
         cr_running = true;
@@ -170,6 +176,5 @@ public class WorldSpawner : MonoBehaviour
             }
         }
     }
-
-
 }
+

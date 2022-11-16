@@ -22,6 +22,8 @@ public class TransactionManager : MonoBehaviour
 
     public ResearchItemsListSO researchPanelInfo;
 
+    public WorldsListSO worldsPanelInfo;
+
     [Space(10)]
     [Header("Setup References")]
     [SerializeField] private WorldSpawner worldSpawner;
@@ -37,6 +39,16 @@ public class TransactionManager : MonoBehaviour
         else
             Instance = this;
 
+    }
+    
+    public void PurchaseWorld(int index)
+    {
+        if (Player.Instance.getDollars() >= worldsPanelInfo.worldsList[index].cost)
+        {
+            Player.Instance.AddDollars(-worldsPanelInfo.worldsList[index].cost);
+            worldSpawner.SetCurrentWorld(index);
+            Player.Instance.resetBuildingCount();
+        }
     }
 
     public void PurchaseSomething(int index)
