@@ -50,20 +50,20 @@ public class WorldSpawner : MonoBehaviour
     {
         if (CurrentWorldGO == null)
         {
-            CurrentWorldGO = WorldsList[WorldIndex];
+            CurrentWorldGO = (GameObject)WorldsList[WorldIndex];
             SpawnWorld();
         }
         else
         {
             DeleteCurrentWorld();
-            CurrentWorldGO = WorldsList[WorldIndex];
+            CurrentWorldGO = (GameObject)WorldsList[WorldIndex];
             SpawnWorld();
         }
     }
 
     private void DeleteCurrentWorld()
     {
-        Destroy(CurrentWorldGO);
+        Destroy(CurrentWorld);
     }
 
     public void SpawnWorld()

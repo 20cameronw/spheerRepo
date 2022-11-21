@@ -182,6 +182,9 @@ public class Player : MonoBehaviour
         dollars += passive;
     }
 
-
+    public void removeUpgrade(float bonus, int index)
+    {
+        researchCount[index]--;
+    }
 
 }

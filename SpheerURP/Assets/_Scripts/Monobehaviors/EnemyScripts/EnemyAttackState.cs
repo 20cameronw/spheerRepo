@@ -41,7 +41,7 @@ public class EnemyAttackState : EnemyState
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, raycastRange))
             {
                 Debug.Log("Did Hit");
-                break;
+                doneAttacking = true;
             }
             else
             {
