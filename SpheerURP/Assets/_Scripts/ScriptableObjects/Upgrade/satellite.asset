@@ -15,9 +15,10 @@ MonoBehaviour:
   name: Satellite
   description: A satellite allows the residents of this planet to have access to
     a global positioning system
-  upgradeIndex: 2
+  upgradeIndex: 6
   Icon: {fileID: 21300000, guid: ca011f1b7740e41459a9ed97f47762b6, type: 3}
-  cost: 1000
+  cost: 35000
   health: 0
-  bonus: 50
+  bonus: 150
   isInOrbit: 1
+  requiredXPLevel: 30

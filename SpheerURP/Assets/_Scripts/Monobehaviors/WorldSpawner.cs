@@ -7,7 +7,7 @@ public class WorldSpawner : MonoBehaviour
     [HideInInspector]
     public GameObject CurrentWorldGO;
 
-    [HideInInspector]
+
     public GameObject CurrentWorld;
 
     [Header("Setup Fields")]
@@ -123,7 +123,7 @@ public class WorldSpawner : MonoBehaviour
             AddsPassive passiveEarner = newObject.AddComponent<AddsPassive>();
             passiveEarner.setAmount(passive);
         }
-        
+
     }
 
     public void LoadObjects(int count, int index)
@@ -155,7 +155,7 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.Rotate(-90, 0, 0);
         spawnedObjects.Add(newObject);
         newObject.gameObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name;
-        
+
         if (passive > 0)
         {
             AddsPassive passiveEarner = newObject.AddComponent<AddsPassive>();
@@ -165,7 +165,7 @@ public class WorldSpawner : MonoBehaviour
 
     public void removeObject(int index)
     {
-        for (int i = 0; i < spawnedObjects.Count; i++) 
+        for (int i = 0; i < spawnedObjects.Count; i++)
         {
             if (spawnedObjects[i].gameObject.name == TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name)
             {

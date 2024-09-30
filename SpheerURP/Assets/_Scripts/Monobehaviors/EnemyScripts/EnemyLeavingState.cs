@@ -24,11 +24,23 @@ public class EnemyLeavingState : EnemyState
         return this;
     }
 
+    void Awake()
+    {
+        Transform[] objs = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
+        for (int i = 0; i < objs.Length; i++)
+        {
+            if (objs[i].gameObject.CompareTag("EnemyLeavePoint"))
+            {
+                leavePoint = objs[i].gameObject.transform;
+            }
+        }
+    }
+
     void Update()
     {
         if (leaving)
         {
-            var step =  speed * Time.deltaTime; 
+            var step = speed * Time.deltaTime;
             transform.parent.parent.position = Vector3.MoveTowards(transform.parent.parent.position, leavePoint.position, step);
         }
 
@@ -36,7 +48,7 @@ public class EnemyLeavingState : EnemyState
         {
             hasArrived = true;
         }
-        else 
+        else
         {
             hasArrived = false;
         }

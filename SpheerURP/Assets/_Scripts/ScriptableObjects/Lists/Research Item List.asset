@@ -15,5 +15,6 @@ MonoBehaviour:
   researchItemsSO:
   - {fileID: 11400000, guid: 786212508b48247dfbefd4a55e56f174, type: 2}
   - {fileID: 11400000, guid: 80fc56d67d31c4bee8c5a8ef5105b1e8, type: 2}
+  - {fileID: 11400000, guid: fa85a305b83d9c645bda1499bb834941, type: 2}
   cardTemplate: {fileID: 3977445391096142732, guid: da582b28369fe408aad7cc529114d8fa,
     type: 3}

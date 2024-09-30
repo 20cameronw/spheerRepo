@@ -24,12 +24,23 @@ public class EnemyApproachingState : EnemyState
         }
         return this;
     }
+    void Awake()
+    {
+        Transform[] objs = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
+        for (int i = 0; i < objs.Length; i++)
+        {
+            if (objs[i].gameObject.CompareTag("EnemyAttackPoint"))
+            {
+                attackPoint = objs[i].gameObject.transform;
+            }
+        }
+    }
 
     void Update()
     {
         if (approaching)
         {
-            var step =  speed * Time.deltaTime; 
+            var step = speed * Time.deltaTime;
             transform.parent.parent.position = Vector3.MoveTowards(transform.parent.parent.position, attackPoint.position, step);
         }
 

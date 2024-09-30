@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: gunner
   m_EditorClassIdentifier: 
   name: Gunner
-  description: Use this turret to defends whats rightfully yours against those pesky
-    alien fuckers
-  upgradeIndex: 3
+  description: Basic defense against aliens. 10 damage per shot.
+  upgradeIndex: 1
   Icon: {fileID: 21300000, guid: 82a2642c4064cdc488dd7263b3ac309d, type: 3}
-  cost: 5000
+  cost: 750
   health: 0
   bonus: 0
   isInOrbit: 0
+  requiredXPLevel: 4

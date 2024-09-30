@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: drill
   m_EditorClassIdentifier: 
   name: Drill
-  description: It drills the world for you just how I drilled your mom last night
-  upgradeIndex: 4
-  Icon: {fileID: 0}
-  cost: 100
+  description: Extracts valuable resources at a higher rate than the windmill.
+  upgradeIndex: 2
+  Icon: {fileID: 21300000, guid: d5764b6951fe26d418f0420149a430de, type: 3}
+  cost: 2000
   health: 0
-  bonus: 0
+  bonus: 20
   isInOrbit: 0
+  requiredXPLevel: 7

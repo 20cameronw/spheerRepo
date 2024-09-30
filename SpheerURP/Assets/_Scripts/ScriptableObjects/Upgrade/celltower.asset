@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Cell Tower
   description: Yes now we have cell phone service
-  upgradeIndex: 1
+  upgradeIndex: 3
   Icon: {fileID: 21300000, guid: e9de6db3ac97a544f9746b7b083ba723, type: 3}
-  cost: 250
+  cost: 10000
   health: 0
-  bonus: 20
+  bonus: 50
+  isInOrbit: 0
+  requiredXPLevel: 12
