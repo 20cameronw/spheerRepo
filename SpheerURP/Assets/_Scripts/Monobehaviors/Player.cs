@@ -20,12 +20,25 @@ public class Player : MonoBehaviour
     [SerializeField] private float dollars;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
+    [SerializeField] private List<int> popupShown;
+
+    [SerializeField] private popupMessagesListSO popupMessages;
     [SerializeField] private int currentWorld;
     [SerializeField] private float maxHealth;
     [SerializeField] private int currentXPLevel;
 
     [SerializeField] private int currentXP;
     [SerializeField] private float power = 1;
+
+    public void setCardShown(int index)
+    {
+        popupShown[index] = 1;
+    }
+
+    public bool shouldCardBeShown(int index)
+    {
+        return popupMessages.popupMessages[index].xpLevel <= currentXPLevel && popupShown[index] == 0;
+    }
 
     public void levelUpXP()
     {
@@ -165,6 +178,11 @@ public class Player : MonoBehaviour
         dollars += 1 * power;
     }
 
+    public List<int> getPopupShown()
+    {
+        return popupShown;
+    }
+
     private void LoadPlayerData() //called in Awake
     {
         if (SaveSystem.LoadPlayer() != null && RWFileData)
@@ -175,6 +193,7 @@ public class Player : MonoBehaviour
             dollars = data.dollars;
             buildingCount = data.buildingCount;
             researchCount = data.researchCount;
+            popupShown = data.popupShown;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);

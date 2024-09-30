@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+
 public class UIManager : MonoBehaviour
 {
     [Header("Panels")]
@@ -16,10 +18,35 @@ public class UIManager : MonoBehaviour
     private Color baseButtonColor;
     private bool settingsOpen;
 
+    [Space(10)]
+    [Header("Pop up manager")]
+    [SerializeField] private GameObject popupPrefab;
+    [SerializeField] private Transform popupParent;
+    [SerializeField] private popupMessagesListSO popupMessages;
 
+    
     void Start()
     {
         baseButtonColor = shopButton.GetComponent<Image>().color;
+        StartCoroutine(CheckPopUpMessages());
+    }
+
+    public IEnumerator CheckPopUpMessages()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5);
+
+            for (int i = 0; i < popupMessages.popupMessages.Count; i++)
+            {
+                if (Player.Instance.shouldCardBeShown(i))
+                {
+                    GameObject popup = Instantiate(popupPrefab, popupParent);
+                    popup.GetComponentInChildren<PopupMessage>().messageText.text = popupMessages.popupMessages[i].message;
+                    Player.Instance.setCardShown(i);
+                }   
+            }
+        }
     }
 
     private void OpenShop()
@@ -100,5 +127,5 @@ public class UIManager : MonoBehaviour
             LeanTween.rotateLocal(shopButton, new Vector3(0, 0, 45), .6f).setEase(LeanTweenType.easeOutBack);
         }
     }
-
+    
 }
