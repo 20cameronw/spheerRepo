@@ -9,7 +9,7 @@ public class TransactionManager : MonoBehaviour
     [Header("Multipliers")]
     [Range(0, 4)]
     [SerializeField] private float purchaseCostIncreaseMultiplier;
-    
+
     [Range(0, 4)]
     [SerializeField] private float researchCostIncreaseMultiplier;
 
@@ -32,6 +32,8 @@ public class TransactionManager : MonoBehaviour
 
     [SerializeField] private ResearchPanel researchPanel;
 
+    private AudioManager audioManager;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -39,8 +41,10 @@ public class TransactionManager : MonoBehaviour
         else
             Instance = this;
 
+        audioManager = FindObjectOfType<AudioManager>();
+
     }
-    
+
     public void PurchaseWorld(int index)
     {
         if (Player.Instance.getDollars() >= worldsPanelInfo.worldsList[index].cost)
@@ -51,25 +55,27 @@ public class TransactionManager : MonoBehaviour
         }
     }
 
-    public void PurchaseSomething(int index)
+    public bool PurchaseSomething(int index)
     {
         float passiveEarnings = structuresPanelInfo.shopItemsSO[index].bonus;
         float cost = getCostOfUpgradeStructure(index);
-        if (cost > Player.Instance.getDollars()) return;
+        if (cost > Player.Instance.getDollars()) return false;
+        audioManager.Play("Place Building");
         Player.Instance.AddDollars(-cost);
         Player.Instance.AddBuildingCount(index);
-        
+
         if (structuresPanelInfo.shopItemsSO[index].isInOrbit)
             worldSpawner.spawnInOrbit(index, passiveEarnings);
         else
             worldSpawner.spawnObject(index, passiveEarnings);
 
         structuresPanel.LoadCards();
+
+        return true;
     }
 
     public void PurchaseResearch(int upgradeIndex)
     {
-        Debug.Log(upgradeIndex);
         Player.Instance.addResearchCount(upgradeIndex);
 
         //hard coding the effects for each research item
@@ -93,7 +99,7 @@ public class TransactionManager : MonoBehaviour
         int numberBuildings = Player.Instance.getNumberBuildings(index);
         if (numberBuildings == 0)
             return;
-        
+
         Player.Instance.minusBuildingCount(index);
         worldSpawner.removeObject(index);
         Player.Instance.AddDollars(getCostOfUpgradeStructure(index) * sellBackMultiplier);

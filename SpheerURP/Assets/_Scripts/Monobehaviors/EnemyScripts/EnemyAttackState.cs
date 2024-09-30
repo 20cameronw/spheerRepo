@@ -40,12 +40,19 @@ public class EnemyAttackState : EnemyState
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * raycastRange, Color.yellow);
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, raycastRange))
             {
-                Debug.Log("Did Hit");
-                break;
+                Debug.Log("Alien got a hit!");
+
+                GameObject prey = hit.transform.gameObject;
+                if (prey)
+                {
+                    GetSuckedUp getSuckedUp = prey.GetComponent<GetSuckedUp>();
+                    if (getSuckedUp) getSuckedUp.getSuckedUp(hit.transform);
+                }
+                doneAttacking = true;
             }
             else
             {
-                Debug.Log("Did Not Hit");
+                Debug.Log("alien Did Not Hit");
             }
 
             timesCasted += 1;

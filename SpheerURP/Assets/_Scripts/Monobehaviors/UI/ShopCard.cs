@@ -18,14 +18,17 @@ public class ShopCard : MonoBehaviour
 
     public TMP_Text count;
 
+    public GameObject lockMask;
+
+    public TMP_Text requiredXPText;
+
     public void purchase()
     {
-        TransactionManager.Instance.PurchaseSomething(upgradeIndex);
+        bool success = TransactionManager.Instance.PurchaseSomething(upgradeIndex);
     }
 
     public void sellItem()
     {
         TransactionManager.Instance.SellStructure(upgradeIndex);
     }
-    
 }

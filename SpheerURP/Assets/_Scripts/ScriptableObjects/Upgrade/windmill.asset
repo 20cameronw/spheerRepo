@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: windmill
   m_EditorClassIdentifier: 
   name: Windmill
-  description: This is just a test description. What happens if its too long>>?>>???????????????????????
+  description: Generates a basic amount of resources or currency passively.
   upgradeIndex: 0
-  Icon: {fileID: 21300000, guid: e519571e25ada9541baeb666c0ee9dc8, type: 3}
-  cost: 5
+  Icon: {fileID: 21300000, guid: f3ea32fe578cee645b9d803e9c1d5c7e, type: 3}
+  cost: 100
   health: 0
-  bonus: 10
+  bonus: 5
   isInOrbit: 0
+  requiredXPLevel: 0

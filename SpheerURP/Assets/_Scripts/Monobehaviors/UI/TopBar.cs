@@ -20,12 +20,20 @@ public class TopBar : MonoBehaviour
     {
         InvokeRepeating("UpdateDollars", dollarsUpdateTime, dollarsUpdateTime);
         StartCoroutine(UpdatePassive());
-        InvokeRepeating("UpdateHealthBar", HealthResetTime, HealthResetTime);
     }
 
     private void UpdateDollars()
     {
-        DollarsText.text = Player.Instance.getDollars().ToString();
+        float dollars = Player.Instance.getDollars();
+        if (dollars > 99999)
+        {
+            DollarsText.text = dollars.ToString("0.##E0");
+        }
+        else
+        {
+            DollarsText.text = Mathf.Round(dollars).ToString("N0");
+        }
+
     }
 
     private IEnumerator UpdatePassive()
@@ -35,12 +43,17 @@ public class TopBar : MonoBehaviour
             previousDollars = Player.Instance.getDollars();
             yield return new WaitForSeconds(1f);
             currentDollars = Player.Instance.getDollars();
-            PassiveText.text = (currentDollars - previousDollars).ToString() + "/s";
-        }
-    }
+            float passive = (currentDollars - previousDollars);
+            if (passive < 0) continue;
+            if (passive > 99999)
+            {
+                PassiveText.text = passive.ToString("0.##E0") + "/s";
+            }
+            else
+            {
+                PassiveText.text = passive.ToString("N0") + "/s";
+            }
 
-    private void UpdateHealthBar()
-    {
-        EnergyBar.fillAmount = Player.Instance.getCurrentHealth();
+        }
     }
 }

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ddc12b120625f4cbca45597c5a983a, type: 3}
   m_Name: Chotis
   m_EditorClassIdentifier: 
-  name: Chotis
-  description: The starting world, Chotis. 6/10
+  name: Lerth
+  description: The starting world, Lerth. 6/10
   cost: 0
   bonus: 0
   Icon: {fileID: 21300000, guid: f797d016d61a03241a4ef1ac582c87bb, type: 3}

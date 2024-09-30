@@ -9,6 +9,11 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Transform attackPoint;
     [SerializeField] private Transform spawnPoint;
 
+    [SerializeField] private List<GameObject> enemyPrefabs;
+
+    private GameObject enemy;
+
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -19,7 +24,26 @@ public class EnemySpawner : MonoBehaviour
         {
             Instance = this;
         }
+
+        InvokeRepeating("spawnEnemyIfNotExists", 5f, 5f);
     }
 
-    
+    private void spawnEnemy()
+    {
+        enemy = Instantiate(enemyPrefabs[0], spawnPoint);
+        enemy.transform.SetParent(this.transform, true);
+    }
+
+
+    private void spawnEnemyIfNotExists()
+    {
+        if (enemy == null && Player.Instance.getCurrentXPLevel() > 3)
+        {
+            spawnEnemy();
+        }
+    }
+
+
+
+
 }

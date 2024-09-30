@@ -16,6 +16,8 @@ public class Upgrade : ScriptableObject
 
     public bool isInOrbit;
 
+    public int requiredXPLevel;
+
     public void Print()
     {
         Debug.Log(name + ": " + description + "\nCosts: " + cost);

@@ -15,9 +15,10 @@ MonoBehaviour:
   name: Missile Silo
   description: You must have this upgrade in order to nuke the world and move on
     to the next planet
-  upgradeIndex: 5
-  Icon: {fileID: 0}
-  cost: 100
+  upgradeIndex: 7
+  Icon: {fileID: 21300000, guid: d8eb9386d0b694c43b5c331fbc353b16, type: 3}
+  cost: 50000
   health: 0
   bonus: 0
   isInOrbit: 0
+  requiredXPLevel: 50

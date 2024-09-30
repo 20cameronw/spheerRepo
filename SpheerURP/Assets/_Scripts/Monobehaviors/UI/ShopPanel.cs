@@ -7,7 +7,7 @@ public class ShopPanel : MonoBehaviour
     [SerializeField] private ShopItemsListSO shopPanelInfo;
     private List<GameObject> shopCards;
     [SerializeField] private Transform contents;
-    void Start()
+    void Awake()
     {
         shopCards = new List<GameObject>();
         for (int i = 0; i < shopPanelInfo.shopItemsSO.Length; i++)
@@ -30,8 +30,30 @@ public class ShopPanel : MonoBehaviour
             currentShopCard.icon.sprite = shopPanelInfo.shopItemsSO[i].Icon;
             int index = shopPanelInfo.shopItemsSO[i].upgradeIndex;
             currentShopCard.upgradeIndex = index;
-            currentShopCard.cost.text = "Cost: " + TransactionManager.Instance.getCostOfUpgradeStructure(index);
+
+            float cost = TransactionManager.Instance.getCostOfUpgradeStructure(index);
+            if (cost > 99999)
+            {
+                currentShopCard.cost.text = "Cost: " + cost.ToString("0.##E0");
+            }
+            else
+            {
+                currentShopCard.cost.text = "Cost: " + cost.ToString("N0");
+            }
             currentShopCard.count.text = "x" + Player.Instance.getNumberBuildings(i);
+
+
+            int requiredLevel = shopPanelInfo.shopItemsSO[i].requiredXPLevel;
+
+            if (requiredLevel <= Player.Instance.getCurrentXPLevel())
+            {
+                currentShopCard.lockMask.active = false;
+            }
+            else
+            {
+                currentShopCard.requiredXPText.text = "Required XP Level: " + requiredLevel;
+                currentShopCard.lockMask.active = true;
+            }
         }
     }
 }

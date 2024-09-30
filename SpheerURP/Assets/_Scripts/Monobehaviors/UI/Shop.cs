@@ -22,6 +22,7 @@ public class Shop : MonoBehaviour
         {
             case "Structures":
                 StructuresPanel.SetActive(true);
+                StructuresPanel.GetComponent<ShopPanel>().LoadCards();
                 break;
             case "Research":
                 ResearchPanel.SetActive(true);

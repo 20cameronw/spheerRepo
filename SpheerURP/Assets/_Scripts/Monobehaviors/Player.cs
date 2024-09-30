@@ -22,14 +22,38 @@ public class Player : MonoBehaviour
     [SerializeField] private List<int> researchCount;
     [SerializeField] private int currentWorld;
     [SerializeField] private float maxHealth;
-    [SerializeField] private float currentHealth;
+    [SerializeField] private int currentXPLevel;
+
+    [SerializeField] private int currentXP;
     [SerializeField] private float power = 1;
+
+    public void levelUpXP()
+    {
+        currentXP = 0;
+        currentXPLevel++;
+        FindObjectOfType<ShopPanel>()?.LoadCards();
+    }
+
+    public void addXpPoints(int amount)
+    {
+        currentXP += amount;
+    }
+
+    public int getCurrentXP()
+    {
+        return currentXP;
+    }
+
+    public int getCurrentXPLevel()
+    {
+        return currentXPLevel;
+    }
 
     public void resetPower()
     {
         power = 2 * researchCount[0];
     }
-    
+
     public float getDollars()
     {
         return dollars;
@@ -74,12 +98,6 @@ public class Player : MonoBehaviour
     {
         return buildingCount[index];
     }
-
-    public float getCurrentHealth()
-    {
-        return currentHealth / maxHealth;
-    }
-
 
     public void addToPassive(float amount)
     {
@@ -142,11 +160,6 @@ public class Player : MonoBehaviour
 
     private void OnDisable() => EventManager.OnClicked -= MineResource;
 
-    private void Start()
-    {
-        worldSpawner.SetCurrentWorld(currentWorld);
-    }
-
     private void MineResource()
     {
         dollars += 1 * power;
@@ -167,7 +180,9 @@ public class Player : MonoBehaviour
                 worldSpawner.LoadObjects(buildingCount[i], i);
             }
             currentWorld = data.currentWorld;
-            resetPower();
+            worldSpawner.SetCurrentWorld(currentWorld);
+            currentXP = data.currentXP;
+            currentXPLevel = data.currentXPLevel;
         }
     }
 
@@ -182,6 +197,9 @@ public class Player : MonoBehaviour
         dollars += passive;
     }
 
-
+    public void removeUpgrade(float bonus, int index)
+    {
+        researchCount[index]--;
+    }
 
 }
