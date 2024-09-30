@@ -11,10 +11,14 @@ public class PlayerData
 
     public List<int> researchCount;
 
+    public List<int> popupShown;
+
     public int currentWorld;
 
     public int currentXPLevel;
     public int currentXP;
+
+
 
     public PlayerData(Player player)
     {
@@ -24,5 +28,6 @@ public class PlayerData
         currentWorld = Player.Instance.getCurrentWorld();
         currentXPLevel = Player.Instance.getCurrentXPLevel();
         currentXP = Player.Instance.getCurrentXP();
+        popupShown = Player.Instance.getPopupShown();
     }
 }

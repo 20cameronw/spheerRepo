@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static LeanTween;
+using TMPro;
 
 public class PopupMessage : MonoBehaviour
 {
     public GameObject messageBox;
     public Button closeButton;
+
+    public TMP_Text messageText;
 
     private void Start()
     {
@@ -31,6 +34,6 @@ public class PopupMessage : MonoBehaviour
 
     private void DestroyMessageBox()
     {
-        Destroy(this);
+        Destroy(this.gameObject);
     }
 }

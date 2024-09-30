@@ -27,9 +27,10 @@ public class EnemyHealth : MonoBehaviour
         healthBar.value = currentHealth;
     }
 
-    void Awake()
+    void Start()
     {
-        for (int i = 0; i < Player.Instance.getCurrentXPLevel(); i++)
+        int level = Player.Instance.getCurrentXPLevel();
+        for (int i = 0; i < level; i++)
         {
             maxHealthPoints *= healthScalarPerXPLevel;
         }
