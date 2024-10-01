@@ -12,5 +12,7 @@ public class World : ScriptableObject
     public Sprite Icon;
     public int index;
 
+    public int cores;
+
     public Vector3 rotation;
 }

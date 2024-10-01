@@ -9,6 +9,8 @@ public class TopBar : MonoBehaviour
     [SerializeField] private TMP_Text DollarsText;
     [SerializeField] private TMP_Text PassiveText;
 
+    [SerializeField] private TMP_Text coresText;
+
     [SerializeField] private float dollarsUpdateTime;
 
     [SerializeField] private Image EnergyBar;
@@ -40,6 +42,7 @@ public class TopBar : MonoBehaviour
     {
         while (true)
         {
+            UpdateCores();
             previousDollars = Player.Instance.getDollars();
             yield return new WaitForSeconds(1f);
             currentDollars = Player.Instance.getDollars();
@@ -55,5 +58,10 @@ public class TopBar : MonoBehaviour
             }
 
         }
+    }
+
+    public void UpdateCores()
+    {
+        coresText.text = Player.Instance.getCores().ToString();
     }
 }

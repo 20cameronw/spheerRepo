@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
-  m_Name: New Research Item 2
+  m_Script: {fileID: 11500000, guid: 78ddc12b120625f4cbca45597c5a983a, type: 3}
+  m_Name: Choty
   m_EditorClassIdentifier: 
-  name: XP Gained
-  bonus: +10% XP Gained from all sources
-  upgradeIndex: 2
-  Icon: {fileID: 21300000, guid: bdfcd00e719df654886a535178587f29, type: 3}
-  cost: 1
+  name: 
+  description: 
+  cost: 0
+  bonus: 0
+  Icon: {fileID: 0}
+  index: 0
+  cores: 0
+  rotation: {x: 0, y: 0, z: 0}

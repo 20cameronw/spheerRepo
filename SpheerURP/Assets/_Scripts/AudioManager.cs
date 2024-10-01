@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class AudioManager : MonoBehaviour
 {
 
     public Sound[] sounds;
+
+    [SerializeField] private Slider musicSlider;
+    [SerializeField] private Slider sfxSlider;
 
     void Awake()
     {
@@ -32,4 +36,39 @@ public class AudioManager : MonoBehaviour
     {
         Play("BackgroundMusic1");
     }
+
+    //function to adjust volume through slider
+    public void SetMusicVolume(float volume)
+    {
+        foreach (Sound s in sounds)
+        {
+            if (s.name == "BackgroundMusic1")
+            {
+                s.source.volume = volume;
+            }
+        }
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        foreach (Sound s in sounds)
+        {
+            if (s.name != "BackgroundMusic1")
+            {
+                s.source.volume = volume;
+            }
+        }
+    }
+
+    //function to link slider 
+    public void SetMusicVolume()
+    {
+        SetMusicVolume(musicSlider.value);
+    }
+
+    public void SetSFXVolume()
+    {
+        SetSFXVolume(sfxSlider.value);
+    }
+
 }

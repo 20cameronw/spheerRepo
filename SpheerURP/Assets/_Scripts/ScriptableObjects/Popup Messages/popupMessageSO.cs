@@ -7,4 +7,7 @@ public class popupMessageSO : ScriptableObject
 {
     public string message;
     public int xpLevel;
+
+    public bool hasOptions;
+    public string optionName;
 }

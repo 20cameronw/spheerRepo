@@ -12,6 +12,10 @@ public class PopupMessage : MonoBehaviour
 
     public TMP_Text messageText;
 
+    public bool hasOptions;
+
+    public GameObject optionsBox;
+
     private void Start()
     {
         // Set the initial scale of the message box to zero
@@ -23,6 +27,16 @@ public class PopupMessage : MonoBehaviour
         // Add a listener to the close button
         closeButton.onClick.AddListener(TweenOutMessageBox);
 
+        // If the message has options, show the options box
+        if (hasOptions)
+        {
+            optionsBox.SetActive(true);
+        }
+        else
+        {
+            optionsBox.SetActive(false);
+        }
+        
         // Tween in the message box
         LeanTween.scale(messageBox, Vector3.one, 0.5f).setEase(LeanTweenType.easeOutBack);
     }

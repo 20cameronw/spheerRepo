@@ -18,6 +18,8 @@ public class PlayerData
     public int currentXPLevel;
     public int currentXP;
 
+    public int cores;
+
 
 
     public PlayerData(Player player)
@@ -29,5 +31,6 @@ public class PlayerData
         currentXPLevel = Player.Instance.getCurrentXPLevel();
         currentXP = Player.Instance.getCurrentXP();
         popupShown = Player.Instance.getPopupShown();
+        cores = Player.Instance.getCores();
     }
 }

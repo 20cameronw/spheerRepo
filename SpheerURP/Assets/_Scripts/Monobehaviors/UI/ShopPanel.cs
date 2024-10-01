@@ -7,7 +7,7 @@ public class ShopPanel : MonoBehaviour
     [SerializeField] private ShopItemsListSO shopPanelInfo;
     private List<GameObject> shopCards;
     [SerializeField] private Transform contents;
-    void Awake()
+    void Start()
     {
         shopCards = new List<GameObject>();
         for (int i = 0; i < shopPanelInfo.shopItemsSO.Length; i++)
