@@ -43,6 +43,8 @@ public class UIManager : MonoBehaviour
                 {
                     GameObject popup = Instantiate(popupPrefab, popupParent);
                     popup.GetComponentInChildren<PopupMessage>().messageText.text = popupMessages.popupMessages[i].message;
+                    popup.GetComponentInChildren<PopupMessage>().hasOptions = popupMessages.popupMessages[i].hasOptions;
+                    
                     Player.Instance.setCardShown(i);
                 }   
             }
@@ -55,17 +57,23 @@ public class UIManager : MonoBehaviour
         {
             CloseSettings();
         }
-        Shop.SetActive(true);
+        lerpShop(false);
         lerpButtonColor();
         shopOpen = true;
     }
 
     private void CloseShop()
     {
-        Shop.SetActive(false);
+        lerpShop(true);
         lerpButtonColor();
         shopOpen = false;
     }
+
+    private void lerpShop(bool close)
+    {
+        LeanTween.moveLocalX(Shop, close ? -400 : 0, .6f).setEase(LeanTweenType.easeOutBack);
+    }
+
 
     private void OpenSettings()
     {

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: New Research Item 1
   m_EditorClassIdentifier: 
-  name: Sell Back Rate
-  bonus: '10% increase '
+  name: Double Down
+  bonus: Double your current cash balance
   upgradeIndex: 1
   Icon: {fileID: 21300000, guid: 2e43f0691f0d7404eae8d01381da65a0, type: 3}
-  cost: 5000
+  cost: 1

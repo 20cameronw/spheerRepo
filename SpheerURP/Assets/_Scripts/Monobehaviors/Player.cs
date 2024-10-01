@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     [Header("Modifiable Data")]
     [SerializeField] private bool RWFileData;
     [SerializeField] private float dollars;
+
+    [SerializeField] private int cores;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
     [SerializeField] private List<int> popupShown;
@@ -29,6 +31,8 @@ public class Player : MonoBehaviour
 
     [SerializeField] private int currentXP;
     [SerializeField] private float power = 1;
+
+    [SerializeField] private float xpModifier = 1;
 
     public void setCardShown(int index)
     {
@@ -49,7 +53,7 @@ public class Player : MonoBehaviour
 
     public void addXpPoints(int amount)
     {
-        currentXP += amount;
+        currentXP += (int)(amount * xpModifier);
     }
 
     public int getCurrentXP()
@@ -60,11 +64,6 @@ public class Player : MonoBehaviour
     public int getCurrentXPLevel()
     {
         return currentXPLevel;
-    }
-
-    public void resetPower()
-    {
-        power = 2 * researchCount[0];
     }
 
     public float getDollars()
@@ -137,9 +136,36 @@ public class Player : MonoBehaviour
         currentWorld = index;
     }
 
-    public void addResearchCount(int index)
+    public int getCores()
     {
-        researchCount[index]++;
+        return cores;
+    }
+
+    public void addResearchCount(int index, bool init)
+    {
+        //if we are loading from file we don't want to increment the research count
+        if (!init) researchCount[index]++;
+        //but we still want to apply the effects of the research on startup 
+        
+        //hard coding the effects for each research item
+        switch (index)
+        {
+            case 0:
+                int ower = 1;
+                for (int i = 0; i < researchCount[index]; i++)
+                    ower *= 2;
+                power = ower;
+                break;
+            case 1:
+                AddDollars(getDollars());
+                break;
+            case 2:
+                xpModifier = xpModifier + 0.1f;
+                break;
+            default:
+                Debug.Log("No effect coded in for this research");
+                break;
+        }
     }
 
     public void resetBuildingCount()
@@ -148,6 +174,11 @@ public class Player : MonoBehaviour
         {
             buildingCount[i] = 0;
         }
+    }
+
+    public void addCores(int amount)
+    {
+        cores += amount;
     }
 
 
@@ -191,12 +222,17 @@ public class Player : MonoBehaviour
             PlayerData data = SaveSystem.LoadPlayer();
             //reload data from object to player
             dollars = data.dollars;
+            cores = data.cores;
             buildingCount = data.buildingCount;
             researchCount = data.researchCount;
             popupShown = data.popupShown;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
+            }
+            for (int i = 0; i < researchCount.Count; i++)
+            {
+                addResearchCount(i, true);
             }
             currentWorld = data.currentWorld;
             worldSpawner.SetCurrentWorld(currentWorld);

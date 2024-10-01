@@ -16,4 +16,4 @@ MonoBehaviour:
   bonus: x2 click power
   upgradeIndex: 0
   Icon: {fileID: 21300000, guid: bdfcd00e719df654886a535178587f29, type: 3}
-  cost: 1000
+  cost: 1

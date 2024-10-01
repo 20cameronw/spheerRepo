@@ -47,11 +47,13 @@ public class TransactionManager : MonoBehaviour
 
     public void PurchaseWorld(int index)
     {
-        if (Player.Instance.getDollars() >= worldsPanelInfo.worldsList[index].cost)
+        if (Player.Instance.getDollars() >= worldsPanelInfo.worldsList[index].cost && index > Player.Instance.getCurrentWorld())
         {
             Player.Instance.AddDollars(-worldsPanelInfo.worldsList[index].cost);
             worldSpawner.SetCurrentWorld(index);
+            Player.Instance.setCurrentWorld(index);
             Player.Instance.resetBuildingCount();
+            Player.Instance.addCores(worldsPanelInfo.worldsList[Player.Instance.getCurrentWorld()].cores);
         }
     }
 
@@ -76,21 +78,15 @@ public class TransactionManager : MonoBehaviour
 
     public void PurchaseResearch(int upgradeIndex)
     {
-        Player.Instance.addResearchCount(upgradeIndex);
-
-        //hard coding the effects for each research item
-        switch (upgradeIndex)
+        int cost = getCostOfResearchUpgrade(upgradeIndex);
+        if (Player.Instance.getCores() < cost)
         {
-            case 0:
-                Player.Instance.resetPower();
-                break;
-            case 1:
-                sellBackMultiplier += .1f;
-                break;
-            default:
-                Debug.Log("No effect coded in for this research");
-                break;
+            Debug.Log("Not enough cores to purchase research");
+            return;
         }
+        Player.Instance.addResearchCount(upgradeIndex, false);
+        Player.Instance.addCores(-cost);
+
         researchPanel.LoadCards();
     }
 
@@ -119,13 +115,13 @@ public class TransactionManager : MonoBehaviour
         return baseCost;
     }
 
-    public float getCostOfResearchUpgrade(int index)
+    public int getCostOfResearchUpgrade(int index)
     {
         int countPurchased = Player.Instance.getResearchCount(index);
-        float baseCost = researchPanelInfo.researchItemsSO[index].cost;
+        int baseCost = researchPanelInfo.researchItemsSO[index].cost;
         for (int i = 0; i < countPurchased; i++)
         {
-            baseCost *= researchCostIncreaseMultiplier;
+            baseCost = (int)(baseCost * researchCostIncreaseMultiplier);
         }
         return baseCost;
     }
