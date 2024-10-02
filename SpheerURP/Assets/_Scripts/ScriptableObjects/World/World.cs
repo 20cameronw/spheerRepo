@@ -8,11 +8,9 @@ public class World : ScriptableObject
     public new string name;
     public string description;
     public float cost;
-    public float bonus;
     public Sprite Icon;
     public int index;
 
     public int cores;
 
-    public Vector3 rotation;
 }

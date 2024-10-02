@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   message: Welcome to the game! I'm still working on it
   xpLevel: 0
-  hasBeenShown: 0
+  hasOptions: 1
+  optionName: 
