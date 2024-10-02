@@ -226,6 +226,8 @@ public class Player : MonoBehaviour
             buildingCount = data.buildingCount;
             researchCount = data.researchCount;
             popupShown = data.popupShown;
+            currentWorld = data.currentWorld;
+            worldSpawner.SetCurrentWorld(currentWorld);
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
@@ -234,8 +236,7 @@ public class Player : MonoBehaviour
             {
                 addResearchCount(i, true);
             }
-            currentWorld = data.currentWorld;
-            worldSpawner.SetCurrentWorld(currentWorld);
+
             currentXP = data.currentXP;
             currentXPLevel = data.currentXPLevel;
         }

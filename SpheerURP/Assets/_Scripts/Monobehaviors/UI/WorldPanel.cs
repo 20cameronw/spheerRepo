@@ -28,7 +28,9 @@ public class WorldPanel : MonoBehaviour
             currentCard.TitleText.text = worldInfo.name;
             currentCard.Icon.sprite = worldInfo.Icon;
             currentCard.cost.text = "Cost: " + worldInfo.cost;
-            currentCard.worldIndex = i;
+            currentCard.cores.text = "Cores: " + worldInfo.cores;
+            currentCard.worldIndex = worldInfo.index;
+            currentCard.isUnlocked(Player.Instance.getCurrentWorld() < i);
         }
     }
 }

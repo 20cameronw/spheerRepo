@@ -25,9 +25,6 @@ public class WorldSpawner : MonoBehaviour
     private GameObject orbitGO;
 
     private List<GameObject> spawnedObjects = new List<GameObject>();
-
-    private int clickQ;
-    private bool cr_running;
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
 
     private void OnDisable() => EventManager.OnClicked -= ExpandAndShrink;
@@ -71,31 +68,36 @@ public class WorldSpawner : MonoBehaviour
         CurrentWorld = Instantiate(CurrentWorldGO, transform);
     }
 
-    private void ExpandAndShrink()
+    public void ExpandAndShrink()
     {
-        clickQ++;
-        if (!cr_running)
-            StartCoroutine(ExpandWorld());
+        StartCoroutine(ExpandAndShrinkCoroutine(.04f));
     }
 
-    IEnumerator ExpandWorld()
+    private IEnumerator ExpandAndShrinkCoroutine(float duration)
     {
-        cr_running = true;
-        while (clickQ > 0)
+        Vector3 originalScale = new Vector3(1f, 1f, 1f);
+        Vector3 expandedScale = originalScale * 1.1f;
+
+        float halfDuration = duration / 2f;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < halfDuration)
         {
-            transform.localScale = new Vector3(1.05f, 1.05f, 1.05f);
-
-            yield return new WaitForSeconds(.05f);
-
-            ResetScale();
+            transform.localScale = Vector3.Lerp(originalScale, expandedScale, elapsedTime / halfDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
         }
-        cr_running = false;
-    }
 
-    private void ResetScale()
-    {
-        transform.localScale = new Vector3(1f, 1f, 1f);
-        clickQ--;
+        elapsedTime = 0f;
+
+        while (elapsedTime < halfDuration)
+        {
+            transform.localScale = Vector3.Lerp(expandedScale, originalScale, elapsedTime / halfDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localScale = originalScale;
     }
 
     public void spawnObject(int index, float passive)
