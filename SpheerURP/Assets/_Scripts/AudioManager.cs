@@ -13,8 +13,16 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
 
+    public static AudioManager Instance;
+
     void Awake()
     {
+        if (Instance != null && Instance != this)
+            Destroy(this);
+        else {
+            Instance = this;
+        }
+
         foreach (Sound s in sounds)
         {
             s.source = gameObject.AddComponent<AudioSource>();

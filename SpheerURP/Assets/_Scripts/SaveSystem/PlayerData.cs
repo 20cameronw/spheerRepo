@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [System.Serializable]
 public class PlayerData
@@ -10,15 +11,18 @@ public class PlayerData
     public List<int> buildingCount;
 
     public List<int> researchCount;
-
-    public List<int> popupShown;
-
     public int currentWorld;
 
     public int currentXPLevel;
     public int currentXP;
 
     public int cores;
+
+    public int currentWave;
+
+    public int darkMatter;
+
+    public DateTime saveTime;
 
 
 
@@ -30,7 +34,9 @@ public class PlayerData
         currentWorld = Player.Instance.getCurrentWorld();
         currentXPLevel = Player.Instance.getCurrentXPLevel();
         currentXP = Player.Instance.getCurrentXP();
-        popupShown = Player.Instance.getPopupShown();
         cores = Player.Instance.getCores();
+        currentWave = EnemySpawner.Instance.currentWave;
+        darkMatter = Player.Instance.getDarkMatter();
+        saveTime = Player.Instance.now();
     }
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 public class ResearchItemsListSO : ScriptableObject
 {
     public Research[] researchItemsSO;
-    public GameObject cardTemplate;
+    public GameObject commonCardTemplate;
+
+    public GameObject epicCardTemplate;
 }
 

@@ -9,4 +9,10 @@ public class Research : ScriptableObject
     public int upgradeIndex;
     public Sprite Icon;
     public int cost;
+    public int requiredXPLevel;
+    public int requiredWorldLevel;
+
+    public int maxPurchases;
+
+    public bool isEpic;
 }

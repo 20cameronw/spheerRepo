@@ -21,6 +21,8 @@ public class EnemyHealth : MonoBehaviour
 
     private float currentHealth;
 
+    private bool isDying = false;
+
     public void SetCurrentHealth(float value)
     {
         currentHealth = value;
@@ -44,8 +46,9 @@ public class EnemyHealth : MonoBehaviour
         float healthGoal = currentHealth - damage;
         SetCurrentHealth(healthGoal);
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0 && !isDying)
         {
+            isDying = true;
             Die();
         }
     }
@@ -53,6 +56,7 @@ public class EnemyHealth : MonoBehaviour
     private void Die()
     {
         Player.Instance.addXpPoints(xpWorth);
+        EnemySpawner.Instance.handleAlienDeath();
         Destroy(gameObject);
     }
 }

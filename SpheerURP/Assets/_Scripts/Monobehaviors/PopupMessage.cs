@@ -1,53 +1,65 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static LeanTween;
 using TMPro;
 
 public class PopupMessage : MonoBehaviour
 {
-    public GameObject messageBox;
-    public Button closeButton;
+    [Header("UI References")]
+    [SerializeField] private TMP_Text messageText;
+    [SerializeField] private GameObject messagePanel; // Contains text + close button
+    [SerializeField] private Button openButton;
+    [SerializeField] private Image icon;
 
-    public TMP_Text messageText;
+    [SerializeField] private float minimizedScale = 1f; // scale for circle
+    [SerializeField] private float expandedScale = 10f;
 
-    public bool hasOptions;
+    private Transform centerParent;
+    private bool isExpanded = false;
+    private Vector3 originalPos;
+    private Transform originalParent;
 
-    public GameObject optionsBox;
-
-    private void Start()
+    public void Setup(string message, Transform centerContainer)
     {
-        // Set the initial scale of the message box to zero
-        messageBox.transform.localScale = Vector3.zero;
+        messageText.text = message;
+        centerParent = centerContainer;
 
-        messageBox = this.gameObject;
-        closeButton = messageBox.GetComponentInChildren<Button>();
-        
-        // Add a listener to the close button
-        closeButton.onClick.AddListener(TweenOutMessageBox);
+        messagePanel.SetActive(false);
 
-        // If the message has options, show the options box
-        if (hasOptions)
-        {
-            optionsBox.SetActive(true);
-        }
-        else
-        {
-            optionsBox.SetActive(false);
-        }
-        
-        // Tween in the message box
-        LeanTween.scale(messageBox, Vector3.one, 0.5f).setEase(LeanTweenType.easeOutBack);
+        transform.localScale = Vector3.one * minimizedScale;
+
+        openButton.onClick.AddListener(ToggleExpand);
     }
 
-    private void TweenOutMessageBox()
+    private void ToggleExpand()
     {
-        LeanTween.scale(messageBox, Vector3.zero, 0.5f).setEase(LeanTweenType.easeInBack).setOnComplete(DestroyMessageBox);
+        Destroy(openButton.gameObject);
+        Destroy(icon.gameObject);
+        if (isExpanded) return;
+
+        isExpanded = true;
+        originalParent = transform.parent;
+        originalPos = transform.position;
+
+        transform.SetParent(centerParent, true);
+
+        LeanTween.move(gameObject, centerParent.position, 0.4f).setEaseOutBack();
+        LeanTween.scale(gameObject, Vector3.one * expandedScale, 0.4f).setEaseOutBack()
+            .setOnComplete(() =>
+            {
+                messagePanel.SetActive(true);
+            });
     }
 
-    private void DestroyMessageBox()
+    public void Close()
     {
-        Destroy(this.gameObject);
+        messagePanel.SetActive(false);
+
+        LeanTween.move(gameObject, originalPos, 0.4f).setEaseInBack();
+        LeanTween.scale(gameObject, Vector3.one * minimizedScale, 0.4f).setEaseInBack()
+            .setOnComplete(() =>
+            {
+                transform.SetParent(originalParent, true);
+                Destroy(gameObject);
+            });
     }
 }

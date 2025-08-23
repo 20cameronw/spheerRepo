@@ -14,6 +14,10 @@ public class IntroScreenAnimation : MonoBehaviour
 
     void Awake()
     {
-        LeanTween.move(image, endPoint, secondsToFly).setEase(LeanTweenType.easeInQuad);
+        LeanTween.move(image, endPoint, secondsToFly).setEase(LeanTweenType.easeInQuad).setOnComplete(dis);
+    }
+
+    void dis() {
+        Destroy(gameObject);
     }
 }

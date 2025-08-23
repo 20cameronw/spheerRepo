@@ -4,21 +4,31 @@ using UnityEngine;
 
 public class EnemyLeavingState : EnemyState
 {
-    [SerializeField] private EnemyIdleState enemyIdleState;
+    [SerializeField] private EnemyState enemyIdleState;
     [SerializeField] private Transform leavePoint;
     [SerializeField] private float speed;
+
+    [SerializeField] private float waitTime;
     private bool hasArrived;
-    private bool cr_running;
     private bool leaving;
+
+    private bool waiting;
+
+    private bool doneWaiting;
+
+    private float timeWaited;
+
+    public ParticleSystem effect;
 
     public override EnemyState RunState()
     {
         leaving = true;
 
-        if (hasArrived)
+        if (doneWaiting)
         {
             leaving = false;
             hasArrived = false;
+            doneWaiting = false;
             return enemyIdleState;
         }
         return this;
@@ -26,13 +36,11 @@ public class EnemyLeavingState : EnemyState
 
     void Awake()
     {
-        Transform[] objs = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
-        for (int i = 0; i < objs.Length; i++)
-        {
-            if (objs[i].gameObject.CompareTag("EnemyLeavePoint"))
-            {
-                leavePoint = objs[i].gameObject.transform;
-            }
+        leavePoint = EnemySpawner.Instance.getLeavePoint();
+
+        timeWaited = waitTime;
+        if (effect != null) {
+            Destroy(effect.gameObject);
         }
     }
 
@@ -47,10 +55,23 @@ public class EnemyLeavingState : EnemyState
         if (Vector3.Distance(transform.parent.parent.position, leavePoint.position) < 0.01f)
         {
             hasArrived = true;
+            // Player.Instance.clearTarget();
+            waiting = true;
         }
         else
         {
             hasArrived = false;
+        }
+
+        if (waiting)
+        {
+            timeWaited -= Time.deltaTime;
+            if (timeWaited <= 0)
+            {
+                timeWaited = waitTime;
+                waiting = false;
+                doneWaiting = true;
+            }
         }
     }
 }

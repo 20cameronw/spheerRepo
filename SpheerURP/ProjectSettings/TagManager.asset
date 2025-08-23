@@ -7,6 +7,7 @@ TagManager:
   - Enemy
   - EnemyAttackPoint
   - EnemyLeavePoint
+  - EnemyAttackPointBelow
   layers:
   - Default
   - TransparentFX

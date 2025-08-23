@@ -14,9 +14,15 @@ public class ResearchCard : MonoBehaviour
 
     public TMP_Text bonus;
 
+    public bool isEpic;
+
+    public TMP_Text counter;
+
+    public Button button;
+
     public void purchase()
     {
-        TransactionManager.Instance.PurchaseResearch(upgradeIndex);
+        TransactionManager.Instance.PurchaseResearch(upgradeIndex, isEpic);
     }
 
 }

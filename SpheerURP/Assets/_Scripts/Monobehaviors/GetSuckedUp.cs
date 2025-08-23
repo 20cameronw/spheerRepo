@@ -4,24 +4,14 @@ using UnityEngine;
 
 public class GetSuckedUp : MonoBehaviour
 {
-    [SerializeField] private float speed;
+    private float speed = 10;
 
     private Transform target;
 
-    private bool gettingSucked;
-
-    [SerializeField] private ParticleSystem suckingEffect;
-
-    private Transform startingPos;
-
-    [SerializeField] private float bonus;
+    public bool gettingSucked;
 
     [SerializeField] private int upgradeIndex;
 
-    void Start()
-    {
-        startingPos = transform;
-    }
 
     void Update()
     {
@@ -30,33 +20,27 @@ public class GetSuckedUp : MonoBehaviour
             gettingSucked = false;
             return;
         }
-
         if (gettingSucked == true)
         {
-            ParticleSystem currentEffect = Instantiate(suckingEffect, startingPos);
-            currentEffect.transform.SetParent(target);
-            currentEffect.transform.LookAt(target);
             Vector3 dir = target.position - transform.position;
             float distanceThisFrame = speed * Time.deltaTime;
 
-            if (dir.magnitude <= distanceThisFrame)
+            if (dir.magnitude - 5 <= distanceThisFrame)
             {
-                transform.SetParent(target);
                 gettingSucked = false;
-                Destroy(currentEffect);
-                Player.Instance.removeUpgrade(bonus, upgradeIndex);
+                Player.Instance.removeUpgrade(upgradeIndex);
                 Destroy(gameObject);
             }
 
             transform.Translate(dir.normalized * distanceThisFrame, Space.World);
         }
     }
-
     public void getSuckedUp(Transform sucker)
     {
         target = sucker;
         gettingSucked = true;
-        //Debug.Log("set getting sucked to true");
+        transform.SetParent(sucker);
+        Debug.Log("Object is being sucked up: " + gameObject.name);
     }
 
 }

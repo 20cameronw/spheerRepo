@@ -25,4 +25,9 @@ public class EnemyStateManager : MonoBehaviour
     {
         currentState = nextState;
     }
+
+    public void targetThis()
+    {
+        Player.Instance.targetThis(transform);
+    }
 }

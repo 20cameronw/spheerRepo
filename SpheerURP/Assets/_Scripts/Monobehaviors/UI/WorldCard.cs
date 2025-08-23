@@ -21,8 +21,9 @@ public class WorldCard : MonoBehaviour
 
     public void purchase()
     {
-        TransactionManager.Instance.PurchaseWorld(worldIndex);
-        isUnlocked(false);
+        if (TransactionManager.Instance.PurchaseWorld(worldIndex)) {
+            isUnlocked(false);
+        }
     }
 
     public void isUnlocked(bool unlocked)

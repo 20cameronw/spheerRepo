@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour
+public class MainMenu : MenuPanel
 {
-    public TMP_Text Header;
-    public Button ExitButton;
+    // public override void OpenPanel() {
+    //     gameObject.SetActive(true);
+    // }
+    // public override void ClosePanel() {
+    //     gameObject.SetActive(false);
+    // }
 }
