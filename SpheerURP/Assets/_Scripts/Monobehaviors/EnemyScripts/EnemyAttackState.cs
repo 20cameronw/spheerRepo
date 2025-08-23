@@ -8,10 +8,20 @@ public class EnemyAttackState : EnemyState
     [SerializeField] private int timesToRaycast;
     [SerializeField] private float timeBetweenCasts;
     [SerializeField] private float raycastRange;
+    [SerializeField] private ParticleSystem suckingEffect;
+    private int currentWaypointIndex = 0;
+
+    public float speed;
+
+    public Transform[] waypoints;
+
     public bool doneAttacking;
     public int timesCasted;
     public bool cr_running;
 
+    private bool gotAHit = false;
+
+    public ParticleSystem effect;
 
     public override EnemyState RunState()
     {
@@ -25,6 +35,10 @@ public class EnemyAttackState : EnemyState
         {
             cr_running = false;
             doneAttacking = false;
+            timesCasted = 0;
+            enemyLeavingState.effect = this.effect;
+            gotAHit = false;
+            currentWaypointIndex = 0;
             return enemyLeavingState;
         }
         return this;
@@ -40,23 +54,48 @@ public class EnemyAttackState : EnemyState
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * raycastRange, Color.yellow);
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, raycastRange))
             {
-                Debug.Log("Alien got a hit!");
+                // Debug.Log("Alien got a hit!");
+                gotAHit = true;
+                AudioManager.Instance.Play("GetSuckedUp");
 
                 GameObject prey = hit.transform.gameObject;
-                if (prey)
+                if (prey && !doneAttacking)
                 {
-                    GetSuckedUp getSuckedUp = prey.GetComponent<GetSuckedUp>();
-                    if (getSuckedUp) getSuckedUp.getSuckedUp(hit.transform);
+                    prey.GetComponent<GetSuckedUp>().getSuckedUp(transform);
+                    effect = Instantiate(suckingEffect, transform.position, Quaternion.identity);
+                    effect.transform.SetParent(transform);
+                    effect.transform.LookAt(prey.transform);
+                    yield return new WaitForSeconds(1);
+
                 }
                 doneAttacking = true;
             }
             else
             {
-                Debug.Log("alien Did Not Hit");
+                // Debug.Log("alien Did Not Hit");
             }
 
             timesCasted += 1;
         }
         doneAttacking = true;
     }
+
+    void Update() {
+        if (cr_running) {
+            if (!gotAHit) MoveTowardsWaypoint();
+
+            if (Vector3.Distance(transform.position, waypoints[currentWaypointIndex].position) <= 0.2f) 
+            {
+                currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+            }
+        }
+    }
+
+    void MoveTowardsWaypoint() {
+        var step = speed * Time.deltaTime;
+        transform.parent.parent.position = Vector3.MoveTowards(transform.parent.parent.position,  waypoints[currentWaypointIndex].position, step);
+    }
+
 }
+
+    

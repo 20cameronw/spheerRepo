@@ -40,7 +40,14 @@ public class ShopPanel : MonoBehaviour
             {
                 currentShopCard.cost.text = "Cost: " + cost.ToString("N0");
             }
-            currentShopCard.count.text = "x" + Player.Instance.getNumberBuildings(i);
+            int count = Player.Instance.getNumberBuildings(i);
+            currentShopCard.count.text = "x" + count;
+
+            if (count <= 0) {
+                currentShopCard.sellButton.interactable = false;
+            } else {
+                currentShopCard.sellButton.interactable = true;
+            }
 
 
             int requiredLevel = shopPanelInfo.shopItemsSO[i].requiredXPLevel;

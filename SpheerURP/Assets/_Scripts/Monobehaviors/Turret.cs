@@ -13,7 +13,15 @@ public class Turret : MonoBehaviour
 
     [Header("Attributes")]
     public float fireRate = 1f;
-    public float range = 100f;
+
+    public float baseFireRate = 1f;
+    public float range = 30f;
+
+    public float baseRange = 30f;
+
+    public float rangeMultiplier;
+
+    public float rateMultiplier;
 
     private float fireCountdown = 0f;
 
@@ -22,10 +30,8 @@ public class Turret : MonoBehaviour
 
     void Start()
     {
-        //Player.Instance.TurretList.Add(this);
-        coroutine = checkForTargetInRange();
+        coroutine = checkForTarget();
         StartCoroutine(coroutine);
-
     }
 
     // Update is called once per frame
@@ -35,7 +41,7 @@ public class Turret : MonoBehaviour
         {
 
             if (cr_running == false)
-                StartCoroutine("checkForTargetInRange");
+                StartCoroutine("checkForTarget");
 
             return;
         }
@@ -59,59 +65,44 @@ public class Turret : MonoBehaviour
         fireCountdown -= Time.deltaTime;
     }
 
-    public IEnumerator checkForTargetInRange()
+    public IEnumerator checkForTarget()
     {
         cr_running = true;
 
         while (cr_running)
         {
-            yield return new WaitForSeconds(0.5f);
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-            float shortestDistance = Mathf.Infinity;
-            GameObject nearestEnemy = null;
-            foreach (GameObject enemy in enemies)
+            yield return new WaitForSeconds(0.3f);
+
+            float rangeMult = Player.Instance.getTurretRangeMultiplier();
+
+            if (rangeMult != rangeMultiplier)
             {
-                float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
-                if (distanceToEnemy < shortestDistance)
-                {
-                    shortestDistance = distanceToEnemy;
-                    nearestEnemy = enemy;
-                }
+                rangeMultiplier = rangeMult;
+                range = baseRange * rangeMultiplier;
             }
 
-            if (nearestEnemy != null && shortestDistance <= range)
+            float rateMult = Player.Instance.getTurretFireRateMultiplier();
+
+            if (rateMult != rateMultiplier)
             {
-                target = nearestEnemy.transform;
+                rateMultiplier = rateMult;
+                fireRate = baseFireRate * rateMultiplier;
+            }
+            
+            Transform enemy = Player.Instance.GetTarget();
+            
+            if (enemy != null)
+            {
+                float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
+                if (distanceToEnemy <= range) {
+                    target = enemy;
+                }
             }
             else
             {
                 target = null;
             }
         }
-        /**{
-            float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
-            if (distanceToEnemy <= range)
-            {
-                target = enemyPos;
-                StopCoroutine("checkForTargetInRange");
-                cr_running = false;
-                yield break;
-            }
-            
-            List<Enemy> enemyList = Player.Instance.enemies;
-            for (int i = 0; i < enemyList.Count; i++)
-            {
-                if (enemyList[i].alive && (Vector3.Distance(transform.position, enemyList[i].transform.position) <= range))
-                {
-                    target = enemyList[i].transform;
-                    cr_running = false;
-                    yield break;
-                }
-            }
-            target = null;
-
-            yield return new WaitForSeconds(1f);
-        }*/
     }
 
     void Aim()
@@ -132,6 +123,7 @@ public class Turret : MonoBehaviour
 
         GameObject bulletGO = (GameObject)Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Bullet bullet = bulletGO.GetComponent<Bullet>();
+        // AudioManager.Instance.Play("Shot");
 
         if (bullet != null)
             bullet.Seek(target);

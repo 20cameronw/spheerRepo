@@ -22,9 +22,16 @@ public class ShopCard : MonoBehaviour
 
     public TMP_Text requiredXPText;
 
+    public Button sellButton;
+
+    public StructuresPanel panel;
+
     public void purchase()
     {
         bool success = TransactionManager.Instance.PurchaseSomething(upgradeIndex);
+        if (success) {
+            panel.LoadCards();
+        }
     }
 
     public void sellItem()

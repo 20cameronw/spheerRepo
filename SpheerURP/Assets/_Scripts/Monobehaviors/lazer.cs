@@ -15,8 +15,6 @@ public class lazer : MonoBehaviour
 
     [SerializeField] private LineRenderer laser;
 
-    [SerializeField] private GameObject LaserHitEffect;
-
     private bool cr_running;
 
     [SerializeField] private float damage;
@@ -24,13 +22,13 @@ public class lazer : MonoBehaviour
     [SerializeField] private Transform lazerEndPosition;
 
 
-    // Start is called before the first frame update
+
     void Start()
     {
         StartCoroutine("checkForTargetInRange");
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         if (target == null)
@@ -47,15 +45,10 @@ public class lazer : MonoBehaviour
         laser.enabled = true;
         laserOn = true;
 
-
-        // laser.SetPosition(0, laserStart.position);
-        // laser.SetPosition(1, target.position);
-        if (target != null) lazerEndPosition.transform.position = target.position;
-
-        // GameObject fireHit = Instantiate(LaserHitEffect, target.transform);
-        // fireHit.transform.LookAt(laserStart.position);
-        //target.GetComponent<Enemy>().takeHit(damage * Time.deltaTime);
-        if (target != null) target.GetComponent<EnemyHealth>().TakeDamage(damage * Time.deltaTime);
+        if (target != null) {
+            lazerEndPosition.transform.position = target.position;
+            target.GetComponent<EnemyHealth>().TakeDamage(damage * Time.deltaTime);
+        } 
 
         if (Vector3.Distance(transform.position, target.position) >= range)
         {
@@ -69,7 +62,8 @@ public class lazer : MonoBehaviour
         cr_running = true;
         while (true)
         {
-            Transform enemyPos = GameObject.FindGameObjectWithTag("Enemy")?.transform;
+            // Transform enemyPos = GameObject.FindGameObjectWithTag("Enemy")?.transform;
+            Transform enemyPos = Player.Instance.GetTarget();
             if (enemyPos != null)
             {
                 float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
@@ -82,20 +76,7 @@ public class lazer : MonoBehaviour
                 }
             }
 
-            /*
-            List<Enemy> enemyList = Player.Instance.enemies;
-            for (int i = 0; i < enemyList.Count; i++)
-            {
-                if (enemyList[i].alive && (Vector3.Distance(transform.position, enemyList[i].transform.position) <= range))
-                {
-                    target = enemyList[i].transform;
-                    cr_running = false;
-                    yield break;
-                }
-            }
-            target = null;*/
-
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 

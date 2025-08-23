@@ -7,7 +7,6 @@ public class WorldSpawner : MonoBehaviour
     [HideInInspector]
     public GameObject CurrentWorldGO;
 
-
     public GameObject CurrentWorld;
 
     [Header("Setup Fields")]
@@ -24,6 +23,7 @@ public class WorldSpawner : MonoBehaviour
 
     private GameObject orbitGO;
 
+    private int objectsSpawned = 0;
     private List<GameObject> spawnedObjects = new List<GameObject>();
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
 
@@ -61,6 +61,11 @@ public class WorldSpawner : MonoBehaviour
     private void DeleteCurrentWorld()
     {
         Destroy(CurrentWorld);
+
+        foreach (GameObject obj in spawnedObjects)
+        {
+            Destroy(obj);
+        }
     }
 
     public void SpawnWorld()
@@ -106,11 +111,12 @@ public class WorldSpawner : MonoBehaviour
             spawnInOrbit(index, passive);
         else
             spawnOnSurface(index, passive);
+
+        objectsSpawned++;
     }
 
     public void spawnOnSurface(int index, float passive)
     {
-        //Debug.Log("Spawning object");
         Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * surface.radius + CurrentWorld.transform.position;
         Quaternion spawnRotation = Quaternion.identity;
         GameObject newObject = Instantiate(structuresGOList[index], spawnPosition, spawnRotation) as GameObject;
@@ -118,14 +124,7 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.LookAt(CurrentWorld.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
         spawnedObjects.Add(newObject);
-        newObject.gameObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name;
-
-        if (passive > 0)
-        {
-            AddsPassive passiveEarner = newObject.AddComponent<AddsPassive>();
-            passiveEarner.setAmount(passive);
-        }
-
+        newObject.gameObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name + " " + objectsSpawned;
     }
 
     public void LoadObjects(int count, int index)
@@ -156,25 +155,24 @@ public class WorldSpawner : MonoBehaviour
         newObject.transform.LookAt(orbitGO.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
         spawnedObjects.Add(newObject);
-        newObject.gameObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name;
-
-        if (passive > 0)
-        {
-            AddsPassive passiveEarner = newObject.AddComponent<AddsPassive>();
-            passiveEarner.setAmount(passive);
-        }
+        newObject.gameObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name + " " + objectsSpawned;
     }
 
     public void removeObject(int index)
     {
         for (int i = 0; i < spawnedObjects.Count; i++)
         {
-            if (spawnedObjects[i].gameObject.name == TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name)
+            string name = spawnedObjects[i].gameObject.name.Split(" ")[0];
+            Debug.Log("name.Split(\" \")[0]: " + name);
+            if (name == TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name.Split(" ")[0])
             {
-                GameObject newObject;
-                newObject = spawnedObjects[i];
-                spawnedObjects.RemoveAt(i);
-                Destroy(newObject);
+                GameObject newObject = spawnedObjects[i];
+                if (newObject != null) {
+                    Destroy(newObject); 
+                    spawnedObjects.RemoveAt(i);
+                }
+                
+                return;
             }
         }
     }

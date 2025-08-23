@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: purp
   m_EditorClassIdentifier: 
   name: Purp
-  description: Creative name for a purple planet huh
-  cost: 250000
-  Icon: {fileID: 21300000, guid: e587a456d5209834c8762a71782673f7, type: 3}
+  description: Welcome to purp.
+  cost: 480000
+  Icon: {fileID: 21300000, guid: 9b9f922d45b438141b9e6273ba418066, type: 3}
   index: 3
-  cores: 100
+  cores: 16
