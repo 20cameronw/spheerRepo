@@ -50,7 +50,9 @@ public class PlacementManager : MonoBehaviour
     [Header("World Spin Sensitivity")]
     [SerializeField] private float spinSensitivity = 0.3f;
 
-    // ── Runtime state ─────────────────────────────────────────────────────────
+    [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap). "
+           + "Consider multiplying by Screen.dpi / 160 for device-independent behaviour.")]
+    [SerializeField] private float dragThresholdPixels = 10f;
     private bool inPlacementMode = false;
     private int pendingUpgradeIndex = -1;
     private float pendingCost = 0f;
@@ -61,7 +63,6 @@ public class PlacementManager : MonoBehaviour
     private Vector3 lastInputPos;
     private Vector3 touchStartPos;
     private bool isDragging = false;
-    private const float DRAG_THRESHOLD_PX = 10f;
 
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -198,22 +199,16 @@ public class PlacementManager : MonoBehaviour
         int slotSize = TransactionManager.Instance.structuresPanelInfo
             .shopItemsSO[pendingUpgradeIndex].slotSize;
 
-        // Ask WorldSpawner for all available slot positions and their indices.
-        // We iterate slotPositions manually via available world-space positions.
-        List<Vector3> available = worldSpawner.GetAvailableSlotPositions(slotSize);
+        // GetAvailableSlotPositions returns (worldPos, slotIndex) pairs in one pass.
+        var available = worldSpawner.GetAvailableSlotPositions(slotSize);
 
-        // WorldSpawner returns positions in the same order as its internal list,
-        // so we rebuild the index by asking for the nearest free slot index.
-        for (int i = 0; i < available.Count; i++)
+        foreach (var (pos, slotIndex) in available)
         {
-            int slotIndex = worldSpawner.GetSlotIndexForWorldPosition(available[i]);
-            if (slotIndex < 0) continue;
-
-            GameObject marker = Instantiate(slotMarkerPrefab, available[i], Quaternion.identity);
+            GameObject marker = Instantiate(slotMarkerPrefab, pos, Quaternion.identity);
             marker.transform.SetParent(worldSpawner.CurrentWorld.transform);
 
             // Orient the dot outward from the world centre so it sits flush on the surface
-            Vector3 outward = (available[i] - worldSpawner.GetWorldCenter()).normalized;
+            Vector3 outward = (pos - worldSpawner.GetWorldCenter()).normalized;
             marker.transform.rotation = Quaternion.LookRotation(outward) * Quaternion.Euler(90f, 0f, 0f);
 
             PlacementSlot slot = marker.GetComponent<PlacementSlot>();
@@ -261,7 +256,7 @@ public class PlacementManager : MonoBehaviour
         else if (Input.GetMouseButton(0))
         {
             Vector3 delta = Input.mousePosition - lastInputPos;
-            if (Vector3.Distance(Input.mousePosition, touchStartPos) > DRAG_THRESHOLD_PX)
+            if (Vector3.Distance(Input.mousePosition, touchStartPos) > dragThresholdPixels)
                 isDragging = true;
             if (isDragging && delta.sqrMagnitude > 0.01f)
                 SpinWorld(delta);
@@ -270,7 +265,7 @@ public class PlacementManager : MonoBehaviour
         else if (Input.GetMouseButtonUp(0))
         {
             if (!isDragging)
-                TryConfirmAtScreenPoint(Input.mousePosition);
+                TryConfirmAtScreenPoint(Input.mousePosition, -1);
             isDragging = false;
         }
 #else
@@ -289,7 +284,7 @@ public class PlacementManager : MonoBehaviour
             case TouchPhase.Moved:
             case TouchPhase.Stationary:
                 Vector3 delta = touchPos - lastInputPos;
-                if (Vector3.Distance(touchPos, touchStartPos) > DRAG_THRESHOLD_PX)
+                if (Vector3.Distance(touchPos, touchStartPos) > dragThresholdPixels)
                     isDragging = true;
                 if (isDragging && delta.sqrMagnitude > 0.01f)
                     SpinWorld(delta);
@@ -298,7 +293,7 @@ public class PlacementManager : MonoBehaviour
 
             case TouchPhase.Ended:
                 if (!isDragging)
-                    TryConfirmAtScreenPoint(touchPos);
+                    TryConfirmAtScreenPoint(touchPos, touch.fingerId);
                 isDragging = false;
                 break;
         }
@@ -315,11 +310,19 @@ public class PlacementManager : MonoBehaviour
         world.Rotate(mainCamera.transform.right, rotX, Space.World);
     }
 
-    private void TryConfirmAtScreenPoint(Vector3 screenPoint)
+    /// <param name="fingerId">Pass -1 for mouse/standalone; pass the touch finger ID for mobile.</param>
+    private void TryConfirmAtScreenPoint(Vector3 screenPoint, int fingerId)
     {
-        // Ignore taps that land on UI elements (e.g. the Cancel button)
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-            return;
+        // Ignore taps that land on UI elements (e.g. the Cancel button).
+        // For touch input, pass the finger ID so Unity checks the correct pointer.
+        if (EventSystem.current != null)
+        {
+#if UNITY_EDITOR || UNITY_STANDALONE
+            if (EventSystem.current.IsPointerOverGameObject()) return;
+#else
+            if (fingerId >= 0 && EventSystem.current.IsPointerOverGameObject(fingerId)) return;
+#endif
+        }
 
         if (mainCamera == null) return;
 
