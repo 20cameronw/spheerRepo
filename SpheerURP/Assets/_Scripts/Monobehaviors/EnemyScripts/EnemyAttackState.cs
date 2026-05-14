@@ -66,7 +66,7 @@ public class EnemyAttackState : EnemyState
                 AudioManager.Instance.Play("GetSuckedUp");
 
                 GameObject prey = hit.transform.gameObject;
-                if (prey != null && !doneAttacking)
+                if (prey && !doneAttacking)
                 {
                     prey.GetComponent<GetSuckedUp>().getSuckedUp(transform);
                     effect = Instantiate(suckingEffect, transform.position, Quaternion.identity);
