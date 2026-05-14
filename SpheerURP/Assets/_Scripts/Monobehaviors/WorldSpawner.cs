@@ -36,6 +36,7 @@ public class WorldSpawner : MonoBehaviour
     private List<Vector3> slotPositions = new List<Vector3>();
     private bool[] slotOccupied = new bool[0];
     private int currentMaxSlots = 20;
+    private const int DEFAULT_MAX_SLOTS = 20;
     // ─────────────────────────────────────────────────────────────────────────
 
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
@@ -99,10 +100,7 @@ public class WorldSpawner : MonoBehaviour
     private void GenerateSlots(int worldIndex)
     {
         slotPositions.Clear();
-
-        currentMaxSlots = (worldsListSO != null && worldIndex < worldsListSO.worldsList.Length)
-            ? worldsListSO.worldsList[worldIndex].maxBuildingSlots
-            : 20;
+        currentMaxSlots = GetConfiguredMaxSlots(worldIndex);
 
         slotOccupied = new bool[currentMaxSlots];
 
@@ -122,6 +120,23 @@ public class WorldSpawner : MonoBehaviour
         }
     }
 
+    private int GetConfiguredMaxSlots(int worldIndex)
+    {
+        int configured = DEFAULT_MAX_SLOTS;
+        if (worldsListSO != null && worldIndex >= 0 && worldIndex < worldsListSO.worldsList.Length)
+        {
+            configured = worldsListSO.worldsList[worldIndex].maxBuildingSlots;
+        }
+
+        if (configured < 1)
+        {
+            Debug.LogWarning("[WorldSpawner] maxBuildingSlots was <= 0; using fallback default.");
+            configured = DEFAULT_MAX_SLOTS;
+        }
+
+        return configured;
+    }
+
     // ── Slot queries ─────────────────────────────────────────────────────────
 
     public int GetMaxSlots() => currentMaxSlots;
@@ -134,7 +149,11 @@ public class WorldSpawner : MonoBehaviour
         return count;
     }
 
-    public int GetSlotsAvailable() => currentMaxSlots - GetSlotsUsed();
+    public int GetSlotsAvailable()
+    {
+        EnsureSlotsGeneratedForCurrentWorld();
+        return currentMaxSlots - GetSlotsUsed();
+    }
 
     /// <summary>
     /// Returns the world-space positions of all unoccupied slots that can
@@ -143,6 +162,7 @@ public class WorldSpawner : MonoBehaviour
     /// </summary>
     public List<(Vector3 position, int index)> GetAvailableSlotPositions(int slotSize = 1)
     {
+        EnsureSlotsGeneratedForCurrentWorld();
         if (CurrentWorld == null) return new List<(Vector3, int)>();
 
         var available = new List<(Vector3, int)>();
@@ -181,6 +201,7 @@ public class WorldSpawner : MonoBehaviour
     /// </summary>
     public int OccupySlot(Vector3 worldPos, int slotSize = 1)
     {
+        EnsureSlotsGeneratedForCurrentWorld();
         if (CurrentWorld == null) return -1;
 
         int nearest = FindNearestSlot(worldPos, freeOnly: true);
@@ -320,7 +341,7 @@ public class WorldSpawner : MonoBehaviour
         // During load: place near a random surface point and occupy the nearest slot.
         Vector3 randomWorldPos = UnityEngine.Random.onUnitSphere * surface.radius
                                  + CurrentWorld.transform.position;
-        int slotSize = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].slotSize;
+        int slotSize = Mathf.Max(1, TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].slotSize);
         OccupySlot(randomWorldPos, slotSize);
 
         GameObject newObject = Instantiate(structuresGOList[index], randomWorldPos, Quaternion.identity) as GameObject;
@@ -408,4 +429,12 @@ public class WorldSpawner : MonoBehaviour
         CurrentWorld != null ? CurrentWorld.transform.position : transform.position;
 
     public float GetSurfaceRadius() => surface.radius;
+
+    private void EnsureSlotsGeneratedForCurrentWorld()
+    {
+        if (CurrentWorld == null || slotPositions.Count > 0) return;
+
+        int worldIndex = WorldsList.IndexOf(CurrentWorldGO);
+        GenerateSlots(worldIndex >= 0 ? worldIndex : 0);
+    }
 }

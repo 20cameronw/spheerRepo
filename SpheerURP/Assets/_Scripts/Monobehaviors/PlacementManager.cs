@@ -130,6 +130,7 @@ public class PlacementManager : MonoBehaviour
 
         int slotSize = TransactionManager.Instance.structuresPanelInfo
             .shopItemsSO[pendingUpgradeIndex].slotSize;
+        slotSize = Mathf.Max(1, slotSize);
 
         // Occupy slot(s) — use the slot marker's world position as the anchor
         GameObject marker = GetMarkerBySlotIndex(slotIndex);
@@ -198,6 +199,7 @@ public class PlacementManager : MonoBehaviour
 
         int slotSize = TransactionManager.Instance.structuresPanelInfo
             .shopItemsSO[pendingUpgradeIndex].slotSize;
+        slotSize = Mathf.Max(1, slotSize);
 
         // GetAvailableSlotPositions returns (worldPos, slotIndex) pairs in one pass.
         var available = worldSpawner.GetAvailableSlotPositions(slotSize);

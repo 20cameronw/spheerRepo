@@ -71,10 +71,17 @@ public class TransactionManager : MonoBehaviour
         // Check slot availability for surface buildings
         if (!isOrbit)
         {
-            int slotSize = structuresPanelInfo.shopItemsSO[index].slotSize;
+            int slotSize = Mathf.Max(1, structuresPanelInfo.shopItemsSO[index].slotSize);
             if (worldSpawner.GetSlotsAvailable() < slotSize)
             {
                 PopupManager.Instance.ShowPopup("Not enough space on this world! Upgrade to a larger world.");
+                return false;
+            }
+
+            if (PlacementManager.Instance == null)
+            {
+                Debug.LogWarning("[TransactionManager] PlacementManager is missing in scene.");
+                PopupManager.Instance.ShowPopup("Placement mode isn't set up in this scene yet.");
                 return false;
             }
         }
