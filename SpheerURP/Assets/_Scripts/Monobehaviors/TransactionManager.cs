@@ -74,14 +74,14 @@ public class TransactionManager : MonoBehaviour
             int slotSize = Mathf.Max(1, structuresPanelInfo.shopItemsSO[index].slotSize);
             if (worldSpawner.GetSlotsAvailable() < slotSize)
             {
-                PopupManager.Instance.ShowPopup("Not enough space on this world! Upgrade to a larger world.");
+                PopupManager.Instance.ShowPopup("Not enough building slots on this world. Some worlds have more space.");
                 return false;
             }
 
             if (PlacementManager.Instance == null)
             {
                 Debug.LogWarning("[TransactionManager] PlacementManager is missing in scene.");
-                PopupManager.Instance.ShowPopup("Cannot place building right now. Please restart or contact support.");
+                PopupManager.Instance.ShowPopup("Building placement is unavailable. Please ensure PlacementManager is configured in this scene.");
                 return false;
             }
         }

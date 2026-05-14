@@ -50,8 +50,7 @@ public class PlacementManager : MonoBehaviour
     [Header("World Spin Sensitivity")]
     [SerializeField] private float spinSensitivity = 0.3f;
 
-    [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap). "
-           + "Consider multiplying by Screen.dpi / 160 for device-independent behaviour.")]
+    [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap).")]
     [SerializeField] private float dragThresholdPixels = 10f;
     private bool inPlacementMode = false;
     private int pendingUpgradeIndex = -1;

@@ -33,10 +33,10 @@ public class WorldSpawner : MonoBehaviour
     // ── Slot system ──────────────────────────────────────────────────────────
     // Slot positions are stored in CurrentWorld local space so they rotate
     // with the world.  Index N in slotPositions maps 1-to-1 with slotOccupied[N].
+    private const int DEFAULT_MAX_SLOTS = 20;
     private List<Vector3> slotPositions = new List<Vector3>();
     private bool[] slotOccupied = new bool[0];
-    private int currentMaxSlots = 20;
-    private const int DEFAULT_MAX_SLOTS = 20;
+    private int currentMaxSlots = DEFAULT_MAX_SLOTS;
     // ─────────────────────────────────────────────────────────────────────────
 
     private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
