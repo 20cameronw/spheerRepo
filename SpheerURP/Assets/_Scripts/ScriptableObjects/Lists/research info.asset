@@ -27,6 +27,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f45fecd381f4a384d92ff8b4fec3723e, type: 2}
   - {fileID: 11400000, guid: 2b6a26114091e9143b19ee11089c1830, type: 2}
   - {fileID: 11400000, guid: 0dac769ea2c060441963e446df153858, type: 2}
+  - {fileID: 11400000, guid: 8e82cf630323dfd4c95951f487ce8b36, type: 2}
+  - {fileID: 11400000, guid: 0af38df417c910d469c150243d30f310, type: 2}
+  - {fileID: 11400000, guid: af958cbcd718a7b429a21d7f8362e6df, type: 2}
+  - {fileID: 11400000, guid: bf78c4581fc627d4ca5467e1a50da0df, type: 2}
+  - {fileID: 11400000, guid: eae2b167fcae1eb49b394361d71021da, type: 2}
+  - {fileID: 11400000, guid: 10b8d644e86efb647bc4e5f9d4889eef, type: 2}
   commonCardTemplate: {fileID: 737817396954718147, guid: 6a204be2450accc4e8bd7d3101df55f1,
     type: 3}
   epicCardTemplate: {fileID: 2952702350989077573, guid: 51f935e1606e62140bb837b99c5b2570,

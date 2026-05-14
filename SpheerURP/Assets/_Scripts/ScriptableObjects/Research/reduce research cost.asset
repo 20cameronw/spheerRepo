@@ -17,7 +17,7 @@ MonoBehaviour:
   upgradeIndex: 7
   Icon: {fileID: -851678419, guid: 1201c14bb4ee74d8e99e56dc4f3f4fd1, type: 3}
   cost: 5000
-  requiredXPLevel: 0
+  requiredXPLevel: 4
   requiredWorldLevel: 0
   maxPurchases: 5
   isEpic: 0

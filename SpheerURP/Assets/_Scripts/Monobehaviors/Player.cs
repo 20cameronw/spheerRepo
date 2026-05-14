@@ -41,6 +41,11 @@ public class Player : MonoBehaviour
     [SerializeField] private float turretRangeMultiplier = 1;
     [SerializeField] private float sellBackMultiplier = 0;
 
+    [SerializeField] private float lazerDamageMultiplier = 1f;
+    [SerializeField] private float lazerRangeMultiplier = 1f;
+    [SerializeField] private float spinBonus = 0f;
+    [SerializeField] private float prestigeDMMultiplier = 1f;
+
     [SerializeField] private UIManager uIManager;
 
     public Transform target;
@@ -72,6 +77,21 @@ public class Player : MonoBehaviour
     public float getSellBackMultiplier()
     {
         return sellBackMultiplier;
+    }
+
+    public float getLazerDamageMultiplier()
+    {
+        return lazerDamageMultiplier;
+    }
+
+    public float getLazerRangeMultiplier()
+    {
+        return lazerRangeMultiplier;
+    }
+
+    public float getSpinBonus()
+    {
+        return spinBonus;
     }
 
     public float getTurretFireRateMultiplier()
@@ -194,6 +214,7 @@ public class Player : MonoBehaviour
 
     public void addResearchCount(int index, bool init)
     {
+        EnsureResearchCountSize();
         //if we are loading from file we don't want to increment the research count
         if (!init) researchCount[index]++;
         //but we still want to apply the effects of the research on startup 
@@ -270,6 +291,42 @@ public class Player : MonoBehaviour
                 else
                     productionRateMultiplier += 0.01f;
                 break;
+            case 14: //lazer damage
+                if (init)
+                    lazerDamageMultiplier = 1f + 0.10f * researchCount[index];
+                else
+                    lazerDamageMultiplier += 0.10f;
+                break;
+            case 15: //lazer range
+                if (init)
+                    lazerRangeMultiplier = 1f + 0.10f * researchCount[index];
+                else
+                    lazerRangeMultiplier += 0.10f;
+                break;
+            case 16: //spin bonus (Mineral Density)
+                if (init)
+                    spinBonus = 0.5f * researchCount[index];
+                else
+                    spinBonus += 0.5f;
+                break;
+            case 17: //prestige DM multiplier (Dark Matter Mastery)
+                if (init)
+                    prestigeDMMultiplier = 1f + 0.20f * researchCount[index];
+                else
+                    prestigeDMMultiplier += 0.20f;
+                break;
+            case 18: //wind turbine production boost
+                if (init)
+                    productionRateMultiplier += 0.05f * researchCount[index];
+                else
+                    productionRateMultiplier += 0.05f;
+                break;
+            case 19: //drill automation production boost
+                if (init)
+                    productionRateMultiplier += 0.02f * researchCount[index];
+                else
+                    productionRateMultiplier += 0.02f;
+                break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
                 break;
@@ -284,6 +341,13 @@ public class Player : MonoBehaviour
             buildingCount[i] = 0;
         }
         passive = 0;
+    }
+
+    private void EnsureResearchCountSize()
+    {
+        int needed = researchInfo != null ? researchInfo.researchItemsSO.Length : 0;
+        while (researchCount.Count < needed)
+            researchCount.Add(0);
     }
 
     public void resetResearchCount()
@@ -356,7 +420,7 @@ public class Player : MonoBehaviour
 
     public void MineResource()
     {
-        dollars += 1 * power;
+        dollars += (1 + spinBonus) * power;
         addXpPoints(xpPerClick);
     }
 
@@ -384,6 +448,7 @@ public class Player : MonoBehaviour
             cores = data.cores;
             buildingCount = data.buildingCount;
             researchCount = data.researchCount;
+            EnsureResearchCountSize();
             currentWorld = data.currentWorld;
             darkMatter = data.darkMatter;
             worldSpawner.SetCurrentWorld(currentWorld);
@@ -471,7 +536,7 @@ public class Player : MonoBehaviour
 
     public void prestige()
     {
-        int earnedDarkMatter = getDMAvailable();
+        int earnedDarkMatter = Mathf.RoundToInt(getDMAvailable() * prestigeDMMultiplier);
 
         darkMatter += earnedDarkMatter;
 

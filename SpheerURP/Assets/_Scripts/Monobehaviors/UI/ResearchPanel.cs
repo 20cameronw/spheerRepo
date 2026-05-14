@@ -50,15 +50,28 @@ public class ResearchPanel : MenuPanel
             currentCard.bonus.text = researchInfo.bonus;
             currentCard.Icon.sprite = researchInfo.Icon;
             int index = researchInfo.upgradeIndex;
-            currentCard.cost.text = "" + TransactionManager.Instance.getCostOfResearchUpgrade(index);
             currentCard.upgradeIndex = index;
             currentCard.isEpic = researchInfo.isEpic;
             int timesPurchased = Player.Instance.getResearchCount(index);
-            currentCard.counter.text = timesPurchased + "/" + researchInfo.maxPurchases; 
-            if (timesPurchased >= researchInfo.maxPurchases) {
+            currentCard.counter.text = timesPurchased + "/" + researchInfo.maxPurchases;
+
+            bool maxedOut = timesPurchased >= researchInfo.maxPurchases;
+            bool levelLocked = !researchInfo.isEpic && Player.Instance.getCurrentXPLevel() < researchInfo.requiredXPLevel;
+
+            if (maxedOut)
+            {
                 currentCard.button.interactable = false;
-            } else {
+                currentCard.cost.text = "MAXED";
+            }
+            else if (levelLocked)
+            {
+                currentCard.button.interactable = false;
+                currentCard.cost.text = "Level " + researchInfo.requiredXPLevel + " required";
+            }
+            else
+            {
                 currentCard.button.interactable = true;
+                currentCard.cost.text = "" + TransactionManager.Instance.getCostOfResearchUpgrade(index);
             }
         }
     }
