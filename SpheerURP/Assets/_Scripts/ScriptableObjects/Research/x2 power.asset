@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: x2 power
   m_EditorClassIdentifier: 
-  name: Quantum Click
-  bonus: Doubles your mining click power — forever.
+  name: Spin Surge
+  bonus: Doubles your spin mining power — forever.
   upgradeIndex: 0
   Icon: {fileID: 21300000, guid: bdfcd00e719df654886a535178587f29, type: 3}
   cost: 1
