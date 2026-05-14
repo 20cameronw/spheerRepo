@@ -130,7 +130,7 @@ public class WorldSpawner : MonoBehaviour
 
         if (configured < 1)
         {
-            Debug.LogWarning("[WorldSpawner] maxBuildingSlots was <= 0; using fallback default.");
+            Debug.LogWarning("[WorldSpawner] maxBuildingSlots was < 1; using fallback default.");
             configured = DEFAULT_MAX_SLOTS;
         }
 

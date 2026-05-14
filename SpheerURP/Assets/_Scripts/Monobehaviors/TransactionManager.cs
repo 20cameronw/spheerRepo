@@ -81,7 +81,7 @@ public class TransactionManager : MonoBehaviour
             if (PlacementManager.Instance == null)
             {
                 Debug.LogWarning("[TransactionManager] PlacementManager is missing in scene.");
-                PopupManager.Instance.ShowPopup("Placement mode isn't set up in this scene yet.");
+                PopupManager.Instance.ShowPopup("Cannot place building right now. Please restart or contact support.");
                 return false;
             }
         }
