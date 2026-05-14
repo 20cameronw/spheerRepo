@@ -73,6 +73,17 @@ public class PlacementManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+                Debug.LogWarning("[PlacementManager] No camera assigned and Camera.main is null. "
+                    + "Assign the Main Camera in the PlacementManager Inspector field.");
+        }
+    }
+
     // ── Entry / exit ──────────────────────────────────────────────────────────
 
     /// <summary>
