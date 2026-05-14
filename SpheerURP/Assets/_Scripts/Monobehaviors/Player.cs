@@ -229,7 +229,7 @@ public class Player : MonoBehaviour
                 researchDiscount -= 0.05f;
                 break;
             case 8: //auto targeting
-                autoTargeting = true;
+                if (researchCount[index] > 0) autoTargeting = true;
                 break;
             case 9: //hold to buy
             case 10: //hold to click
