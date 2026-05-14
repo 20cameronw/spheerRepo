@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: turret range
   m_EditorClassIdentifier: 
-  name: Turret Range
-  bonus: Increases turret's range by %5
+  name: Sensor Expansion
+  bonus: +5% detection range for all turrets
   upgradeIndex: 5
   Icon: {fileID: 21300000, guid: b52130bb79a23344aa8c335cecb91eb0, type: 3}
-  cost: 500
+  cost: 800
   requiredXPLevel: 0
   requiredWorldLevel: 0
   maxPurchases: 10

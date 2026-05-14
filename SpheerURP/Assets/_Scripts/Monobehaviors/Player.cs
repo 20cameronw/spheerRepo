@@ -260,9 +260,9 @@ public class Player : MonoBehaviour
                 break;
             case 12: //offline rate
                 if (init)
-                    offlineIncomeMultiplier = 0.5f + 0.05f * researchCount[index];
+                    offlineIncomeMultiplier = 0.5f + 0.1f * researchCount[index];
                 else
-                    offlineIncomeMultiplier += 0.05f;
+                    offlineIncomeMultiplier += 0.1f;
                 break;
             case 13: //production rate
                 if (init)

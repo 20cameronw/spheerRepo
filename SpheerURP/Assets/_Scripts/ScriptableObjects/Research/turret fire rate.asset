@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: turret fire rate
   m_EditorClassIdentifier: 
-  name: Turret Fire Rate
-  bonus: Increases fire rate for turrets by 5%
+  name: Rapid Discharge
+  bonus: +5% fire rate for all turrets
   upgradeIndex: 4
   Icon: {fileID: 0}
-  cost: 500
+  cost: 1000
   requiredXPLevel: 0
   requiredWorldLevel: 0
   maxPurchases: 10

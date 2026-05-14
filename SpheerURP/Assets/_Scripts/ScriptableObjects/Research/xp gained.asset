@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: xp gained
   m_EditorClassIdentifier: 
-  name: XP Gained
-  bonus: +10% XP Gained from all sources
+  name: Knowledge Synthesis
+  bonus: +10% XP gained from all sources
   upgradeIndex: 2
   Icon: {fileID: 21300000, guid: bdfcd00e719df654886a535178587f29, type: 3}
-  cost: 500
+  cost: 300
   requiredXPLevel: 0
   requiredWorldLevel: 0
   maxPurchases: 10
