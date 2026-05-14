@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 /// <summary>
 /// Spins the world in default (non-placement) mode with physics-feel momentum and glide.
@@ -8,7 +7,8 @@ using UnityEngine.EventSystems;
 ///  • Drag  → world spins following your finger; velocity is accumulated from swipe speed.
 ///  • Same-direction swipe → adds momentum on top of existing spin (feels like pushing a top).
 ///  • Release → world keeps gliding in the last spin direction; friction decays it gradually.
-///  • Short tap (no drag) → fires EventManager.mineResource() as normal.
+///  • Every time the world has physically rotated degreesPerRevolution degrees (drag + glide
+///    both count) → fires MineResource.
 ///
 /// The Rotate component on the world is no longer needed; this script owns all rotation.
 /// PlacementManager's drag-spin is unaffected — this script steps aside when placement mode is active.
@@ -26,8 +26,10 @@ public class WorldDragSpin : MonoBehaviour
     [Tooltip("Converts swipe pixels-per-second into degrees-per-second of angular velocity.")]
     [SerializeField] private float spinSensitivity = 0.25f;
 
-    [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap).")]
-    [SerializeField] private float dragThresholdPixels = 10f;
+    [Header("Revolution Detection")]
+    [Tooltip("How many degrees the world must physically rotate to earn one resource. " +
+             "360 = one full spin. Lower values make it easier to trigger.")]
+    [SerializeField] private float degreesPerRevolution = 360f;
 
     [Header("Glide / Momentum")]
     [Tooltip("Velocity retained per frame at 60 fps. 0.99 = very long glide, 0.95 = short glide.")]
@@ -50,12 +52,24 @@ public class WorldDragSpin : MonoBehaviour
     // Guard against division by zero when deltaTime is nearly zero on the first frame.
     private const float MIN_DELTA_TIME = 0.001f;
 
+    // Minimum squared screen-delta magnitude before a move event is processed.
+    // Filters out sub-pixel jitter without needing a serialized threshold.
+    private const float MIN_DRAG_DELTA_SQR = 0.01f;
+
     // Input tracking
     private Vector3 lastInputPos;
-    private Vector3 touchStartPos;
     private bool isDragging;
 
+    // Tracks actual world rotation (degrees) since the last revolution fired.
+    // Both drag and glide contribute. Fires TriggerMine every degreesPerRevolution.
+    private float accumulatedDegrees;
+
     // ─────────────────────────────────────────────────────────────────────────
+
+    private void OnEnable()
+    {
+        accumulatedDegrees = 0f;
+    }
 
     private void Start()
     {
@@ -87,9 +101,15 @@ public class WorldDragSpin : MonoBehaviour
         velX *= decay;
         velY *= decay;
 
+        float degX = velX * Time.deltaTime;
+        float degY = velY * Time.deltaTime;
+
         Transform world = worldSpawner.CurrentWorld.transform;
-        world.Rotate(mainCamera.transform.right, velX * Time.deltaTime, Space.World);
-        world.Rotate(mainCamera.transform.up,    velY * Time.deltaTime, Space.World);
+        world.Rotate(mainCamera.transform.right, degX, Space.World);
+        world.Rotate(mainCamera.transform.up,    degY, Space.World);
+
+        // Both axes contribute to actual world rotation.
+        AddDegrees(Mathf.Sqrt(degX * degX + degY * degY));
     }
 
     // ── Input handling ────────────────────────────────────────────────────────
@@ -126,29 +146,25 @@ public class WorldDragSpin : MonoBehaviour
 
     private void OnInputBegan(Vector3 screenPos)
     {
-        touchStartPos = screenPos;
-        lastInputPos  = screenPos;
-        isDragging    = false;
+        lastInputPos = screenPos;
+        isDragging   = false;
     }
 
     private void OnInputMoved(Vector3 screenPos)
     {
         Vector3 delta = screenPos - lastInputPos;
 
-        if (!isDragging && Vector3.Distance(screenPos, touchStartPos) > dragThresholdPixels)
+        if (delta.sqrMagnitude > MIN_DRAG_DELTA_SQR)
+        {
             isDragging = true;
-
-        if (isDragging && delta.sqrMagnitude > 0.01f)
             AccumulateSpin(delta);
+        }
 
         lastInputPos = screenPos;
     }
 
     private void OnInputEnded(Vector3 screenPos, int fingerId)
     {
-        if (!isDragging && !IsPointerOverUI(fingerId))
-            TriggerClick();
-
         isDragging = false;
         // Angular velocity set during the drag carries on — the glide takes over.
     }
@@ -160,6 +176,7 @@ public class WorldDragSpin : MonoBehaviour
     /// then blends it with the existing velocity — carrying momentum when swiping
     /// in the same direction, or overriding when reversing.
     /// Also rotates the world by the raw pixel delta so it tracks the finger exactly.
+    /// Actual degrees applied to the world are passed to AddDegrees for revolution tracking.
     /// </summary>
     private void AccumulateSpin(Vector3 screenDelta)
     {
@@ -184,14 +201,34 @@ public class WorldDragSpin : MonoBehaviour
         velX = Mathf.Clamp(velX, -maxAngularSpeed, maxAngularSpeed);
 
         // Rotate the world this frame so it tracks the finger directly.
+        float degY = -screenDelta.x * spinSensitivity;
+        float degX =  screenDelta.y * spinSensitivity;
+
         Transform world = worldSpawner.CurrentWorld.transform;
-        world.Rotate(mainCamera.transform.up,    -screenDelta.x * spinSensitivity, Space.World);
-        world.Rotate(mainCamera.transform.right,  screenDelta.y * spinSensitivity, Space.World);
+        world.Rotate(mainCamera.transform.up,    degY, Space.World);
+        world.Rotate(mainCamera.transform.right, degX, Space.World);
+
+        // Accumulate actual world rotation (degrees) for revolution detection.
+        AddDegrees(Mathf.Sqrt(degX * degX + degY * degY));
+    }
+
+    /// <summary>
+    /// Adds <paramref name="degrees"/> to the revolution counter and fires TriggerMine
+    /// for each completed revolution.
+    /// </summary>
+    private void AddDegrees(float degrees)
+    {
+        accumulatedDegrees += degrees;
+        while (accumulatedDegrees >= degreesPerRevolution)
+        {
+            accumulatedDegrees -= degreesPerRevolution;
+            TriggerMine();
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private void TriggerClick()
+    private void TriggerMine()
     {
         if (eventManager != null)
             eventManager.MineResource();
@@ -199,14 +236,5 @@ public class WorldDragSpin : MonoBehaviour
         Player.Instance.MineResource();
         AudioManager.Instance.Play("click");
     }
-
-    private bool IsPointerOverUI(int fingerId)
-    {
-        if (EventSystem.current == null) return false;
-#if UNITY_EDITOR || UNITY_STANDALONE
-        return EventSystem.current.IsPointerOverGameObject();
-#else
-        return fingerId >= 0 && EventSystem.current.IsPointerOverGameObject(fingerId);
-#endif
-    }
 }
+
