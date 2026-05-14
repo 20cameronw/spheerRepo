@@ -50,8 +50,9 @@ public class BigEnemyAttackState : EnemyState
 
         for (int i = 0; i < steps && cr_running; i++)
         {
-            float dist     = Vector3.Distance(transform.parent.parent.position, sweepPath[i]);
-            float duration = Mathf.Max(1f, dist / Mathf.Max(1f, speed));
+            float validSpeed = Mathf.Max(1f, speed);
+            float dist       = Vector3.Distance(transform.parent.parent.position, sweepPath[i]);
+            float duration   = Mathf.Max(1f, dist / validSpeed);
 
             LeanTween.cancel(transform.parent.parent.gameObject);
             LeanTween.move(transform.parent.parent.gameObject, sweepPath[i], duration)
