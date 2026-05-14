@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>
 /// Manages the interactive building-placement flow:
@@ -33,11 +34,12 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private GameObject placementOverlayUI;
 
     /// <summary>
-    /// Button (or panel) that is shown after the player taps a slot marker,
-    /// allowing them to confirm the placement.  Wire its onClick to
-    /// <see cref="ConfirmSelectedSlot"/>.
+    /// Button that is shown after the player taps a slot marker,
+    /// allowing them to confirm the placement.  The onClick listener is
+    /// wired to <see cref="ConfirmSelectedSlot"/> automatically in code —
+    /// you do NOT need to wire it in the Inspector.
     /// </summary>
-    [SerializeField] private GameObject confirmButton;
+    [SerializeField] private Button confirmButton;
 
     [Header("Slot Visuals")]
     /// <summary>
@@ -47,6 +49,9 @@ public class PlacementManager : MonoBehaviour
     /// URP Lit material works well.  See README / Editor Setup notes.
     /// </summary>
     [SerializeField] private GameObject slotMarkerPrefab;
+
+    [Tooltip("Colour applied to the slot marker that the player has tapped/selected.")]
+    [SerializeField] private Color selectedSlotColor = Color.green;
 
     [Header("World Zoom Settings")]
     [Tooltip("Z position of the world during normal gameplay.")]
@@ -64,6 +69,7 @@ public class PlacementManager : MonoBehaviour
     private int pendingUpgradeIndex = -1;
     private float pendingCost = 0f;
     private int selectedSlotIndex = -1;
+    private GameObject selectedMarkerGO;
 
     private readonly List<GameObject> activeMarkers = new List<GameObject>();
 
@@ -91,6 +97,11 @@ public class PlacementManager : MonoBehaviour
                 Debug.LogWarning("[PlacementManager] No camera assigned and Camera.main is null. "
                     + "Assign the Main Camera in the PlacementManager Inspector field.");
         }
+
+        // Wire confirm button listener in code so it works even if onClick isn't
+        // wired in the Inspector.
+        if (confirmButton != null)
+            confirmButton.onClick.AddListener(ConfirmSelectedSlot);
     }
 
     // ── Entry / exit ──────────────────────────────────────────────────────────
@@ -117,7 +128,7 @@ public class PlacementManager : MonoBehaviour
         if (placementOverlayUI != null)
             placementOverlayUI.SetActive(true);
         if (confirmButton != null)
-            confirmButton.SetActive(false);
+            confirmButton.gameObject.SetActive(false);
 
         // Animate world Z closer then reveal slot markers
         MoveWorldZ(placementWorldZ, ShowSlotMarkers);
@@ -128,14 +139,22 @@ public class PlacementManager : MonoBehaviour
         inPlacementMode     = false;
         pendingUpgradeIndex = -1;
         pendingCost         = 0f;
-        selectedSlotIndex   = -1;
+
+        // Deselect the highlighted marker before clearing
+        if (selectedMarkerGO != null)
+        {
+            PlacementSlot ps = selectedMarkerGO.GetComponent<PlacementSlot>();
+            if (ps != null) ps.SetSelected(false, selectedSlotColor);
+        }
+        selectedSlotIndex = -1;
+        selectedMarkerGO  = null;
 
         ClearMarkers();
 
         if (placementOverlayUI != null)
             placementOverlayUI.SetActive(false);
         if (confirmButton != null)
-            confirmButton.SetActive(false);
+            confirmButton.gameObject.SetActive(false);
 
         worldSpawner.SetAutoRotate(true);
 
@@ -368,13 +387,29 @@ public class PlacementManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Marks a slot as the pending selection and shows the Confirm button.
+    /// Marks a slot as the pending selection, highlights it, and shows the Confirm button.
     /// </summary>
     private void SelectSlot(int slotIndex)
     {
+        // Deselect previous marker
+        if (selectedMarkerGO != null)
+        {
+            PlacementSlot prev = selectedMarkerGO.GetComponent<PlacementSlot>();
+            if (prev != null) prev.SetSelected(false, selectedSlotColor);
+        }
+
         selectedSlotIndex = slotIndex;
+        selectedMarkerGO  = GetMarkerBySlotIndex(slotIndex);
+
+        // Highlight the newly selected marker
+        if (selectedMarkerGO != null)
+        {
+            PlacementSlot ps = selectedMarkerGO.GetComponent<PlacementSlot>();
+            if (ps != null) ps.SetSelected(true, selectedSlotColor);
+        }
+
         if (confirmButton != null)
-            confirmButton.SetActive(true);
+            confirmButton.gameObject.SetActive(true);
     }
 
     /// <summary>
