@@ -316,12 +316,16 @@ public class Player : MonoBehaviour
                     prestigeDMMultiplier += 0.20f;
                 break;
             case 18: //wind turbine production boost
+                // NOTE: cases 13, 18, 19 all share productionRateMultiplier.
+                // During init, case 13 assigns (=) first (lower index), then 18/19
+                // add (+= ) on top. This is correct as long as the array order is maintained.
                 if (init)
                     productionRateMultiplier += 0.05f * researchCount[index];
                 else
                     productionRateMultiplier += 0.05f;
                 break;
             case 19: //drill automation production boost
+                // See note on case 18 re: shared productionRateMultiplier init ordering.
                 if (init)
                     productionRateMultiplier += 0.02f * researchCount[index];
                 else
