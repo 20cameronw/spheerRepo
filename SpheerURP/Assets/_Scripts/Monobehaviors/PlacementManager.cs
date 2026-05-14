@@ -7,10 +7,10 @@ using UnityEngine.EventSystems;
 /// Manages the interactive building-placement flow:
 /// <list type="number">
 ///   <item>Player buys a surface building → TransactionManager calls <see cref="EnterPlacementMode"/>.</item>
-///   <item>Camera zooms in.  All open UI panels close.</item>
+///   <item>World moves closer (Z axis).  All open UI panels close.</item>
 ///   <item>Blue slot markers appear on every available surface slot.</item>
 ///   <item>Player drags one finger to spin the world.</item>
-///   <item>Player taps a blue dot → building spawns there, camera zooms back out.</item>
+///   <item>Player taps a blue dot → building spawns there, world moves back out.</item>
 ///   <item>Or player taps Cancel → purchase is refunded.</item>
 /// </list>
 /// </summary>
@@ -40,12 +40,12 @@ public class PlacementManager : MonoBehaviour
     /// </summary>
     [SerializeField] private GameObject slotMarkerPrefab;
 
-    [Header("Camera Settings")]
-    [Tooltip("Distance from world centre when the game is in normal gameplay.")]
-    [SerializeField] private float normalCameraDistance = 15f;
-    [Tooltip("Distance from world centre when zoomed in for placement.")]
-    [SerializeField] private float placementCameraDistance = 8f;
-    [SerializeField] private float cameraZoomDuration = 0.5f;
+    [Header("World Zoom Settings")]
+    [Tooltip("Z position of the world during normal gameplay.")]
+    [SerializeField] private float normalWorldZ = 0f;
+    [Tooltip("Z position of the world when zoomed in for placement (negative = closer to camera).")]
+    [SerializeField] private float placementWorldZ = -70f;
+    [SerializeField] private float worldZoomDuration = 0.5f;
 
     [Header("World Spin Sensitivity")]
     [SerializeField] private float spinSensitivity = 0.3f;
@@ -108,8 +108,8 @@ public class PlacementManager : MonoBehaviour
         if (placementOverlayUI != null)
             placementOverlayUI.SetActive(true);
 
-        // Animate camera zoom then reveal slot markers
-        ZoomCamera(placementCameraDistance, ShowSlotMarkers);
+        // Animate world Z closer then reveal slot markers
+        MoveWorldZ(placementWorldZ, ShowSlotMarkers);
     }
 
     private void ExitPlacementMode()
@@ -125,7 +125,7 @@ public class PlacementManager : MonoBehaviour
 
         worldSpawner.SetAutoRotate(true);
 
-        ZoomCamera(normalCameraDistance);
+        MoveWorldZ(normalWorldZ);
     }
 
     // ── Player actions ────────────────────────────────────────────────────────
@@ -178,17 +178,17 @@ public class PlacementManager : MonoBehaviour
         ExitPlacementMode();
     }
 
-    // ── Camera zoom ───────────────────────────────────────────────────────────
+    // ── World Z zoom ──────────────────────────────────────────────────────────
 
-    private void ZoomCamera(float targetDist, System.Action onComplete = null)
+    private void MoveWorldZ(float targetZ, System.Action onComplete = null)
     {
-        if (mainCamera == null) { onComplete?.Invoke(); return; }
+        GameObject world = worldSpawner.CurrentWorld;
+        if (world == null) { onComplete?.Invoke(); return; }
 
-        Vector3 center    = worldSpawner.GetWorldCenter();
-        Vector3 direction = (mainCamera.transform.position - center).normalized;
-        Vector3 target    = center + direction * targetDist;
+        Vector3 target = world.transform.position;
+        target.z = targetZ;
 
-        LeanTween.move(mainCamera.gameObject, target, cameraZoomDuration)
+        LeanTween.move(world, target, worldZoomDuration)
             .setEase(LeanTweenType.easeInOutQuad)
             .setOnComplete(() => onComplete?.Invoke());
     }
