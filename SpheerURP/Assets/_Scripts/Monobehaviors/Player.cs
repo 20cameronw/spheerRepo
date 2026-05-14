@@ -45,14 +45,33 @@ public class Player : MonoBehaviour
 
     public Transform target;
 
-    public float getSellBackMultiplier()
+    public static event System.Action<Transform> OnTargetChanged;
+
+    public void targetThis(Transform target)
     {
-        return sellBackMultiplier;
+        this.target = target;
+        OnTargetChanged?.Invoke(target);
+    }
+
+    public Transform GetTarget()
+    {
+        return target;
+    }
+
+    public void ClearTarget()
+    {
+        target = null;
+        OnTargetChanged?.Invoke(null);
     }
 
     public float getTurretRangeMultiplier()
     {
         return turretRangeMultiplier;
+    }
+
+    public float getSellBackMultiplier()
+    {
+        return sellBackMultiplier;
     }
 
     public float getTurretFireRateMultiplier()
@@ -160,16 +179,6 @@ public class Player : MonoBehaviour
     public int getCores()
     {
         return cores;
-    }
-
-    public void targetThis(Transform target)
-    {
-        this.target = target;
-    }
-
-    public Transform GetTarget()
-    {
-        return target;
     }
 
     public float getResearchDiscount()
@@ -440,7 +449,7 @@ public class Player : MonoBehaviour
 
         resetData();
 
-        target = null;
+        ClearTarget();
 
         uIManager.ClosePanel();
 
@@ -478,26 +487,30 @@ public class Player : MonoBehaviour
         // If there are no enemies, clear the target
         if (enemies.Length == 0)
         {
-            target = null;
+            if (target != null) ClearTarget();
             return;
         }
 
         // Pick the closest enemy
-        GameObject closestEnemy = enemies[0];
-        float closestDistance = Vector3.Distance(transform.position, closestEnemy.transform.position);
+        GameObject closestEnemy   = enemies[0];
+        float      closestDistance = Vector3.Distance(transform.position, closestEnemy.transform.position);
 
         foreach (GameObject enemy in enemies)
         {
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
             if (distance < closestDistance)
             {
-                closestEnemy = enemy;
+                closestEnemy    = enemy;
                 closestDistance = distance;
             }
         }
 
-        // Assign the target
-        target = closestEnemy.transform;
+        // Assign the target only if it changed (avoids event spam every frame)
+        if (target != closestEnemy.transform)
+        {
+            target = closestEnemy.transform;
+            OnTargetChanged?.Invoke(target);
+        }
     }
 
 

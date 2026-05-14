@@ -1,34 +1,58 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BigEnemyIdleState : EnemyState
 {
     [SerializeField] private BigEnemyApproachingState enemyApproachingState;
-    [SerializeField] private bool timeLimitReached;
-    [SerializeField] private float waitTime;
-    public bool cr_running;
+    [SerializeField] private float orbitSpeed = 6f;
+
+    private bool doneCircling = false;
+    private bool cr_running   = false;
+
+    public override void OnStateEnter()
+    {
+        doneCircling = false;
+        cr_running   = false;
+    }
+
+    public override void OnStateExit()
+    {
+        StopAllCoroutines();
+        cr_running = false;
+        LeanTween.cancel(transform.parent.parent.gameObject);
+    }
 
     public override EnemyState RunState()
     {
         if (!cr_running)
-        {
-            StartCoroutine("Timer");
-        }
+            StartCoroutine(CircleOrbit());
 
-        if (timeLimitReached)
+        if (doneCircling)
         {
-            timeLimitReached = false;
+            doneCircling = false;
             return enemyApproachingState;
         }
         return this;
     }
 
-    private IEnumerator Timer()
+    private IEnumerator CircleOrbit()
     {
         cr_running = true;
-        yield return new WaitForSeconds(waitTime);
-        timeLimitReached = true;
-        cr_running = false;
+        Vector3[] orbitPath = EnemySpawner.Instance.GetCirclingPath(0f);
+
+        foreach (Vector3 waypoint in orbitPath)
+        {
+            float dist     = Vector3.Distance(transform.parent.parent.position, waypoint);
+            float duration = Mathf.Max(0.5f, dist / orbitSpeed);
+
+            LeanTween.cancel(transform.parent.parent.gameObject);
+            LeanTween.move(transform.parent.parent.gameObject, waypoint, duration)
+                .setEase(LeanTweenType.easeInOutSine);
+
+            yield return new WaitForSeconds(duration);
+        }
+
+        doneCircling = true;
+        cr_running   = false;
     }
 }
