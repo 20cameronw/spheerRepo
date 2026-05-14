@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 /// <summary>
 /// Spins the world in default (non-placement) mode with physics-feel momentum and glide.
@@ -8,8 +7,7 @@ using UnityEngine.EventSystems;
 ///  • Drag  → world spins following your finger; velocity is accumulated from swipe speed.
 ///  • Same-direction swipe → adds momentum on top of existing spin (feels like pushing a top).
 ///  • Release → world keeps gliding in the last spin direction; friction decays it gradually.
-///  • Short tap on the world (no drag) → fires MineResource.
-///  • Full revolution (360° of accumulated drag) → fires MineResource.
+///  • Full revolution (one finger-travel loop ≥ revolutionPixels px) → fires MineResource.
 ///
 /// The Rotate component on the world is no longer needed; this script owns all rotation.
 /// PlacementManager's drag-spin is unaffected — this script steps aside when placement mode is active.
@@ -27,8 +25,10 @@ public class WorldDragSpin : MonoBehaviour
     [Tooltip("Converts swipe pixels-per-second into degrees-per-second of angular velocity.")]
     [SerializeField] private float spinSensitivity = 0.25f;
 
-    [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap).")]
-    [SerializeField] private float dragThresholdPixels = 10f;
+    [Header("Revolution Detection")]
+    [Tooltip("Total finger-travel distance in pixels that counts as one full revolution. " +
+             "Lower = easier to trigger. Tune to match the visual feel of one world spin.")]
+    [SerializeField] private float revolutionPixels = 600f;
 
     [Header("Glide / Momentum")]
     [Tooltip("Velocity retained per frame at 60 fps. 0.99 = very long glide, 0.95 = short glide.")]
@@ -51,20 +51,23 @@ public class WorldDragSpin : MonoBehaviour
     // Guard against division by zero when deltaTime is nearly zero on the first frame.
     private const float MIN_DELTA_TIME = 0.001f;
 
+    // Minimum squared screen-delta magnitude before a move event is processed.
+    // Filters out sub-pixel jitter without needing a serialized threshold.
+    private const float MIN_DRAG_DELTA_SQR = 0.01f;
+
     // Input tracking
     private Vector3 lastInputPos;
-    private Vector3 touchStartPos;
     private bool isDragging;
 
-    // Tracks total degrees rotated during the current drag gesture.
-    // When it reaches 360° a mine event is fired and the counter resets.
-    private float accumulatedRotation;
+    // Tracks total finger-travel distance (pixels) since the last revolution fired.
+    // When it reaches revolutionPixels a mine event is fired and the counter resets.
+    private float accumulatedPixels;
 
     // ─────────────────────────────────────────────────────────────────────────
 
     private void OnEnable()
     {
-        accumulatedRotation = 0f;
+        accumulatedPixels = 0f;
     }
 
     private void Start()
@@ -136,32 +139,25 @@ public class WorldDragSpin : MonoBehaviour
 
     private void OnInputBegan(Vector3 screenPos)
     {
-        touchStartPos = screenPos;
-        lastInputPos  = screenPos;
-        isDragging    = false;
-        // NOTE: accumulatedRotation is intentionally NOT reset here so that
-        // multi-stroke spinning (lift finger, swipe again) still counts toward
-        // the 360° revolution threshold.
+        lastInputPos = screenPos;
+        isDragging   = false;
     }
 
     private void OnInputMoved(Vector3 screenPos)
     {
         Vector3 delta = screenPos - lastInputPos;
 
-        if (!isDragging && Vector3.Distance(screenPos, touchStartPos) > dragThresholdPixels)
+        if (delta.sqrMagnitude > MIN_DRAG_DELTA_SQR)
+        {
             isDragging = true;
-
-        if (isDragging && delta.sqrMagnitude > 0.01f)
             AccumulateSpin(delta);
+        }
 
         lastInputPos = screenPos;
     }
 
     private void OnInputEnded(Vector3 screenPos, int fingerId)
     {
-        if (!isDragging && !IsPointerOverUI(fingerId) && IsPointerOverWorld(screenPos))
-            TriggerClick();
-
         isDragging = false;
         // Angular velocity set during the drag carries on — the glide takes over.
     }
@@ -173,7 +169,8 @@ public class WorldDragSpin : MonoBehaviour
     /// then blends it with the existing velocity — carrying momentum when swiping
     /// in the same direction, or overriding when reversing.
     /// Also rotates the world by the raw pixel delta so it tracks the finger exactly.
-    /// Tracks accumulated rotation and fires MineResource on each full revolution.
+    /// Tracks accumulated finger-travel distance and fires MineResource each time
+    /// the player sweeps revolutionPixels worth of distance.
     /// </summary>
     private void AccumulateSpin(Vector3 screenDelta)
     {
@@ -202,20 +199,22 @@ public class WorldDragSpin : MonoBehaviour
         world.Rotate(mainCamera.transform.up,    -screenDelta.x * spinSensitivity, Space.World);
         world.Rotate(mainCamera.transform.right,  screenDelta.y * spinSensitivity, Space.World);
 
-        // Accumulate total angular displacement (degrees) for revolution detection.
-        // Use vector magnitude so diagonal swipes are measured correctly.
-        float degreesThisFrame = screenDelta.magnitude * spinSensitivity;
-        accumulatedRotation += degreesThisFrame;
-        if (accumulatedRotation >= 360f)
+        // Accumulate raw finger-travel distance (pixels).
+        // Using pixels directly decouples revolution detection from spinSensitivity,
+        // so tuning the visual spin speed doesn't accidentally change how hard it is
+        // to earn a resource.
+        // Use a while-loop so an exceptionally fast swipe can award multiple resources.
+        accumulatedPixels += screenDelta.magnitude;
+        while (accumulatedPixels >= revolutionPixels)
         {
-            accumulatedRotation -= 360f;
-            TriggerClick();
+            accumulatedPixels -= revolutionPixels;
+            TriggerMine();
         }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private void TriggerClick()
+    private void TriggerMine()
     {
         if (eventManager != null)
             eventManager.MineResource();
@@ -223,36 +222,5 @@ public class WorldDragSpin : MonoBehaviour
         Player.Instance.MineResource();
         AudioManager.Instance.Play("click");
     }
-
-    private bool IsPointerOverUI(int fingerId)
-    {
-        if (EventSystem.current == null) return false;
-#if UNITY_EDITOR || UNITY_STANDALONE
-        return EventSystem.current.IsPointerOverGameObject();
-#else
-        return fingerId >= 0 && EventSystem.current.IsPointerOverGameObject(fingerId);
-#endif
-    }
-
-    /// <summary>
-    /// Returns true when a ray from the camera through <paramref name="screenPos"/>
-    /// passes within the world's surface radius of the world centre.
-    /// Uses geometric sphere intersection so no collider is required on the world prefab.
-    /// </summary>
-    private bool IsPointerOverWorld(Vector3 screenPos)
-    {
-        if (worldSpawner.CurrentWorld == null || mainCamera == null) return false;
-
-        Ray ray = mainCamera.ScreenPointToRay(screenPos);
-        Vector3 worldCenter = worldSpawner.GetWorldCenter();
-        float   radius      = worldSpawner.GetSurfaceRadius();
-
-        // Project world center onto the ray and find the closest point.
-        Vector3 toCenter = worldCenter - ray.origin;
-        float   t        = Vector3.Dot(toCenter, ray.direction);
-        if (t < 0f) return false; // world is behind the camera
-
-        Vector3 closest = ray.origin + ray.direction * t;
-        return Vector3.Distance(closest, worldCenter) <= radius;
-    }
 }
+
