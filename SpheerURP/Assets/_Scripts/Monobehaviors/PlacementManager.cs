@@ -10,7 +10,8 @@ using UnityEngine.EventSystems;
 ///   <item>World moves closer (Z axis).  All open UI panels close.</item>
 ///   <item>Blue slot markers appear on every available surface slot.</item>
 ///   <item>Player drags one finger to spin the world.</item>
-///   <item>Player taps a blue dot → building spawns there, world moves back out.</item>
+///   <item>Player taps a blue dot → a Confirm button appears.</item>
+///   <item>Player taps Confirm → building spawns there, world moves back out.</item>
 ///   <item>Or player taps Cancel → purchase is refunded.</item>
 /// </list>
 /// </summary>
@@ -30,6 +31,13 @@ public class PlacementManager : MonoBehaviour
     /// It should contain a Cancel button wired to <see cref="CancelPlacement"/>.
     /// </summary>
     [SerializeField] private GameObject placementOverlayUI;
+
+    /// <summary>
+    /// Button (or panel) that is shown after the player taps a slot marker,
+    /// allowing them to confirm the placement.  Wire its onClick to
+    /// <see cref="ConfirmSelectedSlot"/>.
+    /// </summary>
+    [SerializeField] private GameObject confirmButton;
 
     [Header("Slot Visuals")]
     /// <summary>
@@ -55,6 +63,7 @@ public class PlacementManager : MonoBehaviour
     private bool inPlacementMode = false;
     private int pendingUpgradeIndex = -1;
     private float pendingCost = 0f;
+    private int selectedSlotIndex = -1;
 
     private readonly List<GameObject> activeMarkers = new List<GameObject>();
 
@@ -104,9 +113,11 @@ public class PlacementManager : MonoBehaviour
         // Close any currently open UI panel
         uiManager.ClosePanel();
 
-        // Show placement overlay (Cancel button)
+        // Show placement overlay (Cancel button); confirm button hidden until a slot is selected
         if (placementOverlayUI != null)
             placementOverlayUI.SetActive(true);
+        if (confirmButton != null)
+            confirmButton.SetActive(false);
 
         // Animate world Z closer then reveal slot markers
         MoveWorldZ(placementWorldZ, ShowSlotMarkers);
@@ -117,11 +128,14 @@ public class PlacementManager : MonoBehaviour
         inPlacementMode     = false;
         pendingUpgradeIndex = -1;
         pendingCost         = 0f;
+        selectedSlotIndex   = -1;
 
         ClearMarkers();
 
         if (placementOverlayUI != null)
             placementOverlayUI.SetActive(false);
+        if (confirmButton != null)
+            confirmButton.SetActive(false);
 
         worldSpawner.SetAutoRotate(true);
 
@@ -338,12 +352,38 @@ public class PlacementManager : MonoBehaviour
 
         if (mainCamera == null) return;
 
+        // Use RaycastAll so a planet collider in front of a slot marker never silently
+        // blocks the hit — we iterate all hits and find the first PlacementSlot.
         Ray ray = mainCamera.ScreenPointToRay(screenPoint);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        foreach (RaycastHit hit in hits)
         {
             PlacementSlot slot = hit.collider.GetComponent<PlacementSlot>();
             if (slot != null)
-                ConfirmPlacement(slot.SlotIndex);
+            {
+                SelectSlot(slot.SlotIndex);
+                return;
+            }
         }
+    }
+
+    /// <summary>
+    /// Marks a slot as the pending selection and shows the Confirm button.
+    /// </summary>
+    private void SelectSlot(int slotIndex)
+    {
+        selectedSlotIndex = slotIndex;
+        if (confirmButton != null)
+            confirmButton.SetActive(true);
+    }
+
+    /// <summary>
+    /// Wired to the Confirm button in the placement overlay UI.
+    /// Finalises placement for the previously selected slot.
+    /// </summary>
+    public void ConfirmSelectedSlot()
+    {
+        if (!inPlacementMode || selectedSlotIndex < 0) return;
+        ConfirmPlacement(selectedSlotIndex);
     }
 }
