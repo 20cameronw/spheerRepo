@@ -2,10 +2,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Allows the player to spin the world by dragging in default (non-placement) mode.
-/// A short tap (no drag) still fires the normal <see cref="EventManager.mineResource"/> click action.
-/// Attach this MonoBehaviour to the same Manager GameObject that holds
-/// <see cref="PlacementManager"/> and wire up the Inspector references.
+/// Spins the world in default (non-placement) mode with physics-feel momentum and glide.
+///
+/// Behaviour:
+///  • Drag  → world spins following your finger; velocity is accumulated from swipe speed.
+///  • Same-direction swipe → adds momentum on top of existing spin (feels like pushing a top).
+///  • Release → world keeps gliding in the last spin direction; friction decays it gradually.
+///  • Short tap (no drag) → fires EventManager.mineResource() as normal.
+///
+/// The Rotate component on the world is no longer needed; this script owns all rotation.
+/// PlacementManager's drag-spin is unaffected — this script steps aside when placement mode is active.
+///
+/// Attach to your Manager GameObject and wire up the Inspector references.
 /// </summary>
 public class WorldDragSpin : MonoBehaviour
 {
@@ -14,18 +22,38 @@ public class WorldDragSpin : MonoBehaviour
     [SerializeField] private EventManager eventManager;
     [SerializeField] private Camera mainCamera;
 
-    [Header("Spin Settings")]
-    [Tooltip("How many degrees the world rotates per pixel of drag movement.")]
-    [SerializeField] private float spinSensitivity = 0.3f;
+    [Header("Spin Sensitivity")]
+    [Tooltip("Converts swipe pixels-per-second into degrees-per-second of angular velocity.")]
+    [SerializeField] private float spinSensitivity = 0.25f;
 
     [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap).")]
     [SerializeField] private float dragThresholdPixels = 10f;
 
-    // Internal state
+    [Header("Glide / Momentum")]
+    [Tooltip("Velocity retained per frame at 60 fps. 0.99 = very long glide, 0.95 = short glide.")]
+    [Range(0.90f, 0.999f)]
+    [SerializeField] private float glide = 0.985f;
+
+    [Tooltip("How much existing velocity is carried forward when swiping in the same direction.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float momentumCarry = 0.4f;
+
+    [Tooltip("Maximum angular speed in degrees per second.")]
+    [SerializeField] private float maxAngularSpeed = 720f;
+
+    // Angular velocity in degrees/second, camera-relative axes.
+    // velX → rotation around camera.right  (up/down swipe → tilt)
+    // velY → rotation around camera.up     (left/right swipe → yaw)
+    private float velX;
+    private float velY;
+
+    // Guard against division by zero when deltaTime is nearly zero on the first frame.
+    private const float MIN_DELTA_TIME = 0.001f;
+
+    // Input tracking
     private Vector3 lastInputPos;
     private Vector3 touchStartPos;
-    private bool isDragging = false;
-    private bool wasAutoRotating = false;
+    private bool isDragging;
 
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -37,11 +65,31 @@ public class WorldDragSpin : MonoBehaviour
 
     private void Update()
     {
-        // Yield control to PlacementManager when it is active
+        // PlacementManager owns the world while placing — step aside.
         if (PlacementManager.Instance != null && PlacementManager.Instance.IsInPlacementMode())
             return;
 
         HandleInput();
+
+        // Apply glide every frame when the player is not actively dragging.
+        if (!isDragging)
+            ApplyGlide();
+    }
+
+    // ── Glide ─────────────────────────────────────────────────────────────────
+
+    private void ApplyGlide()
+    {
+        if (worldSpawner.CurrentWorld == null || mainCamera == null) return;
+
+        // Frame-rate-independent decay: same effective friction regardless of fps.
+        float decay = Mathf.Pow(glide, Time.deltaTime * 60f);
+        velX *= decay;
+        velY *= decay;
+
+        Transform world = worldSpawner.CurrentWorld.transform;
+        world.Rotate(mainCamera.transform.right, velX * Time.deltaTime, Space.World);
+        world.Rotate(mainCamera.transform.up,    velY * Time.deltaTime, Space.World);
     }
 
     // ── Input handling ────────────────────────────────────────────────────────
@@ -50,17 +98,11 @@ public class WorldDragSpin : MonoBehaviour
     {
 #if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetMouseButtonDown(0))
-        {
             OnInputBegan(Input.mousePosition);
-        }
         else if (Input.GetMouseButton(0))
-        {
             OnInputMoved(Input.mousePosition);
-        }
         else if (Input.GetMouseButtonUp(0))
-        {
             OnInputEnded(Input.mousePosition, fingerId: -1);
-        }
 #else
         if (Input.touchCount != 1) return;
         Touch touch = Input.GetTouch(0);
@@ -94,50 +136,60 @@ public class WorldDragSpin : MonoBehaviour
         Vector3 delta = screenPos - lastInputPos;
 
         if (!isDragging && Vector3.Distance(screenPos, touchStartPos) > dragThresholdPixels)
-        {
             isDragging = true;
-            // Pause auto-rotation while the player is manually spinning
-            wasAutoRotating = true;
-            worldSpawner.SetAutoRotate(false);
-        }
 
         if (isDragging && delta.sqrMagnitude > 0.01f)
-            SpinWorld(delta);
+            AccumulateSpin(delta);
 
         lastInputPos = screenPos;
     }
 
     private void OnInputEnded(Vector3 screenPos, int fingerId)
     {
-        if (isDragging)
-        {
-            // Resume auto-rotation after the drag finishes
-            if (wasAutoRotating)
-                worldSpawner.SetAutoRotate(true);
-        }
-        else
-        {
-            // Short tap — fire the mine/click action (skip if over a UI element)
-            if (!IsPointerOverUI(fingerId))
-                TriggerClick();
-        }
+        if (!isDragging && !IsPointerOverUI(fingerId))
+            TriggerClick();
 
-        isDragging     = false;
-        wasAutoRotating = false;
+        isDragging = false;
+        // Angular velocity set during the drag carries on — the glide takes over.
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Spin / velocity accumulation ──────────────────────────────────────────
 
-    private void SpinWorld(Vector3 screenDelta)
+    /// <summary>
+    /// Converts this frame's screen delta into an instantaneous angular velocity,
+    /// then blends it with the existing velocity — carrying momentum when swiping
+    /// in the same direction, or overriding when reversing.
+    /// Also rotates the world by the raw pixel delta so it tracks the finger exactly.
+    /// </summary>
+    private void AccumulateSpin(Vector3 screenDelta)
     {
         if (worldSpawner.CurrentWorld == null || mainCamera == null) return;
 
-        float rotY = -screenDelta.x * spinSensitivity;
-        float rotX =  screenDelta.y * spinSensitivity;
+        // dt guard: avoid division by zero on the first frame.
+        float dt = Mathf.Max(Time.deltaTime, MIN_DELTA_TIME);
+
+        // Instantaneous velocity from this swipe (degrees / second).
+        float instVelY = -screenDelta.x / dt * spinSensitivity;
+        float instVelX =  screenDelta.y / dt * spinSensitivity;
+
+        // If swiping in the same direction as current spin, carry existing momentum.
+        float carryY = (Mathf.Sign(instVelY) == Mathf.Sign(velY)) ? momentumCarry : 0f;
+        float carryX = (Mathf.Sign(instVelX) == Mathf.Sign(velX)) ? momentumCarry : 0f;
+
+        velY = instVelY + velY * carryY;
+        velX = instVelX + velX * carryX;
+
+        // Cap to prevent runaway speed.
+        velY = Mathf.Clamp(velY, -maxAngularSpeed, maxAngularSpeed);
+        velX = Mathf.Clamp(velX, -maxAngularSpeed, maxAngularSpeed);
+
+        // Rotate the world this frame so it tracks the finger directly.
         Transform world = worldSpawner.CurrentWorld.transform;
-        world.Rotate(mainCamera.transform.up,    rotY, Space.World);
-        world.Rotate(mainCamera.transform.right, rotX, Space.World);
+        world.Rotate(mainCamera.transform.up,    -screenDelta.x * spinSensitivity, Space.World);
+        world.Rotate(mainCamera.transform.right,  screenDelta.y * spinSensitivity, Space.World);
     }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void TriggerClick()
     {
