@@ -1,10 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyStateManager : MonoBehaviour
 {
     [SerializeField] private EnemyState currentState;
+
+    void Start()
+    {
+        currentState?.OnStateEnter();
+    }
 
     void Update()
     {
@@ -15,7 +18,7 @@ public class EnemyStateManager : MonoBehaviour
     {
         EnemyState nextState = currentState?.RunState();
 
-        if (nextState != null)
+        if (nextState != null && nextState != currentState)
         {
             SwitchToNextState(nextState);
         }
@@ -23,7 +26,10 @@ public class EnemyStateManager : MonoBehaviour
 
     private void SwitchToNextState(EnemyState nextState)
     {
+        currentState?.OnStateExit();
+        LeanTween.cancel(gameObject);
         currentState = nextState;
+        currentState.OnStateEnter();
     }
 
     public void targetThis()

@@ -1,23 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class EnemyHealth : MonoBehaviour
 {
+    [SerializeField] private float maxHealthPoints;
 
-    [SerializeField]
-    private float maxHealthPoints;
+    [SerializeField] private float healthScalarPerXPLevel;
 
-    [SerializeField]
-    private float healthScalarPerXPLevel;
+    [SerializeField] private float waveHealthScalar = 1.08f;
 
-    [SerializeField]
-    private Slider healthBar;
+    [SerializeField] private Slider healthBar;
 
-    [SerializeField]
-    private int xpWorth;
+    [SerializeField] private int xpWorth;
 
     private float currentHealth;
 
@@ -31,14 +25,19 @@ public class EnemyHealth : MonoBehaviour
 
     void Start()
     {
-        int level = Player.Instance.getCurrentXPLevel();
+        int   level = Player.Instance.getCurrentXPLevel();
+        int   wave  = EnemySpawner.Instance.currentWave;
+
+        // Scale health by XP level
         for (int i = 0; i < level; i++)
-        {
             maxHealthPoints *= healthScalarPerXPLevel;
-        }
-        currentHealth = maxHealthPoints;
-        healthBar.maxValue = currentHealth;
-        healthBar.value = currentHealth;
+
+        // Scale health by wave number (compounding per wave)
+        maxHealthPoints *= Mathf.Pow(waveHealthScalar, wave);
+
+        currentHealth        = maxHealthPoints;
+        healthBar.maxValue   = currentHealth;
+        healthBar.value      = currentHealth;
     }
 
     public void TakeDamage(float damage)
@@ -55,6 +54,10 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
+        // Clear the player's target if this enemy was being targeted
+        if (Player.Instance.GetTarget() == transform)
+            Player.Instance.ClearTarget();
+
         Player.Instance.addXpPoints(xpWorth);
         EnemySpawner.Instance.handleAlienDeath();
         Destroy(gameObject);

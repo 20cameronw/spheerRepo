@@ -45,14 +45,33 @@ public class Player : MonoBehaviour
 
     public Transform target;
 
-    public float getSellBackMultiplier()
+    public static event System.Action<Transform> OnTargetChanged;
+
+    public void targetThis(Transform target)
     {
-        return sellBackMultiplier;
+        this.target = target;
+        OnTargetChanged?.Invoke(target);
+    }
+
+    public Transform GetTarget()
+    {
+        return target;
+    }
+
+    public void ClearTarget()
+    {
+        target = null;
+        OnTargetChanged?.Invoke(null);
     }
 
     public float getTurretRangeMultiplier()
     {
         return turretRangeMultiplier;
+    }
+
+    public float getSellBackMultiplier()
+    {
+        return sellBackMultiplier;
     }
 
     public float getTurretFireRateMultiplier()
@@ -162,16 +181,6 @@ public class Player : MonoBehaviour
         return cores;
     }
 
-    public void targetThis(Transform target)
-    {
-        this.target = target;
-    }
-
-    public Transform GetTarget()
-    {
-        return target;
-    }
-
     public float getResearchDiscount()
     {
         return researchDiscount;
@@ -198,40 +207,68 @@ public class Player : MonoBehaviour
                     ower *= 2;
                 power = ower;
                 break;
-            case 1: //x2 current cash
-                AddDollars(getDollars());
+            case 1: //x2 current cash — one-time effect; never re-apply on load
+                if (!init)
+                    AddDollars(getDollars());
                 break;
             case 2: //xp gained +10%
-                xpModifier = xpModifier + 0.1f;
+                if (init)
+                    xpModifier = 1f + 0.1f * researchCount[index];
+                else
+                    xpModifier += 0.1f;
                 break;
             case 3: //turret damage
-                turretDamageMultiplier += 0.05f;
+                if (init)
+                    turretDamageMultiplier = 1f + 0.05f * researchCount[index];
+                else
+                    turretDamageMultiplier += 0.05f;
                 break;
             case 4: //turret fire rate
-                turretFireRateMultiplier += 0.05f;
+                if (init)
+                    turretFireRateMultiplier = 1f + 0.05f * researchCount[index];
+                else
+                    turretFireRateMultiplier += 0.05f;
                 break;
             case 5: //turret range
-                turretRangeMultiplier += 0.05f;
+                if (init)
+                    turretRangeMultiplier = 1f + 0.05f * researchCount[index];
+                else
+                    turretRangeMultiplier += 0.05f;
                 break;
             case 6: //sell back rate
-                sellBackMultiplier += 0.05f;
+                if (init)
+                    sellBackMultiplier = 0.05f * researchCount[index];
+                else
+                    sellBackMultiplier += 0.05f;
                 break;
             case 7: //reduce research costs
-                researchDiscount -= 0.05f;
+                if (init)
+                    researchDiscount = 1f - 0.05f * researchCount[index];
+                else
+                    researchDiscount -= 0.05f;
                 break;
             case 8: //auto targeting
-                autoTargeting = true;
+                if (researchCount[index] > 0) autoTargeting = true;
                 break;
             case 9: //hold to buy
             case 10: //hold to click
             case 11: //junk rewards
-                junkMultiplier += 0.1f;
+                if (init)
+                    junkMultiplier = 1f + 0.1f * researchCount[index];
+                else
+                    junkMultiplier += 0.1f;
                 break;
             case 12: //offline rate
-                offlineIncomeMultiplier += 0.05f;
+                if (init)
+                    offlineIncomeMultiplier = 0.5f + 0.05f * researchCount[index];
+                else
+                    offlineIncomeMultiplier += 0.05f;
                 break;
             case 13: //production rate
-                productionRateMultiplier += 0.01f;
+                if (init)
+                    productionRateMultiplier = 1f + 0.01f * researchCount[index];
+                else
+                    productionRateMultiplier += 0.01f;
                 break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
@@ -440,7 +477,7 @@ public class Player : MonoBehaviour
 
         resetData();
 
-        target = null;
+        ClearTarget();
 
         uIManager.ClosePanel();
 
@@ -478,26 +515,30 @@ public class Player : MonoBehaviour
         // If there are no enemies, clear the target
         if (enemies.Length == 0)
         {
-            target = null;
+            if (target != null) ClearTarget();
             return;
         }
 
         // Pick the closest enemy
-        GameObject closestEnemy = enemies[0];
-        float closestDistance = Vector3.Distance(transform.position, closestEnemy.transform.position);
+        GameObject closestEnemy   = enemies[0];
+        float      closestDistance = Vector3.Distance(transform.position, closestEnemy.transform.position);
 
         foreach (GameObject enemy in enemies)
         {
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
             if (distance < closestDistance)
             {
-                closestEnemy = enemy;
+                closestEnemy    = enemy;
                 closestDistance = distance;
             }
         }
 
-        // Assign the target
-        target = closestEnemy.transform;
+        // Assign the target only if it changed (avoids event spam every frame)
+        if (target != closestEnemy.transform)
+        {
+            target = closestEnemy.transform;
+            OnTargetChanged?.Invoke(target);
+        }
     }
 
 

@@ -1,44 +1,49 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyAttackState : EnemyState
 {
     [SerializeField] private EnemyLeavingState enemyLeavingState;
-    [SerializeField] private int timesToRaycast;
-    [SerializeField] private float timeBetweenCasts;
-    [SerializeField] private float raycastRange;
+    [SerializeField] private int   timesToRaycast   = 5;
+    [SerializeField] private float timeBetweenCasts = 0.5f;
+    [SerializeField] private float raycastRange     = 10f;
     [SerializeField] private ParticleSystem suckingEffect;
-    private int currentWaypointIndex = 0;
 
-    public float speed;
+    public float    speed    = 5f;
+    public Vector3[] waypoints;
 
-    public Transform[] waypoints;
+    private int  currentWaypointIndex = 0;
+    private bool doneAttacking        = false;
+    private bool cr_running           = false;
+    private bool gotAHit              = false;
+    public  ParticleSystem effect;
 
-    public bool doneAttacking;
-    public int timesCasted;
-    public bool cr_running;
+    public override void OnStateEnter()
+    {
+        currentWaypointIndex = 0;
+        doneAttacking        = false;
+        cr_running           = false;
+        gotAHit              = false;
+    }
 
-    private bool gotAHit = false;
-
-    public ParticleSystem effect;
+    public override void OnStateExit()
+    {
+        StopAllCoroutines();
+        cr_running    = false;
+        doneAttacking = false;
+        gotAHit       = false;
+    }
 
     public override EnemyState RunState()
     {
         if (!cr_running)
-        {
-            timesCasted = 0;
-            StartCoroutine("Attack");
-        }
+            StartCoroutine(Attack());
 
         if (doneAttacking)
         {
-            cr_running = false;
-            doneAttacking = false;
-            timesCasted = 0;
             enemyLeavingState.effect = this.effect;
-            gotAHit = false;
-            currentWaypointIndex = 0;
+            this.effect              = null;
+            currentWaypointIndex     = 0;
             return enemyLeavingState;
         }
         return this;
@@ -47,14 +52,16 @@ public class EnemyAttackState : EnemyState
     private IEnumerator Attack()
     {
         cr_running = true;
+        int timesCasted = 0;
+
         while (timesCasted < timesToRaycast && cr_running)
         {
             yield return new WaitForSeconds(timeBetweenCasts);
+
             RaycastHit hit;
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * raycastRange, Color.yellow);
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, raycastRange))
             {
-                // Debug.Log("Alien got a hit!");
                 gotAHit = true;
                 AudioManager.Instance.Play("GetSuckedUp");
 
@@ -65,37 +72,31 @@ public class EnemyAttackState : EnemyState
                     effect = Instantiate(suckingEffect, transform.position, Quaternion.identity);
                     effect.transform.SetParent(transform);
                     effect.transform.LookAt(prey.transform);
-                    yield return new WaitForSeconds(1);
-
+                    yield return new WaitForSeconds(1f);
                 }
                 doneAttacking = true;
             }
-            else
-            {
-                // Debug.Log("alien Did Not Hit");
-            }
 
-            timesCasted += 1;
+            timesCasted++;
         }
         doneAttacking = true;
     }
 
-    void Update() {
-        if (cr_running) {
-            if (!gotAHit) MoveTowardsWaypoint();
-
-            if (Vector3.Distance(transform.position, waypoints[currentWaypointIndex].position) <= 0.2f) 
-            {
-                currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-            }
-        }
+    void Update()
+    {
+        if (cr_running && !gotAHit)
+            MoveTowardsWaypoint();
     }
 
-    void MoveTowardsWaypoint() {
-        var step = speed * Time.deltaTime;
-        transform.parent.parent.position = Vector3.MoveTowards(transform.parent.parent.position,  waypoints[currentWaypointIndex].position, step);
-    }
+    private void MoveTowardsWaypoint()
+    {
+        if (waypoints == null || waypoints.Length == 0) return;
 
+        float step = speed * Time.deltaTime;
+        Transform root = transform.parent.parent;
+        root.position = Vector3.MoveTowards(root.position, waypoints[currentWaypointIndex], step);
+
+        if (Vector3.Distance(root.position, waypoints[currentWaypointIndex]) <= 0.2f)
+            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+    }
 }
-
-    

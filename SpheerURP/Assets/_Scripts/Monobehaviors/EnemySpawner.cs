@@ -5,152 +5,217 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public static EnemySpawner Instance;
-    [SerializeField] private Transform leavePoint;
-    [SerializeField] private Transform[] attackPoints;
 
-    [SerializeField] private Transform[] attackPointsBelow;
+    [Header("World Reference")]
+    [SerializeField] private Transform worldCenter;
 
-    [SerializeField] private Transform bigAttackPointAbove;
+    [Header("Enemy Prefabs")]
+    [SerializeField] private GameObject[] smallEnemyPrefabs;
+    [SerializeField] private GameObject[] bigEnemyPrefabs;
 
-    [SerializeField] private Transform bigAttackPointBelow;
-    [SerializeField] private Transform spawnPoint;
+    [Header("Distances")]
+    [SerializeField] private float spawnOffScreenRadius = 28f;
+    [SerializeField] private float stagingRadius        = 14f;
+    [SerializeField] private float attackYOffset        = 5f;
+    [SerializeField] private float attackSweepWidth     = 8f;
+    [SerializeField] private float leaveDistance        = 32f;
 
-    [SerializeField] private EnemyWavesListSO enemyWavesList;
+    [Header("Wave Scaling")]
+    [SerializeField] private float baseEnemyCount      = 2f;
+    [SerializeField] private float enemiesPerWave      = 0.5f;
+    [SerializeField] private float enemiesPerXPLevel   = 0.3f;
+    [SerializeField] private float incomeScaleDivisor  = 10000f;
+    [SerializeField] private float baseSpawnRate       = 2f;
+    [SerializeField] private float minSpawnRate        = 0.4f;
+    [SerializeField] private float baseWaveDelay       = 5f;
+    [SerializeField] private float minWaveDelay        = 2f;
 
     public delegate void WaveEventHandler(int waveIndex);
-
     public static event WaveEventHandler OnWaveStarted;
     public static event WaveEventHandler OnWaveCompleted;
 
-    private int currentEnemiesKilled = 0;
+    private int currentEnemiesKilled   = 0;
+    public  int currentWave            = 0;
+    private bool betweenWaves          = true;
+    private int  currentWaveEnemyCount = 0;
+    private Coroutine waveCoroutine;
 
-    public int currentWave = 0;
-
-    private bool betweenWaves = true;
-
-    private Coroutine coroutine;
+    private Vector3 Center => worldCenter != null ? worldCenter.position : Vector3.zero;
 
     void Awake()
     {
         if (Instance != null && Instance != this)
-        {
-            Destroy(this);
-        }
+            Destroy(gameObject);
         else
-        {
             Instance = this;
-        }
     }
 
-    void Start() {
+    void Start()
+    {
         StartWave();
     }
 
-    public int getEnemiesRemaining() {
-        int count = (betweenWaves) ? 0 : countEnemiesInWave(currentWave) - currentEnemiesKilled;
-        return count;
+    public int getEnemiesRemaining()
+    {
+        return betweenWaves ? 0 : currentWaveEnemyCount - currentEnemiesKilled;
     }
 
-    public Transform getAttackPoint() {
-        int random = Random.Range(0, 2);
-        Transform point = (random == 0) ? bigAttackPointAbove : bigAttackPointBelow;
-        return point;
+    // ── Procedural position helpers ──────────────────────────────────────────
+
+    /// <summary>Off-screen spawn point. ySide = +1 above, -1 below.</summary>
+    public Vector3 GetOffScreenSpawnPoint(float ySide)
+    {
+        return EnemyPathGenerator.GenerateOffScreenSpawnPoint(Center, spawnOffScreenRadius, ySide);
     }
 
-    public void handleAlienDeath() {
+    /// <summary>Neutral staging area near the planet perimeter (Y ≈ 0).</summary>
+    public Vector3 GetStagingPoint()
+    {
+        return EnemyPathGenerator.GenerateStagingPoint(Center, stagingRadius);
+    }
+
+    /// <summary>
+    /// Horizontal sweep path across the top (+yOffset) or bottom (-yOffset) of the planet.
+    /// </summary>
+    public Vector3[] GetAttackSweepPath(float yOffset)
+    {
+        return EnemyPathGenerator.GenerateAttackSweepPath(Center, 3, attackSweepWidth, yOffset);
+    }
+
+    /// <summary>The Y offset used for attack positions (positive = above).</summary>
+    public float AttackYOffset => attackYOffset;
+
+    /// <summary>Point far from the planet that the enemy retreats to.</summary>
+    public Vector3 GetDynamicLeavePoint()
+    {
+        return EnemyPathGenerator.GenerateLeavePoint(Center, leaveDistance);
+    }
+
+    // ── Wave lifecycle ───────────────────────────────────────────────────────
+
+    public void handleAlienDeath()
+    {
         currentEnemiesKilled++;
-        if (currentEnemiesKilled == countEnemiesInWave(currentWave)) {
+        if (currentEnemiesKilled >= currentWaveEnemyCount)
+        {
             betweenWaves = true;
             OnWaveCompleted?.Invoke(currentWave + 1);
             currentEnemiesKilled = 0;
-            if (currentWave + 1 < enemyWavesList.wavesList.Length) {
-                currentWave++;
-                StartWave();
-            }
+            currentWave++;
+            StartWave();
         }
     }
-    
+
     public void DeleteChildrenStartingWithUFO()
     {
         foreach (Transform child in transform)
         {
             if (child.name.StartsWith("ufo", System.StringComparison.OrdinalIgnoreCase))
-            {
                 Destroy(child.gameObject);
-            }
         }
     }
 
     public void prestige()
     {
-        StopCoroutine(coroutine);
+        if (waveCoroutine != null) StopCoroutine(waveCoroutine);
         DeleteChildrenStartingWithUFO();
         currentEnemiesKilled = 0;
         currentWave = 0;
         StartWave();
     }
 
-    private int countEnemiesInWave(int wave)
+    // ── Procedural wave generation ───────────────────────────────────────────
+
+    private struct WaveData
     {
-        int count = 0;
-        foreach (EnemyInfo ef in enemyWavesList.wavesList[wave].enemyInfoList)
+        public List<(GameObject prefab, int count)> enemies;
+        public float spawnRate;
+        public float waveDelay;
+    }
+
+    private WaveData GenerateWave(int wave)
+    {
+        int   xpLevel     = Player.Instance != null ? Player.Instance.getCurrentXPLevel() : 0;
+        float income      = Player.Instance != null ? Player.Instance.getPassive()        : 0f;
+        float incomeScale = Mathf.Log10(Mathf.Max(income, 1f) / Mathf.Max(incomeScaleDivisor, 1f) + 1f);
+
+        int totalEnemies = Mathf.Max(1, Mathf.RoundToInt(
+            baseEnemyCount
+            + (wave    * enemiesPerWave)
+            + (xpLevel * enemiesPerXPLevel)
+            + (incomeScale * 2f)));
+
+        float bigRatio = Mathf.Clamp01((wave / 20f) + (incomeScale * 0.2f));
+        int   bigCount   = Mathf.RoundToInt(totalEnemies * bigRatio);
+        int   smallCount = totalEnemies - bigCount;
+
+        float spawnRate = Mathf.Max(minSpawnRate, baseSpawnRate - (wave * 0.04f));
+        float waveDelay = Mathf.Max(minWaveDelay, baseWaveDelay  - (wave * 0.08f));
+
+        var data = new WaveData
         {
-            count += ef.numberOfEnemies;
+            enemies   = new List<(GameObject, int)>(),
+            spawnRate = spawnRate,
+            waveDelay = waveDelay
+        };
+
+        if (smallCount > 0 && smallEnemyPrefabs != null && smallEnemyPrefabs.Length > 0)
+            data.enemies.Add((smallEnemyPrefabs[wave % smallEnemyPrefabs.Length], smallCount));
+
+        if (bigCount > 0 && bigEnemyPrefabs != null && bigEnemyPrefabs.Length > 0)
+            data.enemies.Add((bigEnemyPrefabs[wave % bigEnemyPrefabs.Length], bigCount));
+
+        if (data.enemies.Count == 0)
+        {
+            if (smallEnemyPrefabs != null && smallEnemyPrefabs.Length > 0)
+                data.enemies.Add((smallEnemyPrefabs[0], totalEnemies));
+            else if (bigEnemyPrefabs != null && bigEnemyPrefabs.Length > 0)
+                data.enemies.Add((bigEnemyPrefabs[0], totalEnemies));
         }
-        return count;
+
+        return data;
     }
 
     private void spawnEnemy(GameObject prefab)
     {
-        GameObject enemy = Instantiate(prefab, spawnPoint);
+        // Spawn at the spawner's position; the enemy's ApproachingState.Awake will
+        // immediately reposition it to the correct off-screen spawn point.
+        GameObject enemy = Instantiate(prefab, transform.position, Quaternion.identity);
         enemy.transform.SetParent(this.transform, true);
     }
 
     public void StartWave()
     {
-        coroutine = StartCoroutine(SpawnWave(enemyWavesList.wavesList[currentWave]));
+        waveCoroutine = StartCoroutine(SpawnWave(currentWave));
     }
 
-    private IEnumerator SpawnWave(Wave wave)
+    private IEnumerator SpawnWave(int wave)
     {
-        yield return new WaitForSeconds(enemyWavesList.wavesList[currentWave].waveDelay);
-        betweenWaves = false;
-        OnWaveStarted?.Invoke(currentWave + 1);
-        foreach (var enemyInfo in wave.enemyInfoList)
+        WaveData data = GenerateWave(wave);
+
+        currentWaveEnemyCount = 0;
+        foreach (var (_, count) in data.enemies)
+            currentWaveEnemyCount += count;
+
+        if (currentWaveEnemyCount == 0)
         {
-            for (int i = 0; i < enemyInfo.numberOfEnemies; i++)
+            currentWave++;
+            StartWave();
+            yield break;
+        }
+
+        yield return new WaitForSeconds(data.waveDelay);
+        betweenWaves = false;
+        OnWaveStarted?.Invoke(wave + 1);
+
+        foreach (var (prefab, count) in data.enemies)
+        {
+            for (int i = 0; i < count; i++)
             {
-                spawnEnemy(enemyInfo.enemyPrefab);
-                yield return new WaitForSeconds(wave.spawnRate);
+                if (prefab != null)
+                    spawnEnemy(prefab);
+                yield return new WaitForSeconds(data.spawnRate);
             }
         }
-    }
-
-    public Transform[] getAttackPath() {
-        // Choose a random attack path
-        int random = Random.Range(0, 2); // 0 or 1
-        Transform[] selectedPath = (random == 0) ? attackPoints : attackPointsBelow;
-
-        // Create a new array to store the randomized order
-        Transform[] randomizedPath = new Transform[selectedPath.Length];
-        List<int> availableIndices = new List<int>();
-
-        // Fill the list with available indices
-        for (int i = 0; i < selectedPath.Length; i++) {
-            availableIndices.Add(i);
-        }
-
-        // Assign elements in random order
-        for (int i = 0; i < selectedPath.Length; i++) {
-            int randomIndex = Random.Range(0, availableIndices.Count);
-            randomizedPath[i] = selectedPath[availableIndices[randomIndex]];
-            availableIndices.RemoveAt(randomIndex); // Remove the used index
-        }
-
-        return randomizedPath;
-    }
-
-    public Transform getLeavePoint() {
-        return leavePoint;
     }
 }
