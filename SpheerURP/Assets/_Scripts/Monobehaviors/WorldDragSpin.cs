@@ -7,7 +7,8 @@ using UnityEngine;
 ///  • Drag  → world spins following your finger; velocity is accumulated from swipe speed.
 ///  • Same-direction swipe → adds momentum on top of existing spin (feels like pushing a top).
 ///  • Release → world keeps gliding in the last spin direction; friction decays it gradually.
-///  • Full revolution (one finger-travel loop ≥ revolutionPixels px) → fires MineResource.
+///  • Every time the world has physically rotated degreesPerRevolution degrees (drag + glide
+///    both count) → fires MineResource.
 ///
 /// The Rotate component on the world is no longer needed; this script owns all rotation.
 /// PlacementManager's drag-spin is unaffected — this script steps aside when placement mode is active.
@@ -26,9 +27,9 @@ public class WorldDragSpin : MonoBehaviour
     [SerializeField] private float spinSensitivity = 0.25f;
 
     [Header("Revolution Detection")]
-    [Tooltip("Total finger-travel distance in pixels that counts as one full revolution. " +
-             "Lower = easier to trigger. Tune to match the visual feel of one world spin.")]
-    [SerializeField] private float revolutionPixels = 600f;
+    [Tooltip("How many degrees the world must physically rotate to earn one resource. " +
+             "360 = one full spin. Lower values make it easier to trigger.")]
+    [SerializeField] private float degreesPerRevolution = 360f;
 
     [Header("Glide / Momentum")]
     [Tooltip("Velocity retained per frame at 60 fps. 0.99 = very long glide, 0.95 = short glide.")]
@@ -59,15 +60,15 @@ public class WorldDragSpin : MonoBehaviour
     private Vector3 lastInputPos;
     private bool isDragging;
 
-    // Tracks total finger-travel distance (pixels) since the last revolution fired.
-    // When it reaches revolutionPixels a mine event is fired and the counter resets.
-    private float accumulatedPixels;
+    // Tracks actual world rotation (degrees) since the last revolution fired.
+    // Both drag and glide contribute. Fires TriggerMine every degreesPerRevolution.
+    private float accumulatedDegrees;
 
     // ─────────────────────────────────────────────────────────────────────────
 
     private void OnEnable()
     {
-        accumulatedPixels = 0f;
+        accumulatedDegrees = 0f;
     }
 
     private void Start()
@@ -100,9 +101,15 @@ public class WorldDragSpin : MonoBehaviour
         velX *= decay;
         velY *= decay;
 
+        float degX = velX * Time.deltaTime;
+        float degY = velY * Time.deltaTime;
+
         Transform world = worldSpawner.CurrentWorld.transform;
-        world.Rotate(mainCamera.transform.right, velX * Time.deltaTime, Space.World);
-        world.Rotate(mainCamera.transform.up,    velY * Time.deltaTime, Space.World);
+        world.Rotate(mainCamera.transform.right, degX, Space.World);
+        world.Rotate(mainCamera.transform.up,    degY, Space.World);
+
+        // Both axes contribute to actual world rotation.
+        AddDegrees(Mathf.Sqrt(degX * degX + degY * degY));
     }
 
     // ── Input handling ────────────────────────────────────────────────────────
@@ -169,8 +176,7 @@ public class WorldDragSpin : MonoBehaviour
     /// then blends it with the existing velocity — carrying momentum when swiping
     /// in the same direction, or overriding when reversing.
     /// Also rotates the world by the raw pixel delta so it tracks the finger exactly.
-    /// Tracks accumulated finger-travel distance and fires MineResource each time
-    /// the player sweeps revolutionPixels worth of distance.
+    /// Actual degrees applied to the world are passed to AddDegrees for revolution tracking.
     /// </summary>
     private void AccumulateSpin(Vector3 screenDelta)
     {
@@ -195,19 +201,27 @@ public class WorldDragSpin : MonoBehaviour
         velX = Mathf.Clamp(velX, -maxAngularSpeed, maxAngularSpeed);
 
         // Rotate the world this frame so it tracks the finger directly.
-        Transform world = worldSpawner.CurrentWorld.transform;
-        world.Rotate(mainCamera.transform.up,    -screenDelta.x * spinSensitivity, Space.World);
-        world.Rotate(mainCamera.transform.right,  screenDelta.y * spinSensitivity, Space.World);
+        float degY = -screenDelta.x * spinSensitivity;
+        float degX =  screenDelta.y * spinSensitivity;
 
-        // Accumulate raw finger-travel distance (pixels).
-        // Using pixels directly decouples revolution detection from spinSensitivity,
-        // so tuning the visual spin speed doesn't accidentally change how hard it is
-        // to earn a resource.
-        // Use a while-loop so an exceptionally fast swipe can award multiple resources.
-        accumulatedPixels += screenDelta.magnitude;
-        while (accumulatedPixels >= revolutionPixels)
+        Transform world = worldSpawner.CurrentWorld.transform;
+        world.Rotate(mainCamera.transform.up,    degY, Space.World);
+        world.Rotate(mainCamera.transform.right, degX, Space.World);
+
+        // Accumulate actual world rotation (degrees) for revolution detection.
+        AddDegrees(Mathf.Sqrt(degX * degX + degY * degY));
+    }
+
+    /// <summary>
+    /// Adds <paramref name="degrees"/> to the revolution counter and fires TriggerMine
+    /// for each completed revolution.
+    /// </summary>
+    private void AddDegrees(float degrees)
+    {
+        accumulatedDegrees += degrees;
+        while (accumulatedDegrees >= degreesPerRevolution)
         {
-            accumulatedPixels -= revolutionPixels;
+            accumulatedDegrees -= degreesPerRevolution;
             TriggerMine();
         }
     }
