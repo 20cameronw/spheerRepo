@@ -13,4 +13,8 @@ public class World : ScriptableObject
 
     public int cores;
 
+    // Maximum number of building slots available on this world's surface.
+    // Bigger/higher-tier worlds should have more slots.
+    public int maxBuildingSlots = 20;
+
 }

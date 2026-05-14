@@ -18,6 +18,10 @@ public class Upgrade : ScriptableObject
 
     public int requiredXPLevel;
 
+    // How many surface slots this building occupies when placed.
+    // Larger/more powerful buildings should cost more slots.
+    public int slotSize = 1;
+
     public void Print()
     {
         Debug.Log(name + ": " + description + "\nCosts: " + cost);
