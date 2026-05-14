@@ -62,6 +62,11 @@ public class WorldDragSpin : MonoBehaviour
 
     // ─────────────────────────────────────────────────────────────────────────
 
+    private void OnEnable()
+    {
+        accumulatedRotation = 0f;
+    }
+
     private void Start()
     {
         if (mainCamera == null)
@@ -131,10 +136,12 @@ public class WorldDragSpin : MonoBehaviour
 
     private void OnInputBegan(Vector3 screenPos)
     {
-        touchStartPos      = screenPos;
-        lastInputPos       = screenPos;
-        isDragging         = false;
-        accumulatedRotation = 0f;
+        touchStartPos = screenPos;
+        lastInputPos  = screenPos;
+        isDragging    = false;
+        // NOTE: accumulatedRotation is intentionally NOT reset here so that
+        // multi-stroke spinning (lift finger, swipe again) still counts toward
+        // the 360° revolution threshold.
     }
 
     private void OnInputMoved(Vector3 screenPos)
@@ -196,9 +203,8 @@ public class WorldDragSpin : MonoBehaviour
         world.Rotate(mainCamera.transform.right,  screenDelta.y * spinSensitivity, Space.World);
 
         // Accumulate total angular displacement (degrees) for revolution detection.
-        // Use the larger of the horizontal/vertical component to measure the dominant
-        // rotation axis, matching the actual degrees the world visually rotates.
-        float degreesThisFrame = Mathf.Max(Mathf.Abs(screenDelta.x), Mathf.Abs(screenDelta.y)) * spinSensitivity;
+        // Use vector magnitude so diagonal swipes are measured correctly.
+        float degreesThisFrame = screenDelta.magnitude * spinSensitivity;
         accumulatedRotation += degreesThisFrame;
         if (accumulatedRotation >= 360f)
         {
@@ -229,16 +235,24 @@ public class WorldDragSpin : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns true when a ray cast from the given screen position hits the current world
-    /// or any of its children.
+    /// Returns true when a ray from the camera through <paramref name="screenPos"/>
+    /// passes within the world's surface radius of the world centre.
+    /// Uses geometric sphere intersection so no collider is required on the world prefab.
     /// </summary>
     private bool IsPointerOverWorld(Vector3 screenPos)
     {
         if (worldSpawner.CurrentWorld == null || mainCamera == null) return false;
+
         Ray ray = mainCamera.ScreenPointToRay(screenPos);
-        if (Physics.Raycast(ray, out RaycastHit hit))
-            return hit.transform == worldSpawner.CurrentWorld.transform
-                   || hit.transform.IsChildOf(worldSpawner.CurrentWorld.transform);
-        return false;
+        Vector3 worldCenter = worldSpawner.GetWorldCenter();
+        float   radius      = worldSpawner.GetSurfaceRadius();
+
+        // Project world center onto the ray and find the closest point.
+        Vector3 toCenter = worldCenter - ray.origin;
+        float   t        = Vector3.Dot(toCenter, ray.direction);
+        if (t < 0f) return false; // world is behind the camera
+
+        Vector3 closest = ray.origin + ray.direction * t;
+        return Vector3.Distance(closest, worldCenter) <= radius;
     }
 }
