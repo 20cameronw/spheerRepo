@@ -65,22 +65,44 @@ public class TransactionManager : MonoBehaviour
         float passiveEarnings = structuresPanelInfo.shopItemsSO[index].bonus;
         float cost = getCostOfUpgradeStructure(index);
         if (cost > Player.Instance.getDollars()) return false;
+
+        bool isOrbit = structuresPanelInfo.shopItemsSO[index].isInOrbit;
+
+        // Check slot availability for surface buildings
+        if (!isOrbit)
+        {
+            int slotSize = structuresPanelInfo.shopItemsSO[index].slotSize;
+            if (worldSpawner.GetSlotsAvailable() < slotSize)
+            {
+                PopupManager.Instance.ShowPopup("Not enough space on this world! Upgrade to a larger world.");
+                return false;
+            }
+        }
+
         AudioManager.Instance.Play("Place Building");
         Player.Instance.AddDollars(-cost);
-        Player.Instance.AddBuildingCount(index);
 
-        if (structuresPanelInfo.shopItemsSO[index].isInOrbit)
+        if (isOrbit)
+        {
+            // Orbit buildings are placed immediately (no slot system needed)
+            Player.Instance.AddBuildingCount(index);
             worldSpawner.spawnInOrbit(index, passiveEarnings);
+            Player.Instance.AddPassive(passiveEarnings);
+            structuresPanel.LoadCards();
+
+            string message = "-" + cost.ToString("F2");
+            uIManager.CreateAnimatedText(message, Color.red, 1f);
+        }
         else
-            worldSpawner.spawnObject(index, passiveEarnings);
+        {
+            // Surface buildings enter interactive placement mode.
+            // Building count and passive income are applied after the player
+            // chooses a slot (or cancelled and cost is refunded).
+            string message = "-" + cost.ToString("F2");
+            uIManager.CreateAnimatedText(message, Color.red, 1f);
 
-        Player.Instance.AddPassive(structuresPanelInfo.shopItemsSO[index].bonus);
-
-        structuresPanel.LoadCards();
-
-        string message = "-" + cost.ToString("F2");
-
-        uIManager.CreateAnimatedText(message, Color.red, 1f);
+            PlacementManager.Instance.EnterPlacementMode(index, cost);
+        }
 
         return true;
     }

@@ -15,6 +15,10 @@ public class WorldSpawner : MonoBehaviour
     [SerializeField] private SphereCollider surface;
 
     [Space(10)]
+    [Header("World Data")]
+    [SerializeField] private WorldsListSO worldsListSO;
+
+    [Space(10)]
     [Header("Orbit Settings")]
     [SerializeField] private SphereCollider orbitSC;
     [SerializeField] private float xOrbitSpeed;
@@ -25,8 +29,16 @@ public class WorldSpawner : MonoBehaviour
 
     private int objectsSpawned = 0;
     private List<GameObject> spawnedObjects = new List<GameObject>();
-    private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
 
+    // ── Slot system ──────────────────────────────────────────────────────────
+    // Slot positions are stored in CurrentWorld local space so they rotate
+    // with the world.  Index N in slotPositions maps 1-to-1 with slotOccupied[N].
+    private List<Vector3> slotPositions = new List<Vector3>();
+    private bool[] slotOccupied = new bool[0];
+    private int currentMaxSlots = 20;
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void OnEnable() => EventManager.OnClicked += ExpandAndShrink;
     private void OnDisable() => EventManager.OnClicked -= ExpandAndShrink;
 
     private void Start()
@@ -56,6 +68,7 @@ public class WorldSpawner : MonoBehaviour
             CurrentWorldGO = (GameObject)WorldsList[WorldIndex];
             SpawnWorld();
         }
+        GenerateSlots(WorldIndex);
     }
 
     private void DeleteCurrentWorld()
@@ -66,11 +79,190 @@ public class WorldSpawner : MonoBehaviour
         {
             Destroy(obj);
         }
+        spawnedObjects.Clear();
     }
 
     public void SpawnWorld()
     {
         CurrentWorld = Instantiate(CurrentWorldGO, transform);
+    }
+
+    // ── Slot generation ──────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Generates <see cref="currentMaxSlots"/> evenly-distributed points on
+    /// the world surface using the Fibonacci sphere algorithm.
+    /// Positions are in CurrentWorld local space.
+    /// </summary>
+    private void GenerateSlots(int worldIndex)
+    {
+        slotPositions.Clear();
+
+        currentMaxSlots = (worldsListSO != null && worldIndex < worldsListSO.worldsList.Length)
+            ? worldsListSO.worldsList[worldIndex].maxBuildingSlots
+            : 20;
+
+        slotOccupied = new bool[currentMaxSlots];
+
+        float radius = surface.radius;
+        float goldenRatio = (1f + Mathf.Sqrt(5f)) * 0.5f;
+
+        for (int i = 0; i < currentMaxSlots; i++)
+        {
+            float theta = 2f * Mathf.PI * i / goldenRatio;
+            float phi = Mathf.Acos(1f - 2f * (i + 0.5f) / currentMaxSlots);
+
+            float x = Mathf.Sin(phi) * Mathf.Cos(theta);
+            float y = Mathf.Sin(phi) * Mathf.Sin(theta);
+            float z = Mathf.Cos(phi);
+
+            slotPositions.Add(new Vector3(x, y, z) * radius);
+        }
+    }
+
+    // ── Slot queries ─────────────────────────────────────────────────────────
+
+    public int GetMaxSlots() => currentMaxSlots;
+
+    public int GetSlotsUsed()
+    {
+        int count = 0;
+        foreach (bool o in slotOccupied)
+            if (o) count++;
+        return count;
+    }
+
+    public int GetSlotsAvailable() => currentMaxSlots - GetSlotsUsed();
+
+    /// <summary>
+    /// Returns the world-space positions of all unoccupied slots that can
+    /// accommodate a building of the given <paramref name="slotSize"/>.
+    /// </summary>
+    public List<Vector3> GetAvailableSlotPositions(int slotSize = 1)
+    {
+        if (CurrentWorld == null) return new List<Vector3>();
+
+        List<Vector3> available = new List<Vector3>();
+        for (int i = 0; i < slotPositions.Count; i++)
+        {
+            if (!slotOccupied[i] && HasEnoughNearbyFreeSlots(i, slotSize))
+                available.Add(CurrentWorld.transform.TransformPoint(slotPositions[i]));
+        }
+        return available;
+    }
+
+    /// <summary>
+    /// Returns true if there are at least <paramref name="slotSize"/> unoccupied
+    /// slots (including the given one) within the neighbourhood of slot
+    /// <paramref name="anchorIndex"/>.
+    /// </summary>
+    private bool HasEnoughNearbyFreeSlots(int anchorIndex, int slotSize)
+    {
+        if (slotSize <= 1) return true;
+        int freeNeighbors = 1; // the anchor itself
+        Vector3 anchor = slotPositions[anchorIndex];
+        for (int j = 0; j < slotPositions.Count && freeNeighbors < slotSize; j++)
+        {
+            if (j == anchorIndex || slotOccupied[j]) continue;
+            float dist = Vector3.Distance(anchor, slotPositions[j]);
+            if (dist < surface.radius * 0.8f) // ~half the spacing at max slots
+                freeNeighbors++;
+        }
+        return freeNeighbors >= slotSize;
+    }
+
+    /// <summary>
+    /// Occupies the slot nearest to <paramref name="worldPos"/> plus
+    /// (<paramref name="slotSize"/> - 1) nearest free neighbors.
+    /// Returns the index of the primary slot, or -1 if no slot was found.
+    /// </summary>
+    public int OccupySlot(Vector3 worldPos, int slotSize = 1)
+    {
+        if (CurrentWorld == null) return -1;
+
+        int nearest = FindNearestFreeSlot(worldPos);
+        if (nearest < 0) return -1;
+        slotOccupied[nearest] = true;
+
+        // Occupy additional neighbor slots for larger buildings
+        int extraNeeded = slotSize - 1;
+        if (extraNeeded > 0)
+        {
+            Vector3 anchor = slotPositions[nearest];
+            List<int> neighborOrder = GetSlotsSortedByDistance(anchor);
+            foreach (int idx in neighborOrder)
+            {
+                if (extraNeeded <= 0) break;
+                if (!slotOccupied[idx])
+                {
+                    slotOccupied[idx] = true;
+                    extraNeeded--;
+                }
+            }
+        }
+
+        return nearest;
+    }
+
+    /// <summary>
+    /// Marks the next <paramref name="slotSize"/> available slots as occupied.
+    /// Used when re-spawning buildings from save data.
+    /// </summary>
+    public void OccupyNextAvailableSlots(int slotSize)
+    {
+        int occupied = 0;
+        for (int i = 0; i < slotOccupied.Length && occupied < slotSize; i++)
+        {
+            if (!slotOccupied[i])
+            {
+                slotOccupied[i] = true;
+                occupied++;
+            }
+        }
+    }
+
+    private int FindNearestFreeSlot(Vector3 worldPos)
+    {
+        if (CurrentWorld == null) return -1;
+        Vector3 localPos = CurrentWorld.transform.InverseTransformPoint(worldPos);
+        int bestIdx = -1;
+        float bestDist = float.MaxValue;
+        for (int i = 0; i < slotPositions.Count; i++)
+        {
+            if (slotOccupied[i]) continue;
+            float d = Vector3.Distance(localPos, slotPositions[i]);
+            if (d < bestDist) { bestDist = d; bestIdx = i; }
+        }
+        return bestIdx;
+    }
+
+    private List<int> GetSlotsSortedByDistance(Vector3 localAnchor)
+    {
+        List<int> indices = new List<int>();
+        for (int i = 0; i < slotPositions.Count; i++) indices.Add(i);
+        indices.Sort((a, b) =>
+            Vector3.Distance(slotPositions[a], localAnchor)
+            .CompareTo(Vector3.Distance(slotPositions[b], localAnchor)));
+        return indices;
+    }
+
+    // ── Spawn helpers ─────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Spawns a building at a specific world-space position (used by
+    /// <see cref="PlacementManager"/> after the player confirms a slot).
+    /// Does NOT modify slot occupancy — call <see cref="OccupySlot"/> first.
+    /// </summary>
+    public void SpawnAtPosition(int index, Vector3 worldPos)
+    {
+        GameObject newObject = Instantiate(structuresGOList[index], worldPos, Quaternion.identity);
+        newObject.transform.SetParent(CurrentWorld.transform);
+        newObject.transform.LookAt(CurrentWorld.transform.position);
+        newObject.transform.Rotate(-90, 0, 0);
+        spawnedObjects.Add(newObject);
+        newObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name
+                         + " " + objectsSpawned;
+        objectsSpawned++;
     }
 
     public void ExpandAndShrink()
@@ -117,9 +309,13 @@ public class WorldSpawner : MonoBehaviour
 
     public void spawnOnSurface(int index, float passive)
     {
-        Vector3 spawnPosition = UnityEngine.Random.onUnitSphere * surface.radius + CurrentWorld.transform.position;
-        Quaternion spawnRotation = Quaternion.identity;
-        GameObject newObject = Instantiate(structuresGOList[index], spawnPosition, spawnRotation) as GameObject;
+        // During load: place near a random surface point and occupy the nearest slot.
+        Vector3 randomWorldPos = UnityEngine.Random.onUnitSphere * surface.radius
+                                 + CurrentWorld.transform.position;
+        int slotSize = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].slotSize;
+        OccupySlot(randomWorldPos, slotSize);
+
+        GameObject newObject = Instantiate(structuresGOList[index], randomWorldPos, Quaternion.identity) as GameObject;
         newObject.transform.SetParent(CurrentWorld.transform);
         newObject.transform.LookAt(CurrentWorld.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
@@ -175,6 +371,54 @@ public class WorldSpawner : MonoBehaviour
                 return;
             }
         }
+    }
+
+    // ── Auto-rotation control (used by PlacementManager) ─────────────────────
+
+    /// <summary>
+    /// Enables or disables the auto-rotation on the current world and orbit ring.
+    /// Call with <c>false</c> when entering placement mode so the player's
+    /// drag controls the rotation instead.
+    /// </summary>
+    public void SetAutoRotate(bool enabled)
+    {
+        if (CurrentWorld != null)
+        {
+            Rotate worldRotate = CurrentWorld.GetComponent<Rotate>();
+            if (worldRotate != null) worldRotate.enabled = enabled;
+        }
+        if (orbitGO != null)
+        {
+            Rotate orbitRotate = orbitGO.GetComponent<Rotate>();
+            if (orbitRotate != null) orbitRotate.enabled = enabled;
+        }
+    }
+
+    // ── Accessors used by PlacementManager ───────────────────────────────────
+
+    public Vector3 GetWorldCenter() =>
+        CurrentWorld != null ? CurrentWorld.transform.position : transform.position;
+
+    public float GetSurfaceRadius() => surface.radius;
+
+    /// <summary>
+    /// Returns the index of the unoccupied slot whose world-space position is
+    /// closest to <paramref name="worldPos"/>.  Returns -1 if no free slot is
+    /// found within a reasonable distance.
+    /// </summary>
+    public int GetSlotIndexForWorldPosition(Vector3 worldPos)
+    {
+        if (CurrentWorld == null) return -1;
+        Vector3 localPos = CurrentWorld.transform.InverseTransformPoint(worldPos);
+        int bestIdx = -1;
+        float bestDist = float.MaxValue;
+        for (int i = 0; i < slotPositions.Count; i++)
+        {
+            if (slotOccupied[i]) continue;
+            float d = Vector3.Distance(localPos, slotPositions[i]);
+            if (d < bestDist) { bestDist = d; bestIdx = i; }
+        }
+        return bestIdx;
     }
 }
 
