@@ -8,7 +8,8 @@ using UnityEngine.EventSystems;
 ///  • Drag  → world spins following your finger; velocity is accumulated from swipe speed.
 ///  • Same-direction swipe → adds momentum on top of existing spin (feels like pushing a top).
 ///  • Release → world keeps gliding in the last spin direction; friction decays it gradually.
-///  • Short tap (no drag) → fires EventManager.mineResource() as normal.
+///  • Short tap on the world (no drag) → fires MineResource.
+///  • Full revolution (360° of accumulated drag) → fires MineResource.
 ///
 /// The Rotate component on the world is no longer needed; this script owns all rotation.
 /// PlacementManager's drag-spin is unaffected — this script steps aside when placement mode is active.
@@ -54,6 +55,10 @@ public class WorldDragSpin : MonoBehaviour
     private Vector3 lastInputPos;
     private Vector3 touchStartPos;
     private bool isDragging;
+
+    // Tracks total degrees rotated during the current drag gesture.
+    // When it reaches 360° a mine event is fired and the counter resets.
+    private float accumulatedRotation;
 
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -126,9 +131,10 @@ public class WorldDragSpin : MonoBehaviour
 
     private void OnInputBegan(Vector3 screenPos)
     {
-        touchStartPos = screenPos;
-        lastInputPos  = screenPos;
-        isDragging    = false;
+        touchStartPos      = screenPos;
+        lastInputPos       = screenPos;
+        isDragging         = false;
+        accumulatedRotation = 0f;
     }
 
     private void OnInputMoved(Vector3 screenPos)
@@ -146,7 +152,7 @@ public class WorldDragSpin : MonoBehaviour
 
     private void OnInputEnded(Vector3 screenPos, int fingerId)
     {
-        if (!isDragging && !IsPointerOverUI(fingerId))
+        if (!isDragging && !IsPointerOverUI(fingerId) && IsPointerOverWorld(screenPos))
             TriggerClick();
 
         isDragging = false;
@@ -160,6 +166,7 @@ public class WorldDragSpin : MonoBehaviour
     /// then blends it with the existing velocity — carrying momentum when swiping
     /// in the same direction, or overriding when reversing.
     /// Also rotates the world by the raw pixel delta so it tracks the finger exactly.
+    /// Tracks accumulated rotation and fires MineResource on each full revolution.
     /// </summary>
     private void AccumulateSpin(Vector3 screenDelta)
     {
@@ -187,6 +194,17 @@ public class WorldDragSpin : MonoBehaviour
         Transform world = worldSpawner.CurrentWorld.transform;
         world.Rotate(mainCamera.transform.up,    -screenDelta.x * spinSensitivity, Space.World);
         world.Rotate(mainCamera.transform.right,  screenDelta.y * spinSensitivity, Space.World);
+
+        // Accumulate total angular displacement (degrees) for revolution detection.
+        // Use the larger of the horizontal/vertical component to measure the dominant
+        // rotation axis, matching the actual degrees the world visually rotates.
+        float degreesThisFrame = Mathf.Max(Mathf.Abs(screenDelta.x), Mathf.Abs(screenDelta.y)) * spinSensitivity;
+        accumulatedRotation += degreesThisFrame;
+        if (accumulatedRotation >= 360f)
+        {
+            accumulatedRotation -= 360f;
+            TriggerClick();
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -208,5 +226,19 @@ public class WorldDragSpin : MonoBehaviour
 #else
         return fingerId >= 0 && EventSystem.current.IsPointerOverGameObject(fingerId);
 #endif
+    }
+
+    /// <summary>
+    /// Returns true when a ray cast from the given screen position hits the current world
+    /// or any of its children.
+    /// </summary>
+    private bool IsPointerOverWorld(Vector3 screenPos)
+    {
+        if (worldSpawner.CurrentWorld == null || mainCamera == null) return false;
+        Ray ray = mainCamera.ScreenPointToRay(screenPos);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+            return hit.transform == worldSpawner.CurrentWorld.transform
+                   || hit.transform.IsChildOf(worldSpawner.CurrentWorld.transform);
+        return false;
     }
 }
