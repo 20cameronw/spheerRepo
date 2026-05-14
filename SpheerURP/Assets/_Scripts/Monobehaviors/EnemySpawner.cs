@@ -13,18 +13,20 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private GameObject[] smallEnemyPrefabs;
     [SerializeField] private GameObject[] bigEnemyPrefabs;
 
-    [Header("Orbit Radii")]
-    [SerializeField] private float spawnOrbitRadius  = 20f;
-    [SerializeField] private float attackOrbitRadius = 10f;
-    [SerializeField] private float leaveDistance     = 35f;
+    [Header("Distances")]
+    [SerializeField] private float spawnOffScreenRadius = 28f;
+    [SerializeField] private float stagingRadius        = 14f;
+    [SerializeField] private float attackYOffset        = 5f;
+    [SerializeField] private float attackSweepWidth     = 8f;
+    [SerializeField] private float leaveDistance        = 32f;
 
     [Header("Wave Scaling")]
-    [SerializeField] private float baseEnemyCount      = 3f;
-    [SerializeField] private float enemiesPerWave      = 0.8f;
-    [SerializeField] private float enemiesPerXPLevel   = 0.5f;
+    [SerializeField] private float baseEnemyCount      = 2f;
+    [SerializeField] private float enemiesPerWave      = 0.5f;
+    [SerializeField] private float enemiesPerXPLevel   = 0.3f;
     [SerializeField] private float incomeScaleDivisor  = 10000f;
     [SerializeField] private float baseSpawnRate       = 2f;
-    [SerializeField] private float minSpawnRate        = 0.3f;
+    [SerializeField] private float minSpawnRate        = 0.4f;
     [SerializeField] private float baseWaveDelay       = 5f;
     [SerializeField] private float minWaveDelay        = 2f;
 
@@ -32,9 +34,9 @@ public class EnemySpawner : MonoBehaviour
     public static event WaveEventHandler OnWaveStarted;
     public static event WaveEventHandler OnWaveCompleted;
 
-    private int currentEnemiesKilled  = 0;
-    public  int currentWave           = 0;
-    private bool betweenWaves         = true;
+    private int currentEnemiesKilled   = 0;
+    public  int currentWave            = 0;
+    private bool betweenWaves          = true;
     private int  currentWaveEnemyCount = 0;
     private Coroutine waveCoroutine;
 
@@ -60,23 +62,28 @@ public class EnemySpawner : MonoBehaviour
 
     // ── Procedural position helpers ──────────────────────────────────────────
 
-    /// <summary>Wide orbital arc used during the idle/circling phase.</summary>
-    public Vector3[] GetCirclingPath(float yOffset = 0f)
+    /// <summary>Off-screen spawn point. ySide = +1 above, -1 below.</summary>
+    public Vector3 GetOffScreenSpawnPoint(float ySide)
     {
-        return EnemyPathGenerator.GenerateOrbitPath(Center, 5, spawnOrbitRadius, yOffset, 270f);
+        return EnemyPathGenerator.GenerateOffScreenSpawnPoint(Center, spawnOffScreenRadius, ySide);
     }
 
-    /// <summary>Close-range attack orbit arc.</summary>
-    public Vector3[] GetDynamicAttackPath(float yOffset = 0f)
+    /// <summary>Neutral staging area near the planet perimeter (Y ≈ 0).</summary>
+    public Vector3 GetStagingPoint()
     {
-        return EnemyPathGenerator.GenerateOrbitPath(Center, 4, attackOrbitRadius, yOffset, 180f);
+        return EnemyPathGenerator.GenerateStagingPoint(Center, stagingRadius);
     }
 
-    /// <summary>Single close-range point the enemy approaches before attacking.</summary>
-    public Vector3 GetDynamicApproachPoint(float yOffset = 0f)
+    /// <summary>
+    /// Horizontal sweep path across the top (+yOffset) or bottom (-yOffset) of the planet.
+    /// </summary>
+    public Vector3[] GetAttackSweepPath(float yOffset)
     {
-        return EnemyPathGenerator.GenerateApproachPoint(Center, attackOrbitRadius, yOffset);
+        return EnemyPathGenerator.GenerateAttackSweepPath(Center, 3, attackSweepWidth, yOffset);
     }
+
+    /// <summary>The Y offset used for attack positions (positive = above).</summary>
+    public float AttackYOffset => attackYOffset;
 
     /// <summary>Point far from the planet that the enemy retreats to.</summary>
     public Vector3 GetDynamicLeavePoint()
@@ -128,17 +135,17 @@ public class EnemySpawner : MonoBehaviour
 
     private WaveData GenerateWave(int wave)
     {
-        int   xpLevel    = Player.Instance != null ? Player.Instance.getCurrentXPLevel() : 0;
-        float income     = Player.Instance != null ? Player.Instance.getPassive()        : 0f;
+        int   xpLevel     = Player.Instance != null ? Player.Instance.getCurrentXPLevel() : 0;
+        float income      = Player.Instance != null ? Player.Instance.getPassive()        : 0f;
         float incomeScale = Mathf.Log10(Mathf.Max(income, 1f) / Mathf.Max(incomeScaleDivisor, 1f) + 1f);
 
         int totalEnemies = Mathf.Max(1, Mathf.RoundToInt(
             baseEnemyCount
-            + (wave        * enemiesPerWave)
-            + (xpLevel     * enemiesPerXPLevel)
-            + (incomeScale * 3f)));
+            + (wave    * enemiesPerWave)
+            + (xpLevel * enemiesPerXPLevel)
+            + (incomeScale * 2f)));
 
-        float bigRatio = Mathf.Clamp01((wave / 15f) + (incomeScale * 0.3f));
+        float bigRatio = Mathf.Clamp01((wave / 20f) + (incomeScale * 0.2f));
         int   bigCount   = Mathf.RoundToInt(totalEnemies * bigRatio);
         int   smallCount = totalEnemies - bigCount;
 
@@ -147,24 +154,17 @@ public class EnemySpawner : MonoBehaviour
 
         var data = new WaveData
         {
-            enemies    = new List<(GameObject, int)>(),
-            spawnRate  = spawnRate,
-            waveDelay  = waveDelay
+            enemies   = new List<(GameObject, int)>(),
+            spawnRate = spawnRate,
+            waveDelay = waveDelay
         };
 
         if (smallCount > 0 && smallEnemyPrefabs != null && smallEnemyPrefabs.Length > 0)
-        {
-            GameObject prefab = smallEnemyPrefabs[wave % smallEnemyPrefabs.Length];
-            data.enemies.Add((prefab, smallCount));
-        }
+            data.enemies.Add((smallEnemyPrefabs[wave % smallEnemyPrefabs.Length], smallCount));
 
         if (bigCount > 0 && bigEnemyPrefabs != null && bigEnemyPrefabs.Length > 0)
-        {
-            GameObject prefab = bigEnemyPrefabs[wave % bigEnemyPrefabs.Length];
-            data.enemies.Add((prefab, bigCount));
-        }
+            data.enemies.Add((bigEnemyPrefabs[wave % bigEnemyPrefabs.Length], bigCount));
 
-        // Fallback: ensure something always spawns if prefabs are assigned
         if (data.enemies.Count == 0)
         {
             if (smallEnemyPrefabs != null && smallEnemyPrefabs.Length > 0)
@@ -178,8 +178,9 @@ public class EnemySpawner : MonoBehaviour
 
     private void spawnEnemy(GameObject prefab)
     {
-        Vector3 spawnPos = EnemyPathGenerator.GenerateApproachPoint(Center, spawnOrbitRadius, 0f);
-        GameObject enemy = Instantiate(prefab, spawnPos, Quaternion.identity);
+        // Spawn at the spawner's position; the enemy's ApproachingState.Awake will
+        // immediately reposition it to the correct off-screen spawn point.
+        GameObject enemy = Instantiate(prefab, transform.position, Quaternion.identity);
         enemy.transform.SetParent(this.transform, true);
     }
 

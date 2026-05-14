@@ -4,15 +4,15 @@ using UnityEngine;
 public class BigEnemyIdleState : EnemyState
 {
     [SerializeField] private BigEnemyApproachingState enemyApproachingState;
-    [SerializeField] private float orbitSpeed = 6f;
+    [SerializeField] private float flyInSpeed = 8f;
 
-    private bool doneCircling = false;
-    private bool cr_running   = false;
+    private bool doneFlyIn  = false;
+    private bool cr_running = false;
 
     public override void OnStateEnter()
     {
-        doneCircling = false;
-        cr_running   = false;
+        doneFlyIn  = false;
+        cr_running = false;
     }
 
     public override void OnStateExit()
@@ -25,34 +25,31 @@ public class BigEnemyIdleState : EnemyState
     public override EnemyState RunState()
     {
         if (!cr_running)
-            StartCoroutine(CircleOrbit());
+            StartCoroutine(FlyIn());
 
-        if (doneCircling)
+        if (doneFlyIn)
         {
-            doneCircling = false;
+            doneFlyIn = false;
             return enemyApproachingState;
         }
         return this;
     }
 
-    private IEnumerator CircleOrbit()
+    private IEnumerator FlyIn()
     {
         cr_running = true;
-        Vector3[] orbitPath = EnemySpawner.Instance.GetCirclingPath(0f);
 
-        foreach (Vector3 waypoint in orbitPath)
-        {
-            float dist     = Vector3.Distance(transform.parent.parent.position, waypoint);
-            float duration = Mathf.Max(0.5f, dist / orbitSpeed);
+        Vector3 stagingPoint = EnemySpawner.Instance.GetStagingPoint();
+        float   dist         = Vector3.Distance(transform.parent.parent.position, stagingPoint);
+        float   duration     = Mathf.Max(0.5f, dist / flyInSpeed);
 
-            LeanTween.cancel(transform.parent.parent.gameObject);
-            LeanTween.move(transform.parent.parent.gameObject, waypoint, duration)
-                .setEase(LeanTweenType.easeInOutSine);
+        LeanTween.cancel(transform.parent.parent.gameObject);
+        LeanTween.move(transform.parent.parent.gameObject, stagingPoint, duration)
+            .setEase(LeanTweenType.easeInOutQuad);
 
-            yield return new WaitForSeconds(duration);
-        }
+        yield return new WaitForSeconds(duration);
 
-        doneCircling = true;
-        cr_running   = false;
+        doneFlyIn  = true;
+        cr_running = false;
     }
 }

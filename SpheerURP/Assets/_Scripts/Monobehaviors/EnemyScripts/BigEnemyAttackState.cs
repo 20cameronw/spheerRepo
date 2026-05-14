@@ -44,9 +44,9 @@ public class BigEnemyAttackState : EnemyState
     {
         cr_running = true;
 
-        // Slow orbital sweep across a couple of attack waypoints
-        Vector3[] sweepPath = EnemySpawner.Instance.GetDynamicAttackPath(yOffset);
-        int steps = Mathf.Min(2, sweepPath.Length);
+        // Sweep across the full attack path (top or bottom of planet)
+        Vector3[] sweepPath = EnemySpawner.Instance.GetAttackSweepPath(yOffset);
+        int steps = sweepPath.Length;
 
         for (int i = 0; i < steps && cr_running; i++)
         {
