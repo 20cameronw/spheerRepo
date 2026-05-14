@@ -19,7 +19,7 @@ public class WorldDragSpin : MonoBehaviour
 {
     [Header("Scene References")]
     [SerializeField] private WorldSpawner worldSpawner;
-    [SerializeField] private EventManager eventManager;
+    [SerializeField] private UIManager eventManager;
     [SerializeField] private Camera mainCamera;
 
     [Header("Spin Sensitivity")]
@@ -194,7 +194,10 @@ public class WorldDragSpin : MonoBehaviour
     private void TriggerClick()
     {
         if (eventManager != null)
-            eventManager.mineResource();
+            eventManager.MineResource();
+
+        Player.Instance.MineResource();
+        AudioManager.Instance.Play("click");
     }
 
     private bool IsPointerOverUI(int fingerId)
