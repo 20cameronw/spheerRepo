@@ -81,6 +81,7 @@ public class WorldSpawner : MonoBehaviour
             Destroy(obj);
         }
         spawnedObjects.Clear();
+        objectsSpawned = 0;
     }
 
     public void SpawnWorld()
