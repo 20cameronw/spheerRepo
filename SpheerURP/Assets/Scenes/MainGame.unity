@@ -14529,11 +14529,11 @@ MonoBehaviour:
   bigEnemyPrefabs:
   - {fileID: 1565879919830752414, guid: 92e70138adfa11e42b9771c19777654b, type: 3}
   spawnOffScreenRadius: 100
-  stagingRadius: 20
-  attackYOffset: 39.4
+  stagingRadius: 50
+  attackYOffset: 40
   attackSweepWidth: 8
-  leaveDistance: 35
-  baseEnemyCount: 3
+  leaveDistance: 100
+  baseEnemyCount: 1
   enemiesPerWave: 0.8
   enemiesPerXPLevel: 0.5
   incomeScaleDivisor: 10000
@@ -21653,6 +21653,11 @@ MonoBehaviour:
   turretFireRateMultiplier: 1
   turretRangeMultiplier: 1
   sellBackMultiplier: 0
+  lazerDamageMultiplier: 1
+  lazerRangeMultiplier: 1
+  spinBonus: 0
+  prestigeDMMultiplier: 1
+  xpPerClickBonus: 0
   uIManager: {fileID: 1938628149}
   target: {fileID: 0}
   darkMatter: 0
@@ -21794,9 +21799,9 @@ MonoBehaviour:
   worldSpawner: {fileID: 1914055860}
   eventManager: {fileID: 1938628149}
   mainCamera: {fileID: 330585545}
-  spinSensitivity: 0.25
+  spinSensitivity: 0.1
   degreesPerRevolution: 360
-  glide: 0.999
+  glide: 0.9676
   momentumCarry: 0.49
   maxAngularSpeed: 720
 --- !u!114 &1938628154
