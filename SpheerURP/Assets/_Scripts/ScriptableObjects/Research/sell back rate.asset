@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: sell back rate
   m_EditorClassIdentifier: 
-  name: Sell Back Rate
-  bonus: Increases your structures' sell back rate by 5%
+  name: Material Recovery
+  bonus: +5% Spheer returned when selling structures
   upgradeIndex: 6
   Icon: {fileID: 21300000, guid: 2e43f0691f0d7404eae8d01381da65a0, type: 3}
-  cost: 1000
-  requiredXPLevel: 0
+  cost: 500
+  requiredXPLevel: 1
   requiredWorldLevel: 0
   maxPurchases: 10
   isEpic: 0

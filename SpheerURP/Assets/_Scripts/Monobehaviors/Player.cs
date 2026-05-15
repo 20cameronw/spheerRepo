@@ -41,6 +41,12 @@ public class Player : MonoBehaviour
     [SerializeField] private float turretRangeMultiplier = 1;
     [SerializeField] private float sellBackMultiplier = 0;
 
+    [SerializeField] private float lazerDamageMultiplier = 1f;
+    [SerializeField] private float lazerRangeMultiplier = 1f;
+    [SerializeField] private float spinBonus = 0f;
+    [SerializeField] private float prestigeDMMultiplier = 1f;
+    [SerializeField] private int xpPerClickBonus = 0;
+
     [SerializeField] private UIManager uIManager;
 
     public Transform target;
@@ -72,6 +78,21 @@ public class Player : MonoBehaviour
     public float getSellBackMultiplier()
     {
         return sellBackMultiplier;
+    }
+
+    public float getLazerDamageMultiplier()
+    {
+        return lazerDamageMultiplier;
+    }
+
+    public float getLazerRangeMultiplier()
+    {
+        return lazerRangeMultiplier;
+    }
+
+    public float getSpinBonus()
+    {
+        return spinBonus;
     }
 
     public float getTurretFireRateMultiplier()
@@ -194,6 +215,7 @@ public class Player : MonoBehaviour
 
     public void addResearchCount(int index, bool init)
     {
+        EnsureResearchCountSize();
         //if we are loading from file we don't want to increment the research count
         if (!init) researchCount[index]++;
         //but we still want to apply the effects of the research on startup 
@@ -260,15 +282,100 @@ public class Player : MonoBehaviour
                 break;
             case 12: //offline rate
                 if (init)
-                    offlineIncomeMultiplier = 0.5f + 0.05f * researchCount[index];
+                    offlineIncomeMultiplier = 0.5f + 0.1f * researchCount[index];
+                else
+                    offlineIncomeMultiplier += 0.1f;
+                break;
+            case 13: //production rate (Core Extraction)
+                RecalculateProductionRate();
+                break;
+            case 14: //lazer damage
+                if (init)
+                    lazerDamageMultiplier = 1f + 0.10f * researchCount[index];
+                else
+                    lazerDamageMultiplier += 0.10f;
+                break;
+            case 15: //lazer range
+                if (init)
+                    lazerRangeMultiplier = 1f + 0.10f * researchCount[index];
+                else
+                    lazerRangeMultiplier += 0.10f;
+                break;
+            case 16: //spin bonus (Mineral Density)
+                if (init)
+                    spinBonus = 0.5f * researchCount[index];
+                else
+                    spinBonus += 0.5f;
+                break;
+            case 17: //prestige DM multiplier (Dark Matter Mastery)
+                if (init)
+                    prestigeDMMultiplier = 1f + 0.20f * researchCount[index];
+                else
+                    prestigeDMMultiplier += 0.20f;
+                break;
+            case 18: //wind turbine production boost (Wind Power)
+                RecalculateProductionRate();
+                break;
+            case 19: //drill automation production boost (Drill Automation)
+                RecalculateProductionRate();
+                break;
+            case 20: //quantum capacitor — DM income bonus
+                if (init)
+                    dmMultiplier = 1f + 0.05f * researchCount[index];
+                else
+                    dmMultiplier += 0.05f;
+                break;
+            case 21: //neural interface — +1 XP per click per level
+                if (init)
+                    xpPerClickBonus = researchCount[index];
+                else
+                    xpPerClickBonus++;
+                break;
+            case 22: //orbital relay — +5% offline income per level
+                if (init)
+                    offlineIncomeMultiplier += 0.05f * researchCount[index];
                 else
                     offlineIncomeMultiplier += 0.05f;
                 break;
-            case 13: //production rate
+            case 23: //neutron drill — +2% production rate per level (Neutron Drill)
+                RecalculateProductionRate();
+                break;
+            case 24: //warp core — one-time +50% cash boost
+                // Effect is immediate: dollars are updated and persisted in the save.
+                // On reload (init=true) we skip this because the boosted amount is
+                // already stored in the saved 'dollars' field — re-applying would be a double-grant.
+                if (!init)
+                    AddDollars(getDollars() * 0.5f);
+                break;
+            case 25: //singularity drive — +0.5 spin bonus (additive with case 16)
                 if (init)
-                    productionRateMultiplier = 1f + 0.01f * researchCount[index];
+                    spinBonus += 0.5f * researchCount[index];
                 else
-                    productionRateMultiplier += 0.01f;
+                    spinBonus += 0.5f;
+                break;
+            case 26: //ion burst — +10% laser damage per level (additive with case 14)
+                if (init)
+                    lazerDamageMultiplier += 0.10f * researchCount[index];
+                else
+                    lazerDamageMultiplier += 0.10f;
+                break;
+            case 27: //gravity well — +5% junk multiplier per level (additive with case 11)
+                if (init)
+                    junkMultiplier += 0.05f * researchCount[index];
+                else
+                    junkMultiplier += 0.05f;
+                break;
+            case 28: //void lens — +5% turret range per level (additive with case 5)
+                if (init)
+                    turretRangeMultiplier += 0.05f * researchCount[index];
+                else
+                    turretRangeMultiplier += 0.05f;
+                break;
+            case 29: //stellar core — immediately grant 5 cores per purchase
+                // Effect is immediate: cores are persisted in the 'cores' field.
+                // On reload (init=true) we skip because granted cores are already in the save.
+                if (!init)
+                    addCores(5);
                 break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
@@ -284,6 +391,29 @@ public class Player : MonoBehaviour
             buildingCount[i] = 0;
         }
         passive = 0;
+    }
+
+    private void EnsureResearchCountSize()
+    {
+        int needed = researchInfo != null ? researchInfo.researchItemsSO.Length : 0;
+        while (researchCount.Count < needed)
+            researchCount.Add(0);
+    }
+
+    // Recomputes productionRateMultiplier from all research indices that contribute to it.
+    // Call this from any case that modifies production rate so ordering never matters.
+    private void RecalculateProductionRate()
+    {
+        productionRateMultiplier = 1f
+            + 0.01f * GetResearchCount(13)   // Core Extraction
+            + 0.05f * GetResearchCount(18)   // Wind Power
+            + 0.02f * GetResearchCount(19)   // Drill Automation
+            + 0.02f * GetResearchCount(23);  // Neutron Drill
+    }
+
+    private int GetResearchCount(int index)
+    {
+        return (index < researchCount.Count) ? researchCount[index] : 0;
     }
 
     public void resetResearchCount()
@@ -356,8 +486,8 @@ public class Player : MonoBehaviour
 
     public void MineResource()
     {
-        dollars += 1 * power;
-        addXpPoints(xpPerClick);
+        dollars += (1 + spinBonus) * power;
+        addXpPoints(xpPerClick + xpPerClickBonus);
     }
 
     private float offlineIncomeMultiplier = 0.5f;
@@ -384,6 +514,7 @@ public class Player : MonoBehaviour
             cores = data.cores;
             buildingCount = data.buildingCount;
             researchCount = data.researchCount;
+            EnsureResearchCountSize();
             currentWorld = data.currentWorld;
             darkMatter = data.darkMatter;
             worldSpawner.SetCurrentWorld(currentWorld);
@@ -471,7 +602,7 @@ public class Player : MonoBehaviour
 
     public void prestige()
     {
-        int earnedDarkMatter = getDMAvailable();
+        int earnedDarkMatter = Mathf.RoundToInt(getDMAvailable() * prestigeDMMultiplier);
 
         darkMatter += earnedDarkMatter;
 

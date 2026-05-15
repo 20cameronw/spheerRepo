@@ -117,6 +117,18 @@ public class TransactionManager : MonoBehaviour
     public void PurchaseResearch(int upgradeIndex, bool isEpic)
     {
         float cost = getCostOfResearchUpgrade(upgradeIndex);
+
+        // Enforce XP level requirement for common (non-epic) research
+        if (!isEpic)
+        {
+            int required = researchPanelInfo.researchItemsSO[upgradeIndex].requiredXPLevel;
+            if (Player.Instance.getCurrentXPLevel() < required)
+            {
+                Debug.Log("Player XP level too low for this research (requires " + required + ")");
+                return;
+            }
+        }
+
         if (isEpic) {
             if (Player.Instance.getCores() < cost)
             {

@@ -12,13 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: Wind Speed
   m_EditorClassIdentifier: 
-  name: Wind Speed
-  bonus: Grants for researching artificial wind generation to boost windmill output
-    by 5%
-  upgradeIndex: 13
+  name: Wind Power
+  bonus: +5% production rate from wind energy research
+  upgradeIndex: 18
   Icon: {fileID: 0}
-  cost: 0
-  requiredXPLevel: 0
+  cost: 2000
+  requiredXPLevel: 7
   requiredWorldLevel: 0
   maxPurchases: 10
   isEpic: 0

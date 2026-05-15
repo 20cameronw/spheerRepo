@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
   m_Name: Laser
   m_EditorClassIdentifier: 
-  name: Tesla Turret
-  description: Advanced electrical defense. 20 damage per second.
+  name: Ion Laser
+  description: Locks a sustained ion beam onto alien craft and deals continuous high-energy damage. 20 damage per second.
   upgradeIndex: 4
   Icon: {fileID: 21300000, guid: bdee96a18d99880409b2be15f2e68bf9, type: 3}
   cost: 20000

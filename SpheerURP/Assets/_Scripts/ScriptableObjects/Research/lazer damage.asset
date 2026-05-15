@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: lazer damage
   m_EditorClassIdentifier: 
-  name: Lazer Damage
-  bonus: 
-  upgradeIndex: 0
+  name: Laser Amplifier
+  bonus: +10% laser damage per level
+  upgradeIndex: 14
   Icon: {fileID: 0}
-  cost: 0
-  requiredXPLevel: 0
+  cost: 800
+  requiredXPLevel: 3
   requiredWorldLevel: 0
-  maxPurchases: 0
+  maxPurchases: 5
   isEpic: 0

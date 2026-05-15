@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: auto target
   m_EditorClassIdentifier: 
-  name: Auto Targeting
-  bonus: Adds auto targeting to all types of turrets!
+  name: Combat AI
+  bonus: Turrets automatically target the nearest enemy
   upgradeIndex: 8
   Icon: {fileID: 21300000, guid: b52130bb79a23344aa8c335cecb91eb0, type: 3}
-  cost: 30
+  cost: 10
   requiredXPLevel: 0
   requiredWorldLevel: 0
   maxPurchases: 1

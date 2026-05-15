@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
-  m_Name: Drill Rate
+  m_Name: ion burst
   m_EditorClassIdentifier: 
-  name: Drill Automation
-  bonus: +2% passive income rate per level
-  upgradeIndex: 19
+  name: Ion Burst
+  bonus: +10% laser damage per level
+  upgradeIndex: 26
   Icon: {fileID: 0}
-  cost: 500
-  requiredXPLevel: 2
+  cost: 1200
+  requiredXPLevel: 5
   requiredWorldLevel: 0
-  maxPurchases: 10
+  maxPurchases: 5
   isEpic: 0

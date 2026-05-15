@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: x2 cash
   m_EditorClassIdentifier: 
-  name: Double Down
-  bonus: Double your current cash balance
+  name: Resource Surge
+  bonus: Instantly doubles your current Spheer balance.
   upgradeIndex: 1
   Icon: {fileID: 21300000, guid: 2e43f0691f0d7404eae8d01381da65a0, type: 3}
   cost: 5
   requiredXPLevel: 0
   requiredWorldLevel: 0
-  maxPurchases: 10
+  maxPurchases: 3
   isEpic: 1

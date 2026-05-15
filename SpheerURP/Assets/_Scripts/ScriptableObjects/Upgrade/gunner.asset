@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
   m_Name: gunner
   m_EditorClassIdentifier: 
-  name: Gunner
-  description: Basic defense against aliens. 10 damage per shot.
+  name: Pulse Cannon
+  description: A rapid-fire plasma turret that defends your colony from incoming alien fighters. 10 damage per shot.
   upgradeIndex: 1
   Icon: {fileID: 21300000, guid: 82a2642c4064cdc488dd7263b3ac309d, type: 3}
   cost: 750

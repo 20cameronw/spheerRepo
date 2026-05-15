@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
   m_Name: Sat Dish
   m_EditorClassIdentifier: 
-  name: Sat Dish
-  description: It receives signals from your satellites and gives you money for it
-    idk
+  name: Deep Space Relay
+  description: A deep-space parabolic receiver that intercepts long-range signals from your satellite constellation, converting telemetry into passive income.
   upgradeIndex: 5
   Icon: {fileID: 21300000, guid: ada9a8a10f5aba3419a1840245d75f9d, type: 3}
   cost: 25000

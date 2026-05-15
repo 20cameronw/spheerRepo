@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
-  m_Name: new one
+  m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
+  m_Name: stellar core
   m_EditorClassIdentifier: 
-  name: Quantum Refinery
-  description: An experimental quantum-processing plant that converts exotic matter into refined Spheer at an unprecedented rate.
-  upgradeIndex: 14
+  name: Stellar Core
+  bonus: Immediately grants 5 Dark Matter cores
+  upgradeIndex: 29
   Icon: {fileID: 0}
-  cost: 0
-  health: 0
-  bonus: 1000
-  isInOrbit: 0
+  cost: 40
   requiredXPLevel: 0
+  requiredWorldLevel: 0
+  maxPurchases: 5
+  isEpic: 1

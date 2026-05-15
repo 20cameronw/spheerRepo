@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ddc12b120625f4cbca45597c5a983a, type: 3}
   m_Name: spoiky
   m_EditorClassIdentifier: 
-  name: Spoiky
-  description: mmm yes very spoiky dont prick ur finger
+  name: Acantha
+  description: A crystalline spike world in the outer void. Its jagged silica spires are kilometres tall and contain the densest known concentrations of quantum minerals in the galaxy.
   cost: 6.7e+10
   Icon: {fileID: 21300000, guid: ea02885a1c417504aa415df67d3d8d22, type: 3}
   index: 6

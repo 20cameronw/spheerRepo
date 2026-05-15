@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: junk rewards
   m_EditorClassIdentifier: 
-  name: Junk Rewards
-  bonus: When you collect space junk, increases those rewards by 10%
+  name: Debris Collector
+  bonus: +10% rewards when collecting space junk
   upgradeIndex: 11
   Icon: {fileID: 0}
-  cost: 50000
-  requiredXPLevel: 0
+  cost: 10000
+  requiredXPLevel: 5
   requiredWorldLevel: 0
   maxPurchases: 5
   isEpic: 0

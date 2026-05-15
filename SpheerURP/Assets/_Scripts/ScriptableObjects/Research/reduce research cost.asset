@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: reduce research cost
   m_EditorClassIdentifier: 
-  name: AI Breakthrough
-  bonus: Reduces research costs by 5%
+  name: Scientific Method
+  bonus: -5% cost on all common research
   upgradeIndex: 7
   Icon: {fileID: -851678419, guid: 1201c14bb4ee74d8e99e56dc4f3f4fd1, type: 3}
-  cost: 20000
-  requiredXPLevel: 0
+  cost: 5000
+  requiredXPLevel: 4
   requiredWorldLevel: 0
   maxPurchases: 5
   isEpic: 0

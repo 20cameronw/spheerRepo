@@ -23,6 +23,8 @@ public class lazer : MonoBehaviour
 
 
 
+    private float effectiveRange => range * Player.Instance.getLazerRangeMultiplier();
+
     void Start()
     {
         StartCoroutine("checkForTargetInRange");
@@ -47,10 +49,10 @@ public class lazer : MonoBehaviour
 
         if (target != null) {
             lazerEndPosition.transform.position = target.position;
-            target.GetComponent<EnemyHealth>().TakeDamage(damage * Time.deltaTime);
+            target.GetComponent<EnemyHealth>().TakeDamage(damage * Player.Instance.getLazerDamageMultiplier() * Time.deltaTime);
         } 
 
-        if (Vector3.Distance(transform.position, target.position) >= range)
+        if (Vector3.Distance(transform.position, target.position) >= effectiveRange)
         {
             target = null;
             return;
@@ -67,7 +69,7 @@ public class lazer : MonoBehaviour
             if (enemyPos != null)
             {
                 float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
-                if (distanceToEnemy <= range)
+                if (distanceToEnemy <= effectiveRange)
                 {
                     target = enemyPos;
                     StopCoroutine("checkForTargetInRange");
@@ -83,6 +85,7 @@ public class lazer : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, range);
+        float displayRange = Player.Instance != null ? effectiveRange : range;
+        Gizmos.DrawWireSphere(transform.position, displayRange);
     }
 }

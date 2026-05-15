@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
   m_Name: hold to click
   m_EditorClassIdentifier: 
-  name: Hold to click
-  bonus: 'For lazy people... '
+  name: Auto Miner
+  bonus: Hold to continuously mine your planet
   upgradeIndex: 10
   Icon: {fileID: 0}
-  cost: 0
+  cost: 3
   requiredXPLevel: 0
   requiredWorldLevel: 0
   maxPurchases: 1
