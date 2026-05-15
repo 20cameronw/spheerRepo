@@ -24,6 +24,16 @@ public class PlayerData
 
     public DateTime saveTime;
 
+    // Lifetime stats (never reset on prestige)
+    public int lifetimeTotalEnemiesKilled;
+    public int lifetimeTotalWavesCompleted;
+    public float lifetimeTotalMoneyEarned;
+    public int lifetimeHighestWave;
+    public int lifetimePrestigeCount;
+    public float lifetimeRecordPeakPassive;
+    public int lifetimeRecordHighestXPLevel;
+    public List<int> completedMissionIndices;
+
 
 
     public PlayerData(Player player)
@@ -38,5 +48,14 @@ public class PlayerData
         currentWave = EnemySpawner.Instance.currentWave;
         darkMatter = Player.Instance.getDarkMatter();
         saveTime = Player.Instance.now();
+
+        lifetimeTotalEnemiesKilled = Player.Instance.getLifetimeEnemiesKilled();
+        lifetimeTotalWavesCompleted = Player.Instance.getLifetimeWavesCompleted();
+        lifetimeTotalMoneyEarned = Player.Instance.getLifetimeTotalMoneyEarned();
+        lifetimeHighestWave = Player.Instance.getLifetimeHighestWave();
+        lifetimePrestigeCount = Player.Instance.getLifetimePrestigeCount();
+        lifetimeRecordPeakPassive = Player.Instance.getLifetimeRecordPeakPassive();
+        lifetimeRecordHighestXPLevel = Player.Instance.getLifetimeRecordHighestXPLevel();
+        completedMissionIndices = Player.Instance.getCompletedMissionIndices();
     }
 }

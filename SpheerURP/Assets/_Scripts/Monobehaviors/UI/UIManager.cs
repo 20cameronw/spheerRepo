@@ -15,6 +15,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private MenuPanel DebugMenu;
     [SerializeField] private MenuPanel InfoMenu;
     [SerializeField] private MenuPanel PrestigeMenu;
+    [SerializeField] private MenuPanel MissionsMenu;
+    [SerializeField] private MenuPanel LeaderboardMenu;
+    [SerializeField] private MenuPanel StatsMenu;
 
     [Range(0, 3)]
     [SerializeField] private float openPanelDelay;
@@ -85,6 +88,15 @@ public class UIManager : MonoBehaviour
                 break;
             case "prestige":
                 panel = PrestigeMenu;
+                break;
+            case "missions":
+                panel = MissionsMenu;
+                break;
+            case "leaderboard":
+                panel = LeaderboardMenu;
+                break;
+            case "stats":
+                panel = StatsMenu;
                 break;
             default:
                 panel = MainMenu;

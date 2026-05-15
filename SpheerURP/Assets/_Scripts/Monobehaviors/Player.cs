@@ -49,6 +49,57 @@ public class Player : MonoBehaviour
 
     [SerializeField] private UIManager uIManager;
 
+    // Lifetime stats (persist across prestiges)
+    private int lifetimeTotalEnemiesKilled = 0;
+    private int lifetimeTotalWavesCompleted = 0;
+    private float lifetimeTotalMoneyEarned = 0f;
+    private int lifetimeHighestWave = 0;
+    private int lifetimePrestigeCount = 0;
+    private float lifetimeRecordPeakPassive = 0f;
+    private int lifetimeRecordHighestXPLevel = 0;
+    private List<int> completedMissionIndices = new List<int>();
+
+    public int getLifetimeEnemiesKilled()           => lifetimeTotalEnemiesKilled;
+    public int getLifetimeWavesCompleted()          => lifetimeTotalWavesCompleted;
+    public float getLifetimeTotalMoneyEarned()      => lifetimeTotalMoneyEarned;
+    public int getLifetimeHighestWave()             => lifetimeHighestWave;
+    public int getLifetimePrestigeCount()           => lifetimePrestigeCount;
+    public float getLifetimeRecordPeakPassive()     => lifetimeRecordPeakPassive;
+    public int getLifetimeRecordHighestXPLevel()    => lifetimeRecordHighestXPLevel;
+    public List<int> getCompletedMissionIndices()   => completedMissionIndices;
+
+    public void recordEnemyKilled()
+    {
+        lifetimeTotalEnemiesKilled++;
+    }
+
+    public void recordWaveCompleted(int wave)
+    {
+        lifetimeTotalWavesCompleted++;
+        if (wave > lifetimeHighestWave) lifetimeHighestWave = wave;
+    }
+
+    public void recordMoneyEarned(float amount)
+    {
+        if (amount > 0) lifetimeTotalMoneyEarned += amount;
+    }
+
+    public void updateRecordPassive(float currentPassive)
+    {
+        if (currentPassive > lifetimeRecordPeakPassive) lifetimeRecordPeakPassive = currentPassive;
+    }
+
+    public void completeMission(int missionIndex)
+    {
+        if (!completedMissionIndices.Contains(missionIndex))
+            completedMissionIndices.Add(missionIndex);
+    }
+
+    public bool isMissionComplete(int missionIndex)
+    {
+        return completedMissionIndices.Contains(missionIndex);
+    }
+
     public Transform target;
 
     public static event System.Action<Transform> OnTargetChanged;
@@ -455,6 +506,18 @@ public class Player : MonoBehaviour
         LoadPlayerData();
 
         InvokeRepeating("SaveAndAddPassive", 1f, 1f);
+
+        EnemySpawner.OnWaveCompleted += OnWaveCompleted;
+    }
+
+    private void OnDestroy()
+    {
+        EnemySpawner.OnWaveCompleted -= OnWaveCompleted;
+    }
+
+    private void OnWaveCompleted(int wave)
+    {
+        recordWaveCompleted(wave);
     }
 
 
@@ -538,6 +601,16 @@ public class Player : MonoBehaviour
 
             offlineEarnings = CalculateOfflineEarnings(data.saveTime);
             dollars += offlineEarnings;
+
+            // Restore lifetime stats
+            lifetimeTotalEnemiesKilled   = data.lifetimeTotalEnemiesKilled;
+            lifetimeTotalWavesCompleted  = data.lifetimeTotalWavesCompleted;
+            lifetimeTotalMoneyEarned     = data.lifetimeTotalMoneyEarned;
+            lifetimeHighestWave          = data.lifetimeHighestWave;
+            lifetimePrestigeCount        = data.lifetimePrestigeCount;
+            lifetimeRecordPeakPassive    = data.lifetimeRecordPeakPassive;
+            lifetimeRecordHighestXPLevel = data.lifetimeRecordHighestXPLevel;
+            completedMissionIndices      = data.completedMissionIndices ?? new List<int>();
         }
         else
         {
@@ -551,7 +624,11 @@ public class Player : MonoBehaviour
         {
             SaveSystem.SavePlayer(this);
         }
-        dollars += passive * productionRateMultiplier * (1 + (getDMEarningsBonus()/100));
+        float baseIncome = passive * productionRateMultiplier;
+        float earned = baseIncome * (1 + (getDMEarningsBonus()/100));
+        dollars += earned;
+        recordMoneyEarned(earned);
+        updateRecordPassive(baseIncome);
     }
 
     public void removeUpgrade(int index)
@@ -603,6 +680,11 @@ public class Player : MonoBehaviour
     public void prestige()
     {
         int earnedDarkMatter = Mathf.RoundToInt(getDMAvailable() * prestigeDMMultiplier);
+
+        // Track prestige stats before resetting
+        lifetimePrestigeCount++;
+        if (currentXPLevel > lifetimeRecordHighestXPLevel)
+            lifetimeRecordHighestXPLevel = currentXPLevel;
 
         darkMatter += earnedDarkMatter;
 
