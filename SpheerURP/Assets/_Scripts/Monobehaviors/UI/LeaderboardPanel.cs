@@ -1,52 +1,84 @@
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
+using Unity.Services.Leaderboards;
+using Unity.Services.Leaderboards.Models;
 
 public class LeaderboardPanel : MenuPanel
 {
-    [Header("Record Labels")]
-    [SerializeField] private TMP_Text highestWaveRecord;
-    [SerializeField] private TMP_Text highestXPLevelRecord;
-    [SerializeField] private TMP_Text peakPassiveRecord;
-    [SerializeField] private TMP_Text mostEnemiesKilledRecord;
-    [SerializeField] private TMP_Text mostWavesCompletedRecord;
-    [SerializeField] private TMP_Text prestigeCountRecord;
-    [SerializeField] private TMP_Text mostMoneyEarnedRecord;
-    [SerializeField] private TMP_Text currentDarkMatterRecord;
+    [Header("Leaderboard Settings")]
+    [SerializeField] private string leaderboardId = "lifetime-value";
+    [SerializeField] private int topEntriesCount = 100;
+
+    [Header("UI References")]
+    [SerializeField] private Transform rowContainer;
+    [SerializeField] private GameObject rowPrefab;
+    [SerializeField] private TMP_Text statusText;
 
     public override void OpenPanel()
     {
-        RefreshRecords();
         base.OpenPanel();
+        _ = LoadLeaderboardAsync();
     }
 
-    public void RefreshRecords()
+    private async Task LoadLeaderboardAsync()
     {
-        Player p = Player.Instance;
-        if (p == null) return;
+        SetStatus("Loading...");
+        ClearRows();
 
-        if (highestWaveRecord)
-            highestWaveRecord.text = "🏆 Highest Wave\n" + p.getLifetimeHighestWave().ToString("N0");
-        if (highestXPLevelRecord)
-            highestXPLevelRecord.text = "🏆 Best XP Level\n" + p.getLifetimeRecordHighestXPLevel().ToString("N0");
-        if (peakPassiveRecord)
+        try
         {
-            float pp = p.getLifetimeRecordPeakPassive();
-            peakPassiveRecord.text = "🏆 Peak Income/s\n" + (pp > 999999 ? pp.ToString("0.##E0") : Mathf.Round(pp).ToString("N0"));
+            if (UnityServicesManager.Instance != null)
+                await UnityServicesManager.Instance.InitializeAsync();
+
+            double score = Player.Instance != null ? (double)Player.Instance.getLifetimeTotalMoneyEarned() : 0.0;
+            await LeaderboardsService.Instance.AddPlayerScoreAsync(leaderboardId, score);
+
+            var options = new GetScoresOptions { Limit = topEntriesCount };
+            LeaderboardScoresPage page = await LeaderboardsService.Instance.GetScoresAsync(leaderboardId, options);
+
+            ClearRows();
+            SetStatus(null);
+
+            if (page.Results == null || page.Results.Count == 0)
+            {
+                SetStatus("No entries yet.");
+                return;
+            }
+
+            foreach (var entry in page.Results)
+                SpawnRow(entry.Rank + 1, entry.PlayerName ?? entry.PlayerId, entry.Score);
         }
-        if (mostEnemiesKilledRecord)
-            mostEnemiesKilledRecord.text = "🏆 Enemies Killed\n" + p.getLifetimeEnemiesKilled().ToString("N0");
-        if (mostWavesCompletedRecord)
-            mostWavesCompletedRecord.text = "🏆 Waves Completed\n" + p.getLifetimeWavesCompleted().ToString("N0");
-        if (prestigeCountRecord)
-            prestigeCountRecord.text = "🏆 Prestiges\n" + p.getLifetimePrestigeCount().ToString("N0");
-        if (mostMoneyEarnedRecord)
+        catch (System.Exception e)
         {
-            float m = p.getLifetimeTotalMoneyEarned();
-            mostMoneyEarnedRecord.text = "🏆 Total Earned\n" + (m > 999999999 ? m.ToString("0.##E0") : Mathf.Round(m).ToString("N0"));
+            SetStatus("Failed to load leaderboard.");
+            Debug.LogError("[LeaderboardPanel] " + e);
         }
-        if (currentDarkMatterRecord)
-            currentDarkMatterRecord.text = "🏆 Dark Matter\n" + p.getDarkMatter().ToString("N0");
+    }
+
+    private void SpawnRow(int rank, string playerName, double score)
+    {
+        if (rowPrefab == null || rowContainer == null) return;
+
+        GameObject row = Instantiate(rowPrefab, rowContainer);
+        TMP_Text[] texts = row.GetComponentsInChildren<TMP_Text>();
+        if (texts.Length >= 1) texts[0].text = "#" + rank;
+        if (texts.Length >= 2) texts[1].text = playerName;
+        if (texts.Length >= 3) texts[2].text = score > 999999999.0 ? score.ToString("0.##E0") : ((long)score).ToString("N0");
+    }
+
+    private void ClearRows()
+    {
+        if (rowContainer == null) return;
+        foreach (Transform child in rowContainer)
+            Destroy(child.gameObject);
+    }
+
+    private void SetStatus(string message)
+    {
+        if (statusText == null) return;
+        statusText.text = message ?? string.Empty;
+        statusText.gameObject.SetActive(!string.IsNullOrEmpty(message));
     }
 }
+
