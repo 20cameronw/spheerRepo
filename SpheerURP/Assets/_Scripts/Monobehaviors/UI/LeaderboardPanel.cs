@@ -7,7 +7,7 @@ using Unity.Services.Leaderboards.Models;
 public class LeaderboardPanel : MenuPanel
 {
     [Header("Leaderboard Settings")]
-    [SerializeField] private string leaderboardId = "lifetime-value";
+    [SerializeField] private string leaderboardId = "Lifetime_Earnings_Leaderboard";
     [SerializeField] private int topEntriesCount = 100;
 
     [Header("UI References")]
@@ -31,7 +31,7 @@ public class LeaderboardPanel : MenuPanel
             if (UnityServicesManager.Instance != null)
                 await UnityServicesManager.Instance.InitializeAsync();
 
-            double score = Player.Instance != null ? (double)Player.Instance.getLifetimeTotalMoneyEarned() : 0.0;
+            double score = (double)Player.Instance.getLifetimeTotalMoneyEarned();
             await LeaderboardsService.Instance.AddPlayerScoreAsync(leaderboardId, score);
 
             var options = new GetScoresOptions { Limit = topEntriesCount };
