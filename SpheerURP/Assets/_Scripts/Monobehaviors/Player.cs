@@ -286,11 +286,8 @@ public class Player : MonoBehaviour
                 else
                     offlineIncomeMultiplier += 0.1f;
                 break;
-            case 13: //production rate
-                if (init)
-                    productionRateMultiplier = 1f + 0.01f * researchCount[index];
-                else
-                    productionRateMultiplier += 0.01f;
+            case 13: //production rate (Core Extraction)
+                RecalculateProductionRate();
                 break;
             case 14: //lazer damage
                 if (init)
@@ -316,21 +313,11 @@ public class Player : MonoBehaviour
                 else
                     prestigeDMMultiplier += 0.20f;
                 break;
-            case 18: //wind turbine production boost
-                // NOTE: cases 13, 18, 19 all share productionRateMultiplier.
-                // During init, case 13 assigns (=) first (lower index), then 18/19
-                // add (+= ) on top. This is correct as long as the array order is maintained.
-                if (init)
-                    productionRateMultiplier += 0.05f * researchCount[index];
-                else
-                    productionRateMultiplier += 0.05f;
+            case 18: //wind turbine production boost (Wind Power)
+                RecalculateProductionRate();
                 break;
-            case 19: //drill automation production boost
-                // See note on case 18 re: shared productionRateMultiplier init ordering.
-                if (init)
-                    productionRateMultiplier += 0.02f * researchCount[index];
-                else
-                    productionRateMultiplier += 0.02f;
+            case 19: //drill automation production boost (Drill Automation)
+                RecalculateProductionRate();
                 break;
             case 20: //quantum capacitor — DM income bonus
                 if (init)
@@ -350,11 +337,8 @@ public class Player : MonoBehaviour
                 else
                     offlineIncomeMultiplier += 0.05f;
                 break;
-            case 23: //neutron drill — +2% production rate per level (additive with 13/18/19)
-                if (init)
-                    productionRateMultiplier += 0.02f * researchCount[index];
-                else
-                    productionRateMultiplier += 0.02f;
+            case 23: //neutron drill — +2% production rate per level (Neutron Drill)
+                RecalculateProductionRate();
                 break;
             case 24: //warp core — one-time +50% current cash per purchase
                 if (!init)
@@ -409,6 +393,22 @@ public class Player : MonoBehaviour
         int needed = researchInfo != null ? researchInfo.researchItemsSO.Length : 0;
         while (researchCount.Count < needed)
             researchCount.Add(0);
+    }
+
+    // Recomputes productionRateMultiplier from all research indices that contribute to it.
+    // Call this from any case that modifies production rate so ordering never matters.
+    private void RecalculateProductionRate()
+    {
+        productionRateMultiplier = 1f
+            + 0.01f * GetCount(13)   // Core Extraction
+            + 0.05f * GetCount(18)   // Wind Power
+            + 0.02f * GetCount(19)   // Drill Automation
+            + 0.02f * GetCount(23);  // Neutron Drill
+    }
+
+    private int GetCount(int index)
+    {
+        return (index < researchCount.Count) ? researchCount[index] : 0;
     }
 
     public void resetResearchCount()
