@@ -27,7 +27,8 @@ public class ResearchPanel : MenuPanel
         researchCards = new List<GameObject>();
 
         // Build a sorted list: epics first (no level gate), then commons sorted by requiredXPLevel ascending.
-        // We preserve the original array so upgradeIndex values remain correct — we only change spawn order.
+        // researchCards[i] always maps to researchItemsSO[i] (same index), but the Unity sibling order
+        // of common cards in the scroll view will match ascending XP level rather than asset array order.
         Research[] allResearch = researchPanelInfo.researchItemsSO;
 
         // Create a mapping: researchItemsSO index → instantiated card GameObject

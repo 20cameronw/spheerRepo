@@ -340,7 +340,10 @@ public class Player : MonoBehaviour
             case 23: //neutron drill — +2% production rate per level (Neutron Drill)
                 RecalculateProductionRate();
                 break;
-            case 24: //warp core — one-time +50% current cash per purchase
+            case 24: //warp core — one-time +50% cash boost
+                // Effect is immediate: dollars are updated and persisted in the save.
+                // On reload (init=true) we skip this because the boosted amount is
+                // already stored in the saved 'dollars' field — re-applying would be a double-grant.
                 if (!init)
                     AddDollars(getDollars() * 0.5f);
                 break;
@@ -369,6 +372,8 @@ public class Player : MonoBehaviour
                     turretRangeMultiplier += 0.05f;
                 break;
             case 29: //stellar core — immediately grant 5 cores per purchase
+                // Effect is immediate: cores are persisted in the 'cores' field.
+                // On reload (init=true) we skip because granted cores are already in the save.
                 if (!init)
                     addCores(5);
                 break;
@@ -400,13 +405,13 @@ public class Player : MonoBehaviour
     private void RecalculateProductionRate()
     {
         productionRateMultiplier = 1f
-            + 0.01f * GetCount(13)   // Core Extraction
-            + 0.05f * GetCount(18)   // Wind Power
-            + 0.02f * GetCount(19)   // Drill Automation
-            + 0.02f * GetCount(23);  // Neutron Drill
+            + 0.01f * GetResearchCount(13)   // Core Extraction
+            + 0.05f * GetResearchCount(18)   // Wind Power
+            + 0.02f * GetResearchCount(19)   // Drill Automation
+            + 0.02f * GetResearchCount(23);  // Neutron Drill
     }
 
-    private int GetCount(int index)
+    private int GetResearchCount(int index)
     {
         return (index < researchCount.Count) ? researchCount[index] : 0;
     }
