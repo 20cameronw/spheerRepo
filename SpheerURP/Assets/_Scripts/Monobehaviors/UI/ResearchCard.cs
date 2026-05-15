@@ -20,6 +20,9 @@ public class ResearchCard : MonoBehaviour
 
     public Button button;
 
+    // Attach the root CanvasGroup here; the panel sets alpha/interactable to grey out locked cards.
+    public CanvasGroup lockGroup;
+
     public void purchase()
     {
         TransactionManager.Instance.PurchaseResearch(upgradeIndex, isEpic);
