@@ -59,6 +59,7 @@ public class EnemyHealth : MonoBehaviour
             Player.Instance.ClearTarget();
 
         Player.Instance.addXpPoints(xpWorth);
+        Player.Instance.recordEnemyKilled();
         EnemySpawner.Instance.handleAlienDeath();
         Destroy(gameObject);
     }
