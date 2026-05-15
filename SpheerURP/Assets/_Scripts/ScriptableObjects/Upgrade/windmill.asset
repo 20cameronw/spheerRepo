@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
   m_Name: windmill
   m_EditorClassIdentifier: 
-  name: Windmill
-  description: Generates a basic amount of resources or currency passively.
+  name: Solar Harvester
+  description: Converts stellar radiation into Spheer energy. Your first step toward an interplanetary empire.
   upgradeIndex: 0
   Icon: {fileID: 21300000, guid: f3ea32fe578cee645b9d803e9c1d5c7e, type: 3}
   cost: 100

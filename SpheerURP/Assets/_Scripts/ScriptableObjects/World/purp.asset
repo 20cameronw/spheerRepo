@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ddc12b120625f4cbca45597c5a983a, type: 3}
   m_Name: purp
   m_EditorClassIdentifier: 
-  name: Purp
-  description: Welcome to purp.
+  name: Purpura
+  description: A violet-hued gas-dwarf with a stable solid core. Storms of ionised xenon rage across its upper atmosphere, but the core material is extraordinarily valuable.
   cost: 480000
   Icon: {fileID: 21300000, guid: 9b9f922d45b438141b9e6273ba418066, type: 3}
   index: 3

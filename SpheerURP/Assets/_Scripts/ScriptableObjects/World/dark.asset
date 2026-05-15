@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ddc12b120625f4cbca45597c5a983a, type: 3}
   m_Name: dark
   m_EditorClassIdentifier: 
-  name: Dark
-  description: 'A wiremesh planet. '
+  name: Umbris
+  description: An enigmatic dark world with a wire-lattice crust formed by ancient volcanic venting. Its interior radiates void energy — harness it carefully.
   cost: 30000000
   Icon: {fileID: 21300000, guid: 50ec9c19e9993f8438c55a0599e02d72, type: 3}
   index: 5

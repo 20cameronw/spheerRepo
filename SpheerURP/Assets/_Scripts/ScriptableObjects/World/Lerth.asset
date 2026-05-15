@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lerth
   m_EditorClassIdentifier: 
   name: Lerth
-  description: The starting world, Lerth. 6/10
+  description: "Your humble origin world. A dense, mineral-rich terrestrial planet with a breathable atmosphere and hostile local wildlife. The perfect place to begin your empire. 6/10."
   cost: 0
   Icon: {fileID: 21300000, guid: 6452473380fcecd4c8370c19c1831d2d, type: 3}
   index: 0

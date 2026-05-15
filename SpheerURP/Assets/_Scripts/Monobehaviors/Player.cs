@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float lazerRangeMultiplier = 1f;
     [SerializeField] private float spinBonus = 0f;
     [SerializeField] private float prestigeDMMultiplier = 1f;
+    [SerializeField] private int xpPerClickBonus = 0;
 
     [SerializeField] private UIManager uIManager;
 
@@ -331,6 +332,62 @@ public class Player : MonoBehaviour
                 else
                     productionRateMultiplier += 0.02f;
                 break;
+            case 20: //quantum capacitor — DM income bonus
+                if (init)
+                    dmMultiplier = 1f + 0.05f * researchCount[index];
+                else
+                    dmMultiplier += 0.05f;
+                break;
+            case 21: //neural interface — +1 XP per click per level
+                if (init)
+                    xpPerClickBonus = researchCount[index];
+                else
+                    xpPerClickBonus++;
+                break;
+            case 22: //orbital relay — +5% offline income per level
+                if (init)
+                    offlineIncomeMultiplier += 0.05f * researchCount[index];
+                else
+                    offlineIncomeMultiplier += 0.05f;
+                break;
+            case 23: //neutron drill — +2% production rate per level (additive with 13/18/19)
+                if (init)
+                    productionRateMultiplier += 0.02f * researchCount[index];
+                else
+                    productionRateMultiplier += 0.02f;
+                break;
+            case 24: //warp core — one-time +50% current cash per purchase
+                if (!init)
+                    AddDollars(getDollars() * 0.5f);
+                break;
+            case 25: //singularity drive — +0.5 spin bonus (additive with case 16)
+                if (init)
+                    spinBonus += 0.5f * researchCount[index];
+                else
+                    spinBonus += 0.5f;
+                break;
+            case 26: //ion burst — +10% laser damage per level (additive with case 14)
+                if (init)
+                    lazerDamageMultiplier += 0.10f * researchCount[index];
+                else
+                    lazerDamageMultiplier += 0.10f;
+                break;
+            case 27: //gravity well — +5% junk multiplier per level (additive with case 11)
+                if (init)
+                    junkMultiplier += 0.05f * researchCount[index];
+                else
+                    junkMultiplier += 0.05f;
+                break;
+            case 28: //void lens — +5% turret range per level (additive with case 5)
+                if (init)
+                    turretRangeMultiplier += 0.05f * researchCount[index];
+                else
+                    turretRangeMultiplier += 0.05f;
+                break;
+            case 29: //stellar core — immediately grant 5 cores per purchase
+                if (!init)
+                    addCores(5);
+                break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
                 break;
@@ -425,7 +482,7 @@ public class Player : MonoBehaviour
     public void MineResource()
     {
         dollars += (1 + spinBonus) * power;
-        addXpPoints(xpPerClick);
+        addXpPoints(xpPerClick + xpPerClickBonus);
     }
 
     private float offlineIncomeMultiplier = 0.5f;

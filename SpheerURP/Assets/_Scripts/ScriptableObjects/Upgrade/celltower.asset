@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4f15ffda233584e8d36bb63c25f98e, type: 3}
   m_Name: celltower
   m_EditorClassIdentifier: 
-  name: Cell Tower
-  description: Yes now we have cell phone service
+  name: Comm Array
+  description: A high-gain antenna array that synchronizes with your orbital network, boosting coordination and resource processing across the colony.
   upgradeIndex: 3
   Icon: {fileID: 21300000, guid: e9de6db3ac97a544f9746b7b083ba723, type: 3}
   cost: 10000

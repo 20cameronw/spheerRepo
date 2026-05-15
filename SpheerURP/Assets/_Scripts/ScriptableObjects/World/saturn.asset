@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ddc12b120625f4cbca45597c5a983a, type: 3}
   m_Name: saturn
   m_EditorClassIdentifier: 
-  name: saturn
-  description: Saturns got rings baby
+  name: Kronos
+  description: A gas giant encircled by majestic icy rings composed of silicate dust and frozen methane. The ring debris alone contains enough rare isotopes to fuel a fleet.
   cost: 2000000
   Icon: {fileID: 21300000, guid: a733ecee0c206004db18bc0972238d0c, type: 3}
   index: 4
