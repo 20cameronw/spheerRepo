@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Manages the interactive building-placement flow:
 /// <list type="number">
-///   <item>Player buys a surface building → TransactionManager calls <see cref="EnterPlacementMode"/>.</item>
-///   <item>World moves closer (Z axis).  All open UI panels close.</item>
+///   <item>Player presses Buy in the shop → TransactionManager calls <see cref="EnterPlacementMode"/>.</item>
+///   <item>World moves closer (Z axis).  All open UI panels close.  No money is taken yet.</item>
 ///   <item>Blue slot markers appear on every available surface slot.</item>
 ///   <item>Player drags one finger to spin the world.</item>
-///   <item>Player taps a blue dot → a Confirm button appears.</item>
-///   <item>Player taps Confirm → building spawns there, world moves back out.</item>
-///   <item>Or player taps Cancel → purchase is refunded.</item>
+///   <item>Player taps blue dots to toggle them selected (green) / deselected.</item>
+///   <item>A bill text field shows the cumulative cost as slots are added / removed.</item>
+///   <item>Player taps Confirm → money is deducted and all selected buildings are spawned.</item>
+///   <item>Or player taps Cancel → no charge; placement mode exits cleanly.</item>
 /// </list>
 /// </summary>
 public class PlacementManager : MonoBehaviour
@@ -34,23 +36,27 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private GameObject placementOverlayUI;
 
     /// <summary>
-    /// Button that is shown after the player taps a slot marker,
-    /// allowing them to confirm the placement.  The onClick listener is
-    /// wired to <see cref="ConfirmSelectedSlot"/> automatically in code —
+    /// Button that is shown after the player taps at least one slot marker,
+    /// allowing them to confirm all selected placements.  The onClick listener is
+    /// wired to <see cref="ConfirmAllSelected"/> automatically in code —
     /// you do NOT need to wire it in the Inspector.
     /// </summary>
     [SerializeField] private Button confirmButton;
+
+    /// <summary>
+    /// Text field shown in the placement overlay.  Updated whenever the selection
+    /// changes to display the running total cost of all selected slots.
+    /// </summary>
+    [SerializeField] private TMP_Text costBillText;
 
     [Header("Slot Visuals")]
     /// <summary>
     /// Prefab used for each available-slot indicator (blue dot).
     /// Must have: MeshRenderer, Collider, and PlacementSlot component.
-    /// A sphere primitive (scale ~0.15) with a blue, slightly transparent
-    /// URP Lit material works well.  See README / Editor Setup notes.
     /// </summary>
     [SerializeField] private GameObject slotMarkerPrefab;
 
-    [Tooltip("Colour applied to the slot marker that the player has tapped/selected.")]
+    [Tooltip("Colour applied to slot markers that the player has selected.")]
     [SerializeField] private Color selectedSlotColor = Color.green;
 
     [Header("World Zoom Settings")]
@@ -65,11 +71,13 @@ public class PlacementManager : MonoBehaviour
 
     [Tooltip("Minimum pixel movement before a touch is classified as a drag (not a tap).")]
     [SerializeField] private float dragThresholdPixels = 10f;
+
     private bool inPlacementMode = false;
     private int pendingUpgradeIndex = -1;
-    private float pendingCost = 0f;
-    private int selectedSlotIndex = -1;
-    private GameObject selectedMarkerGO;
+
+    // Multi-slot selection
+    private readonly List<int> selectedSlotIndices = new List<int>();
+    private readonly List<GameObject> selectedMarkerGOs = new List<GameObject>();
 
     private readonly List<GameObject> activeMarkers = new List<GameObject>();
 
@@ -98,39 +106,36 @@ public class PlacementManager : MonoBehaviour
                     + "Assign the Main Camera in the PlacementManager Inspector field.");
         }
 
-        // Wire confirm button listener in code so it works even if onClick isn't
-        // wired in the Inspector.
         if (confirmButton != null)
-            confirmButton.onClick.AddListener(ConfirmSelectedSlot);
+            confirmButton.onClick.AddListener(ConfirmAllSelected);
     }
 
     // ── Entry / exit ──────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Call this after the cost has been deducted but BEFORE incrementing
-    /// building count or spawning the building.  The manager owns the rest.
+    /// Enters placement mode for a surface building.  No money is deducted here;
+    /// the full bill is charged only when the player confirms.
     /// </summary>
-    public void EnterPlacementMode(int upgradeIndex, float cost)
+    public void EnterPlacementMode(int upgradeIndex)
     {
         if (inPlacementMode) return;
 
-        inPlacementMode    = true;
+        inPlacementMode     = true;
         pendingUpgradeIndex = upgradeIndex;
-        pendingCost         = cost;
 
-        // Pause world auto-spin so the player's drag controls it
+        selectedSlotIndices.Clear();
+        selectedMarkerGOs.Clear();
+
         worldSpawner.SetAutoRotate(false);
-
-        // Close any currently open UI panel
         uiManager.ClosePanel();
 
-        // Show placement overlay (Cancel button); confirm button hidden until a slot is selected
         if (placementOverlayUI != null)
             placementOverlayUI.SetActive(true);
         if (confirmButton != null)
             confirmButton.gameObject.SetActive(false);
 
-        // Animate world Z closer then reveal slot markers
+        UpdateCostBill();
+
         MoveWorldZ(placementWorldZ, ShowSlotMarkers);
     }
 
@@ -138,16 +143,16 @@ public class PlacementManager : MonoBehaviour
     {
         inPlacementMode     = false;
         pendingUpgradeIndex = -1;
-        pendingCost         = 0f;
 
-        // Deselect the highlighted marker before clearing
-        if (selectedMarkerGO != null)
+        // Deselect all highlighted markers before clearing
+        foreach (GameObject go in selectedMarkerGOs)
         {
-            PlacementSlot ps = selectedMarkerGO.GetComponent<PlacementSlot>();
+            if (go == null) continue;
+            PlacementSlot ps = go.GetComponent<PlacementSlot>();
             if (ps != null) ps.SetSelected(false, selectedSlotColor);
         }
-        selectedSlotIndex = -1;
-        selectedMarkerGO  = null;
+        selectedSlotIndices.Clear();
+        selectedMarkerGOs.Clear();
 
         ClearMarkers();
 
@@ -155,60 +160,99 @@ public class PlacementManager : MonoBehaviour
             placementOverlayUI.SetActive(false);
         if (confirmButton != null)
             confirmButton.gameObject.SetActive(false);
+        if (costBillText != null)
+            costBillText.text = string.Empty;
 
         worldSpawner.SetAutoRotate(true);
-
         MoveWorldZ(normalWorldZ);
     }
 
     // ── Player actions ────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Called when the player taps a blue dot slot marker.
-    /// Spawns the building, applies passive income, and exits placement mode.
+    /// Wired to the Confirm button.  Charges the full bill and places all
+    /// selected buildings.
     /// </summary>
-    public void ConfirmPlacement(int slotIndex)
+    public void ConfirmAllSelected()
     {
-        if (!inPlacementMode) return;
+        if (!inPlacementMode || selectedSlotIndices.Count == 0) return;
+
+        // Calculate total cost (each additional placement costs more).
+        int startingCount = Player.Instance.getNumberBuildings(pendingUpgradeIndex);
+        float total = 0f;
+        for (int i = 0; i < selectedSlotIndices.Count; i++)
+            total += TransactionManager.Instance.GetCostAtBuildingCount(pendingUpgradeIndex, startingCount + i);
+
+        if (Player.Instance.getDollars() < total)
+        {
+            int count = selectedSlotIndices.Count;
+            PopupManager.Instance.ShowPopup(
+                "Not enough money to place " + count + " building" + (count > 1 ? "s" : "")
+                + ". Total cost: $" + total.ToString("F2"));
+            return;
+        }
+
+        // Deduct the full bill.
+        Player.Instance.AddDollars(-total);
+        uiManager.CreateAnimatedText("-" + total.ToString("F2"), Color.red, 1f);
 
         int slotSize = TransactionManager.Instance.structuresPanelInfo
             .shopItemsSO[pendingUpgradeIndex].slotSize;
         slotSize = Mathf.Max(1, slotSize);
 
-        // Occupy slot(s) — use the slot marker's world position as the anchor
-        GameObject marker = GetMarkerBySlotIndex(slotIndex);
-        Vector3 spawnPos = marker != null ? marker.transform.position
-                                          : worldSpawner.GetWorldCenter();
+        float bonus = TransactionManager.Instance.structuresPanelInfo
+            .shopItemsSO[pendingUpgradeIndex].bonus;
 
-        worldSpawner.OccupySlot(spawnPos, slotSize);
-        worldSpawner.SpawnAtPosition(pendingUpgradeIndex, spawnPos);
+        AudioManager.Instance.Play("Place Building");
 
-        // Now it's safe to register the building in the player state
-        Player.Instance.AddBuildingCount(pendingUpgradeIndex);
-        Player.Instance.AddPassive(TransactionManager.Instance.structuresPanelInfo
-            .shopItemsSO[pendingUpgradeIndex].bonus);
+        // Place each building.
+        foreach (int slotIndex in new List<int>(selectedSlotIndices))
+        {
+            GameObject marker = GetMarkerBySlotIndex(slotIndex);
+            Vector3 spawnPos = marker != null
+                ? marker.transform.position
+                : worldSpawner.GetWorldCenter();
+
+            worldSpawner.OccupySlot(spawnPos, slotSize);
+            worldSpawner.SpawnAtPosition(pendingUpgradeIndex, spawnPos);
+            Player.Instance.AddBuildingCount(pendingUpgradeIndex);
+            Player.Instance.AddPassive(bonus);
+        }
 
         structuresPanel.LoadCards();
-
         ExitPlacementMode();
     }
 
     /// <summary>
-    /// Wired to the Cancel button in the placement overlay UI.
-    /// Refunds the purchase and exits placement mode.
+    /// Wired to the Cancel button.  Exits placement mode without any charge.
     /// </summary>
     public void CancelPlacement()
     {
         if (!inPlacementMode) return;
-
-        Player.Instance.AddDollars(pendingCost);
-
-        string msg = "+" + pendingCost.ToString("F2") + " (refunded)";
-        uiManager.CreateAnimatedText(msg, Color.yellow, 0.6f);
-
         structuresPanel.LoadCards();
-
         ExitPlacementMode();
+    }
+
+    // ── Cost bill ─────────────────────────────────────────────────────────────
+
+    private void UpdateCostBill()
+    {
+        if (costBillText == null) return;
+
+        if (pendingUpgradeIndex < 0 || selectedSlotIndices.Count == 0)
+        {
+            costBillText.text = "Select a slot";
+            return;
+        }
+
+        int startingCount = Player.Instance.getNumberBuildings(pendingUpgradeIndex);
+        float total = 0f;
+        for (int i = 0; i < selectedSlotIndices.Count; i++)
+            total += TransactionManager.Instance.GetCostAtBuildingCount(pendingUpgradeIndex, startingCount + i);
+
+        int count = selectedSlotIndices.Count;
+        costBillText.text = count + " building" + (count > 1 ? "s" : "")
+            + "\nTotal: $" + total.ToString("F2");
     }
 
     // ── World Z zoom ──────────────────────────────────────────────────────────
@@ -244,7 +288,6 @@ public class PlacementManager : MonoBehaviour
             .shopItemsSO[pendingUpgradeIndex].slotSize;
         slotSize = Mathf.Max(1, slotSize);
 
-        // GetAvailableSlotPositions returns (worldPos, slotIndex) pairs in one pass.
         var available = worldSpawner.GetAvailableSlotPositions(slotSize);
 
         foreach (var (pos, slotIndex) in available)
@@ -252,7 +295,6 @@ public class PlacementManager : MonoBehaviour
             GameObject marker = Instantiate(slotMarkerPrefab, pos, Quaternion.identity);
             marker.transform.SetParent(worldSpawner.CurrentWorld.transform);
 
-            // Orient the dot outward from the world centre so it sits flush on the surface
             Vector3 outward = (pos - worldSpawner.GetWorldCenter()).normalized;
             marker.transform.rotation = Quaternion.LookRotation(outward) * Quaternion.Euler(90f, 0f, 0f);
 
@@ -281,7 +323,7 @@ public class PlacementManager : MonoBehaviour
         return null;
     }
 
-    // ── Update: drag-to-spin + tap-to-confirm ─────────────────────────────────
+    // ── Update: drag-to-spin + tap-to-select ─────────────────────────────────
 
     private void Update()
     {
@@ -310,7 +352,7 @@ public class PlacementManager : MonoBehaviour
         else if (Input.GetMouseButtonUp(0))
         {
             if (!isDragging)
-                TryConfirmAtScreenPoint(Input.mousePosition, -1);
+                TryToggleSlotAtScreenPoint(Input.mousePosition, -1);
             isDragging = false;
         }
 #else
@@ -338,7 +380,7 @@ public class PlacementManager : MonoBehaviour
 
             case TouchPhase.Ended:
                 if (!isDragging)
-                    TryConfirmAtScreenPoint(touchPos, touch.fingerId);
+                    TryToggleSlotAtScreenPoint(touchPos, touch.fingerId);
                 isDragging = false;
                 break;
         }
@@ -356,10 +398,8 @@ public class PlacementManager : MonoBehaviour
     }
 
     /// <param name="fingerId">Pass -1 for mouse/standalone; pass the touch finger ID for mobile.</param>
-    private void TryConfirmAtScreenPoint(Vector3 screenPoint, int fingerId)
+    private void TryToggleSlotAtScreenPoint(Vector3 screenPoint, int fingerId)
     {
-        // Ignore taps that land on UI elements (e.g. the Cancel button).
-        // For touch input, pass the finger ID so Unity checks the correct pointer.
         if (EventSystem.current != null)
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
@@ -371,8 +411,6 @@ public class PlacementManager : MonoBehaviour
 
         if (mainCamera == null) return;
 
-        // Use RaycastAll so a planet collider in front of a slot marker never silently
-        // blocks the hit — we iterate all hits and find the first PlacementSlot.
         Ray ray = mainCamera.ScreenPointToRay(screenPoint);
         RaycastHit[] hits = Physics.RaycastAll(ray);
         foreach (RaycastHit hit in hits)
@@ -380,45 +418,49 @@ public class PlacementManager : MonoBehaviour
             PlacementSlot slot = hit.collider.GetComponent<PlacementSlot>();
             if (slot != null)
             {
-                SelectSlot(slot.SlotIndex);
+                ToggleSlot(slot.SlotIndex);
                 return;
             }
         }
     }
 
     /// <summary>
-    /// Marks a slot as the pending selection, highlights it, and shows the Confirm button.
+    /// Toggles a slot's selection state.  Selecting adds it to the bill;
+    /// deselecting removes it.
     /// </summary>
-    private void SelectSlot(int slotIndex)
+    private void ToggleSlot(int slotIndex)
     {
-        // Deselect previous marker
-        if (selectedMarkerGO != null)
+        int existingIdx = selectedSlotIndices.IndexOf(slotIndex);
+        if (existingIdx >= 0)
         {
-            PlacementSlot prev = selectedMarkerGO.GetComponent<PlacementSlot>();
-            if (prev != null) prev.SetSelected(false, selectedSlotColor);
+            // Deselect
+            selectedSlotIndices.RemoveAt(existingIdx);
+            GameObject markerGO = selectedMarkerGOs[existingIdx];
+            selectedMarkerGOs.RemoveAt(existingIdx);
+            if (markerGO != null)
+            {
+                PlacementSlot ps = markerGO.GetComponent<PlacementSlot>();
+                if (ps != null) ps.SetSelected(false, selectedSlotColor);
+            }
+        }
+        else
+        {
+            // Select
+            selectedSlotIndices.Add(slotIndex);
+            GameObject markerGO = GetMarkerBySlotIndex(slotIndex);
+            selectedMarkerGOs.Add(markerGO);
+            if (markerGO != null)
+            {
+                PlacementSlot ps = markerGO.GetComponent<PlacementSlot>();
+                if (ps != null) ps.SetSelected(true, selectedSlotColor);
+            }
         }
 
-        selectedSlotIndex = slotIndex;
-        selectedMarkerGO  = GetMarkerBySlotIndex(slotIndex);
-
-        // Highlight the newly selected marker
-        if (selectedMarkerGO != null)
-        {
-            PlacementSlot ps = selectedMarkerGO.GetComponent<PlacementSlot>();
-            if (ps != null) ps.SetSelected(true, selectedSlotColor);
-        }
-
+        // Show confirm button only when at least one slot is selected.
         if (confirmButton != null)
-            confirmButton.gameObject.SetActive(true);
-    }
+            confirmButton.gameObject.SetActive(selectedSlotIndices.Count > 0);
 
-    /// <summary>
-    /// Wired to the Confirm button in the placement overlay UI.
-    /// Finalises placement for the previously selected slot.
-    /// </summary>
-    public void ConfirmSelectedSlot()
-    {
-        if (!inPlacementMode || selectedSlotIndex < 0) return;
-        ConfirmPlacement(selectedSlotIndex);
+        UpdateCostBill();
     }
 }
+

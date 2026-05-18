@@ -64,13 +64,34 @@ public class TransactionManager : MonoBehaviour
     {
         float passiveEarnings = structuresPanelInfo.shopItemsSO[index].bonus;
         float cost = getCostOfUpgradeStructure(index);
-        if (cost > Player.Instance.getDollars()) return false;
 
         bool isOrbit = structuresPanelInfo.shopItemsSO[index].isInOrbit;
 
-        // Check slot availability for surface buildings
-        if (!isOrbit)
+        if (isOrbit)
         {
+            // Orbit buildings: check funds and place immediately.
+            if (cost > Player.Instance.getDollars()) return false;
+
+            AudioManager.Instance.Play("Place Building");
+            Player.Instance.AddDollars(-cost);
+            Player.Instance.AddBuildingCount(index);
+            worldSpawner.spawnInOrbit(index, passiveEarnings);
+            Player.Instance.AddPassive(passiveEarnings);
+            structuresPanel.LoadCards();
+
+            string message = "-" + cost.ToString("F2");
+            uIManager.CreateAnimatedText(message, Color.red, 1f);
+        }
+        else
+        {
+            // Surface buildings: enter placement mode WITHOUT deducting money yet.
+            // Funds are checked and deducted only when the player confirms.
+            if (cost > Player.Instance.getDollars())
+            {
+                PopupManager.Instance.ShowPopup("Not enough money to buy this building.");
+                return false;
+            }
+
             int slotSize = Mathf.Max(1, structuresPanelInfo.shopItemsSO[index].slotSize);
             if (worldSpawner.GetSlotsAvailable() < slotSize)
             {
@@ -84,31 +105,9 @@ public class TransactionManager : MonoBehaviour
                 PopupManager.Instance.ShowPopup("Building placement is unavailable. Please ensure PlacementManager is configured in this scene.");
                 return false;
             }
-        }
 
-        AudioManager.Instance.Play("Place Building");
-        Player.Instance.AddDollars(-cost);
-
-        if (isOrbit)
-        {
-            // Orbit buildings are placed immediately (no slot system needed)
-            Player.Instance.AddBuildingCount(index);
-            worldSpawner.spawnInOrbit(index, passiveEarnings);
-            Player.Instance.AddPassive(passiveEarnings);
-            structuresPanel.LoadCards();
-
-            string message = "-" + cost.ToString("F2");
-            uIManager.CreateAnimatedText(message, Color.red, 1f);
-        }
-        else
-        {
-            // Surface buildings enter interactive placement mode.
-            // Building count and passive income are applied after the player
-            // chooses a slot (or cancelled and cost is refunded).
-            string message = "-" + cost.ToString("F2");
-            uIManager.CreateAnimatedText(message, Color.red, 1f);
-
-            PlacementManager.Instance.EnterPlacementMode(index, cost);
+            // Enter placement mode — money is only taken when the player confirms.
+            PlacementManager.Instance.EnterPlacementMode(index);
         }
 
         return true;
@@ -175,11 +174,19 @@ public class TransactionManager : MonoBehaviour
     public float getCostOfUpgradeStructure(int index)
     {
         int numberBuildings = Player.Instance.getNumberBuildings(index);
+        return GetCostAtBuildingCount(index, numberBuildings);
+    }
+
+    /// <summary>
+    /// Returns the purchase cost of building <paramref name="index"/> assuming the player
+    /// already owns exactly <paramref name="count"/> of them.  Used by PlacementManager to
+    /// preview the incremental cost of each additional slot selection.
+    /// </summary>
+    public float GetCostAtBuildingCount(int index, int count)
+    {
         float baseCost = structuresPanelInfo.shopItemsSO[index].cost;
-        for (int i = 0; i < numberBuildings; i++)
-        {
+        for (int i = 0; i < count; i++)
             baseCost *= purchaseCostIncreaseMultiplier;
-        }
         return baseCost;
     }
 

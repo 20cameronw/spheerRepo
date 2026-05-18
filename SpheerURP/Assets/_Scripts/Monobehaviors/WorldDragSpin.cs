@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Spins the world in default (non-placement) mode with physics-feel momentum and glide.
@@ -167,6 +168,40 @@ public class WorldDragSpin : MonoBehaviour
     {
         isDragging = false;
         // Angular velocity set during the drag carries on — the glide takes over.
+        // If this was a tap (no drag), check whether the player hit an enemy.
+        TryTapEnemy(screenPos, fingerId);
+    }
+
+    // ── Enemy tap ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// If the tap (no-drag release) lands on an enemy, deal tap damage and show a hit marker.
+    /// Ignored when a UI element is under the pointer.
+    /// </summary>
+    private void TryTapEnemy(Vector3 screenPos, int fingerId)
+    {
+        if (mainCamera == null) return;
+
+        if (EventSystem.current != null)
+        {
+#if UNITY_EDITOR || UNITY_STANDALONE
+            if (EventSystem.current.IsPointerOverGameObject()) return;
+#else
+            if (fingerId >= 0 && EventSystem.current.IsPointerOverGameObject(fingerId)) return;
+#endif
+        }
+
+        Ray ray = mainCamera.ScreenPointToRay(screenPos);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        foreach (RaycastHit hit in hits)
+        {
+            EnemyStateManager enemy = hit.collider.GetComponentInParent<EnemyStateManager>();
+            if (enemy != null)
+            {
+                enemy.TapEnemy();
+                return;
+            }
+        }
     }
 
     // ── Spin / velocity accumulation ──────────────────────────────────────────
