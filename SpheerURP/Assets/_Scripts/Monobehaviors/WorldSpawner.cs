@@ -415,6 +415,8 @@ public class WorldSpawner : MonoBehaviour
             {
                 GameObject newObject = spawnedObjects[i];
                 if (newObject != null) {
+                    // Free the slot so this space is available for future buildings.
+                    FreeSlotAtPosition(newObject.transform.position);
                     Destroy(newObject); 
                     spawnedObjects.RemoveAt(i);
                 }
