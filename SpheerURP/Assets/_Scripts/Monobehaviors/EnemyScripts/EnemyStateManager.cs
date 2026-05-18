@@ -8,8 +8,11 @@ public class EnemyStateManager : MonoBehaviour
     [Tooltip("Damage dealt each time the player taps this enemy.")]
     [SerializeField] private float tapDamage = 10f;
 
+    private UIManager uiManager;
+
     void Start()
     {
+        uiManager = FindObjectOfType<UIManager>();
         currentState?.OnStateEnter();
     }
 
@@ -51,7 +54,6 @@ public class EnemyStateManager : MonoBehaviour
         if (health != null)
         {
             health.TakeDamage(tapDamage);
-            UIManager uiManager = FindObjectOfType<UIManager>();
             if (uiManager != null)
                 uiManager.ShowHitMarker(transform.position, tapDamage);
         }
