@@ -4,6 +4,10 @@ public class EnemyStateManager : MonoBehaviour
 {
     [SerializeField] private EnemyState currentState;
 
+    [Header("Tap Attack")]
+    [Tooltip("Damage dealt each time the player taps this enemy.")]
+    [SerializeField] private float tapDamage = 10f;
+
     void Start()
     {
         currentState?.OnStateEnter();
@@ -35,5 +39,21 @@ public class EnemyStateManager : MonoBehaviour
     public void targetThis()
     {
         Player.Instance.targetThis(transform);
+    }
+
+    /// <summary>
+    /// Call this from the enemy UI button's OnClick list to deal tap damage and show a hit marker.
+    /// </summary>
+    public void TapEnemy()
+    {
+        EnemyHealth health = GetComponentInChildren<EnemyHealth>();
+        if (health == null) health = GetComponent<EnemyHealth>();
+        if (health != null)
+        {
+            health.TakeDamage(tapDamage);
+            UIManager uiManager = FindObjectOfType<UIManager>();
+            if (uiManager != null)
+                uiManager.ShowHitMarker(transform.position, tapDamage);
+        }
     }
 }

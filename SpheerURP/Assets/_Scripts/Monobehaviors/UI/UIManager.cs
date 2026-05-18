@@ -142,6 +142,35 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void ShowHitMarker(Vector3 worldPosition, float damage)
+    {
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+
+        // Convert screen position to canvas local position
+        RectTransform canvasRect = canvasTransform as RectTransform;
+        Vector2 localPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect, screenPos, null, out localPos);
+
+        GameObject textObject = Instantiate(textPrefab, canvasTransform);
+        TMP_Text textComponent = textObject.GetComponent<TMP_Text>();
+        textComponent.text = "-" + Mathf.RoundToInt(damage).ToString("N0");
+        textComponent.color = Color.red;
+        textComponent.fontSize = 28;
+        textObject.transform.localPosition = localPos;
+        textObject.transform.localScale = Vector3.one * 0.8f;
+
+        LeanTween.moveLocal(textObject, textObject.transform.localPosition + new Vector3(Random.Range(-20f, 20f), 60f, 0), 0.8f)
+            .setEaseOutCubic();
+        LeanTween.scale(textObject, Vector3.one * 1.2f, 0.15f).setEaseOutBack()
+            .setOnComplete(() =>
+            {
+                LeanTween.alphaText(textObject.GetComponent<RectTransform>(), 0f, 0.4f).setDelay(0.3f)
+                    .setOnComplete(() => Destroy(textObject));
+            });
+    }
+
+
     public void handleWaveCompleted(int wave) {
         string message = "Wave " + wave + " ended";
         Debug.Log(message);
