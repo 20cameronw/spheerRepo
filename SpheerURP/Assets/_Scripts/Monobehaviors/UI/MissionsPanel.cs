@@ -28,8 +28,8 @@ public class MissionsPanel : MenuPanel
 
     public override void OpenPanel()
     {
-        RefreshCards();
         base.OpenPanel();
+        RefreshCards();
     }
 
     private void BuildCards()
