@@ -19,6 +19,11 @@ public class WorldSpawner : MonoBehaviour
     [SerializeField] private WorldsListSO worldsListSO;
 
     [Space(10)]
+    [Header("Surface Slot Settings")]
+    [Tooltip("Scales surface.radius when placing slot positions. Values < 1 move buildings closer to the planet surface.")]
+    [SerializeField] private float slotRadiusScale = 0.9f;
+
+    [Space(10)]
     [Header("Orbit Settings")]
     [SerializeField] private SphereCollider orbitSC;
     [SerializeField] private float xOrbitSpeed;
@@ -105,7 +110,7 @@ public class WorldSpawner : MonoBehaviour
 
         slotOccupied = new bool[currentMaxSlots];
 
-        float radius = surface.radius;
+        float radius = surface.radius * slotRadiusScale;
         float goldenRatio = (1f + Mathf.Sqrt(5f)) * 0.5f;
 
         for (int i = 0; i < currentMaxSlots; i++)
