@@ -339,18 +339,39 @@ public class WorldSpawner : MonoBehaviour
 
     public void spawnOnSurface(int index, float passive)
     {
-        // During load: place near a random surface point and occupy the nearest slot.
-        Vector3 randomWorldPos = UnityEngine.Random.onUnitSphere * surface.radius
-                                 + CurrentWorld.transform.position;
+        EnsureSlotsGeneratedForCurrentWorld();
         int slotSize = Mathf.Max(1, TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].slotSize);
-        OccupySlot(randomWorldPos, slotSize);
 
-        GameObject newObject = Instantiate(structuresGOList[index], randomWorldPos, Quaternion.identity) as GameObject;
+        // Use the first available slot position so buildings never stack on top of each other.
+        var available = GetAvailableSlotPositions(slotSize);
+        if (available.Count == 0)
+        {
+            Debug.LogWarning("[WorldSpawner] No available slots for building " + index);
+            return;
+        }
+
+        Vector3 spawnPos = available[0].position;
+        OccupySlot(spawnPos, slotSize);
+
+        GameObject newObject = Instantiate(structuresGOList[index], spawnPos, Quaternion.identity) as GameObject;
         newObject.transform.SetParent(CurrentWorld.transform);
         newObject.transform.LookAt(CurrentWorld.transform.position);
         newObject.transform.Rotate(-90, 0, 0);
         spawnedObjects.Add(newObject);
         newObject.gameObject.name = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[index].name + " " + objectsSpawned;
+    }
+
+    /// <summary>
+    /// Frees the slot nearest to <paramref name="worldPos"/> so a new building
+    /// can be placed there.  Called when a building is removed (e.g. sucked up
+    /// by an alien).
+    /// </summary>
+    public void FreeSlotAtPosition(Vector3 worldPos)
+    {
+        if (CurrentWorld == null) return;
+        int nearest = FindNearestSlot(worldPos, freeOnly: false);
+        if (nearest >= 0)
+            slotOccupied[nearest] = false;
     }
 
     public void LoadObjects(int count, int index)

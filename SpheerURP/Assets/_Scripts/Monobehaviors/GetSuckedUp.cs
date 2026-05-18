@@ -37,6 +37,11 @@ public class GetSuckedUp : MonoBehaviour
     }
     public void getSuckedUp(Transform sucker)
     {
+        // Free the slot before reparenting — transform.position is still in world space here.
+        WorldSpawner ws = FindObjectOfType<WorldSpawner>();
+        if (ws != null)
+            ws.FreeSlotAtPosition(transform.position);
+
         target = sucker;
         gettingSucked = true;
         transform.SetParent(sucker);

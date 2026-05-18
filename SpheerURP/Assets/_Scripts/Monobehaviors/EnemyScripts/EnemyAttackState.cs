@@ -41,9 +41,10 @@ public class EnemyAttackState : EnemyState
 
         if (doneAttacking)
         {
-            enemyLeavingState.effect = this.effect;
-            this.effect              = null;
-            currentWaypointIndex     = 0;
+            enemyLeavingState.effect          = this.effect;
+            enemyLeavingState.hasSuccessfulSuck = this.gotAHit;
+            this.effect                       = null;
+            currentWaypointIndex              = 0;
             return enemyLeavingState;
         }
         return this;
