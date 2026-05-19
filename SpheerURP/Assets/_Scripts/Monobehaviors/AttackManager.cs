@@ -364,6 +364,14 @@ public class AttackManager : MonoBehaviour
         AttackBuildingView abv = bgo.GetComponent<AttackBuildingView>()
                                ?? bgo.AddComponent<AttackBuildingView>();
         abv.Initialise(health, defense: 0f);
+
+        // Ensure the building can receive raycasts — add a small sphere collider
+        // if the prefab doesn't already supply any collider.
+        if (bgo.GetComponentInChildren<Collider>() == null)
+        {
+            SphereCollider fallback = bgo.AddComponent<SphereCollider>();
+            fallback.radius = 0.5f;
+        }
     }
 
     // ── Loot distribution ─────────────────────────────────────────────────────
