@@ -55,14 +55,18 @@ public class AttackManager : MonoBehaviour
     [Tooltip("World prefabs the generator can pick from when creating an enemy base.")]
     [SerializeField] private List<GameObject> worldPrefabs = new List<GameObject>();
 
-    [Tooltip("Building prefabs that can be placed on the enemy world surface.")]
-    [SerializeField] private List<GameObject> buildingPrefabs = new List<GameObject>();
-
     [Tooltip("Health per building on the generated base (scaled by simulatedXPLevel).")]
     [SerializeField] private float baseBuildingHealth = 80f;
 
     [Tooltip("Percentage of the enemy's simulated passive income available to loot (0–1).")]
     [SerializeField] [Range(0f, 1f)] private float lootPercentage = 0.3f;
+
+    [Header("Enemy World Rotation")]
+    [Tooltip("Minimum rotation speed (degrees/second) per axis applied to the spawned enemy world.")]
+    [SerializeField] private Vector3 enemyWorldRotateMin = new Vector3(0f, 5f, 0f);
+
+    [Tooltip("Maximum rotation speed (degrees/second) per axis applied to the spawned enemy world.")]
+    [SerializeField] private Vector3 enemyWorldRotateMax = new Vector3(0f, 20f, 5f);
 
     [Header("Animation")]
     [Tooltip("Seconds the slide-in / slide-out animations take.")]
@@ -183,10 +187,10 @@ public class AttackManager : MonoBehaviour
 
     private float EstimatePassiveFromBuildings(EnemyBaseData data)
     {
-        if (buildingPrefabs.Count == 0 || data.buildingCounts.Count == 0) return 100f;
+        if (data.buildingCounts.Count == 0) return 100f;
         float total = 0f;
-        for (int i = 0; i < data.buildingCounts.Count && i < buildingPrefabs.Count; i++)
-            total += data.buildingCounts[i] * 5f;  // rough per-building income estimate
+        foreach (int count in data.buildingCounts)
+            total += count * 5f;  // rough per-building income estimate
         return Mathf.Max(total, 50f);
     }
 
@@ -231,6 +235,14 @@ public class AttackManager : MonoBehaviour
                 : transform.position;
 
             spawnedEnemyWorldGO = Instantiate(prefab, startPos, Quaternion.identity);
+
+            // Add rotation with random speeds within the configured range
+            Rotate rotComp = spawnedEnemyWorldGO.AddComponent<Rotate>();
+            rotComp.SetSpeeds(
+                UnityEngine.Random.Range(enemyWorldRotateMin.x, enemyWorldRotateMax.x),
+                UnityEngine.Random.Range(enemyWorldRotateMin.y, enemyWorldRotateMax.y),
+                UnityEngine.Random.Range(enemyWorldRotateMin.z, enemyWorldRotateMax.z)
+            );
 
             // Attach AttackWorldView if the prefab doesn't already have one
             currentAttackWorldView = spawnedEnemyWorldGO.GetComponent<AttackWorldView>()
@@ -294,41 +306,55 @@ public class AttackManager : MonoBehaviour
 
     private void SpawnBuildingsOnEnemyWorld(EnemyBaseData data)
     {
-        if (buildingPrefabs.Count == 0) return;
+        List<GameObject> structures = worldSpawner != null
+            ? worldSpawner.GetStructuresList()
+            : new List<GameObject>();
+        if (structures == null || structures.Count == 0) return;
 
-        float surfaceRadius = 5f;  // default; override if world prefab exposes a collider
+        float surfaceRadius = worldSpawner != null ? worldSpawner.GetSurfaceRadius() : 5f;
         Vector3 sphereCenter = spawnedEnemyWorldGO.transform.position;
         SphereCollider sc = spawnedEnemyWorldGO.GetComponentInChildren<SphereCollider>();
         if (sc != null)
         {
-            // Use world-space bounds so scale is accounted for, and the
-            // actual collider centre rather than the root transform position.
             sphereCenter  = sc.bounds.center;
-            surfaceRadius = sc.bounds.extents.x * 0.9f;
+            surfaceRadius = sc.bounds.extents.x;
         }
 
         float buildingHealth = baseBuildingHealth * Mathf.Max(1, data.simulatedXPLevel * 0.5f);
 
-        int buildingIndex = 0;
-        for (int typeIdx = 0; typeIdx < data.buildingCounts.Count && typeIdx < buildingPrefabs.Count; typeIdx++)
+        // Count total buildings; guarantee a minimum so the enemy world is never empty.
+        int totalCount = 0;
+        foreach (int c in data.buildingCounts) totalCount += c;
+
+        if (totalCount == 0)
+        {
+            int minBuildings = UnityEngine.Random.Range(3, 7);
+            for (int i = 0; i < minBuildings; i++)
+            {
+                int typeIdx = UnityEngine.Random.Range(0, structures.Count);
+                SpawnSingleBuilding(structures[typeIdx], sphereCenter, surfaceRadius, buildingHealth);
+            }
+            return;
+        }
+
+        for (int typeIdx = 0; typeIdx < data.buildingCounts.Count && typeIdx < structures.Count; typeIdx++)
         {
             for (int n = 0; n < data.buildingCounts[typeIdx]; n++)
-            {
-                Vector3 localPos   = UnityEngine.Random.onUnitSphere * surfaceRadius;
-                Vector3 worldPos   = sphereCenter + localPos;
-                Quaternion rot     = Quaternion.FromToRotation(Vector3.up, localPos.normalized);
-
-                GameObject bgo     = Instantiate(buildingPrefabs[typeIdx], worldPos, rot);
-                bgo.transform.SetParent(spawnedEnemyWorldGO.transform, worldPositionStays: true);
-
-                // Attach AttackBuildingView if not already on the prefab
-                AttackBuildingView abv = bgo.GetComponent<AttackBuildingView>()
-                                      ?? bgo.AddComponent<AttackBuildingView>();
-                abv.Initialise(buildingHealth, defense: 0f);
-
-                buildingIndex++;
-            }
+                SpawnSingleBuilding(structures[typeIdx], sphereCenter, surfaceRadius, buildingHealth);
         }
+    }
+
+    private void SpawnSingleBuilding(GameObject prefab, Vector3 sphereCenter, float surfaceRadius, float health)
+    {
+        Vector3 worldPos = sphereCenter + UnityEngine.Random.onUnitSphere * surfaceRadius;
+        GameObject bgo   = Instantiate(prefab, worldPos, Quaternion.identity);
+        bgo.transform.SetParent(spawnedEnemyWorldGO.transform, worldPositionStays: true);
+        bgo.transform.LookAt(spawnedEnemyWorldGO.transform.position);
+        bgo.transform.Rotate(-90f, 0f, 0f);
+
+        AttackBuildingView abv = bgo.GetComponent<AttackBuildingView>()
+                               ?? bgo.AddComponent<AttackBuildingView>();
+        abv.Initialise(health, defense: 0f);
     }
 
     // ── Loot distribution ─────────────────────────────────────────────────────

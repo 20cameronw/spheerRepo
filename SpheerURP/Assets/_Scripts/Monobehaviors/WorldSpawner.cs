@@ -459,6 +459,8 @@ public class WorldSpawner : MonoBehaviour
 
     public float GetSurfaceRadius() => surface.radius;
 
+    public List<GameObject> GetStructuresList() => structuresGOList;
+
     private void EnsureSlotsGeneratedForCurrentWorld()
     {
         if (CurrentWorld == null || slotPositions.Count > 0) return;
