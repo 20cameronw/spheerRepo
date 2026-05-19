@@ -3,12 +3,20 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
+/// <summary>
+/// Missions panel — simplified card layout.
+/// Each card shows:
+///   • GoalText  — mission objective label
+///   • ProgressBar — progress towards goal
+///   • CheckboxUnchecked / CheckboxChecked — toggled based on completion
+///
+/// Missions are defined in MissionDefinitions.cs and never reset.
+/// </summary>
 public class MissionsPanel : MenuPanel
 {
-    [Header("Data")]
-    [SerializeField] private MissionsListSO missionsListSO;
+    [Header("Card Template")]
     [SerializeField] private GameObject missionCardTemplate;
-    [SerializeField] private Transform missionListContent;
+    [SerializeField] private Transform  missionListContent;
 
     private List<GameObject> missionCards = new List<GameObject>();
 
@@ -20,16 +28,15 @@ public class MissionsPanel : MenuPanel
 
     public override void OpenPanel()
     {
-        RefreshCards();
         base.OpenPanel();
+        RefreshCards();
     }
 
     private void BuildCards()
     {
-        if (missionsListSO == null || missionCardTemplate == null || missionListContent == null)
-            return;
+        if (missionCardTemplate == null || missionListContent == null) return;
 
-        foreach (var mission in missionsListSO.missions)
+        foreach (var mission in MissionDefinitions.All)
         {
             GameObject card = Instantiate(missionCardTemplate, missionListContent);
             missionCards.Add(card);
@@ -39,64 +46,43 @@ public class MissionsPanel : MenuPanel
 
     public void RefreshCards()
     {
-        if (missionsListSO == null) return;
         Player p = Player.Instance;
         if (p == null) return;
 
-        for (int i = 0; i < missionsListSO.missions.Length && i < missionCards.Count; i++)
+        for (int i = 0; i < MissionDefinitions.All.Length && i < missionCards.Count; i++)
         {
-            MissionSO mission = missionsListSO.missions[i];
-            GameObject card = missionCards[i];
+            MissionEntry mission = MissionDefinitions.All[i];
+            GameObject   card    = missionCards[i];
 
-            TMP_Text titleText    = card.transform.Find("TitleText")?.GetComponent<TMP_Text>();
-            TMP_Text descText     = card.transform.Find("DescText")?.GetComponent<TMP_Text>();
-            TMP_Text progressText = card.transform.Find("ProgressText")?.GetComponent<TMP_Text>();
-            TMP_Text rewardText   = card.transform.Find("RewardText")?.GetComponent<TMP_Text>();
-            Image checkmark       = card.transform.Find("Checkmark")?.GetComponent<Image>();
-            Image iconImage       = card.transform.Find("Icon")?.GetComponent<Image>();
-            Slider progressBar    = card.transform.Find("ProgressBar")?.GetComponent<Slider>();
+            TMP_Text  goalText          = card.transform.Find("GoalText")?.GetComponent<TMP_Text>();
+            Slider    progressBar       = card.transform.Find("ProgressBar")?.GetComponent<Slider>();
+            GameObject checkboxChecked  = card.transform.Find("CheckboxChecked")?.gameObject;
+            GameObject checkboxEmpty    = card.transform.Find("CheckboxUnchecked")?.gameObject;
 
-            bool completed = p.isMissionComplete(i);
+            bool  completed = p.isMissionComplete(i);
+            float current   = GetCurrentProgress(mission, p);
+            float target    = mission.targetValue;
+            float clamped   = Mathf.Min(current, target);
 
-            float current = GetCurrentProgress(mission, p);
-            float target  = mission.targetValue;
+            if (goalText) goalText.text = mission.goalText;
 
-            if (titleText)    titleText.text    = mission.name;
-            if (descText)     descText.text     = mission.description;
-            if (rewardText)   rewardText.text   = "Reward: " + mission.rewardDescription;
-            if (iconImage && mission.icon) iconImage.sprite = mission.icon;
-
-            if (completed)
+            if (progressBar != null)
             {
-                if (progressText) progressText.text = "COMPLETE!";
-                if (progressBar)
-                {
-                    progressBar.minValue = 0;
-                    progressBar.maxValue = 1;
-                    progressBar.value    = 1;
-                }
-                if (checkmark) checkmark.gameObject.SetActive(true);
+                progressBar.minValue = 0f;
+                progressBar.maxValue = target;
+                progressBar.value    = clamped;
             }
-            else
-            {
-                float clamped = Mathf.Min(current, target);
-                if (progressText) progressText.text = FormatValue(clamped) + " / " + FormatValue(target);
-                if (progressBar)
-                {
-                    progressBar.minValue = 0;
-                    progressBar.maxValue = target;
-                    progressBar.value    = clamped;
-                }
-                if (checkmark) checkmark.gameObject.SetActive(false);
 
-                // Auto-complete if threshold reached
-                if (current >= target)
-                    p.completeMission(i);
-            }
+            if (checkboxChecked)  checkboxChecked.SetActive(completed);
+            if (checkboxEmpty)    checkboxEmpty.SetActive(!completed);
+
+            // Auto-complete if threshold reached for the first time
+            if (!completed && current >= target)
+                p.completeMission(i);
         }
     }
 
-    private float GetCurrentProgress(MissionSO mission, Player p)
+    private float GetCurrentProgress(MissionEntry mission, Player p)
     {
         switch (mission.type)
         {
@@ -125,12 +111,5 @@ public class MissionsPanel : MenuPanel
             default:
                 return 0;
         }
-    }
-
-    private string FormatValue(float value)
-    {
-        if (value >= 1000000000f) return value.ToString("0.##E0");
-        if (value >= 1000f)       return Mathf.Round(value).ToString("N0");
-        return Mathf.Round(value).ToString();
     }
 }

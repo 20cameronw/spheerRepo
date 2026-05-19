@@ -58,6 +58,7 @@ public class Player : MonoBehaviour
     private float lifetimeRecordPeakPassive = 0f;
     private int lifetimeRecordHighestXPLevel = 0;
     private List<int> completedMissionIndices = new List<int>();
+    private bool hasSeenTutorial = false;
 
     public int getLifetimeEnemiesKilled()           => lifetimeTotalEnemiesKilled;
     public int getLifetimeWavesCompleted()          => lifetimeTotalWavesCompleted;
@@ -67,6 +68,8 @@ public class Player : MonoBehaviour
     public float getLifetimeRecordPeakPassive()     => lifetimeRecordPeakPassive;
     public int getLifetimeRecordHighestXPLevel()    => lifetimeRecordHighestXPLevel;
     public List<int> getCompletedMissionIndices()   => completedMissionIndices;
+    public bool getHasSeenTutorial()                => hasSeenTutorial;
+    public void markTutorialSeen()                  { hasSeenTutorial = true; }
 
     public void recordEnemyKilled()
     {
@@ -611,6 +614,7 @@ public class Player : MonoBehaviour
             lifetimeRecordPeakPassive    = data.lifetimeRecordPeakPassive;
             lifetimeRecordHighestXPLevel = data.lifetimeRecordHighestXPLevel;
             completedMissionIndices      = data.completedMissionIndices ?? new List<int>();
+            hasSeenTutorial              = data.hasSeenTutorial;
         }
         else
         {

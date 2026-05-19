@@ -33,6 +33,7 @@ public class PlayerData
     public float lifetimeRecordPeakPassive;
     public int lifetimeRecordHighestXPLevel;
     public List<int> completedMissionIndices;
+    public bool hasSeenTutorial;
 
 
 
@@ -57,5 +58,6 @@ public class PlayerData
         lifetimeRecordPeakPassive = Player.Instance.getLifetimeRecordPeakPassive();
         lifetimeRecordHighestXPLevel = Player.Instance.getLifetimeRecordHighestXPLevel();
         completedMissionIndices = Player.Instance.getCompletedMissionIndices();
+        hasSeenTutorial = Player.Instance.getHasSeenTutorial();
     }
 }

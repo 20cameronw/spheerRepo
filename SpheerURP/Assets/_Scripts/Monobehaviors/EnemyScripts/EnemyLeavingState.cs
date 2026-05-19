@@ -7,13 +7,20 @@ public class EnemyLeavingState : EnemyState
     [SerializeField] private float waitTime = 2f;
 
     private Vector3 leavePosition;
-    private bool    isMoving   = false;
-    private bool    hasArrived = false;
-    private bool    waiting    = false;
+    private bool    isMoving    = false;
+    private bool    hasArrived  = false;
+    private bool    waiting     = false;
     private bool    doneWaiting = false;
     private float   timeWaited;
 
     public ParticleSystem effect;
+
+    /// <summary>
+    /// Set by <see cref="EnemyAttackState"/> before transitioning here.
+    /// When true the UFO permanently leaves (self-destructs) instead of
+    /// cycling back to idle for another attack run.
+    /// </summary>
+    public bool hasSuccessfulSuck;
 
     public override void OnStateEnter()
     {
@@ -57,7 +64,17 @@ public class EnemyLeavingState : EnemyState
     public override EnemyState RunState()
     {
         if (hasArrived && !waiting)
+        {
+            if (hasSuccessfulSuck)
+            {
+                // This alien permanently leaves — count it toward wave completion
+                // then destroy the root UFO off-screen.
+                EnemySpawner.Instance.handleAlienDeath();
+                Destroy(transform.parent.parent.gameObject);
+                return this;
+            }
             waiting = true;
+        }
 
         if (waiting)
         {
@@ -71,7 +88,8 @@ public class EnemyLeavingState : EnemyState
 
         if (doneWaiting)
         {
-            doneWaiting = false;
+            doneWaiting      = false;
+            hasSuccessfulSuck = false;
             return enemyIdleState;
         }
         return this;

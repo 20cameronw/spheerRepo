@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Domny
   m_EditorClassIdentifier: 
   name: Domny
-  description: A frozen world in the outer reaches of its star system. No atmosphere, sub-zero surface temps, and rich subsurface cryo-crystal deposits worth the risk.
+  description: A frozen world in the outer reaches of its star system. No atmosphere,
+    sub-zero surface temps, and rich subsurface cryo-crystal deposits worth the risk.
   cost: 250000
   Icon: {fileID: 21300000, guid: 7da6618dcf984404ba7227ffce6f4e71, type: 3}
   index: 2
   cores: 7
+  maxBuildingSlots: 50

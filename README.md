@@ -1,72 +1,50 @@
-# Spheer — Game Design Document
+# Spheer — Game Design Document & Developer Reference
 
-## What the Game Is Right Now
+## What the Game Is
 
-Spheer is a **mobile idle/clicker game** set in space. The player owns a planet-like world and taps it to earn money ("dollars"). That money is spent in a shop to place structures on the world — drills, windmills, cell towers, satellite dishes, missile silos, lasers, gunners, and more — each providing a **passive income bonus** that ticks every second so the game keeps earning while you're away.
+Spheer is a **mobile idle/clicker base-builder** inspired by *Clash of Clans* and *Egg Inc* — your world is your base. Tap it to earn money, buy structures that generate passive income, research powerful upgrades, and defend against alien invasion waves. The goal is a satisfying loop of building, earning, defending, and prestiging that keeps you coming back.
 
-### Core Loop (Current)
-1. **Tap the world** → earn dollars based on your current `power` stat.
-2. **Buy structures** in the shop → each one adds to your passive income-per-second and physically appears on your world.
-3. **Passive income** accrues every second (and a portion accrues while offline).
-4. **Research upgrades** (common and epic tiers) unlock multipliers: click power, production rate, turret stats, XP rate, sell-back rate, and more.
-5. **Enemy waves** (UFOs / aliens) periodically attack. Turret structures auto-shoot them; tapping an enemy manually targets it. Killing aliens grants **XP**.
-6. **XP levels** gate higher-tier shop items so you can't buy everything instantly.
-7. **Prestige** resets your dollars and buildings, awards **Dark Matter** (a permanent currency), which permanently boosts all future earnings.
-8. **Multiple worlds** are unlockable — each is a distinct planet skin (Lerth, Domny, Chotis, Purp, Dark, Saturn, Spiky…).
+### Core Loop
+1. **Spin / tap the world** → earn dollars based on your current `power` stat.
+2. **Buy structures** in the shop → each one adds to your passive income-per-second and physically appears on your world. Each world has a **limited number of building slots** — choose wisely.
+3. **Passive income** accrues every second (and a portion accrues while you're offline).
+4. **Research upgrades** unlock multipliers: click power, production rate, turret stats, XP rate, sell-back rate, and more.
+5. **Enemy waves** (UFOs / aliens) invade at increasing difficulty. Turrets and lazers auto-attack; you can also **tap an alien directly** to deal bonus damage + see a hit marker.
+6. **XP levels** unlock higher-tier structures.
+7. **Prestige** when you're ready to reset — earn **Dark Matter** (permanent currency) that boosts all future earnings.
+8. **Multiple worlds** unlock as you progress (Lerth → Domny → Chotis → Purp → Dark → Saturn → Spiky…).
 
 ### Tech Stack
 - **Unity (URP)** — 3D mobile game targeting iOS/Android
-- **LeanTween** for UI animation
-- **Unity Ads** (banner + interstitial + rewarded)
+- **LeanTween** — UI and world animations
+- **Unity Ads** — banner, interstitial, and rewarded video
 - **JSON file-based save system** with offline-earnings calculation
 
 ---
 
-## What's Not Working / Why It Feels Dull
+## Vision — *Spheer: Clash of Worlds*
 
-- Tapping the world generates money but there's **no meaningful decision** — you just tap until you can buy the next thing in a linear list.
-- Structures appear on the world but the **world doesn't feel like yours** — placement is automatic with no strategy.
-- Alien waves happen whether you engage or not; **combat is passive**.
-- Progression is fast and numbers just get bigger — **no tension or risk of losing**.
-- Nothing social or competitive to keep you coming back.
+Think **Clash of Clans** meets **Egg Inc**:
+- Your planet surface is your base. Structures are placed on limited slots, so layout matters.
+- Income compounds with smart building choices (Egg Inc–style scaling).
+- Defense towers protect your base from alien waves that get harder forever.
+- Prestige resets progress but unlocks permanent bonuses — the offline grind loop.
 
 ---
 
-## Pivot Vision — Spheer 2.0: *Clash of Worlds*
+## Future Scope (Planned Features)
 
-The goal is to transform Spheer from a mindless idle tapper into a **strategic base-building / tower-defense / raiding game** with a fun space/alien twist — think *Clash of Clans* in orbit.
-
-### Big Ideas
-
-#### 1. Your World = Your Base
-- The planet surface becomes a **grid-based build zone** you actually design.
-- Resources (Stardust, Energy Crystals, Dark Matter) are mined by structures you **place strategically**.
-- Buildings have health — they can be **destroyed by raiders**.
-
-#### 2. Meaningful Economy (Slow the Progression)
-- Remove instant-buy; resources take real time to accumulate.
-- Each upgrade tier should feel like an **achievement**, not a routine click.
-- Introduce a **builder queue** (like Clash) so you can only upgrade one or two things at a time.
-
-#### 3. Tower Defense Layer
-- When aliens (or rival players) attack, **your layout matters** — walls, turret placement, and resource vault positioning determine if you survive.
-- Waves scale and enemies adapt over time (fliers, tanks, EMP drones that disable turrets).
-
-#### 4. Raiding / Multiplayer
-- **Attack other players' worlds** for resources. Design your strike force from alien unit types you've unlocked.
-- **Defense replays** let you watch how your world was attacked while you were offline.
-- A **trophy / league system** matches you against similarly-sized worlds.
-
-#### 5. The Fun Twist — *Alien DNA*
-- Every enemy you kill drops **Alien DNA fragments**.
-- You can **splice DNA** into your own defenses to create hybrid alien-tech buildings (e.g., a turret that fires corrosive slime, a wall that regenerates, a drill that spawns mini-aliens to fight for you).
-- This creates a unique meta-game loop: let some enemies through on purpose to farm rare DNA.
-
-#### 6. Rewarding Moments
-- **Seasonal events** (meteor showers, alien invasions, rogue black holes) with limited-time rewards.
-- Visual **world-level-up animations** when you unlock a new planet tier.
-- Satisfying **destruction physics** when buildings get hit.
-- A short **cinematic intro** per raid.
+| Feature | Description |
+|---------|-------------|
+| **Build Timers** | Structures take real time to construct (Clash of Clans–style). Higher tiers take longer. |
+| **Builder's Huts** | Buy extra builder slots to construct/upgrade multiple buildings simultaneously. |
+| **Science & Research Rework** | Research tiers require accumulated "Science" points (earned by buying upgrades), not XP level — like Egg Inc's research progression. |
+| **In-App Purchases** | Gem packs, instant-build skips, Dark Matter boosts. |
+| **Rewarded Ads** | Watch an ad to double offline earnings, get a free research boost, etc. |
+| **Piggy Bank** | Passively collects in-game currency. Break it (via real purchase or ad) to collect. |
+| **More Structures** | New buildings with unique effects (e.g., Shield Generator, Warp Drive income booster, DNA Splicer). |
+| **Mission Rewards** | Completing missions will grant real rewards (currency, Dark Matter, boosts). |
+| **Leaderboard Polish** | Cross-platform leaderboards via Unity Gaming Services. |
 
 ---
 
@@ -182,29 +160,66 @@ Open each upgrade asset in `Assets/_Scripts/ScriptableObjects/Upgrade/` and set 
 
 ---
 
-## Suggested Restructure Roadmap
-
-| Phase | Focus |
-|-------|-------|
-| 1 — Foundation | Redesign world as a grid; add drag-to-place buildings; slow resource rates |
-| 2 — Combat | Rework enemy pathfinding around your base layout; add wall/obstacle buildings |
-| 3 — DNA System | Add DNA drops, splicing UI, and hybrid building types |
-| 4 — Multiplayer | Cloud saves, player profiles, matchmaking, attack replays |
-| 5 — Polish | Seasons, events, leaderboards, monetization rework |
-
----
-
 ## Repository Structure
 
 ```
 SpheerURP/
   Assets/
     _Scripts/
-      Monobehaviors/       # Core gameplay: Player, EnemySpawner, Turret, Bullet, etc.
-      ScriptableObjects/   # Data: Upgrade, Research, World, Enemy Waves
-      SaveSystem/          # JSON save/load + PlayerData
-    Prefabs/               # 3D world objects (buildings, enemies, UI cards)
-    Scenes/                # MainGame + PhotoBooth
-    Sounds/                # Audio clips
-    Models/                # 3D assets
+      Monobehaviors/
+        EnemyScripts/          # Enemy state machine (Idle, Approaching, Attack, Leaving)
+        UI/                    # All panel scripts (UIManager, MissionsPanel, ResearchPanel, etc.)
+        Player.cs              # Singleton: money, XP, prestige, targeting, save/load
+        EnemySpawner.cs        # Wave generation & enemy scaling
+        PopupManager.cs        # Notification icon stack (Egg Inc-style)
+        PopupMessage.cs        # Individual notification: slide-in, wiggle, expand
+        TutorialManager.cs     # First-time player timed tutorial messages
+        Turret.cs / lazer.cs   # Defense building logic
+        PlacementManager.cs    # Interactive building placement
+        TransactionManager.cs  # Purchase validation
+        WorldSpawner.cs        # World model swapping & object loading
+      ScriptableObjects/
+        Missions/
+          MissionSO.cs         # Mission data class + MissionType enum
+          MissionsListSO.cs    # List container ScriptableObject
+          MissionDefinitions.cs # Hard-coded mission list (45 missions, 9 types × 5 tiers)
+        Research/              # ResearchItemSO per upgrade
+        Upgrade/               # ShopItemSO per building
+        World/                 # WorldSO per planet
+        Lists/                 # Combined list SOs (research info.asset, shop items.asset, etc.)
+      SaveSystem/
+        PlayerData.cs          # Serializable snapshot of Player state
+        SaveSystem.cs          # JSON read/write to persistent data path
+    Prefabs/                   # UFO enemy, buildings, slot marker, UI cards
+    Scenes/                    # MainGame + PhotoBooth
+    Sounds/                    # Audio clips
+    Models/                    # 3D world/building models
 ```
+
+---
+
+## Key Systems Reference
+
+### Panel System
+All panels extend `MenuPanel` and are registered in `UIManager.getPanelFromName()`.
+Keys: `"main"`, `"worlds"`, `"research"`, `"structures"`, `"debug menu"`, `"info"`, `"prestige"`, `"missions"`, `"leaderboard"`, `"stats"`.
+
+### Enemy Tap Damage
+A UI button is placed over each enemy prefab. Add the following to its **OnClick** list:
+- `EnemyStateManager → TapEnemy()`
+
+This deals configurable tap damage and spawns a hit marker via UIManager.
+
+### Research System
+30 research items (indices 0–29). Indices 13/18/19/23 all contribute to `productionRateMultiplier` — always call `RecalculateProductionRate()` when adding new indices that affect it. `EnsureResearchCountSize()` auto-pads saves.
+
+### Missions System
+45 missions in 9 categories × 5 difficulty tiers, defined in `MissionDefinitions.cs`. Missions never reset. Completing a mission toggles the checkbox image on its card. No rewards yet (planned for future release).
+
+### Notification / Popup System
+`PopupManager.ShowPopup(message)` creates an icon that slides up the right side of the screen. If the icon is not tapped within 5 seconds it starts wiggling. Tapping expands it to a full message; tapping again closes it.
+
+### Tutorial
+`TutorialManager` detects first-time players (via `Player.hasSeenTutorial`) and sends 7 timed messages explaining spinning, structures, building slots, research, alien waves, defense, and prestige.
+
+---

@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: dark
   m_EditorClassIdentifier: 
   name: Umbris
-  description: An enigmatic dark world with a wire-lattice crust formed by ancient volcanic venting. Its interior radiates void energy — harness it carefully.
+  description: "An enigmatic dark world with a wire-lattice crust formed by ancient
+    volcanic venting. Its interior radiates void energy \u2014 harness it carefully."
   cost: 30000000
   Icon: {fileID: 21300000, guid: 50ec9c19e9993f8438c55a0599e02d72, type: 3}
   index: 5
   cores: 79
+  maxBuildingSlots: 50
