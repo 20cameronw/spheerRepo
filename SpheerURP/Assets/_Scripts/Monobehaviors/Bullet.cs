@@ -41,11 +41,24 @@ public class Bullet : MonoBehaviour
     void HitTarget()
     {
         float dmg = damage * Player.Instance.getTurretDamageMultiplier();
-        //Debug.Log("Hit something");
-        //Quaternion rotation = Quaternion.FromToRotation(Camera.main.transform.position, core.transform.position);
         GameObject fireHit = Instantiate(fireHitParticleSystem, transform.position, Quaternion.identity);
         fireHit.GetComponent<ParticleSystem>().Play();
-        if (target != null) target.GetComponent<EnemyHealth>().TakeDamage(dmg);
+
+        if (target != null)
+        {
+            EnemyHealth eh = target.GetComponent<EnemyHealth>();
+            if (eh != null)
+            {
+                eh.TakeDamage(dmg);
+            }
+            else
+            {
+                // Target is an enemy world building or the world itself during an attack.
+                IAttackable attackable = target.GetComponentInParent<IAttackable>();
+                attackable?.TakeDamage(dmg, AttackWeaponType.Turret);
+            }
+        }
+
         Destroy(this.gameObject);
         Destroy(fireHit, 0.5f);
     }

@@ -49,8 +49,19 @@ public class lazer : MonoBehaviour
 
         if (target != null) {
             lazerEndPosition.transform.position = target.position;
-            target.GetComponent<EnemyHealth>().TakeDamage(damage * Player.Instance.getLazerDamageMultiplier() * Time.deltaTime);
-        } 
+            float lazerDmg = damage * Player.Instance.getLazerDamageMultiplier() * Time.deltaTime;
+            EnemyHealth eh = target.GetComponent<EnemyHealth>();
+            if (eh != null)
+            {
+                eh.TakeDamage(lazerDmg);
+            }
+            else
+            {
+                // Target is an enemy world building or the world itself during an attack.
+                IAttackable attackable = target.GetComponentInParent<IAttackable>();
+                attackable?.TakeDamage(lazerDmg, AttackWeaponType.Laser);
+            }
+        }
 
         if (Vector3.Distance(transform.position, target.position) >= effectiveRange)
         {

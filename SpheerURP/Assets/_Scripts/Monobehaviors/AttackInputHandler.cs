@@ -61,12 +61,23 @@ public class AttackInputHandler : MonoBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, attackLayerMask)) return;
 
         // Prefer a specific building hit; fall back to the whole world.
-        IAttackable target = hit.collider.GetComponentInParent<AttackBuildingView>()
-                          ?? (IAttackable)hit.collider.GetComponentInParent<AttackWorldView>();
-        if (target == null || target.IsDestroyed) return;
+        AttackBuildingView building = hit.collider.GetComponentInParent<AttackBuildingView>();
+        AttackWorldView    world    = hit.collider.GetComponentInParent<AttackWorldView>();
 
+        IAttackable attackTarget = building != null ? (IAttackable)building : world;
+        if (attackTarget == null || attackTarget.IsDestroyed) return;
+
+        Transform attackTransform = building != null ? building.transform : world.transform;
+
+        // Set as the player's active target so turrets/lazers also aim here,
+        // exactly as they would when the player taps an alien UFO.
+        if (Player.Instance != null)
+            Player.Instance.targetThis(attackTransform);
+
+        // Also deal immediate tap damage so attacking feels responsive
+        // even when turrets are out of range.
         float effectiveDamage = damage * (Player.Instance != null ? Player.Instance.getPower() : 1f);
-        target.TakeDamage(effectiveDamage, weaponType);
+        attackTarget.TakeDamage(effectiveDamage, weaponType);
     }
 
     // ── Event handlers ────────────────────────────────────────────────────────

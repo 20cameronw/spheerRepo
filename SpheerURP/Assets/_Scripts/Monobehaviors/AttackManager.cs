@@ -259,6 +259,15 @@ public class AttackManager : MonoBehaviour
             SpawnBuildingsOnEnemyWorld(data);
             currentAttackWorldView.Initialise(data);
 
+            // Add WorldAttackTarget to every Collider child of the world sphere so that
+            // tapping bare sphere surface routes through Player.targetThis() just like
+            // tapping an alien UFO does. Buildings already received it in SpawnSingleBuilding.
+            foreach (Collider col in spawnedEnemyWorldGO.GetComponentsInChildren<Collider>())
+            {
+                if (col.GetComponent<WorldAttackTarget>() == null)
+                    col.gameObject.AddComponent<WorldAttackTarget>();
+            }
+
             LeanTween.move(spawnedEnemyWorldGO, finalPos, animationDuration)
                      .setEase(enterEase);
         }
@@ -372,6 +381,11 @@ public class AttackManager : MonoBehaviour
             SphereCollider fallback = bgo.AddComponent<SphereCollider>();
             fallback.radius = 0.5f;
         }
+
+        // Add WorldAttackTarget so tapping this building routes through Player.targetThis()
+        // and the existing turret / lazer / missile system fires at it automatically.
+        if (bgo.GetComponent<WorldAttackTarget>() == null)
+            bgo.AddComponent<WorldAttackTarget>();
     }
 
     // ── Loot distribution ─────────────────────────────────────────────────────
