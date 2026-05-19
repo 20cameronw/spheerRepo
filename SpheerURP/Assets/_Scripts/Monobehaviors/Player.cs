@@ -726,6 +726,11 @@ public class Player : MonoBehaviour
     }
     private void AutoTarget()
     {
+        // During an enemy-world attack the player manually taps buildings to target them.
+        // No UFOs are present, so enemies.Length would be 0 and we'd immediately
+        // ClearTarget(), wiping the building the player just tapped.
+        if (AttackManager.Instance != null && AttackManager.Instance.IsAttacking()) return;
+
         // Find all enemies in the scene
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
