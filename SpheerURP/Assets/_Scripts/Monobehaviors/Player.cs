@@ -124,6 +124,10 @@ public class Player : MonoBehaviour
         OnTargetChanged?.Invoke(null);
     }
 
+    public bool getGunnerAutoTargeting()   { return gunnerAutoTargeting; }
+    public bool getLazerAutoTargeting()    { return lazerAutoTargeting; }
+    public bool getMissileAutoTargeting()  { return missileAutoTargeting; }
+
     public float getTurretRangeMultiplier()
     {
         return turretRangeMultiplier;
@@ -261,7 +265,9 @@ public class Player : MonoBehaviour
         return researchDiscount;
     }
 
-    private bool autoTargeting = false;
+    private bool gunnerAutoTargeting = false;
+    private bool lazerAutoTargeting  = false;
+    private bool missileAutoTargeting = false;
 
     private float junkMultiplier = 1;
 
@@ -323,8 +329,8 @@ public class Player : MonoBehaviour
                 else
                     researchDiscount -= 0.05f;
                 break;
-            case 8: //auto targeting
-                if (researchCount[index] > 0) autoTargeting = true;
+            case 8: //gunner auto targeting
+                if (researchCount[index] > 0) gunnerAutoTargeting = true;
                 break;
             case 9: //hold to buy
             case 10: //hold to click
@@ -430,6 +436,12 @@ public class Player : MonoBehaviour
                 // On reload (init=true) we skip because granted cores are already in the save.
                 if (!init)
                     addCores(5);
+                break;
+            case 30: //laser auto targeting
+                if (researchCount[index] > 0) lazerAutoTargeting = true;
+                break;
+            case 31: //missile auto targeting
+                if (researchCount[index] > 0) missileAutoTargeting = true;
                 break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
@@ -719,49 +731,6 @@ public class Player : MonoBehaviour
 
     public void Update()
     {
-        if (autoTargeting)
-        {
-            AutoTarget();
-        }
     }
-    private void AutoTarget()
-    {
-        // During an enemy-world attack the player manually taps buildings to target them.
-        // No UFOs are present, so enemies.Length would be 0 and we'd immediately
-        // ClearTarget(), wiping the building the player just tapped.
-        if (AttackManager.Instance != null && AttackManager.Instance.IsAttacking()) return;
-
-        // Find all enemies in the scene
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
-        // If there are no enemies, clear the target
-        if (enemies.Length == 0)
-        {
-            if (target != null) ClearTarget();
-            return;
-        }
-
-        // Pick the closest enemy
-        GameObject closestEnemy   = enemies[0];
-        float      closestDistance = Vector3.Distance(transform.position, closestEnemy.transform.position);
-
-        foreach (GameObject enemy in enemies)
-        {
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance < closestDistance)
-            {
-                closestEnemy    = enemy;
-                closestDistance = distance;
-            }
-        }
-
-        // Assign the target only if it changed (avoids event spam every frame)
-        if (target != closestEnemy.transform)
-        {
-            target = closestEnemy.transform;
-            OnTargetChanged?.Invoke(target);
-        }
-    }
-
 
 }

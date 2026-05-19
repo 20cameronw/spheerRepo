@@ -76,21 +76,61 @@ public class lazer : MonoBehaviour
         cr_running = true;
         while (true)
         {
-            Transform enemyPos = Player.Instance.GetTarget();
-            if (enemyPos != null && enemyPos.gameObject.activeInHierarchy)
+            if (Player.Instance.getLazerAutoTargeting())
             {
-                float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
-                if (distanceToEnemy <= effectiveRange)
+                // Independent targeting: pick the nearest Enemy-tagged object in range
+                target = FindNearestEnemyInRange();
+                if (target == null)
                 {
-                    target = enemyPos;
-                    StopCoroutine("checkForTargetInRange");
-                    cr_running = false;
-                    yield break;
+                    // No enemy found — fall back to player's manual target (e.g. attack-phase building)
+                    Transform manual = Player.Instance.GetTarget();
+                    if (manual != null && manual.gameObject.activeInHierarchy)
+                    {
+                        float dist = Vector3.Distance(transform.position, manual.position);
+                        if (dist <= effectiveRange) target = manual;
+                    }
                 }
+            }
+            else
+            {
+                Transform enemyPos = Player.Instance.GetTarget();
+                if (enemyPos != null && enemyPos.gameObject.activeInHierarchy)
+                {
+                    float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
+                    if (distanceToEnemy <= effectiveRange)
+                    {
+                        target = enemyPos;
+                    }
+                }
+            }
+
+            if (target != null)
+            {
+                StopCoroutine("checkForTargetInRange");
+                cr_running = false;
+                yield break;
             }
 
             yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    private Transform FindNearestEnemyInRange()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        Transform nearest = null;
+        float nearestDist = float.MaxValue;
+        foreach (GameObject e in enemies)
+        {
+            if (!e.activeInHierarchy) continue;
+            float dist = Vector3.Distance(transform.position, e.transform.position);
+            if (dist <= effectiveRange && dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearest = e.transform;
+            }
+        }
+        return nearest;
     }
 
     void OnDrawGizmosSelected()

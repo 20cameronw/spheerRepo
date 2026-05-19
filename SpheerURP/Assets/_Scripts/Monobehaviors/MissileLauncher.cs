@@ -34,7 +34,7 @@ public class MissileLauncher : MonoBehaviour
 
     private void TryFire()
     {
-        Transform target = Player.Instance.GetTarget();
+        Transform target = ResolveTarget();
         if (target == null) return;
 
         float dist = Vector3.Distance(transform.position, target.position);
@@ -56,5 +56,31 @@ public class MissileLauncher : MonoBehaviour
 
         MissileProjectile proj = missileGO.AddComponent<MissileProjectile>();
         proj.Initialize(target, missileDamage, missileSpeed, splashRadius, explosionPrefab);
+    }
+
+    private Transform ResolveTarget()
+    {
+        if (Player.Instance.getMissileAutoTargeting())
+        {
+            // Independent targeting: nearest Enemy-tagged object in range
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            Transform nearest = null;
+            float nearestDist = float.MaxValue;
+            foreach (GameObject e in enemies)
+            {
+                if (!e.activeInHierarchy) continue;
+                float dist = Vector3.Distance(transform.position, e.transform.position);
+                if (dist <= range && dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearest = e.transform;
+                }
+            }
+            // Fall back to player's manual target when no enemy found (e.g. attack-phase buildings)
+            if (nearest != null) return nearest;
+        }
+
+        Transform manual = Player.Instance.GetTarget();
+        return (manual != null && manual.gameObject.activeInHierarchy) ? manual : null;
     }
 }
