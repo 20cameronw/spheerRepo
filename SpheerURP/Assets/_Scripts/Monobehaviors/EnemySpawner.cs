@@ -124,6 +124,27 @@ public class EnemySpawner : MonoBehaviour
         StartWave();
     }
 
+    /// <summary>
+    /// Suspend all wave activity while an enemy-base attack is in progress.
+    /// All active UFOs are immediately removed so the screen is clear during the assault.
+    /// </summary>
+    public void PauseForAttack()
+    {
+        if (waveCoroutine != null) { StopCoroutine(waveCoroutine); waveCoroutine = null; }
+        DeleteChildrenStartingWithUFO();
+        betweenWaves = true;
+        // Clear any UFO target the player may have had
+        if (Player.Instance != null) Player.Instance.ClearTarget();
+    }
+
+    /// <summary>
+    /// Resume wave spawning after an enemy-base attack ends.
+    /// </summary>
+    public void ResumeFromAttack()
+    {
+        StartWave();
+    }
+
     // ── Procedural wave generation ───────────────────────────────────────────
 
     private struct WaveData

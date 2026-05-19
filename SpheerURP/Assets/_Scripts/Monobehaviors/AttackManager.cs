@@ -104,6 +104,10 @@ public class AttackManager : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(this); return; }
         Instance = this;
 
+        // Attach the attack HUD overlay if it isn't already present
+        if (GetComponent<AttackProgressUI>() == null)
+            gameObject.AddComponent<AttackProgressUI>();
+
         AttackWorldView.OnBaseDestroyed += HandleBaseDestroyed;
     }
 
@@ -218,6 +222,10 @@ public class AttackManager : MonoBehaviour
         // 1. Hide HUD
         SetHUDVisible(false);
 
+        // 2a. Pause the alien wave system and dismiss all active UFOs so aliens
+        //     are not visible or attacking during the enemy-world assault.
+        EnemySpawner.Instance?.PauseForAttack();
+
         // 2. Remember and slide the player's world to the parked position
         if (worldSpawner != null && worldSpawner.CurrentWorld != null)
         {
@@ -309,11 +317,17 @@ public class AttackManager : MonoBehaviour
             currentAttackWorldView  = null;
         }
 
+        // Clear any lingering target (destroyed building / world sphere)
+        Player.Instance?.ClearTarget();
+
         // Restore HUD
         SetHUDVisible(true);
 
         isAttacking      = false;
         currentEnemyBase = null;
+
+        // Resume alien waves so they return after the attack phase
+        EnemySpawner.Instance?.ResumeFromAttack();
 
         OnAttackEnded?.Invoke(playerWon);
     }
@@ -386,6 +400,17 @@ public class AttackManager : MonoBehaviour
         // and the existing turret / lazer / missile system fires at it automatically.
         if (bgo.GetComponent<WorldAttackTarget>() == null)
             bgo.AddComponent<WorldAttackTarget>();
+
+        // Enemy-world buildings must NOT fire back — they use the same prefabs as
+        // the player's structures, which carry Turret / lazer / MissileLauncher
+        // components.  Remove those weapon components so they don't call
+        // Player.Instance.GetTarget() and shoot at the player's own target.
+        foreach (Turret t in bgo.GetComponentsInChildren<Turret>(true))
+            Destroy(t);
+        foreach (lazer l in bgo.GetComponentsInChildren<lazer>(true))
+            Destroy(l);
+        foreach (MissileLauncher ml in bgo.GetComponentsInChildren<MissileLauncher>(true))
+            Destroy(ml);
     }
 
     // ── Loot distribution ─────────────────────────────────────────────────────

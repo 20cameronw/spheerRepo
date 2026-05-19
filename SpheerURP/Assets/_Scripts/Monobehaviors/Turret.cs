@@ -37,6 +37,11 @@ public class Turret : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Treat inactive (destroyed) targets the same as null so turrets don't
+        // keep aiming at buildings that have been deactivated on death.
+        if (target != null && !target.gameObject.activeInHierarchy)
+            target = null;
+
         if (target == null)
         {
 
@@ -91,7 +96,7 @@ public class Turret : MonoBehaviour
             
             Transform enemy = Player.Instance.GetTarget();
             
-            if (enemy != null)
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
             {
                 float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
                 if (distanceToEnemy <= range) {

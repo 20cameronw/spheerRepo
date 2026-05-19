@@ -33,10 +33,11 @@ public class lazer : MonoBehaviour
 
     void Update()
     {
-        if (target == null)
+        if (target == null || !target.gameObject.activeInHierarchy)
         {
             laser.enabled = false;
             laserOn = false;
+            target = null;
 
             if (cr_running == false)
                 StartCoroutine("checkForTargetInRange");
@@ -75,9 +76,8 @@ public class lazer : MonoBehaviour
         cr_running = true;
         while (true)
         {
-            // Transform enemyPos = GameObject.FindGameObjectWithTag("Enemy")?.transform;
             Transform enemyPos = Player.Instance.GetTarget();
-            if (enemyPos != null)
+            if (enemyPos != null && enemyPos.gameObject.activeInHierarchy)
             {
                 float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
                 if (distanceToEnemy <= effectiveRange)

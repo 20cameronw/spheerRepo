@@ -84,6 +84,11 @@ public class AttackBuildingView : MonoBehaviour, IDefenseStructure
         isDestroyed = true;
         AttackWorldView worldView = GetComponentInParent<AttackWorldView>();
         worldView?.OnBuildingDestroyed(this);
+
+        // Clear the player's target so turrets stop tracking the destroyed building.
+        if (Player.Instance != null && Player.Instance.GetTarget() == transform)
+            Player.Instance.ClearTarget();
+
         gameObject.SetActive(false);
     }
 
