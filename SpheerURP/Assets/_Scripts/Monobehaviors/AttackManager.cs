@@ -224,6 +224,8 @@ public class AttackManager : MonoBehaviour
             Vector3 startPos  = finalPos + enemyWorldSpawnOffset;
 
             spawnedEnemyWorldGO = Instantiate(prefab, startPos, Quaternion.identity);
+            if (Camera.main != null)
+                spawnedEnemyWorldGO.transform.SetParent(Camera.main.transform, worldPositionStays: true);
 
             // Attach AttackWorldView if the prefab doesn't already have one
             currentAttackWorldView = spawnedEnemyWorldGO.GetComponent<AttackWorldView>()
@@ -288,8 +290,15 @@ public class AttackManager : MonoBehaviour
         if (buildingPrefabs.Count == 0) return;
 
         float surfaceRadius = 5f;  // default; override if world prefab exposes a collider
+        Vector3 sphereCenter = spawnedEnemyWorldGO.transform.position;
         SphereCollider sc = spawnedEnemyWorldGO.GetComponentInChildren<SphereCollider>();
-        if (sc != null) surfaceRadius = sc.radius * 0.9f;
+        if (sc != null)
+        {
+            // Use world-space bounds so scale is accounted for, and the
+            // actual collider centre rather than the root transform position.
+            sphereCenter  = sc.bounds.center;
+            surfaceRadius = sc.bounds.extents.x * 0.9f;
+        }
 
         float buildingHealth = baseBuildingHealth * Mathf.Max(1, data.simulatedXPLevel * 0.5f);
 
@@ -299,7 +308,7 @@ public class AttackManager : MonoBehaviour
             for (int n = 0; n < data.buildingCounts[typeIdx]; n++)
             {
                 Vector3 localPos   = UnityEngine.Random.onUnitSphere * surfaceRadius;
-                Vector3 worldPos   = spawnedEnemyWorldGO.transform.position + localPos;
+                Vector3 worldPos   = sphereCenter + localPos;
                 Quaternion rot     = Quaternion.FromToRotation(Vector3.up, localPos.normalized);
 
                 GameObject bgo     = Instantiate(buildingPrefabs[typeIdx], worldPos, rot);
