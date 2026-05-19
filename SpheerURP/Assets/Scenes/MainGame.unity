@@ -8966,7 +8966,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &800250722
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25019,6 +25019,7 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 1c311dae0af2f400ebe73409c652c949, type: 3}
   surface: {fileID: 1914055861}
   worldsListSO: {fileID: 0}
+  slotRadiusScale: 0.9
   orbitSC: {fileID: 1914055862}
   xOrbitSpeed: -5
   yOrbitSpeed: -8

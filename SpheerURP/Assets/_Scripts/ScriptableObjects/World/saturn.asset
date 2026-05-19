@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: saturn
   m_EditorClassIdentifier: 
   name: Kronos
-  description: A gas giant encircled by majestic icy rings composed of silicate dust and frozen methane. The ring debris alone contains enough rare isotopes to fuel a fleet.
+  description: A gas giant encircled by majestic icy rings composed of silicate dust
+    and frozen methane. The ring debris alone contains enough rare isotopes to fuel
+    a fleet.
   cost: 2000000
   Icon: {fileID: 21300000, guid: a733ecee0c206004db18bc0972238d0c, type: 3}
   index: 4
   cores: 35
+  maxBuildingSlots: 50

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: spoiky
   m_EditorClassIdentifier: 
   name: Acantha
-  description: A crystalline spike world in the outer void. Its jagged silica spires are kilometres tall and contain the densest known concentrations of quantum minerals in the galaxy.
+  description: A crystalline spike world in the outer void. Its jagged silica spires
+    are kilometres tall and contain the densest known concentrations of quantum minerals
+    in the galaxy.
   cost: 6.7e+10
   Icon: {fileID: 21300000, guid: ea02885a1c417504aa415df67d3d8d22, type: 3}
   index: 6
   cores: 200
+  maxBuildingSlots: 50
