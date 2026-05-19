@@ -43,6 +43,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 785b1409a7834dddae171fcadc59325e, type: 2}
   - {fileID: 11400000, guid: 1bf4cca6ffe840fea15efa4c9123d77d, type: 2}
   - {fileID: 11400000, guid: 47a899dbad4446a4bac6113c10d4c719, type: 2}
+  - {fileID: 11400000, guid: c1d2e3f4a5b6789012345678abcdef90, type: 2}
+  - {fileID: 11400000, guid: d2e3f4a5b6789012345678abcdef9001, type: 2}
   commonCardTemplate: {fileID: 737817396954718147, guid: 6a204be2450accc4e8bd7d3101df55f1,
     type: 3}
   epicCardTemplate: {fileID: 2952702350989077573, guid: 51f935e1606e62140bb837b99c5b2570,

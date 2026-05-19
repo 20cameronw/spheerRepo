@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3f30a8240ae74c188c4a8dd5529efad, type: 3}
-  m_Name: auto target
+  m_Name: laser auto target
   m_EditorClassIdentifier: 
-  name: Gunner Auto-Targeting
-  bonus: Gunners independently acquire and engage nearby enemies
-  upgradeIndex: 8
-  Icon: {fileID: 21300000, guid: b52130bb79a23344aa8c335cecb91eb0, type: 3}
+  name: Laser Auto-Targeting
+  bonus: Lasers independently acquire and engage nearby enemies
+  upgradeIndex: 30
+  Icon: {fileID: 0}
   cost: 10
   requiredXPLevel: 0
   requiredWorldLevel: 0

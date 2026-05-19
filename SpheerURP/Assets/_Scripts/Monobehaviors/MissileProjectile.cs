@@ -100,14 +100,29 @@ public class MissileProjectile : MonoBehaviour
             Destroy(explosion, 2f);
         }
 
-        // Splash damage — hits any enemy whose EnemyHealth is in the radius
+        // Splash damage — hits enemies and any IAttackable targets in the radius.
         Collider[] cols = Physics.OverlapSphere(impactPos, splashRadius);
+        // Use a HashSet to avoid dealing damage to the same IAttackable more than once
+        // (e.g. a building with multiple child colliders).
+        System.Collections.Generic.HashSet<IAttackable> damagedAttackables =
+            new System.Collections.Generic.HashSet<IAttackable>();
+
         foreach (Collider col in cols)
         {
-            // Check this collider and ancestors for EnemyHealth
             EnemyHealth eh = col.GetComponentInParent<EnemyHealth>();
             if (eh != null)
+            {
                 eh.TakeDamage(damage);
+                continue;
+            }
+
+            // Also damage enemy world buildings / the world sphere during an attack.
+            IAttackable attackable = col.GetComponentInParent<IAttackable>();
+            if (attackable != null && !damagedAttackables.Contains(attackable))
+            {
+                damagedAttackables.Add(attackable);
+                attackable.TakeDamage(damage, AttackWeaponType.Missile);
+            }
         }
 
         Destroy(gameObject);
