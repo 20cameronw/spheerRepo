@@ -45,8 +45,11 @@ public class AttackManager : MonoBehaviour
     [Tooltip("The player's world will be moved to this transform's position when an attack starts.")]
     [SerializeField] private Transform playerWorldParkedTransform;
 
-    [Tooltip("The enemy world rises from this offset (local to this transform) before the attack.")]
-    [SerializeField] private Vector3 enemyWorldSpawnOffset = new Vector3(0f, -30f, 0f);
+    [Tooltip("The enemy world is instantiated here (e.g. below the screen) before animating in.")]
+    [SerializeField] private Transform enemyWorldStartTransform;
+
+    [Tooltip("The enemy world animates to this transform's position when an attack starts.")]
+    [SerializeField] private Transform enemyWorldEndTransform;
 
     [Header("Enemy World Generation")]
     [Tooltip("World prefabs the generator can pick from when creating an enemy base.")]
@@ -216,16 +219,18 @@ public class AttackManager : MonoBehaviour
                      .setEase(enterEase);
         }
 
-        // 3. Spawn and animate the enemy world in from below
+        // 3. Spawn and animate the enemy world in from its start position
         if (worldPrefabs.Count > 0)
         {
             GameObject prefab = worldPrefabs[data.worldPrefabIndex];
-            Vector3 finalPos  = transform.position;
-            Vector3 startPos  = finalPos + enemyWorldSpawnOffset;
+            Vector3 startPos = enemyWorldStartTransform != null
+                ? enemyWorldStartTransform.position
+                : transform.position + new Vector3(0f, -30f, 0f);
+            Vector3 finalPos = enemyWorldEndTransform != null
+                ? enemyWorldEndTransform.position
+                : transform.position;
 
             spawnedEnemyWorldGO = Instantiate(prefab, startPos, Quaternion.identity);
-            if (Camera.main != null)
-                spawnedEnemyWorldGO.transform.SetParent(Camera.main.transform, worldPositionStays: true);
 
             // Attach AttackWorldView if the prefab doesn't already have one
             currentAttackWorldView = spawnedEnemyWorldGO.GetComponent<AttackWorldView>()
@@ -249,10 +254,12 @@ public class AttackManager : MonoBehaviour
         if (playerWon && currentEnemyBase != null)
             AwardLoot(currentEnemyBase);
 
-        // Slide the enemy world back down
+        // Slide the enemy world back to its start position
         if (spawnedEnemyWorldGO != null)
         {
-            Vector3 exitPos = spawnedEnemyWorldGO.transform.position + enemyWorldSpawnOffset;
+            Vector3 exitPos = enemyWorldStartTransform != null
+                ? enemyWorldStartTransform.position
+                : spawnedEnemyWorldGO.transform.position + new Vector3(0f, -30f, 0f);
             LeanTween.move(spawnedEnemyWorldGO, exitPos, animationDuration)
                      .setEase(exitEase);
         }
