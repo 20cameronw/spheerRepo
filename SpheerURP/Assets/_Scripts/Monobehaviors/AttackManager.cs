@@ -308,7 +308,7 @@ public class AttackManager : MonoBehaviour
                 // Attach AttackBuildingView if not already on the prefab
                 AttackBuildingView abv = bgo.GetComponent<AttackBuildingView>()
                                       ?? bgo.AddComponent<AttackBuildingView>();
-                abv.Initialise(buildingHealth, defenseRating: 0f);
+                abv.Initialise(buildingHealth, defense: 0f);
 
                 buildingIndex++;
             }
