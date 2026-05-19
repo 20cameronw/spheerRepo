@@ -84,6 +84,9 @@ public class AttackManager : MonoBehaviour
 
     private void Awake()
     {
+        // Destroy the duplicate component only (not the GameObject) so the shared
+        // "Game Managers" object stays alive — consistent with Player.cs and
+        // TransactionManager.cs singleton patterns in this project.
         if (Instance != null && Instance != this) { Destroy(this); return; }
         Instance = this;
 

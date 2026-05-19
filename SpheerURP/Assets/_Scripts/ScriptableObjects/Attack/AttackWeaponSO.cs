@@ -8,7 +8,7 @@ using UnityEngine;
 public class AttackWeaponSO : ScriptableObject
 {
     [Header("Identity")]
-    public new string name;
+    public string weaponName;
     public string description;
     public Sprite icon;
 
