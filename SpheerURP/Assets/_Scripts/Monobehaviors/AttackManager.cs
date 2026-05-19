@@ -68,6 +68,13 @@ public class AttackManager : MonoBehaviour
     [Tooltip("Maximum rotation speed (degrees/second) per axis applied to the spawned enemy world.")]
     [SerializeField] private Vector3 enemyWorldRotateMax = new Vector3(0f, 20f, 5f);
 
+    [Header("Enemy World Building Fallback")]
+    [Tooltip("Minimum number of buildings to place when the player has bought none yet.")]
+    [SerializeField] private int minEnemyBuildingsMin = 3;
+
+    [Tooltip("Maximum number of buildings to place when the player has bought none yet.")]
+    [SerializeField] private int minEnemyBuildingsMax = 7;
+
     [Header("Animation")]
     [Tooltip("Seconds the slide-in / slide-out animations take.")]
     [SerializeField] private float animationDuration = 1.2f;
@@ -328,7 +335,7 @@ public class AttackManager : MonoBehaviour
 
         if (totalCount == 0)
         {
-            int minBuildings = UnityEngine.Random.Range(3, 7);
+            int minBuildings = UnityEngine.Random.Range(minEnemyBuildingsMin, minEnemyBuildingsMax + 1);
             for (int i = 0; i < minBuildings; i++)
             {
                 int typeIdx = UnityEngine.Random.Range(0, structures.Count);
@@ -350,6 +357,8 @@ public class AttackManager : MonoBehaviour
         GameObject bgo   = Instantiate(prefab, worldPos, Quaternion.identity);
         bgo.transform.SetParent(spawnedEnemyWorldGO.transform, worldPositionStays: true);
         bgo.transform.LookAt(spawnedEnemyWorldGO.transform.position);
+        // Rotate -90° on X so the building's "up" axis points away from the sphere center
+        // (matches the same adjustment used in WorldSpawner.spawnOnSurface).
         bgo.transform.Rotate(-90f, 0f, 0f);
 
         AttackBuildingView abv = bgo.GetComponent<AttackBuildingView>()
