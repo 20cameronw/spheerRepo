@@ -46,77 +46,6 @@ Think **Clash of Clans** meets **Egg Inc**:
 | **Mission Rewards** | Completing missions will grant real rewards (currency, Dark Matter, boosts). |
 | **Leaderboard Polish** | Cross-platform leaderboards via Unity Gaming Services. |
 
----
-
-## Unity Editor Setup — Interactive Placement System
-
-The code for the building placement system (`PlacementManager`, `PlacementSlot`, slot tracking in `WorldSpawner`) is complete, but the following steps **must be done in the Unity Editor** because they involve creating assets, prefabs, and wiring scene references.
-
----
-
-### Step 1 — Create the Slot Marker Prefab (blue dot)
-
-1. In the Scene or Hierarchy, create a **Sphere** primitive (*GameObject → 3D Object → Sphere*).
-2. Set its **Scale** to `(0.15, 0.15, 0.15)`.
-3. Create a new **Material** (*Assets → Create → Material*), name it `SlotMarkerMat`.
-   - Shader: `Universal Render Pipeline/Lit`
-   - Surface Type: **Transparent**
-   - Base Color: `R 0.2  G 0.5  B 1.0  A 0.75` (semi-transparent blue)
-4. Assign `SlotMarkerMat` to the sphere's `MeshRenderer`.
-5. Add the **`PlacementSlot`** script component to the sphere.
-6. The sphere already has a `SphereCollider` — leave it enabled (it is used for raycasting).
-7. Drag the sphere from the Hierarchy into `Assets/Prefabs/` to make it a prefab, name it `SlotMarker`.
-8. Delete the instance from the scene.
-
----
-
-### Step 2 — Create the Placement Overlay UI
-
-This is the "Cancel" panel shown while the player is choosing a slot.
-
-1. In the **MainGame** scene Hierarchy, select the existing Canvas.
-2. Add a **Panel** child, name it `PlacementOverlay`.
-   - Anchor: stretch to fill, or centre — your choice.
-   - Set the Image color to semi-transparent dark (e.g. `A = 50`).
-3. Inside `PlacementOverlay`, add a **Button** (*UI → Button - TextMeshPro*).
-   - Label it **"Cancel"**.
-   - In the Button's `OnClick()` list, add an entry → drag the `PlacementManager` GameObject → select `PlacementManager.CancelPlacement()`.
-4. Disable `PlacementOverlay` in the Inspector (`active = false`) — the script enables/disables it at runtime.
-
----
-
-### Step 3 — Add PlacementManager to the Scene
-
-1. Create an **empty GameObject** in the MainGame scene, name it `PlacementManager`.
-2. Add the **`PlacementManager`** script component.
-3. Fill in its Inspector fields:
-
-| Field | Value |
-|-------|-------|
-| **World Spawner** | drag the `WorldSpawner` GameObject |
-| **Ui Manager** | drag the `UIManager` GameObject |
-| **Structures Panel** | drag the `StructuresPanel` GameObject |
-| **Main Camera** | drag `Main Camera` |
-| **Placement Overlay UI** | drag the `PlacementOverlay` panel created in Step 2 |
-| **Slot Marker Prefab** | drag the `SlotMarker` prefab from Assets/Prefabs |
-| **Normal Camera Distance** | set to match your current camera's distance from the world (measure in the Scene view — typically `~15`) |
-| **Placement Camera Distance** | `8` (adjustable — closer = more intimate view of the surface) |
-| **Camera Zoom Duration** | `0.5` |
-| **Spin Sensitivity** | `0.3` |
-
----
-
-### Step 4 — Wire WorldSpawner's new field
-
-1. Select the **WorldSpawner** GameObject in the scene.
-2. In its Inspector, find the new **"Worlds List SO"** field.
-3. Drag `Assets/_Scripts/ScriptableObjects/Lists/Worlds Info.asset` into that field.
-
----
-
-### Step 5 — Set `maxBuildingSlots` on each World ScriptableObject
-
-Open each world asset in `Assets/_Scripts/ScriptableObjects/World/` and set **Max Building Slots** to reflect how big the world should feel:
 
 | World | Suggested `maxBuildingSlots` |
 |-------|------------------------------|
@@ -128,11 +57,6 @@ Open each world asset in `Assets/_Scripts/ScriptableObjects/World/` and set **Ma
 | Saturn | 32 |
 | Spiky | 36 |
 
----
-
-### Step 6 — Set `slotSize` on each Upgrade ScriptableObject
-
-Open each upgrade asset in `Assets/_Scripts/ScriptableObjects/Upgrade/` and set **Slot Size** to reflect how much space the building should occupy:
 
 | Building | Suggested `slotSize` |
 |----------|-----------------------|
@@ -144,21 +68,6 @@ Open each upgrade asset in `Assets/_Scripts/ScriptableObjects/Upgrade/` and set 
 | Laser | 3 |
 | Missile Silo | 3 |
 | Satellite *(orbit)* | — (ignored, orbit items skip placement) |
-
----
-
-### Step 7 — Test in Play Mode
-
-1. Hit Play, earn enough money to buy a building.
-2. Tap **Buy** on any surface building card.
-3. The UI panel should close, the camera should zoom in, and **blue dots** should appear on the world surface.
-4. Drag your mouse (or finger) to **spin the world**.
-5. Click/tap a blue dot → building spawns there, camera zooms back out.
-6. Or click **Cancel** → purchase is refunded.
-
-> **Tip:** If the blue dots don't appear, check the Console for `[PlacementManager] slotMarkerPrefab is not assigned` — it means Step 1/3 above wasn't completed.
-
----
 
 ## Repository Structure
 
