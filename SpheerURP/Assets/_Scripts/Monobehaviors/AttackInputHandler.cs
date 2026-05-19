@@ -23,6 +23,9 @@ public class AttackInputHandler : MonoBehaviour
     [Tooltip("Camera used for raycasting. Defaults to Camera.main if left empty.")]
     [SerializeField] private Camera attackCamera;
 
+    [Tooltip("Layer mask for the raycast. Set to the layers your world/building objects are on to prevent UI or other objects from being hit.")]
+    [SerializeField] private LayerMask attackLayerMask = ~0; // default: everything
+
     // ── Unity lifecycle ───────────────────────────────────────────────────────
 
     private void Awake()
@@ -55,7 +58,7 @@ public class AttackInputHandler : MonoBehaviour
             : Input.mousePosition;
 
         Ray ray = cam.ScreenPointToRay(screenPoint);
-        if (!Physics.Raycast(ray, out RaycastHit hit)) return;
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, attackLayerMask)) return;
 
         // Prefer a specific building hit; fall back to the whole world.
         IAttackable target = hit.collider.GetComponentInParent<AttackBuildingView>()
