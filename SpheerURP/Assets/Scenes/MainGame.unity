@@ -2980,6 +2980,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266741364}
   m_CullTransparentMesh: 1
+--- !u!1 &277026428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 277026429}
+  m_Layer: 6
+  m_Name: enemy world attack state position
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &277026429
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277026428}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -30, z: 150}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &295635224
 GameObject:
   m_ObjectHideFlags: 0
@@ -3670,6 +3701,8 @@ Transform:
   - {fileID: 960570426}
   - {fileID: 1044183737}
   - {fileID: 1236484877}
+  - {fileID: 277026429}
+  - {fileID: 2090580323}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
@@ -18857,7 +18890,7 @@ Transform:
   m_GameObject: {fileID: 1236484876}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 45, z: 150}
+  m_LocalPosition: {x: 0, y: 30, z: 150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25782,6 +25815,8 @@ GameObject:
   - component: {fileID: 1938628155}
   - component: {fileID: 1938628156}
   - component: {fileID: 1938628157}
+  - component: {fileID: 1938628158}
+  - component: {fileID: 1938628159}
   m_Layer: 0
   m_Name: GameManagers
   m_TagString: Untagged
@@ -26070,24 +26105,52 @@ MonoBehaviour:
   - {fileID: 1881171087}
   - {fileID: 1106993570}
   playerWorldParkedTransform: {fileID: 1236484877}
-  enemyWorldSpawnOffset: {x: 0, y: -70, z: 0}
+  enemyWorldStartTransform: {fileID: 2090580323}
+  enemyWorldEndTransform: {fileID: 277026429}
   worldPrefabs:
   - {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3, type: 3}
   - {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d, type: 3}
   - {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9, type: 3}
   - {fileID: 1208959515800470850, guid: c9b3b65b6d15149eab2d05fb66494710, type: 3}
-  buildingPrefabs:
-  - {fileID: 6167137264061970111, guid: b7485f5c7262c43d9aa31506d7bbe793, type: 3}
-  - {fileID: 2213521813779323438, guid: 4fe058add63954f7f8edcb785876a681, type: 3}
-  - {fileID: 6825596879887032473, guid: 6946c4e2a57a5244699ef72f630f5e0a, type: 3}
-  - {fileID: 4138480710187463257, guid: 79d5fdf46750c884e9c8b49855ab9796, type: 3}
-  - {fileID: 8005019957655098634, guid: 35b44654aaf824c91b1590baa998f2eb, type: 3}
-  - {fileID: 2387481435115236454, guid: 46541eb3b5af6254998965c52579fedb, type: 3}
   baseBuildingHealth: 80
   lootPercentage: 1
+  enemyWorldRotateMin: {x: 3, y: 5, z: 0}
+  enemyWorldRotateMax: {x: 10, y: 20, z: 5}
+  minEnemyBuildingsMin: 3
+  minEnemyBuildingsMax: 7
   animationDuration: 1.2
   enterEase: 27
   exitEase: 26
+--- !u!114 &1938628158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938628145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 326e57b285de45a469ac972bd622a238, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackInputHandler
+  damage: 25
+  weaponType: 0
+  attackCamera: {fileID: 0}
+  attackLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1938628159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938628145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddada4db02ed7c84ea52f09689e12741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackProgressUI
 --- !u!1 &1956166089
 GameObject:
   m_ObjectHideFlags: 0
@@ -27906,6 +27969,37 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &2090580322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2090580323}
+  m_Layer: 6
+  m_Name: enemy world start
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2090580323
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090580322}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -128.6, z: 150}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2117950738
 GameObject:
   m_ObjectHideFlags: 0
