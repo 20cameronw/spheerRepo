@@ -111,12 +111,17 @@ public class PopupMessage : MonoBehaviour
 
         LeanTween.move(gameObject, centerParent.position, 0.4f).setEaseOutBack();
         LeanTween.scale(gameObject, Vector3.one * expandedScale, 0.4f).setEaseOutBack()
-            .setOnComplete(() => messagePanel.SetActive(true));
+            .setOnComplete(() =>
+            {
+                if (icon != null) icon.gameObject.SetActive(false);
+                messagePanel.SetActive(true);
+            });
     }
 
     public void Close()
     {
         messagePanel.SetActive(false);
+        if (icon != null) icon.gameObject.SetActive(true);
 
         LeanTween.move(gameObject, originalPos, 0.35f).setEaseInBack();
         LeanTween.scale(gameObject, Vector3.zero, 0.35f).setEaseInBack()
