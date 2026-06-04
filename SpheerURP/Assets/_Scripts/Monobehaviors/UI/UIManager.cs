@@ -29,6 +29,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject textPrefab; 
     [SerializeField] private Transform canvasTransform;
 
+    [Header("XP Gain Text")]
+    [SerializeField] private Color xpGainTextColor = Color.cyan;
+
     void Awake() {
         EnemySpawner.OnWaveStarted += handleWaveStarted;
         EnemySpawner.OnWaveCompleted += handleWaveCompleted;
@@ -167,6 +170,34 @@ public class UIManager : MonoBehaviour
         LeanTween.moveLocal(textObject, textObject.transform.localPosition + new Vector3(Random.Range(-20f, 20f), 60f, 0), 0.8f)
             .setEaseOutCubic();
         LeanTween.scale(textObject, Vector3.one * 1.2f, 0.15f).setEaseOutBack()
+            .setOnComplete(() =>
+            {
+                LeanTween.alphaText(textObject.GetComponent<RectTransform>(), 0f, 0.4f).setDelay(0.3f)
+                    .setOnComplete(() => Destroy(textObject));
+            });
+    }
+
+
+    public void ShowXPGain(int amount, Vector3 worldPosition)
+    {
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+
+        RectTransform canvasRect = canvasTransform as RectTransform;
+        Vector2 localPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect, screenPos, null, out localPos);
+
+        GameObject textObject = Instantiate(textPrefab, canvasTransform);
+        TMP_Text textComponent = textObject.GetComponent<TMP_Text>();
+        textComponent.text = "+" + amount + " XP";
+        textComponent.color = xpGainTextColor;
+        textComponent.fontSize = 28;
+        textObject.transform.localPosition = localPos + new Vector2(Random.Range(-20f, 20f), 30f);
+        textObject.transform.localScale = Vector3.one * 0.8f;
+
+        LeanTween.moveLocal(textObject, textObject.transform.localPosition + new Vector3(Random.Range(-15f, 15f), 70f, 0), 0.9f)
+            .setEaseOutCubic();
+        LeanTween.scale(textObject, Vector3.one * 1.1f, 0.15f).setEaseOutBack()
             .setOnComplete(() =>
             {
                 LeanTween.alphaText(textObject.GetComponent<RectTransform>(), 0f, 0.4f).setDelay(0.3f)
