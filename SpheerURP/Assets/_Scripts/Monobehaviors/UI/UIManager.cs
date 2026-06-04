@@ -180,7 +180,16 @@ public class UIManager : MonoBehaviour
 
     public void ShowXPGain(int amount, Vector3 worldPosition)
     {
+        if (Camera.main == null || textPrefab == null || canvasTransform == null) return;
+
         Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+
+        // Skip if the enemy is behind the camera (would map to inverted screen coords)
+        if (screenPos.z < 0)
+        {
+            CreateAnimatedText("+" + amount + " XP", xpGainTextColor, 0.7f);
+            return;
+        }
 
         RectTransform canvasRect = canvasTransform as RectTransform;
         Vector2 localPos;
@@ -190,7 +199,8 @@ public class UIManager : MonoBehaviour
         GameObject textObject = Instantiate(textPrefab, canvasTransform);
         TMP_Text textComponent = textObject.GetComponent<TMP_Text>();
         textComponent.text = "+" + amount + " XP";
-        textComponent.color = xpGainTextColor;
+        // Force alpha=1 so the text is always visible regardless of Inspector color alpha
+        textComponent.color = new Color(xpGainTextColor.r, xpGainTextColor.g, xpGainTextColor.b, 1f);
         textComponent.fontSize = 28;
         textObject.transform.localPosition = localPos + new Vector2(Random.Range(-20f, 20f), 30f);
         textObject.transform.localScale = Vector3.one * 0.8f;

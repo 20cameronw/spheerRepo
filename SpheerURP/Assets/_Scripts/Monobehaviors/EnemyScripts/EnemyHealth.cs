@@ -62,6 +62,8 @@ public class EnemyHealth : MonoBehaviour
         if (Player.Instance.GetTarget() == transform)
             Player.Instance.ClearTarget();
 
+        // Lazy lookup in case Start() ran before UIManager was ready
+        if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
         if (uiManager != null)
             uiManager.ShowXPGain(xpWorth, transform.position);
 
