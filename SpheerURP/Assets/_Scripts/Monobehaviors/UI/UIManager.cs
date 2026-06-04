@@ -65,6 +65,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public bool IsAnyPanelOpen() {
+        return currentPanel != null;
+    }
+
     private MenuPanel getPanelFromName(string name) {
         MenuPanel panel = null;
         switch (name) {
