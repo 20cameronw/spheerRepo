@@ -117,7 +117,7 @@ public class UIManager : MonoBehaviour
         GameObject textObject = Instantiate(textPrefab, canvasTransform);
         TMP_Text textComponent = textObject.GetComponent<TMP_Text>();
         textComponent.text = message;
-        textComponent.color = color;
+        textComponent.color = new Color(color.r, color.g, color.b, 1f);
         textComponent.fontSize = Mathf.RoundToInt(30 * size);
 
         if (isWaveMessage)
@@ -180,39 +180,7 @@ public class UIManager : MonoBehaviour
 
     public void ShowXPGain(int amount, Vector3 worldPosition)
     {
-        if (Camera.main == null || textPrefab == null || canvasTransform == null) return;
-
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
-
-        // Skip if the enemy is behind the camera (would map to inverted screen coords)
-        if (screenPos.z < 0)
-        {
-            CreateAnimatedText("+" + amount + " XP", xpGainTextColor, 0.7f);
-            return;
-        }
-
-        RectTransform canvasRect = canvasTransform as RectTransform;
-        Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect, screenPos, null, out localPos);
-
-        GameObject textObject = Instantiate(textPrefab, canvasTransform);
-        TMP_Text textComponent = textObject.GetComponent<TMP_Text>();
-        textComponent.text = "+" + amount + " XP";
-        // Force alpha=1 so the text is always visible regardless of Inspector color alpha
-        textComponent.color = new Color(xpGainTextColor.r, xpGainTextColor.g, xpGainTextColor.b, 1f);
-        textComponent.fontSize = 28;
-        textObject.transform.localPosition = localPos + new Vector2(Random.Range(-20f, 20f), 30f);
-        textObject.transform.localScale = Vector3.one * 0.8f;
-
-        LeanTween.moveLocal(textObject, textObject.transform.localPosition + new Vector3(Random.Range(-15f, 15f), 70f, 0), 0.9f)
-            .setEaseOutCubic();
-        LeanTween.scale(textObject, Vector3.one * 1.1f, 0.15f).setEaseOutBack()
-            .setOnComplete(() =>
-            {
-                LeanTween.alphaText(textObject.GetComponent<RectTransform>(), 0f, 0.4f).setDelay(0.3f)
-                    .setOnComplete(() => Destroy(textObject));
-            });
+        CreateAnimatedText("+" + amount + " XP", xpGainTextColor, 0.7f);
     }
 
 
