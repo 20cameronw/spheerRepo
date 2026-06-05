@@ -27,9 +27,18 @@ public class Upgrade : ScriptableObject
     public ResourceType resourceProduced = ResourceType.Nebulite;
 
     // How much Electricity (capacity) this building requires to operate.
-    // Set > 0 for advanced buildings that need power from Windmills.
-    // Phase 3 will enforce this gate; wired here so assets can be configured now.
+    // TransactionManager checks electricityCapacity - electricityUsed >= this value.
+    // Windmill buildings contribute to electricityCapacity via ResourceType.Electricity.
     public float electricityRequired = 0f;
+
+    // Phase 3: Minimum Town Hall level required to place this building.
+    // Leave 0 (default) for buildings available from the start.
+    public int requiredTownHallLevel = 0;
+
+    // Phase 3: Mark this building as a Town Hall.
+    // Each placed Town Hall increments Player.townHallLevel by 1,
+    // unlocking buildings whose requiredTownHallLevel matches or exceeds the new level.
+    public bool isTownHall = false;
 
     public void Print()
     {

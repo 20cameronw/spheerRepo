@@ -14,6 +14,7 @@ public class TopBar : MonoBehaviour
     // Phase 2 — additional resource displays (assign in Inspector; safe to leave null)
     [SerializeField] private TMP_Text plasmaText;
     [SerializeField] private TMP_Text electricityText;
+    [SerializeField] private TMP_Text nebuliteCapText;  // Optional: shows Nebulite cap
 
     [SerializeField] private float dollarsUpdateTime;
 
@@ -45,9 +46,16 @@ public class TopBar : MonoBehaviour
 
         if (electricityText != null)
         {
-            // Electricity shows total Windmill output capacity (not a stock).
-            // Phase 3 will gate buildings by comparing this against their electricityRequired.
-            electricityText.text = Mathf.Round(Player.Instance.getElectricityCapacity()).ToString("N0") + " ⚡";
+            // Shows free / total electricity (Phase 3 gate).
+            float free  = Player.Instance.getElectricityFree();
+            float total = Player.Instance.getElectricityCapacity();
+            electricityText.text = free.ToString("F0") + "/" + total.ToString("F0") + " ⚡";
+        }
+
+        if (nebuliteCapText != null)
+        {
+            float cap  = Player.Instance.getNebuliteCapacity();
+            nebuliteCapText.text = "Cap: " + (cap > 999999 ? cap.ToString("0.##E0") : Mathf.Round(cap).ToString("N0"));
         }
     }
 

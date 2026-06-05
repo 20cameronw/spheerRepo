@@ -62,10 +62,32 @@ public class TransactionManager : MonoBehaviour
 
     public bool PurchaseSomething(int index)
     {
-        float passiveEarnings = structuresPanelInfo.shopItemsSO[index].bonus;
-        float cost = getCostOfUpgradeStructure(index);
+        Upgrade upgradeItem    = structuresPanelInfo.shopItemsSO[index];
+        float passiveEarnings  = upgradeItem.bonus;
+        float cost             = getCostOfUpgradeStructure(index);
+        bool  isOrbit          = upgradeItem.isInOrbit;
 
-        bool isOrbit = structuresPanelInfo.shopItemsSO[index].isInOrbit;
+        // ── Phase 3 gates ─────────────────────────────────────────────────────────
+        // Town Hall level gate
+        if (Player.Instance.getTownHallLevel() < upgradeItem.requiredTownHallLevel)
+        {
+            PopupManager.Instance.ShowPopup(
+                "Requires Town Hall level " + upgradeItem.requiredTownHallLevel
+                + " (current: " + Player.Instance.getTownHallLevel() + ").");
+            return false;
+        }
+
+        // Electricity availability gate
+        if (upgradeItem.electricityRequired > 0f &&
+            Player.Instance.getElectricityFree() < upgradeItem.electricityRequired)
+        {
+            PopupManager.Instance.ShowPopup(
+                "Not enough electricity. Needs " + upgradeItem.electricityRequired
+                + " ⚡ (available: " + Player.Instance.getElectricityFree().ToString("F0") + " ⚡). "
+                + "Build more Windmills.");
+            return false;
+        }
+        // ─────────────────────────────────────────────────────────────────────────
 
         if (isOrbit)
         {
@@ -76,7 +98,9 @@ public class TransactionManager : MonoBehaviour
             Player.Instance.AddDollars(-cost);
             Player.Instance.AddBuildingCount(index);
             worldSpawner.spawnInOrbit(index, passiveEarnings);
-            Player.Instance.RoutePassiveIncome(structuresPanelInfo.shopItemsSO[index].resourceProduced, passiveEarnings);
+            Player.Instance.RoutePassiveIncome(upgradeItem.resourceProduced, passiveEarnings);
+            // Phase 3: track electricity demand and Town Hall level for orbit builds.
+            Player.Instance.OnBuildingPlaced(upgradeItem);
             structuresPanel.LoadCards();
 
             string message = "-" + cost.ToString("F2");
@@ -92,7 +116,7 @@ public class TransactionManager : MonoBehaviour
                 return false;
             }
 
-            int slotSize = Mathf.Max(1, structuresPanelInfo.shopItemsSO[index].slotSize);
+            int slotSize = Mathf.Max(1, upgradeItem.slotSize);
             if (worldSpawner.GetSlotsAvailable() < slotSize)
             {
                 PopupManager.Instance.ShowPopup("Not enough building slots on this world. Some worlds have more space.");

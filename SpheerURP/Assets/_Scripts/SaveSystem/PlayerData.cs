@@ -38,8 +38,6 @@ public class PlayerData
     public List<int> completedMissionIndices;
     public bool hasSeenTutorial;
 
-
-
     public PlayerData(Player player)
     {
         dollars = Player.Instance.getDollars();

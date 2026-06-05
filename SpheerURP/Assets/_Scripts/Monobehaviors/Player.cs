@@ -30,9 +30,20 @@ public class Player : MonoBehaviour
     [Header("Resource Pools (Phase 2)")]
     [SerializeField] private float plasma = 0f;              // Plasma stock
     [SerializeField] private float plasmaPassive = 0f;       // Plasma income/s
-    [SerializeField] private float electricity = 0f;         // Electricity stock
+    [SerializeField] private float electricity = 0f;         // Electricity stock (accumulated, future use)
     [SerializeField] private float electricityCapacity = 0f; // Total Electricity output from Windmills
     [SerializeField] private float voidCrystal = 0f;         // Void Crystal stock (late-game)
+
+    // Storage caps — base values give early-game headroom; storage buildings increase these.
+    private const float BASE_NEBULITE_CAP = 10000f;
+    private const float BASE_PLASMA_CAP   = 500f;
+    [SerializeField] private float nebuliteCapacity = BASE_NEBULITE_CAP;
+    [SerializeField] private float plasmaCapacity   = BASE_PLASMA_CAP;
+
+    // Phase 3 — Town Hall & Electricity gating
+    [Header("Gating (Phase 3)")]
+    [SerializeField] private int   townHallLevel    = 0;    // Number of Town Hall buildings placed
+    [SerializeField] private float electricityUsed  = 0f;  // Sum of electricityRequired for all placed buildings
 
     [SerializeField] private int currentWorld;
     [SerializeField] private float maxHealth;
@@ -200,6 +211,15 @@ public class Player : MonoBehaviour
     public float getElectricity()             => electricity;
     public float getElectricityCapacity()     => electricityCapacity;
     public float getVoidCrystal()             => voidCrystal;
+    public float getNebuliteCapacity()        => nebuliteCapacity;
+    public float getPlasmaCapacity()          => plasmaCapacity;
+
+    // ── Phase 3: Gating getters ───────────────────────────────────────────────────
+
+    public int   getTownHallLevel()           => townHallLevel;
+    public float getElectricityUsed()         => electricityUsed;
+    /// <summary>Electricity still available for new buildings.</summary>
+    public float getElectricityFree()         => electricityCapacity - electricityUsed;
 
     public void AddPlasma(float amount)       { plasma += amount; }
     public void AddElectricity(float amount)  { electricity += amount; }
@@ -215,9 +235,24 @@ public class Player : MonoBehaviour
         electricityCapacity += bonus;
     }
 
+    // ── Phase 3: gating mutators ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// Called whenever a building is confirmed as placed (surface or orbit).
+    /// Increments electricity demand and, for Town Hall buildings, the town-hall level.
+    /// </summary>
+    public void OnBuildingPlaced(Upgrade item)
+    {
+        electricityUsed += item.electricityRequired;
+        if (item.isTownHall) townHallLevel++;
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+
     /// <summary>
     /// Routes a building's passive income bonus to the correct resource pool based on its <see cref="ResourceType"/>.
     /// Call this whenever a building is placed or sold (with a negative value).
+    /// Storage types (NebuliteStorage, PlasmaStorage) add to capacity rather than per-second income.
     /// </summary>
     public void RoutePassiveIncome(ResourceType resourceType, float bonus)
     {
@@ -228,6 +263,12 @@ public class Player : MonoBehaviour
                 break;
             case ResourceType.Electricity:
                 electricityCapacity += bonus;
+                break;
+            case ResourceType.NebuliteStorage:
+                nebuliteCapacity += bonus;
+                break;
+            case ResourceType.PlasmaStorage:
+                plasmaCapacity += bonus;
                 break;
             default: // Nebulite (and VoidCrystal if added later)
                 passive += bonus;
@@ -483,6 +524,12 @@ public class Player : MonoBehaviour
         passive = 0;
         plasmaPassive = 0;
         electricityCapacity = 0;
+        // Reset storage caps to their base values — building loop will re-add vault bonuses.
+        nebuliteCapacity = BASE_NEBULITE_CAP;
+        plasmaCapacity   = BASE_PLASMA_CAP;
+        // Reset Phase 3 gating state.
+        townHallLevel   = 0;
+        electricityUsed = 0;
     }
 
     private void EnsureResearchCountSize()
@@ -626,10 +673,20 @@ public class Player : MonoBehaviour
             currentXP = data.currentXP;
             currentXPLevel = data.currentXPLevel;
 
+            // Reset derived passive/capacity/gating totals before rebuilding from building counts.
+            passive = 0; plasmaPassive = 0; electricityCapacity = 0;
+            nebuliteCapacity = BASE_NEBULITE_CAP;
+            plasmaCapacity   = BASE_PLASMA_CAP;
+            electricityUsed  = 0;
+            townHallLevel    = 0;
+
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 Upgrade item = shopItemsList.shopItemsSO[i];
                 RoutePassiveIncome(item.resourceProduced, item.bonus * buildingCount[i]);
+                // Phase 3: rebuild electricity demand and Town Hall level from saved counts.
+                electricityUsed += item.electricityRequired * buildingCount[i];
+                if (item.isTownHall) townHallLevel += buildingCount[i];
             }
 
             // Restore Phase 2 resource stocks
@@ -638,7 +695,8 @@ public class Player : MonoBehaviour
             voidCrystal = data.voidCrystal;
 
             offlineEarnings = CalculateOfflineEarnings(data.saveTime);
-            dollars += offlineEarnings;
+            // Cap offline Nebulite gains at the storage limit.
+            dollars = Mathf.Min(dollars + offlineEarnings, nebuliteCapacity);
 
             // Restore lifetime stats
             lifetimeTotalEnemiesKilled   = data.lifetimeTotalEnemiesKilled;
@@ -666,15 +724,15 @@ public class Player : MonoBehaviour
         float baseIncome = passive * productionRateMultiplier;
         float earned = baseIncome * (1 + (getDMEarningsBonus()/100));
         dollars += earned;
+        // Phase 2: clamp Nebulite to storage cap (increased by NebuliteVault buildings).
+        dollars = Mathf.Min(dollars, nebuliteCapacity);
         recordMoneyEarned(earned);
         updateRecordPassive(baseIncome);
 
-        // Phase 2: tick Plasma and Electricity each second.
-        // Plasma uses the production multiplier the same as Nebulite.
-        // Electricity represents total output capacity from Windmills, which is also
-        // boosted by production research (e.g. Wind Power). Phase 3 will use
-        // electricityCapacity to gate advanced buildings, not a stock check.
-        plasma      += plasmaPassive      * productionRateMultiplier;
+        // Phase 2: tick Plasma (capped by plasmaCapacity from PlasmaTank buildings) and
+        // Electricity each second.  Electricity accumulates without a cap for now; Phase 3
+        // uses electricityCapacity to gate buildings, not the stock value.
+        plasma = Mathf.Min(plasma + plasmaPassive * productionRateMultiplier, plasmaCapacity);
         electricity += electricityCapacity * productionRateMultiplier;
     }
 
@@ -683,6 +741,9 @@ public class Player : MonoBehaviour
         buildingCount[index]--;
         Upgrade item = shopItemsList.shopItemsSO[index];
         RoutePassiveIncome(item.resourceProduced, -item.bonus);
+        // Phase 3: free up electricity and Town Hall level when a building is sold.
+        electricityUsed = Mathf.Max(0f, electricityUsed - item.electricityRequired);
+        if (item.isTownHall) townHallLevel = Mathf.Max(0, townHallLevel - 1);
     }
 
     public void resetData()
