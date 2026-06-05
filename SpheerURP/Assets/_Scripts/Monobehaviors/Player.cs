@@ -521,6 +521,15 @@ public class Player : MonoBehaviour
         {
             buildingCount[i] = 0;
         }
+        ResetDerivedBuildingStats();
+    }
+
+    /// <summary>
+    /// Resets all stats derived from placed buildings back to their base values.
+    /// Call before any loop that rebuilds these totals from scratch.
+    /// </summary>
+    private void ResetDerivedBuildingStats()
+    {
         passive = 0;
         plasmaPassive = 0;
         electricityCapacity = 0;
@@ -674,11 +683,7 @@ public class Player : MonoBehaviour
             currentXPLevel = data.currentXPLevel;
 
             // Reset derived passive/capacity/gating totals before rebuilding from building counts.
-            passive = 0; plasmaPassive = 0; electricityCapacity = 0;
-            nebuliteCapacity = BASE_NEBULITE_CAP;
-            plasmaCapacity   = BASE_PLASMA_CAP;
-            electricityUsed  = 0;
-            townHallLevel    = 0;
+            ResetDerivedBuildingStats();
 
             for (int i = 0; i < buildingCount.Count; i++)
             {
@@ -695,7 +700,7 @@ public class Player : MonoBehaviour
             voidCrystal = data.voidCrystal;
 
             offlineEarnings = CalculateOfflineEarnings(data.saveTime);
-            // Cap offline Nebulite gains at the storage limit.
+            // dollars was saved capped, so adding offline earnings and re-clamping is safe.
             dollars = Mathf.Min(dollars + offlineEarnings, nebuliteCapacity);
 
             // Restore lifetime stats

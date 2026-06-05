@@ -49,7 +49,9 @@ public class TopBar : MonoBehaviour
             // Shows free / total electricity (Phase 3 gate).
             float free  = Player.Instance.getElectricityFree();
             float total = Player.Instance.getElectricityCapacity();
-            electricityText.text = free.ToString("F0") + "/" + total.ToString("F0") + " ⚡";
+            string freeStr  = free  > 999999 ? free.ToString("0.##E0")  : free.ToString("F0");
+            string totalStr = total > 999999 ? total.ToString("0.##E0") : total.ToString("F0");
+            electricityText.text = freeStr + "/" + totalStr + " ⚡";
         }
 
         if (nebuliteCapText != null)

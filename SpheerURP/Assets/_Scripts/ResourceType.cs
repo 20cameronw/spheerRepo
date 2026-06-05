@@ -1,11 +1,13 @@
 /// <summary>
 /// The resource types produced and consumed in Spheer.
-/// Each building declares which resource it produces via Upgrade.resourceProduced.
-///
-/// Storage types (NebuliteStorage, PlasmaStorage) follow the same pattern as
-/// Electricity: a building's <c>bonus</c> field increases the corresponding
-/// player capacity rather than generating per-second income.
+/// Each building declares its type via <see cref="Upgrade.resourceProduced"/>.
 /// </summary>
+/// <remarks>
+/// Routing is handled by <c>Player.RoutePassiveIncome</c>.
+/// Storage types (NebuliteStorage, PlasmaStorage) add the building's <c>bonus</c>
+/// to the corresponding capacity cap instead of generating per-second income —
+/// the same pattern Electricity uses for <c>electricityCapacity</c>.
+/// </remarks>
 public enum ResourceType
 {
     Nebulite,         // Primary building/upgrade resource (was "dollars")

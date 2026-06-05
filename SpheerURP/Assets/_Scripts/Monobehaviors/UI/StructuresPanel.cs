@@ -73,7 +73,7 @@ public class StructuresPanel : MenuPanel
                 var reasons = new System.Collections.Generic.List<string>();
                 if (xpLocked)   reasons.Add("XP Level " + requiredLevel);
                 if (thLocked)   reasons.Add("Town Hall " + requiredTH);
-                if (elecLocked) reasons.Add(elecReq + " ⚡");
+                if (elecLocked) reasons.Add("Needs " + elecReq + " ⚡");
                 currentShopCard.requiredXPText.text = "Requires: " + string.Join(", ", reasons);
                 currentShopCard.lockMask.active = true;
             }
