@@ -111,6 +111,16 @@ public class Player : MonoBehaviour
         return completedMissionIndices.Contains(missionIndex);
     }
 
+    // ── Legacy targeting API ────────────────────────────────────────────────────
+    // Kept for source-compatibility with enemy scripts that are still in the project
+    // but will be removed when Phase 1 scene/prefab cleanup is completed in Unity.
+    private Transform _legacyTarget;
+    public static event System.Action<Transform> OnTargetChanged;
+    public void targetThis(Transform t) { _legacyTarget = t; OnTargetChanged?.Invoke(t); }
+    public Transform GetTarget() => _legacyTarget;
+    public void ClearTarget() { _legacyTarget = null; OnTargetChanged?.Invoke(null); }
+    // ──────────────────────────────────────────────────────────────────────────
+
     public float getTurretRangeMultiplier()
     {
         return turretRangeMultiplier;
@@ -203,6 +213,26 @@ public class Player : MonoBehaviour
     public void AddElectricityCapacity(float bonus)
     {
         electricityCapacity += bonus;
+    }
+
+    /// <summary>
+    /// Routes a building's passive income bonus to the correct resource pool based on its <see cref="ResourceType"/>.
+    /// Call this whenever a building is placed or sold (with a negative value).
+    /// </summary>
+    public void RoutePassiveIncome(ResourceType resourceType, float bonus)
+    {
+        switch (resourceType)
+        {
+            case ResourceType.Plasma:
+                plasmaPassive += bonus;
+                break;
+            case ResourceType.Electricity:
+                electricityCapacity += bonus;
+                break;
+            default: // Nebulite (and VoidCrystal if added later)
+                passive += bonus;
+                break;
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -599,19 +629,7 @@ public class Player : MonoBehaviour
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 Upgrade item = shopItemsList.shopItemsSO[i];
-                float earned = item.bonus * buildingCount[i];
-                switch (item.resourceProduced)
-                {
-                    case ResourceType.Plasma:
-                        plasmaPassive += earned;
-                        break;
-                    case ResourceType.Electricity:
-                        electricityCapacity += earned;
-                        break;
-                    default: // Nebulite
-                        passive += earned;
-                        break;
-                }
+                RoutePassiveIncome(item.resourceProduced, item.bonus * buildingCount[i]);
             }
 
             // Restore Phase 2 resource stocks
@@ -651,27 +669,20 @@ public class Player : MonoBehaviour
         recordMoneyEarned(earned);
         updateRecordPassive(baseIncome);
 
-        // Phase 2: tick Plasma and Electricity each second
-        plasma += plasmaPassive * productionRateMultiplier;
-        electricity += electricityCapacity; // Electricity accumulates; gating happens at purchase time
+        // Phase 2: tick Plasma and Electricity each second.
+        // Plasma uses the production multiplier the same as Nebulite.
+        // Electricity represents total output capacity from Windmills, which is also
+        // boosted by production research (e.g. Wind Power). Phase 3 will use
+        // electricityCapacity to gate advanced buildings, not a stock check.
+        plasma      += plasmaPassive      * productionRateMultiplier;
+        electricity += electricityCapacity * productionRateMultiplier;
     }
 
     public void removeUpgrade(int index)
     {
         buildingCount[index]--;
         Upgrade item = shopItemsList.shopItemsSO[index];
-        switch (item.resourceProduced)
-        {
-            case ResourceType.Plasma:
-                plasmaPassive -= item.bonus;
-                break;
-            case ResourceType.Electricity:
-                electricityCapacity -= item.bonus;
-                break;
-            default: // Nebulite (and anything unmapped)
-                passive -= item.bonus;
-                break;
-        }
+        RoutePassiveIncome(item.resourceProduced, -item.bonus);
     }
 
     public void resetData()

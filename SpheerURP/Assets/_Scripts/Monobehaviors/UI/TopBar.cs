@@ -44,7 +44,11 @@ public class TopBar : MonoBehaviour
         }
 
         if (electricityText != null)
+        {
+            // Electricity shows total Windmill output capacity (not a stock).
+            // Phase 3 will gate buildings by comparing this against their electricityRequired.
             electricityText.text = Mathf.Round(Player.Instance.getElectricityCapacity()).ToString("N0") + " ⚡";
+        }
     }
 
     private IEnumerator UpdatePassive()

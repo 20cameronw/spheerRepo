@@ -76,7 +76,7 @@ public class TransactionManager : MonoBehaviour
             Player.Instance.AddDollars(-cost);
             Player.Instance.AddBuildingCount(index);
             worldSpawner.spawnInOrbit(index, passiveEarnings);
-            RoutePassiveIncome(index, passiveEarnings);
+            Player.Instance.RoutePassiveIncome(structuresPanelInfo.shopItemsSO[index].resourceProduced, passiveEarnings);
             structuresPanel.LoadCards();
 
             string message = "-" + cost.ToString("F2");
@@ -151,26 +151,6 @@ public class TransactionManager : MonoBehaviour
     private float getSellBackRate()
     {
         return sellBackMultiplier + Player.Instance.getSellBackMultiplier();
-    }
-
-    /// <summary>
-    /// Routes the building's passive income to the correct resource pool based on its resourceProduced type.
-    /// </summary>
-    private void RoutePassiveIncome(int upgradeIndex, float bonus)
-    {
-        Upgrade item = structuresPanelInfo.shopItemsSO[upgradeIndex];
-        switch (item.resourceProduced)
-        {
-            case ResourceType.Plasma:
-                Player.Instance.AddPlasmaPassive(bonus);
-                break;
-            case ResourceType.Electricity:
-                Player.Instance.AddElectricityCapacity(bonus);
-                break;
-            default: // Nebulite
-                Player.Instance.AddPassive(bonus);
-                break;
-        }
     }
 
     public void SellStructure(int index)

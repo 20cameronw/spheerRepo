@@ -214,7 +214,7 @@ public class PlacementManager : MonoBehaviour
             worldSpawner.OccupySlot(spawnPos, slotSize);
             worldSpawner.SpawnAtPosition(pendingUpgradeIndex, spawnPos);
             Player.Instance.AddBuildingCount(pendingUpgradeIndex);
-            RoutePassiveIncome(pendingUpgradeIndex, bonus);
+            Player.Instance.RoutePassiveIncome(upgradeItem.resourceProduced, bonus);
         }
 
         structuresPanel.LoadCards();
@@ -232,26 +232,6 @@ public class PlacementManager : MonoBehaviour
     }
 
     // ── Cost bill ─────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Routes the building's passive income to the correct resource pool based on its resourceProduced type.
-    /// </summary>
-    private void RoutePassiveIncome(int upgradeIndex, float bonus)
-    {
-        Upgrade item = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[upgradeIndex];
-        switch (item.resourceProduced)
-        {
-            case ResourceType.Plasma:
-                Player.Instance.AddPlasmaPassive(bonus);
-                break;
-            case ResourceType.Electricity:
-                Player.Instance.AddElectricityCapacity(bonus);
-                break;
-            default: // Nebulite
-                Player.Instance.AddPassive(bonus);
-                break;
-        }
-    }
 
     private void UpdateCostBill()
     {
