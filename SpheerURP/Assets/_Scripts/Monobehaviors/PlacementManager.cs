@@ -196,12 +196,10 @@ public class PlacementManager : MonoBehaviour
         Player.Instance.AddDollars(-total);
         uiManager.CreateAnimatedText("-" + total.ToString("F2"), Color.red, 1f);
 
-        int slotSize = TransactionManager.Instance.structuresPanelInfo
-            .shopItemsSO[pendingUpgradeIndex].slotSize;
-        slotSize = Mathf.Max(1, slotSize);
-
-        float bonus = TransactionManager.Instance.structuresPanelInfo
-            .shopItemsSO[pendingUpgradeIndex].bonus;
+        Upgrade upgradeItem = TransactionManager.Instance.structuresPanelInfo
+            .shopItemsSO[pendingUpgradeIndex];
+        int slotSize = Mathf.Max(1, upgradeItem.slotSize);
+        float bonus  = upgradeItem.bonus;
 
         AudioManager.Instance.Play("Place Building");
 
@@ -216,7 +214,7 @@ public class PlacementManager : MonoBehaviour
             worldSpawner.OccupySlot(spawnPos, slotSize);
             worldSpawner.SpawnAtPosition(pendingUpgradeIndex, spawnPos);
             Player.Instance.AddBuildingCount(pendingUpgradeIndex);
-            Player.Instance.AddPassive(bonus);
+            RoutePassiveIncome(pendingUpgradeIndex, bonus);
         }
 
         structuresPanel.LoadCards();
@@ -234,6 +232,26 @@ public class PlacementManager : MonoBehaviour
     }
 
     // ── Cost bill ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Routes the building's passive income to the correct resource pool based on its resourceProduced type.
+    /// </summary>
+    private void RoutePassiveIncome(int upgradeIndex, float bonus)
+    {
+        Upgrade item = TransactionManager.Instance.structuresPanelInfo.shopItemsSO[upgradeIndex];
+        switch (item.resourceProduced)
+        {
+            case ResourceType.Plasma:
+                Player.Instance.AddPlasmaPassive(bonus);
+                break;
+            case ResourceType.Electricity:
+                Player.Instance.AddElectricityCapacity(bonus);
+                break;
+            default: // Nebulite
+                Player.Instance.AddPassive(bonus);
+                break;
+        }
+    }
 
     private void UpdateCostBill()
     {

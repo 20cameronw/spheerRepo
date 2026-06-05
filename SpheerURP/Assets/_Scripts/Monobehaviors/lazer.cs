@@ -76,33 +76,8 @@ public class lazer : MonoBehaviour
         cr_running = true;
         while (true)
         {
-            if (Player.Instance.getLazerAutoTargeting())
-            {
-                // Independent targeting: pick the nearest Enemy-tagged object in range
-                target = FindNearestEnemyInRange();
-                if (target == null)
-                {
-                    // No enemy found — fall back to player's manual target (e.g. attack-phase building)
-                    Transform manual = Player.Instance.GetTarget();
-                    if (manual != null && manual.gameObject.activeInHierarchy)
-                    {
-                        float dist = Vector3.Distance(transform.position, manual.position);
-                        if (dist <= effectiveRange) target = manual;
-                    }
-                }
-            }
-            else
-            {
-                Transform enemyPos = Player.Instance.GetTarget();
-                if (enemyPos != null && enemyPos.gameObject.activeInHierarchy)
-                {
-                    float distanceToEnemy = Vector3.Distance(transform.position, enemyPos.position);
-                    if (distanceToEnemy <= effectiveRange)
-                    {
-                        target = enemyPos;
-                    }
-                }
-            }
+            // Always scan for the nearest enemy-tagged object in range (future troop enemies will use this tag)
+            target = FindNearestEnemyInRange();
 
             if (target != null)
             {

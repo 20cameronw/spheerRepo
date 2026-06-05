@@ -32,11 +32,6 @@ public class UIManager : MonoBehaviour
     [Header("XP Gain Text")]
     [SerializeField] private Color xpGainTextColor = Color.cyan;
 
-    void Awake() {
-        EnemySpawner.OnWaveStarted += handleWaveStarted;
-        EnemySpawner.OnWaveCompleted += handleWaveCompleted;
-    }
-
     public IEnumerator waitAndOpenPanel(string panelName) {
             yield return new WaitForSeconds(openPanelDelay);
             MenuPanel panel = getPanelFromName(panelName);
@@ -184,26 +179,9 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void handleWaveCompleted(int wave) {
-        string message = "Wave " + wave + " ended";
-        Debug.Log(message);
-        CreateAnimatedText(message, Color.white, 1f, true);
-    }
-
-    public void handleWaveStarted(int wave) {
-        string message = "Wave " + wave + " started";
-        Debug.Log(message);
-        CreateAnimatedText(message, Color.white, 1f, true);
-    }
-
     public void MineResource() {
         float reward = Player.Instance.getPower();
         string message = "+" + reward;
         CreateAnimatedText(message, Color.yellow, 0.6f);
-    }
-
-    void OnDisable() {
-        EnemySpawner.OnWaveStarted -= handleWaveStarted;
-        EnemySpawner.OnWaveCompleted -= handleWaveCompleted;
     }
 }

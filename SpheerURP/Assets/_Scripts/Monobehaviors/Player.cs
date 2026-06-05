@@ -20,11 +20,19 @@ public class Player : MonoBehaviour
     [Space(10)]
     [Header("Modifiable Data")]
     [SerializeField] private bool RWFileData;
-    [SerializeField] private float dollars;
-    [SerializeField] private float passive;
+    [SerializeField] private float dollars;     // Nebulite stock
+    [SerializeField] private float passive;     // Nebulite income/s
     [SerializeField] private int cores;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
+
+    // Phase 2 — Multi-resource pools
+    [Header("Resource Pools (Phase 2)")]
+    [SerializeField] private float plasma = 0f;              // Plasma stock
+    [SerializeField] private float plasmaPassive = 0f;       // Plasma income/s
+    [SerializeField] private float electricity = 0f;         // Electricity stock
+    [SerializeField] private float electricityCapacity = 0f; // Total Electricity output from Windmills
+    [SerializeField] private float voidCrystal = 0f;         // Void Crystal stock (late-game)
 
     [SerializeField] private int currentWorld;
     [SerializeField] private float maxHealth;
@@ -103,31 +111,6 @@ public class Player : MonoBehaviour
         return completedMissionIndices.Contains(missionIndex);
     }
 
-    public Transform target;
-
-    public static event System.Action<Transform> OnTargetChanged;
-
-    public void targetThis(Transform target)
-    {
-        this.target = target;
-        OnTargetChanged?.Invoke(target);
-    }
-
-    public Transform GetTarget()
-    {
-        return target;
-    }
-
-    public void ClearTarget()
-    {
-        target = null;
-        OnTargetChanged?.Invoke(null);
-    }
-
-    public bool getGunnerAutoTargeting()   { return gunnerAutoTargeting; }
-    public bool getLazerAutoTargeting()    { return lazerAutoTargeting; }
-    public bool getMissileAutoTargeting()  { return missileAutoTargeting; }
-
     public float getTurretRangeMultiplier()
     {
         return turretRangeMultiplier;
@@ -200,6 +183,30 @@ public class Player : MonoBehaviour
         return dollarsGainedThisSecond;
     }
 
+    // ── Phase 2: Multi-resource getters ──────────────────────────────────────────
+
+    public float getPlasma()                  => plasma;
+    public float getPlasmaPassive()           => plasmaPassive;
+    public float getElectricity()             => electricity;
+    public float getElectricityCapacity()     => electricityCapacity;
+    public float getVoidCrystal()             => voidCrystal;
+
+    public void AddPlasma(float amount)       { plasma += amount; }
+    public void AddElectricity(float amount)  { electricity += amount; }
+    public void AddVoidCrystal(float amount)  { voidCrystal += amount; }
+
+    public void AddPlasmaPassive(float bonus)
+    {
+        plasmaPassive += bonus;
+    }
+
+    public void AddElectricityCapacity(float bonus)
+    {
+        electricityCapacity += bonus;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+
     public float getPassive()
     {
         return passive;
@@ -265,10 +272,6 @@ public class Player : MonoBehaviour
         return researchDiscount;
     }
 
-    private bool gunnerAutoTargeting = false;
-    private bool lazerAutoTargeting  = false;
-    private bool missileAutoTargeting = false;
-
     private float junkMultiplier = 1;
 
 
@@ -328,9 +331,6 @@ public class Player : MonoBehaviour
                     researchDiscount = 1f - 0.05f * researchCount[index];
                 else
                     researchDiscount -= 0.05f;
-                break;
-            case 8: //gunner auto targeting
-                if (researchCount[index] > 0) gunnerAutoTargeting = true;
                 break;
             case 9: //hold to buy
             case 10: //hold to click
@@ -437,12 +437,6 @@ public class Player : MonoBehaviour
                 if (!init)
                     addCores(5);
                 break;
-            case 30: //laser auto targeting
-                if (researchCount[index] > 0) lazerAutoTargeting = true;
-                break;
-            case 31: //missile auto targeting
-                if (researchCount[index] > 0) missileAutoTargeting = true;
-                break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
                 break;
@@ -457,6 +451,8 @@ public class Player : MonoBehaviour
             buildingCount[i] = 0;
         }
         passive = 0;
+        plasmaPassive = 0;
+        electricityCapacity = 0;
     }
 
     private void EnsureResearchCountSize()
@@ -521,18 +517,10 @@ public class Player : MonoBehaviour
         LoadPlayerData();
 
         InvokeRepeating("SaveAndAddPassive", 1f, 1f);
-
-        EnemySpawner.OnWaveCompleted += OnWaveCompleted;
     }
 
     private void OnDestroy()
     {
-        EnemySpawner.OnWaveCompleted -= OnWaveCompleted;
-    }
-
-    private void OnWaveCompleted(int wave)
-    {
-        recordWaveCompleted(wave);
     }
 
 
@@ -596,7 +584,6 @@ public class Player : MonoBehaviour
             currentWorld = data.currentWorld;
             darkMatter = data.darkMatter;
             worldSpawner.SetCurrentWorld(currentWorld);
-            EnemySpawner.Instance.currentWave = data.currentWave;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
@@ -611,8 +598,26 @@ public class Player : MonoBehaviour
 
             for (int i = 0; i < buildingCount.Count; i++)
             {
-                passive += shopItemsList.shopItemsSO[i].bonus * buildingCount[i];
+                Upgrade item = shopItemsList.shopItemsSO[i];
+                float earned = item.bonus * buildingCount[i];
+                switch (item.resourceProduced)
+                {
+                    case ResourceType.Plasma:
+                        plasmaPassive += earned;
+                        break;
+                    case ResourceType.Electricity:
+                        electricityCapacity += earned;
+                        break;
+                    default: // Nebulite
+                        passive += earned;
+                        break;
+                }
             }
+
+            // Restore Phase 2 resource stocks
+            plasma    = data.plasma;
+            electricity = data.electricity;
+            voidCrystal = data.voidCrystal;
 
             offlineEarnings = CalculateOfflineEarnings(data.saveTime);
             dollars += offlineEarnings;
@@ -645,12 +650,28 @@ public class Player : MonoBehaviour
         dollars += earned;
         recordMoneyEarned(earned);
         updateRecordPassive(baseIncome);
+
+        // Phase 2: tick Plasma and Electricity each second
+        plasma += plasmaPassive * productionRateMultiplier;
+        electricity += electricityCapacity; // Electricity accumulates; gating happens at purchase time
     }
 
     public void removeUpgrade(int index)
     {
         buildingCount[index]--;
-        passive -= shopItemsList.shopItemsSO[index].bonus;
+        Upgrade item = shopItemsList.shopItemsSO[index];
+        switch (item.resourceProduced)
+        {
+            case ResourceType.Plasma:
+                plasmaPassive -= item.bonus;
+                break;
+            case ResourceType.Electricity:
+                electricityCapacity -= item.bonus;
+                break;
+            default: // Nebulite (and anything unmapped)
+                passive -= item.bonus;
+                break;
+        }
     }
 
     public void resetData()
@@ -660,7 +681,6 @@ public class Player : MonoBehaviour
         dollars = 0;
         currentWorld = 0;
         worldSpawner.SetCurrentWorld(currentWorld);
-        EnemySpawner.Instance.prestige();
         resetResearchCount();
         resetBuildingCount();
         FindObjectOfType<XPBar>()?.refreshXPLevel();
@@ -705,8 +725,6 @@ public class Player : MonoBehaviour
         darkMatter += earnedDarkMatter;
 
         resetData();
-
-        ClearTarget();
 
         uIManager.ClosePanel();
 
