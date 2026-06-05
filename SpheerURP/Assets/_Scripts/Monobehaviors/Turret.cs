@@ -94,27 +94,8 @@ public class Turret : MonoBehaviour
                 fireRate = baseFireRate * rateMultiplier;
             }
 
-            if (Player.Instance.getGunnerAutoTargeting())
-            {
-                // Independent targeting: pick the nearest Enemy-tagged object in range
-                target = FindNearestEnemyInRange();
-            }
-            else
-            {
-                Transform enemy = Player.Instance.GetTarget();
-
-                if (enemy != null && enemy.gameObject.activeInHierarchy)
-                {
-                    float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
-                    if (distanceToEnemy <= range) {
-                        target = enemy;
-                    }
-                }
-                else
-                {
-                    target = null;
-                }
-            }
+            // Always scan for the nearest enemy-tagged object in range (future troop enemies will use this tag)
+            target = FindNearestEnemyInRange();
         }
     }
 
@@ -131,16 +112,6 @@ public class Turret : MonoBehaviour
             {
                 nearestDist = dist;
                 nearest = e.transform;
-            }
-        }
-        // Fall back to player's manual target (e.g. attack-phase buildings) when no enemy found
-        if (nearest == null)
-        {
-            Transform manual = Player.Instance.GetTarget();
-            if (manual != null && manual.gameObject.activeInHierarchy)
-            {
-                float dist = Vector3.Distance(transform.position, manual.position);
-                if (dist <= range) nearest = manual;
             }
         }
         return nearest;

@@ -57,14 +57,24 @@ public class StructuresPanel : MenuPanel
 
 
             int requiredLevel = shopPanelInfo.shopItemsSO[i].requiredXPLevel;
+            int requiredTH    = shopPanelInfo.shopItemsSO[i].requiredTownHallLevel;
+            float elecReq     = shopPanelInfo.shopItemsSO[i].electricityRequired;
 
-            if (requiredLevel <= Player.Instance.getCurrentXPLevel())
+            bool xpLocked  = requiredLevel > Player.Instance.getCurrentXPLevel();
+            bool thLocked  = requiredTH > Player.Instance.getTownHallLevel();
+            bool elecLocked = elecReq > 0f && Player.Instance.getElectricityFree() < elecReq;
+
+            if (!xpLocked && !thLocked && !elecLocked)
             {
                 currentShopCard.lockMask.active = false;
             }
             else
             {
-                currentShopCard.requiredXPText.text = "Required XP Level: " + requiredLevel;
+                var reasons = new System.Collections.Generic.List<string>();
+                if (xpLocked)   reasons.Add("XP Level " + requiredLevel);
+                if (thLocked)   reasons.Add("Town Hall " + requiredTH);
+                if (elecLocked) reasons.Add("Needs " + elecReq + " ⚡");
+                currentShopCard.requiredXPText.text = "Requires: " + string.Join(", ", reasons);
                 currentShopCard.lockMask.active = true;
             }
 

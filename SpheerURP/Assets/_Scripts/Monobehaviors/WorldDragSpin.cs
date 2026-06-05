@@ -84,6 +84,16 @@ public class WorldDragSpin : MonoBehaviour
         if (PlacementManager.Instance != null && PlacementManager.Instance.IsInPlacementMode())
             return;
 
+        // Stop all spinning when any menu panel is open so the player cannot
+        // accidentally earn money by scrolling through the shop.
+        if (eventManager != null && eventManager.IsAnyPanelOpen())
+        {
+            velX = 0f;
+            velY = 0f;
+            isDragging = false;
+            return;
+        }
+
         HandleInput();
 
         // Apply glide every frame when the player is not actively dragging.

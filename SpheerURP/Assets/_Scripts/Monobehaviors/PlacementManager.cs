@@ -192,16 +192,30 @@ public class PlacementManager : MonoBehaviour
             return;
         }
 
+        Upgrade upgradeItem = TransactionManager.Instance.structuresPanelInfo
+            .shopItemsSO[pendingUpgradeIndex];
+
+        // Phase 3: verify electricity is available for ALL selected slots before committing.
+        if (upgradeItem.electricityRequired > 0f)
+        {
+            float totalElecNeeded = upgradeItem.electricityRequired * selectedSlotIndices.Count;
+            if (Player.Instance.getElectricityFree() < totalElecNeeded)
+            {
+                PopupManager.Instance.ShowPopup(
+                    "Not enough electricity for " + selectedSlotIndices.Count + " building"
+                    + (selectedSlotIndices.Count > 1 ? "s" : "") + ". Needs "
+                    + totalElecNeeded + " ⚡ (available: "
+                    + Player.Instance.getElectricityFree().ToString("F0") + " ⚡).");
+                return;
+            }
+        }
+
         // Deduct the full bill.
         Player.Instance.AddDollars(-total);
         uiManager.CreateAnimatedText("-" + total.ToString("F2"), Color.red, 1f);
 
-        int slotSize = TransactionManager.Instance.structuresPanelInfo
-            .shopItemsSO[pendingUpgradeIndex].slotSize;
-        slotSize = Mathf.Max(1, slotSize);
-
-        float bonus = TransactionManager.Instance.structuresPanelInfo
-            .shopItemsSO[pendingUpgradeIndex].bonus;
+        int slotSize = Mathf.Max(1, upgradeItem.slotSize);
+        float bonus  = upgradeItem.bonus;
 
         AudioManager.Instance.Play("Place Building");
 
@@ -216,7 +230,9 @@ public class PlacementManager : MonoBehaviour
             worldSpawner.OccupySlot(spawnPos, slotSize);
             worldSpawner.SpawnAtPosition(pendingUpgradeIndex, spawnPos);
             Player.Instance.AddBuildingCount(pendingUpgradeIndex);
-            Player.Instance.AddPassive(bonus);
+            Player.Instance.RoutePassiveIncome(upgradeItem.resourceProduced, bonus);
+            // Phase 3: track electricity demand and Town Hall level.
+            Player.Instance.OnBuildingPlaced(upgradeItem);
         }
 
         structuresPanel.LoadCards();

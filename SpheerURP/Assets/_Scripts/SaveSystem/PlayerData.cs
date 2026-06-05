@@ -18,9 +18,12 @@ public class PlayerData
 
     public int cores;
 
-    public int currentWave;
-
     public int darkMatter;
+
+    // Phase 2 — Multi-resource pools
+    public float plasma;
+    public float electricity;
+    public float voidCrystal;
 
     public DateTime saveTime;
 
@@ -35,8 +38,6 @@ public class PlayerData
     public List<int> completedMissionIndices;
     public bool hasSeenTutorial;
 
-
-
     public PlayerData(Player player)
     {
         dollars = Player.Instance.getDollars();
@@ -46,8 +47,10 @@ public class PlayerData
         currentXPLevel = Player.Instance.getCurrentXPLevel();
         currentXP = Player.Instance.getCurrentXP();
         cores = Player.Instance.getCores();
-        currentWave = EnemySpawner.Instance.currentWave;
         darkMatter = Player.Instance.getDarkMatter();
+        plasma      = Player.Instance.getPlasma();
+        electricity = Player.Instance.getElectricity();
+        voidCrystal = Player.Instance.getVoidCrystal();
         saveTime = Player.Instance.now();
 
         lifetimeTotalEnemiesKilled = Player.Instance.getLifetimeEnemiesKilled();
