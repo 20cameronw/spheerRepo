@@ -41,6 +41,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 28a3fa0010669e6449b90a0ef2c89790, type: 2}
   - {fileID: 11400000, guid: 78bfd096e961e454da07816174d39b4f, type: 2}
   - {fileID: 11400000, guid: 5c7e0dd91fbb14c4c9bceb5e143a0b33, type: 2}
+  - {fileID: 11400000, guid: 3bb811cad2934f94e96a12353e1aa63b, type: 2}
+  - {fileID: 11400000, guid: e5541ea2f74c1924f88c39b60daef3d0, type: 2}
+  - {fileID: 11400000, guid: e31c3a9e8d35d8c49bbac24a957db0bc, type: 2}
+  - {fileID: 11400000, guid: d504379caa98f0f4ba24fe13aab5f825, type: 2}
+  - {fileID: 11400000, guid: 2a880f310ba80d84eb56769ea6319584, type: 2}
+  - {fileID: 11400000, guid: 488697fdd695da44981f6ec6a708d7f5, type: 2}
+  - {fileID: 11400000, guid: 996fb1d5aa06802478af72e9a0437dd7, type: 2}
+  - {fileID: 11400000, guid: 060dcb064aeed3c48b968185b902944c, type: 2}
+  - {fileID: 11400000, guid: da544a2c4bf25944d831edb250f3ccce, type: 2}
+  - {fileID: 11400000, guid: 0057f7f974f3022419d0b5e4f45c0fa1, type: 2}
+  - {fileID: 11400000, guid: 5ee4dc88108a4fe49ba60a05a11683c0, type: 2}
+  - {fileID: 11400000, guid: 21753443e95c3c74e8eb63fccbe42e03, type: 2}
   upgrades:
   - {fileID: 11400000, guid: c8acbe125b9a3744db0eb06aeffc63c4, type: 2}
   - {fileID: 11400000, guid: 8797741e6f83c9e48897a9a845cf1019, type: 2}
@@ -87,6 +99,6 @@ MonoBehaviour:
     amount: 24
   - resource: {fileID: 11400000, guid: 41d60b14022c20a4b9a01f911c0acab4, type: 2}
     amount: 30
-  baseBackpackSlots: 27
+  baseBackpackSlots: 9
   baseReactorHealth: 100
   fuelPerMapUnit: 1

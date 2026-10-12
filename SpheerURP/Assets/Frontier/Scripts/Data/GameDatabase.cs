@@ -19,7 +19,7 @@ namespace Frontier
         public PlanetSO startPlanet;
         public List<ItemAmount> startingItems = new List<ItemAmount>();
 
-        public int baseBackpackSlots = 27;
+        public int baseBackpackSlots = 9;
         public float baseReactorHealth = 100f;
         public float fuelPerMapUnit = 1f;
 

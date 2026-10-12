@@ -84,7 +84,7 @@ namespace Frontier
             displayedRadius = p.surfaceRadius > 0.01f ? p.surfaceRadius : Radius;
             displayedModelScale = p.modelScale > 0f ? p.modelScale : 1f;
             lastRadius = displayedRadius;
-            var model = ModelLibrary.Spawn(p.id, core, displayedRadius * 2f * displayedModelScale, false);
+            var model = ModelLibrary.Spawn(p.ModelKey, core, displayedRadius * 2f * displayedModelScale, false);
             if (model != null)
             {
                 solids.Clear();

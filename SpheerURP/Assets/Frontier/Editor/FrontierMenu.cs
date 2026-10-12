@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -102,6 +103,31 @@ namespace Frontier.EditorTools
             Debug.Log("Frontier: verify OK res=" + db.resources.Length + " planets=" + db.planets.Length + " upgrades=" + db.upgrades.Length +
                 " structs=" + db.structures.Length + " tiers=" + tiers + " fuel=" + (db.fuel != null) + " start=" + (db.startPlanet != null) +
                 " systems=" + db.planets[0].systemId + " formula=" + (db.formula != null));
+        }
+
+        [MenuItem("Frontier/Generate Deep Space Planets")]
+        public static void GenerateDeepSpacePlanets()
+        {
+            var db = Resources.Load<GameDatabase>("Frontier/GameDatabase");
+            if (db == null) { Debug.LogError("Frontier: no GameDatabase asset found."); return; }
+
+            Directory.CreateDirectory(Dir + "/Data");
+            var currentPlanets = new List<PlanetSO>(db.planets);
+            var roster = PlanetGenerator.GenerateDeepSpaceRoster(db);
+            int added = 0;
+            foreach (var p in roster)
+            {
+                if (currentPlanets.Exists(existing => existing != null && existing.id == p.id)) continue;
+                string path = Dir + "/Data/Planet_" + p.id + ".asset";
+                if (File.Exists(path)) AssetDatabase.DeleteAsset(path);
+                AssetDatabase.CreateAsset(p, path);
+                currentPlanets.Add(p);
+                added++;
+            }
+            db.planets = currentPlanets.ToArray();
+            EditorUtility.SetDirty(db);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Frontier: added " + added + " deep space planets to GameDatabase (total " + db.planets.Length + ").");
         }
 
         [MenuItem("Frontier/Build Model Library")]

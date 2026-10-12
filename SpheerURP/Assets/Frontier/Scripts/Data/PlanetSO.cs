@@ -47,6 +47,9 @@ namespace Frontier
         public float surfaceBands;
 
         [Header("Size")]
+        [Tooltip("Key into ModelLibrary for the 3D model. If empty, falls back to planet id.")]
+        public string modelKey;
+        public string ModelKey { get { return !string.IsNullOrEmpty(modelKey) ? modelKey : id; } }
         [Tooltip("Radius of the planet's ground SphereCollider. Structures sit on this sphere; satellites orbit above it. 1.5 = standard. " +
                  "In Play mode you can also edit the collider on PlanetRoot/Spin/Surface and it saves back here.")]
         public float surfaceRadius = PlanetView.Radius;

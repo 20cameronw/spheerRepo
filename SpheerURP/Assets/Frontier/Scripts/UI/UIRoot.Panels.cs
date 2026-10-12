@@ -14,7 +14,7 @@ namespace Frontier
         int researchTab;
 
         // ------------------------------------------------------------ modal core
-        void OpenModal(string key, string icon, string title, Color accent, Action<VisualElement> build, bool wide = false)
+        void OpenModal(string key, string icon, string title, Color accent, Action<VisualElement> build, bool wide = true)
         {
             if (modalKey == key) { CloseModal(); return; }
             ClosePopup();
@@ -69,7 +69,7 @@ namespace Frontier
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
         }
 
-        void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", "BUILD", UiKit.Lime, BuildShop); }
+        void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", "BUILD", UiKit.Lime, BuildShop, true); }
         void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", "COMMAND", UiKit.Magenta, BuildResearch, true); }
         void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", "BACKPACK", UiKit.Amber, BuildPack, true); }
 
@@ -211,12 +211,13 @@ namespace Frontier
 
         void BuildTutorial(VisualElement body)
         {
-            TutorialStep(body, "build", UiKit.Lime, "1. Build", "Open the shop (bottom right) and place a Lumber Camp, then a Refinery.");
-            TutorialStep(body, "wood", UiKit.Amber, "2. Gather", "Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and collect resources.");
-            TutorialStep(body, "fuel", UiKit.Amber, "3. Refine", "Tap the Refinery to turn raw resources into fuel.");
-            TutorialStep(body, "alarm", UiKit.Magenta, "4. Defend", "Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight and bigger rewards. Gunners and Lasers defend automatically.");
-            TutorialStep(body, "map", UiKit.Cyan, "5. Travel", "Open the world map (top left) and spend fuel to visit new planets. Your bases stay where you built them.");
-            TutorialStep(body, "research", UiKit.Magenta, "6. Upgrade", "The research button (bottom left) manages your bases and unlocks upgrades, including more backpack space.");
+            TutorialStep(body, "build", UiKit.Lime, "1. Build", "Open the shop (bottom right) and place a Lumber Camp, then a Refinery and a Warehouse.");
+            TutorialStep(body, "pack", UiKit.Cyan, "2. Storage", "Your starter backpack has only 9 slots. Build a Warehouse early to store extra resources and drag stacks between grids.");
+            TutorialStep(body, "wood", UiKit.Amber, "3. Gather", "Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and collect resources.");
+            TutorialStep(body, "fuel", UiKit.Amber, "4. Refine", "Tap the Refinery to turn raw resources into fuel.");
+            TutorialStep(body, "alarm", UiKit.Magenta, "5. Defend", "Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight and bigger rewards. Gunners and Lasers defend automatically.");
+            TutorialStep(body, "map", UiKit.Cyan, "6. Travel", "Open the world map (top left) and spend fuel to visit new planets. Your bases stay where you built them.");
+            TutorialStep(body, "research", UiKit.Magenta, "7. Upgrade", "The research button (bottom left) manages your bases and unlocks upgrades, including more backpack space.");
         }
 
         void TutorialStep(VisualElement body, string icon, Color color, string title, string text)

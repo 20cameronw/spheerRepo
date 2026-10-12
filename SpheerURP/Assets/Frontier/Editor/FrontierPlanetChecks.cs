@@ -34,7 +34,7 @@ namespace Frontier.EditorTools
                 int count = 0;
                 foreach (var planet in GameDatabase.Load().planets)
                 {
-                    var model = ModelLibrary.Spawn(planet.id, holder.transform, 3f, false);
+                    var model = ModelLibrary.Spawn(planet.ModelKey, holder.transform, 3f, false);
                     if (model == null) throw new InvalidOperationException("Missing planet model: " + planet.id);
                     Bounds bounds;
                     if (!ModelLibrary.MeshBounds(model.gameObject, out bounds))

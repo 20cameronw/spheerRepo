@@ -73,17 +73,17 @@
     position: absolute; left: 0; top: 0; right: 0; bottom: 0;
     background-color: rgba(2, 3, 14, 0.62);
     align-items: center; justify-content: center;
-    padding: 24px;
+    padding: 16px;
 }
 .fr-modal {
     flex-direction: column;
-    width: 640px; min-width: 0; max-width: 100%; max-height: 100%;
+    width: 960px; min-width: 0; max-width: 100%; max-height: 100%;
     overflow: hidden;
     border-radius: 30px; border-width: 3px;
     background-color: rgba(4, 7, 24, 0.96);
-    padding: 18px 22px 22px 22px;
+    padding: 20px 24px 24px 24px;
 }
-.fr-modal-wide { width: 940px; }
+.fr-modal-wide { width: 960px; }
 .fr-modal-head { flex-direction: row; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
 .fr-modal-title { font-size: 36px; margin-left: 12px; flex-grow: 1; }
 .fr-modal-scroll { flex-shrink: 1; flex-grow: 0; min-height: 0; min-width: 0; }
@@ -170,12 +170,13 @@
 .fr-popup {
     position: absolute;
     flex-direction: column;
-    width: 740px; min-width: 0; max-width: 100%; max-height: 100%;
+    width: 960px; min-width: 0; max-width: 100%; max-height: 100%;
     overflow: hidden;
     padding: 20px 24px 22px 24px;
     border-radius: 30px; border-width: 3px;
     background-color: rgba(4, 7, 24, 0.96);
 }
+.fr-popup-compact { width: 580px; }
 .fr-popup-scroll { flex-shrink: 1; min-height: 0; min-width: 0; }
 .fr-popup-close { position: absolute; top: 14px; right: 14px; }
 .fr-popup-head { padding-right: 70px; margin-bottom: 8px; }

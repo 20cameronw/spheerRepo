@@ -26,6 +26,7 @@ namespace Frontier
             popupKey = key; popupAnchor = anchor; popupBuild = build; popupColor = accent;
             popupCompact = compact;
             popup = UiKit.Div("fr-popup");
+            if (compact) popup.AddToClassList("fr-popup-compact");
             popup.pickingMode = PickingMode.Position;
             UiKit.Border(popup, UiKit.Ui(accent, 0.9f), 3f);
             popup.style.opacity = 0f;

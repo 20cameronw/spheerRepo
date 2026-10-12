@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1175b5dce9dd134ba2ed369b5c2135b, type: 3}
+  m_Name: Planet_cryo
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.PlanetSO
+  id: cryo
+  displayName: Cryo Trench
+  description: Sub-zero glacial rift where geothermal vents spew concentrated fuel.
+  tier: 5
+  mapPosition: {x: 0.5, y: 0.5}
+  danger: 6.1000004
+  primary: {r: 0.74675024, g: 0.82042485, b: 1, a: 1}
+  secondary: {r: 0.08, g: 0.18, b: 0.35, a: 1}
+  rim: {r: 0.6, g: 1.8, b: 2.6, a: 1}
+  weather: 2
+  mood: 0
+  hasRings: 0
+  style: 4
+  glowIntensity: 0.65
+  atmosphereIntensity: 0.45
+  surfaceBands: 4.8260493
+  modelKey: glacia
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
+  worldSize: 1.8
+  buildingSlots: 32
+  spots:
+  - label: Sub-Glacial Vent
+    game: 2
+    resource: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+    baseYield: 25
+    difficulty: 0.65000004
+  - label: Frost Geodes
+    game: 1
+    resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+    baseYield: 16
+    difficulty: 0.70000005
+  systemId: frost

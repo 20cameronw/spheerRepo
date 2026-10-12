@@ -40,9 +40,10 @@ namespace Frontier
             return p;
         }
 
-        static PlanetSO Extra(PlanetSO p, int style, WeatherKind w, bool rings = false)
+        static PlanetSO Extra(PlanetSO p, int style, WeatherKind w, bool rings = false, string modelKey = null)
         {
             p.style = style; p.weather = w; p.hasRings = rings;
+            if (!string.IsNullOrEmpty(modelKey)) p.modelKey = modelKey;
             return p;
         }
 
@@ -101,12 +102,12 @@ namespace Frontier
         {
             var groups = new Dictionary<string, string[]>
             {
-                { "sylva", new[] { "sylva", "ferrum", "glacia" } },
-                { "ember", new[] { "cinder", "pyre", "aurum" } },
-                { "verdance", new[] { "arbor", "mire", "coral", "tide" } },
-                { "umbra", new[] { "nyx", "vesper", "obsidian" } },
-                { "frost", new[] { "halcyon", "tundra", "zephyr" } },
-                { "edge", new[] { "prism", "kaos" } },
+                { "sylva", new[] { "sylva", "veridian", "ferrum", "calcite", "glacia" } },
+                { "ember", new[] { "cinder", "sulfur", "pyre", "magma", "aurum" } },
+                { "verdance", new[] { "arbor", "tide", "lotus", "coral", "mire", "spore" } },
+                { "umbra", new[] { "nyx", "vesper", "eclipse", "obsidian", "phantom" } },
+                { "frost", new[] { "halcyon", "tundra", "borealis", "zephyr", "cryo" } },
+                { "edge", new[] { "prism", "aether", "kaos", "genesis" } },
             };
             foreach (var kv in groups)
             {
@@ -218,6 +219,58 @@ namespace Frontier
                     new Vector2(0.32f, 0.3f), 4.4f, new Color(1f, 0.4f, 0.6f), new Color(0.3f, 0.05f, 0.2f), new Color(2.6f, 0.8f, 1.6f),
                     Spot("Glow Reef", MinigameKind.Chop, wood, 30, 0.55f),
                     Spot("Pearl Beds", MinigameKind.Mine, crystal, 8, 0.6f)), 2, WeatherKind.Spores),
+
+                // Expanded Deep Space Worlds
+                Extra(Planet("veridian", "Veridian", "Lush emerald moon dense with giant mossy canopy.", 1,
+                    new Vector2(0.24f, 0.82f), 0.8f, new Color(0.22f, 0.75f, 0.35f), new Color(0.04f, 0.20f, 0.08f), new Color(0.6f, 2.2f, 1.2f),
+                    Spot("Emerald Canopy", MinigameKind.Chop, wood, 14, 0.28f),
+                    Spot("Mossy Creek", MinigameKind.Mine, stone, 6, 0.3f)), 0, WeatherKind.Clear, false, "sylva"),
+                Extra(Planet("calcite", "Calcite", "Chalk-white limestone world with deep stone quarries.", 2,
+                    new Vector2(0.20f, 0.74f), 1.4f, new Color(0.85f, 0.82f, 0.75f), new Color(0.25f, 0.22f, 0.20f), new Color(1.8f, 1.6f, 1.2f),
+                    Spot("Chalk Ridge", MinigameKind.Mine, stone, 10, 0.35f),
+                    Spot("Iron Seam", MinigameKind.Mine, iron, 5, 0.42f)), 2, WeatherKind.Dust, false, "ferrum"),
+                Extra(Planet("sulfur", "Sulfur Basin", "Yellow brimstone plains erupting with pressurized vapor.", 3,
+                    new Vector2(0.50f, 0.82f), 2.8f, new Color(0.92f, 0.80f, 0.20f), new Color(0.28f, 0.16f, 0.02f), new Color(2.4f, 2.0f, 0.4f),
+                    Spot("Brimstone Vent", MinigameKind.Drill, fuel, 8, 0.52f),
+                    Spot("Sulfur Flats", MinigameKind.Mine, scrap, 18, 0.45f)), 1, WeatherKind.Dust, false, "cinder"),
+                Extra(Planet("magma", "Magma", "Churning rivers of liquid rock and rich titanium deposits.", 4,
+                    new Vector2(0.60f, 0.86f), 4.2f, new Color(1f, 0.35f, 0.05f), new Color(0.18f, 0.02f, 0.02f), new Color(2.8f, 0.8f, 0.2f),
+                    Spot("Magma River", MinigameKind.Mine, iron, 14, 0.6f),
+                    Spot("Thermal Core", MinigameKind.Drill, fuel, 11, 0.65f)), 3, WeatherKind.Embers, false, "pyre"),
+                Extra(Planet("lotus", "Lotus", "Oceanic world of giant bioluminescent floating flora.", 3,
+                    new Vector2(0.22f, 0.34f), 3.2f, new Color(0.2f, 0.85f, 0.65f), new Color(0.04f, 0.18f, 0.14f), new Color(0.8f, 2.4f, 1.8f),
+                    Spot("Floating Lily", MinigameKind.Chop, wood, 28, 0.48f),
+                    Spot("Glow Beds", MinigameKind.Mine, crystal, 7, 0.52f)), 4, WeatherKind.Spores, false, "coral"),
+                Extra(Planet("spore", "Spore Prime", "Subterranean fungal hive where massive caps pierce the crust.", 4,
+                    new Vector2(0.28f, 0.46f), 4.8f, new Color(0.65f, 0.60f, 0.25f), new Color(0.14f, 0.12f, 0.04f), new Color(2.0f, 2.2f, 0.6f),
+                    Spot("Giant Caps", MinigameKind.Chop, wood, 36, 0.58f),
+                    Spot("Hive Nexus", MinigameKind.Drill, core, 3, 0.68f)), 2, WeatherKind.Spores, false, "mire"),
+                Extra(Planet("eclipse", "Eclipse", "A dark world locked in permanent transit. Violet lightning storms.", 5,
+                    new Vector2(0.78f, 0.64f), 6.2f, new Color(0.22f, 0.08f, 0.35f), new Color(0.03f, 0.01f, 0.06f), new Color(2.2f, 0.6f, 3.0f),
+                    Spot("Eclipse Seam", MinigameKind.Mine, iron, 20, 0.68f),
+                    Spot("Storm Siphon", MinigameKind.Drill, fuel, 12, 0.72f),
+                    Spot("Shadow Core", MinigameKind.Drill, core, 5, 0.78f)), 4, WeatherKind.Storm, true, "obsidian"),
+                Extra(Planet("phantom", "Phantom Rift", "Eerie gravitational void world threaded with alien wreckage.", 6,
+                    new Vector2(0.86f, 0.72f), 7.2f, new Color(0.45f, 0.18f, 0.65f), new Color(0.08f, 0.02f, 0.15f), new Color(2.4f, 1.2f, 3.2f),
+                    Spot("Void Wreckage", MinigameKind.Mine, scrap, 32, 0.74f),
+                    Spot("Phantom Heart", MinigameKind.Drill, core, 6, 0.8f)), 1, WeatherKind.Dust, false, "nyx"),
+                Extra(Planet("borealis", "Borealis", "Atmosphere glows with shifting auroras above frozen seas.", 3,
+                    new Vector2(0.54f, 0.26f), 3.6f, new Color(0.45f, 0.90f, 0.85f), new Color(0.08f, 0.20f, 0.25f), new Color(1.2f, 2.4f, 2.8f),
+                    Spot("Aurora Shelf", MinigameKind.Mine, crystal, 6, 0.52f),
+                    Spot("Cryo Fissure", MinigameKind.Drill, fuel, 9, 0.55f)), 0, WeatherKind.Snow, false, "halcyon"),
+                Extra(Planet("cryo", "Cryo Trench", "Sub-zero glacial rift where geothermal vents spew concentrated fuel.", 5,
+                    new Vector2(0.62f, 0.34f), 6.0f, new Color(0.70f, 0.85f, 1.0f), new Color(0.12f, 0.20f, 0.38f), new Color(1.4f, 2.2f, 3.2f),
+                    Spot("Deep Cryo Vent", MinigameKind.Drill, fuel, 16, 0.7f),
+                    Spot("Glacial Core", MinigameKind.Drill, core, 4, 0.75f)), 4, WeatherKind.Snow, false, "glacia"),
+                Extra(Planet("aether", "Aether", "Floating crystalline fragments trapped in an ion field.", 7,
+                    new Vector2(0.85f, 0.18f), 8.5f, new Color(0.65f, 0.95f, 1.0f), new Color(0.30f, 0.10f, 0.50f), new Color(2.6f, 2.4f, 3.4f),
+                    Spot("Ion Shards", MinigameKind.Mine, crystal, 22, 0.82f),
+                    Spot("Aether Bore", MinigameKind.Drill, core, 8, 0.88f)), 4, WeatherKind.Storm, true, "prism"),
+                Extra(Planet("genesis", "Genesis", "A primordial anomaly pulsating with raw energy. The deepest world.", 8,
+                    new Vector2(0.92f, 0.06f), 10.0f, new Color(1.0f, 0.85f, 0.95f), new Color(0.05f, 0.02f, 0.10f), new Color(3.4f, 3.0f, 3.8f),
+                    Spot("Primordial Core", MinigameKind.Drill, core, 12, 0.92f),
+                    Spot("Singular Crystal", MinigameKind.Mine, crystal, 30, 0.90f),
+                    Spot("Energy Rift", MinigameKind.Drill, fuel, 25, 0.88f)), 3, WeatherKind.Storm, true, "kaos"),
             };
 
             planets[1].style = 2; planets[2].style = 4; planets[3].style = 3; planets[4].style = 1; planets[5].style = 4;
@@ -348,6 +401,7 @@ namespace Frontier
             db.recipes = recipes;
             db.formula = wave;
             db.fuel = fuel;
+            db.baseBackpackSlots = 9;
             db.startPlanet = planets[0];
             db.startingItems = L(A(fuel, 10), A(wood, 24), A(scrap, 30));
             AssignSystems(planets);
