@@ -14,8 +14,22 @@ namespace Frontier
         public List<int> upgradeLevels = new List<int>();
         public List<string> waveIds = new List<string>();
         public List<int> waveCounts = new List<int>();
+        public List<string> structPlanets = new List<string>();
+        public List<string> structIds = new List<string>();
+        public List<int> structSlots = new List<int>();
+        public List<int> structLevels = new List<int>();
+        public int xp;
         public string planetId;
         public int totalWavesCleared;
+    }
+
+    [Serializable]
+    public class PlacedStructure
+    {
+        public string planetId;
+        public StructureSO def;
+        public int slot;
+        public int level = 1;
     }
 
     public class GameState
@@ -25,6 +39,8 @@ namespace Frontier
         public readonly GameDatabase db;
         public PlanetSO planet;
         public int totalWavesCleared;
+        public int xp;
+        public readonly List<PlacedStructure> structures = new List<PlacedStructure>();
         public event Action Changed;
 
         readonly Dictionary<ResourceSO, int> items = new Dictionary<ResourceSO, int>();
@@ -138,8 +154,64 @@ namespace Frontier
         public float TurretDamage { get { return 5f * (1f + EffectSum(UpgradeEffect.TurretDamage)); } }
         public float TapDamage { get { return 8f * (1f + EffectSum(UpgradeEffect.TapDamage)); } }
         public float ReactorMax { get { return db.baseReactorHealth + EffectSum(UpgradeEffect.ReactorHealth); } }
-        public float RewardBonus { get { return 1f + EffectSum(UpgradeEffect.RewardBonus); } }
+        public float RewardBonus { get { return 1f + EffectSum(UpgradeEffect.RewardBonus) + 0.03f * (PlayerLevel - 1); } }
         public float FuelMultiplier { get { return Mathf.Max(0.25f, 1f - EffectSum(UpgradeEffect.FuelEfficiency)); } }
+
+        // ---------- XP ----------
+        public int PlayerLevel { get { return 1 + Mathf.FloorToInt(Mathf.Sqrt(xp / 40f)); } }
+        public float LevelProgress
+        {
+            get
+            {
+                int l = PlayerLevel - 1;
+                float lo = 40f * l * l, hi = 40f * (l + 1) * (l + 1);
+                return Mathf.Clamp01((xp - lo) / (hi - lo));
+            }
+        }
+
+        public void AddXp(int amount) { if (amount <= 0) return; xp += amount; Notify(); }
+
+        // ---------- Structures ----------
+        public PlacedStructure StructureAt(PlanetSO p, int slot)
+        {
+            foreach (var s in structures) if (s.planetId == p.id && s.slot == slot) return s;
+            return null;
+        }
+
+        public PlacedStructure StructureOfKind(PlanetSO p, StructureKind k)
+        {
+            foreach (var s in structures) if (s.planetId == p.id && s.def.kind == k) return s;
+            return null;
+        }
+
+        public bool HasStructure(PlanetSO p, StructureSO def)
+        {
+            foreach (var s in structures) if (s.planetId == p.id && s.def == def) return true;
+            return false;
+        }
+
+        public bool Place(StructureSO def, int slot)
+        {
+            if (HasStructure(planet, def) || StructureAt(planet, slot) != null || !Spend(def.buildCost)) return false;
+            structures.Add(new PlacedStructure { planetId = planet.id, def = def, slot = slot, level = 1 });
+            Notify();
+            return true;
+        }
+
+        public bool UpgradeStructure(PlacedStructure s)
+        {
+            if (s.level >= s.def.maxLevel || !Spend(s.def.UpgradeCost(s.level))) return false;
+            s.level++;
+            Notify();
+            return true;
+        }
+
+        public float StructureBonus(PlacedStructure s) { return s == null ? 0f : s.def.bonusPerLevel * (s.level - 1); }
+
+        public float AlarmBonus(PlanetSO p)
+        {
+            return 1f + StructureBonus(StructureOfKind(p, StructureKind.Alarm));
+        }
 
         // ---------- Travel ----------
         public int FuelCost(PlanetSO to)
@@ -169,20 +241,24 @@ namespace Frontier
         }
 
         // ---------- Refinery ----------
-        public bool Craft(RecipeSO r)
+        public int OutputAmount(ItemAmount o, float bonus) { return Mathf.Max(1, Mathf.RoundToInt(o.amount * (1f + bonus))); }
+
+        public bool Craft(RecipeSO r, float bonus = 0f)
         {
             if (!Has(r.inputs)) return false;
-            foreach (var o in r.outputs) if (FreeSpace(o.resource) < o.amount && !CanFitAfter(r, o.resource)) return false;
+            var outs = new List<ItemAmount>();
+            foreach (var o in r.outputs) outs.Add(new ItemAmount(o.resource, OutputAmount(o, bonus)));
+            foreach (var o in outs) if (FreeSpace(o.resource) < o.amount && !CanFitAfter(r, outs, o.resource)) return false;
             Spend(r.inputs);
-            foreach (var o in r.outputs) Add(o.resource, o.amount, false);
+            foreach (var o in outs) Add(o.resource, o.amount, false);
             Notify();
             return true;
         }
 
-        bool CanFitAfter(RecipeSO r, ResourceSO res)
+        bool CanFitAfter(RecipeSO r, List<ItemAmount> outs, ResourceSO res)
         {
             int need = 0;
-            foreach (var o in r.outputs) if (o.resource == res) need += o.amount;
+            foreach (var o in outs) if (o.resource == res) need += o.amount;
             int have = Count(res), inputUse = 0;
             foreach (var i in r.inputs) if (i.resource == res) inputUse += i.amount;
             int usedOthers = 0;
@@ -209,6 +285,8 @@ namespace Frontier
                 foreach (var kv in items) { s.itemIds.Add(kv.Key.id); s.itemCounts.Add(kv.Value); }
                 foreach (var kv in levels) { s.upgradeIds.Add(kv.Key.id); s.upgradeLevels.Add(kv.Value); }
                 foreach (var kv in wavesCleared) { s.waveIds.Add(kv.Key); s.waveCounts.Add(kv.Value); }
+                s.xp = xp;
+                foreach (var st in structures) { s.structPlanets.Add(st.planetId); s.structIds.Add(st.def.id); s.structSlots.Add(st.slot); s.structLevels.Add(st.level); }
                 File.WriteAllText(SavePath, JsonUtility.ToJson(s));
             }
             catch (Exception e) { Debug.LogWarning("Frontier save failed: " + e.Message); }
@@ -234,6 +312,12 @@ namespace Frontier
                 }
                 for (int i = 0; i < s.waveIds.Count; i++) wavesCleared[s.waveIds[i]] = s.waveCounts[i];
                 totalWavesCleared = s.totalWavesCleared;
+                xp = s.xp;
+                for (int i = 0; i < s.structIds.Count; i++)
+                {
+                    var def = db.FindStructure(s.structIds[i]);
+                    if (def != null) structures.Add(new PlacedStructure { planetId = s.structPlanets[i], def = def, slot = s.structSlots[i], level = s.structLevels[i] });
+                }
                 return true;
             }
             catch { return false; }
@@ -242,7 +326,7 @@ namespace Frontier
         public void ResetProgress()
         {
             try { if (File.Exists(SavePath)) File.Delete(SavePath); } catch { }
-            items.Clear(); levels.Clear(); wavesCleared.Clear(); totalWavesCleared = 0;
+            items.Clear(); levels.Clear(); wavesCleared.Clear(); structures.Clear(); xp = 0; totalWavesCleared = 0;
             planet = db.startPlanet;
             foreach (var s in db.startingItems) if (s.resource != null) items[s.resource] = s.amount;
             Notify();

@@ -25,6 +25,7 @@ namespace Frontier.EditorTools
             foreach (var o in db.upgrades) Save(o, "Upgrade");
             foreach (var o in db.enemies) Save(o, "Alien");
             foreach (var o in db.recipes) Save(o, "Recipe");
+            foreach (var o in db.structures) Save(o, "Structure");
             AssetDatabase.CreateAsset(db.formula, Dir + "/Data/WaveFormula.asset");
             AssetDatabase.CreateAsset(db, Dir + "/GameDatabase.asset");
             AssetDatabase.SaveAssets();
@@ -50,6 +51,10 @@ namespace Frontier.EditorTools
                 ("brute", "Assets/Models/ufo (2).fbx", 1f),
                 ("titan", "Assets/Models/ufo (2).fbx", 1f),
                 ("turret", "Assets/Models/gunner.fbx", 1f),
+                ("struct_refinery", "Assets/Prefabs/silo_with_missil.prefab", 1f),
+                ("struct_alarm", "Assets/Prefabs/sat_dish.prefab", 1f),
+                ("node_mine", "Assets/Models/space_trash.fbx", 1f),
+                ("node_drill", "Assets/Prefabs/drill.prefab", 1f),
             };
             var list = new System.Collections.Generic.List<ModelLibrary.Entry>();
             foreach (var m in map)

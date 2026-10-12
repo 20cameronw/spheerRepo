@@ -53,3 +53,17 @@ MonoBehaviour:
   - key: turret
     prefab: {fileID: 919132149155446097, guid: 6e1e7dca4b4ed33409a90661701216d0, type: 3}
     scale: 1
+  - key: struct_refinery
+    prefab: {fileID: 964346929062732501, guid: a13a8558c6fe35849b037473df891b0a, type: 3}
+    scale: 1
+  - key: struct_alarm
+    prefab: {fileID: 3192028281512451177, guid: b4d04437add6d7e4386db2307d914fb7,
+      type: 3}
+    scale: 1
+  - key: node_mine
+    prefab: {fileID: 919132149155446097, guid: 1c311dae0af2f400ebe73409c652c949, type: 3}
+    scale: 1
+  - key: node_drill
+    prefab: {fileID: 6167137264061970111, guid: b7485f5c7262c43d9aa31506d7bbe793,
+      type: 3}
+    scale: 1

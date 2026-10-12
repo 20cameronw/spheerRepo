@@ -18,6 +18,12 @@ namespace Frontier
         RewardBonus
     }
 
+    public enum StructureKind
+    {
+        Refinery,
+        Alarm
+    }
+
     [Serializable]
     public struct ItemAmount
     {

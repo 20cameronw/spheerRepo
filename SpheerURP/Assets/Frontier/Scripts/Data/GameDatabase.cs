@@ -11,13 +11,14 @@ namespace Frontier
         public UpgradeSO[] upgrades;
         public EnemySO[] enemies;
         public RecipeSO[] recipes;
+        public StructureSO[] structures;
         public WaveFormulaSO formula;
 
         public ResourceSO fuel;
         public PlanetSO startPlanet;
         public List<ItemAmount> startingItems = new List<ItemAmount>();
 
-        public int baseBackpackSlots = 8;
+        public int baseBackpackSlots = 27;
         public float baseReactorHealth = 100f;
         public float fuelPerMapUnit = 1f;
 
@@ -44,6 +45,20 @@ namespace Frontier
         public UpgradeSO FindUpgrade(string id)
         {
             foreach (var u in upgrades) if (u != null && u.id == id) return u;
+            return null;
+        }
+
+        public StructureSO FindStructure(string id)
+        {
+            if (structures == null) return null;
+            foreach (var s in structures) if (s != null && s.id == id) return s;
+            return null;
+        }
+
+        public StructureSO StructureOfKind(StructureKind k)
+        {
+            if (structures == null) return null;
+            foreach (var s in structures) if (s != null && s.kind == k) return s;
             return null;
         }
     }

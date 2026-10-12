@@ -102,8 +102,7 @@ namespace Frontier
             var chip = Div("fr-itemchip");
             Color c = Ui(r.color);
             Border(chip, new Color(c.r, c.g, c.b, 0.8f), 2f);
-            var dot = Div("fr-dot");
-            dot.style.backgroundColor = c;
+            var dot = Icons.Make(Icons.ForResource(r), c);
             chip.Add(dot);
             bool short_ = have >= 0 && have < amount;
             string label = have >= 0 ? have + "/" + amount : amount.ToString();

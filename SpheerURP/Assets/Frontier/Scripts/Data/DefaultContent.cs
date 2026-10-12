@@ -16,7 +16,7 @@ namespace Frontier
         static ResourceSO Res(string id, string name, Color c, string desc)
         {
             var r = New<ResourceSO>(id);
-            r.id = id; r.displayName = name; r.color = c; r.description = desc;
+            r.id = id; r.displayName = name; r.color = c; r.description = desc; r.stackSize = 64;
             return r;
         }
 
@@ -55,6 +55,14 @@ namespace Frontier
             e.id = id; e.displayName = name; e.color = c; e.shape = shape; e.scale = scale; e.health = hp;
             e.speed = speed; e.damage = dmg; e.threat = threat; e.minWave = minWave; e.weight = weight; e.bounty = bounty;
             return e;
+        }
+
+        static StructureSO Struct(string id, string name, string desc, StructureKind kind, Color c, string model, List<ItemAmount> cost, float bonus)
+        {
+            var s = New<StructureSO>(id);
+            s.id = id; s.displayName = name; s.description = desc; s.kind = kind; s.color = c; s.modelKey = model;
+            s.buildCost = cost; s.bonusPerLevel = bonus;
+            return s;
         }
 
         static RecipeSO Recipe(string name, List<ItemAmount> inputs, List<ItemAmount> outputs)
@@ -117,7 +125,7 @@ namespace Frontier
                 Up("drill", "Drill", "More yield and a wider pressure band.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
                     iron.color, L(A(wood, 20), A(iron, 10)), MinigameKind.Drill,
                     new[] { "Hand Drill", "Auger", "Pneumatic Drill", "Crystal Bore", "Plasma Bore", "Singularity Bore" }),
-                Up("pack", "Backpack", "+4 slots. Carry more before you have to turn back.", UpgradeCategory.Ship, UpgradeEffect.BackpackSlots, 4f, 8, 1.7f,
+                Up("pack", "Backpack", "+9 slots (one more row). Carry more before you turn back.", UpgradeCategory.Ship, UpgradeEffect.BackpackSlots, 9f, 6, 1.7f,
                     new Color(1.6f, 1.6f, 0.4f), L(A(wood, 25), A(stone, 10))),
                 Up("engine", "Engine Efficiency", "-8% fuel for every trip.", UpgradeCategory.Ship, UpgradeEffect.FuelEfficiency, 0.08f, 8, 1.6f,
                     fuel.color, L(A(wood, 10), A(iron, 10), A(crystal, 3))),
@@ -148,7 +156,16 @@ namespace Frontier
                 Recipe("Crystal Cell", L(A(crystal, 3)), L(A(fuel, 12))),
             };
 
+            var structures = new[]
+            {
+                Struct("refinery", "Refinery", "Converts raw materials into fuel. Tap it to run an exchange. Higher levels refine more per batch.",
+                    StructureKind.Refinery, new Color(0.7f, 2.2f, 0.4f), "struct_refinery", L(A(wood, 15), A(stone, 6)), 0.25f),
+                Struct("alarm", "Alarm Beacon", "Tap it to burn fuel and call a wave. More fuel means a longer fight and bigger rewards.",
+                    StructureKind.Alarm, new Color(2.2f, 0.4f, 1.8f), "struct_alarm", L(A(wood, 12), A(stone, 8)), 0.15f),
+            };
+
             var db = New<GameDatabase>("GameDatabase");
+            db.structures = structures;
             db.resources = new[] { wood, stone, iron, crystal, fuel, core };
             db.planets = planets;
             db.upgrades = upgrades;

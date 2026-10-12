@@ -8,7 +8,8 @@ namespace Frontier
     public class WaveInfo
     {
         public int waveNumber;
-        public int risk;
+        public int fuel;
+        public int xp;
         public float budget;
         public float healthMult;
         public float rewardMult;
@@ -26,8 +27,7 @@ namespace Frontier
 
     public class DefenseController : MonoBehaviour
     {
-        public static readonly float[] RiskMult = { 0.75f, 1f, 1.6f };
-        public static readonly string[] RiskName = { "CALM", "NORMAL", "FRENZY" };
+        public static float FuelMult(int fuel) { return 0.5f + 0.25f * Mathf.Max(1, fuel); }
 
         public bool Active { get; private set; }
         public float ReactorHp { get; private set; }
@@ -55,16 +55,17 @@ namespace Frontier
         }
 
         // Deterministic so the preview in the UI matches the wave you actually get.
-        public WaveInfo Preview(int risk)
+        public WaveInfo Preview(int fuel)
         {
             var p = gs.planet;
             var f = gs.db.formula;
-            var info = new WaveInfo { waveNumber = gs.NextWave(p), risk = risk };
-            float rm = RiskMult[Mathf.Clamp(risk, 0, RiskMult.Length - 1)];
+            var info = new WaveInfo { waveNumber = gs.NextWave(p), fuel = fuel };
+            float rm = FuelMult(fuel);
             info.budget = f.Budget(info.waveNumber, p.danger, rm);
             info.healthMult = f.HealthMult(info.waveNumber);
-            info.rewardMult = f.RewardMult(info.waveNumber, rm) * gs.RewardBonus;
-            var rng = new System.Random(p.id.GetHashCode() ^ (info.waveNumber * 7919) ^ (risk * 104729));
+            info.rewardMult = f.RewardMult(info.waveNumber, rm) * gs.RewardBonus * gs.AlarmBonus(p);
+            info.xp = Mathf.Max(1, Mathf.RoundToInt(info.budget * 6f * gs.AlarmBonus(p)));
+            var rng = new System.Random(p.id.GetHashCode() ^ (info.waveNumber * 7919) ^ (fuel * 104729));
             info.aliens = f.Build(gs.db.enemies, info.waveNumber, info.budget, rng);
 
             var totals = new Dictionary<ResourceSO, float>();
@@ -83,10 +84,11 @@ namespace Frontier
             return info;
         }
 
-        public void StartWave(int risk)
+        public bool StartWave(int fuel)
         {
-            if (Active) return;
-            Current = Preview(risk);
+            if (Active) return false;
+            if (!gs.Spend(new List<ItemAmount> { new ItemAmount(gs.db.fuel, fuel) })) return false;
+            Current = Preview(fuel);
             Active = true;
             Spawned = 0; Killed = 0;
             ReactorMax = gs.ReactorMax;
@@ -99,6 +101,7 @@ namespace Frontier
             BuildTurrets();
             spawnRoutine = StartCoroutine(SpawnLoop());
             Sfx.Play(300f, 0.4f, 0.3f, 600f);
+            return true;
         }
 
         void BuildTurrets()
@@ -252,6 +255,8 @@ namespace Frontier
                     if (ok < r.amount) result.lost.Add(new ItemAmount(r.resource, r.amount - ok));
                 }
                 gs.WaveCleared(gs.planet);
+                gs.AddXp(Current.xp);
+                gs.AddXp(Current.xp);
                 Sfx.Good();
             }
             else Sfx.Bad();

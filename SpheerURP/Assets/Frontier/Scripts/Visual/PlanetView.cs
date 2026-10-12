@@ -13,6 +13,12 @@ namespace Frontier
         readonly List<Transform> orbiters = new List<Transform>();
         readonly List<float> orbiterSpeed = new List<float>();
         Transform root;
+        public Transform Spin { get; private set; }
+        public Transform Root { get { return root; } }
+        public PlanetSO Current { get; private set; }
+        public event System.Action<PlanetSO> Rebuilt;
+        float spinVelocity;
+        public bool IdleSpin = true;
         float punch;
         float appear = 1f;
         GameObject glow;
@@ -25,12 +31,16 @@ namespace Frontier
             if (root != null) Destroy(root.gameObject);
             orbiters.Clear(); orbiterSpeed.Clear();
 
+            Current = p;
             root = new GameObject("PlanetRoot").transform;
             root.SetParent(transform, false);
+            root.localRotation = Quaternion.Euler(16f, 0f, -7f);
+            Spin = new GameObject("Spin").transform;
+            Spin.SetParent(root, false);
             var rng = new System.Random(p.id.GetHashCode());
 
             var sphere = new GameObject("Core");
-            sphere.transform.SetParent(root, false);
+            sphere.transform.SetParent(Spin, false);
             core = sphere.transform;
             baseRim = p.rim;
             coreMat = null;
@@ -40,7 +50,7 @@ namespace Frontier
                 Destroy(sphere);
                 sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 Destroy(sphere.GetComponent<Collider>());
-                sphere.transform.SetParent(root, false);
+                sphere.transform.SetParent(Spin, false);
                 sphere.transform.localScale = Vector3.one * Radius * 2f;
                 core = sphere.transform;
                 coreMat = new Material(Fx.PlanetShader);
@@ -71,7 +81,11 @@ namespace Frontier
 
             appear = animate ? 0f : 1f;
             root.localScale = Vector3.one * appear;
+            if (Rebuilt != null) Rebuilt(p);
         }
+
+        public void AddSpin(float degrees) { if (Spin != null) Spin.Rotate(0f, -degrees, 0f, Space.Self); }
+        public void SetSpinVelocity(float degPerSec) { spinVelocity = degPerSec; }
 
         void BuildRing(float radius, Color c, float tilt, float yaw)
         {
@@ -123,7 +137,8 @@ namespace Frontier
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
             float pulse = 1f + Mathf.Sin(Time.time * 1.6f) * 0.012f + punch * 0.08f;
             core.localScale = Vector3.one * (usesModel ? 1f : Radius * 2f) * pulse;
-            core.Rotate(0f, 8f * Time.deltaTime, 0f, Space.Self);
+            spinVelocity = Mathf.MoveTowards(spinVelocity, 0f, Time.deltaTime * 140f);
+            Spin.Rotate(0f, -(spinVelocity + (IdleSpin ? 5f : 0f)) * Time.deltaTime, 0f, Space.Self);
             for (int i = 0; i < orbiters.Count; i++) orbiters[i].Rotate(0f, orbiterSpeed[i] * Time.deltaTime, 0f, Space.Self);
             if (coreMat != null && (punch > 0f || punchWas)) coreMat.SetColor("_RimColor", Color.Lerp(baseRim, new Color(3f, 0.4f, 0.4f), punch));
             punchWas = punch > 0f;
