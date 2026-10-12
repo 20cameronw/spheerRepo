@@ -10,6 +10,7 @@ Shader "Frontier/NeonPlanet"
         _Seed ("Seed", Float) = 0
         _Center ("Center (object space)", Vector) = (0,0,0,0)
         _Style ("Style", Float) = 0
+        _Lines ("Latitude lines", Float) = 1
     }
     SubShader
     {
@@ -32,7 +33,7 @@ Shader "Frontier/NeonPlanet"
                 float _Seed;
                 float4 _Center;
                 float _Style;
-            CBUFFER_END
+                float _Lines;
 
             struct Attributes
             {
@@ -103,7 +104,7 @@ Shader "Frontier/NeonPlanet"
 
                 float lat = abs(frac(i.posOS.y * 5.0) - 0.5);
                 float latLine = smoothstep(0.46, 0.5, lat);
-                col += _RimColor.rgb * (fres + latLine * 0.35);
+                col += _RimColor.rgb * (fres + latLine * 0.35 * _Lines);
                 return half4(col, 1);
             }
             ENDHLSL

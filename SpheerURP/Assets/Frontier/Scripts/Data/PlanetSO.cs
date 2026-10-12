@@ -31,6 +31,8 @@ namespace Frontier
         [ColorUsage(false, true)] public Color rim = new Color(0.4f, 1.5f, 1f);
 
         public WeatherKind weather = WeatherKind.Clear;
+        [Tooltip("Space backdrop vibe. Auto derives it from weather and the planet id.")]
+        public BackdropMood mood = BackdropMood.Auto;
         [Tooltip("Rings are reserved for rare planets.")]
         public bool hasRings;
         [Tooltip("Surface pattern: 0 bands, 1 swirls, 2 craters, 3 lava veins, 4 crystalline facets.")]

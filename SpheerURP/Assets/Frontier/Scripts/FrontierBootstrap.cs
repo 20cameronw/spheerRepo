@@ -51,6 +51,7 @@ namespace Frontier
             backdrop.Build(cam);
 
             var planet = new GameObject("Planet").AddComponent<PlanetView>();
+            planet.Rebuilt += backdrop.Apply;
             planet.Show(gs.planet, true);
 
             var defense = new GameObject("Defense").AddComponent<DefenseController>();

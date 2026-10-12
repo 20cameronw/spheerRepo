@@ -332,6 +332,7 @@ namespace Frontier
                        : spot.game == MinigameKind.Mine ? (Minigame)new NodeGame(false) : new DrillGame();
             g.toolDamage = gs.ToolDamage(spot.game);
             g.toolLevel = gs.ToolLevel(spot.game);
+            g.toolName = gs.ToolName(spot.game);
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;

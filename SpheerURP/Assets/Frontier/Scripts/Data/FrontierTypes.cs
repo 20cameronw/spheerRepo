@@ -31,6 +31,8 @@ namespace Frontier
         Fabricator
     }
 
+    public enum BackdropMood { Auto, Calm, Rush, Gloom, Glow, Storm }
+
     public enum WeatherKind { Clear, Rain, Snow, Embers, Spores, Dust, Storm }
 
     public static class StructureKinds
