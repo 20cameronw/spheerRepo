@@ -18,12 +18,15 @@ MonoBehaviour:
   tier: 1
   mapPosition: {x: 0.15744826, y: 0.7664101}
   danger: 1.2
-  primary: {r: 0.9, g: 0.4, b: 0.15, a: 1}
-  secondary: {r: 0.25, g: 0.06, b: 0.03, a: 1}
+  primary: {r: 0.56, g: 0.34, b: 0.24, a: 1}
+  secondary: {r: 0.21, g: 0.14, b: 0.11, a: 1}
   rim: {r: 2, g: 0.9, b: 0.3, a: 1}
   weather: 5
   hasRings: 0
   style: 2
+  glowIntensity: 0.3
+  atmosphereIntensity: 0.12
+  surfaceBands: 9
   spots:
   - label: Scrub Trees
     game: 0

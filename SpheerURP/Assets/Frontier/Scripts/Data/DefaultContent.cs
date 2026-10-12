@@ -220,13 +220,43 @@ namespace Frontier
 
             planets[1].style = 2; planets[2].style = 4; planets[3].style = 3; planets[4].style = 1; planets[5].style = 4;
 
-            planets[0].weather = WeatherKind.Rain;
+            planets[0].weather = WeatherKind.Clear;
             planets[1].weather = WeatherKind.Dust;
             planets[2].weather = WeatherKind.Snow;
             planets[3].weather = WeatherKind.Embers;
             planets[4].weather = WeatherKind.Storm;
             planets[5].weather = WeatherKind.Spores;
             planets[5].hasRings = true;
+
+            foreach (var p in planets)
+            {
+                switch (p.id)
+                {
+                    case "sylva":
+                        p.primary = new Color(0.27f, 0.44f, 0.24f);
+                        p.secondary = new Color(0.1f, 0.19f, 0.13f);
+                        p.glowIntensity = 0.22f; p.atmosphereIntensity = 0.25f; p.surfaceBands = 3f;
+                        break;
+                    case "ferrum":
+                        p.primary = new Color(0.56f, 0.34f, 0.24f);
+                        p.secondary = new Color(0.21f, 0.14f, 0.11f);
+                        p.glowIntensity = 0.3f; p.atmosphereIntensity = 0.12f; p.surfaceBands = 9f;
+                        break;
+                    case "glacia":
+                        p.primary = new Color(0.62f, 0.75f, 0.8f);
+                        p.glowIntensity = 0.55f; p.atmosphereIntensity = 0.4f; p.surfaceBands = 2f;
+                        break;
+                    case "aurum":
+                        p.glowIntensity = 0.65f; p.atmosphereIntensity = 0.2f; p.surfaceBands = 14f;
+                        break;
+                    case "obsidian":
+                        p.glowIntensity = 0.45f; p.atmosphereIntensity = 0.08f; p.surfaceBands = 12f;
+                        break;
+                    case "prism":
+                        p.glowIntensity = 1.35f; p.atmosphereIntensity = 1.2f; p.surfaceBands = 3f;
+                        break;
+                }
+            }
 
             var upgrades = new[]
             {

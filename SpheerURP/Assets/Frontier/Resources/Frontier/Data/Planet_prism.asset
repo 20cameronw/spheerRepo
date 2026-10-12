@@ -24,6 +24,9 @@ MonoBehaviour:
   weather: 2
   hasRings: 1
   style: 4
+  glowIntensity: 1.35
+  atmosphereIntensity: 1.2
+  surfaceBands: 3
   spots:
   - label: Prism Fields
     game: 1

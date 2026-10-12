@@ -49,6 +49,7 @@ namespace Frontier
         static BackdropMood Derive(PlanetSO p)
         {
             if (p.mood != BackdropMood.Auto) return p.mood;
+            if (p.tier <= 1) return BackdropMood.Calm;
             switch (p.weather)
             {
                 case WeatherKind.Storm: return BackdropMood.Storm;
@@ -66,6 +67,12 @@ namespace Frontier
         {
             if (p == null) return;
             target = MakeMood(Derive(p), baseBg);
+            if (p.tier <= 1 && p.mood == BackdropMood.Auto)
+            {
+                target.bright *= 0.65f;
+                target.nebMul *= 0.3f;
+                target.spd *= 0.5f;
+            }
             if (!moodInit) { cur = target; moodInit = true; }
         }
 

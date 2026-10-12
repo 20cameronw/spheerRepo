@@ -38,6 +38,14 @@ namespace Frontier
         [Tooltip("Surface pattern: 0 bands, 1 swirls, 2 craters, 3 lava veins, 4 crystalline facets.")]
         public int style;
 
+        [Header("Visual intensity")]
+        [Range(0f, 2f), Tooltip("Surface rim and halo brightness. Lower values give natural, quieter worlds.")]
+        public float glowIntensity = 1f;
+        [Range(0f, 2f), Tooltip("Atmosphere brightness, independent of the surface glow.")]
+        public float atmosphereIntensity = 1f;
+        [Range(0f, 20f), Tooltip("Surface pattern frequency. Zero uses the planet's seeded variation.")]
+        public float surfaceBands;
+
         [Header("Size")]
         [Tooltip("Radius of the planet's ground SphereCollider. Structures sit on this sphere; satellites orbit above it. 1.5 = standard. " +
                  "In Play mode you can also edit the collider on PlanetRoot/Spin/Surface and it saves back here.")]
@@ -45,6 +53,7 @@ namespace Frontier
         [Tooltip("Multiplier on the standard planet model size (every model is first fitted to the same diameter).")]
         public float modelScale = 1f;
 
+        [InspectorName("Planet Resources"), Tooltip("Available resources, gathering methods, yield and difficulty. These are not physical spots or spawn positions.")]
         public List<GatherSpot> spots = new List<GatherSpot>();
         [Tooltip("Solar system this planet orbits (see PlanetSO.Systems).")]
         public string systemId;

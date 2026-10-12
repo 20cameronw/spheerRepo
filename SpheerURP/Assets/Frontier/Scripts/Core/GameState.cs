@@ -218,6 +218,15 @@ namespace Frontier
             return list;
         }
 
+        public List<ResourceSO> ResourcesFor(PlanetSO p)
+        {
+            var list = new List<ResourceSO>();
+            foreach (var spot in p.spots)
+                if (spot.resource != null && !list.Contains(spot.resource)) list.Add(spot.resource);
+            if (db.scrap != null && !list.Contains(db.scrap)) list.Add(db.scrap);
+            return list;
+        }
+
         // Gather structures need a matching resource on the planet.
         public bool CanBuildHere(StructureSO def)
         {

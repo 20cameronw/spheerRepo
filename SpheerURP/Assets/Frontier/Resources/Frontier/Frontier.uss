@@ -181,6 +181,19 @@
     border-radius: 18px; background-color: rgba(255, 255, 255, 0.05);
 }
 .fr-recipe { margin-top: 10px; margin-bottom: 0; }
+.fr-recipe-flow { flex-direction: row; align-items: center; }
+.fr-recipe-side {
+    flex-basis: 0; flex-grow: 1; flex-shrink: 1; min-width: 0;
+    padding: 10px 12px; border-radius: 12px;
+    background-color: rgb(38, 41, 48);
+}
+.fr-recipe-side > .fr-tiny { font-size: 20px; margin-bottom: 6px; color: rgb(201, 212, 225); }
+.fr-recipe-arrow { flex-shrink: 0; margin: 0 12px; }
+.fr-recipe-resource { flex-direction: row; align-items: center; margin-top: 4px; }
+.fr-recipe-resource .fr-icon { margin-right: 8px; }
+.fr-recipe-resource .fr-small {
+    flex-shrink: 1; min-width: 0; margin-left: 0; font-size: 24px; white-space: normal;
+}
 .fr-stepper { flex-direction: row; align-items: center; justify-content: center; margin: 6px 0; }
 .fr-stepper-val { font-size: 40px; min-width: 90px; -unity-text-align: middle-center; }
 

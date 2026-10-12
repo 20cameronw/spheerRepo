@@ -37,6 +37,7 @@ namespace Frontier
         void StyleModel(Transform model, PlanetSO p, System.Random rng)
         {
             float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
+            if (p.surfaceBands > 0f) bands = p.surfaceBands;
             var mats = new List<Material>();
             int layer = 0;
             foreach (var r in solids)
@@ -46,7 +47,7 @@ namespace Frontier
                 var mat = new Material(Fx.PlanetShader);
                 mat.SetColor("_BaseColor", alt ? Color.Lerp(p.secondary, p.primary, 0.35f) : p.primary);
                 mat.SetColor("_AltColor", alt ? p.secondary * 0.6f : p.secondary);
-                mat.SetColor("_RimColor", p.rim);
+                mat.SetColor("_RimColor", baseRim);
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
                 mat.SetFloat("_Style", p.style);
@@ -76,7 +77,7 @@ namespace Frontier
             var sphere = new GameObject("Core");
             sphere.transform.SetParent(Spin, false);
             core = sphere.transform;
-            baseRim = p.rim;
+            baseRim = p.rim * p.glowIntensity;
             coreMat = null; modelMats = null;
             var model = ModelLibrary.Spawn(p.id, core, Radius * 2f * 1.04f * (p.modelScale > 0f ? p.modelScale : 1f));
             if (model != null)
@@ -96,8 +97,8 @@ namespace Frontier
                 coreMat = new Material(Fx.PlanetShader);
                 coreMat.SetColor("_BaseColor", p.primary);
                 coreMat.SetColor("_AltColor", p.secondary);
-                coreMat.SetColor("_RimColor", p.rim);
-                coreMat.SetFloat("_Bands", 4f + (float)rng.NextDouble() * 6f);
+                coreMat.SetColor("_RimColor", baseRim);
+                coreMat.SetFloat("_Bands", p.surfaceBands > 0f ? p.surfaceBands : 4f + (float)rng.NextDouble() * 6f);
                 coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
                 coreMat.SetFloat("_Style", p.style);
                 sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
@@ -113,9 +114,10 @@ namespace Frontier
             Destroy(atmo.GetComponent<Collider>());
             atmo.transform.SetParent(root, false);
             atmo.transform.localScale = Vector3.one * Radius * 2.28f;
-            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(p.rim.r * 1.2f, p.rim.g * 1.2f, p.rim.b * 1.2f, 1f));
+            Color atmosphere = p.rim * (1.2f * p.atmosphereIntensity);
+            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(atmosphere.r, atmosphere.g, atmosphere.b, 1f));
 
-            glow = Fx.GlowQuad(root, new Color(p.rim.r, p.rim.g, p.rim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
+            glow = Fx.GlowQuad(root, new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
 
             if (p.hasRings)
                 for (int i = 0; i < 2; i++)

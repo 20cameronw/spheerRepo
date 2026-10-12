@@ -24,6 +24,9 @@ MonoBehaviour:
   weather: 6
   hasRings: 0
   style: 4
+  glowIntensity: 0.45
+  atmosphereIntensity: 0.08
+  surfaceBands: 12
   spots:
   - label: Glass Shelf
     game: 1

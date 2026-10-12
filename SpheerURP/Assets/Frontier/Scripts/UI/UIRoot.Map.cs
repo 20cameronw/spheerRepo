@@ -288,10 +288,10 @@ namespace Frontier
             mapCard.Add(top);
             mapCard.Add(UiKit.Text(p2.description, "fr-tiny"));
 
+            mapCard.Add(UiKit.Text("AVAILABLE RESOURCES", "fr-small"));
             var res = UiKit.Div("fr-row-wrap");
-            var seen = new HashSet<ResourceSO>();
-            foreach (var s in p2.spots)
-                if (s.resource != null && seen.Add(s.resource)) res.Add(ResourceIconChip(s.resource, s.baseYield.ToString()));
+            foreach (var resource in gs.ResourcesFor(p2))
+                res.Add(ResourceIconChip(resource, resource.displayName));
             if (gs.structures.Exists(s => s.planetId == p2.id))
             {
                 var bc = UiKit.Div("fr-itemchip");

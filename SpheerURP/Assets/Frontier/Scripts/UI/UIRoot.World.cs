@@ -195,6 +195,14 @@ namespace Frontier
             return n == 999 ? 0 : n;
         }
 
+        VisualElement RecipeResource(ResourceSO resource, int amount, bool lack = false)
+        {
+            var row = UiKit.Div("fr-recipe-resource");
+            row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), 32f));
+            row.Add(UiKit.Text(amount + " " + resource.displayName, "fr-small", lack ? UiKit.Red : Color.white));
+            return row;
+        }
+
         void OpenRefinery(PlacedStructure s, Transform t)
         {
             Color c = UiKit.Ui(s.def.color);
@@ -213,12 +221,20 @@ namespace Frontier
                     card.AddToClassList("fr-recipe");
                     if (can <= 0) card.style.opacity = 0.7f;
 
-                    var line = UiKit.Div("fr-row-wrap");
+                    var line = UiKit.Div("fr-recipe-flow");
+                    var inputs = UiKit.Div("fr-recipe-side");
+                    inputs.Add(UiKit.Text("INPUT", "fr-tiny"));
                     foreach (var i in r.inputs)
-                        if (i.resource != null) line.Add(ResourceIconChip(i.resource, i.amount + " " + i.resource.displayName, gs.Count(i.resource) < i.amount));
-                    line.Add(Icons.Make("play", c, 40f));
+                        if (i.resource != null) inputs.Add(RecipeResource(i.resource, i.amount, gs.Count(i.resource) < i.amount));
+                    line.Add(inputs);
+                    var arrow = UiKit.Text(">", "fr-h2", c);
+                    arrow.AddToClassList("fr-recipe-arrow");
+                    line.Add(arrow);
+                    var outputs = UiKit.Div("fr-recipe-side");
+                    outputs.Add(UiKit.Text("OUTPUT", "fr-tiny"));
                     foreach (var o in r.outputs)
-                        if (o.resource != null) line.Add(ResourceIconChip(o.resource, gs.OutputAmount(o, bonus) + " " + o.resource.displayName));
+                        if (o.resource != null) outputs.Add(RecipeResource(o.resource, gs.OutputAmount(o, bonus)));
+                    line.Add(outputs);
                     card.Add(line);
 
                     var have = UiKit.Div("fr-row-wrap");

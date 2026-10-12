@@ -18,12 +18,15 @@ MonoBehaviour:
   tier: 2
   mapPosition: {x: 0.2735638, y: 0.766835}
   danger: 1.6
-  primary: {r: 0.4, g: 0.8, b: 1, a: 1}
+  primary: {r: 0.62, g: 0.75, b: 0.8, a: 1}
   secondary: {r: 0.05, g: 0.12, b: 0.3, a: 1}
   rim: {r: 0.5, g: 1.8, b: 2.4, a: 1}
   weather: 2
   hasRings: 0
   style: 4
+  glowIntensity: 0.55
+  atmosphereIntensity: 0.4
+  surfaceBands: 2
   spots:
   - label: Cryo Siphon
     game: 2

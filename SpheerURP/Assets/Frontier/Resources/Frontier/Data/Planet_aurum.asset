@@ -24,6 +24,9 @@ MonoBehaviour:
   weather: 5
   hasRings: 0
   style: 1
+  glowIntensity: 0.65
+  atmosphereIntensity: 0.2
+  surfaceBands: 14
   spots:
   - label: Dune Quarry
     game: 1
