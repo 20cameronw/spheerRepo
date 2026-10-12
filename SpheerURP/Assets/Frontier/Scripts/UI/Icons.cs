@@ -10,7 +10,7 @@ namespace Frontier
         struct Shape
         {
             public Vector2[] pts;
-            public bool closed, fill;
+            public bool closed, fill, dim;
         }
 
         static Shape S(bool closed, bool fill, params float[] xy)
@@ -43,20 +43,49 @@ namespace Frontier
             return new Shape { pts = p, closed = true, fill = fill };
         }
 
+        static Shape Arc(float cx, float cy, float rx, float ry, float rotDeg, float a0Deg, float a1Deg, bool dim = false, int n = 28)
+        {
+            var p = new Vector2[n + 1];
+            float rot = rotDeg * Mathf.Deg2Rad, cr = Mathf.Cos(rot), sr = Mathf.Sin(rot);
+            for (int i = 0; i <= n; i++)
+            {
+                float a = Mathf.Lerp(a0Deg, a1Deg, i / (float)n) * Mathf.Deg2Rad;
+                float x = Mathf.Cos(a) * rx, y = Mathf.Sin(a) * ry;
+                p[i] = new Vector2(cx + x * cr - y * sr, cy + x * sr + y * cr);
+            }
+            return new Shape { pts = p, closed = false, fill = false, dim = dim };
+        }
+
+        static Shape Dim(Shape s) { s.dim = true; return s; }
+
         static readonly Dictionary<string, Shape[]> Library = new Dictionary<string, Shape[]>
         {
             { "map", new[] {
-                S(true, false, .1f,.22f, .37f,.1f, .63f,.22f, .9f,.1f, .9f,.78f, .63f,.9f, .37f,.78f, .1f,.9f),
-                S(false, false, .37f,.1f, .37f,.78f), S(false, false, .63f,.22f, .63f,.9f) } },
+                Circle(.5f,.5f,.36f, false, 36),
+                Dim(Arc(.5f,.5f,.36f,.13f,0f,0f,360f,false,36)),
+                Arc(.5f,.5f,.15f,.36f,0f,0f,360f,true,36),
+                Dim(S(false, false, .5f,.14f, .5f,.86f)),
+                Arc(.5f,.5f,.47f,.15f,-28f,200f,340f,false,24),
+                Circle(.88f,.34f,.05f,true,12) } },
             { "build", new[] {
-                S(true, false, .18f,.5f, .5f,.14f, .82f,.5f), S(true, false, .26f,.5f, .26f,.88f, .74f,.88f, .74f,.5f),
-                S(true, true, .42f,.88f, .42f,.64f, .58f,.64f, .58f,.88f) } },
+                Arc(.5f,.62f,.36f,.4f,0f,180f,360f,false,28),
+                S(false, false, .14f,.62f, .86f,.62f),
+                S(false, false, .22f,.62f, .22f,.84f, .78f,.84f, .78f,.62f),
+                Arc(.5f,.84f,.1f,.2f,0f,180f,360f,true,12),
+                S(false, false, .5f,.22f, .5f,.06f), Circle(.5f,.06f,.04f,true,10),
+                Circle(.34f,.46f,.04f,true,10), Circle(.66f,.46f,.04f,true,10) } },
+            { "pack", new[] {
+                Arc(.5f,.42f,.3f,.28f,0f,180f,360f,false,24),
+                S(false, false, .2f,.42f, .16f,.86f, .84f,.86f, .8f,.42f),
+                Arc(.5f,.16f,.1f,.1f,0f,180f,360f,true,12),
+                S(true, true, .3f,.58f, .7f,.58f, .7f,.8f, .3f,.8f),
+                S(false, false, .3f,.66f, .7f,.66f),
+                S(false, false, .5f,.66f, .5f,.72f),
+                Dim(S(false, false, .12f,.5f, .08f,.74f, .13f,.8f)), Dim(S(false, false, .88f,.5f, .92f,.74f, .87f,.8f)) } },
             { "research", new[] {
                 S(true, true, .4f,.1f, .6f,.1f, .6f,.42f, .86f,.86f, .14f,.86f, .4f,.42f),
                 S(false, false, .3f,.1f, .7f,.1f), S(false, false, .26f,.68f, .74f,.68f) } },
-            { "pack", new[] {
-                S(true, false, .24f,.32f, .76f,.32f, .82f,.9f, .18f,.9f), S(false, false, .36f,.32f, .36f,.14f, .64f,.14f, .64f,.32f),
-                S(true, false, .34f,.62f, .66f,.62f, .66f,.82f, .34f,.82f) } },
+
             { "fuel", new[] {
                 S(true, true, .5f,.08f, .74f,.44f, .8f,.62f, .72f,.8f, .5f,.92f, .28f,.8f, .2f,.62f, .26f,.44f) } },
             { "wood", new[] {
@@ -128,8 +157,12 @@ namespace Frontier
 
         static readonly Dictionary<string, Texture2D> spriteCache = new Dictionary<string, Texture2D>();
 
+        // These use the redrawn neon vector versions instead of the old bitmap icons.
+        static readonly HashSet<string> VectorOnly = new HashSet<string> { "map", "build", "pack" };
+
         static Texture2D Sprite(string name)
         {
+            if (VectorOnly.Contains(name)) return null;
             Texture2D t;
             if (!spriteCache.TryGetValue(name, out t))
             {
@@ -161,20 +194,24 @@ namespace Frontier
                 float s = Mathf.Min(r.width, r.height);
                 Vector2 o = new Vector2((r.width - s) * 0.5f, (r.height - s) * 0.5f);
                 var p = ctx.painter2D;
-                p.lineWidth = Mathf.Max(1.5f, s * 0.075f);
+                float lw = Mathf.Max(1.5f, s * 0.075f);
                 p.lineJoin = LineJoin.Round;
                 p.lineCap = LineCap.Round;
-                p.strokeColor = c;
-                p.fillColor = new Color(c.r, c.g, c.b, 0.32f);
-                foreach (var sh in shapes)
-                {
-                    p.BeginPath();
-                    p.MoveTo(o + sh.pts[0] * s);
-                    for (int i = 1; i < sh.pts.Length; i++) p.LineTo(o + sh.pts[i] * s);
-                    if (sh.closed) p.ClosePath();
-                    if (sh.fill) p.Fill();
-                    p.Stroke();
-                }
+                // Soft glow pass, then the crisp neon line on top.
+                for (int pass = 0; pass < 2; pass++)
+                    foreach (var sh in shapes)
+                    {
+                        float a = sh.dim ? 0.5f : 1f;
+                        p.lineWidth = pass == 0 ? lw * 2.6f : lw;
+                        p.strokeColor = pass == 0 ? new Color(c.r, c.g, c.b, 0.12f * a) : new Color(c.r, c.g, c.b, a);
+                        p.fillColor = new Color(c.r, c.g, c.b, 0.32f);
+                        p.BeginPath();
+                        p.MoveTo(o + sh.pts[0] * s);
+                        for (int i = 1; i < sh.pts.Length; i++) p.LineTo(o + sh.pts[i] * s);
+                        if (sh.closed) p.ClosePath();
+                        if (sh.fill && pass == 1) p.Fill();
+                        p.Stroke();
+                    }
             };
             e.RegisterCallback<GeometryChangedEvent>(_ => e.MarkDirtyRepaint());
             return e;
