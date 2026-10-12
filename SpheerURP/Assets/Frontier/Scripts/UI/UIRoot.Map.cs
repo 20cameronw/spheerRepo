@@ -388,6 +388,7 @@ namespace Frontier
             top.Add(UiKit.Text(p2.danger.ToString("0.0"), "fr-small"));
             mapCard.Add(top);
             mapCard.Add(UiKit.Text(p2.description, "fr-tiny"));
+            mapCard.Add(UiKit.Text(p2.BuildingSlots + " building slots  -  world size x" + p2.worldSize.ToString("0.00"), "fr-small"));
 
             mapCard.Add(UiKit.Text("AVAILABLE RESOURCES", "fr-small"));
             var res = UiKit.Div("fr-row-wrap");

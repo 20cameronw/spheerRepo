@@ -154,6 +154,7 @@ namespace Frontier.EditorTools
             var lib = AssetDatabase.LoadAssetAtPath<ModelLibrary>(path);
             if (lib == null) { lib = ScriptableObject.CreateInstance<ModelLibrary>(); AssetDatabase.CreateAsset(lib, path); }
             lib.entries = list.ToArray();
+            ModelScaleCalibration.BakeLibrary(lib);
             EditorUtility.SetDirty(lib);
             AssetDatabase.SaveAssets();
             Debug.Log("Frontier: model library built with " + list.Count + " entries");

@@ -12,8 +12,9 @@ namespace Frontier
         {
             public string key;
             public GameObject prefab;
-            [Tooltip("Extra multiplier on top of the auto-fit size.")]
+            [Tooltip("Measured source-to-reference scale correction, baked by Frontier/Calibrate Model Scales.")]
             public float scale;
+            public float referenceDiameter;
         }
 
         public Entry[] entries;
@@ -30,7 +31,7 @@ namespace Frontier
             }
         }
 
-        /// <summary>Instantiates the model for a key, strips behaviours, and fits it to the given diameter. Returns null if none.</summary>
+        /// <summary>Instantiates an inert model using its baked scale correction and the requested diameter.</summary>
         public static Transform Spawn(string key, Transform parent, float diameter, bool useEntryScale = true)
         {
             var lib = Instance;
@@ -47,7 +48,9 @@ namespace Frontier
                 if (!MeshBounds(go, out b)) { Destroy(go); return null; }
                 float size = Mathf.Max(b.size.x, Mathf.Max(b.size.y, b.size.z));
                 if (size < 1e-4f) size = 1f;
-                float s = diameter / size * (useEntryScale && e.scale > 0f ? e.scale : 1f);
+                float s = e.referenceDiameter > 0f
+                    ? e.scale * diameter / e.referenceDiameter
+                    : diameter / size * (useEntryScale && e.scale > 0f ? e.scale : 1f);
                 go.transform.localScale = Vector3.one * s;
                 go.transform.position = -b.center * s;
                 go.transform.SetParent(parent, false);

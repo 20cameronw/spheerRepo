@@ -9,7 +9,7 @@ namespace Frontier.EditorTools
     {
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.HelpBox("Ground Radius controls planet and placement size. Model Scale fine-tunes the visible mesh only. Atmosphere Scale is its diameter. These controls update live in Play mode.", MessageType.Info);
+            EditorGUILayout.HelpBox("Display sizing is already calibrated. World Size makes structures relatively smaller without enlarging the planet on screen. Building Slots sets capacity. The size reset preserves world size and capacity.", MessageType.Info);
             if (GUILayout.Button("Reset this planet to standard size"))
             {
                 Undo.RecordObject(target, "Reset planet size");

@@ -31,6 +31,8 @@ MonoBehaviour:
   surfaceRadius: 1.5
   modelScale: 1
   atmosphereScale: 5
+  worldSize: 2.12
+  buildingSlots: 40
   spots:
   - label: Null Seam
     game: 2

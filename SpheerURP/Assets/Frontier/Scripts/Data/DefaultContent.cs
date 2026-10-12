@@ -35,6 +35,8 @@ namespace Frontier
             p.id = id; p.displayName = name; p.description = desc; p.tier = tier; p.mapPosition = pos;
             p.danger = danger; p.primary = primary; p.secondary = secondary; p.rim = rim;
             p.spots = new List<GatherSpot>(spots);
+            p.worldSize = 1f + tier * 0.16f;
+            p.buildingSlots = 12 + tier * 4;
             return p;
         }
 

@@ -155,7 +155,7 @@ namespace Frontier
                 placedCd[i] -= Time.deltaTime;
                 if (placedCd[i] > 0f) continue;
                 var def = placed[i].def;
-                Vector3 from = placedT[i].position + placedT[i].up * 0.45f;
+                Vector3 from = placedT[i].TransformPoint(Vector3.up * 0.45f);
                 var target = Nearest(from, def.range * def.range);
                 if (target == null) { placedCd[i] = 0.15f; continue; }
                 placedCd[i] = def.fireInterval / gs.TurretFireRate;

@@ -218,11 +218,11 @@ namespace Frontier
 
         public bool AtLimit(PlanetSO p, StructureSO def) { return def.maxPerPlanet > 0 && CountOnPlanet(p, def) >= def.maxPerPlanet; }
 
-        public int FreePads(PlanetSO p, int total)
+        public int FreePads(PlanetSO p)
         {
             int used = 0;
-            foreach (var s in structures) if (s.planetId == p.id) used++;
-            return total - used;
+            foreach (var s in structures) if (s.planetId == p.id && s.slot >= 0 && s.slot < p.BuildingSlots) used++;
+            return Mathf.Max(0, p.BuildingSlots - used);
         }
 
         public List<GatherSpot> SpotsFor(PlanetSO p, MinigameKind game)
@@ -251,7 +251,7 @@ namespace Frontier
 
         public bool Place(StructureSO def, int slot)
         {
-            if (AtLimit(planet, def) || !CanBuildHere(def) || StructureAt(planet, slot) != null || !Spend(def.buildCost)) return false;
+            if (slot < 0 || slot >= planet.BuildingSlots || AtLimit(planet, def) || !CanBuildHere(def) || StructureAt(planet, slot) != null || !Spend(def.buildCost)) return false;
             structures.Add(new PlacedStructure { planetId = planet.id, def = def, slot = slot, level = 1 });
             Notify();
             return true;

@@ -54,6 +54,13 @@ namespace Frontier
         public float modelScale = 1f;
         [Tooltip("Atmosphere sphere diameter (Transform scale). Default is 5 on every world.")]
         public float atmosphereScale = 5f;
+        [Header("World capacity")]
+        [Tooltip("Logical world size. Larger worlds keep the same screen size but buildings appear smaller.")]
+        [Min(1f)] public float worldSize = 1f;
+        [Tooltip("Number of building pads. Existing slot indices are preserved when capacity increases.")]
+        [Min(12)] public int buildingSlots = 12;
+        public int BuildingSlots { get { return Mathf.Max(12, buildingSlots); } }
+        public float StructureScale { get { return 1f / Mathf.Max(1f, worldSize); } }
 
         [InspectorName("Planet Resources"), Tooltip("Available resources, gathering methods, yield and difficulty. These are not physical spots or spawn positions.")]
         public List<GatherSpot> spots = new List<GatherSpot>();

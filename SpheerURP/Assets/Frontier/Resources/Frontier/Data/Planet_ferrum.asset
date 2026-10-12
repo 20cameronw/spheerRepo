@@ -31,6 +31,8 @@ MonoBehaviour:
   surfaceRadius: 1.5
   modelScale: 1
   atmosphereScale: 5
+  worldSize: 1.16
+  buildingSlots: 16
   spots:
   - label: Scrub Trees
     game: 0

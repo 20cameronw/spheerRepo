@@ -16,104 +16,135 @@ MonoBehaviour:
   - key: sylva
     prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
       type: 3}
-    scale: 1
+    scale: 0.07099946
+    referenceDiameter: 3
   - key: ferrum
     prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
-    scale: 1
+    scale: 3.0000005
+    referenceDiameter: 3
   - key: glacia
     prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
       type: 3}
-    scale: 1
+    scale: 0.07294791
+    referenceDiameter: 3
   - key: cinder
     prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
-    scale: 1
+    scale: 3.0000005
+    referenceDiameter: 3
   - key: arbor
     prefab: {fileID: 919132149155446097, guid: bb6b61e6cab8b4bf6866be5f20be71c4, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: nyx
     prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
       type: 3}
-    scale: 1
+    scale: 0.054803535
+    referenceDiameter: 3
   - key: aurum
     prefab: {fileID: 919132149155446097, guid: 6b210a7be80fc43ceb72f03a8ac92928, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: tide
     prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
       type: 3}
-    scale: 1
+    scale: 0.07099946
+    referenceDiameter: 3
   - key: zephyr
     prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: pyre
     prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: halcyon
     prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
       type: 3}
-    scale: 1
+    scale: 0.07294791
+    referenceDiameter: 3
   - key: mire
     prefab: {fileID: 919132149155446097, guid: bb6b61e6cab8b4bf6866be5f20be71c4, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: obsidian
     prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
       type: 3}
-    scale: 1
+    scale: 0.054803535
+    referenceDiameter: 3
   - key: vesper
     prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
-    scale: 1
+    scale: 3.0000005
+    referenceDiameter: 3
   - key: prism
     prefab: {fileID: 919132149155446097, guid: 6b210a7be80fc43ceb72f03a8ac92928, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: kaos
     prefab: {fileID: 919132149155446097, guid: bb6b61e6cab8b4bf6866be5f20be71c4, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: tundra
     prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: coral
     prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
       type: 3}
-    scale: 1
+    scale: 0.07099946
+    referenceDiameter: 3
   - key: scout
     prefab: {fileID: 919132149155446097, guid: cfc6a7b43afc80b4db95f51fed2b82c2, type: 3}
-    scale: 1
+    scale: 2.9999998
+    referenceDiameter: 3
   - key: swarmer
     prefab: {fileID: 919132149155446097, guid: 1c311dae0af2f400ebe73409c652c949, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: raider
     prefab: {fileID: 919132149155446097, guid: 1e815cb89adcd2a42945948def54ebf5, type: 3}
-    scale: 1
+    scale: 3.0000002
+    referenceDiameter: 3
   - key: brute
     prefab: {fileID: 919132149155446097, guid: cfc6a7b43afc80b4db95f51fed2b82c2, type: 3}
-    scale: 1
+    scale: 2.9999998
+    referenceDiameter: 3
   - key: titan
     prefab: {fileID: 919132149155446097, guid: cfc6a7b43afc80b4db95f51fed2b82c2, type: 3}
-    scale: 1
+    scale: 2.9999998
+    referenceDiameter: 3
   - key: turret
     prefab: {fileID: 919132149155446097, guid: 6e1e7dca4b4ed33409a90661701216d0, type: 3}
-    scale: 1
+    scale: 3
+    referenceDiameter: 3
   - key: struct_refinery
     prefab: {fileID: 964346929062732501, guid: a13a8558c6fe35849b037473df891b0a, type: 3}
-    scale: 1
+    scale: 0.21617143
+    referenceDiameter: 0.75
   - key: struct_alarm
     prefab: {fileID: 3192028281512451177, guid: b4d04437add6d7e4386db2307d914fb7,
       type: 3}
-    scale: 1
+    scale: 0.17214702
+    referenceDiameter: 0.75
   - key: struct_mine
     prefab: {fileID: 919132149155446097, guid: 1c311dae0af2f400ebe73409c652c949, type: 3}
-    scale: 1
+    scale: 0.75
+    referenceDiameter: 0.75
   - key: struct_drill
     prefab: {fileID: 6167137264061970111, guid: b7485f5c7262c43d9aa31506d7bbe793,
       type: 3}
-    scale: 1
+    scale: 0.111695394
+    referenceDiameter: 0.75
   - key: struct_gunner
     prefab: {fileID: 919132149155446097, guid: 6e1e7dca4b4ed33409a90661701216d0, type: 3}
-    scale: 1
+    scale: 0.75
+    referenceDiameter: 0.75
   - key: struct_laser
     prefab: {fileID: 6825596879887032473, guid: 6946c4e2a57a5244699ef72f630f5e0a,
       type: 3}
-    scale: 1
+    scale: 0.12824853
+    referenceDiameter: 0.75
   - key: struct_satellite
     prefab: {fileID: 8005019957655098634, guid: 35b44654aaf824c91b1590baa998f2eb,
       type: 3}
-    scale: 1
+    scale: 0.05756053
+    referenceDiameter: 0.75

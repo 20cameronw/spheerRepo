@@ -11,7 +11,8 @@ namespace Frontier
     /// </summary>
     public class WorldSurface : MonoBehaviour
     {
-        public const int SlotCount = 12;
+        public int SlotCount { get { return view.Current.BuildingSlots; } }
+        public bool ShowStructureLabels = true;
         const float OrbitHeight = 1.0f;
 
         public event Action<PlacedStructure, Transform> StructureTapped;
@@ -58,14 +59,6 @@ namespace Frontier
         public void Init(PlanetView pv, Camera camera, GameState state)
         {
             view = pv; cam = camera; gs = state;
-            dirs = new Vector3[SlotCount];
-            for (int i = 0; i < SlotCount; i++)
-            {
-                float y = Mathf.Lerp(0.78f, -0.78f, (i + 0.5f) / SlotCount);
-                float r = Mathf.Sqrt(1f - y * y);
-                float a = i * 2.39996323f;
-                dirs[i] = new Vector3(Mathf.Cos(a) * r, y, Mathf.Sin(a) * r).normalized;
-            }
             view.Rebuilt += OnPlanet;
             gs.Changed += OnChanged;
             if (view.Spin != null) OnPlanet(view.Current);
@@ -96,10 +89,41 @@ namespace Frontier
         // ------------------------------------------------------------ build
         void OnPlanet(PlanetSO p)
         {
+            int count = p.BuildingSlots;
+            foreach (var structure in gs.structures)
+                if (structure.planetId == p.id) count = Mathf.Max(count, structure.slot + 1);
+            dirs = SlotDirections(count);
             signature = null;
             ClearAll();
             RebuildStructures();
             RebuildPads();
+        }
+
+        public static Vector3[] SlotDirections(int count)
+        {
+            var directions = new Vector3[Mathf.Max(12, count)];
+            // Preserve the original twelve slots for old saves. Additional pads
+            // split the largest available gaps without moving existing buildings.
+            for (int i = 0; i < 12; i++)
+            {
+                float y = Mathf.Lerp(0.78f, -0.78f, (i + 0.5f) / 12f);
+                float r = Mathf.Sqrt(1f - y * y), a = i * 2.39996323f;
+                directions[i] = new Vector3(Mathf.Cos(a) * r, y, Mathf.Sin(a) * r).normalized;
+            }
+            for (int i = 12; i < directions.Length; i++)
+            {
+                float best = -1f;
+                for (int candidate = 0; candidate < 512; candidate++)
+                {
+                    float y = 1f - 2f * (candidate + 0.5f) / 512f;
+                    float r = Mathf.Sqrt(1f - y * y), a = candidate * 2.39996323f;
+                    Vector3 direction = new Vector3(Mathf.Cos(a) * r, y, Mathf.Sin(a) * r);
+                    float gap = float.MaxValue;
+                    for (int j = 0; j < i; j++) gap = Mathf.Min(gap, (direction - directions[j]).sqrMagnitude);
+                    if (gap > best) { best = gap; directions[i] = direction; }
+                }
+            }
+            return directions;
         }
 
         void OnChanged()
@@ -170,6 +194,7 @@ namespace Frontier
             go.transform.localPosition = n * view.SurfaceRadius();
             go.transform.localRotation = Quaternion.FromToRotation(Vector3.up, n);
             var col = go.AddComponent<SphereCollider>();
+            go.transform.localScale = Vector3.one * view.Current.StructureScale;
             col.radius = 0.42f;
             col.center = new Vector3(0f, 0.3f, 0f);
             return new Item { t = go.transform, slot = slot };
@@ -181,7 +206,25 @@ namespace Frontier
             it.structure = s;
             Color c = s.def.color;
             var model = SpawnModel(s.def.modelKey, it.t, 0.75f);
-            if (model == null) BuildFallbackStructure(it.t, s.def.kind, c);
+            if (model == null)
+            {
+                var visual = new GameObject("StructureVisual");
+                BuildFallbackStructure(visual.transform, s.def.kind, c);
+                Bounds bounds;
+                if (ModelLibrary.MeshBounds(visual, out bounds))
+                {
+                    float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+                    float scale = 0.75f / Mathf.Max(0.0001f, diameter);
+                    visual.transform.localScale = Vector3.one * scale;
+                    visual.transform.SetParent(it.t, false);
+                    visual.transform.localPosition = new Vector3(-bounds.center.x, -bounds.min.y, -bounds.center.z) * scale;
+                }
+                else
+                {
+                    Debug.LogError("Frontier: fallback structure has no geometry: " + s.def.id, this);
+                    Destroy(visual);
+                }
+            }
             PrepareStructure(it, c);
             if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
             it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, UiKit.Ui(c), 1.0f, 0.34f, out it.labelRenderer);
@@ -228,6 +271,7 @@ namespace Frontier
                 outline.receiveShadows = false;
                 var props = new MaterialPropertyBlock();
                 props.SetColor("_Color", UiKit.Ui(color) * 2f);
+                props.SetFloat("_Width", 0.018f * view.Current.StructureScale);
                 outline.SetPropertyBlock(props);
                 outline.enabled = false;
                 item.outlines.Add(outline);
@@ -394,12 +438,12 @@ namespace Frontier
 
         Vector3 ProbePoint(Item it)
         {
-            return it.t.position + it.t.up * 0.3f;
+            return it.t.TransformPoint(Vector3.up * 0.3f);
         }
 
         public bool AnchorVisible(Transform t)
         {
-            return t != null && Visible(t.position + t.up * 0.3f);
+            return t != null && Visible(t.TransformPoint(Vector3.up * 0.3f));
         }
 
         void Update()
@@ -438,7 +482,7 @@ namespace Frontier
                 if (it.label != null)
                 {
                     it.label.localPosition = new Vector3(0f, (it.structure != null ? 1.0f : 0.6f) + bob, 0f);
-                    it.labelRenderer.enabled = facing && !Locked;
+                    it.labelRenderer.enabled = facing && !Locked && (it.structure == null || ShowStructureLabels || selected);
                 }
                 if (it.glow != null)
                 {

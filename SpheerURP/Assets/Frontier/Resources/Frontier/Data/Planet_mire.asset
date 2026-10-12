@@ -31,6 +31,8 @@ MonoBehaviour:
   surfaceRadius: 1.5
   modelScale: 1
   atmosphereScale: 5
+  worldSize: 1.64
+  buildingSlots: 28
   spots:
   - label: Fungal Giants
     game: 0

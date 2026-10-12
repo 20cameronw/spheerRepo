@@ -16,7 +16,11 @@ Tap a warehouse to open its storage and your backpack together. Drag stacks in e
 
 ### Frontier planet sizing and travel
 
-Planet models ignore ModelLibrary scale overrides and fit to `surfaceRadius * 2 * modelScale`. Every world defaults to ground radius 1.5, model scale 1, and atmosphere scale 5. Select a Planet asset in `Assets/Frontier/Resources/Frontier/Data` to tune these controls live in Play mode, or use its **Reset this planet to standard size** button. **Frontier > Normalize All Planet Sizes** resets all worlds; **Validate Planet Model Sizes** measures their fitted mesh diameters.
+Planet and structure source FBX import scales are calibrated directly to common units; each ModelLibrary entry also stores a measured correction for its assembled prefab. **Frontier > Calibrate Model Scales** repeats this process after replacing models. It preserves assembled prefab part offsets. The source imports are shared with the legacy scene, so bare model instances there also use the corrected units.
+
+All Frontier planets retain a displayed radius of 1.5 and atmosphere scale 5. Logical **World Size** increases with depth (1.00 to 2.12), shrinking buildings, build pads and their pick colliders proportionally, while **Building Slots** increases from 12 to 40. Both are authored on each PlanetSO, independently of display sizing; size resets preserve capacity. Existing saved buildings keep their original slot positions. **Validate Planet Model Sizes** checks calibrated planet/structure mesh diameters and capacity.
+
+Menu > Settings > **Structure Labels** switches between always-visible labels and selected-only labels, and remembers the choice. Empty build-pad markers remain available in build mode.
 
 Travel plays the departure warp first, the flight minigame second, and the destination approach last. The star map separates six existing solar systems into three spiral galaxy regions. Curved departure/arrival tangents and a moving ship show the route; the map is illustrative, not a gravity simulation or optimal-path solver. Its expanded visual spacing and route curvature do not change fuel costs or authored planet coordinates.
 

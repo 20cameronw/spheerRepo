@@ -97,7 +97,7 @@ namespace Frontier
             tabs.Add(TabButton("alien", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
             tabs.Add(TabButton("warp", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
             body.Add(tabs);
-            body.Add(UiKit.Text("Build on " + gs.planet.displayName + ". Tap a structure on the planet to use it.", "fr-muted"));
+            body.Add(UiKit.Text("Build on " + gs.planet.displayName + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots + " free slots. Tap a structure on the planet to use it.", "fr-muted"));
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Warehouse); break;
@@ -252,6 +252,13 @@ namespace Frontier
                 RefreshModal();
             });
             body.Add(snd);
+            body.Add(IconBtn(world.ShowStructureLabels ? "STRUCTURE LABELS: ALWAYS" : "STRUCTURE LABELS: SELECTED ONLY", "base", UiKit.Cyan, () =>
+            {
+                world.ShowStructureLabels = !world.ShowStructureLabels;
+                PlayerPrefs.SetInt("fr_structure_labels", world.ShowStructureLabels ? 1 : 0);
+                PlayerPrefs.Save();
+                RefreshModal();
+            }));
 
             var reset = IconBtn(confirmReset ? "TAP AGAIN TO ERASE" : "RESET PROGRESS", "close", UiKit.Red, () =>
             {

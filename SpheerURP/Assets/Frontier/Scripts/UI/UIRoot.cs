@@ -322,6 +322,7 @@ namespace Frontier
         void LoadPrefs()
         {
             Sfx.Muted = PlayerPrefs.GetInt("fr_muted", 0) == 1;
+            world.ShowStructureLabels = PlayerPrefs.GetInt("fr_structure_labels", 1) == 1;
         }
 
         // ------------------------------------------------------------ gathering
