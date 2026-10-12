@@ -38,6 +38,13 @@ namespace Frontier
         [Tooltip("Surface pattern: 0 bands, 1 swirls, 2 craters, 3 lava veins, 4 crystalline facets.")]
         public int style;
 
+        [Header("Size")]
+        [Tooltip("Radius of the planet's ground SphereCollider. Structures sit on this sphere; satellites orbit above it. 1.5 = standard. " +
+                 "In Play mode you can also edit the collider on PlanetRoot/Spin/Surface and it saves back here.")]
+        public float surfaceRadius = PlanetView.Radius;
+        [Tooltip("Multiplier on the standard planet model size (every model is first fitted to the same diameter).")]
+        public float modelScale = 1f;
+
         public List<GatherSpot> spots = new List<GatherSpot>();
         [Tooltip("Solar system this planet orbits (see PlanetSO.Systems).")]
         public string systemId;

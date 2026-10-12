@@ -25,8 +25,7 @@ MonoBehaviour:
       type: 3}
     scale: 1
   - key: cinder
-    prefab: {fileID: 1238312849663419745, guid: 051ba5a398b8b3c4092c654f96a6eb2f,
-      type: 3}
+    prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
     scale: 1
   - key: arbor
     prefab: {fileID: 919132149155446097, guid: bb6b61e6cab8b4bf6866be5f20be71c4, type: 3}
@@ -46,8 +45,7 @@ MonoBehaviour:
     prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
     scale: 1
   - key: pyre
-    prefab: {fileID: 1238312849663419745, guid: 051ba5a398b8b3c4092c654f96a6eb2f,
-      type: 3}
+    prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
     scale: 1
   - key: halcyon
     prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
@@ -67,8 +65,7 @@ MonoBehaviour:
     prefab: {fileID: 919132149155446097, guid: 6b210a7be80fc43ceb72f03a8ac92928, type: 3}
     scale: 1
   - key: kaos
-    prefab: {fileID: 1238312849663419745, guid: 051ba5a398b8b3c4092c654f96a6eb2f,
-      type: 3}
+    prefab: {fileID: 919132149155446097, guid: bb6b61e6cab8b4bf6866be5f20be71c4, type: 3}
     scale: 1
   - key: tundra
     prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}

@@ -26,143 +26,24 @@ namespace Frontier
         bool usesModel;
         List<Material> modelMats;
 
-        // Raycasts the real mesh from outside so structures sit on the true surface, not an assumed radius.
-        Vector3[] surfDirs;
-        float[] surfR;
-
         List<MeshRenderer> solids = new List<MeshRenderer>();
 
-        // Hides atmosphere/shell/cloud layers baked into hand-made models so only the true ground is styled and sampled.
-        void FilterShells(Transform model)
-        {
-            solids.Clear();
-            var all = new List<MeshRenderer>(model.GetComponentsInChildren<MeshRenderer>());
-            var keep = new List<MeshRenderer>();
-            foreach (var r in all)
-            {
-                string n = r.name.ToLowerInvariant();
-                bool bad = n.Contains("atmo") || n.Contains("shell") || n.Contains("cloud") || n.Contains("glow")
-                    || n.Contains("halo") || n.Contains("aura") || n.Contains("ring") || n.Contains("fog");
-                foreach (var m in r.sharedMaterials)
-                    if (m != null && (m.renderQueue >= 3000 || (m.HasProperty("_Surface") && m.GetFloat("_Surface") > 0.5f))) bad = true;
-                if (bad) r.enabled = false; else keep.Add(r);
-            }
-            foreach (var r in keep)
-            {
-                bool shell = false;
-                foreach (var o in keep)
-                {
-                    if (o == r) continue;
-                    var rb = r.bounds; var ob = o.bounds;
-                    if (rb.Contains(ob.min) && rb.Contains(ob.max) && rb.size.magnitude > ob.size.magnitude * 1.002f) { shell = true; break; }
-                }
-                if (shell) r.enabled = false; else solids.Add(r);
-            }
-            if (solids.Count == 0) { foreach (var r in all) r.enabled = true; solids.AddRange(all); }
-        }
+        /// <summary>The planet's ground. Its radius is the single source of truth for where structures sit.</summary>
+        public SphereCollider Surface { get; private set; }
 
-        float SurfaceMedian()
-        {
-            if (surfR == null) return Radius;
-            var s = (float[])surfR.Clone();
-            System.Array.Sort(s);
-            return s[s.Length / 2];
-        }
-
-        void SampleSurface(Transform model)
-        {
-            var cols = new List<MeshCollider>();
-            foreach (var r in solids)
-            {
-                var mf = r.GetComponent<MeshFilter>();
-                if (mf == null || mf.sharedMesh == null) continue;
-                var mc = mf.gameObject.AddComponent<MeshCollider>();
-                mc.sharedMesh = mf.sharedMesh;
-                cols.Add(mc);
-            }
-            if (cols.Count == 0) return;
-            var set = new HashSet<Collider>(cols);
-            var savedScale = root.localScale;
-            root.localScale = Vector3.one;
-            Physics.SyncTransforms();
-
-            const int N = 400;
-            var dirs = new Vector3[N]; var rs = new float[N];
-            int hitCount = 0;
-            for (int i = 0; i < N; i++)
-            {
-                float y = 1f - 2f * (i + 0.5f) / N;
-                float r = Mathf.Sqrt(1f - y * y);
-                float a = i * 2.39996323f;
-                var d = new Vector3(Mathf.Cos(a) * r, y, Mathf.Sin(a) * r);
-                dirs[i] = d;
-                Vector3 from = Spin.TransformPoint(d * Radius * 5f);
-                Vector3 to = Spin.TransformDirection(-d);
-                float best = float.MaxValue; Vector3 bp = Vector3.zero;
-                foreach (var h in Physics.RaycastAll(from, to, Radius * 8f))
-                    if (set.Contains(h.collider) && h.distance < best) { best = h.distance; bp = h.point; }
-                if (best < float.MaxValue) { rs[i] = Spin.InverseTransformPoint(bp).magnitude; hitCount++; }
-                else rs[i] = Radius;
-            }
-            root.localScale = savedScale;
-            foreach (var c in cols) Destroy(c);
-            if (hitCount < N / 2) return;
-            surfDirs = dirs; surfR = rs;
-        }
-
-        public float SurfaceRadius(Vector3 localDir)
-        {
-            if (surfR == null) return Radius;
-            localDir.Normalize();
-            float sum = 0f; int n = 0;
-            for (int i = 0; i < surfDirs.Length; i++)
-                if (Vector3.Dot(surfDirs[i], localDir) > 0.985f) { sum += surfR[i]; n++; }
-            if (n == 0)
-            {
-                float bd = -2f; int bi = 0;
-                for (int i = 0; i < surfDirs.Length; i++)
-                {
-                    float d = Vector3.Dot(surfDirs[i], localDir);
-                    if (d > bd) { bd = d; bi = i; }
-                }
-                return surfR[bi];
-            }
-            return sum / n;
-        }
-
-        // Rescales a hand-made model so its typical surface sits exactly at Radius, whatever its shape or import scale.
-        void NormalizeModel(Transform model, Transform center)
-        {
-            var dists = new List<float>();
-            foreach (var rr in solids)
-            {
-                var mf = rr.GetComponent<MeshFilter>();
-                if (mf == null) continue;
-                var m = mf.sharedMesh;
-                if (m == null || !m.isReadable) continue;
-                var vs = m.vertices;
-                int step = Mathf.Max(1, vs.Length / 1500);
-                for (int i = 0; i < vs.Length; i += step)
-                    dists.Add((mf.transform.TransformPoint(vs[i]) - center.position).magnitude);
-            }
-            if (dists.Count < 8) return;
-            dists.Sort();
-            float median = dists[dists.Count / 2];
-            if (median < 1e-4f) return;
-            float k = Radius / median;
-            model.localScale *= k;
-            model.position = center.position + (model.position - center.position) * k;
-        }
-
+        public float SurfaceRadius() { return Surface != null ? Surface.radius : Radius; }
         void StyleModel(Transform model, PlanetSO p, System.Random rng)
         {
             float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
             var mats = new List<Material>();
+            int layer = 0;
             foreach (var r in solids)
             {
+                // Stacked layers (land/ocean) alternate the palette so they read as different terrain.
+                bool alt = (layer++ % 2) == 1;
                 var mat = new Material(Fx.PlanetShader);
-                mat.SetColor("_BaseColor", p.primary);
-                mat.SetColor("_AltColor", p.secondary);
+                mat.SetColor("_BaseColor", alt ? Color.Lerp(p.secondary, p.primary, 0.35f) : p.primary);
+                mat.SetColor("_AltColor", alt ? p.secondary * 0.6f : p.secondary);
                 mat.SetColor("_RimColor", p.rim);
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
@@ -195,23 +76,12 @@ namespace Frontier
             core = sphere.transform;
             baseRim = p.rim;
             coreMat = null; modelMats = null;
-            var model = ModelLibrary.Spawn(p.id, core, Radius * 2f);
-            surfDirs = null; surfR = null;
+            var model = ModelLibrary.Spawn(p.id, core, Radius * 2f * 1.04f * (p.modelScale > 0f ? p.modelScale : 1f));
             if (model != null)
             {
-                FilterShells(model);
-                NormalizeModel(model, core);
+                solids.Clear();
+                solids.AddRange(model.GetComponentsInChildren<MeshRenderer>());
                 StyleModel(model, p, rng);
-                SampleSurface(model);
-                // Raycast fallback for non-readable meshes: rescale so the measured ground sits at Radius, then resample.
-                float med = SurfaceMedian();
-                if (surfR != null && Mathf.Abs(med - Radius) > 0.02f && med > 1e-3f)
-                {
-                    float k = Radius / med;
-                    model.localScale *= k;
-                    model.position = core.position + (model.position - core.position) * k;
-                    SampleSurface(model);
-                }
             }
             if (model == null)
             {
@@ -231,6 +101,11 @@ namespace Frontier
                 sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
             }
             usesModel = model != null;
+
+            var surfGo = new GameObject("Surface");
+            surfGo.transform.SetParent(Spin, false);
+            Surface = surfGo.AddComponent<SphereCollider>();
+            Surface.radius = p.surfaceRadius > 0.01f ? p.surfaceRadius : Radius;
 
             var atmo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(atmo.GetComponent<Collider>());
@@ -350,6 +225,14 @@ namespace Frontier
                 if (modelMats != null) foreach (var m in modelMats) if (m != null) m.SetColor("_RimColor", rim);
             }
             punchWas = punch > 0f;
+#if UNITY_EDITOR
+            // Live-edit: tweaking the Surface collider in Play mode saves the radius back to the planet asset.
+            if (Surface != null && Current != null && !Mathf.Approximately(Surface.radius, Current.surfaceRadius))
+            {
+                Current.surfaceRadius = Surface.radius;
+                UnityEditor.EditorUtility.SetDirty(Current);
+            }
+#endif
         }
     }
 }

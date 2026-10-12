@@ -38,28 +38,70 @@ namespace Frontier
             foreach (var e in lib.entries)
             {
                 if (e.key != key || e.prefab == null) continue;
-                var go = Instantiate(e.prefab, parent, false);
+                var go = InstantiateInert(e.prefab);
                 go.name = key + "_model";
-                foreach (var b in go.GetComponentsInChildren<MonoBehaviour>(true)) Destroy(b);
-                foreach (var c in go.GetComponentsInChildren<Collider>(true)) Destroy(c);
-
-                var rends = go.GetComponentsInChildren<Renderer>();
-                if (rends.Length == 0) { Destroy(go); return null; }
-                go.transform.localPosition = Vector3.zero;
-                go.transform.localRotation = Quaternion.identity;
+                // Fit in an unrotated, unparented pose so bounds are true (no rotated-AABB inflation).
+                go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 go.transform.localScale = Vector3.one;
-                var b2 = rends[0].bounds;
-                foreach (var r in rends) b2.Encapsulate(r.bounds);
-                float size = Mathf.Max(b2.size.x, Mathf.Max(b2.size.y, b2.size.z));
+                Bounds b;
+                if (!MeshBounds(go, out b)) { Destroy(go); return null; }
+                float size = Mathf.Max(b.size.x, Mathf.Max(b.size.y, b.size.z));
                 if (size < 1e-4f) size = 1f;
                 float s = diameter / size * (e.scale > 0f ? e.scale : 1f);
                 go.transform.localScale = Vector3.one * s;
-                var b3 = rends[0].bounds;
-                foreach (var r in rends) b3.Encapsulate(r.bounds);
-                go.transform.position += parent.position - b3.center;
+                go.transform.position = -b.center * s;
+                go.transform.SetParent(parent, false);
                 return go.transform;
             }
             return null;
+        }
+
+        public static GameObject Prefab(string key)
+        {
+            var lib = Instance;
+            if (lib == null || lib.entries == null) return null;
+            foreach (var e in lib.entries) if (e.key == key && e.prefab != null) return e.prefab;
+            return null;
+        }
+
+        /// <summary>Instantiates a prefab without running its scripts (spawned under an inactive parent), then strips it.</summary>
+        public static GameObject InstantiateInert(GameObject prefab)
+        {
+            var parking = new GameObject("Inert");
+            parking.SetActive(false);
+            var go = Instantiate(prefab, parking.transform, false);
+            Strip(go);
+            go.transform.SetParent(null, false);
+            DestroyImmediate(parking);
+            return go;
+        }
+
+        /// <summary>Removes gameplay scripts, colliders and baked particle effects from a spawned prefab.</summary>
+        public static void Strip(GameObject go)
+        {
+            foreach (var b in go.GetComponentsInChildren<MonoBehaviour>(true)) DestroyImmediate(b);
+            foreach (var c in go.GetComponentsInChildren<Collider>(true)) DestroyImmediate(c);
+            foreach (var p in go.GetComponentsInChildren<ParticleSystem>(true))
+            {
+                if (p.gameObject != go && p.transform.childCount == 0) { DestroyImmediate(p.gameObject); continue; }
+                var pr = p.GetComponent<ParticleSystemRenderer>();
+                if (pr != null) DestroyImmediate(pr);
+                if (p != null) DestroyImmediate(p);
+            }
+        }
+
+        /// <summary>Bounds of mesh renderers only, in world space.</summary>
+        public static bool MeshBounds(GameObject go, out Bounds b)
+        {
+            b = new Bounds();
+            bool any = false;
+            foreach (var r in go.GetComponentsInChildren<Renderer>())
+            {
+                if (!(r is MeshRenderer) && !(r is SkinnedMeshRenderer)) continue;
+                if (r is MeshRenderer) { var mf = r.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null) continue; }
+                if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+            }
+            return any;
         }
     }
 }

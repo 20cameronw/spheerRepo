@@ -12,7 +12,7 @@ namespace Frontier
     public class WorldSurface : MonoBehaviour
     {
         public const int SlotCount = 12;
-        const float OrbitRadius = 2.5f;
+        const float OrbitHeight = 1.0f;
 
         public event Action<PlacedStructure, Transform> StructureTapped;
         public event Action<int, Transform> SlotTapped;
@@ -25,6 +25,7 @@ namespace Frontier
         Camera cam;
         GameState gs;
         bool buildMode;
+        float placedRadius = -1f;
         Vector3[] dirs;
         readonly List<Item> items = new List<Item>();
         readonly List<Item> pads = new List<Item>();
@@ -154,7 +155,7 @@ namespace Frontier
             var go = new GameObject(name);
             go.transform.SetParent(view.Spin, false);
             Vector3 n = dirs[slot];
-            go.transform.localPosition = n * (view.SurfaceRadius(n) - 0.02f);
+            go.transform.localPosition = n * view.SurfaceRadius();
             go.transform.localRotation = Quaternion.FromToRotation(Vector3.up, n);
             var col = go.AddComponent<SphereCollider>();
             col.radius = 0.42f;
@@ -169,6 +170,7 @@ namespace Frontier
             Color c = s.def.color;
             var model = SpawnModel(s.def.modelKey, it.t, 0.75f);
             if (model == null) BuildFallbackStructure(it.t, s.def.kind, c);
+            if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
             it.glow = Fx.GlowQuad(it.t, new Color(c.r, c.g, c.b, 0.5f), 1.8f, new Vector3(0f, 0.3f, 0f)).transform;
             it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, UiKit.Ui(c), 1.0f, 0.34f, out it.labelRenderer);
             it.phase = s.slot * 0.4f;
@@ -184,11 +186,48 @@ namespace Frontier
             holder.transform.position = new Vector3(5000f, 5000f, 5000f);
             var m = ModelLibrary.Spawn(key, holder.transform, size);
             if (m == null) { Destroy(holder); return null; }
+            Bounds b;
+            float lift = ModelLibrary.MeshBounds(m.gameObject, out b) ? holder.transform.position.y - b.min.y : size * 0.5f;
             m.SetParent(parent, false);
-            m.localPosition = new Vector3(0f, size * 0.5f, 0f);
+            m.localPosition += new Vector3(0f, lift, 0f);
             m.localRotation = Quaternion.identity;
             Destroy(holder);
             return m;
+        }
+
+        // Small, subtle grit-and-spark plume at the drill's base (replaces the prefab's oversized effect).
+        static void DrillDust(Transform t, Color c)
+        {
+            var go = new GameObject("DrillDust");
+            go.transform.SetParent(t, false);
+            go.transform.localPosition = new Vector3(0f, 0.04f, 0f);
+            go.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            var ps = go.AddComponent<ParticleSystem>();
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = ps.main;
+            main.loop = true;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.35f, 0.7f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.25f, 0.6f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.02f, 0.055f);
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color(1.6f, 1.1f, 0.5f, 1f), new Color(c.r, c.g, c.b, 1f));
+            main.gravityModifier = 0.25f;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+            main.maxParticles = 40;
+            var em = ps.emission; em.rateOverTime = 14f;
+            var sh = ps.shape;
+            sh.shapeType = ParticleSystemShapeType.Cone;
+            sh.angle = 40f; sh.radius = 0.05f;
+            var col = ps.colorOverLifetime; col.enabled = true;
+            var g = new Gradient();
+            g.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+                      new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
+            col.color = g;
+            var sz = ps.sizeOverLifetime; sz.enabled = true;
+            sz.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 1f, 1f, 0.2f));
+            var r = go.GetComponent<ParticleSystemRenderer>();
+            r.sharedMaterial = Fx.AddMat(Color.white, Fx.Glow);
+            ps.Play();
         }
 
         static Material Lit(Color c, float emission = 0f)
@@ -271,6 +310,13 @@ namespace Frontier
         void Update()
         {
             if (view == null || view.Spin == null || cam == null) return;
+            float r = view.SurfaceRadius();
+            if (!Mathf.Approximately(r, placedRadius))
+            {
+                placedRadius = r;
+                foreach (var it in items) if (it.t != null && !it.orbit) it.t.localPosition = dirs[it.slot] * r;
+                foreach (var it in pads) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
+            }
             AnimateItems(items);
             AnimateItems(pads);
             HandleInput();
@@ -286,7 +332,7 @@ namespace Frontier
                     Vector3 n = dirs[it.slot];
                     Vector3 axis = Vector3.Cross(n, Vector3.up);
                     if (axis.sqrMagnitude < 0.01f) axis = Vector3.right;
-                    Vector3 pos = Quaternion.AngleAxis(Time.time * 18f + it.slot * 40f, axis.normalized) * n * OrbitRadius;
+                    Vector3 pos = Quaternion.AngleAxis(Time.time * 18f + it.slot * 40f, axis.normalized) * n * (view.SurfaceRadius() + OrbitHeight);
                     it.t.localPosition = pos;
                     it.t.localRotation = Quaternion.FromToRotation(Vector3.up, pos.normalized);
                 }

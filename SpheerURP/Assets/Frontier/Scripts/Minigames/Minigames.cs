@@ -523,8 +523,7 @@ namespace Frontier
         float t, pressure = 0.1f, vel, inBand, progress, sparkT, spinAngle;
         bool holding, inside;
         Transform rig, spin, hole, dust;
-        float frameW = 5.4f, frameH = 6.4f;
-        Material bitM;
+        float frameW = 5.4f, frameH = 7.8f;
 
         protected override string Title { get { return "BORE"; } }
         protected override string Hint { get { return "Hold to raise pressure. Keep it inside the band to sink the drill"; } }
@@ -581,10 +580,17 @@ namespace Frontier
 
             var btn = UiKit.Btn("HOLD", color, null, true);
             btn.style.minWidth = 420;
-            btn.RegisterCallback<PointerDownEvent>(e => { holding = true; btn.CapturePointer(e.pointerId); });
-            btn.RegisterCallback<PointerUpEvent>(e => { holding = false; if (btn.HasPointerCapture(e.pointerId)) btn.ReleasePointer(e.pointerId); });
-            btn.RegisterCallback<PointerCancelEvent>(e => holding = false);
+            // TrickleDown: the Button's own clickable stops pointer events before normal callbacks run.
+            HoldArea(btn);
+            HoldArea(arena);
             controls.Add(btn);
+        }
+
+        void HoldArea(VisualElement el)
+        {
+            el.RegisterCallback<PointerDownEvent>(e => { holding = true; el.CapturePointer(e.pointerId); }, TrickleDown.TrickleDown);
+            el.RegisterCallback<PointerUpEvent>(e => { holding = false; if (el.HasPointerCapture(e.pointerId)) el.ReleasePointer(e.pointerId); }, TrickleDown.TrickleDown);
+            el.RegisterCallback<PointerCancelEvent>(e => holding = false, TrickleDown.TrickleDown);
         }
 
         protected override void BuildScene()
@@ -605,28 +611,71 @@ namespace Frontier
             spin = new GameObject("Spin").transform;
             spin.SetParent(rig, false);
 
-            Color headC, rimC;
-            if (toolLevel <= 0) { headC = new Color(0.45f, 0.45f, 0.5f); rimC = new Color(0.5f, 0.6f, 0.7f) * 0.5f; }
-            else if (toolLevel == 1) { headC = new Color(0.7f, 0.74f, 0.8f); rimC = new Color(0.3f, 0.9f, 1.4f) * 0.7f; }
-            else { headC = new Color(0.12f, 0.3f, 0.4f); rimC = new Color(rawColor.r, rawColor.g, rawColor.b) * 2.4f; }
-            bitM = st.Lit(headC, rimC, 0f, 14f, 0f);
-            var bodyM = st.Lit(headC * 0.8f, rimC * 0.6f, 0f, 3f, 0f);
-            var glowM = st.Lit(headC * 0.6f, rimC * 1.4f, 0f, 3f, 0f);
-
-            st.AddMesh(MeshKit.Cyl(0.02f, 0.42f, 1.7f, 8), bitM, spin, Vector3.zero);
-            for (int i = 0; i < 3; i++)
-                st.Prim(PrimitiveType.Cube, spin, new Vector3(0f, 0.5f + i * 0.42f, 0f), new Vector3(0.5f + i * 0.2f, 0.07f, 0.07f), new Vector3(0f, i * 60f, 0f), glowM);
-            st.Prim(PrimitiveType.Cube, rig, new Vector3(0f, 2.0f, 0f), new Vector3(0.95f, 0.55f, 0.95f), Vector3.zero, bodyM);
-            st.Prim(PrimitiveType.Cylinder, rig, new Vector3(0f, 3.5f, 0f), new Vector3(0.2f, 1.5f, 0.2f), Vector3.zero, glowM);
+            Color rimC = toolLevel <= 0 ? new Color(0.5f, 0.6f, 0.7f) * 0.5f
+                       : toolLevel == 1 ? new Color(0.3f, 0.9f, 1.4f) * 0.7f
+                       : new Color(rawColor.r, rawColor.g, rawColor.b) * 2.4f;
+            if (!UseDrillPrefab(rimC)) BuildFallbackBit(rimC);
             rig.localPosition = new Vector3(0f, 1.8f, 0f);
         }
 
-        protected override void Frame(float aspect) { FramePose(frameW, frameH, 1.1f, aspect, 1.6f); }
+        // Uses the moving part ("PartsToMove": drill head + staff) of the real drill structure, tip at the rig origin.
+        bool UseDrillPrefab(Color rimC)
+        {
+            var prefab = ModelLibrary.Prefab("struct_drill");
+            if (prefab == null) return false;
+            var inst = ModelLibrary.InstantiateInert(prefab);
+            inst.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            inst.transform.localScale = Vector3.one;
+            var partsT = inst.transform.Find("PartsToMove");
+            if (partsT == null) { UnityEngine.Object.Destroy(inst); return false; }
+            var parts = partsT.gameObject;
+            Bounds b;
+            if (!ModelLibrary.MeshBounds(parts, out b)) { UnityEngine.Object.Destroy(inst); return false; }
+            Vector3 lp = partsT.localPosition; Quaternion lr = partsT.localRotation; Vector3 ls = partsT.localScale;
+
+            const float height = 3.2f;
+            float s = height / Mathf.Max(0.001f, b.size.y);
+            var holder = new GameObject("DrillBit").transform;
+            holder.SetParent(spin, false);
+            holder.localScale = Vector3.one * s;
+            parts.transform.SetParent(holder, false);
+            parts.transform.localRotation = lr; parts.transform.localScale = ls;
+            // Bounds were measured with the prefab at the origin, so they're already in holder space: tip to origin, centered on the axis.
+            parts.transform.localPosition = lp - new Vector3(b.center.x, b.min.y, b.center.z);
+            UnityEngine.Object.Destroy(inst);
+            foreach (var r in parts.GetComponentsInChildren<MeshRenderer>())
+            {
+                var src = r.sharedMaterial;
+                Color baseC = src != null && src.HasProperty("_BaseColor") ? src.GetColor("_BaseColor") : (src != null ? src.color : Color.gray);
+                var m = stage.Lit(baseC, rimC, 0f, 14f, 0f);
+                var arr = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
+                for (int i = 0; i < arr.Length; i++) arr[i] = m;
+                r.sharedMaterials = arr;
+            }
+            return true;
+        }
+
+        void BuildFallbackBit(Color rimC)
+        {
+            var st = stage;
+            Color headC = new Color(0.7f, 0.74f, 0.8f);
+            var bitM = st.Lit(headC, rimC, 0f, 14f, 0f);
+            var glowM = st.Lit(headC * 0.6f, rimC * 1.4f, 0f, 3f, 0f);
+            st.AddMesh(MeshKit.Cyl(0.02f, 0.42f, 1.7f, 8), bitM, spin, Vector3.zero);
+            for (int i = 0; i < 3; i++)
+                st.Prim(PrimitiveType.Cube, spin, new Vector3(0f, 0.5f + i * 0.42f, 0f), new Vector3(0.5f + i * 0.2f, 0.07f, 0.07f), new Vector3(0f, i * 60f, 0f), glowM);
+            st.Prim(PrimitiveType.Cylinder, spin, new Vector3(0f, 2.6f, 0f), new Vector3(0.2f, 1.0f, 0.2f), Vector3.zero, glowM);
+        }
+
+        protected override void Frame(float aspect) { FramePose(frameW, frameH, 1.7f, aspect, 1.6f); }
 
         protected override void Tick(float dt)
         {
             t += dt;
-            float target = holding ? 0.7f : -0.8f;
+            // Safety net in case a pointer-up is swallowed elsewhere; Space also works as hold.
+            if (holding && !Input.GetMouseButton(0) && Input.touchCount == 0) holding = false;
+            bool press = holding || Input.GetKey(KeyCode.Space);
+            float target = press ? 0.7f : -0.8f;
             vel = Mathf.Lerp(vel, target, 5f * dt);
             pressure = Mathf.Clamp01(pressure + vel * dt);
             if (pressure <= 0f || pressure >= 1f) vel = 0f;
@@ -648,16 +697,16 @@ namespace Frontier
 
             float k = Mathf.Clamp01(progress);
             float tipY = Mathf.Lerp(1.8f, -1.0f, k);
-            float shakeAmt = (holding ? 0.02f + 0.03f * pressure : 0f) * (inside ? 0.6f : 1.6f);
+            float shakeAmt = (press ? 0.02f + 0.03f * pressure : 0f) * (inside ? 0.6f : 1.6f);
             rig.localPosition = new Vector3(UnityEngine.Random.Range(-1f, 1f) * shakeAmt, tipY, UnityEngine.Random.Range(-1f, 1f) * shakeAmt);
-            spinAngle += dt * (holding ? 300f + 900f * pressure : 80f) * (inside ? 1f : 0.5f);
+            spinAngle += dt * (press ? 300f + 900f * pressure : 80f) * (inside ? 1f : 0.5f);
             spin.localRotation = Quaternion.Euler(0f, spinAngle, 0f);
             float hs = 0.2f + 0.8f * k;
             hole.localScale = new Vector3(hs, 1f, hs);
-            dust.localScale = Vector3.one * (inside && holding ? 2.6f + Mathf.Sin(t * 30f) * 0.3f : 0.001f);
+            dust.localScale = Vector3.one * (inside && press ? 2.6f + Mathf.Sin(t * 30f) * 0.3f : 0.001f);
 
             sparkT -= dt;
-            if (sparkT <= 0f && holding && tipY < 1.0f)
+            if (sparkT <= 0f && press && tipY < 1.0f)
             {
                 Vector3 p = stage.root.TransformPoint(new Vector3(0f, 0.1f, -0.25f));
                 if (inside) { Fx.Burst(p, new Color(2f, 1.5f, 0.5f), 7, 3.2f, 0.12f); stage.Shake(0.05f); }
