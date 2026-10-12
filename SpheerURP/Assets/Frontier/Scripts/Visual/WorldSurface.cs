@@ -19,6 +19,8 @@ namespace Frontier
 
         public Func<Vector2, bool> IsOverUi;
         public bool Locked;
+        /// <summary>The currently selected structure anchor (gets a stronger pulse).</summary>
+        public Transform Selected;
         public bool BuildMode { get { return buildMode; } set { if (buildMode != value) { buildMode = value; RebuildPads(); } } }
 
         PlanetView view;
@@ -306,6 +308,36 @@ namespace Frontier
             return Vector3.Dot((worldPos - c).normalized, (cam.transform.position - c).normalized) > 0.18f;
         }
 
+        /// <summary>True when the point is on screen and not hidden behind the planet body.</summary>
+        public bool Visible(Vector3 worldPos)
+        {
+            Vector3 vp = cam.WorldToViewportPoint(worldPos);
+            if (vp.z <= 0f || vp.x < -0.02f || vp.x > 1.02f || vp.y < -0.02f || vp.y > 1.02f) return false;
+            Vector3 o = cam.transform.position;
+            Vector3 d = worldPos - o;
+            float dist = d.magnitude;
+            if (dist < 0.0001f) return true;
+            d /= dist;
+            Vector3 c = view.Spin.position;
+            float r = view.SurfaceRadius() * 0.97f;
+            Vector3 oc = o - c;
+            float b = Vector3.Dot(oc, d);
+            float disc = b * b - (oc.sqrMagnitude - r * r);
+            if (disc <= 0f) return true;
+            float tHit = -b - Mathf.Sqrt(disc);
+            return tHit <= 0f || tHit >= dist - 0.02f;
+        }
+
+        Vector3 ProbePoint(Item it)
+        {
+            return it.t.position + it.t.up * 0.3f;
+        }
+
+        public bool AnchorVisible(Transform t)
+        {
+            return t != null && Visible(t.position + t.up * 0.3f);
+        }
+
         void Update()
         {
             if (view == null || view.Spin == null || cam == null) return;
@@ -335,7 +367,8 @@ namespace Frontier
                     it.t.localPosition = pos;
                     it.t.localRotation = Quaternion.FromToRotation(Vector3.up, pos.normalized);
                 }
-                bool facing = Facing(it.t.position);
+                bool facing = Visible(ProbePoint(it));
+                bool selected = Selected != null && Selected == it.t;
                 float bob = 0.04f * Mathf.Sin(Time.time * 2.2f + it.phase);
                 if (it.label != null)
                 {
@@ -344,7 +377,7 @@ namespace Frontier
                 }
                 if (it.glow != null)
                 {
-                    float k = 1f + 0.12f * Mathf.Sin(Time.time * 3f + it.phase);
+                    float k = selected ? 1.35f + 0.25f * Mathf.Sin(Time.time * 6f) : 1f + 0.12f * Mathf.Sin(Time.time * 3f + it.phase);
                     it.glow.localScale = Vector3.one * (it.structure != null ? 1.8f : 1.6f) * k;
                     it.glow.gameObject.SetActive(facing);
                 }
@@ -364,7 +397,7 @@ namespace Frontier
             }
             else if (down && Input.GetMouseButton(0) && !blocked)
             {
-                if (!dragging && (pos - downPos).magnitude > 20f) { dragging = true; view.BeginDrag(); lastPos = pos; lastTime = Time.unscaledTime; }
+                if (!dragging && !view.Frozen && (pos - downPos).magnitude > 20f) { dragging = true; view.BeginDrag(); lastPos = pos; lastTime = Time.unscaledTime; }
                 if (dragging)
                 {
                     float dt = Mathf.Max(0.001f, Time.unscaledTime - lastTime);
@@ -377,7 +410,7 @@ namespace Frontier
                 down = false;
                 if (blocked) return;
                 if (dragging) view.EndDrag();
-                else Pick(pos);
+                else if ((pos - downPos).magnitude <= 40f) Pick(pos);
             }
         }
 
@@ -388,16 +421,31 @@ namespace Frontier
             Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
             foreach (var h in hits)
             {
-                if (!Facing(h.transform.position)) continue;
-                foreach (var it in pads) if (it.t == h.transform) { Sfx.Click(); if (SlotTapped != null) SlotTapped(it.slot, it.t); return; }
-                foreach (var it in items)
-                {
-                    if (it.t != h.transform) continue;
-                    Sfx.Click();
-                    if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
-                    return;
-                }
+                foreach (var it in pads) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
+                foreach (var it in items) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
             }
+
+            // Generous screen-space fallback: anything visible near the tap counts.
+            float best = 95f * Mathf.Max(0.6f, Screen.height / 1080f);
+            Item pick = null;
+            foreach (var list in new[] { items, pads })
+                foreach (var it in list)
+                {
+                    if (it.t == null) continue;
+                    Vector3 p = ProbePoint(it);
+                    if (!Visible(p)) continue;
+                    Vector3 sp = cam.WorldToScreenPoint(p);
+                    float d = (new Vector2(sp.x, sp.y) - screen).magnitude;
+                    if (d < best) { best = d; pick = it; }
+                }
+            if (pick != null) Tap(pick);
+        }
+
+        void Tap(Item it)
+        {
+            Sfx.Click();
+            if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
+            else if (SlotTapped != null) SlotTapped(it.slot, it.t);
         }
     }
 }

@@ -19,6 +19,8 @@ namespace Frontier
         public event System.Action<PlanetSO> Rebuilt;
         float punch;
         public bool IdleSpin = true;
+        /// <summary>Holds the planet completely still (used while a structure is selected).</summary>
+        public bool Frozen;
         float appear = 1f;
         GameObject glow;
         Color baseRim;
@@ -209,7 +211,8 @@ namespace Frontier
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
             float pulse = 1f + Mathf.Sin(Time.time * 1.6f) * 0.012f + punch * 0.08f;
             core.localScale = Vector3.one * (usesModel ? 1f : Radius * 2f) * pulse;
-            if (!grabbed)
+            if (Frozen) { angVel = Vector3.zero; }
+            else if (!grabbed)
             {
                 Vector3 def = IdleSpin ? DefaultVel() : Vector3.zero;
                 if (Time.time >= returnAt) angVel = Vector3.Lerp(angVel, def, 1f - Mathf.Exp(-1.6f * Time.deltaTime));

@@ -158,11 +158,29 @@
 .fr-popup {
     position: absolute;
     flex-direction: column;
-    min-width: 330px; max-width: 640px;
-    padding: 14px 18px 16px 18px;
-    border-radius: 26px; border-width: 3px;
-    background-color: rgba(4, 7, 24, 0.94);
+    min-width: 480px; max-width: 780px; max-height: 78%;
+    padding: 20px 24px 22px 24px;
+    border-radius: 30px; border-width: 3px;
+    background-color: rgba(4, 7, 24, 0.96);
 }
+.fr-popup-scroll { flex-shrink: 1; }
+.fr-popup-close { position: absolute; top: 14px; right: 14px; }
+.fr-popup-head { padding-right: 70px; margin-bottom: 8px; }
+.fr-popup .fr-tiny { font-size: 24px; }
+.fr-popup .fr-small { font-size: 28px; }
+.fr-popup .fr-h2 { font-size: 34px; }
+.fr-popup .fr-btn { font-size: 28px; padding: 14px 26px; }
+.fr-popup .fr-itemchip { padding: 6px 16px 6px 8px; margin: 4px 10px 4px 0; border-radius: 20px; }
+.fr-popup .fr-itemchip .fr-icon { width: 40px; height: 40px; margin-right: 8px; }
+.fr-popup-section {
+    font-size: 22px; letter-spacing: 2px; margin-top: 14px; margin-bottom: 6px;
+    color: rgba(140, 220, 255, 0.85);
+}
+.fr-popup-line {
+    margin-top: 8px; padding: 10px 14px;
+    border-radius: 18px; background-color: rgba(255, 255, 255, 0.05);
+}
+.fr-recipe { margin-top: 10px; margin-bottom: 0; }
 .fr-stepper { flex-direction: row; align-items: center; justify-content: center; margin: 6px 0; }
 .fr-stepper-val { font-size: 40px; min-width: 90px; -unity-text-align: middle-center; }
 

@@ -12,7 +12,6 @@ namespace Frontier
         string popupKey;
         Action<VisualElement> popupBuild;
         Color popupColor;
-        float popupOpenedAt;
 
         StructureSO buildDef;
         VisualElement banner;
@@ -28,35 +27,48 @@ namespace Frontier
             UiKit.Border(popup, UiKit.Ui(accent, 0.9f), 3f);
             popup.style.opacity = 0f;
             popupLayer.Add(popup);
-            popupOpenedAt = Time.unscaledTime;
-            build(popup);
+            BuildPopupBody();
+            // Selecting a structure holds the world still until it's tapped again (or closed).
+            planetView.Frozen = true;
+            world.Selected = anchor;
             Sfx.Click();
+        }
+
+        void BuildPopupBody()
+        {
+            var scroll = new ScrollView(ScrollViewMode.Vertical);
+            scroll.AddToClassList("fr-popup-scroll");
+            popup.Add(scroll);
+            popupBuild(scroll.contentContainer);
+            popup.Add(PopupClose());
+        }
+
+        VisualElement PopupClose()
+        {
+            var x = Icons.IconButton("close", UiKit.Red, ClosePopup, 60f, true);
+            x.AddToClassList("fr-popup-close");
+            return x;
         }
 
         void ClosePopup()
         {
             if (popup != null) popup.RemoveFromHierarchy();
             popup = null; popupAnchor = null; popupBuild = null; popupKey = null;
+            if (planetView != null) planetView.Frozen = false;
+            if (world != null) world.Selected = null;
         }
 
         void RefreshPopup()
         {
             if (popup == null || popupBuild == null) return;
             popup.Clear();
-            popupBuild(popup);
+            BuildPopupBody();
         }
 
         void UpdatePopupPosition()
         {
             if (popup == null) return;
-            if (popupAnchor == null || !world.Facing(popupAnchor.position)) { ClosePopup(); return; }
-
-            // A press outside the popup dismisses it; a new tap on a node then reopens one on release.
-            if (Input.GetMouseButtonDown(0) && Time.unscaledTime - popupOpenedAt > 0.15f && !IsOverUi(Input.mousePosition))
-            {
-                ClosePopup();
-                return;
-            }
+            if (popupAnchor == null) { ClosePopup(); return; }
 
             float w = popup.resolvedStyle.width, h = popup.resolvedStyle.height;
             if (float.IsNaN(w) || float.IsNaN(h) || w < 1f) return;
@@ -75,6 +87,8 @@ namespace Frontier
         void OnStructureTapped(PlacedStructure s, Transform t)
         {
             if (busy || defense.Active) return;
+            // Tapping the selected structure again releases it.
+            if (popup != null && popupAnchor == t) { ClosePopup(); return; }
             CloseModal();
             var k = s.def.kind;
             if (k == StructureKind.Refinery || k == StructureKind.Fabricator) OpenRefinery(s, t);
@@ -84,18 +98,31 @@ namespace Frontier
             else OpenSimple(s, t, "UPLINK COMING SOON", "Satellites will unlock orbital abilities in a future update.");
         }
 
-        void StructureHeader(VisualElement body, PlacedStructure s, Color c)
+        void StructureHeader(VisualElement body, PlacedStructure s, Color c, string subtitle = null)
         {
             var head = UiKit.Div("fr-row");
-            head.Add(Icons.Make(StructureIcon(s.def.kind), c, 48f));
-            head.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level, "fr-h2", c));
+            head.AddToClassList("fr-popup-head");
+            head.Add(Icons.Make(StructureIcon(s.def.kind), c, 60f));
+            var col = UiKit.Div();
+            col.style.flexShrink = 1;
+            col.style.marginLeft = 10;
+            col.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level, "fr-h2", c));
+            if (!string.IsNullOrEmpty(subtitle)) col.Add(UiKit.Text(subtitle, "fr-tiny"));
+            head.Add(col);
             body.Add(head);
+        }
+
+        static VisualElement SectionLabel(string text)
+        {
+            var l = UiKit.Text(text, "fr-popup-section");
+            return l;
         }
 
         void UpgradeButton(VisualElement body, PlacedStructure s, Color c)
         {
-            if (s.level >= s.def.maxLevel) { body.Add(UiKit.Text("MAXED", "fr-small", UiKit.Lime)); return; }
+            if (s.level >= s.def.maxLevel) { body.Add(UiKit.Text("MAX LEVEL", "fr-small", UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
+            body.Add(SectionLabel("UPGRADE TO LV " + (s.level + 1) + "  (" + StructureEffect(s.def, s.level + 1) + ")"));
             body.Add(UiKit.CostRow(cost, gs, true));
             var up = IconBtn("UPGRADE", "up", c, () =>
             {
@@ -111,8 +138,7 @@ namespace Frontier
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("simple" + s.slot, t, c, body =>
             {
-                StructureHeader(body, s, c);
-                body.Add(UiKit.Text(title, "fr-small", c));
+                StructureHeader(body, s, c, title);
                 body.Add(UiKit.Text(text, "fr-tiny"));
             });
         }
@@ -122,9 +148,8 @@ namespace Frontier
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("turret" + s.slot, t, c, body =>
             {
-                StructureHeader(body, s, c);
-                body.Add(UiKit.Text("Fires automatically during waves", "fr-tiny"));
-                body.Add(UiKit.Text("DMG " + gs.TurretPower(s).ToString("0.#") + "   RANGE " + s.def.range.ToString("0"), "fr-small"));
+                StructureHeader(body, s, c, "Fires automatically during waves");
+                body.Add(UiKit.Text("DAMAGE " + gs.TurretPower(s).ToString("0.#") + "     RANGE " + s.def.range.ToString("0"), "fr-small"));
                 UpgradeButton(body, s, c);
             });
         }
@@ -135,58 +160,88 @@ namespace Frontier
             var game = s.def.kind.Game();
             OpenPopup("gather" + s.slot, t, c, body =>
             {
-                StructureHeader(body, s, c);
-                body.Add(UiKit.Text(gs.ToolName(game) + "  LV " + gs.ToolLevel(game) + "  DMG x" + gs.ToolDamage(game).ToString("0.0"), "fr-tiny"));
+                StructureHeader(body, s, c, "Tool: " + gs.ToolName(game) + "  (LV " + gs.ToolLevel(game) + ", damage x" + gs.ToolDamage(game).ToString("0.0") + ")");
                 float bonus = gs.StructureBonus(s);
-                foreach (var spot in gs.SpotsFor(gs.planet, game))
+                var spots = gs.SpotsFor(gs.planet, game);
+                body.Add(SectionLabel(spots.Count > 0 ? "GATHER ON THIS PLANET" : "NOTHING TO GATHER HERE"));
+                string verb = game == MinigameKind.Drill ? "DRILL" : game == MinigameKind.Chop ? "CHOP" : "MINE";
+                foreach (var spot in spots)
                 {
                     var sp = spot;
                     Color rc = UiKit.Ui(sp.resource.color);
                     var row = UiKit.Div("fr-row");
-                    row.style.marginTop = 6;
+                    row.AddToClassList("fr-popup-line");
                     int est = Mathf.Max(1, Mathf.RoundToInt(sp.baseYield * gs.ToolMultiplier(game) * (1f + bonus)));
-                    row.Add(ResourceIconChip(sp.resource, "~" + est));
+                    row.Add(Icons.Make(Icons.ForResource(sp.resource), rc, 48f));
+                    var txt = UiKit.Div(); txt.style.marginLeft = 10; txt.style.flexShrink = 1;
+                    txt.Add(UiKit.Text(sp.resource.displayName, "fr-small", rc));
+                    txt.Add(UiKit.Text("about " + est + " per run", "fr-tiny"));
+                    row.Add(txt);
                     row.Add(UiKit.Div("fr-spacer"));
-                    row.Add(IconBtn("START", "play", rc, () => { ClosePopup(); StartGather(sp, t, bonus); }));
+                    var go = IconBtn(verb, "play", rc, () => { ClosePopup(); StartGather(sp, t, bonus); });
+                    go.style.marginTop = 0;
+                    row.Add(go);
                     body.Add(row);
                 }
                 UpgradeButton(body, s, c);
             });
         }
 
+        int MaxCrafts(RecipeSO r)
+        {
+            int n = 999;
+            foreach (var i in r.inputs)
+                if (i.resource != null && i.amount > 0) n = Mathf.Min(n, gs.Count(i.resource) / i.amount);
+            return n == 999 ? 0 : n;
+        }
+
         void OpenRefinery(PlacedStructure s, Transform t)
         {
             Color c = UiKit.Ui(s.def.color);
-            OpenPopup("station" + s.def.kind, t, c, body =>
+            OpenPopup("station" + s.slot, t, c, body =>
             {
-                var head = UiKit.Div("fr-row");
-                head.Add(Icons.Make(StructureIcon(s.def.kind), c, 48f));
-                head.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level, "fr-h2", c));
-                body.Add(head);
-                float bonus = gs.StructureBonus(s);
                 bool fab = s.def.kind == StructureKind.Fabricator;
+                StructureHeader(body, s, c, fab ? "Combine materials into advanced parts" : "Convert resources into fuel and other materials");
+                float bonus = gs.StructureBonus(s);
+                body.Add(SectionLabel("RECIPES  -  you give  >  you get"));
                 foreach (var rec in gs.db.recipes)
                 {
                     if (rec.fabricator != fab) continue;
                     var r = rec;
+                    int can = MaxCrafts(r);
                     var card = Card(c);
-                    card.style.marginTop = 8; card.style.marginBottom = 0;
+                    card.AddToClassList("fr-recipe");
+                    if (can <= 0) card.style.opacity = 0.7f;
+
                     var line = UiKit.Div("fr-row-wrap");
                     foreach (var i in r.inputs)
-                        if (i.resource != null) line.Add(ResourceIconChip(i.resource, gs.Count(i.resource) + "/" + i.amount, gs.Count(i.resource) < i.amount));
-                    line.Add(Icons.Make("play", c, 30f));
+                        if (i.resource != null) line.Add(ResourceIconChip(i.resource, i.amount + " " + i.resource.displayName, gs.Count(i.resource) < i.amount));
+                    line.Add(Icons.Make("play", c, 40f));
                     foreach (var o in r.outputs)
-                        if (o.resource != null) line.Add(ResourceIconChip(o.resource, gs.OutputAmount(o, bonus).ToString()));
+                        if (o.resource != null) line.Add(ResourceIconChip(o.resource, gs.OutputAmount(o, bonus) + " " + o.resource.displayName));
                     card.Add(line);
+
+                    var have = UiKit.Div("fr-row-wrap");
+                    var haveText = new System.Text.StringBuilder("You have: ");
+                    bool first = true;
+                    foreach (var i in r.inputs)
+                    {
+                        if (i.resource == null) continue;
+                        if (!first) haveText.Append(",  ");
+                        haveText.Append(gs.Count(i.resource)).Append(' ').Append(i.resource.displayName);
+                        first = false;
+                    }
+                    have.Add(UiKit.Text(haveText.ToString(), "fr-tiny"));
+                    card.Add(have);
+
                     var btns = UiKit.Div("fr-row");
                     btns.style.justifyContent = Justify.FlexEnd;
-                    bool can = gs.Has(r.inputs);
-                    var one = UiKit.Btn("x1", c, () => Craft(r, bonus, 1));
-                    one.AddToClassList("fr-btn-mini");
-                    UiKit.SetEnabledLook(one, can);
-                    var max = UiKit.Btn("MAX", c, () => Craft(r, bonus, 100));
-                    max.AddToClassList("fr-btn-mini");
-                    UiKit.SetEnabledLook(max, can);
+                    btns.style.marginTop = 6;
+                    var one = UiKit.Btn("MAKE 1", c, () => Craft(r, bonus, 1));
+                    UiKit.SetEnabledLook(one, can > 0);
+                    var max = UiKit.Btn(can > 1 ? "MAKE ALL (" + can + ")" : "MAKE ALL", c, () => Craft(r, bonus, 100));
+                    max.style.marginLeft = 12;
+                    UiKit.SetEnabledLook(max, can > 1);
                     btns.Add(one); btns.Add(max);
                     card.Add(btns);
                     body.Add(card);

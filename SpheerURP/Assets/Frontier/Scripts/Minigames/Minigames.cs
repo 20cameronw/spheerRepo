@@ -520,13 +520,15 @@ namespace Frontier
     public class DrillGame : Minigame
     {
         VisualElement gauge, band, needle, progFill;
-        float t, pressure = 0.1f, vel, inBand, progress, sparkT, spinAngle;
-        bool holding, inside;
-        Transform rig, spin, hole, dust;
+        float t, pressure = 0.1f, vel, inBand, progress, sparkT, chunkT, spinAngle, tipY, impact;
+        bool holding, inside, contact;
+        Transform rig, spin, ore, oreGlow, dust;
+        Material oreMat;
+        Mesh chunkMesh;
         float frameW = 5.4f, frameH = 7.8f;
 
         protected override string Title { get { return "BORE"; } }
-        protected override string Hint { get { return "Hold to raise pressure. Keep it inside the band to sink the drill"; } }
+        protected override string Hint { get { return "Press to drive the drill into the ore. Keep the pressure needle inside the green band"; } }
         protected override Color StageBg { get { return new Color(color.r * 0.04f + 0.01f, color.g * 0.04f + 0.012f, color.b * 0.05f + 0.025f); } }
 
         protected override void Build()
@@ -601,10 +603,17 @@ namespace Frontier
 
             var groundM = st.Lit(new Color(0.18f + color.r * 0.2f, 0.18f + color.g * 0.2f, 0.2f + color.b * 0.2f), rim, 2f, 3f, 0f);
             st.AddMesh(MeshKit.Cyl(2.8f, 2.6f, 0.9f, 22), groundM, st.root, new Vector3(0f, -0.9f, 0f));
-            var holeM = st.Lit(new Color(0.01f, 0.01f, 0.015f), Color.black, 0f, 2f, 0f);
-            hole = st.AddMesh(MeshKit.Cyl(0.6f, 0.6f, 0.02f, 16), holeM, st.root, new Vector3(0f, 0.012f, 0f)).transform;
-            hole.localScale = new Vector3(0.2f, 1f, 0.2f);
-            dust = st.GlowQuad(st.root, new Color(1.4f, 1.0f, 0.4f, 0.5f), 2.4f, new Vector3(0f, 0.15f, -0.4f));
+
+            // The ore node the drill bites into: shrinks and cracks as you work it.
+            float seed = UnityEngine.Random.value * 50f;
+            oreMat = st.Lit(new Color(0.2f + color.r * 0.25f, 0.2f + color.g * 0.25f, 0.22f + color.b * 0.25f), rim * 1.3f, 3f, 3.5f, 0f, seed);
+            ore = st.AddMesh(MeshKit.Ico(2, d => OreR * (0.82f + 0.3f * Mathf.PerlinNoise(d.x * 1.7f + seed, d.y * 1.7f + d.z * 1.3f)) * (d.y < -0.2f ? 0.85f : 1f)),
+                oreMat, st.root, new Vector3(0f, OreCenter, 0f)).transform;
+            ore.localScale = new Vector3(1.15f, 0.9f, 1.15f);
+            oreGlow = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.5f), 2.6f, new Vector3(0f, OreCenter, 0.6f));
+            chunkMesh = st.Own(MeshKit.Ico(0, d => 0.5f));
+
+            dust = st.GlowQuad(st.root, new Color(1.4f, 1.0f, 0.4f, 0.6f), 1.6f, new Vector3(0f, OreTop(), -0.6f));
 
             rig = new GameObject("Rig").transform;
             rig.SetParent(st.root, false);
@@ -615,8 +624,13 @@ namespace Frontier
                        : toolLevel == 1 ? new Color(0.3f, 0.9f, 1.4f) * 0.7f
                        : new Color(rawColor.r, rawColor.g, rawColor.b) * 2.4f;
             if (!UseDrillPrefab(rimC)) BuildFallbackBit(rimC);
-            rig.localPosition = new Vector3(0f, 1.8f, 0f);
+            tipY = OreTop() + Lift;
+            rig.localPosition = new Vector3(0f, tipY, 0f);
         }
+
+        const float OreR = 0.95f, OreCenter = 0.2f, Lift = 1.5f;
+        float OreScale { get { return Mathf.Lerp(1f, 0.45f, Mathf.Clamp01(progress)); } }
+        float OreTop() { return OreCenter + OreR * 0.9f * OreScale; }
 
         // Uses the moving part ("PartsToMove": drill head + staff) of the real drill structure, tip at the rig origin.
         bool UseDrillPrefab(Color rimC)
@@ -667,7 +681,7 @@ namespace Frontier
             st.Prim(PrimitiveType.Cylinder, spin, new Vector3(0f, 2.6f, 0f), new Vector3(0.2f, 1.0f, 0.2f), Vector3.zero, glowM);
         }
 
-        protected override void Frame(float aspect) { FramePose(frameW, frameH, 1.7f, aspect, 1.6f); }
+        protected override void Frame(float aspect) { FramePose(frameW, frameH, 2.0f, aspect, 1.6f); }
 
         protected override void Tick(float dt)
         {
@@ -683,45 +697,82 @@ namespace Frontier
             float center = 0.5f + 0.3f * Mathf.Sin(t * (0.6f + difficulty)) + 0.08f * Mathf.Sin(t * 2.1f);
             float half = Mathf.Lerp(0.16f, 0.07f, difficulty) * tolerance;
             inside = Mathf.Abs(pressure - center) <= half;
-            if (inside)
-            {
-                inBand += dt;
-                progress += dt * 0.075f * toolDamage / (0.6f + difficulty);
-            }
-
             band.style.bottom = Length.Percent((center - half) * 100f);
             band.style.height = Length.Percent(half * 2f * 100f);
             needle.style.bottom = Length.Percent(pressure * 100f);
             needle.style.backgroundColor = inside ? Color.white : new Color(1f, 0.4f, 0.4f);
+
+            // Pressing slams the bit down onto the ore; releasing lets it spring back up.
+            float top = OreTop();
+            float goalY = press ? top - 0.08f : top + Lift;
+            tipY = Mathf.Lerp(tipY, goalY, 1f - Mathf.Exp(-(press ? 22f : 7f) * dt));
+            bool wasContact = contact;
+            contact = press && tipY <= top + 0.04f;
+
+            if (contact && !wasContact)
+            {
+                Vector3 hitP = stage.root.TransformPoint(new Vector3(0f, top, -0.3f));
+                Fx.Burst(hitP, inside ? new Color(2.2f, 1.6f, 0.5f) : new Color(1.8f, 0.4f, 0.3f), 18, 4.5f, 0.16f);
+                stage.Shake(0.28f);
+                impact = 1f;
+                Chunks(4, 0.14f, 3.2f);
+                Sfx.Play(inside ? 150f : 110f, 0.09f, 0.35f, -60f);
+            }
+
+            if (contact && inside)
+            {
+                inBand += dt;
+                progress += dt * 0.11f * toolDamage / (0.6f + difficulty);
+            }
             progFill.style.height = Length.Percent(Mathf.Clamp01(progress) * 100f);
 
-            float k = Mathf.Clamp01(progress);
-            float tipY = Mathf.Lerp(1.8f, -1.0f, k);
-            float shakeAmt = (press ? 0.02f + 0.03f * pressure : 0f) * (inside ? 0.6f : 1.6f);
-            rig.localPosition = new Vector3(UnityEngine.Random.Range(-1f, 1f) * shakeAmt, tipY, UnityEngine.Random.Range(-1f, 1f) * shakeAmt);
-            spinAngle += dt * (press ? 300f + 900f * pressure : 80f) * (inside ? 1f : 0.5f);
+            impact = Mathf.MoveTowards(impact, 0f, dt * 5f);
+            float shakeAmt = contact ? (inside ? 0.035f : 0.07f) + impact * 0.06f : 0f;
+            if (contact) stage.Shake(inside ? 0.05f : 0.09f);
+            rig.localPosition = new Vector3(UnityEngine.Random.Range(-1f, 1f) * shakeAmt, Mathf.Max(tipY, top - 0.12f), UnityEngine.Random.Range(-1f, 1f) * shakeAmt);
+            spinAngle += dt * (press ? 500f + 900f * pressure : 90f) * (contact ? 1.4f : 1f);
             spin.localRotation = Quaternion.Euler(0f, spinAngle, 0f);
-            float hs = 0.2f + 0.8f * k;
-            hole.localScale = new Vector3(hs, 1f, hs);
-            dust.localScale = Vector3.one * (inside && press ? 2.6f + Mathf.Sin(t * 30f) * 0.3f : 0.001f);
+
+            float os = OreScale;
+            float jig = contact ? 0.025f + impact * 0.05f : impact * 0.03f;
+            ore.localScale = new Vector3(1.15f, 0.9f, 1.15f) * os * (1f - impact * 0.06f);
+            ore.localPosition = new Vector3(UnityEngine.Random.Range(-1f, 1f) * jig, OreCenter - (1f - os) * 0.35f, UnityEngine.Random.Range(-1f, 1f) * jig);
+            oreGlow.localScale = Vector3.one * (2.2f + Mathf.Clamp01(progress) * 1.6f + (contact && inside ? Mathf.Sin(t * 40f) * 0.3f : 0f)) * os;
+            dust.localPosition = new Vector3(0f, top, -0.6f);
+            dust.localScale = Vector3.one * (contact ? (inside ? 2.2f : 1.4f) + Mathf.Sin(t * 30f) * 0.3f + impact : 0.001f);
 
             sparkT -= dt;
-            if (sparkT <= 0f && press && tipY < 1.0f)
+            if (sparkT <= 0f && contact)
             {
-                Vector3 p = stage.root.TransformPoint(new Vector3(0f, 0.1f, -0.25f));
-                if (inside) { Fx.Burst(p, new Color(2f, 1.5f, 0.5f), 7, 3.2f, 0.12f); stage.Shake(0.05f); }
-                else Fx.Burst(p, new Color(1.6f, 0.3f, 0.3f), 5, 1.8f, 0.14f);
-                sparkT = 0.07f;
+                Vector3 p = stage.root.TransformPoint(new Vector3(UnityEngine.Random.Range(-0.15f, 0.15f), top + 0.05f, -0.3f));
+                if (inside) Fx.Burst(p, new Color(2f, 1.5f, 0.5f), 8, 3.4f, 0.12f);
+                else Fx.Burst(p, new Color(1.6f, 0.3f, 0.3f), 6, 2.2f, 0.14f);
+                sparkT = 0.06f;
+            }
+            chunkT -= dt;
+            if (chunkT <= 0f && contact && inside)
+            {
+                Chunks(2, 0.1f, 2.6f);
+                chunkT = 0.22f;
             }
 
             if (progress >= 1f)
             {
                 Sfx.Good();
                 stage.Shake(0.6f);
-                Fx.Burst(stage.root.TransformPoint(new Vector3(0f, 0.2f, -0.2f)), new Color(rawColor.r, rawColor.g, rawColor.b) * 1.8f, 40, 6f, 0.24f);
+                Chunks(16, 0.2f, 5f);
+                Fx.Burst(stage.root.TransformPoint(new Vector3(0f, OreCenter, -0.2f)), new Color(rawColor.r, rawColor.g, rawColor.b) * 1.8f, 40, 6f, 0.24f);
                 float eff = inBand / Mathf.Max(0.01f, t);
                 Finish(new MinigameResult { quality = Mathf.Clamp01(0.3f + 0.7f * eff), perfects = Mathf.RoundToInt(inBand), total = Mathf.Max(1, Mathf.RoundToInt(t)) });
             }
+        }
+
+        void Chunks(int n, float size, float speed)
+        {
+            Vector3 c = stage.root.TransformPoint(new Vector3(0f, OreTop(), -0.2f));
+            for (int i = 0; i < n; i++)
+                stage.Chunk(chunkMesh, oreMat, c + UnityEngine.Random.insideUnitSphere * 0.25f, size * UnityEngine.Random.Range(0.6f, 1.4f),
+                    new Vector3(UnityEngine.Random.Range(-1f, 1f) * speed, UnityEngine.Random.Range(0.5f, 1f) * speed, UnityEngine.Random.Range(-1f, 0.2f) * speed), 12f, UnityEngine.Random.Range(0.7f, 1.2f));
         }
     }
 
