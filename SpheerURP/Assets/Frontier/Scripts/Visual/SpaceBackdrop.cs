@@ -107,7 +107,7 @@ namespace Frontier
             if (rush != null)
             {
                 var em = rush.emission; em.rateOverTime = rushRateNow;
-                var vel = rush.velocityOverLifetime; vel.x = -cur.rushSpeed;
+                var vel = rush.velocityOverLifetime; vel.x = new ParticleSystem.MinMaxCurve(-cur.rushSpeed);
             }
 
             float boost = 1f + flash * 1.8f;
@@ -155,7 +155,7 @@ namespace Frontier
             vel.enabled = true; vel.space = ParticleSystemSimulationSpace.Local;
             vel.x = new ParticleSystem.MinMaxCurve(-26f, -18f);
             vel.y = new ParticleSystem.MinMaxCurve(-16f, -10f);
-            vel.z = 0f;
+            vel.z = new ParticleSystem.MinMaxCurve(0f, 0f);
             var col = shooting.colorOverLifetime; col.enabled = true;
             var g = new Gradient();
             g.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
@@ -225,7 +225,7 @@ namespace Frontier
             sh.scale = new Vector3(1f, 40f, 12f);
             var vel = rush.velocityOverLifetime;
             vel.enabled = true; vel.space = ParticleSystemSimulationSpace.World;
-            vel.x = -4f; vel.y = 0f; vel.z = 0f;
+            vel.x = new ParticleSystem.MinMaxCurve(-4f); vel.y = new ParticleSystem.MinMaxCurve(0f); vel.z = new ParticleSystem.MinMaxCurve(0f);
             var r = go.GetComponent<ParticleSystemRenderer>();
             r.renderMode = ParticleSystemRenderMode.Stretch;
             r.velocityScale = 0.12f; r.lengthScale = 2f;
