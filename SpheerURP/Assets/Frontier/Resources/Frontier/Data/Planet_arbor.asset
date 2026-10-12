@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.02, g: 0.18, b: 0.04, a: 1}
   rim: {r: 1, g: 2.4, b: 0.5, a: 1}
   weather: 6
+  mood: 0
   hasRings: 0
   style: 1
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Titan Grove
     game: 0

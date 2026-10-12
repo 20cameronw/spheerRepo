@@ -31,7 +31,7 @@ namespace Frontier
         }
 
         /// <summary>Instantiates the model for a key, strips behaviours, and fits it to the given diameter. Returns null if none.</summary>
-        public static Transform Spawn(string key, Transform parent, float diameter)
+        public static Transform Spawn(string key, Transform parent, float diameter, bool useEntryScale = true)
         {
             var lib = Instance;
             if (lib == null || lib.entries == null) return null;
@@ -47,7 +47,7 @@ namespace Frontier
                 if (!MeshBounds(go, out b)) { Destroy(go); return null; }
                 float size = Mathf.Max(b.size.x, Mathf.Max(b.size.y, b.size.z));
                 if (size < 1e-4f) size = 1f;
-                float s = diameter / size * (e.scale > 0f ? e.scale : 1f);
+                float s = diameter / size * (useEntryScale && e.scale > 0f ? e.scale : 1f);
                 go.transform.localScale = Vector3.one * s;
                 go.transform.position = -b.center * s;
                 go.transform.SetParent(parent, false);

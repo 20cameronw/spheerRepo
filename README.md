@@ -14,6 +14,12 @@ Build a **Warehouse** from Build > Econ (20 Scrap + 10 Wood). Each warehouse sta
 
 Tap a warehouse to open its storage and your backpack together. Drag stacks in either direction or rearrange either grid. Matching resources merge up to the resource's stack limit; transfers move only what fits and never discard the remainder. Stored resources stay on that planet and are not used automatically for crafting, fuel or construction. Old saves load with empty warehouse storage. An opaque icon and stack count follow mouse/touch drags, including ordinary backpack rearrangement.
 
+### Frontier planet sizing and travel
+
+Planet models ignore ModelLibrary scale overrides and fit to `surfaceRadius * 2 * modelScale`. Every world defaults to ground radius 1.5, model scale 1, and atmosphere scale 5. Select a Planet asset in `Assets/Frontier/Resources/Frontier/Data` to tune these controls live in Play mode, or use its **Reset this planet to standard size** button. **Frontier > Normalize All Planet Sizes** resets all worlds; **Validate Planet Model Sizes** measures their fitted mesh diameters.
+
+Travel plays the departure warp first, the flight minigame second, and the destination approach last. The star map separates six existing solar systems into three spiral galaxy regions. Curved departure/arrival tangents and a moving ship show the route; the map is illustrative, not a gravity simulation or optimal-path solver. Its expanded visual spacing and route curvature do not change fuel costs or authored planet coordinates.
+
 The sections below describe the legacy Spheer scene.
 
 ## What the Game Is

@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.03, g: 0.03, b: 0.06, a: 1}
   rim: {r: 2.8, g: 2.8, b: 3.2, a: 1}
   weather: 6
+  mood: 0
   hasRings: 1
   style: 2
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Null Seam
     game: 2

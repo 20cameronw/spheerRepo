@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.3, g: 0.2, b: 0.6, a: 1}
   rim: {r: 2.2, g: 1.2, b: 2.2, a: 1}
   weather: 6
+  mood: 0
   hasRings: 0
   style: 1
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Gas Siphon
     game: 2

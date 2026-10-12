@@ -22,11 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.7, g: 0.2, b: 1, a: 1}
   rim: {r: 2, g: 2, b: 2.8, a: 1}
   weather: 2
+  mood: 0
   hasRings: 1
   style: 4
   glowIntensity: 1.35
   atmosphereIntensity: 1.2
   surfaceBands: 3
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Prism Fields
     game: 1

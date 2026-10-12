@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.12, g: 0.02, b: 0.02, a: 1}
   rim: {r: 2.4, g: 0.5, b: 0.2, a: 1}
   weather: 3
+  mood: 0
   hasRings: 0
   style: 3
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Magma Vent
     game: 2

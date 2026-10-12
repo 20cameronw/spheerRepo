@@ -7,8 +7,8 @@ namespace Frontier
 {
     public partial class UIRoot
     {
-        const float MapSize = 4000f;
-        const float MinZoom = 0.14f, MaxZoom = 2.4f;
+        const float MapSize = 9000f;
+        const float MinZoom = 0.07f, MaxZoom = 2.4f;
 
         PlanetSO selected;
         bool mapOpen;
@@ -33,7 +33,15 @@ namespace Frontier
             if (stars.Count == 0)
             {
                 var rng = new System.Random(99);
-                for (int i = 0; i < 600; i++) stars.Add(new Vector2((float)rng.NextDouble() * MapSize, (float)rng.NextDouble() * MapSize));
+                for (int i = 0; i < 350; i++) stars.Add(new Vector2((float)rng.NextDouble() * MapSize, (float)rng.NextDouble() * MapSize));
+                for (int galaxy = 0; galaxy < 3; galaxy++)
+                    for (int i = 0; i < 900; i++)
+                    {
+                        float radius = Mathf.Sqrt((float)rng.NextDouble()) * (galaxy == 1 ? 1400f : 1700f);
+                        float angle = radius * 0.0024f + (i % (galaxy + 2)) * Mathf.PI * 2f / (galaxy + 2);
+                        float spread = ((float)rng.NextDouble() - 0.5f) * 0.5f;
+                        stars.Add(GalaxyCenter(galaxy) + new Vector2(Mathf.Cos(angle + spread), Mathf.Sin(angle + spread) * 0.65f) * radius);
+                    }
             }
 
             mapView = UiKit.Div("fr-map");
@@ -41,6 +49,7 @@ namespace Frontier
             mapLayer.Add(mapView);
 
             mapWorld = UiKit.Div("fr-map-world");
+            mapWorld.style.width = MapSize; mapWorld.style.height = MapSize;
             mapWorld.pickingMode = PickingMode.Position;
             mapWorld.generateVisualContent += DrawMapBackground;
             mapView.Add(mapWorld);
@@ -89,7 +98,60 @@ namespace Frontier
             return new Vector2(mapView.resolvedStyle.width * 0.5f, mapView.resolvedStyle.height * 0.5f);
         }
 
-        static Vector2 MapPoint(PlanetSO p) { return new Vector2(p.mapPosition.x * MapSize, (1f - p.mapPosition.y) * MapSize); }
+        static Vector2 GalaxyCenter(int galaxy)
+        {
+            return galaxy == 0 ? new Vector2(2200f, 2400f) : galaxy == 1 ? new Vector2(6500f, 2100f) : new Vector2(5600f, 6800f);
+        }
+
+        static int SystemIndex(string id)
+        {
+            for (int i = 0; i < PlanetSO.Systems.Length; i++) if (PlanetSO.Systems[i].id == id) return i;
+            return -1;
+        }
+
+        static Vector2 SystemPoint(PlanetSO.StarSystem system)
+        {
+            int i = SystemIndex(system.id);
+            Vector2 offset = i % 2 == 0 ? new Vector2(-620f, -260f) : new Vector2(570f, 350f);
+            return GalaxyCenter(i / 2) + offset;
+        }
+
+        static Vector2 MapPoint(PlanetSO planet)
+        {
+            var system = PlanetSO.SystemOf(planet.systemId);
+            if (system == null) return new Vector2(planet.mapPosition.x, 1f - planet.mapPosition.y) * MapSize;
+            Vector2 offset = planet.mapPosition - system.center;
+            return SystemPoint(system) + new Vector2(offset.x, -offset.y) * 6200f;
+        }
+
+        static Vector2 RoutePoint(PlanetSO from, PlanetSO to, float time)
+        {
+            Vector2 a = MapPoint(from), b = MapPoint(to);
+            var fromSystem = PlanetSO.SystemOf(from.systemId);
+            var toSystem = PlanetSO.SystemOf(to.systemId);
+            Vector2 ar = fromSystem != null ? a - SystemPoint(fromSystem) : a - b;
+            Vector2 br = toSystem != null ? b - SystemPoint(toSystem) : b - a;
+            Vector2 ac = a - ar, bc = b - br;
+            const float orbitAngle = 0.65f;
+            if (time < 0.15f) return ac + RotateMapVector(ar, time / 0.15f * orbitAngle);
+            if (time > 0.85f) return bc + RotateMapVector(br, -(1f - time) / 0.15f * orbitAngle);
+            ar = RotateMapVector(ar, orbitAngle);
+            br = RotateMapVector(br, -orbitAngle);
+            a = ac + ar; b = bc + br;
+            time = (time - 0.15f) / 0.7f;
+            Vector2 startTangent = new Vector2(-ar.y, ar.x).normalized;
+            Vector2 endTangent = new Vector2(-br.y, br.x).normalized;
+            float bend = Mathf.Clamp(Vector2.Distance(a, b) * 0.4f, 180f, 1300f);
+            Vector2 c1 = a + startTangent * bend, c2 = b - endTangent * bend;
+            float u = 1f - time;
+            return u * u * u * a + 3f * u * u * time * c1 + 3f * u * time * time * c2 + time * time * time * b;
+        }
+
+        static Vector2 RotateMapVector(Vector2 point, float radians)
+        {
+            float c = Mathf.Cos(radians), s = Mathf.Sin(radians);
+            return new Vector2(point.x * c - point.y * s, point.x * s + point.y * c);
+        }
 
         void CenterOn(PlanetSO p)
         {
@@ -160,6 +222,7 @@ namespace Frontier
         void UpdateMapInput()
         {
             if (!mapOpen || mapView == null) return;
+            if (selected != gs.planet) mapWorld.MarkDirtyRepaint();
             if (Input.touchCount == 2)
             {
                 var a = Input.GetTouch(0).position; var b = Input.GetTouch(1).position;
@@ -181,9 +244,9 @@ namespace Frontier
             var p = ctx.painter2D;
             p.lineWidth = 2f;
             p.strokeColor = new Color(0.1f, 0.9f, 1f, 0.07f);
-            for (int i = 0; i <= 40; i++)
+            for (int i = 0; i <= 30; i++)
             {
-                float v = i * 100f;
+                float v = i * 300f;
                 p.BeginPath(); p.MoveTo(new Vector2(v, 0f)); p.LineTo(new Vector2(v, MapSize)); p.Stroke();
                 p.BeginPath(); p.MoveTo(new Vector2(0f, v)); p.LineTo(new Vector2(MapSize, v)); p.Stroke();
             }
@@ -194,9 +257,27 @@ namespace Frontier
                 p.MoveTo(s); p.LineTo(s + new Vector2(3f, 0f)); p.LineTo(s + new Vector2(3f, 3f)); p.LineTo(s + new Vector2(0f, 3f));
                 p.ClosePath(); p.Fill();
             }
+            for (int galaxy = 0; galaxy < 3; galaxy++)
+            {
+                Color tint = galaxy == 0 ? UiKit.Cyan : galaxy == 1 ? UiKit.Magenta : UiKit.Amber;
+                p.strokeColor = new Color(tint.r, tint.g, tint.b, 0.045f);
+                p.lineWidth = 85f;
+                for (int arm = 0; arm < galaxy + 2; arm++)
+                {
+                    p.BeginPath();
+                    for (int i = 0; i < 100; i++)
+                    {
+                        float radius = i * 17f;
+                        float angle = radius * 0.0024f + arm * Mathf.PI * 2f / (galaxy + 2);
+                        Vector2 point = GalaxyCenter(galaxy) + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle) * 0.65f) * radius;
+                        if (i == 0) p.MoveTo(point); else p.LineTo(point);
+                    }
+                    p.Stroke();
+                }
+            }
             foreach (var sys in PlanetSO.Systems)
             {
-                Vector2 c = new Vector2(sys.center.x * MapSize, (1f - sys.center.y) * MapSize);
+                Vector2 c = SystemPoint(sys);
                 float maxR = 0f;
                 foreach (var pl in gs.db.planets)
                     if (pl.systemId == sys.id) maxR = Mathf.Max(maxR, (MapPoint(pl) - c).magnitude);
@@ -222,7 +303,17 @@ namespace Frontier
             {
                 p.lineWidth = 6f;
                 p.strokeColor = new Color(1f, 0.25f, 0.95f, 0.9f);
-                p.BeginPath(); p.MoveTo(MapPoint(gs.planet)); p.LineTo(MapPoint(selected)); p.Stroke();
+                p.BeginPath(); p.MoveTo(MapPoint(gs.planet));
+                for (int i = 1; i <= 100; i++) p.LineTo(RoutePoint(gs.planet, selected, i / 100f));
+                p.Stroke();
+                float time = Mathf.Repeat(Time.unscaledTime * 0.15f, 1f);
+                Vector2 ship = RoutePoint(gs.planet, selected, time);
+                Vector2 forward = (RoutePoint(gs.planet, selected, Mathf.Min(1f, time + 0.01f)) - ship).normalized;
+                Vector2 side = new Vector2(-forward.y, forward.x);
+                p.fillColor = Color.white;
+                p.BeginPath(); p.MoveTo(ship + forward * 20f);
+                p.LineTo(ship - forward * 12f + side * 10f); p.LineTo(ship - forward * 12f - side * 10f);
+                p.ClosePath(); p.Fill();
             }
         }
 
@@ -230,13 +321,23 @@ namespace Frontier
         void BuildMapNodes()
         {
             for (int i = mapWorld.childCount - 1; i >= 0; i--) mapWorld.RemoveAt(i);
+            string[] galaxies = { "THE VERDANT SPIRAL", "EMBER REACH", "THE FRACTURED EXPANSE" };
+            for (int i = 0; i < galaxies.Length; i++)
+            {
+                var label = UiKit.Text(galaxies[i], "fr-title", new Color(0.7f, 0.8f, 0.9f, 0.65f));
+                label.pickingMode = PickingMode.Ignore;
+                label.style.position = Position.Absolute;
+                label.style.left = GalaxyCenter(i).x - 600f;
+                label.style.top = GalaxyCenter(i).y - 1250f;
+                mapWorld.Add(label);
+            }
             foreach (var sys in PlanetSO.Systems)
             {
                 var lbl = UiKit.Text(sys.name.ToUpper(), "fr-small", UiKit.Ui(sys.color));
                 lbl.pickingMode = PickingMode.Ignore;
                 lbl.style.position = Position.Absolute;
-                lbl.style.left = sys.center.x * MapSize - 200f;
-                lbl.style.top = (1f - sys.center.y) * MapSize + 70f;
+                lbl.style.left = SystemPoint(sys).x - 200f;
+                lbl.style.top = SystemPoint(sys).y + 70f;
                 lbl.style.width = 400f;
                 lbl.style.unityTextAlign = TextAnchor.UpperCenter;
                 mapWorld.Add(lbl);

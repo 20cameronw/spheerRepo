@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.02, g: 0.25, b: 0.3, a: 1}
   rim: {r: 0.4, g: 2.4, b: 2.2, a: 1}
   weather: 2
+  mood: 0
   hasRings: 0
   style: 4
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Glacier Core
     game: 2

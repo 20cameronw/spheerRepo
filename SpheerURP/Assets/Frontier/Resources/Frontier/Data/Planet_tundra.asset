@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.25, g: 0.3, b: 0.45, a: 1}
   rim: {r: 0.8, g: 1.6, b: 2.4, a: 1}
   weather: 2
+  mood: 0
   hasRings: 0
   style: 0
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Frozen Pines
     game: 0

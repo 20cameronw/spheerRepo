@@ -52,6 +52,8 @@ namespace Frontier
         public float surfaceRadius = PlanetView.Radius;
         [Tooltip("Multiplier on the standard planet model size (every model is first fitted to the same diameter).")]
         public float modelScale = 1f;
+        [Tooltip("Atmosphere sphere diameter (Transform scale). Default is 5 on every world.")]
+        public float atmosphereScale = 5f;
 
         [InspectorName("Planet Resources"), Tooltip("Available resources, gathering methods, yield and difficulty. These are not physical spots or spawn positions.")]
         public List<GatherSpot> spots = new List<GatherSpot>();

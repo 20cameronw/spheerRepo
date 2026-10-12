@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.12, g: 0.02, b: 0.3, a: 1}
   rim: {r: 1.8, g: 0.8, b: 2.8, a: 1}
   weather: 5
+  mood: 0
   hasRings: 0
   style: 2
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Dusk Ore
     game: 1

@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.08, g: 0.02, b: 0.2, a: 1}
   rim: {r: 2, g: 0.5, b: 2.4, a: 1}
   weather: 4
+  mood: 0
   hasRings: 1
   style: 4
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Crystal Heart
     game: 2

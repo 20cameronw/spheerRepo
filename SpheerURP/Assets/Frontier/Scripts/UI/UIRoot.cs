@@ -396,34 +396,37 @@ namespace Frontier
             if (gs.Count(gs.db.fuel) < cost) { Sfx.Bad(); return; }
             busy = true;
             CloseAll();
-            var tg = new TravelGame();
-            float tier = Mathf.Clamp01(target.tier / 8f);
-            tg.Run(overlayLayer, UiKit.Magenta, 1f, tier, r =>
-            {
-                if (!gs.Travel(target)) { busy = false; return; }
-                int refund = Mathf.FloorToInt(cost * FrontierSettings.I.travelRefundMax * r.quality);
-                if (refund > 0) { gs.Add(gs.db.fuel, refund); Toast("Smooth flight: +" + refund + " fuel back", UiKit.Lime); }
-                StartCoroutine(backdrop.DoWarp(() =>
-                {
-                    planetView.Show(target, true);
-                    selected = target;
-                }));
-                StartCoroutine(TravelFlash());
-            });
+            StartCoroutine(TravelSequence(target, cost));
         }
 
-        IEnumerator TravelFlash()
+        IEnumerator TravelSequence(PlanetSO target, int cost)
         {
-            float t = 0f;
-            while (t < 1.8f)
+            StartCoroutine(backdrop.DoWarp(null));
+            yield return planetView.Depart();
+            while (backdrop.Warping) yield return null;
+            var tg = new TravelGame();
+            float tier = Mathf.Clamp01(target.tier / 8f);
+            MinigameResult result = default;
+            bool completed = false;
+            tg.Run(overlayLayer, UiKit.Magenta, 1f, tier, r =>
             {
-                t += Time.deltaTime;
-                flash.style.opacity = Mathf.Pow(Mathf.Sin(Mathf.Clamp01(t / 1.8f) * Mathf.PI), 6f) * 0.85f;
-                yield return null;
+                result = r; completed = true;
+            });
+            while (!completed) yield return null;
+            if (!gs.Travel(target))
+            {
+                yield return planetView.Approach(gs.planet);
+                busy = false;
+                Toast("Travel failed: not enough fuel.", UiKit.Red);
+                yield break;
             }
-            flash.style.opacity = 0f;
+            backdrop.Apply(target);
+            int refund = Mathf.FloorToInt(cost * FrontierSettings.I.travelRefundMax * result.quality);
+            if (refund > 0) gs.Add(gs.db.fuel, refund);
+            selected = target;
+            yield return planetView.Approach(target);
             busy = false;
-            Toast("Arrived at " + gs.planet.displayName, UiKit.Cyan);
+            Toast("Arrived at " + target.displayName + (refund > 0 ? "  -  +" + refund + " fuel back" : ""), UiKit.Cyan);
         }
 
         // ------------------------------------------------------------ toast

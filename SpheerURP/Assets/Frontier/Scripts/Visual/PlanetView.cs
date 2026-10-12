@@ -27,6 +27,8 @@ namespace Frontier
         bool punchWas;
         bool usesModel;
         List<Material> modelMats;
+        Transform atmosphere;
+        float displayedRadius, displayedModelScale, lastRadius;
 
         List<MeshRenderer> solids = new List<MeshRenderer>();
 
@@ -79,7 +81,10 @@ namespace Frontier
             core = sphere.transform;
             baseRim = p.rim * p.glowIntensity;
             coreMat = null; modelMats = null;
-            var model = ModelLibrary.Spawn(p.id, core, Radius * 2f * 1.04f * (p.modelScale > 0f ? p.modelScale : 1f));
+            displayedRadius = p.surfaceRadius > 0.01f ? p.surfaceRadius : Radius;
+            displayedModelScale = p.modelScale > 0f ? p.modelScale : 1f;
+            lastRadius = displayedRadius;
+            var model = ModelLibrary.Spawn(p.id, core, displayedRadius * 2f * displayedModelScale, false);
             if (model != null)
             {
                 solids.Clear();
@@ -111,11 +116,13 @@ namespace Frontier
             Surface.radius = p.surfaceRadius > 0.01f ? p.surfaceRadius : Radius;
 
             var atmo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            atmo.name = "Atmosphere";
             Destroy(atmo.GetComponent<Collider>());
             atmo.transform.SetParent(root, false);
-            atmo.transform.localScale = Vector3.one * Radius * 2.28f;
-            Color atmosphere = p.rim * (1.2f * p.atmosphereIntensity);
-            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(atmosphere.r, atmosphere.g, atmosphere.b, 1f));
+            atmosphere = atmo.transform;
+            atmo.transform.localScale = Vector3.one * p.atmosphereScale;
+            Color atmosphereColor = p.rim * (1.2f * p.atmosphereIntensity);
+            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
 
             glow = Fx.GlowQuad(root, new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
 
@@ -201,6 +208,40 @@ namespace Frontier
 
         public void Punch() { punch = 1f; }
 
+        public IEnumerator Depart()
+        {
+            Frozen = true;
+            float time = 0f;
+            Vector3 start = root.localPosition;
+            while (time < 0.9f)
+            {
+                time += Time.deltaTime;
+                float k = Mathf.Clamp01(time / 0.9f);
+                root.localPosition = start + new Vector3(-3f * k * k, -0.5f * k, 12f * k * k);
+                root.localScale = Vector3.one * Mathf.Lerp(1f, 0.02f, k * k);
+                yield return null;
+            }
+            root.gameObject.SetActive(false);
+        }
+
+        public IEnumerator Approach(PlanetSO planet)
+        {
+            Show(planet, false);
+            Frozen = true;
+            float time = 0f;
+            while (time < 1.1f)
+            {
+                time += Time.deltaTime;
+                float k = 1f - Mathf.Pow(1f - Mathf.Clamp01(time / 1.1f), 3f);
+                root.localPosition = new Vector3(2.5f, 0.4f, 12f) * (1f - k);
+                root.localScale = Vector3.one * Mathf.Lerp(0.02f, 1f, k);
+                yield return null;
+            }
+            root.localPosition = Vector3.zero;
+            root.localScale = Vector3.one;
+            Frozen = false;
+        }
+
         void Update()
         {
             if (root == null) return;
@@ -211,8 +252,11 @@ namespace Frontier
                 root.localScale = Vector3.one * Mathf.Max(0.001f, e * 1.0f);
             }
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
-            float pulse = 1f + Mathf.Sin(Time.time * 1.6f) * 0.012f + punch * 0.08f;
-            core.localScale = Vector3.one * (usesModel ? 1f : Radius * 2f) * pulse;
+            float pulse = 1f + punch * 0.08f;
+            float size = SurfaceRadius() / Mathf.Max(0.01f, displayedRadius) *
+                (Current.modelScale > 0f ? Current.modelScale : 1f) / displayedModelScale;
+            core.localScale = Vector3.one * (usesModel ? 1f : displayedRadius * 2f * displayedModelScale) * size * pulse;
+            if (atmosphere != null) atmosphere.localScale = Vector3.one * Current.atmosphereScale;
             if (Frozen) { angVel = Vector3.zero; }
             else if (!grabbed)
             {
@@ -231,10 +275,15 @@ namespace Frontier
             }
             punchWas = punch > 0f;
 #if UNITY_EDITOR
-            // Live-edit: tweaking the Surface collider in Play mode saves the radius back to the planet asset.
-            if (Surface != null && Current != null && !Mathf.Approximately(Surface.radius, Current.surfaceRadius))
+            if (!Mathf.Approximately(Current.surfaceRadius, lastRadius))
+            {
+                Surface.radius = Mathf.Max(0.01f, Current.surfaceRadius);
+                lastRadius = Surface.radius;
+            }
+            else if (!Mathf.Approximately(Surface.radius, lastRadius))
             {
                 Current.surfaceRadius = Surface.radius;
+                lastRadius = Surface.radius;
                 UnityEditor.EditorUtility.SetDirty(Current);
             }
 #endif

@@ -22,8 +22,15 @@ MonoBehaviour:
   secondary: {r: 0.02, g: 0.08, b: 0.3, a: 1}
   rim: {r: 0.3, g: 1.6, b: 2.6, a: 1}
   weather: 1
+  mood: 0
   hasRings: 0
   style: 1
+  glowIntensity: 1
+  atmosphereIntensity: 1
+  surfaceBands: 0
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
   spots:
   - label: Kelp Forest
     game: 0
