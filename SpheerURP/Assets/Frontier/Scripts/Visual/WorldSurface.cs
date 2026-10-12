@@ -49,7 +49,6 @@ namespace Frontier
         bool down, dragging, blocked;
         Vector2 downPos, lastPos;
         float lastTime;
-        float velocity;
 
         public void Init(PlanetView pv, Camera camera, GameState state)
         {
@@ -360,7 +359,7 @@ namespace Frontier
             if (Input.GetMouseButtonDown(0))
             {
                 down = true; dragging = false;
-                downPos = lastPos = pos; lastTime = Time.unscaledTime; velocity = 0f;
+                downPos = lastPos = pos; lastTime = Time.unscaledTime;
                 blocked = IsOverUi != null && IsOverUi(pos);
             }
             else if (down && Input.GetMouseButton(0) && !blocked)

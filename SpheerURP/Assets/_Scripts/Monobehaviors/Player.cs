@@ -167,7 +167,7 @@ public class Player : MonoBehaviour
     {
         currentXP = 0;
         currentXPLevel++;
-        FindObjectOfType<ShopPanel>()?.LoadCards();
+        FindAnyObjectByType<ShopPanel>()?.LoadCards();
     }
 
     public float getPower()
@@ -663,9 +663,9 @@ public class Player : MonoBehaviour
         EnemySpawner.Instance.prestige();
         resetResearchCount();
         resetBuildingCount();
-        FindObjectOfType<XPBar>()?.refreshXPLevel();
-        FindObjectOfType<StructuresPanel>()?.LoadCards();
-        FindObjectOfType<ResearchPanel>()?.LoadCards();
+        FindAnyObjectByType<XPBar>()?.refreshXPLevel();
+        FindAnyObjectByType<StructuresPanel>()?.LoadCards();
+        FindAnyObjectByType<ResearchPanel>()?.LoadCards();
     }
 
     public DateTime now()
@@ -725,8 +725,8 @@ public class Player : MonoBehaviour
     public void giveSomeXPLevel()
     {
         currentXPLevel += 10;
-        FindObjectOfType<XPBar>()?.refreshXPLevel();
-        FindObjectOfType<StructuresPanel>()?.LoadCards();
+        FindAnyObjectByType<XPBar>()?.refreshXPLevel();
+        FindAnyObjectByType<StructuresPanel>()?.LoadCards();
     }
 
     public void Update()

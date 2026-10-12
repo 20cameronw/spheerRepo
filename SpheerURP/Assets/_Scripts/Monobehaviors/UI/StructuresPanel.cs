@@ -60,12 +60,12 @@ public class StructuresPanel : MenuPanel
 
             if (requiredLevel <= Player.Instance.getCurrentXPLevel())
             {
-                currentShopCard.lockMask.active = false;
+                currentShopCard.lockMask.SetActive(false);
             }
             else
             {
                 currentShopCard.requiredXPText.text = "Required XP Level: " + requiredLevel;
-                currentShopCard.lockMask.active = true;
+                currentShopCard.lockMask.SetActive(true);
             }
 
             currentShopCard.panel = this;

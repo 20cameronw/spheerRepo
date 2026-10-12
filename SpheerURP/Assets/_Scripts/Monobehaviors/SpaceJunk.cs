@@ -29,7 +29,7 @@ public class SpaceJunk : MonoBehaviour
         float collectedAmount = Player.Instance.collectSpaceJunk();
 
 
-        UIManager ui = FindObjectOfType<UIManager>();
+        UIManager ui = FindAnyObjectByType<UIManager>();
         if (ui != null)
         {
             string message = "+";

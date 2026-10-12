@@ -43,7 +43,7 @@ namespace Frontier.EditorTools
             if (scene.path != scenePath && File.Exists(scenePath))
                 scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath);
 
-            var boot = Object.FindFirstObjectByType<FrontierBootstrap>();
+            var boot = Object.FindAnyObjectByType<FrontierBootstrap>();
             if (boot == null) { Debug.LogError("Frontier: no FrontierBootstrap in the scene."); return; }
 
             if (AssetDatabase.LoadAssetAtPath<FrontierSettings>(Dir + "/FrontierSettings.asset") == null)
@@ -67,7 +67,7 @@ namespace Frontier.EditorTools
                 cam = camGo.AddComponent<Camera>();
                 camGo.AddComponent<AudioListener>();
             }
-            var light = Object.FindFirstObjectByType<Light>();
+            var light = Object.FindAnyObjectByType<Light>();
             if (light == null)
             {
                 light = new GameObject("Key Light").AddComponent<Light>();

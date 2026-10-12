@@ -12,7 +12,7 @@ public class EnemyStateManager : MonoBehaviour
 
     void Start()
     {
-        uiManager = FindObjectOfType<UIManager>();
+        uiManager = FindAnyObjectByType<UIManager>();
         currentState?.OnStateEnter();
     }
 
