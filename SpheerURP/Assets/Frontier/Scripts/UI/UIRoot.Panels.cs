@@ -64,29 +64,44 @@ namespace Frontier
 
         void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", "BUILD", UiKit.Lime, BuildShop); }
         void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", "COMMAND", UiKit.Magenta, BuildResearch, true); }
-        void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", "BACKPACK", UiKit.Amber, BuildPack, true); }
+        void OpenPack() { if (defense.Active || busy) return; menuPage = "pack"; OpenModal("menu", "grid", "MENU", UiKit.Cyan, BuildMenu, true); }
 
         // ------------------------------------------------------------ build shop
         void BuildShop(VisualElement body)
         {
-            body.Add(UiKit.Text("Place structures on " + gs.planet.displayName + ". One of each per planet.", "fr-muted"));
+            body.Add(UiKit.Text("Build on " + gs.planet.displayName + ". Tap a structure on the planet to use it.", "fr-muted"));
+            ShopSection(body, "ECONOMY", StructureKind.Refinery, StructureKind.Alarm);
+            ShopSection(body, "GATHERING", StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill);
+            ShopSection(body, "DEFENSE", StructureKind.Gunner, StructureKind.Laser);
+            ShopSection(body, "ORBITAL", StructureKind.Satellite);
+        }
+
+        void ShopSection(VisualElement body, string title, params StructureKind[] kinds)
+        {
+            var list = new List<StructureSO>();
             foreach (var sd in gs.db.structures)
+                if (sd != null && Array.IndexOf(kinds, sd.kind) >= 0) list.Add(sd);
+            if (list.Count == 0) return;
+            var h = UiKit.Text(title, "fr-small", UiKit.Lime);
+            h.style.marginTop = 10; h.style.marginBottom = 6;
+            body.Add(h);
+            foreach (var sd in list)
             {
-                if (sd == null) continue;
                 var def = sd;
                 Color c = UiKit.Ui(def.color);
                 var card = Card(c);
-                card.style.marginTop = 10;
                 var top = UiKit.Div("fr-row");
                 top.Add(Icons.Make(StructureIcon(def.kind), c, 56f));
                 var col = UiKit.Div(); col.style.flexGrow = 1; col.style.marginLeft = 10; col.pickingMode = PickingMode.Ignore;
                 col.Add(UiKit.Text(def.displayName.ToUpper(), "fr-h2", c));
                 col.Add(UiKit.Text(def.description, "fr-tiny"));
                 top.Add(col);
+                int have = gs.CountOnPlanet(gs.planet, def);
+                top.Add(UiKit.Text(def.maxPerPlanet > 0 ? have + "/" + def.maxPerPlanet : "x" + have, "fr-small", c));
                 card.Add(top);
 
-                bool built = gs.HasStructure(gs.planet, def);
-                if (built) card.Add(UiKit.Text("BUILT - tap it on the planet", "fr-small", UiKit.Lime));
+                if (gs.AtLimit(gs.planet, def)) card.Add(UiKit.Text("BUILT - tap it on the planet", "fr-small", UiKit.Lime));
+                else if (!gs.CanBuildHere(def)) card.Add(UiKit.Text("Nothing to harvest on this planet", "fr-small", UiKit.Amber));
                 else
                 {
                     card.Add(UiKit.CostRow(def.buildCost, gs, true));
@@ -97,6 +112,147 @@ namespace Frontier
                 }
                 body.Add(card);
             }
+        }
+
+        // ------------------------------------------------------------ menu (leaderboard, tutorial, about, settings)
+        void OpenMenu() { if (defense.Active || busy) return; menuPage = ""; OpenModal("menu", "grid", "MENU", UiKit.Cyan, BuildMenu, true); }
+
+        string menuPage = "";
+
+        void BuildMenu(VisualElement body)
+        {
+            if (menuPage != "")
+            {
+                var back = IconBtn("BACK", "up", UiKit.Cyan, () => { menuPage = ""; RefreshModal(); });
+                back.AddToClassList("fr-back");
+                body.Add(back);
+                switch (menuPage)
+                {
+                    case "pack": BuildPack(body); break;
+                    case "ranks": BuildLeaderboard(body); break;
+                    case "tutorial": BuildTutorial(body); break;
+                    case "about": BuildAbout(body); break;
+                    default: BuildSettings(body); break;
+                }
+                return;
+            }
+            var grid = UiKit.Div("fr-menu-grid");
+            grid.Add(MenuTile("pack", "BACKPACK", UiKit.Amber, "pack"));
+            grid.Add(MenuTile("ranks", "RANKS", UiKit.Lime, "ranks"));
+            grid.Add(MenuTile("tutorial", "HOW TO PLAY", UiKit.Cyan, "tutorial"));
+            grid.Add(MenuTile("about", "ABOUT", UiKit.Magenta, "about"));
+            grid.Add(MenuTile("gear", "SETTINGS", UiKit.Cyan, "settings"));
+            body.Add(grid);
+        }
+
+        VisualElement MenuTile(string icon, string label, Color color, string page)
+        {
+            Color c = UiKit.Ui(color);
+            var b = new Button();
+            b.AddToClassList("fr-menu-tile");
+            UiKit.Border(b, c, 2f);
+            b.Add(Icons.Make(icon, c));
+            b.Add(UiKit.Text(label, "fr-small", c));
+            b.clicked += () => { Sfx.Click(); menuPage = page; RefreshModal(); };
+            return b;
+        }
+
+        void StatRow(VisualElement body, string icon, Color color, string label, string value)
+        {
+            var row = UiKit.Div("fr-row"); row.style.marginBottom = 10;
+            row.Add(Icons.Make(icon, UiKit.Ui(color), 44f));
+            row.Add(UiKit.Text(label, "fr-small"));
+            row.Add(UiKit.Div("fr-spacer"));
+            row.Add(UiKit.Text(value, "fr-h2", color));
+            body.Add(row);
+        }
+
+        void BuildLeaderboard(VisualElement body)
+        {
+            var card = Card(UiKit.Lime);
+            card.Add(UiKit.Text("YOUR RECORD", "fr-h2", UiKit.Lime));
+            StatRow(card, "star", UiKit.Magenta, "Level", gs.PlayerLevel.ToString());
+            StatRow(card, "alien", UiKit.Red, "Waves cleared", gs.totalWavesCleared.ToString());
+            StatRow(card, "base", UiKit.Cyan, "Structures", gs.structures.Count.ToString());
+            var planets = new HashSet<string>();
+            foreach (var s in gs.structures) planets.Add(s.planetId);
+            StatRow(card, "map", UiKit.Amber, "Bases", planets.Count.ToString());
+            body.Add(card);
+            body.Add(UiKit.Text("Online leaderboards aren't connected yet - this shows your local progress.", "fr-muted"));
+        }
+
+        void BuildTutorial(VisualElement body)
+        {
+            TutorialStep(body, "build", UiKit.Lime, "1. Build", "Open the shop (bottom right) and place a Lumber Camp, then a Refinery.");
+            TutorialStep(body, "wood", UiKit.Amber, "2. Gather", "Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and collect resources.");
+            TutorialStep(body, "fuel", UiKit.Amber, "3. Refine", "Tap the Refinery to turn raw resources into fuel.");
+            TutorialStep(body, "alarm", UiKit.Magenta, "4. Defend", "Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight and bigger rewards. Gunners and Lasers defend automatically.");
+            TutorialStep(body, "map", UiKit.Cyan, "5. Travel", "Open the world map (top left) and spend fuel to visit new planets. Your bases stay where you built them.");
+            TutorialStep(body, "research", UiKit.Magenta, "6. Upgrade", "The research button (bottom left) manages your bases and unlocks upgrades, including more backpack space.");
+        }
+
+        void TutorialStep(VisualElement body, string icon, Color color, string title, string text)
+        {
+            var card = Card(color);
+            var row = UiKit.Div("fr-row");
+            row.Add(Icons.Make(icon, UiKit.Ui(color), 56f));
+            var col = UiKit.Div(); col.style.marginLeft = 12; col.style.flexShrink = 1; col.pickingMode = PickingMode.Ignore;
+            col.Add(UiKit.Text(title, "fr-h2", color));
+            col.Add(UiKit.Text(text, "fr-muted"));
+            row.Add(col);
+            card.Add(row);
+            body.Add(card);
+        }
+
+        void BuildAbout(VisualElement body)
+        {
+            var card = Card(UiKit.Magenta);
+            card.Add(UiKit.Text("FRONTIER", "fr-title", UiKit.Magenta));
+            card.Add(UiKit.Text("Build bases across the stars. Gather, refine, travel, and defend your worlds from alien waves.", "fr-muted"));
+            card.Add(UiKit.Text("Version " + Application.version, "fr-tiny"));
+            body.Add(card);
+        }
+
+        bool confirmReset;
+
+        void BuildSettings(VisualElement body)
+        {
+            SliderRow(body, "UI SCALE", uiScale, 0.7f, 1.5f, SetUiScale);
+            SliderRow(body, "TEXT SCALE", textScale, 0.8f, 1.6f, SetTextScale);
+
+            var snd = IconBtn(Sfx.Muted ? "SOUND OFF" : "SOUND ON", "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
+            {
+                Sfx.Muted = !Sfx.Muted;
+                PlayerPrefs.SetInt("fr_muted", Sfx.Muted ? 1 : 0);
+                RefreshModal();
+            });
+            body.Add(snd);
+
+            var reset = IconBtn(confirmReset ? "TAP AGAIN TO ERASE" : "RESET PROGRESS", "close", UiKit.Red, () =>
+            {
+                if (!confirmReset) { confirmReset = true; RefreshModal(); return; }
+                confirmReset = false;
+                CloseModal();
+                gs.ResetProgress();
+                planetView.Show(gs.planet, true);
+                selected = gs.planet;
+            });
+            body.Add(reset);
+        }
+
+        void SliderRow(VisualElement body, string label, float value, float min, float max, Action<float> onChange)
+        {
+            var row = UiKit.Div("fr-setting-row");
+            row.Add(UiKit.Text(label, "fr-small"));
+            var s = new Slider(min, max) { value = value };
+            s.AddToClassList("fr-slider");
+            var val = UiKit.Text(Mathf.RoundToInt(value * 100f) + "%", "fr-small");
+            // Applied on release so the modal isn't rebuilt (and the drag lost) mid-gesture.
+            s.RegisterValueChangedCallback(e => val.text = Mathf.RoundToInt(e.newValue * 100f) + "%");
+            s.RegisterCallback<PointerCaptureOutEvent>(e => onChange(s.value));
+            row.Add(s);
+            row.Add(val);
+            body.Add(row);
         }
 
         // ------------------------------------------------------------ command (bases + research)

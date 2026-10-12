@@ -42,6 +42,7 @@ namespace Frontier
         public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd, WorldSurface ws, Camera camera)
         {
             doc = document; gs = state; defense = def; planetView = pv; backdrop = bd; world = ws; cam = camera;
+            LoadPrefs();
             panelSettings = doc.panelSettings;
             selected = gs.planet;
 
@@ -70,7 +71,6 @@ namespace Frontier
 
             gs.Changed += OnStateChanged;
             defense.WaveEnded += OnWaveEnded;
-            world.NodeTapped += OnNodeTapped;
             world.StructureTapped += OnStructureTapped;
             world.SlotTapped += OnSlotTapped;
             OnStateChanged();
@@ -89,7 +89,6 @@ namespace Frontier
             if (defense != null) defense.WaveEnded -= OnWaveEnded;
             if (world != null)
             {
-                world.NodeTapped -= OnNodeTapped;
                 world.StructureTapped -= OnStructureTapped;
                 world.SlotTapped -= OnSlotTapped;
             }
@@ -101,7 +100,7 @@ namespace Frontier
             var sa = Screen.safeArea;
             if (!force && Screen.width == lastW && Screen.height == lastH && sa == lastSafe) return;
             lastW = Screen.width; lastH = Screen.height; lastSafe = sa;
-            float scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / 1080f);
+            float scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / 1080f) * uiScale;
             if (panelSettings != null) panelSettings.scale = scale;
             inset = new Vector4(sa.xMin / scale, (Screen.height - sa.yMax) / scale, (Screen.width - sa.xMax) / scale, sa.yMin / scale);
             hud.style.left = inset.x; hud.style.top = inset.y;
@@ -121,45 +120,48 @@ namespace Frontier
             hud = Layer();
             safe.Add(hud);
 
-            var stats = UiKit.Div("fr-hudstats"); stats.pickingMode = PickingMode.Ignore;
-            fuelLabel = StatPill(stats, "fuel", UiKit.Amber);
-            packLabel = StatPill(stats, "pack", UiKit.Cyan);
-            levelLabel = StatPill(stats, "star", UiKit.Magenta);
-            hud.Add(stats);
-
-            var top = UiKit.Div("fr-topcenter"); top.pickingMode = PickingMode.Ignore;
-            planetTag = UiKit.Div("fr-planet-tag");
+            var top = UiKit.Div("fr-topbar"); top.pickingMode = PickingMode.Ignore;
+            planetTag = UiKit.Div("fr-topbar-bar");
             planetTag.pickingMode = PickingMode.Ignore;
-            planetLabel = UiKit.Text("", "fr-h2");
-            planetLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
+            packLabel = Chip(planetTag, "pack", UiKit.Cyan, null);
+            levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
+            planetLabel = UiKit.Text("", "fr-planet-name");
             planetTag.Add(planetLabel);
-            planetTag.Add(UiKit.Bar(UiKit.Magenta, out xpFill));
             top.Add(planetTag);
+
+            var map = Icons.IconButton("map", UiKit.Cyan, OpenMap, 0f, true);
+            map.AddToClassList("fr-topbar-corner"); map.AddToClassList("fr-topbar-left");
+            top.Add(map);
+            var menu = Icons.IconButton("grid", UiKit.Cyan, OpenMenu, 0f, true);
+            menu.AddToClassList("fr-topbar-corner"); menu.AddToClassList("fr-topbar-right");
+            top.Add(menu);
             hud.Add(top);
 
-            var left = UiKit.Div("fr-side fr-side-left"); left.pickingMode = PickingMode.Ignore;
-            left.Add(Icons.IconButton("map", UiKit.Cyan, OpenMap));
-            hud.Add(left);
-
-            var right = UiKit.Div("fr-side fr-side-right"); right.pickingMode = PickingMode.Ignore;
-            right.Add(Icons.IconButton("pack", UiKit.Amber, OpenPack));
-            hud.Add(right);
-
-            var bottom = UiKit.Div("fr-bottom"); bottom.pickingMode = PickingMode.Ignore;
-            bottom.Add(Icons.IconButton("research", UiKit.Magenta, OpenResearch));
-            bottom.Add(Icons.IconButton("build", UiKit.Lime, OpenShop));
-            hud.Add(bottom);
+            var research = Icons.IconButton("research", UiKit.Magenta, OpenResearch, 0f, true);
+            research.AddToClassList("fr-corner"); research.AddToClassList("fr-corner-left");
+            hud.Add(research);
+            var shop = Icons.IconButton("build", UiKit.Lime, OpenShop, 0f, true);
+            shop.AddToClassList("fr-corner"); shop.AddToClassList("fr-corner-right");
+            hud.Add(shop);
         }
 
-        Label StatPill(VisualElement parent, string icon, Color color)
+        Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp)
         {
-            var pill = UiKit.Div("fr-pill");
+            var chip = UiKit.Div("fr-chip"); chip.pickingMode = PickingMode.Ignore;
             Color c = UiKit.Ui(color);
-            UiKit.Border(pill, new Color(c.r, c.g, c.b, 0.85f), 2f);
-            pill.Add(Icons.Make(icon, c));
-            var l = UiKit.Text("0", "fr-pill-text");
-            pill.Add(l);
-            parent.Add(pill);
+            chip.Add(Icons.Make(icon, c));
+            var l = UiKit.Text("0", "fr-chip-text");
+            chip.Add(l);
+            if (xp != null)
+            {
+                VisualElement fill;
+                var bar = UiKit.Bar(color, out fill);
+                bar.AddToClassList("fr-chip-xp");
+                chip.Add(bar);
+                xp(fill);
+            }
+            parent.Add(chip);
             return l;
         }
 
@@ -194,7 +196,6 @@ namespace Frontier
             levelLabel.text = "LV " + gs.PlayerLevel;
             planetLabel.text = gs.planet.displayName.ToUpper();
             planetLabel.style.color = UiKit.Ui(gs.planet.rim);
-            UiKit.Border(planetTag, UiKit.Ui(gs.planet.rim, 0.8f), 2f);
             UiKit.SetFill(xpFill, gs.LevelProgress);
             RefreshModal();
             RefreshPopup();
@@ -234,6 +235,7 @@ namespace Frontier
 
             UpdatePopupPosition();
             UpdateMapInput();
+            SweepText();
         }
 
         void CloseAll()
@@ -272,7 +274,10 @@ namespace Frontier
         string StructureEffect(StructureSO d, int level)
         {
             int pct = Mathf.RoundToInt(d.bonusPerLevel * (level - 1) * 100f);
-            return d.kind == StructureKind.Refinery ? "+" + pct + "% output" : "+" + pct + "% rewards, XP";
+            if (d.kind.IsTurret()) return "dmg " + Mathf.RoundToInt(d.damage * (1f + d.bonusPerLevel * (level - 1)));
+            if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";
+            if (d.kind.IsGather()) return "+" + pct + "% yield";
+            return "+" + pct + "% rewards, XP";
         }
 
         string UpgradeEffectText(UpgradeSO u, int level)
@@ -288,31 +293,64 @@ namespace Frontier
             }
         }
 
-        static string StructureIcon(StructureKind k) { return k == StructureKind.Refinery ? "refinery" : "alarm"; }
-
-        // ------------------------------------------------------------ gathering
-        void OnNodeTapped(GatherSpot spot, Transform t)
+        static string StructureIcon(StructureKind k)
         {
-            if (busy || defense.Active) return;
-            CloseModal();
-            Color c = UiKit.Ui(spot.resource != null ? spot.resource.color : Color.white);
-            OpenPopup("node:" + spot.label, t, c, body =>
+            switch (k)
             {
-                var head = UiKit.Div("fr-row");
-                head.Add(Icons.Make(Icons.ForResource(spot.resource), c, 48f));
-                head.Add(UiKit.Text(spot.label.ToUpper(), "fr-h2", c));
-                body.Add(head);
-                body.Add(UiKit.Text(gs.ToolName(spot.game) + "  LV " + gs.ToolLevel(spot.game), "fr-tiny"));
-                int est = Mathf.Max(1, Mathf.RoundToInt(spot.baseYield * gs.ToolMultiplier(spot.game)));
-                var row = UiKit.Div("fr-row-wrap");
-                row.style.marginTop = 6;
-                row.Add(ResourceIconChip(spot.resource, "~" + est));
-                body.Add(row);
-                body.Add(IconBtn("START", "play", c, () => { ClosePopup(); StartGather(spot, t); }, true));
-            });
+                case StructureKind.Refinery: return "refinery";
+                case StructureKind.Lumber: return "wood";
+                case StructureKind.Mine: return "iron";
+                case StructureKind.Drill: return "tools";
+                case StructureKind.Gunner: return "alien";
+                case StructureKind.Laser: return "bolt";
+                case StructureKind.Satellite: return "warp";
+                default: return "alarm";
+            }
         }
 
-        void StartGather(GatherSpot spot, Transform at)
+        // ------------------------------------------------------------ settings (UI scale, text scale, sound)
+        float uiScale = 1f, textScale = 1f;
+        float nextSweep;
+
+        void LoadPrefs()
+        {
+            uiScale = Mathf.Clamp(PlayerPrefs.GetFloat("fr_uiscale", 1f), 0.7f, 1.5f);
+            textScale = Mathf.Clamp(PlayerPrefs.GetFloat("fr_textscale", 1f), 0.8f, 1.6f);
+            Sfx.Muted = PlayerPrefs.GetInt("fr_muted", 0) == 1;
+        }
+
+        void SetUiScale(float v) { uiScale = v; PlayerPrefs.SetFloat("fr_uiscale", v); ApplyLayout(true); }
+        void SetTextScale(float v) { textScale = v; PlayerPrefs.SetFloat("fr_textscale", v); nextSweep = 0f; }
+
+        // Labels keep their USS size in userData; a periodic sweep rescales them so new popups pick it up too.
+        void SweepText()
+        {
+            if (Time.unscaledTime < nextSweep) return;
+            nextSweep = Time.unscaledTime + 0.15f;
+            ScaleLabels(root);
+        }
+
+        void ScaleLabels(VisualElement ve)
+        {
+            var l = ve as Label;
+            if (l != null)
+            {
+                if (!(l.userData is float))
+                {
+                    float f = l.resolvedStyle.fontSize;
+                    if (!(f > 0f)) { goto children; }
+                    l.userData = f;
+                }
+                float want = (float)l.userData * textScale;
+                if (Mathf.Abs(l.style.fontSize.value.value - want) > 0.01f || l.style.fontSize.keyword != StyleKeyword.Undefined)
+                    l.style.fontSize = want;
+            }
+            children:
+            foreach (var c in ve.Children()) ScaleLabels(c);
+        }
+
+        // ------------------------------------------------------------ gathering
+        void StartGather(GatherSpot spot, Transform at, float bonus)
         {
             if (busy || defense.Active) return;
             busy = true;
@@ -322,7 +360,7 @@ namespace Frontier
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;
-                float amount = spot.baseYield * gs.ToolMultiplier(spot.game) * (0.4f + 1.1f * r.quality);
+                float amount = spot.baseYield * gs.ToolMultiplier(spot.game) * (1f + bonus) * (0.4f + 1.1f * r.quality);
                 int n = r.quality > 0.05f ? Mathf.Max(1, Mathf.RoundToInt(amount)) : 0;
                 int got = gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);

@@ -79,6 +79,23 @@ namespace Frontier
             { "refinery", new[] {
                 S(true, true, .1f,.86f, .1f,.46f, .36f,.62f, .36f,.4f, .62f,.62f, .62f,.16f, .82f,.16f, .82f,.86f),
                 S(false, false, .7f,.1f, .74f,.04f) } },
+            { "grid", new[] {
+                Circle(.2f,.2f,.07f,true), Circle(.5f,.2f,.07f,true), Circle(.8f,.2f,.07f,true),
+                Circle(.2f,.5f,.07f,true), Circle(.5f,.5f,.07f,true), Circle(.8f,.5f,.07f,true),
+                Circle(.2f,.8f,.07f,true), Circle(.5f,.8f,.07f,true), Circle(.8f,.8f,.07f,true) } },
+            { "ranks", new[] {
+                S(true, false, .12f,.9f, .12f,.58f, .34f,.58f, .34f,.9f), S(true, false, .38f,.9f, .38f,.3f, .62f,.3f, .62f,.9f),
+                S(true, false, .66f,.9f, .66f,.7f, .88f,.7f, .88f,.9f) } },
+            { "tutorial", new[] {
+                S(true, false, .18f,.14f, .82f,.14f, .82f,.9f, .18f,.9f), S(false, false, .3f,.34f, .7f,.34f),
+                S(false, false, .3f,.52f, .7f,.52f), S(false, false, .3f,.7f, .56f,.7f) } },
+            { "about", new[] { Circle(.5f,.5f,.4f), S(false, false, .5f,.46f, .5f,.72f), Circle(.5f,.3f,.04f,true) } },
+            { "alien", new[] {
+                S(true, false, .2f,.3f, .5f,.1f, .8f,.3f, .72f,.7f, .5f,.9f, .28f,.7f), Circle(.38f,.46f,.07f,true), Circle(.62f,.46f,.07f,true) } },
+            { "tools", new[] { S(false, false, .2f,.8f, .62f,.38f), Circle(.7f,.3f,.18f), S(false, false, .8f,.8f, .3f,.3f) } },
+            { "sound", new[] {
+                S(true, true, .14f,.4f, .34f,.4f, .56f,.2f, .56f,.8f, .34f,.6f, .14f,.6f),
+                S(false, false, .7f,.35f, .78f,.5f, .7f,.65f) } },
             { "close", new[] { S(false, false, .22f,.22f, .78f,.78f), S(false, false, .78f,.22f, .22f,.78f) } },
             { "plus", new[] { S(false, false, .5f,.2f, .5f,.8f), S(false, false, .2f,.5f, .8f,.5f) } },
             { "minus", new[] { S(false, false, .2f,.5f, .8f,.5f) } },
@@ -109,11 +126,31 @@ namespace Frontier
             return "core";
         }
 
+        static readonly Dictionary<string, Texture2D> spriteCache = new Dictionary<string, Texture2D>();
+
+        static Texture2D Sprite(string name)
+        {
+            Texture2D t;
+            if (!spriteCache.TryGetValue(name, out t))
+            {
+                t = Resources.Load<Texture2D>("Frontier/Icons/" + name);
+                spriteCache[name] = t;
+            }
+            return t;
+        }
+
         public static VisualElement Make(string name, Color color, float size = 0f)
         {
             var e = new VisualElement { pickingMode = PickingMode.Ignore };
             e.AddToClassList("fr-icon");
             if (size > 0f) { e.style.width = size; e.style.height = size; e.style.flexShrink = 0; }
+            var tex = Sprite(name);
+            if (tex != null)
+            {
+                e.style.backgroundImage = new StyleBackground(tex);
+                e.style.unityBackgroundImageTintColor = UiKit.Ui(color);
+                return e;
+            }
             Shape[] shapes;
             if (!Library.TryGetValue(name, out shapes)) shapes = Library["core"];
             Color c = UiKit.Ui(color);
@@ -144,10 +181,11 @@ namespace Frontier
         }
 
         /// <summary>A square neon icon button.</summary>
-        public static Button IconButton(string icon, Color color, System.Action onClick, float size = 0f)
+        public static Button IconButton(string icon, Color color, System.Action onClick, float size = 0f, bool round = false)
         {
             var b = new Button();
             b.AddToClassList("fr-iconbtn");
+            if (round) b.AddToClassList("fr-round");
             Color c = UiKit.Ui(color);
             UiKit.Border(b, c, 3f);
             b.style.backgroundColor = new Color(c.r * 0.12f, c.g * 0.12f, c.b * 0.12f, 0.88f);

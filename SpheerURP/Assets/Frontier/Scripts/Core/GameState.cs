@@ -184,18 +184,48 @@ namespace Frontier
             return null;
         }
 
-        public bool HasStructure(PlanetSO p, StructureSO def)
+        public int CountOnPlanet(PlanetSO p, StructureSO def)
         {
-            foreach (var s in structures) if (s.planetId == p.id && s.def == def) return true;
-            return false;
+            int n = 0;
+            foreach (var s in structures) if (s.planetId == p.id && s.def == def) n++;
+            return n;
+        }
+
+        public bool HasStructure(PlanetSO p, StructureSO def) { return CountOnPlanet(p, def) > 0; }
+
+        public bool AtLimit(PlanetSO p, StructureSO def) { return def.maxPerPlanet > 0 && CountOnPlanet(p, def) >= def.maxPerPlanet; }
+
+        public int FreePads(PlanetSO p, int total)
+        {
+            int used = 0;
+            foreach (var s in structures) if (s.planetId == p.id) used++;
+            return total - used;
+        }
+
+        public List<GatherSpot> SpotsFor(PlanetSO p, MinigameKind game)
+        {
+            var list = new List<GatherSpot>();
+            foreach (var sp in p.spots) if (sp.game == game && sp.resource != null) list.Add(sp);
+            return list;
+        }
+
+        // Gather structures need a matching resource on the planet.
+        public bool CanBuildHere(StructureSO def)
+        {
+            return !def.kind.IsGather() || SpotsFor(planet, def.kind.Game()).Count > 0;
         }
 
         public bool Place(StructureSO def, int slot)
         {
-            if (HasStructure(planet, def) || StructureAt(planet, slot) != null || !Spend(def.buildCost)) return false;
+            if (AtLimit(planet, def) || !CanBuildHere(def) || StructureAt(planet, slot) != null || !Spend(def.buildCost)) return false;
             structures.Add(new PlacedStructure { planetId = planet.id, def = def, slot = slot, level = 1 });
             Notify();
             return true;
+        }
+
+        public float TurretPower(PlacedStructure s)
+        {
+            return s.def.damage * (1f + s.def.bonusPerLevel * (s.level - 1)) * (1f + EffectSum(UpgradeEffect.TurretDamage));
         }
 
         public bool UpgradeStructure(PlacedStructure s)

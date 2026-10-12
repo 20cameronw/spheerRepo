@@ -6,14 +6,13 @@ using UnityEngine;
 namespace Frontier
 {
     /// <summary>
-    /// Everything that sits on the planet surface: gather nodes (trees, ore, drill sites), placed structures,
+    /// Everything that sits on the planet surface: placed structures,
     /// build pads, floating 3D labels, drag-to-rotate and tap picking.
     /// </summary>
     public class WorldSurface : MonoBehaviour
     {
         public const int SlotCount = 12;
 
-        public event Action<GatherSpot, Transform> NodeTapped;
         public event Action<PlacedStructure, Transform> StructureTapped;
         public event Action<int, Transform> SlotTapped;
 
@@ -26,7 +25,6 @@ namespace Frontier
         GameState gs;
         bool buildMode;
         Vector3[] dirs;
-        int[] nodeSlot;
         readonly List<Item> items = new List<Item>();
         readonly List<Item> pads = new List<Item>();
         string signature = "";
@@ -37,7 +35,6 @@ namespace Frontier
         {
             public Transform t;
             public Transform label;
-            public GatherSpot spot;
             public PlacedStructure structure;
             public int slot;
             public float phase;
@@ -73,9 +70,17 @@ namespace Frontier
             if (gs != null) gs.Changed -= OnChanged;
         }
 
+        public List<KeyValuePair<PlacedStructure, Transform>> TurretAnchors()
+        {
+            var list = new List<KeyValuePair<PlacedStructure, Transform>>();
+            foreach (var it in items)
+                if (it.structure != null && it.structure.def.kind.IsTurret() && it.t != null)
+                    list.Add(new KeyValuePair<PlacedStructure, Transform>(it.structure, it.t));
+            return list;
+        }
+
         public bool SlotOccupied(int slot)
         {
-            if (nodeSlot != null) foreach (var n in nodeSlot) if (n == slot) return true;
             return gs.StructureAt(gs.planet, slot) != null;
         }
 
@@ -84,17 +89,6 @@ namespace Frontier
         {
             signature = null;
             ClearAll();
-            nodeSlot = new int[p.spots.Count];
-            var order = new List<int>();
-            for (int i = 0; i < SlotCount; i++) order.Add(i);
-            var rng = new System.Random(p.id.GetHashCode() * 31 + 7);
-            for (int i = order.Count - 1; i > 0; i--) { int j = rng.Next(i + 1); int t = order[i]; order[i] = order[j]; order[j] = t; }
-            for (int i = 0; i < p.spots.Count; i++)
-            {
-                nodeSlot[i] = order[i % order.Count];
-                var it = MakeNode(p.spots[i], nodeSlot[i]);
-                items.Add(it);
-            }
             RebuildStructures();
             RebuildPads();
         }
@@ -166,20 +160,6 @@ namespace Frontier
             return new Item { t = go.transform, slot = slot };
         }
 
-        Item MakeNode(GatherSpot spot, int slot)
-        {
-            var it = NewItem(slot, "Node_" + spot.label);
-            it.spot = spot;
-            string key = spot.game == MinigameKind.Chop ? "node_chop" : spot.game == MinigameKind.Mine ? "node_mine" : "node_drill";
-            Color rc = spot.resource != null ? spot.resource.color : Color.white;
-            var model = SpawnModel(key, it.t, 0.62f);
-            if (model == null) BuildFallbackNode(it.t, spot.game, rc);
-            it.glow = Fx.GlowQuad(it.t, new Color(rc.r, rc.g, rc.b, 0.55f), 1.5f, new Vector3(0f, 0.25f, 0f)).transform;
-            it.label = MakeLabel(it.t, spot.label.ToUpper(), UiKit.Ui(rc), 0.9f, 0.34f, out it.labelRenderer);
-            it.phase = slot * 0.7f;
-            return it;
-        }
-
         Item MakeStructure(PlacedStructure s)
         {
             var it = NewItem(s.slot, "Struct_" + s.def.id);
@@ -235,37 +215,26 @@ namespace Frontier
             return g.transform;
         }
 
-        static void BuildFallbackNode(Transform t, MinigameKind game, Color rc)
+        static void BuildFallbackStructure(Transform t, StructureKind kind, Color c)
         {
-            if (game == MinigameKind.Chop)
+            var metal = Lit(new Color(0.45f, 0.5f, 0.6f), 0.15f);
+            var glow = Lit(c, 1.2f);
+            if (kind == StructureKind.Lumber)
             {
                 var bark = Lit(new Color(0.35f, 0.2f, 0.1f));
                 var leaf = Lit(new Color(0.15f, 0.65f, 0.3f), 0.15f);
                 Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.16f, 0f), new Vector3(0.1f, 0.16f, 0.1f), bark);
                 Prim(t, PrimitiveType.Sphere, new Vector3(0f, 0.42f, 0f), new Vector3(0.42f, 0.36f, 0.42f), leaf);
                 Prim(t, PrimitiveType.Sphere, new Vector3(0.03f, 0.62f, 0f), new Vector3(0.3f, 0.28f, 0.3f), leaf);
+                return;
             }
-            else if (game == MinigameKind.Mine)
-            {
-                var rock = Lit(new Color(rc.r * 0.5f, rc.g * 0.5f, rc.b * 0.5f), 0.6f);
-                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.16f, 0f), new Vector3(0.34f, 0.3f, 0.3f), rock, new Vector3(0f, 25f, 12f));
-                Prim(t, PrimitiveType.Cube, new Vector3(0.12f, 0.12f, 0.1f), new Vector3(0.22f, 0.2f, 0.22f), rock, new Vector3(20f, -10f, 30f));
-                Prim(t, PrimitiveType.Cube, new Vector3(-0.1f, 0.1f, -0.08f), new Vector3(0.2f, 0.18f, 0.2f), rock, new Vector3(-12f, 40f, 5f));
-            }
-            else
-            {
-                var metal = Lit(new Color(0.5f, 0.55f, 0.65f), 0.2f);
-                Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.2f, 0f), new Vector3(0.18f, 0.2f, 0.18f), metal);
-                Prim(t, PrimitiveType.Sphere, new Vector3(0f, 0.42f, 0f), new Vector3(0.2f, 0.2f, 0.2f), Lit(rc, 1f));
-            }
-        }
-
-        static void BuildFallbackStructure(Transform t, StructureKind kind, Color c)
-        {
-            var metal = Lit(new Color(0.45f, 0.5f, 0.6f), 0.15f);
             Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.2f, 0f), new Vector3(0.34f, 0.2f, 0.34f), metal);
-            Prim(t, kind == StructureKind.Refinery ? PrimitiveType.Sphere : PrimitiveType.Cylinder,
-                new Vector3(0f, 0.52f, 0f), kind == StructureKind.Refinery ? new Vector3(0.36f, 0.36f, 0.36f) : new Vector3(0.12f, 0.22f, 0.12f), Lit(c, 1.2f));
+            if (kind == StructureKind.Refinery || kind == StructureKind.Satellite)
+                Prim(t, PrimitiveType.Sphere, new Vector3(0f, 0.52f, 0f), new Vector3(0.36f, 0.36f, 0.36f), glow);
+            else if (kind.IsTurret())
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.6f, 0f), new Vector3(0.1f, kind == StructureKind.Laser ? 0.3f : 0.2f, 0.1f), glow);
+            else
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.52f, 0f), new Vector3(0.12f, 0.22f, 0.12f), glow);
         }
 
         // ------------------------------------------------------------ labels
@@ -313,13 +282,13 @@ namespace Frontier
                 float bob = 0.04f * Mathf.Sin(Time.time * 2.2f + it.phase);
                 if (it.label != null)
                 {
-                    it.label.localPosition = new Vector3(0f, (it.structure != null ? 1.0f : it.spot != null ? 0.9f : 0.6f) + bob, 0f);
+                    it.label.localPosition = new Vector3(0f, (it.structure != null ? 1.0f : 0.6f) + bob, 0f);
                     it.labelRenderer.enabled = facing && !Locked;
                 }
                 if (it.glow != null)
                 {
                     float k = 1f + 0.12f * Mathf.Sin(Time.time * 3f + it.phase);
-                    it.glow.localScale = Vector3.one * (it.structure != null ? 1.8f : it.spot != null ? 1.5f : 1.6f) * k;
+                    it.glow.localScale = Vector3.one * (it.structure != null ? 1.8f : 1.6f) * k;
                     it.glow.gameObject.SetActive(facing);
                 }
             }
@@ -372,7 +341,6 @@ namespace Frontier
                     if (it.t != h.transform) continue;
                     Sfx.Click();
                     if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
-                    else if (NodeTapped != null && !buildMode) NodeTapped(it.spot, it.t);
                     return;
                 }
             }

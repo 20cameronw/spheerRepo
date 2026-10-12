@@ -67,6 +67,7 @@ namespace Frontier
             surface.Init(planet, cam, gs);
             surface.IsOverUi = ui.IsOverUi;
             defense.IsOverUi = ui.IsOverUi;
+            defense.World = surface;
             ui.Init(doc, gs, defense, planet, backdrop, surface, cam);
         }
     }

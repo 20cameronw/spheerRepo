@@ -44,6 +44,10 @@ namespace Frontier
         GameState gs;
         readonly List<Transform> turrets = new List<Transform>();
         readonly List<float> turretCooldown = new List<float>();
+        readonly List<PlacedStructure> placed = new List<PlacedStructure>();
+        readonly List<Transform> placedT = new List<Transform>();
+        readonly List<float> placedCd = new List<float>();
+        public WorldSurface World;
         float tapCooldown;
         float turretAngle;
         float spawnRadius;
@@ -99,6 +103,9 @@ namespace Frontier
             spawnRadius = Mathf.Sqrt(hh * hh + hw * hw) + 1.2f;
 
             BuildTurrets();
+            placed.Clear(); placedCd.Clear();
+            if (World != null)
+                foreach (var kv in World.TurretAnchors()) { placed.Add(kv.Key); placedT.Add(kv.Value); placedCd.Add(UnityEngine.Random.value * 0.5f); }
             spawnRoutine = StartCoroutine(SpawnLoop());
             Sfx.Play(300f, 0.4f, 0.3f, 600f);
             return true;
@@ -173,10 +180,31 @@ namespace Frontier
                 }
             }
 
+            FirePlaced();
             tapCooldown -= Time.deltaTime;
             HandleTap();
 
             if (Spawned >= Current.aliens.Count && AlienActor.All.Count == 0 && Active) End(true);
+        }
+
+        void FirePlaced()
+        {
+            for (int i = 0; i < placed.Count; i++)
+            {
+                if (placedT[i] == null) continue;
+                placedCd[i] -= Time.deltaTime;
+                if (placedCd[i] > 0f) continue;
+                var def = placed[i].def;
+                Vector3 from = placedT[i].position + placedT[i].up * 0.45f;
+                var target = Nearest(from, def.range * def.range);
+                if (target == null) { placedCd[i] = 0.15f; continue; }
+                placedCd[i] = def.fireInterval;
+                Color c = def.color;
+                Fx.Bolt(from, target.transform.position, new Color(c.r, c.g, c.b, 1f), def.beamWidth, def.kind == StructureKind.Laser ? 0.28f : 0.1f);
+                Fx.Burst(target.transform.position, c, def.kind == StructureKind.Laser ? 14 : 6, 2.5f, 0.15f);
+                Sfx.Zap();
+                target.Damage(gs.TurretPower(placed[i]));
+            }
         }
 
         AlienActor Nearest(Vector3 from, float maxDist)
@@ -243,6 +271,7 @@ namespace Frontier
             Active = false;
             if (spawnRoutine != null) StopCoroutine(spawnRoutine);
             ClearTurrets();
+            placed.Clear(); placedT.Clear(); placedCd.Clear();
             foreach (var a in new List<AlienActor>(AlienActor.All)) if (a != null) a.Die();
 
             var result = new WaveResult { victory = victory, wave = Current };
@@ -255,7 +284,6 @@ namespace Frontier
                     if (ok < r.amount) result.lost.Add(new ItemAmount(r.resource, r.amount - ok));
                 }
                 gs.WaveCleared(gs.planet);
-                gs.AddXp(Current.xp);
                 gs.AddXp(Current.xp);
                 Sfx.Good();
             }

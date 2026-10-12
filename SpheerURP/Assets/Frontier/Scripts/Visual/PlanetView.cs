@@ -66,18 +66,20 @@ namespace Frontier
             var atmo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(atmo.GetComponent<Collider>());
             atmo.transform.SetParent(root, false);
-            atmo.transform.localScale = Vector3.one * Radius * 2.4f;
-            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AddMat(new Color(p.rim.r, p.rim.g, p.rim.b, 0.9f), null, 2.2f);
+            atmo.transform.localScale = Vector3.one * Radius * 2.28f;
+            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(p.rim.r * 1.2f, p.rim.g * 1.2f, p.rim.b * 1.2f, 1f));
 
-            glow = Fx.GlowQuad(root, new Color(p.rim.r, p.rim.g, p.rim.b, 0.55f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
+            glow = Fx.GlowQuad(root, new Color(p.rim.r, p.rim.g, p.rim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
 
-            int rings = Mathf.Clamp(1 + p.tier / 2, 1, 3);
-            for (int i = 0; i < rings; i++)
-                BuildRing(Radius * (1.7f + i * 0.35f), p.rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
+            if (p.hasRings)
+                for (int i = 0; i < 2; i++)
+                    BuildRing(Radius * (1.7f + i * 0.35f), p.rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
 
-            int moons = Mathf.Clamp(1 + p.tier, 1, 4);
+            int moons = p.tier / 2;
             for (int i = 0; i < moons; i++)
                 BuildMoon(Radius * (2.1f + i * 0.45f), p.rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f);
+
+            Weather.Build(root, p);
 
             appear = animate ? 0f : 1f;
             root.localScale = Vector3.one * appear;

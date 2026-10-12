@@ -60,10 +60,21 @@ MonoBehaviour:
     prefab: {fileID: 3192028281512451177, guid: b4d04437add6d7e4386db2307d914fb7,
       type: 3}
     scale: 1
-  - key: node_mine
+  - key: struct_mine
     prefab: {fileID: 919132149155446097, guid: 1c311dae0af2f400ebe73409c652c949, type: 3}
     scale: 1
-  - key: node_drill
+  - key: struct_drill
     prefab: {fileID: 6167137264061970111, guid: b7485f5c7262c43d9aa31506d7bbe793,
+      type: 3}
+    scale: 1
+  - key: struct_gunner
+    prefab: {fileID: 919132149155446097, guid: 6e1e7dca4b4ed33409a90661701216d0, type: 3}
+    scale: 1
+  - key: struct_laser
+    prefab: {fileID: 6825596879887032473, guid: 6946c4e2a57a5244699ef72f630f5e0a,
+      type: 3}
+    scale: 1
+  - key: struct_satellite
+    prefab: {fileID: 8005019957655098634, guid: 35b44654aaf824c91b1590baa998f2eb,
       type: 3}
     scale: 1

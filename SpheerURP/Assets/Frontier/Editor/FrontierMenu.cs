@@ -53,8 +53,11 @@ namespace Frontier.EditorTools
                 ("turret", "Assets/Models/gunner.fbx", 1f),
                 ("struct_refinery", "Assets/Prefabs/silo_with_missil.prefab", 1f),
                 ("struct_alarm", "Assets/Prefabs/sat_dish.prefab", 1f),
-                ("node_mine", "Assets/Models/space_trash.fbx", 1f),
-                ("node_drill", "Assets/Prefabs/drill.prefab", 1f),
+                ("struct_mine", "Assets/Models/space_trash.fbx", 1f),
+                ("struct_drill", "Assets/Prefabs/drill.prefab", 1f),
+                ("struct_gunner", "Assets/Models/gunner.fbx", 1f),
+                ("struct_laser", "Assets/Prefabs/lazer.prefab", 1f),
+                ("struct_satellite", "Assets/Prefabs/satellite.prefab", 1f),
             };
             var list = new System.Collections.Generic.List<ModelLibrary.Entry>();
             foreach (var m in map)
@@ -71,6 +74,43 @@ namespace Frontier.EditorTools
             EditorUtility.SetDirty(lib);
             AssetDatabase.SaveAssets();
             Debug.Log("Frontier: model library built with " + list.Count + " entries");
+        }
+
+        [MenuItem("Frontier/Build Icons")]
+        public static void BuildIcons()
+        {
+            // icon key -> your original sprite. Dark sprites are recolored white so the UI can tint them neon.
+            var map = new (string key, string path)[]
+            {
+                ("build", "Assets/Dark UI/Free/Shop.png"),
+                ("map", "Assets/Dark UI/Free/World.png"),
+                ("gear", "Assets/Dark UI/Free/Settings.png"),
+                ("ranks", "Assets/Dark UI/Free/Ranks.png"),
+                ("about", "Assets/Dark UI/Free/Info.png"),
+                ("tutorial", "Assets/Dark UI/Free/Missions.png"),
+                ("pack", "Assets/Dark UI/Free/Inventory.png"),
+                ("grid", "Assets/Images/apps-grid-icon.png"),
+                ("research", "Assets/Images/flask-icon.png"),
+                ("tools", "Assets/Images/tools-icon.png"),
+                ("alien", "Assets/Images/aliens-icon.png"),
+            };
+            string outDir = "Assets/Frontier/Resources/Frontier/Icons";
+            Directory.CreateDirectory(outDir);
+            int n = 0;
+            foreach (var m in map)
+            {
+                if (!File.Exists(m.path)) { Debug.LogWarning("Frontier: missing icon " + m.path); continue; }
+                var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                if (!tex.LoadImage(File.ReadAllBytes(m.path))) continue;
+                var px = tex.GetPixels32();
+                for (int i = 0; i < px.Length; i++) { px[i].r = 255; px[i].g = 255; px[i].b = 255; }
+                tex.SetPixels32(px);
+                tex.Apply();
+                File.WriteAllBytes(outDir + "/" + m.key + ".png", tex.EncodeToPNG());
+                n++;
+            }
+            AssetDatabase.Refresh();
+            Debug.Log("Frontier: built " + n + " icons");
         }
 
         [MenuItem("Frontier/Reset Save")]

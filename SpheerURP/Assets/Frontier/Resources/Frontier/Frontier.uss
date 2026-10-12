@@ -22,24 +22,25 @@
 .fr-icon { width: 40px; height: 40px; flex-shrink: 0; }
 
 /* ---------- HUD ---------- */
-.fr-hudstats { position: absolute; left: 0; top: 0; flex-direction: column; align-items: flex-start; padding: 16px 0 0 16px; }
-.fr-pill {
+.fr-topbar { position: absolute; left: 0; right: 0; top: 0; height: 120px; }
+.fr-topbar-bar {
+    position: absolute; left: 56px; right: 56px; top: 14px; height: 76px;
     flex-direction: row; align-items: center;
-    height: 62px; padding: 0 20px 0 14px; margin-bottom: 10px;
-    border-radius: 31px; border-width: 2px;
-    background-color: rgba(5, 9, 28, 0.82);
+    padding: 0 40px 0 64px;
+    border-radius: 0 38px 38px 0; border-width: 2px;
+    background-color: rgba(5, 9, 28, 0.86);
 }
-.fr-pill .fr-icon { width: 38px; height: 38px; margin-right: 8px; }
-.fr-pill-text { font-size: 30px; }
-
-.fr-topcenter { position: absolute; left: 0; right: 0; top: 0; align-items: center; padding-top: 16px; }
-.fr-planet-tag {
-    flex-direction: column; align-items: stretch;
-    padding: 8px 34px 12px 34px;
-    border-radius: 26px; border-width: 2px;
-    background-color: rgba(5, 9, 28, 0.82);
-    min-width: 300px;
+.fr-topbar-corner { position: absolute; top: 0; }
+.fr-topbar-left { left: 0; }
+.fr-topbar-right { right: 0; }
+.fr-chip {
+    flex-direction: row; align-items: center;
+    margin-right: 22px; flex-shrink: 0;
 }
+.fr-chip .fr-icon { width: 36px; height: 36px; margin-right: 8px; }
+.fr-chip-text { font-size: 28px; }
+.fr-chip-xp { width: 110px; margin-left: 10px; }
+.fr-planet-name { font-size: 26px; flex-grow: 1; flex-shrink: 1; -unity-text-align: middle-right; white-space: nowrap; overflow: hidden; }
 .fr-bar {
     height: 16px;
     border-radius: 8px;
@@ -49,11 +50,11 @@
 }
 .fr-bar-fill { height: 100%; border-radius: 8px; }
 
-.fr-side { position: absolute; top: 0; bottom: 0; justify-content: center; }
-.fr-side-left { left: 0; padding-left: 16px; }
-.fr-side-right { right: 0; padding-right: 16px; }
-.fr-bottom { position: absolute; left: 0; right: 0; bottom: 0; flex-direction: row; justify-content: center; padding-bottom: 20px; }
-.fr-bottom .fr-iconbtn { margin: 0 34px; }
+.fr-corner { position: absolute; bottom: 22px; }
+.fr-corner-left { left: 22px; }
+.fr-corner-right { right: 22px; }
+.fr-round { width: 150px; height: 150px; border-radius: 75px; }
+.fr-topbar-corner.fr-round { width: 104px; height: 104px; border-radius: 52px; }
 
 .fr-iconbtn {
     width: 128px; height: 128px;
@@ -139,6 +140,20 @@
 .fr-slot-locked { opacity: 0.3; }
 .fr-slot .fr-icon { width: 62%; height: 62%; }
 .fr-slot-count { position: absolute; right: 4px; bottom: 0; font-size: 22px; }
+
+/* ---------- Menu / settings ---------- */
+.fr-menu-grid { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+.fr-menu-tile {
+    width: 30%; min-width: 200px; margin: 8px 1.5%; padding: 20px 8px;
+    border-radius: 24px; border-width: 2px;
+    flex-direction: column; align-items: center;
+    background-color: rgba(10, 18, 44, 0.92);
+}
+.fr-menu-tile .fr-icon { width: 80px; height: 80px; margin-bottom: 8px; }
+.fr-slider { flex-grow: 1; min-height: 54px; margin: 0 8px; }
+.fr-setting-row { flex-direction: row; align-items: center; margin: 10px 0; }
+.fr-setting-row > Label { min-width: 200px; }
+.fr-back { align-self: flex-start; margin-bottom: 8px; }
 
 /* ---------- World popups ---------- */
 .fr-popup {

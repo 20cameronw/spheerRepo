@@ -30,6 +30,10 @@ namespace Frontier
         public Color secondary = new Color(0.03f, 0.2f, 0.1f);
         [ColorUsage(false, true)] public Color rim = new Color(0.4f, 1.5f, 1f);
 
+        public WeatherKind weather = WeatherKind.Clear;
+        [Tooltip("Rings are reserved for rare planets.")]
+        public bool hasRings;
+
         public List<GatherSpot> spots = new List<GatherSpot>();
 
         public const float MapScale = 20f;

@@ -16,8 +16,15 @@ namespace Frontier
         public List<ItemAmount> buildCost = new List<ItemAmount>();
         public int maxLevel = 5;
         public float upgradeGrowth = 1.9f;
-        [Tooltip("Per level above 1: refinery output bonus, or alarm reward/xp bonus.")]
+        [Tooltip("Per level above 1: refinery output, alarm reward/xp, gather yield or turret damage bonus.")]
         public float bonusPerLevel = 0.25f;
+        [Tooltip("How many of this structure fit on one planet. 0 = unlimited (limited by pads).")]
+        public int maxPerPlanet = 1;
+        [Header("Turrets")]
+        public float damage = 6f;
+        public float fireInterval = 0.7f;
+        public float range = 8f;
+        public float beamWidth = 0.07f;
 
         public List<ItemAmount> UpgradeCost(int currentLevel)
         {

@@ -57,11 +57,13 @@ namespace Frontier
             return e;
         }
 
-        static StructureSO Struct(string id, string name, string desc, StructureKind kind, Color c, string model, List<ItemAmount> cost, float bonus)
+        static StructureSO Struct(string id, string name, string desc, StructureKind kind, Color c, string model, List<ItemAmount> cost, float bonus,
+            int max = 1, float dmg = 0f, float interval = 0.7f, float range = 8f, float beam = 0.07f)
         {
             var s = New<StructureSO>(id);
             s.id = id; s.displayName = name; s.description = desc; s.kind = kind; s.color = c; s.modelKey = model;
-            s.buildCost = cost; s.bonusPerLevel = bonus;
+            s.buildCost = cost; s.bonusPerLevel = bonus; s.maxPerPlanet = max;
+            s.damage = dmg; s.fireInterval = interval; s.range = range; s.beamWidth = beam;
             return s;
         }
 
@@ -114,6 +116,14 @@ namespace Frontier
                     Spot("Void Ore", MinigameKind.Mine, iron, 12, 0.6f)),
             };
 
+            planets[0].weather = WeatherKind.Rain;
+            planets[1].weather = WeatherKind.Dust;
+            planets[2].weather = WeatherKind.Snow;
+            planets[3].weather = WeatherKind.Embers;
+            planets[4].weather = WeatherKind.Storm;
+            planets[5].weather = WeatherKind.Spores;
+            planets[5].hasRings = true;
+
             var upgrades = new[]
             {
                 Up("axe", "Axe", "More wood per chop and a wider sweet spot.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
@@ -162,6 +172,20 @@ namespace Frontier
                     StructureKind.Refinery, new Color(0.7f, 2.2f, 0.4f), "struct_refinery", L(A(wood, 15), A(stone, 6)), 0.25f),
                 Struct("alarm", "Alarm Beacon", "Tap it to burn fuel and call a wave. More fuel means a longer fight and bigger rewards.",
                     StructureKind.Alarm, new Color(2.2f, 0.4f, 1.8f), "struct_alarm", L(A(wood, 12), A(stone, 8)), 0.15f),
+                Struct("lumber", "Lumber Camp", "Tap it to chop the trees on this planet. Higher levels yield more.",
+                    StructureKind.Lumber, new Color(1.8f, 1.1f, 0.35f), "struct_lumber", L(A(wood, 6)), 0.2f),
+                Struct("mine", "Mining Rig", "Tap it to mine ore and stone on this planet. Higher levels yield more.",
+                    StructureKind.Mine, new Color(0.8f, 1.2f, 1.8f), "struct_mine", L(A(wood, 10), A(stone, 6)), 0.2f),
+                Struct("driller", "Deep Driller", "Tap it to drill fuel, crystal and cores. Higher levels yield more.",
+                    StructureKind.Drill, new Color(2f, 0.8f, 0.4f), "struct_drill", L(A(wood, 14), A(stone, 10), A(iron, 6)), 0.2f),
+                Struct("gunner", "Gunner Turret", "Rapid fire kinetic turret. Fires during waves.",
+                    StructureKind.Gunner, new Color(2.2f, 1.4f, 0.4f), "struct_gunner", L(A(wood, 12), A(iron, 8)), 0.3f,
+                    0, 4f, 0.45f, 8f, 0.05f),
+                Struct("laser", "Laser Turret", "Slow, heavy beam with long range. Fires during waves.",
+                    StructureKind.Laser, new Color(0.4f, 2.2f, 2.2f), "struct_laser", L(A(stone, 12), A(iron, 12), A(crystal, 4)), 0.3f,
+                    0, 14f, 1.3f, 11f, 0.12f),
+                Struct("satellite", "Satellite", "Uplink relay. Does nothing yet - future upgrades will plug in here.",
+                    StructureKind.Satellite, new Color(0.6f, 1.4f, 2.4f), "struct_satellite", L(A(iron, 10), A(crystal, 3)), 0.1f),
             };
 
             var db = New<GameDatabase>("GameDatabase");
@@ -174,7 +198,7 @@ namespace Frontier
             db.formula = wave;
             db.fuel = fuel;
             db.startPlanet = planets[0];
-            db.startingItems = L(A(fuel, 10));
+            db.startingItems = L(A(fuel, 10), A(wood, 12));
             return db;
         }
     }

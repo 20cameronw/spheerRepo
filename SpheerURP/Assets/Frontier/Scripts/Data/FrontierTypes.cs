@@ -21,7 +21,26 @@ namespace Frontier
     public enum StructureKind
     {
         Refinery,
-        Alarm
+        Alarm,
+        Lumber,
+        Mine,
+        Drill,
+        Gunner,
+        Laser,
+        Satellite
+    }
+
+    public enum WeatherKind { Clear, Rain, Snow, Embers, Spores, Dust, Storm }
+
+    public static class StructureKinds
+    {
+        public static bool IsGather(this StructureKind k) { return k == StructureKind.Lumber || k == StructureKind.Mine || k == StructureKind.Drill; }
+        public static bool IsTurret(this StructureKind k) { return k == StructureKind.Gunner || k == StructureKind.Laser; }
+
+        public static MinigameKind Game(this StructureKind k)
+        {
+            return k == StructureKind.Lumber ? MinigameKind.Chop : k == StructureKind.Mine ? MinigameKind.Mine : MinigameKind.Drill;
+        }
     }
 
     [Serializable]

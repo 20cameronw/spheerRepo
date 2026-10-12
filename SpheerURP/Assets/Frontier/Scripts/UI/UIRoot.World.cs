@@ -76,8 +76,82 @@ namespace Frontier
         {
             if (busy || defense.Active) return;
             CloseModal();
-            if (s.def.kind == StructureKind.Refinery) OpenRefinery(s, t);
-            else OpenAlarm(s, t);
+            var k = s.def.kind;
+            if (k == StructureKind.Refinery) OpenRefinery(s, t);
+            else if (k == StructureKind.Alarm) OpenAlarm(s, t);
+            else if (k.IsGather()) OpenGatherer(s, t);
+            else if (k.IsTurret()) OpenTurret(s, t);
+            else OpenSimple(s, t, "UPLINK COMING SOON", "Satellites will unlock orbital abilities in a future update.");
+        }
+
+        void StructureHeader(VisualElement body, PlacedStructure s, Color c)
+        {
+            var head = UiKit.Div("fr-row");
+            head.Add(Icons.Make(StructureIcon(s.def.kind), c, 48f));
+            head.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level, "fr-h2", c));
+            body.Add(head);
+        }
+
+        void UpgradeButton(VisualElement body, PlacedStructure s, Color c)
+        {
+            if (s.level >= s.def.maxLevel) { body.Add(UiKit.Text("MAXED", "fr-small", UiKit.Lime)); return; }
+            var cost = s.def.UpgradeCost(s.level);
+            body.Add(UiKit.CostRow(cost, gs, true));
+            var up = IconBtn("UPGRADE", "up", c, () =>
+            {
+                if (gs.UpgradeStructure(s)) { Sfx.Good(); Toast(s.def.displayName + " LV " + s.level, c); }
+                else Sfx.Bad();
+            });
+            UiKit.SetEnabledLook(up, gs.Has(cost));
+            body.Add(up);
+        }
+
+        void OpenSimple(PlacedStructure s, Transform t, string title, string text)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("simple" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c);
+                body.Add(UiKit.Text(title, "fr-small", c));
+                body.Add(UiKit.Text(text, "fr-tiny"));
+            });
+        }
+
+        void OpenTurret(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("turret" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c);
+                body.Add(UiKit.Text("Fires automatically during waves", "fr-tiny"));
+                body.Add(UiKit.Text("DMG " + gs.TurretPower(s).ToString("0.#") + "   RANGE " + s.def.range.ToString("0"), "fr-small"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
+        void OpenGatherer(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            var game = s.def.kind.Game();
+            OpenPopup("gather" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c);
+                body.Add(UiKit.Text(gs.ToolName(game) + "  LV " + gs.ToolLevel(game), "fr-tiny"));
+                float bonus = gs.StructureBonus(s);
+                foreach (var spot in gs.SpotsFor(gs.planet, game))
+                {
+                    var sp = spot;
+                    Color rc = UiKit.Ui(sp.resource.color);
+                    var row = UiKit.Div("fr-row");
+                    row.style.marginTop = 6;
+                    int est = Mathf.Max(1, Mathf.RoundToInt(sp.baseYield * gs.ToolMultiplier(game) * (1f + bonus)));
+                    row.Add(ResourceIconChip(sp.resource, "~" + est));
+                    row.Add(UiKit.Div("fr-spacer"));
+                    row.Add(IconBtn("START", "play", rc, () => { ClosePopup(); StartGather(sp, t, bonus); }));
+                    body.Add(row);
+                }
+                UpgradeButton(body, s, c);
+            });
         }
 
         void OpenRefinery(PlacedStructure s, Transform t)
@@ -225,19 +299,18 @@ namespace Frontier
         {
             if (buildDef == null) return;
             var def = buildDef;
-            if (gs.Place(def, slot))
+            if (!gs.Place(def, slot)) { }
+            else
             {
                 Sfx.Good();
                 Fx.Burst(t.position, def.color, 50, 5f, 0.25f);
                 planetView.Punch();
                 Toast(def.displayName + " built!", UiKit.Ui(def.color));
                 ExitBuild();
+                return;
             }
-            else
-            {
-                Sfx.Bad();
-                Toast("Not enough resources", UiKit.Red);
-            }
+            Sfx.Bad();
+            Toast("Not enough resources", UiKit.Red);
         }
     }
 }

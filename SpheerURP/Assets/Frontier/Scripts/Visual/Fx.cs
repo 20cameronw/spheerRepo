@@ -83,6 +83,17 @@ namespace Frontier
             return t;
         }
 
+        public static Material AtmoMat(Color c, float power = 3.2f, float intensity = 1.3f)
+        {
+            var sh = Resources.Load<Shader>("Frontier/NeonAtmosphere");
+            if (sh == null) return AddMat(new Color(c.r, c.g, c.b, 0.08f), null, 3f);
+            var m = new Material(sh);
+            m.SetColor("_Color", c);
+            m.SetFloat("_Power", power);
+            m.SetFloat("_Intensity", intensity);
+            return m;
+        }
+
         public static Material AddMat(Color c, Texture tex = null, float fresnel = 0f)
         {
             var m = new Material(Additive);
@@ -229,11 +240,12 @@ namespace Frontier
         static AudioSource src;
         static readonly Dictionary<string, AudioClip> cache = new Dictionary<string, AudioClip>();
 
+        public static bool Muted;
         public static void Init(GameObject host) { src = host.AddComponent<AudioSource>(); src.playOnAwake = false; }
 
         public static void Play(float freq, float dur = 0.12f, float vol = 0.25f, float sweep = 0f)
         {
-            if (src == null) return;
+            if (src == null || Muted) return;
             string key = freq + "_" + dur + "_" + sweep;
             AudioClip clip;
             if (!cache.TryGetValue(key, out clip))
