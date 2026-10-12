@@ -15,6 +15,7 @@ namespace Frontier
         public WaveFormulaSO formula;
 
         public ResourceSO fuel;
+        public ResourceSO scrap;
         public PlanetSO startPlanet;
         public List<ItemAmount> startingItems = new List<ItemAmount>();
 

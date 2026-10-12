@@ -37,6 +37,30 @@ namespace Frontier
         public int style;
 
         public List<GatherSpot> spots = new List<GatherSpot>();
+        [Tooltip("Solar system this planet orbits (see PlanetSO.Systems).")]
+        public string systemId;
+
+        public class StarSystem
+        {
+            public string id, name; public Vector2 center; public Color color;
+            public StarSystem(string id, string name, float x, float y, Color c) { this.id = id; this.name = name; center = new Vector2(x, y); color = c; }
+        }
+
+        public static readonly StarSystem[] Systems =
+        {
+            new StarSystem("sylva", "Sylva System", 0.22f, 0.80f, new Color(1f, 0.95f, 0.6f)),
+            new StarSystem("ember", "Emberfall", 0.56f, 0.84f, new Color(1f, 0.45f, 0.2f)),
+            new StarSystem("verdance", "Verdance", 0.25f, 0.40f, new Color(0.5f, 1f, 0.6f)),
+            new StarSystem("umbra", "Umbra", 0.82f, 0.68f, new Color(0.7f, 0.4f, 1f)),
+            new StarSystem("frost", "Frostline", 0.58f, 0.30f, new Color(0.6f, 0.9f, 1f)),
+            new StarSystem("edge", "The Fracture", 0.88f, 0.12f, new Color(1f, 1f, 1f)),
+        };
+
+        public static StarSystem SystemOf(string id)
+        {
+            foreach (var s in Systems) if (s.id == id) return s;
+            return null;
+        }
 
         public const float MapScale = 40f;
 

@@ -194,6 +194,30 @@ namespace Frontier
                 p.MoveTo(s); p.LineTo(s + new Vector2(3f, 0f)); p.LineTo(s + new Vector2(3f, 3f)); p.LineTo(s + new Vector2(0f, 3f));
                 p.ClosePath(); p.Fill();
             }
+            foreach (var sys in PlanetSO.Systems)
+            {
+                Vector2 c = new Vector2(sys.center.x * MapSize, (1f - sys.center.y) * MapSize);
+                float maxR = 0f;
+                foreach (var pl in gs.db.planets)
+                    if (pl.systemId == sys.id) maxR = Mathf.Max(maxR, (MapPoint(pl) - c).magnitude);
+                if (maxR <= 0f) continue;
+                p.fillColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.05f);
+                p.BeginPath(); p.Arc(c, maxR + 150f, Angle.Degrees(0f), Angle.Degrees(360f)); p.Fill();
+                p.lineWidth = 3f;
+                foreach (var pl in gs.db.planets)
+                {
+                    if (pl.systemId != sys.id) continue;
+                    p.strokeColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.25f);
+                    p.BeginPath(); p.Arc(c, (MapPoint(pl) - c).magnitude, Angle.Degrees(0f), Angle.Degrees(360f)); p.Stroke();
+                }
+                for (int k = 3; k >= 1; k--)
+                {
+                    p.fillColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.16f * (4 - k) / 3f);
+                    p.BeginPath(); p.Arc(c, 28f + k * 22f, Angle.Degrees(0f), Angle.Degrees(360f)); p.Fill();
+                }
+                p.fillColor = Color.Lerp(sys.color, Color.white, 0.6f);
+                p.BeginPath(); p.Arc(c, 30f, Angle.Degrees(0f), Angle.Degrees(360f)); p.Fill();
+            }
             if (selected != null && selected != gs.planet)
             {
                 p.lineWidth = 6f;
@@ -206,6 +230,17 @@ namespace Frontier
         void BuildMapNodes()
         {
             for (int i = mapWorld.childCount - 1; i >= 0; i--) mapWorld.RemoveAt(i);
+            foreach (var sys in PlanetSO.Systems)
+            {
+                var lbl = UiKit.Text(sys.name.ToUpper(), "fr-small", UiKit.Ui(sys.color));
+                lbl.pickingMode = PickingMode.Ignore;
+                lbl.style.position = Position.Absolute;
+                lbl.style.left = sys.center.x * MapSize - 200f;
+                lbl.style.top = (1f - sys.center.y) * MapSize + 70f;
+                lbl.style.width = 400f;
+                lbl.style.unityTextAlign = TextAnchor.UpperCenter;
+                mapWorld.Add(lbl);
+            }
             foreach (var pl in gs.db.planets)
             {
                 var planet = pl;

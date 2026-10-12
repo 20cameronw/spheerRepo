@@ -87,6 +87,42 @@ namespace Frontier
             return r;
         }
 
+        static RecipeSO Fab(string name, List<ItemAmount> inputs, List<ItemAmount> outputs)
+        {
+            var r = Recipe(name, inputs, outputs);
+            r.fabricator = true;
+            return r;
+        }
+
+        // Groups planets into solar systems and places each one on an orbit around its star.
+        static void AssignSystems(PlanetSO[] planets)
+        {
+            var groups = new Dictionary<string, string[]>
+            {
+                { "sylva", new[] { "sylva", "ferrum", "glacia" } },
+                { "ember", new[] { "cinder", "pyre", "aurum" } },
+                { "verdance", new[] { "arbor", "mire", "coral", "tide" } },
+                { "umbra", new[] { "nyx", "vesper", "obsidian" } },
+                { "frost", new[] { "halcyon", "tundra", "zephyr" } },
+                { "edge", new[] { "prism", "kaos" } },
+            };
+            foreach (var kv in groups)
+            {
+                var sys = PlanetSO.SystemOf(kv.Key);
+                for (int i = 0; i < kv.Value.Length; i++)
+                {
+                    foreach (var p in planets)
+                    {
+                        if (p.id != kv.Value[i]) continue;
+                        p.systemId = kv.Key;
+                        float ang = (i / (float)kv.Value.Length) * Mathf.PI * 2f + sys.center.x * 7f;
+                        float rad = 0.055f + 0.012f * (i % 2) + 0.004f * i;
+                        p.mapPosition = sys.center + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * rad;
+                    }
+                }
+            }
+        }
+
         public static GameDatabase Create()
         {
             var wood = Res("wood", "Wood", new Color(1.8f, 1.1f, 0.35f), "Timber from the lush worlds. Everything starts here.");
@@ -95,6 +131,9 @@ namespace Frontier
             var crystal = Res("crystal", "Crystal", new Color(0.3f, 2.0f, 2.2f), "Resonant crystal, glows when struck.");
             var fuel = Res("fuel", "Fuel Cell", new Color(0.7f, 2.2f, 0.4f), "Powers the ship between planets.");
             var core = Res("core", "Xeno Core", new Color(2.2f, 0.4f, 1.8f), "Salvaged from fallen aliens.");
+            var scrap = Res("scrap", "Scrap", new Color(1.3f, 1.3f, 1.4f), "Debris found on every world. Pressed into stone, burned for fuel.");
+            var alloy = Res("alloy", "Alloy", new Color(1.6f, 1.9f, 2.4f), "Fabricated from iron ore and stone. Needed for advanced gear.");
+            var plasma = Res("plasma", "Plasma Cell", new Color(2.4f, 1.0f, 2.4f), "Fabricated from crystal and fuel. Powers late-game tech.");
 
             var wave = New<WaveFormulaSO>("Wave Formula");
 
@@ -195,17 +234,17 @@ namespace Frontier
                     wood.color, L(A(wood, 10), A(stone, 4)), MinigameKind.Chop,
                     new[] { "Bare Hands", "Stone Axe", "Iron Axe", "Steel Axe", "Crystal Axe", "Plasma Chainsaw", "Singularity Saw" }),
                     L(A(wood, 6), A(stone, 2)), L(A(wood, 14), A(stone, 8)), L(A(wood, 20), A(iron, 8)),
-                    L(A(iron, 18), A(wood, 30)), L(A(crystal, 10), A(iron, 25)), L(A(crystal, 30), A(core, 8))),
+                    L(A(iron, 18), A(wood, 30)), L(A(alloy, 10), A(crystal, 10)), L(A(plasma, 8), A(core, 8))),
                 Tiers(Up("pick", "Pickaxe", "Strike the shiny spot to break nodes through stages. Better picks crack them faster.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
                     stone.color, L(A(wood, 8), A(stone, 8)), MinigameKind.Mine,
                     new[] { "Bare Hands", "Stone Pick", "Iron Pick", "Steel Pick", "Pneumatic Pick", "Jackhammer", "Plasma Jackhammer" }),
                     L(A(wood, 8), A(stone, 6)), L(A(wood, 14), A(stone, 14)), L(A(stone, 25), A(iron, 8)),
-                    L(A(iron, 20), A(stone, 30)), L(A(iron, 35), A(crystal, 8)), L(A(crystal, 30), A(core, 8))),
+                    L(A(iron, 20), A(stone, 30)), L(A(alloy, 15), A(crystal, 8)), L(A(plasma, 10), A(core, 8))),
                 Tiers(Up("drill", "Drill", "Hold to bore through rock. Better drills fill the progress gauge faster.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
                     iron.color, L(A(wood, 20), A(iron, 10)), MinigameKind.Drill,
                     new[] { "Hand Auger", "Pneumatic Drill", "Crystal Bore", "Plasma Bore", "Quantum Bore", "Singularity Bore", "Void Bore" }),
                     L(A(wood, 20), A(iron, 10)), L(A(iron, 25), A(stone, 20)), L(A(iron, 30), A(crystal, 8)),
-                    L(A(crystal, 18), A(iron, 40)), L(A(crystal, 30), A(core, 6)), L(A(crystal, 50), A(core, 15))),
+                    L(A(alloy, 20), A(crystal, 18)), L(A(plasma, 10), A(core, 6)), L(A(plasma, 25), A(core, 15))),
                 Up("pack", "Backpack", "+9 slots (one more row). Carry more before you turn back.", UpgradeCategory.Ship, UpgradeEffect.BackpackSlots, 9f, 6, 1.7f,
                     new Color(1.6f, 1.6f, 0.4f), L(A(wood, 25), A(stone, 10))),
                 Up("engine", "Engine Efficiency", "-8% fuel for every trip.", UpgradeCategory.Ship, UpgradeEffect.FuelEfficiency, 0.08f, 8, 1.6f,
@@ -233,35 +272,42 @@ namespace Frontier
 
             var recipes = new[]
             {
+                Recipe("Scrap Burner", L(A(scrap, 10)), L(A(fuel, 2))),
                 Recipe("Wood Distillate", L(A(wood, 8)), L(A(fuel, 3))),
                 Recipe("Crystal Cell", L(A(crystal, 3)), L(A(fuel, 12))),
+                Fab("Scrap Press", L(A(scrap, 8)), L(A(stone, 2))),
+                Fab("Alloy Smelter", L(A(iron, 2), A(stone, 2)), L(A(alloy, 1))),
+                Fab("Plasma Cell", L(A(crystal, 2), A(fuel, 2)), L(A(plasma, 1))),
             };
 
             var structures = new[]
             {
                 Struct("refinery", "Refinery", "Converts raw materials into fuel. Tap it to run an exchange. Higher levels refine more per batch.",
-                    StructureKind.Refinery, new Color(0.7f, 2.2f, 0.4f), "struct_refinery", L(A(wood, 15), A(stone, 6)), 0.25f),
+                    StructureKind.Refinery, new Color(0.7f, 2.2f, 0.4f), "struct_refinery", L(A(scrap, 15)), 0.25f),
+                Struct("fabricator", "Fabricator", "Combines materials into Alloy, Plasma Cells and more. Tap it to craft.",
+                    StructureKind.Fabricator, new Color(0.6f, 1.6f, 2.4f), "struct_fabricator", L(A(scrap, 25)), 0.2f),
                 Struct("alarm", "Alarm Beacon", "Tap it to burn fuel and call a wave. More fuel means a longer fight and bigger rewards.",
-                    StructureKind.Alarm, new Color(2.2f, 0.4f, 1.8f), "struct_alarm", L(A(wood, 12), A(stone, 8)), 0.15f),
+                    StructureKind.Alarm, new Color(2.2f, 0.4f, 1.8f), "struct_alarm", L(A(scrap, 12)), 0.15f),
                 Struct("lumber", "Lumber Camp", "Tap it to chop the trees on this planet. Higher levels yield more.",
-                    StructureKind.Lumber, new Color(1.8f, 1.1f, 0.35f), "struct_lumber", L(A(wood, 6)), 0.2f),
-                Struct("mine", "Mining Rig", "Tap it to mine ore and stone on this planet. Higher levels yield more.",
-                    StructureKind.Mine, new Color(0.8f, 1.2f, 1.8f), "struct_mine", L(A(wood, 8)), 0.2f),
+                    StructureKind.Lumber, new Color(1.8f, 1.1f, 0.35f), "struct_lumber", L(A(scrap, 6)), 0.2f),
+                Struct("mine", "Mining Rig", "Tap it to mine scrap, stone and ore on this planet. Free to build. Higher levels yield more.",
+                    StructureKind.Mine, new Color(0.8f, 1.2f, 1.8f), "struct_mine", L(), 0.2f),
                 Struct("driller", "Deep Driller", "Tap it to drill fuel, crystal and cores. Higher levels yield more.",
-                    StructureKind.Drill, new Color(2f, 0.8f, 0.4f), "struct_drill", L(A(wood, 14), A(stone, 10), A(iron, 6)), 0.2f),
+                    StructureKind.Drill, new Color(2f, 0.8f, 0.4f), "struct_drill", L(A(scrap, 25), A(stone, 8)), 0.2f),
                 Struct("gunner", "Gunner Turret", "Rapid fire kinetic turret. Fires during waves.",
-                    StructureKind.Gunner, new Color(2.2f, 1.4f, 0.4f), "struct_gunner", L(A(wood, 12), A(iron, 8)), 0.3f,
+                    StructureKind.Gunner, new Color(2.2f, 1.4f, 0.4f), "struct_gunner", L(A(scrap, 15), A(alloy, 3)), 0.3f,
                     0, 4f, 0.45f, 8f, 0.05f),
                 Struct("laser", "Laser Turret", "Slow, heavy beam with long range. Fires during waves.",
-                    StructureKind.Laser, new Color(0.4f, 2.2f, 2.2f), "struct_laser", L(A(stone, 12), A(iron, 12), A(crystal, 4)), 0.3f,
+                    StructureKind.Laser, new Color(0.4f, 2.2f, 2.2f), "struct_laser", L(A(alloy, 8), A(crystal, 4)), 0.3f,
                     0, 14f, 1.3f, 11f, 0.12f),
                 Struct("satellite", "Satellite", "Uplink relay. Does nothing yet - future upgrades will plug in here.",
-                    StructureKind.Satellite, new Color(0.6f, 1.4f, 2.4f), "struct_satellite", L(A(iron, 10), A(crystal, 3)), 0.1f),
+                    StructureKind.Satellite, new Color(0.6f, 1.4f, 2.4f), "struct_satellite", L(A(alloy, 6), A(crystal, 3)), 0.1f),
             };
 
             var db = New<GameDatabase>("GameDatabase");
             db.structures = structures;
-            db.resources = new[] { wood, stone, iron, crystal, fuel, core };
+            db.resources = new[] { scrap, wood, stone, iron, alloy, crystal, plasma, fuel, core };
+            db.scrap = scrap;
             db.planets = planets;
             db.upgrades = upgrades;
             db.enemies = enemies;
@@ -269,7 +315,8 @@ namespace Frontier
             db.formula = wave;
             db.fuel = fuel;
             db.startPlanet = planets[0];
-            db.startingItems = L(A(fuel, 10), A(wood, 24));
+            db.startingItems = L(A(fuel, 10), A(wood, 24), A(scrap, 30));
+            AssignSystems(planets);
             return db;
         }
     }

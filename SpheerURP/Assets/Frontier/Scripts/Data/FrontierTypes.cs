@@ -27,7 +27,8 @@ namespace Frontier
         Drill,
         Gunner,
         Laser,
-        Satellite
+        Satellite,
+        Fabricator
     }
 
     public enum WeatherKind { Clear, Rain, Snow, Embers, Spores, Dust, Storm }

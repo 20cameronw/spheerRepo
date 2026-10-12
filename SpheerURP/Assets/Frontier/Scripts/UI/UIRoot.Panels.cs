@@ -93,7 +93,7 @@ namespace Frontier
             body.Add(UiKit.Text("Build on " + gs.planet.displayName + ". Tap a structure on the planet to use it.", "fr-muted"));
             switch (shopTab)
             {
-                case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Alarm); break;
+                case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm); break;
                 case 1: ShopSection(body, StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill); break;
                 case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;
                 default: ShopSection(body, StructureKind.Satellite); break;

@@ -207,6 +207,8 @@ namespace Frontier
         {
             var list = new List<GatherSpot>();
             foreach (var sp in p.spots) if (sp.game == game && sp.resource != null) list.Add(sp);
+            if (game == MinigameKind.Mine && db.scrap != null)
+                list.Insert(0, new GatherSpot { label = "Surface Scrap", game = MinigameKind.Mine, resource = db.scrap, baseYield = 6, difficulty = 0.2f });
             return list;
         }
 

@@ -77,7 +77,7 @@ namespace Frontier
             if (busy || defense.Active) return;
             CloseModal();
             var k = s.def.kind;
-            if (k == StructureKind.Refinery) OpenRefinery(s, t);
+            if (k == StructureKind.Refinery || k == StructureKind.Fabricator) OpenRefinery(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
@@ -157,15 +157,17 @@ namespace Frontier
         void OpenRefinery(PlacedStructure s, Transform t)
         {
             Color c = UiKit.Ui(s.def.color);
-            OpenPopup("refinery", t, c, body =>
+            OpenPopup("station" + s.def.kind, t, c, body =>
             {
                 var head = UiKit.Div("fr-row");
-                head.Add(Icons.Make("refinery", c, 48f));
-                head.Add(UiKit.Text("REFINERY  LV " + s.level, "fr-h2", c));
+                head.Add(Icons.Make(StructureIcon(s.def.kind), c, 48f));
+                head.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level, "fr-h2", c));
                 body.Add(head);
                 float bonus = gs.StructureBonus(s);
+                bool fab = s.def.kind == StructureKind.Fabricator;
                 foreach (var rec in gs.db.recipes)
                 {
+                    if (rec.fabricator != fab) continue;
                     var r = rec;
                     var card = Card(c);
                     card.style.marginTop = 8; card.style.marginBottom = 0;

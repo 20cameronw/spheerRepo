@@ -130,12 +130,17 @@ namespace Frontier
             packLabel = Chip(planetTag, "pack", UiKit.Cyan, null);
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
+            var menuBtn = Icons.IconButton("grid", UiKit.Amber, OpenMenu, 72f, true);
+            menuBtn.style.borderTopLeftRadius = 36; menuBtn.style.borderTopRightRadius = 36;
+            menuBtn.style.borderBottomLeftRadius = 36; menuBtn.style.borderBottomRightRadius = 36;
+            menuBtn.style.marginLeft = 16; menuBtn.style.flexShrink = 0;
+            planetTag.Add(menuBtn);
             hud.Add(top);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
             dock.Add(Icons.IconButton("research", UiKit.Magenta, OpenResearch, 0f, true));
             dock.Add(Icons.IconButton("map", UiKit.Cyan, OpenMap, 0f, true));
-            dock.Add(Icons.IconButton("grid", UiKit.Amber, OpenMenu, 0f, true));
+            dock.Add(Icons.IconButton("pack", UiKit.Cyan, OpenPack, 0f, true));
             dock.Add(Icons.IconButton("build", UiKit.Lime, OpenShop, 0f, true));
             hud.Add(dock);
         }
@@ -303,6 +308,7 @@ namespace Frontier
                 case StructureKind.Gunner: return "alien";
                 case StructureKind.Laser: return "bolt";
                 case StructureKind.Satellite: return "warp";
+                case StructureKind.Fabricator: return "build";
                 default: return "alarm";
             }
         }
