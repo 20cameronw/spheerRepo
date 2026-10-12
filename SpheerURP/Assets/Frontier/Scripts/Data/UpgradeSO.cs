@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Frontier
 {
+    [System.Serializable]
+    public class CostTier { public List<ItemAmount> cost = new List<ItemAmount>(); }
+
     [CreateAssetMenu(fileName = "New Upgrade", menuName = "Frontier/Upgrade")]
     public class UpgradeSO : ScriptableObject
     {
@@ -22,9 +25,13 @@ namespace Frontier
         [ColorUsage(false, true)] public Color color = Color.cyan;
         [Tooltip("Optional names per level, e.g. Stone Axe, Iron Axe...")]
         public string[] levelNames;
+        [Tooltip("Optional explicit cost per level; falls back to baseCost x growth.")]
+        public List<CostTier> levelCosts = new List<CostTier>();
 
         public List<ItemAmount> CostAt(int level)
         {
+            if (levelCosts != null && level >= 0 && level < levelCosts.Count && levelCosts[level] != null)
+                return new List<ItemAmount>(levelCosts[level].cost);
             var list = new List<ItemAmount>();
             float mult = Mathf.Pow(costGrowth, level);
             foreach (var c in baseCost)

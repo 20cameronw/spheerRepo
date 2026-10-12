@@ -142,6 +142,7 @@ namespace Frontier
         }
 
         public float ToolTolerance(MinigameKind k) { return Mathf.Min(1.6f, 1f + 0.08f * ToolLevel(k)); }
+        public float ToolDamage(MinigameKind k) { return 1f + 0.7f * ToolLevel(k); }
 
         public string ToolName(MinigameKind k)
         {

@@ -319,8 +319,10 @@ namespace Frontier
             if (busy || defense.Active) return;
             busy = true;
             Vector3 fxPos = at != null ? at.position : Vector3.zero;
-            Minigame g = spot.game == MinigameKind.Chop ? (Minigame)new ChopGame()
-                       : spot.game == MinigameKind.Mine ? (Minigame)new MineGame() : new DrillGame();
+            Minigame g = spot.game == MinigameKind.Chop ? (Minigame)new NodeGame(true)
+                       : spot.game == MinigameKind.Mine ? (Minigame)new NodeGame(false) : new DrillGame();
+            g.toolDamage = gs.ToolDamage(spot.game);
+            g.toolLevel = gs.ToolLevel(spot.game);
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;
@@ -378,15 +380,24 @@ namespace Frontier
         void StartTravel(PlanetSO target)
         {
             if (busy || defense.Active || backdrop.Warping) return;
-            if (!gs.Travel(target)) { Sfx.Bad(); return; }
+            int cost = gs.FuelCost(target);
+            if (gs.Count(gs.db.fuel) < cost) { Sfx.Bad(); return; }
             busy = true;
             CloseAll();
-            StartCoroutine(backdrop.DoWarp(() =>
+            var tg = new TravelGame();
+            float tier = Mathf.Clamp01(target.tier / 8f);
+            tg.Run(overlayLayer, UiKit.Magenta, 1f, tier, r =>
             {
-                planetView.Show(target, true);
-                selected = target;
-            }));
-            StartCoroutine(TravelFlash());
+                if (!gs.Travel(target)) { busy = false; return; }
+                int refund = Mathf.FloorToInt(cost * 0.4f * r.quality);
+                if (refund > 0) { gs.Add(gs.db.fuel, refund); Toast("Smooth flight: +" + refund + " fuel back", UiKit.Lime); }
+                StartCoroutine(backdrop.DoWarp(() =>
+                {
+                    planetView.Show(target, true);
+                    selected = target;
+                }));
+                StartCoroutine(TravelFlash());
+            });
         }
 
         IEnumerator TravelFlash()

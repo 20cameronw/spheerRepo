@@ -136,7 +136,7 @@ namespace Frontier
             OpenPopup("gather" + s.slot, t, c, body =>
             {
                 StructureHeader(body, s, c);
-                body.Add(UiKit.Text(gs.ToolName(game) + "  LV " + gs.ToolLevel(game), "fr-tiny"));
+                body.Add(UiKit.Text(gs.ToolName(game) + "  LV " + gs.ToolLevel(game) + "  DMG x" + gs.ToolDamage(game).ToString("0.0"), "fr-tiny"));
                 float bonus = gs.StructureBonus(s);
                 foreach (var spot in gs.SpotsFor(gs.planet, game))
                 {

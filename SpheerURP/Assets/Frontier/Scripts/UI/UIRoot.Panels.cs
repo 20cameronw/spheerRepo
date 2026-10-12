@@ -67,24 +67,45 @@ namespace Frontier
         void OpenPack() { if (defense.Active || busy) return; menuPage = "pack"; OpenModal("menu", "grid", "MENU", UiKit.Cyan, BuildMenu, true); }
 
         // ------------------------------------------------------------ build shop
-        void BuildShop(VisualElement body)
+        int shopTab;
+        int toolTab;
+
+        VisualElement TabButton(string icon, string label, bool on, Color accent, Action onClick)
         {
-            body.Add(UiKit.Text("Build on " + gs.planet.displayName + ". Tap a structure on the planet to use it.", "fr-muted"));
-            ShopSection(body, "ECONOMY", StructureKind.Refinery, StructureKind.Alarm);
-            ShopSection(body, "GATHERING", StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill);
-            ShopSection(body, "DEFENSE", StructureKind.Gunner, StructureKind.Laser);
-            ShopSection(body, "ORBITAL", StructureKind.Satellite);
+            Color c = on ? accent : new Color(0.55f, 0.65f, 0.8f);
+            var t = new Button();
+            t.AddToClassList("fr-tab");
+            UiKit.Border(t, UiKit.Ui(c, on ? 1f : 0.4f), 2f);
+            t.Add(Icons.Make(icon, c, 32f));
+            t.Add(UiKit.Text(label, "fr-small", UiKit.Ui(c)));
+            t.clicked += () => { Sfx.Click(); onClick(); RefreshModal(); };
+            return t;
         }
 
-        void ShopSection(VisualElement body, string title, params StructureKind[] kinds)
+        void BuildShop(VisualElement body)
+        {
+            var tabs = UiKit.Div("fr-tabs");
+            tabs.Add(TabButton("refinery", "ECON", shopTab == 0, UiKit.Lime, () => shopTab = 0));
+            tabs.Add(TabButton("tools", "GATHER", shopTab == 1, UiKit.Lime, () => shopTab = 1));
+            tabs.Add(TabButton("alien", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
+            tabs.Add(TabButton("warp", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
+            body.Add(tabs);
+            body.Add(UiKit.Text("Build on " + gs.planet.displayName + ". Tap a structure on the planet to use it.", "fr-muted"));
+            switch (shopTab)
+            {
+                case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Alarm); break;
+                case 1: ShopSection(body, StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill); break;
+                case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;
+                default: ShopSection(body, StructureKind.Satellite); break;
+            }
+        }
+
+        void ShopSection(VisualElement body, params StructureKind[] kinds)
         {
             var list = new List<StructureSO>();
             foreach (var sd in gs.db.structures)
                 if (sd != null && Array.IndexOf(kinds, sd.kind) >= 0) list.Add(sd);
-            if (list.Count == 0) return;
-            var h = UiKit.Text(title, "fr-small", UiKit.Lime);
-            h.style.marginTop = 10; h.style.marginBottom = 6;
-            body.Add(h);
+            if (list.Count == 0) { body.Add(UiKit.Text("Nothing here yet.", "fr-muted")); return; }
             foreach (var sd in list)
             {
                 var def = sd;
@@ -241,23 +262,67 @@ namespace Frontier
         void BuildResearch(VisualElement body)
         {
             var tabs = UiKit.Div("fr-tabs");
-            tabs.Add(Tab("base", "BASES", 0));
-            tabs.Add(Tab("research", "RESEARCH", 1));
+            tabs.Add(TabButton("base", "BASES", researchTab == 0, UiKit.Magenta, () => researchTab = 0));
+            tabs.Add(TabButton("tools", "TOOLS", researchTab == 1, UiKit.Magenta, () => researchTab = 1));
+            tabs.Add(TabButton("warp", "SHIP", researchTab == 2, UiKit.Magenta, () => researchTab = 2));
+            tabs.Add(TabButton("alien", "DEFENSE", researchTab == 3, UiKit.Magenta, () => researchTab = 3));
             body.Add(tabs);
-            if (researchTab == 0) BuildBases(body); else BuildUpgrades(body);
+            switch (researchTab)
+            {
+                case 0: BuildBases(body); break;
+                case 1: BuildTools(body); break;
+                case 2: BuildUpgrades(body, UpgradeCategory.Ship); break;
+                default: BuildUpgrades(body, UpgradeCategory.Defense); break;
+            }
         }
 
-        VisualElement Tab(string icon, string label, int index)
+        void BuildTools(VisualElement body)
         {
-            bool on = researchTab == index;
-            Color c = on ? UiKit.Magenta : new Color(0.55f, 0.65f, 0.8f);
-            var t = new Button();
-            t.AddToClassList("fr-tab");
-            UiKit.Border(t, UiKit.Ui(c, on ? 1f : 0.4f), 2f);
-            t.Add(Icons.Make(icon, c, 36f));
-            t.Add(UiKit.Text(label, "fr-small", UiKit.Ui(c)));
-            t.clicked += () => { Sfx.Click(); researchTab = index; RefreshModal(); };
-            return t;
+            var tools = new List<UpgradeSO>();
+            foreach (var u in gs.db.upgrades)
+                if (u != null && u.category == UpgradeCategory.Tools) tools.Add(u);
+            if (tools.Count == 0) return;
+            toolTab = Mathf.Clamp(toolTab, 0, tools.Count - 1);
+            var sub = UiKit.Div("fr-tabs");
+            for (int i = 0; i < tools.Count; i++)
+            {
+                int idx = i;
+                string ic = tools[i].tool == MinigameKind.Chop ? "wood" : tools[i].tool == MinigameKind.Mine ? "iron" : "tools";
+                sub.Add(TabButton(ic, tools[i].displayName.ToUpper(), toolTab == i, tools[i].color, () => toolTab = idx));
+            }
+            body.Add(sub);
+
+            var u2 = tools[toolTab];
+            int lvl = gs.Level(u2);
+            body.Add(UiKit.Text(u2.description, "fr-muted"));
+            body.Add(UiKit.Text("Equipped: " + u2.NameAtLevel(lvl) + "   DMG x" + (1f + 0.7f * lvl).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * lvl).ToString("0.0"), "fr-small", UiKit.Ui(u2.color)));
+            for (int l = 0; l <= u2.maxLevel; l++)
+            {
+                int level = l;
+                bool owned = l <= lvl, next = l == lvl + 1;
+                Color c = UiKit.Ui(u2.color);
+                var card = Card(owned ? c : new Color(0.5f, 0.6f, 0.75f));
+                card.style.opacity = owned || next ? 1f : 0.55f;
+                var top = UiKit.Div("fr-row");
+                top.Add(UiKit.Text(u2.NameAtLevel(l), "fr-h2", owned ? c : Color.white));
+                top.Add(UiKit.Div("fr-spacer"));
+                top.Add(UiKit.Text(owned ? (l == lvl ? "EQUIPPED" : "OWNED") : next ? "NEXT" : "LOCKED", "fr-tiny", owned ? UiKit.Lime : UiKit.Amber));
+                card.Add(top);
+                card.Add(UiKit.Text("DMG x" + (1f + 0.7f * l).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * l).ToString("0.0") + "   Faster swing", "fr-tiny"));
+                if (next)
+                {
+                    var cost = u2.CostAt(lvl);
+                    card.Add(UiKit.CostRow(cost, gs, true));
+                    var buy = IconBtn("UPGRADE", "up", u2.color, () =>
+                    {
+                        if (gs.Buy(u2)) { Sfx.Good(); Toast(u2.NameAtLevel(gs.Level(u2)) + " ready!", UiKit.Ui(u2.color)); planetView.Punch(); }
+                        else Sfx.Bad();
+                    });
+                    UiKit.SetEnabledLook(buy, gs.Has(cost));
+                    card.Add(buy);
+                }
+                body.Add(card);
+            }
         }
 
         void BuildBases(VisualElement body)
@@ -307,13 +372,9 @@ namespace Frontier
             if (!any) body.Add(UiKit.Text("Build a refinery and an alarm to establish a base.", "fr-muted"));
         }
 
-        void BuildUpgrades(VisualElement body)
+        void BuildUpgrades(VisualElement body, UpgradeCategory cat)
         {
-            foreach (UpgradeCategory cat in Enum.GetValues(typeof(UpgradeCategory)))
             {
-                var h = UiKit.Text(cat.ToString().ToUpper(), "fr-small", UiKit.Magenta);
-                h.style.marginTop = 6; h.style.marginBottom = 8;
-                body.Add(h);
                 foreach (var up in gs.db.upgrades)
                 {
                     if (up == null || up.category != cat) continue;

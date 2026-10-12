@@ -54,6 +54,13 @@ namespace Frontier
             return u;
         }
 
+        static UpgradeSO Tiers(UpgradeSO u, params List<ItemAmount>[] costs)
+        {
+            u.levelCosts = new List<CostTier>();
+            foreach (var c in costs) u.levelCosts.Add(new CostTier { cost = c });
+            return u;
+        }
+
         static EnemySO Alien(string id, string name, Color c, PrimitiveType shape, float scale, float hp, float speed,
             float dmg, float threat, int minWave, float weight, List<ItemAmount> bounty)
         {
@@ -184,15 +191,21 @@ namespace Frontier
 
             var upgrades = new[]
             {
-                Up("axe", "Axe", "More wood per chop and a wider sweet spot.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
+                Tiers(Up("axe", "Axe", "Hit the glowing weak spot to fell trees. Better axes deal more damage and swing faster.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
                     wood.color, L(A(wood, 10), A(stone, 4)), MinigameKind.Chop,
-                    new[] { "Stone Axe", "Iron Axe", "Steel Axe", "Crystal Axe", "Plasma Axe", "Singularity Axe" }),
-                Up("pick", "Pickaxe", "More ore per node and slower node timers.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
+                    new[] { "Bare Hands", "Stone Axe", "Iron Axe", "Steel Axe", "Crystal Axe", "Plasma Chainsaw", "Singularity Saw" }),
+                    L(A(wood, 6), A(stone, 2)), L(A(wood, 14), A(stone, 8)), L(A(wood, 20), A(iron, 8)),
+                    L(A(iron, 18), A(wood, 30)), L(A(crystal, 10), A(iron, 25)), L(A(crystal, 30), A(core, 8))),
+                Tiers(Up("pick", "Pickaxe", "Strike the shiny spot to break nodes through stages. Better picks crack them faster.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
                     stone.color, L(A(wood, 8), A(stone, 8)), MinigameKind.Mine,
-                    new[] { "Flint Pick", "Iron Pick", "Steel Pick", "Crystal Pick", "Plasma Pick", "Singularity Pick" }),
-                Up("drill", "Drill", "More yield and a wider pressure band.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
+                    new[] { "Bare Hands", "Stone Pick", "Iron Pick", "Steel Pick", "Pneumatic Pick", "Jackhammer", "Plasma Jackhammer" }),
+                    L(A(wood, 8), A(stone, 6)), L(A(wood, 14), A(stone, 14)), L(A(stone, 25), A(iron, 8)),
+                    L(A(iron, 20), A(stone, 30)), L(A(iron, 35), A(crystal, 8)), L(A(crystal, 30), A(core, 8))),
+                Tiers(Up("drill", "Drill", "Hold to bore through rock. Better drills fill the progress gauge faster.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
                     iron.color, L(A(wood, 20), A(iron, 10)), MinigameKind.Drill,
-                    new[] { "Hand Drill", "Auger", "Pneumatic Drill", "Crystal Bore", "Plasma Bore", "Singularity Bore" }),
+                    new[] { "Hand Auger", "Pneumatic Drill", "Crystal Bore", "Plasma Bore", "Quantum Bore", "Singularity Bore", "Void Bore" }),
+                    L(A(wood, 20), A(iron, 10)), L(A(iron, 25), A(stone, 20)), L(A(iron, 30), A(crystal, 8)),
+                    L(A(crystal, 18), A(iron, 40)), L(A(crystal, 30), A(core, 6)), L(A(crystal, 50), A(core, 15))),
                 Up("pack", "Backpack", "+9 slots (one more row). Carry more before you turn back.", UpgradeCategory.Ship, UpgradeEffect.BackpackSlots, 9f, 6, 1.7f,
                     new Color(1.6f, 1.6f, 0.4f), L(A(wood, 25), A(stone, 10))),
                 Up("engine", "Engine Efficiency", "-8% fuel for every trip.", UpgradeCategory.Ship, UpgradeEffect.FuelEfficiency, 0.08f, 8, 1.6f,

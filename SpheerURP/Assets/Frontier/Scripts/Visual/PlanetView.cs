@@ -30,12 +30,52 @@ namespace Frontier
         Vector3[] surfDirs;
         float[] surfR;
 
+        List<MeshRenderer> solids = new List<MeshRenderer>();
+
+        // Hides atmosphere/shell/cloud layers baked into hand-made models so only the true ground is styled and sampled.
+        void FilterShells(Transform model)
+        {
+            solids.Clear();
+            var all = new List<MeshRenderer>(model.GetComponentsInChildren<MeshRenderer>());
+            var keep = new List<MeshRenderer>();
+            foreach (var r in all)
+            {
+                string n = r.name.ToLowerInvariant();
+                bool bad = n.Contains("atmo") || n.Contains("shell") || n.Contains("cloud") || n.Contains("glow")
+                    || n.Contains("halo") || n.Contains("aura") || n.Contains("ring") || n.Contains("fog");
+                foreach (var m in r.sharedMaterials)
+                    if (m != null && (m.renderQueue >= 3000 || (m.HasProperty("_Surface") && m.GetFloat("_Surface") > 0.5f))) bad = true;
+                if (bad) r.enabled = false; else keep.Add(r);
+            }
+            foreach (var r in keep)
+            {
+                bool shell = false;
+                foreach (var o in keep)
+                {
+                    if (o == r) continue;
+                    var rb = r.bounds; var ob = o.bounds;
+                    if (rb.Contains(ob.min) && rb.Contains(ob.max) && rb.size.magnitude > ob.size.magnitude * 1.002f) { shell = true; break; }
+                }
+                if (shell) r.enabled = false; else solids.Add(r);
+            }
+            if (solids.Count == 0) { foreach (var r in all) r.enabled = true; solids.AddRange(all); }
+        }
+
+        float SurfaceMedian()
+        {
+            if (surfR == null) return Radius;
+            var s = (float[])surfR.Clone();
+            System.Array.Sort(s);
+            return s[s.Length / 2];
+        }
+
         void SampleSurface(Transform model)
         {
             var cols = new List<MeshCollider>();
-            foreach (var mf in model.GetComponentsInChildren<MeshFilter>())
+            foreach (var r in solids)
             {
-                if (mf.sharedMesh == null) continue;
+                var mf = r.GetComponent<MeshFilter>();
+                if (mf == null || mf.sharedMesh == null) continue;
                 var mc = mf.gameObject.AddComponent<MeshCollider>();
                 mc.sharedMesh = mf.sharedMesh;
                 cols.Add(mc);
@@ -94,8 +134,10 @@ namespace Frontier
         void NormalizeModel(Transform model, Transform center)
         {
             var dists = new List<float>();
-            foreach (var mf in model.GetComponentsInChildren<MeshFilter>())
+            foreach (var rr in solids)
             {
+                var mf = rr.GetComponent<MeshFilter>();
+                if (mf == null) continue;
                 var m = mf.sharedMesh;
                 if (m == null || !m.isReadable) continue;
                 var vs = m.vertices;
@@ -116,7 +158,7 @@ namespace Frontier
         {
             float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
             var mats = new List<Material>();
-            foreach (var r in model.GetComponentsInChildren<MeshRenderer>())
+            foreach (var r in solids)
             {
                 var mat = new Material(Fx.PlanetShader);
                 mat.SetColor("_BaseColor", p.primary);
@@ -157,9 +199,19 @@ namespace Frontier
             surfDirs = null; surfR = null;
             if (model != null)
             {
+                FilterShells(model);
                 NormalizeModel(model, core);
                 StyleModel(model, p, rng);
                 SampleSurface(model);
+                // Raycast fallback for non-readable meshes: rescale so the measured ground sits at Radius, then resample.
+                float med = SurfaceMedian();
+                if (surfR != null && Mathf.Abs(med - Radius) > 0.02f && med > 1e-3f)
+                {
+                    float k = Radius / med;
+                    model.localScale *= k;
+                    model.position = core.position + (model.position - core.position) * k;
+                    SampleSurface(model);
+                }
             }
             if (model == null)
             {
@@ -205,7 +257,7 @@ namespace Frontier
 
         // Free trackball control: drags rotate about the camera's up/right axes, so any direction works.
         const float DragDegPerPx = 0.32f;
-        const float DefaultSpin = 5f;
+        const float DefaultSpin = 16f;
         Vector3 angVel;
         bool grabbed;
         float returnAt;
