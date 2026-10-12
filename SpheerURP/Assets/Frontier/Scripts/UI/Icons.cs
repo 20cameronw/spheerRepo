@@ -83,8 +83,10 @@ namespace Frontier
                 S(false, false, .5f,.66f, .5f,.72f),
                 Dim(S(false, false, .12f,.5f, .08f,.74f, .13f,.8f)), Dim(S(false, false, .88f,.5f, .92f,.74f, .87f,.8f)) } },
             { "research", new[] {
-                S(true, true, .4f,.1f, .6f,.1f, .6f,.42f, .86f,.86f, .14f,.86f, .4f,.42f),
-                S(false, false, .3f,.1f, .7f,.1f), S(false, false, .26f,.68f, .74f,.68f) } },
+                S(false, false, .38f,.1f, .38f,.4f, .16f,.8f, .2f,.9f, .8f,.9f, .84f,.8f, .62f,.4f, .62f,.1f),
+                S(false, false, .3f,.1f, .7f,.1f),
+                S(false, false, .24f,.7f, .76f,.7f),
+                Circle(.46f,.8f,.04f,true,10), Circle(.6f,.76f,.03f,true,10), Dim(Circle(.5f,.55f,.035f,false,10)) } },
 
             { "fuel", new[] {
                 S(true, true, .5f,.08f, .74f,.44f, .8f,.62f, .72f,.8f, .5f,.92f, .28f,.8f, .2f,.62f, .26f,.44f) } },
@@ -158,7 +160,7 @@ namespace Frontier
         static readonly Dictionary<string, Texture2D> spriteCache = new Dictionary<string, Texture2D>();
 
         // These use the redrawn neon vector versions instead of the old bitmap icons.
-        static readonly HashSet<string> VectorOnly = new HashSet<string> { "map", "build", "pack" };
+        static readonly HashSet<string> VectorOnly = new HashSet<string> { "map", "build", "pack", "research" };
 
         static Texture2D Sprite(string name)
         {
@@ -194,24 +196,22 @@ namespace Frontier
                 float s = Mathf.Min(r.width, r.height);
                 Vector2 o = new Vector2((r.width - s) * 0.5f, (r.height - s) * 0.5f);
                 var p = ctx.painter2D;
-                float lw = Mathf.Max(1.5f, s * 0.075f);
+                float lw = Mathf.Max(1.5f, s * 0.05f);
                 p.lineJoin = LineJoin.Round;
                 p.lineCap = LineCap.Round;
-                // Soft glow pass, then the crisp neon line on top.
-                for (int pass = 0; pass < 2; pass++)
-                    foreach (var sh in shapes)
-                    {
-                        float a = sh.dim ? 0.5f : 1f;
-                        p.lineWidth = pass == 0 ? lw * 2.6f : lw;
-                        p.strokeColor = pass == 0 ? new Color(c.r, c.g, c.b, 0.12f * a) : new Color(c.r, c.g, c.b, a);
-                        p.fillColor = new Color(c.r, c.g, c.b, 0.32f);
-                        p.BeginPath();
-                        p.MoveTo(o + sh.pts[0] * s);
-                        for (int i = 1; i < sh.pts.Length; i++) p.LineTo(o + sh.pts[i] * s);
-                        if (sh.closed) p.ClosePath();
-                        if (sh.fill && pass == 1) p.Fill();
-                        p.Stroke();
-                    }
+                foreach (var sh in shapes)
+                {
+                    float a = sh.dim ? 0.55f : 1f;
+                    p.lineWidth = lw;
+                    p.strokeColor = new Color(c.r, c.g, c.b, a);
+                    p.fillColor = new Color(c.r, c.g, c.b, 0.22f);
+                    p.BeginPath();
+                    p.MoveTo(o + sh.pts[0] * s);
+                    for (int i = 1; i < sh.pts.Length; i++) p.LineTo(o + sh.pts[i] * s);
+                    if (sh.closed) p.ClosePath();
+                    if (sh.fill) p.Fill();
+                    p.Stroke();
+                }
             };
             e.RegisterCallback<GeometryChangedEvent>(_ => e.MarkDirtyRepaint());
             return e;

@@ -398,7 +398,7 @@ namespace Frontier
             tg.Run(overlayLayer, UiKit.Magenta, 1f, tier, r =>
             {
                 if (!gs.Travel(target)) { busy = false; return; }
-                int refund = Mathf.FloorToInt(cost * 0.4f * r.quality);
+                int refund = Mathf.FloorToInt(cost * FrontierSettings.I.travelRefundMax * r.quality);
                 if (refund > 0) { gs.Add(gs.db.fuel, refund); Toast("Smooth flight: +" + refund + " fuel back", UiKit.Lime); }
                 StartCoroutine(backdrop.DoWarp(() =>
                 {

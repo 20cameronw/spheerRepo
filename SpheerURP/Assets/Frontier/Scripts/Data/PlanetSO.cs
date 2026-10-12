@@ -62,7 +62,7 @@ namespace Frontier
             return null;
         }
 
-        public const float MapScale = 40f;
+        public static float MapScale { get { return FrontierSettings.I.mapScale; } }
 
         public static float Distance(PlanetSO a, PlanetSO b)
         {

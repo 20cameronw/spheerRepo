@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aefdcd39c4155a348b84c9d13e5fe732, type: 3}
+  m_Name: GameDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.GameDatabase
+  resources:
+  - {fileID: 11400000, guid: 41d60b14022c20a4b9a01f911c0acab4, type: 2}
+  - {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+  - {fileID: 11400000, guid: 4f4d2532363d6c94a836abcfda0b73d9, type: 2}
+  - {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+  - {fileID: 11400000, guid: 25b2940a17406dc4c95085d3588a640a, type: 2}
+  - {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+  - {fileID: 11400000, guid: 3edbb7015a808624f9e1213ce9497e5c, type: 2}
+  - {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+  - {fileID: 11400000, guid: 8567583bacf739a42a16112cc194cd22, type: 2}
+  planets:
+  - {fileID: 11400000, guid: 7bb66e2ca01b0204d9ed850c2a487e25, type: 2}
+  - {fileID: 11400000, guid: bc7a284606ca12c409e40ecb12bc4200, type: 2}
+  - {fileID: 11400000, guid: d10eabde8226ebb4fb84b23c98a70118, type: 2}
+  - {fileID: 11400000, guid: 4976ae744fea07443bb539ff046310df, type: 2}
+  - {fileID: 11400000, guid: a204b9e3a0f5ed6428298502a82230c6, type: 2}
+  - {fileID: 11400000, guid: 21fb439f97a90e64bbc6bda157513798, type: 2}
+  - {fileID: 11400000, guid: 50827a5d5a02c9e429fdf17fa0838277, type: 2}
+  - {fileID: 11400000, guid: 03f14c0baa76da14aaadbcd60d3b27c7, type: 2}
+  - {fileID: 11400000, guid: 204a6d274f2afeb4e947cf3bd79fd1b2, type: 2}
+  - {fileID: 11400000, guid: 7acdeb9fc73b9464dbe57c616e75d96b, type: 2}
+  - {fileID: 11400000, guid: a3fab759c2a22be4ea6c5902c6bb7252, type: 2}
+  - {fileID: 11400000, guid: 0d0922b58471cf740b4fdf2f366be645, type: 2}
+  - {fileID: 11400000, guid: b5d4c53811b4a8b4daa01a76f05edb76, type: 2}
+  - {fileID: 11400000, guid: 1fba7701da27f82489e01b5a7ed4d81b, type: 2}
+  - {fileID: 11400000, guid: e578d9c725867234ebc9b7f5e4a900de, type: 2}
+  - {fileID: 11400000, guid: 28a3fa0010669e6449b90a0ef2c89790, type: 2}
+  - {fileID: 11400000, guid: 78bfd096e961e454da07816174d39b4f, type: 2}
+  - {fileID: 11400000, guid: 5c7e0dd91fbb14c4c9bceb5e143a0b33, type: 2}
+  upgrades:
+  - {fileID: 11400000, guid: c8acbe125b9a3744db0eb06aeffc63c4, type: 2}
+  - {fileID: 11400000, guid: 8797741e6f83c9e48897a9a845cf1019, type: 2}
+  - {fileID: 11400000, guid: fd9ec4a3101a0be4baeeb261ccdd4298, type: 2}
+  - {fileID: 11400000, guid: 116e71bcd59283040ac2bf797bb68c06, type: 2}
+  - {fileID: 11400000, guid: a77a807657e0e704cad8a030ad967366, type: 2}
+  - {fileID: 11400000, guid: 4778069b13f2e8142a902e5281e79a01, type: 2}
+  - {fileID: 11400000, guid: 1fa3bd31a4f804e43a3a12db66762544, type: 2}
+  - {fileID: 11400000, guid: 66d2542a25a73954e8c86ad7064adfbd, type: 2}
+  - {fileID: 11400000, guid: 92f2ce110e5edd14fb3c53f3cbfaee32, type: 2}
+  - {fileID: 11400000, guid: 17ef3bfcf9e6df94cb7595d2a2a8f5d5, type: 2}
+  enemies:
+  - {fileID: 11400000, guid: d740457ae18869a4d97ef00e6225927a, type: 2}
+  - {fileID: 11400000, guid: be6e2fd9f2a018c41a5542b539403d29, type: 2}
+  - {fileID: 11400000, guid: 6217eb6b2e9862347b2b71d6cc8502ac, type: 2}
+  - {fileID: 11400000, guid: 793bc187971adb64eafb29fcd96b41d2, type: 2}
+  - {fileID: 11400000, guid: 3d5fbb22d97c49e42abfaeb5f7fe38c6, type: 2}
+  recipes:
+  - {fileID: 11400000, guid: d073191d521c9754cb3063557a2a2c02, type: 2}
+  - {fileID: 11400000, guid: 51449cecc04af8a40b8d156a33aa564e, type: 2}
+  - {fileID: 11400000, guid: ffc9373ee49d84442a22db5221da9578, type: 2}
+  - {fileID: 11400000, guid: 891ecabd9292f024abc63018eb46bd0b, type: 2}
+  - {fileID: 11400000, guid: 6d7b0df8d317e0648a898c6b9666bc13, type: 2}
+  - {fileID: 11400000, guid: e7a6aa0c8695fd9468dd11699b6a010b, type: 2}
+  structures:
+  - {fileID: 11400000, guid: c6ef56d2743a1dc40a1ff4e6194608ca, type: 2}
+  - {fileID: 11400000, guid: cf39f60aff266a541960607807a9ea41, type: 2}
+  - {fileID: 11400000, guid: 92453a3e23c69a24f86e95b823f0cec6, type: 2}
+  - {fileID: 11400000, guid: 75ab8d96d739ef445a11d26f41c50cfe, type: 2}
+  - {fileID: 11400000, guid: edc39cd88e84bb54da7c5a3db2bc2664, type: 2}
+  - {fileID: 11400000, guid: f60ec1e415dc2fc4289883ba2356e871, type: 2}
+  - {fileID: 11400000, guid: f3724c82e033f5448bebef5242b24b6c, type: 2}
+  - {fileID: 11400000, guid: 70939eab430525345ab5c9429e433b5a, type: 2}
+  - {fileID: 11400000, guid: 65faf74c97b875e43a1e52dbf05e71aa, type: 2}
+  formula: {fileID: 11400000, guid: 977df9612f4477545a25d708300756ef, type: 2}
+  fuel: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+  scrap: {fileID: 11400000, guid: 41d60b14022c20a4b9a01f911c0acab4, type: 2}
+  startPlanet: {fileID: 11400000, guid: 7bb66e2ca01b0204d9ed850c2a487e25, type: 2}
+  startingItems:
+  - resource: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+    amount: 10
+  - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+    amount: 24
+  - resource: {fileID: 11400000, guid: 41d60b14022c20a4b9a01f911c0acab4, type: 2}
+    amount: 30
+  baseBackpackSlots: 27
+  baseReactorHealth: 100
+  fuelPerMapUnit: 1

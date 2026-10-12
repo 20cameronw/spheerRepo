@@ -10,26 +10,42 @@ namespace Frontier
     /// </summary>
     public class FrontierBootstrap : MonoBehaviour
     {
+        [Header("Optional overrides (assign in the Inspector; anything left empty is built from code/Resources)")]
+        public GameDatabase database;
+        public FrontierSettings settings;
+        public PanelSettings panelSettings;
+        public Camera sceneCamera;
+        public Light keyLight;
+
         IEnumerator Start()
         {
-            Application.targetFrameRate = 60;
+            FrontierSettings.Use(settings);
+            var cfg = FrontierSettings.I;
+            Application.targetFrameRate = cfg.targetFrameRate;
 
-            var db = GameDatabase.Load();
+            var db = database != null ? database : GameDatabase.Load();
             var gs = new GameState(db);
 
-            var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
+            var cam = sceneCamera != null ? sceneCamera : Camera.main;
+            GameObject camGo;
+            if (cam == null)
+            {
+                camGo = new GameObject("Main Camera") { tag = "MainCamera" };
+                cam = camGo.AddComponent<Camera>();
+            }
+            camGo = cam.gameObject;
             camGo.transform.position = new Vector3(0f, 0f, -12f);
-            var cam = camGo.AddComponent<Camera>();
+            camGo.transform.rotation = Quaternion.identity;
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.01f, 0.012f, 0.04f);
-            cam.fieldOfView = 50f;
+            cam.backgroundColor = cfg.backgroundColor;
+            cam.fieldOfView = cfg.cameraFov;
             cam.nearClipPlane = 0.1f;
             cam.farClipPlane = 100f;
             cam.allowHDR = true;
-            camGo.AddComponent<AudioListener>();
+            if (camGo.GetComponent<AudioListener>() == null) camGo.AddComponent<AudioListener>();
             Sfx.Init(camGo);
             Fx.SetupPost(cam);
-            camGo.AddComponent<CameraFit>();
+            if (camGo.GetComponent<CameraFit>() == null) camGo.AddComponent<CameraFit>();
 
             var backdrop = new GameObject("Backdrop").AddComponent<SpaceBackdrop>();
             backdrop.Build(cam);
@@ -40,20 +56,20 @@ namespace Frontier
             var defense = new GameObject("Defense").AddComponent<DefenseController>();
             defense.Init(planet, cam, gs);
 
-            var panel = ScriptableObject.CreateInstance<PanelSettings>();
+            var panel = panelSettings != null ? panelSettings : ScriptableObject.CreateInstance<PanelSettings>();
             panel.scaleMode = PanelScaleMode.ConstantPixelSize;
-            panel.scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / 1080f);
+            panel.scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / Mathf.Max(100f, cfg.uiReferenceHeight));
             panel.clearColor = false;
-            panel.themeStyleSheet = Resources.Load<ThemeStyleSheet>("Frontier/FrontierTheme");
+            if (panel.themeStyleSheet == null) panel.themeStyleSheet = Resources.Load<ThemeStyleSheet>("Frontier/FrontierTheme");
 
-            var lightGo = new GameObject("Key Light");
-            var light = lightGo.AddComponent<Light>();
+            var light = keyLight;
+            if (light == null) light = new GameObject("Key Light").AddComponent<Light>();
             light.type = LightType.Directional;
-            light.color = new Color(0.85f, 0.9f, 1f);
-            light.intensity = 1.6f;
-            lightGo.transform.rotation = Quaternion.Euler(35f, -30f, 0f);
+            light.color = cfg.lightColor;
+            light.intensity = cfg.lightIntensity;
+            light.transform.rotation = Quaternion.Euler(35f, -30f, 0f);
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.32f, 0.34f, 0.5f);
+            RenderSettings.ambientLight = cfg.ambientColor;
 
             var uiGo = new GameObject("UI");
             uiGo.SetActive(false);

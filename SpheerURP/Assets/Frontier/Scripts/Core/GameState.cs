@@ -142,7 +142,7 @@ namespace Frontier
         }
 
         public float ToolTolerance(MinigameKind k) { return Mathf.Min(1.6f, 1f + 0.08f * ToolLevel(k)); }
-        public float ToolDamage(MinigameKind k) { return 1f + 0.7f * ToolLevel(k); }
+        public float ToolDamage(MinigameKind k) { return 1f + FrontierSettings.I.toolDamagePerLevel * ToolLevel(k); }
 
         public string ToolName(MinigameKind k)
         {
@@ -159,13 +159,14 @@ namespace Frontier
         public float FuelMultiplier { get { return Mathf.Max(0.25f, 1f - EffectSum(UpgradeEffect.FuelEfficiency)); } }
 
         // ---------- XP ----------
-        public int PlayerLevel { get { return 1 + Mathf.FloorToInt(Mathf.Sqrt(xp / 40f)); } }
+        public int PlayerLevel { get { return 1 + Mathf.FloorToInt(Mathf.Sqrt(xp / XpBase)); } }
+        static float XpBase { get { return Mathf.Max(1f, FrontierSettings.I.xpPerLevelBase); } }
         public float LevelProgress
         {
             get
             {
                 int l = PlayerLevel - 1;
-                float lo = 40f * l * l, hi = 40f * (l + 1) * (l + 1);
+                float lo = XpBase * l * l, hi = XpBase * (l + 1) * (l + 1);
                 return Mathf.Clamp01((xp - lo) / (hi - lo));
             }
         }
@@ -174,7 +175,7 @@ namespace Frontier
 
         // ---------- Debug ----------
         public void DebugSetUpgrade(UpgradeSO u, int level) { levels[u] = Mathf.Clamp(level, 0, u.maxLevel); Notify(); }
-        public void DebugSetLevel(int level) { xp = Mathf.RoundToInt(40f * Mathf.Max(0, level - 1) * Mathf.Max(0, level - 1)); Notify(); }
+        public void DebugSetLevel(int level) { xp = Mathf.RoundToInt(XpBase * Mathf.Max(0, level - 1) * Mathf.Max(0, level - 1)); Notify(); }
         public void DebugTeleport(PlanetSO p) { if (p == null) return; planet = p; Notify(); }
 
         // ---------- Structures ----------

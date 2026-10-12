@@ -12,7 +12,7 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Generate Editable Data Assets")]
         public static void Generate()
         {
-            if (File.Exists(Dir + "/GameDatabase.asset") &&
+            if (File.Exists(Dir + "/GameDatabase.asset") && !Application.isBatchMode &&
                 !EditorUtility.DisplayDialog("Frontier", "A GameDatabase already exists. Overwrite it with defaults?", "Overwrite", "Cancel"))
                 return;
 
@@ -28,9 +28,80 @@ namespace Frontier.EditorTools
             foreach (var o in db.structures) Save(o, "Structure");
             AssetDatabase.CreateAsset(db.formula, Dir + "/Data/WaveFormula.asset");
             AssetDatabase.CreateAsset(db, Dir + "/GameDatabase.asset");
+            if (AssetDatabase.LoadAssetAtPath<FrontierSettings>(Dir + "/FrontierSettings.asset") == null)
+                AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<FrontierSettings>(), Dir + "/FrontierSettings.asset");
             AssetDatabase.SaveAssets();
             Selection.activeObject = db;
-            Debug.Log("Frontier data assets generated in " + Dir);
+            Debug.Log("Frontier: data assets generated in " + Dir);
+        }
+
+        [MenuItem("Frontier/Setup Scene Objects")]
+        public static void SetupScene()
+        {
+            const string scenePath = "Assets/Frontier/Scenes/Frontier.unity";
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            if (scene.path != scenePath && File.Exists(scenePath))
+                scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath);
+
+            var boot = Object.FindFirstObjectByType<FrontierBootstrap>();
+            if (boot == null) { Debug.LogError("Frontier: no FrontierBootstrap in the scene."); return; }
+
+            if (AssetDatabase.LoadAssetAtPath<FrontierSettings>(Dir + "/FrontierSettings.asset") == null)
+            {
+                Directory.CreateDirectory(Dir);
+                AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<FrontierSettings>(), Dir + "/FrontierSettings.asset");
+            }
+            string panelPath = Dir + "/FrontierPanelSettings.asset";
+            var panel = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.PanelSettings>(panelPath);
+            if (panel == null)
+            {
+                panel = ScriptableObject.CreateInstance<UnityEngine.UIElements.PanelSettings>();
+                panel.themeStyleSheet = Resources.Load<UnityEngine.UIElements.ThemeStyleSheet>("Frontier/FrontierTheme");
+                AssetDatabase.CreateAsset(panel, panelPath);
+            }
+
+            var cam = Camera.main;
+            if (cam == null)
+            {
+                var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
+                cam = camGo.AddComponent<Camera>();
+                camGo.AddComponent<AudioListener>();
+            }
+            var light = Object.FindFirstObjectByType<Light>();
+            if (light == null)
+            {
+                light = new GameObject("Key Light").AddComponent<Light>();
+                light.type = LightType.Directional;
+            }
+
+            boot.database = AssetDatabase.LoadAssetAtPath<GameDatabase>(Dir + "/GameDatabase.asset");
+            boot.settings = AssetDatabase.LoadAssetAtPath<FrontierSettings>(Dir + "/FrontierSettings.asset");
+            boot.panelSettings = panel;
+            boot.sceneCamera = cam;
+            boot.keyLight = light;
+            EditorUtility.SetDirty(boot);
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Frontier: scene objects set up");
+        }
+
+        public static void GenerateAll()
+        {
+            Generate();
+            SetupScene();
+        }
+
+        [MenuItem("Frontier/Verify Data Assets")]
+        public static void Verify()
+        {
+            var db = Resources.Load<GameDatabase>("Frontier/GameDatabase");
+            if (db == null) { Debug.LogError("Frontier: verify - no GameDatabase asset"); return; }
+            int tiers = 0;
+            foreach (var u in db.upgrades) if (u != null && u.levelCosts != null) tiers += u.levelCosts.Count;
+            Debug.Log("Frontier: verify OK res=" + db.resources.Length + " planets=" + db.planets.Length + " upgrades=" + db.upgrades.Length +
+                " structs=" + db.structures.Length + " tiers=" + tiers + " fuel=" + (db.fuel != null) + " start=" + (db.startPlanet != null) +
+                " systems=" + db.planets[0].systemId + " formula=" + (db.formula != null));
         }
 
         [MenuItem("Frontier/Build Model Library")]

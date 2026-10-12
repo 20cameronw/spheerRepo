@@ -256,8 +256,8 @@ namespace Frontier
         }
 
         // Free trackball control: drags rotate about the camera's up/right axes, so any direction works.
-        const float DragDegPerPx = 0.32f;
-        const float DefaultSpin = 16f;
+        static float DefaultSpin { get { return FrontierSettings.I.defaultSpin; } }
+        static float DragDegPerPx { get { return FrontierSettings.I.dragDegPerPx; } }
         Vector3 angVel;
         bool grabbed;
         float returnAt;

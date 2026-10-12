@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a77a5014ca9c1140980f1b987ea7c97, type: 3}
+  m_Name: Structure_laser
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.StructureSO
+  id: laser
+  displayName: Laser Turret
+  description: Slow, heavy beam with long range. Fires during waves.
+  kind: 6
+  color: {r: 0.4, g: 2.2, b: 2.2, a: 1}
+  modelKey: struct_laser
+  buildCost:
+  - resource: {fileID: 11400000, guid: 25b2940a17406dc4c95085d3588a640a, type: 2}
+    amount: 8
+  - resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+    amount: 4
+  maxLevel: 5
+  upgradeGrowth: 1.9
+  bonusPerLevel: 0.3
+  maxPerPlanet: 0
+  damage: 14
+  fireInterval: 1.3
+  range: 11
+  beamWidth: 0.12

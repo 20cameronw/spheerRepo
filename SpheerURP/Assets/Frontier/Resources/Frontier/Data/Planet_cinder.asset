@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1175b5dce9dd134ba2ed369b5c2135b, type: 3}
+  m_Name: Planet_cinder
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.PlanetSO
+  id: cinder
+  displayName: Cinder
+  description: Volcanic and hostile. Metal-rich, crystal-poor.
+  tier: 2
+  mapPosition: {x: 0.5208382, y: 0.80138195}
+  danger: 2
+  primary: {r: 1, g: 0.25, b: 0.1, a: 1}
+  secondary: {r: 0.12, g: 0.02, b: 0.02, a: 1}
+  rim: {r: 2.4, g: 0.5, b: 0.2, a: 1}
+  weather: 3
+  hasRings: 0
+  style: 3
+  spots:
+  - label: Magma Vent
+    game: 2
+    resource: {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+    baseYield: 7
+    difficulty: 0.55
+  - label: Slag Field
+    game: 1
+    resource: {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+    baseYield: 8
+    difficulty: 0.5
+  - label: Deep Bore
+    game: 2
+    resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+    baseYield: 2
+    difficulty: 0.65
+  systemId: ember

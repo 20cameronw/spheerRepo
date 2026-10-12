@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1175b5dce9dd134ba2ed369b5c2135b, type: 3}
+  m_Name: Planet_obsidian
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.PlanetSO
+  id: obsidian
+  displayName: Obsidian
+  description: Black glass plains threaded with violet crystal.
+  tier: 5
+  mapPosition: {x: 0.7648339, y: 0.64957464}
+  danger: 6
+  primary: {r: 0.15, g: 0.1, b: 0.25, a: 1}
+  secondary: {r: 0.02, g: 0, b: 0.06, a: 1}
+  rim: {r: 1.6, g: 0.4, b: 2.8, a: 1}
+  weather: 6
+  hasRings: 0
+  style: 4
+  spots:
+  - label: Glass Shelf
+    game: 1
+    resource: {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+    baseYield: 20
+    difficulty: 0.65
+  - label: Violet Spires
+    game: 1
+    resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+    baseYield: 9
+    difficulty: 0.7
+  systemId: umbra

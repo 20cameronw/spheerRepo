@@ -295,7 +295,7 @@ namespace Frontier
             var u2 = tools[toolTab];
             int lvl = gs.Level(u2);
             body.Add(UiKit.Text(u2.description, "fr-muted"));
-            body.Add(UiKit.Text("Equipped: " + u2.NameAtLevel(lvl) + "   DMG x" + (1f + 0.7f * lvl).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * lvl).ToString("0.0"), "fr-small", UiKit.Ui(u2.color)));
+            body.Add(UiKit.Text("Equipped: " + u2.NameAtLevel(lvl) + "   DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * lvl).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * lvl).ToString("0.0"), "fr-small", UiKit.Ui(u2.color)));
             for (int l = 0; l <= u2.maxLevel; l++)
             {
                 int level = l;
@@ -308,7 +308,7 @@ namespace Frontier
                 top.Add(UiKit.Div("fr-spacer"));
                 top.Add(UiKit.Text(owned ? (l == lvl ? "EQUIPPED" : "OWNED") : next ? "NEXT" : "LOCKED", "fr-tiny", owned ? UiKit.Lime : UiKit.Amber));
                 card.Add(top);
-                card.Add(UiKit.Text("DMG x" + (1f + 0.7f * l).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * l).ToString("0.0") + "   Faster swing", "fr-tiny"));
+                card.Add(UiKit.Text("DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * l).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * l).ToString("0.0") + "   Faster swing", "fr-tiny"));
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);
