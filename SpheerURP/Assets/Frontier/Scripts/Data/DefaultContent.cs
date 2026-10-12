@@ -175,7 +175,7 @@ namespace Frontier
                 Struct("lumber", "Lumber Camp", "Tap it to chop the trees on this planet. Higher levels yield more.",
                     StructureKind.Lumber, new Color(1.8f, 1.1f, 0.35f), "struct_lumber", L(A(wood, 6)), 0.2f),
                 Struct("mine", "Mining Rig", "Tap it to mine ore and stone on this planet. Higher levels yield more.",
-                    StructureKind.Mine, new Color(0.8f, 1.2f, 1.8f), "struct_mine", L(A(wood, 10), A(stone, 6)), 0.2f),
+                    StructureKind.Mine, new Color(0.8f, 1.2f, 1.8f), "struct_mine", L(A(wood, 8)), 0.2f),
                 Struct("driller", "Deep Driller", "Tap it to drill fuel, crystal and cores. Higher levels yield more.",
                     StructureKind.Drill, new Color(2f, 0.8f, 0.4f), "struct_drill", L(A(wood, 14), A(stone, 10), A(iron, 6)), 0.2f),
                 Struct("gunner", "Gunner Turret", "Rapid fire kinetic turret. Fires during waves.",
@@ -198,7 +198,7 @@ namespace Frontier
             db.formula = wave;
             db.fuel = fuel;
             db.startPlanet = planets[0];
-            db.startingItems = L(A(fuel, 10), A(wood, 12));
+            db.startingItems = L(A(fuel, 10), A(wood, 24));
             return db;
         }
     }

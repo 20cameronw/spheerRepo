@@ -17,14 +17,58 @@ namespace Frontier
         public Transform Root { get { return root; } }
         public PlanetSO Current { get; private set; }
         public event System.Action<PlanetSO> Rebuilt;
-        float spinVelocity;
-        public bool IdleSpin = true;
         float punch;
+        public bool IdleSpin = true;
         float appear = 1f;
         GameObject glow;
         Color baseRim;
         bool punchWas;
         bool usesModel;
+        List<Material> modelMats;
+
+        // Rescales a hand-made model so its typical surface sits exactly at Radius, whatever its shape or import scale.
+        void NormalizeModel(Transform model, Transform center)
+        {
+            var dists = new List<float>();
+            foreach (var mf in model.GetComponentsInChildren<MeshFilter>())
+            {
+                var m = mf.sharedMesh;
+                if (m == null || !m.isReadable) continue;
+                var vs = m.vertices;
+                int step = Mathf.Max(1, vs.Length / 1500);
+                for (int i = 0; i < vs.Length; i += step)
+                    dists.Add((mf.transform.TransformPoint(vs[i]) - center.position).magnitude);
+            }
+            if (dists.Count < 8) return;
+            dists.Sort();
+            float median = dists[dists.Count / 2];
+            if (median < 1e-4f) return;
+            float k = Radius / median;
+            model.localScale *= k;
+            model.position = center.position + (model.position - center.position) * k;
+        }
+
+        void StyleModel(Transform model, PlanetSO p, System.Random rng)
+        {
+            float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
+            var mats = new List<Material>();
+            foreach (var r in model.GetComponentsInChildren<MeshRenderer>())
+            {
+                var mat = new Material(Fx.PlanetShader);
+                mat.SetColor("_BaseColor", p.primary);
+                mat.SetColor("_AltColor", p.secondary);
+                mat.SetColor("_RimColor", p.rim);
+                mat.SetFloat("_Bands", bands);
+                mat.SetFloat("_Seed", seed);
+                var lb = r.localBounds.center;
+                mat.SetVector("_Center", new Vector4(lb.x, lb.y, lb.z, 0f));
+                var arr = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
+                for (int i = 0; i < arr.Length; i++) arr[i] = mat;
+                r.sharedMaterials = arr;
+                mats.Add(mat);
+            }
+            modelMats = mats;
+        }
 
         public void Show(PlanetSO p, bool animate)
         {
@@ -43,8 +87,13 @@ namespace Frontier
             sphere.transform.SetParent(Spin, false);
             core = sphere.transform;
             baseRim = p.rim;
-            coreMat = null;
+            coreMat = null; modelMats = null;
             var model = ModelLibrary.Spawn(p.id, core, Radius * 2f);
+            if (model != null)
+            {
+                NormalizeModel(model, core);
+                StyleModel(model, p, rng);
+            }
             if (model == null)
             {
                 Destroy(sphere);
@@ -86,8 +135,34 @@ namespace Frontier
             if (Rebuilt != null) Rebuilt(p);
         }
 
-        public void AddSpin(float degrees) { if (Spin != null) Spin.Rotate(0f, -degrees, 0f, Space.Self); }
-        public void SetSpinVelocity(float degPerSec) { spinVelocity = degPerSec; }
+        // Free trackball control: drags rotate about the camera's up/right axes, so any direction works.
+        const float DragDegPerPx = 0.32f;
+        const float DefaultSpin = 5f;
+        Vector3 angVel;
+        bool grabbed;
+        float returnAt;
+
+        Vector3 DefaultVel() { return root != null ? -root.up * DefaultSpin : Vector3.zero; }
+
+        public void BeginDrag() { grabbed = true; angVel = Vector3.zero; }
+
+        public void Drag(Vector2 deltaPx, float dt)
+        {
+            if (Spin == null) return;
+            var c = Camera.main;
+            Vector3 up = c != null ? c.transform.up : Vector3.up, right = c != null ? c.transform.right : Vector3.right;
+            Vector3 step = (-up * deltaPx.x + right * deltaPx.y) * DragDegPerPx;
+            float ang = step.magnitude;
+            if (ang > 0f) Spin.rotation = Quaternion.AngleAxis(ang, step / ang) * Spin.rotation;
+            angVel = Vector3.Lerp(angVel, step / Mathf.Max(0.001f, dt), 0.4f);
+        }
+
+        public void EndDrag()
+        {
+            grabbed = false;
+            if (angVel.magnitude > 400f) angVel = angVel.normalized * 400f;
+            returnAt = Time.time + 1.5f;
+        }
 
         void BuildRing(float radius, Color c, float tilt, float yaw)
         {
@@ -139,10 +214,21 @@ namespace Frontier
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
             float pulse = 1f + Mathf.Sin(Time.time * 1.6f) * 0.012f + punch * 0.08f;
             core.localScale = Vector3.one * (usesModel ? 1f : Radius * 2f) * pulse;
-            spinVelocity = Mathf.MoveTowards(spinVelocity, 0f, Time.deltaTime * 140f);
-            Spin.Rotate(0f, -(spinVelocity + (IdleSpin ? 5f : 0f)) * Time.deltaTime, 0f, Space.Self);
+            if (!grabbed)
+            {
+                Vector3 def = IdleSpin ? DefaultVel() : Vector3.zero;
+                if (Time.time >= returnAt) angVel = Vector3.Lerp(angVel, def, 1f - Mathf.Exp(-1.6f * Time.deltaTime));
+                else angVel = Vector3.Lerp(angVel, Vector3.zero, 1f - Mathf.Exp(-0.5f * Time.deltaTime));
+                float a = angVel.magnitude * Time.deltaTime;
+                if (a > 0f) Spin.rotation = Quaternion.AngleAxis(a, angVel.normalized) * Spin.rotation;
+            }
             for (int i = 0; i < orbiters.Count; i++) orbiters[i].Rotate(0f, orbiterSpeed[i] * Time.deltaTime, 0f, Space.Self);
-            if (coreMat != null && (punch > 0f || punchWas)) coreMat.SetColor("_RimColor", Color.Lerp(baseRim, new Color(3f, 0.4f, 0.4f), punch));
+            if (punch > 0f || punchWas)
+            {
+                var rim = Color.Lerp(baseRim, new Color(3f, 0.4f, 0.4f), punch);
+                if (coreMat != null) coreMat.SetColor("_RimColor", rim);
+                if (modelMats != null) foreach (var m in modelMats) if (m != null) m.SetColor("_RimColor", rim);
+            }
             punchWas = punch > 0f;
         }
     }

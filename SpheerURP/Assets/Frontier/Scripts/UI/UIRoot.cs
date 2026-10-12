@@ -27,6 +27,7 @@ namespace Frontier
         VisualElement planetTag;
 
         bool busy;
+        public const float UiBoost = 1.2f;
         bool batching;
         Vector4 inset; // left, top, right, bottom in logical px
         int lastW, lastH;
@@ -100,7 +101,7 @@ namespace Frontier
             var sa = Screen.safeArea;
             if (!force && Screen.width == lastW && Screen.height == lastH && sa == lastSafe) return;
             lastW = Screen.width; lastH = Screen.height; lastSafe = sa;
-            float scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / 1080f) * uiScale;
+            float scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / 1080f) * UiBoost;
             if (panelSettings != null) panelSettings.scale = scale;
             inset = new Vector4(sa.xMin / scale, (Screen.height - sa.yMax) / scale, (Screen.width - sa.xMax) / scale, sa.yMin / scale);
             hud.style.left = inset.x; hud.style.top = inset.y;
@@ -123,27 +124,20 @@ namespace Frontier
             var top = UiKit.Div("fr-topbar"); top.pickingMode = PickingMode.Ignore;
             planetTag = UiKit.Div("fr-topbar-bar");
             planetTag.pickingMode = PickingMode.Ignore;
+            planetLabel = UiKit.Text("", "fr-planet-name");
+            planetTag.Add(planetLabel);
             fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
             packLabel = Chip(planetTag, "pack", UiKit.Cyan, null);
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
-            planetLabel = UiKit.Text("", "fr-planet-name");
-            planetTag.Add(planetLabel);
             top.Add(planetTag);
-
-            var map = Icons.IconButton("map", UiKit.Cyan, OpenMap, 0f, true);
-            map.AddToClassList("fr-topbar-corner"); map.AddToClassList("fr-topbar-left");
-            top.Add(map);
-            var menu = Icons.IconButton("grid", UiKit.Cyan, OpenMenu, 0f, true);
-            menu.AddToClassList("fr-topbar-corner"); menu.AddToClassList("fr-topbar-right");
-            top.Add(menu);
             hud.Add(top);
 
-            var research = Icons.IconButton("research", UiKit.Magenta, OpenResearch, 0f, true);
-            research.AddToClassList("fr-corner"); research.AddToClassList("fr-corner-left");
-            hud.Add(research);
-            var shop = Icons.IconButton("build", UiKit.Lime, OpenShop, 0f, true);
-            shop.AddToClassList("fr-corner"); shop.AddToClassList("fr-corner-right");
-            hud.Add(shop);
+            var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
+            dock.Add(Icons.IconButton("research", UiKit.Magenta, OpenResearch, 0f, true));
+            dock.Add(Icons.IconButton("map", UiKit.Cyan, OpenMap, 0f, true));
+            dock.Add(Icons.IconButton("grid", UiKit.Amber, OpenMenu, 0f, true));
+            dock.Add(Icons.IconButton("build", UiKit.Lime, OpenShop, 0f, true));
+            hud.Add(dock);
         }
 
         Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp)
@@ -235,7 +229,6 @@ namespace Frontier
 
             UpdatePopupPosition();
             UpdateMapInput();
-            SweepText();
         }
 
         void CloseAll()
@@ -256,8 +249,14 @@ namespace Frontier
 
         Button IconBtn(string text, string icon, Color color, Action onClick, bool big = false)
         {
-            var b = UiKit.Btn(text, color, onClick, big);
-            b.Insert(0, Icons.Make(icon, color, big ? 44f : 34f));
+            var b = UiKit.Btn("", color, onClick, big);
+            var ic = Icons.Make(icon, color, big ? 44f : 34f);
+            ic.style.marginRight = 12;
+            b.Add(ic);
+            var l = UiKit.Text(text, null, UiKit.Ui(color));
+            l.style.flexShrink = 1;
+            l.style.whiteSpace = WhiteSpace.Normal;
+            b.Add(l);
             return b;
         }
 
@@ -308,45 +307,10 @@ namespace Frontier
             }
         }
 
-        // ------------------------------------------------------------ settings (UI scale, text scale, sound)
-        float uiScale = 1f, textScale = 1f;
-        float nextSweep;
-
+        // ------------------------------------------------------------ settings
         void LoadPrefs()
         {
-            uiScale = Mathf.Clamp(PlayerPrefs.GetFloat("fr_uiscale", 1f), 0.7f, 1.5f);
-            textScale = Mathf.Clamp(PlayerPrefs.GetFloat("fr_textscale", 1f), 0.8f, 1.6f);
             Sfx.Muted = PlayerPrefs.GetInt("fr_muted", 0) == 1;
-        }
-
-        void SetUiScale(float v) { uiScale = v; PlayerPrefs.SetFloat("fr_uiscale", v); ApplyLayout(true); }
-        void SetTextScale(float v) { textScale = v; PlayerPrefs.SetFloat("fr_textscale", v); nextSweep = 0f; }
-
-        // Labels keep their USS size in userData; a periodic sweep rescales them so new popups pick it up too.
-        void SweepText()
-        {
-            if (Time.unscaledTime < nextSweep) return;
-            nextSweep = Time.unscaledTime + 0.15f;
-            ScaleLabels(root);
-        }
-
-        void ScaleLabels(VisualElement ve)
-        {
-            var l = ve as Label;
-            if (l != null)
-            {
-                if (!(l.userData is float))
-                {
-                    float f = l.resolvedStyle.fontSize;
-                    if (!(f > 0f)) { goto children; }
-                    l.userData = f;
-                }
-                float want = (float)l.userData * textScale;
-                if (Mathf.Abs(l.style.fontSize.value.value - want) > 0.01f || l.style.fontSize.keyword != StyleKeyword.Undefined)
-                    l.style.fontSize = want;
-            }
-            children:
-            foreach (var c in ve.Children()) ScaleLabels(c);
         }
 
         // ------------------------------------------------------------ gathering

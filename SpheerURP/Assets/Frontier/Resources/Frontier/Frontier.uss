@@ -24,23 +24,20 @@
 /* ---------- HUD ---------- */
 .fr-topbar { position: absolute; left: 0; right: 0; top: 0; height: 120px; }
 .fr-topbar-bar {
-    position: absolute; left: 56px; right: 56px; top: 14px; height: 76px;
-    flex-direction: row; align-items: center;
-    padding: 0 40px 0 64px;
-    border-radius: 0 38px 38px 0; border-width: 2px;
-    background-color: rgba(5, 9, 28, 0.86);
+    position: absolute; left: 24px; right: 24px; top: 14px; height: 84px;
+    flex-direction: row; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    border-radius: 42px; border-width: 2px;
+    background-color: rgba(5, 9, 28, 0.88);
 }
-.fr-topbar-corner { position: absolute; top: 0; }
-.fr-topbar-left { left: 0; }
-.fr-topbar-right { right: 0; }
 .fr-chip {
     flex-direction: row; align-items: center;
-    margin-right: 22px; flex-shrink: 0;
+    margin-left: 22px; flex-shrink: 0;
 }
-.fr-chip .fr-icon { width: 36px; height: 36px; margin-right: 8px; }
+.fr-chip .fr-icon { width: 36px; height: 36px; margin-right: 10px; flex-shrink: 0; }
 .fr-chip-text { font-size: 28px; }
 .fr-chip-xp { width: 110px; margin-left: 10px; }
-.fr-planet-name { font-size: 26px; flex-grow: 1; flex-shrink: 1; -unity-text-align: middle-right; white-space: nowrap; overflow: hidden; }
+.fr-planet-name { font-size: 26px; flex-grow: 1; flex-shrink: 1; -unity-text-align: middle-left; white-space: nowrap; overflow: hidden; }
 .fr-bar {
     height: 16px;
     border-radius: 8px;
@@ -50,11 +47,13 @@
 }
 .fr-bar-fill { height: 100%; border-radius: 8px; }
 
-.fr-corner { position: absolute; bottom: 22px; }
-.fr-corner-left { left: 22px; }
-.fr-corner-right { right: 22px; }
-.fr-round { width: 150px; height: 150px; border-radius: 75px; }
-.fr-topbar-corner.fr-round { width: 104px; height: 104px; border-radius: 52px; }
+.fr-dock {
+    position: absolute; left: 0; right: 0; bottom: 20px;
+    flex-direction: row; justify-content: space-evenly; align-items: center;
+}
+.fr-round { width: 140px; height: 140px; border-radius: 70px; }
+.fr-btn .fr-icon { flex-shrink: 0; }
+.fr-btn { flex-direction: row; align-items: center; justify-content: center; }
 
 .fr-iconbtn {
     width: 128px; height: 128px;

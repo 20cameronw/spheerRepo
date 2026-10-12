@@ -307,14 +307,11 @@ namespace Frontier
             }
             else if (down && Input.GetMouseButton(0) && !blocked)
             {
-                if (!dragging && (pos - downPos).magnitude > 20f) dragging = true;
+                if (!dragging && (pos - downPos).magnitude > 20f) { dragging = true; view.BeginDrag(); lastPos = pos; lastTime = Time.unscaledTime; }
                 if (dragging)
                 {
-                    float dx = pos.x - lastPos.x;
-                    float deg = dx * 0.35f;
-                    view.AddSpin(deg);
                     float dt = Mathf.Max(0.001f, Time.unscaledTime - lastTime);
-                    velocity = Mathf.Lerp(velocity, deg / dt, 0.4f);
+                    view.Drag(pos - lastPos, dt);
                     lastPos = pos; lastTime = Time.unscaledTime;
                 }
             }
@@ -322,7 +319,7 @@ namespace Frontier
             {
                 down = false;
                 if (blocked) return;
-                if (dragging) view.SetSpinVelocity(Mathf.Clamp(velocity, -360f, 360f));
+                if (dragging) view.EndDrag();
                 else Pick(pos);
             }
         }

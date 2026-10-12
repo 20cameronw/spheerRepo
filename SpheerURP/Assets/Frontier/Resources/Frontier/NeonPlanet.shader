@@ -8,6 +8,7 @@ Shader "Frontier/NeonPlanet"
         _Bands ("Bands", Float) = 6
         _RimPower ("Rim Power", Float) = 2.5
         _Seed ("Seed", Float) = 0
+        _Center ("Center (object space)", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -28,6 +29,7 @@ Shader "Frontier/NeonPlanet"
                 float _Bands;
                 float _RimPower;
                 float _Seed;
+                float4 _Center;
             CBUFFER_END
 
             struct Attributes
@@ -51,7 +53,7 @@ Shader "Frontier/NeonPlanet"
                 o.positionCS = vp.positionCS;
                 o.normalWS = TransformObjectToWorldNormal(i.normalOS);
                 o.viewWS = GetWorldSpaceViewDir(vp.positionWS);
-                o.posOS = i.positionOS.xyz;
+                o.posOS = normalize(i.positionOS.xyz - _Center.xyz + float3(0, 1e-4, 0)) * 0.5;
                 return o;
             }
 

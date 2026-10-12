@@ -217,9 +217,6 @@ namespace Frontier
 
         void BuildSettings(VisualElement body)
         {
-            SliderRow(body, "UI SCALE", uiScale, 0.7f, 1.5f, SetUiScale);
-            SliderRow(body, "TEXT SCALE", textScale, 0.8f, 1.6f, SetTextScale);
-
             var snd = IconBtn(Sfx.Muted ? "SOUND OFF" : "SOUND ON", "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
             {
                 Sfx.Muted = !Sfx.Muted;
@@ -238,21 +235,6 @@ namespace Frontier
                 selected = gs.planet;
             });
             body.Add(reset);
-        }
-
-        void SliderRow(VisualElement body, string label, float value, float min, float max, Action<float> onChange)
-        {
-            var row = UiKit.Div("fr-setting-row");
-            row.Add(UiKit.Text(label, "fr-small"));
-            var s = new Slider(min, max) { value = value };
-            s.AddToClassList("fr-slider");
-            var val = UiKit.Text(Mathf.RoundToInt(value * 100f) + "%", "fr-small");
-            // Applied on release so the modal isn't rebuilt (and the drag lost) mid-gesture.
-            s.RegisterValueChangedCallback(e => val.text = Mathf.RoundToInt(e.newValue * 100f) + "%");
-            s.RegisterCallback<PointerCaptureOutEvent>(e => onChange(s.value));
-            row.Add(s);
-            row.Add(val);
-            body.Add(row);
         }
 
         // ------------------------------------------------------------ command (bases + research)
