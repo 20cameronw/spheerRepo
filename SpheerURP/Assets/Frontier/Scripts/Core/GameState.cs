@@ -172,6 +172,11 @@ namespace Frontier
 
         public void AddXp(int amount) { if (amount <= 0) return; xp += amount; Notify(); }
 
+        // ---------- Debug ----------
+        public void DebugSetUpgrade(UpgradeSO u, int level) { levels[u] = Mathf.Clamp(level, 0, u.maxLevel); Notify(); }
+        public void DebugSetLevel(int level) { xp = Mathf.RoundToInt(40f * Mathf.Max(0, level - 1) * Mathf.Max(0, level - 1)); Notify(); }
+        public void DebugTeleport(PlanetSO p) { if (p == null) return; planet = p; Notify(); }
+
         // ---------- Structures ----------
         public PlacedStructure StructureAt(PlanetSO p, int slot)
         {

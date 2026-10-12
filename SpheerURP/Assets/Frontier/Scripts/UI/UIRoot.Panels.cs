@@ -64,7 +64,7 @@ namespace Frontier
 
         void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", "BUILD", UiKit.Lime, BuildShop); }
         void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", "COMMAND", UiKit.Magenta, BuildResearch, true); }
-        void OpenPack() { if (defense.Active || busy) return; menuPage = "pack"; OpenModal("menu", "grid", "MENU", UiKit.Cyan, BuildMenu, true); }
+        void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", "BACKPACK", UiKit.Amber, BuildPack, true); }
 
         // ------------------------------------------------------------ build shop
         int shopTab;
@@ -149,7 +149,7 @@ namespace Frontier
                 body.Add(back);
                 switch (menuPage)
                 {
-                    case "pack": BuildPack(body); break;
+                    case "debug": BuildDebug(body); break;
                     case "ranks": BuildLeaderboard(body); break;
                     case "tutorial": BuildTutorial(body); break;
                     case "about": BuildAbout(body); break;
@@ -158,11 +158,11 @@ namespace Frontier
                 return;
             }
             var grid = UiKit.Div("fr-menu-grid");
-            grid.Add(MenuTile("pack", "BACKPACK", UiKit.Amber, "pack"));
             grid.Add(MenuTile("ranks", "RANKS", UiKit.Lime, "ranks"));
             grid.Add(MenuTile("tutorial", "HOW TO PLAY", UiKit.Cyan, "tutorial"));
             grid.Add(MenuTile("about", "ABOUT", UiKit.Magenta, "about"));
             grid.Add(MenuTile("gear", "SETTINGS", UiKit.Cyan, "settings"));
+            grid.Add(MenuTile("tools", "DEBUG", UiKit.Red, "debug"));
             body.Add(grid);
         }
 
@@ -412,27 +412,17 @@ namespace Frontier
 
         void BuildPack(VisualElement body)
         {
-            body.Add(UiKit.Text(gs.SlotsUsed + " / " + gs.Slots + " slots used", "fr-muted"));
+            SyncPack();
+            body.Add(UiKit.Text(gs.SlotsUsed + " / " + gs.Slots + " slots used  -  drag to rearrange", "fr-muted"));
             var grid = UiKit.Div("fr-grid");
             grid.style.marginTop = 8;
 
             var slots = new List<VisualElement>();
-            int used = 0;
-            foreach (var r in gs.db.resources)
-            {
-                int have = gs.Count(r);
-                while (have > 0 && used < gs.Slots)
-                {
-                    int inSlot = Mathf.Min(have, r.stackSize);
-                    slots.Add(Slot(r, inSlot, false));
-                    have -= inSlot; used++;
-                }
-            }
-            for (; used < gs.Slots; used++) slots.Add(Slot(null, 0, false));
+            for (int i = 0; i < packRes.Length; i++) slots.Add(PackSlot(i, slots));
 
-            // Pad the final row and show the next upgrade tier of slots as locked.
             int rows = Mathf.CeilToInt(slots.Count / (float)PackColumns);
-            while (slots.Count < rows * PackColumns) slots.Add(Slot(null, 0, true));
+            int padded = slots.Count;
+            while (padded < rows * PackColumns) { slots.Add(Slot(null, 0, true)); padded++; }
             foreach (var s in slots) grid.Add(s);
 
             grid.RegisterCallback<GeometryChangedEvent>(e =>
@@ -443,19 +433,190 @@ namespace Frontier
             });
             body.Add(grid);
 
-            var list = UiKit.Div(); list.style.marginTop = 14;
-            foreach (var r in gs.db.resources)
-                if (gs.Count(r) > 0)
-                {
-                    var row = UiKit.Div("fr-row");
-                    row.Add(Icons.Make(Icons.ForResource(r), UiKit.Ui(r.color), 34f));
-                    row.Add(UiKit.Text(r.displayName, "fr-small"));
-                    row.Add(UiKit.Div("fr-spacer"));
-                    row.Add(UiKit.Text(gs.Count(r).ToString(), "fr-small"));
-                    list.Add(row);
-                }
-            body.Add(list);
+            var detail = Card(UiKit.Cyan);
+            detail.style.marginTop = 14;
+            if (packSel >= 0 && packSel < packRes.Length && packRes[packSel] != null)
+            {
+                var r = packRes[packSel];
+                Color c = UiKit.Ui(r.color);
+                var row = UiKit.Div("fr-row");
+                row.Add(Icons.Make(Icons.ForResource(r), c, 72f));
+                var col = UiKit.Div(); col.style.marginLeft = 12; col.style.flexShrink = 1; col.pickingMode = PickingMode.Ignore;
+                col.Add(UiKit.Text(r.displayName.ToUpper(), "fr-h2", c));
+                col.Add(UiKit.Text("In this slot: " + packCnt[packSel] + " / " + r.stackSize, "fr-small"));
+                col.Add(UiKit.Text("Total carried: " + gs.Count(r), "fr-small"));
+                row.Add(col);
+                detail.Add(row);
+                if (!string.IsNullOrEmpty(r.description)) detail.Add(UiKit.Text(r.description, "fr-muted"));
+            }
+            else detail.Add(UiKit.Text("Tap an item to see its details.", "fr-muted"));
+            body.Add(detail);
             body.Add(UiKit.Text("Upgrade the backpack in Command > Research for more slots.", "fr-tiny"));
+        }
+
+        ResourceSO[] packRes = new ResourceSO[0];
+        int[] packCnt = new int[0];
+        int packSel = -1;
+
+        // Keeps the arranged slot layout consistent with the real inventory totals.
+        void SyncPack()
+        {
+            int n = gs.Slots;
+            if (packRes.Length != n)
+            {
+                Array.Resize(ref packRes, n);
+                Array.Resize(ref packCnt, n);
+            }
+            foreach (var r in gs.db.resources)
+            {
+                int total = gs.Count(r), sum = 0;
+                for (int i = 0; i < n; i++) if (packRes[i] == r) sum += packCnt[i];
+                for (int i = n - 1; i >= 0 && sum > total; i--)
+                {
+                    if (packRes[i] != r) continue;
+                    int take = Mathf.Min(packCnt[i], sum - total);
+                    packCnt[i] -= take; sum -= take;
+                    if (packCnt[i] <= 0) { packRes[i] = null; packCnt[i] = 0; }
+                }
+                for (int i = 0; i < n && sum < total; i++)
+                {
+                    if (packRes[i] != r || packCnt[i] >= r.stackSize) continue;
+                    int add = Mathf.Min(r.stackSize - packCnt[i], total - sum);
+                    packCnt[i] += add; sum += add;
+                }
+                for (int i = 0; i < n && sum < total; i++)
+                {
+                    if (packRes[i] != null) continue;
+                    int add = Mathf.Min(r.stackSize, total - sum);
+                    packRes[i] = r; packCnt[i] = add; sum += add;
+                }
+            }
+            for (int i = 0; i < n; i++) if (packRes[i] != null && packCnt[i] <= 0) packRes[i] = null;
+            if (packSel >= n || (packSel >= 0 && packRes[packSel] == null)) packSel = -1;
+        }
+
+        VisualElement PackSlot(int index, List<VisualElement> all)
+        {
+            var s = Slot(packRes[index], packCnt[index], false);
+            if (index == packSel)
+            {
+                Color c = packRes[index] != null ? UiKit.Ui(packRes[index].color) : UiKit.Cyan;
+                UiKit.Border(s, Color.white, 5f);
+                UiKit.Halo(s, c, 18f, 0.6f);
+            }
+            Vector2 down = Vector2.zero;
+            bool pressed = false;
+            s.RegisterCallback<PointerDownEvent>(e =>
+            {
+                pressed = true; down = e.position;
+                s.CapturePointer(e.pointerId);
+                if (packRes[index] != null) s.style.opacity = 0.6f;
+            });
+            s.RegisterCallback<PointerUpEvent>(e =>
+            {
+                if (!pressed) return;
+                pressed = false;
+                if (s.HasPointerCapture(e.pointerId)) s.ReleasePointer(e.pointerId);
+                if (((Vector2)e.position - down).magnitude < 14f)
+                {
+                    packSel = (packRes[index] != null && packSel != index) ? index : -1;
+                    Sfx.Click();
+                }
+                else
+                {
+                    int target = -1;
+                    for (int i = 0; i < packRes.Length; i++)
+                        if (all[i].worldBound.Contains(e.position)) { target = i; break; }
+                    if (target >= 0 && target != index && packRes[index] != null)
+                    {
+                        MovePackSlot(index, target);
+                        packSel = target;
+                        Sfx.Click();
+                    }
+                }
+                RefreshModal();
+            });
+            return s;
+        }
+
+        void MovePackSlot(int from, int to)
+        {
+            if (packRes[to] == packRes[from] && packRes[to] != null)
+            {
+                int room = packRes[to].stackSize - packCnt[to];
+                int move = Mathf.Min(room, packCnt[from]);
+                packCnt[to] += move; packCnt[from] -= move;
+                if (packCnt[from] <= 0) { packRes[from] = null; packCnt[from] = 0; }
+                return;
+            }
+            var r = packRes[to]; packRes[to] = packRes[from]; packRes[from] = r;
+            int c = packCnt[to]; packCnt[to] = packCnt[from]; packCnt[from] = c;
+        }
+
+        // ------------------------------------------------------------ debug
+        int debugAmount = 100;
+
+        void BuildDebug(VisualElement body)
+        {
+            body.Add(UiKit.Text("DEBUG TOOLS - for testing only", "fr-muted", UiKit.Red));
+
+            var give = Card(UiKit.Amber);
+            give.Add(UiKit.Text("GIVE ITEMS", "fr-h2", UiKit.Amber));
+            var amt = UiKit.Div("fr-tabs");
+            foreach (int a in new[] { 10, 100, 1000 })
+            {
+                int v = a;
+                amt.Add(TabButton("star", "x" + a, debugAmount == v, UiKit.Amber, () => debugAmount = v));
+            }
+            give.Add(amt);
+            var res = UiKit.Div("fr-tabs");
+            foreach (var r in gs.db.resources)
+            {
+                var rr = r;
+                var b = IconBtn(r.displayName.ToUpper(), Icons.ForResource(r), UiKit.Ui(r.color), () => { gs.Add(rr, debugAmount); Sfx.Good(); RefreshModal(); });
+                res.Add(b);
+            }
+            give.Add(res);
+            give.Add(IconBtn("GIVE ONE OF EACH x" + debugAmount, "pack", UiKit.Lime, () =>
+            {
+                foreach (var r in gs.db.resources) gs.Add(r, debugAmount, false);
+                gs.Notify(); Sfx.Good(); RefreshModal();
+            }));
+            body.Add(give);
+
+            var prog = Card(UiKit.Magenta);
+            prog.Add(UiKit.Text("PROGRESS", "fr-h2", UiKit.Magenta));
+            prog.Add(UiKit.Text("Player level " + gs.PlayerLevel, "fr-small"));
+            prog.Add(IconBtn("LEVEL +1", "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 1); Sfx.Good(); RefreshModal(); }));
+            prog.Add(IconBtn("LEVEL +10", "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 10); Sfx.Good(); RefreshModal(); }));
+            prog.Add(IconBtn("MAX ALL UPGRADES", "up", UiKit.Lime, () =>
+            {
+                foreach (var u in gs.db.upgrades) if (u != null) gs.DebugSetUpgrade(u, u.maxLevel);
+                Sfx.Good(); RefreshModal();
+            }));
+            prog.Add(IconBtn("RESET UPGRADES", "close", UiKit.Red, () =>
+            {
+                foreach (var u in gs.db.upgrades) if (u != null) gs.DebugSetUpgrade(u, 0);
+                Sfx.Click(); RefreshModal();
+            }));
+            body.Add(prog);
+
+            var tp = Card(UiKit.Cyan);
+            tp.Add(UiKit.Text("TELEPORT (free)", "fr-h2", UiKit.Cyan));
+            foreach (var p in gs.db.planets)
+            {
+                var pl = p;
+                if (pl == null) continue;
+                var sys = PlanetSO.SystemOf(pl.systemId);
+                tp.Add(IconBtn(pl.displayName.ToUpper() + (sys != null ? "  -  " + sys.name : ""), "map", pl == gs.planet ? UiKit.Lime : UiKit.Cyan, () =>
+                {
+                    CloseModal();
+                    gs.DebugTeleport(pl);
+                    planetView.Show(pl, true);
+                    selected = pl;
+                }));
+            }
+            body.Add(tp);
         }
 
         VisualElement Slot(ResourceSO r, int count, bool locked)

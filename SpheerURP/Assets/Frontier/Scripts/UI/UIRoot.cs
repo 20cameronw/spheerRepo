@@ -130,11 +130,14 @@ namespace Frontier
             packLabel = Chip(planetTag, "pack", UiKit.Cyan, null);
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
-            var menuBtn = Icons.IconButton("grid", UiKit.Amber, OpenMenu, 72f, true);
-            menuBtn.style.borderTopLeftRadius = 36; menuBtn.style.borderTopRightRadius = 36;
-            menuBtn.style.borderBottomLeftRadius = 36; menuBtn.style.borderBottomRightRadius = 36;
-            menuBtn.style.marginLeft = 16; menuBtn.style.flexShrink = 0;
-            planetTag.Add(menuBtn);
+            var menuBtn = Icons.IconButton("grid", UiKit.Amber, OpenMenu, 104f, true);
+            menuBtn.style.borderTopLeftRadius = 52; menuBtn.style.borderTopRightRadius = 52;
+            menuBtn.style.borderBottomLeftRadius = 52; menuBtn.style.borderBottomRightRadius = 52;
+            menuBtn.style.position = Position.Absolute;
+            menuBtn.style.right = 8; menuBtn.style.top = 4; menuBtn.style.flexShrink = 0;
+            menuBtn.style.backgroundColor = new Color(0.02f, 0.04f, 0.12f, 0.97f);
+            planetTag.style.paddingRight = 120;
+            top.Add(menuBtn);
             hud.Add(top);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
