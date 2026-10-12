@@ -18,6 +18,7 @@ namespace Frontier
         float spin;
         float wobbleSeed;
         bool dead;
+        bool usesModel;
 
         public static AlienActor Spawn(EnemySO d, float hpMult, Vector3 pos, DefenseController owner)
         {
@@ -37,13 +38,23 @@ namespace Frontier
             wobbleSeed = Random.value * 10f;
             spin = Random.Range(40f, 140f);
 
-            var body = GameObject.CreatePrimitive(d.shape);
-            Destroy(body.GetComponent<Collider>());
+            var body = new GameObject("Body");
             body.transform.SetParent(transform, false);
             body.transform.localScale = Vector3.one * d.scale;
             visual = body.transform;
-            mat = Fx.AddMat(baseColor, null, 1.6f);
-            body.GetComponent<MeshRenderer>().sharedMaterial = mat;
+            var model = ModelLibrary.Spawn(d.id, body.transform, 1f);
+            if (model != null) usesModel = true;
+            else
+            {
+                Destroy(body);
+                body = GameObject.CreatePrimitive(d.shape);
+                Destroy(body.GetComponent<Collider>());
+                body.transform.SetParent(transform, false);
+                body.transform.localScale = Vector3.one * d.scale;
+                visual = body.transform;
+                mat = Fx.AddMat(baseColor, null, 1.6f);
+                body.GetComponent<MeshRenderer>().sharedMaterial = mat;
+            }
 
             Fx.GlowQuad(transform, new Color(baseColor.r, baseColor.g, baseColor.b, 0.55f), d.scale * 4.2f);
 
@@ -68,10 +79,11 @@ namespace Frontier
             Vector3 side = new Vector3(-dir.y, dir.x, 0f);
             float wob = Mathf.Sin(Time.time * 3f + wobbleSeed) * 0.35f;
             transform.position = pos + (dir * speed + side * wob) * Time.deltaTime;
-            visual.Rotate(spin * Time.deltaTime, spin * 0.7f * Time.deltaTime, 0f);
+            if (usesModel) visual.Rotate(0f, spin * 0.5f * Time.deltaTime, 0f);
+            else visual.Rotate(spin * Time.deltaTime, spin * 0.7f * Time.deltaTime, 0f);
 
             flash = Mathf.MoveTowards(flash, 0f, Time.deltaTime * 6f);
-            mat.SetColor("_Color", Color.Lerp(baseColor, new Color(3f, 3f, 3f, 1f), flash));
+            if (mat != null) mat.SetColor("_Color", Color.Lerp(baseColor, new Color(3f, 3f, 3f, 1f), flash));
             visual.localScale = Vector3.one * data.scale * (1f + flash * 0.25f);
 
             if (transform.position.magnitude <= PlanetView.Radius + data.scale * 0.4f)

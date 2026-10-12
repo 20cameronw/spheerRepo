@@ -32,6 +32,42 @@ namespace Frontier.EditorTools
             Debug.Log("Frontier data assets generated in " + Dir);
         }
 
+        [MenuItem("Frontier/Build Model Library")]
+        public static void BuildModelLibrary()
+        {
+            // key -> hand-made model. Reassign these in the generated asset to taste.
+            var map = new (string key, string path, float scale)[]
+            {
+                ("sylva", "Assets/Prefabs/lerth.prefab", 1f),
+                ("ferrum", "Assets/Models/planet_2.fbx", 1f),
+                ("glacia", "Assets/Prefabs/purp.prefab", 1f),
+                ("cinder", "Assets/Prefabs/spiky_planet.prefab", 1f),
+                ("arbor", "Assets/Models/planet_3.fbx", 1f),
+                ("nyx", "Assets/Prefabs/domny.prefab", 1f),
+                ("scout", "Assets/Models/ufo (2).fbx", 1f),
+                ("swarmer", "Assets/Models/space_trash.fbx", 1f),
+                ("raider", "Assets/Models/spaceship.fbx", 1f),
+                ("brute", "Assets/Models/ufo (2).fbx", 1f),
+                ("titan", "Assets/Models/ufo (2).fbx", 1f),
+                ("turret", "Assets/Models/gunner.fbx", 1f),
+            };
+            var list = new System.Collections.Generic.List<ModelLibrary.Entry>();
+            foreach (var m in map)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(m.path);
+                if (prefab == null) { Debug.LogWarning("Frontier: missing model " + m.path); continue; }
+                list.Add(new ModelLibrary.Entry { key = m.key, prefab = prefab, scale = m.scale });
+            }
+            Directory.CreateDirectory(Dir);
+            string path = Dir + "/ModelLibrary.asset";
+            var lib = AssetDatabase.LoadAssetAtPath<ModelLibrary>(path);
+            if (lib == null) { lib = ScriptableObject.CreateInstance<ModelLibrary>(); AssetDatabase.CreateAsset(lib, path); }
+            lib.entries = list.ToArray();
+            EditorUtility.SetDirty(lib);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Frontier: model library built with " + list.Count + " entries");
+        }
+
         [MenuItem("Frontier/Reset Save")]
         public static void ResetSave()
         {

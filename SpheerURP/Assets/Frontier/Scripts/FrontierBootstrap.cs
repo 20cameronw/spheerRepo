@@ -45,6 +45,16 @@ namespace Frontier
             panel.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
             panel.match = 0.5f;
             panel.clearColor = false;
+            panel.themeStyleSheet = Resources.Load<ThemeStyleSheet>("Frontier/FrontierTheme");
+
+            var lightGo = new GameObject("Key Light");
+            var light = lightGo.AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.color = new Color(0.85f, 0.9f, 1f);
+            light.intensity = 1.6f;
+            lightGo.transform.rotation = Quaternion.Euler(35f, -30f, 0f);
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = new Color(0.32f, 0.34f, 0.5f);
 
             var uiGo = new GameObject("UI");
             uiGo.SetActive(false);

@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b554432c5f86a5642b1960fe4dc7f2cc, type: 3}
+  m_Name: ModelLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.ModelLibrary
+  entries:
+  - key: sylva
+    prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
+      type: 3}
+    scale: 1
+  - key: ferrum
+    prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
+    scale: 1
+  - key: glacia
+    prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
+      type: 3}
+    scale: 1
+  - key: cinder
+    prefab: {fileID: 1238312849663419745, guid: 051ba5a398b8b3c4092c654f96a6eb2f,
+      type: 3}
+    scale: 1
+  - key: arbor
+    prefab: {fileID: 919132149155446097, guid: bb6b61e6cab8b4bf6866be5f20be71c4, type: 3}
+    scale: 1
+  - key: nyx
+    prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
+      type: 3}
+    scale: 1
+  - key: scout
+    prefab: {fileID: 919132149155446097, guid: cfc6a7b43afc80b4db95f51fed2b82c2, type: 3}
+    scale: 1
+  - key: swarmer
+    prefab: {fileID: 919132149155446097, guid: 1c311dae0af2f400ebe73409c652c949, type: 3}
+    scale: 1
+  - key: raider
+    prefab: {fileID: 919132149155446097, guid: 1e815cb89adcd2a42945948def54ebf5, type: 3}
+    scale: 1
+  - key: brute
+    prefab: {fileID: 919132149155446097, guid: cfc6a7b43afc80b4db95f51fed2b82c2, type: 3}
+    scale: 1
+  - key: titan
+    prefab: {fileID: 919132149155446097, guid: cfc6a7b43afc80b4db95f51fed2b82c2, type: 3}
+    scale: 1
+  - key: turret
+    prefab: {fileID: 919132149155446097, guid: 6e1e7dca4b4ed33409a90661701216d0, type: 3}
+    scale: 1

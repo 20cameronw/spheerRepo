@@ -107,12 +107,19 @@ namespace Frontier
             int n = gs.TurretCount;
             for (int i = 0; i < n; i++)
             {
-                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                Destroy(go.GetComponent<Collider>());
+                var go = new GameObject("Turret");
                 go.transform.SetParent(transform, false);
-                go.transform.localScale = Vector3.one * 0.3f;
-                go.GetComponent<MeshRenderer>().sharedMaterial = Fx.AddMat(new Color(2.2f, 0.6f, 2f, 1f), null, 1.4f);
-                Fx.GlowQuad(go.transform, new Color(2.2f, 0.6f, 2f, 0.7f), 4f);
+                var tm = ModelLibrary.Spawn("turret", go.transform, 0.55f);
+                if (tm == null)
+                {
+                    Destroy(go);
+                    go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    Destroy(go.GetComponent<Collider>());
+                    go.transform.SetParent(transform, false);
+                    go.transform.localScale = Vector3.one * 0.3f;
+                    go.GetComponent<MeshRenderer>().sharedMaterial = Fx.AddMat(new Color(2.2f, 0.6f, 2f, 1f), null, 1.4f);
+                }
+                Fx.GlowQuad(go.transform, new Color(2.2f, 0.6f, 2f, 0.7f), tm == null ? 4f : 1.6f);
                 turrets.Add(go.transform);
                 turretCooldown.Add(UnityEngine.Random.value);
             }

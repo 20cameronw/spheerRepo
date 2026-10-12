@@ -18,6 +18,7 @@ namespace Frontier
         GameObject glow;
         Color baseRim;
         bool punchWas;
+        bool usesModel;
 
         public void Show(PlanetSO p, bool animate)
         {
@@ -28,19 +29,29 @@ namespace Frontier
             root.SetParent(transform, false);
             var rng = new System.Random(p.id.GetHashCode());
 
-            var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Destroy(sphere.GetComponent<Collider>());
+            var sphere = new GameObject("Core");
             sphere.transform.SetParent(root, false);
-            sphere.transform.localScale = Vector3.one * Radius * 2f;
             core = sphere.transform;
-            coreMat = new Material(Fx.PlanetShader);
-            coreMat.SetColor("_BaseColor", p.primary);
-            coreMat.SetColor("_AltColor", p.secondary);
-            coreMat.SetColor("_RimColor", p.rim);
             baseRim = p.rim;
-            coreMat.SetFloat("_Bands", 4f + (float)rng.NextDouble() * 6f);
-            coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
-            sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
+            coreMat = null;
+            var model = ModelLibrary.Spawn(p.id, core, Radius * 2f);
+            if (model == null)
+            {
+                Destroy(sphere);
+                sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Destroy(sphere.GetComponent<Collider>());
+                sphere.transform.SetParent(root, false);
+                sphere.transform.localScale = Vector3.one * Radius * 2f;
+                core = sphere.transform;
+                coreMat = new Material(Fx.PlanetShader);
+                coreMat.SetColor("_BaseColor", p.primary);
+                coreMat.SetColor("_AltColor", p.secondary);
+                coreMat.SetColor("_RimColor", p.rim);
+                coreMat.SetFloat("_Bands", 4f + (float)rng.NextDouble() * 6f);
+                coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
+                sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
+            }
+            usesModel = model != null;
 
             var atmo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(atmo.GetComponent<Collider>());
@@ -111,10 +122,10 @@ namespace Frontier
             }
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
             float pulse = 1f + Mathf.Sin(Time.time * 1.6f) * 0.012f + punch * 0.08f;
-            core.localScale = Vector3.one * Radius * 2f * pulse;
+            core.localScale = Vector3.one * (usesModel ? 1f : Radius * 2f) * pulse;
             core.Rotate(0f, 8f * Time.deltaTime, 0f, Space.Self);
             for (int i = 0; i < orbiters.Count; i++) orbiters[i].Rotate(0f, orbiterSpeed[i] * Time.deltaTime, 0f, Space.Self);
-            if (punch > 0f || punchWas) coreMat.SetColor("_RimColor", Color.Lerp(baseRim, new Color(3f, 0.4f, 0.4f), punch));
+            if (coreMat != null && (punch > 0f || punchWas)) coreMat.SetColor("_RimColor", Color.Lerp(baseRim, new Color(3f, 0.4f, 0.4f), punch));
             punchWas = punch > 0f;
         }
     }
