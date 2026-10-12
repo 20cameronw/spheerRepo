@@ -38,6 +38,12 @@ namespace Frontier
             return p;
         }
 
+        static PlanetSO Extra(PlanetSO p, int style, WeatherKind w, bool rings = false)
+        {
+            p.style = style; p.weather = w; p.hasRings = rings;
+            return p;
+        }
+
         static UpgradeSO Up(string id, string name, string desc, UpgradeCategory cat, UpgradeEffect fx, float perLevel,
             int max, float growth, Color color, List<ItemAmount> cost, MinigameKind tool = MinigameKind.Chop, string[] names = null)
         {
@@ -88,33 +94,85 @@ namespace Frontier
             var planets = new[]
             {
                 Planet("sylva", "Sylva", "A gentle forest world. Perfect for a first axe swing.", 0,
-                    new Vector2(0.2f, 0.78f), 0.6f, new Color(0.15f, 0.85f, 0.4f), new Color(0.02f, 0.22f, 0.12f), new Color(0.4f, 2f, 1f),
+                    new Vector2(0.15f, 0.85f), 0.6f, new Color(0.15f, 0.85f, 0.4f), new Color(0.02f, 0.22f, 0.12f), new Color(0.4f, 2f, 1f),
                     Spot("Ironbark Grove", MinigameKind.Chop, wood, 8, 0.25f),
                     Spot("Mossy Outcrop", MinigameKind.Mine, stone, 4, 0.3f)),
                 Planet("ferrum", "Ferrum", "Rust-red plains laced with ore veins. Few trees.", 1,
-                    new Vector2(0.45f, 0.62f), 1.2f, new Color(0.9f, 0.4f, 0.15f), new Color(0.25f, 0.06f, 0.03f), new Color(2f, 0.9f, 0.3f),
+                    new Vector2(0.27f, 0.78f), 1.2f, new Color(0.9f, 0.4f, 0.15f), new Color(0.25f, 0.06f, 0.03f), new Color(2f, 0.9f, 0.3f),
                     Spot("Scrub Trees", MinigameKind.Chop, wood, 3, 0.35f),
                     Spot("Quarry", MinigameKind.Mine, stone, 7, 0.35f),
                     Spot("Ore Seam", MinigameKind.Mine, iron, 4, 0.45f)),
                 Planet("glacia", "Glacia", "Frozen world with cryo-vents full of fuel.", 2,
-                    new Vector2(0.3f, 0.35f), 1.6f, new Color(0.4f, 0.8f, 1f), new Color(0.05f, 0.12f, 0.3f), new Color(0.5f, 1.8f, 2.4f),
+                    new Vector2(0.2f, 0.65f), 1.6f, new Color(0.4f, 0.8f, 1f), new Color(0.05f, 0.12f, 0.3f), new Color(0.5f, 1.8f, 2.4f),
                     Spot("Cryo Siphon", MinigameKind.Drill, fuel, 4, 0.45f),
                     Spot("Ice Crystals", MinigameKind.Mine, crystal, 3, 0.5f)),
                 Planet("cinder", "Cinder", "Volcanic and hostile. Metal-rich, crystal-poor.", 2,
-                    new Vector2(0.72f, 0.7f), 2f, new Color(1f, 0.25f, 0.1f), new Color(0.12f, 0.02f, 0.02f), new Color(2.4f, 0.5f, 0.2f),
+                    new Vector2(0.36f, 0.88f), 2f, new Color(1f, 0.25f, 0.1f), new Color(0.12f, 0.02f, 0.02f), new Color(2.4f, 0.5f, 0.2f),
                     Spot("Magma Vent", MinigameKind.Drill, iron, 7, 0.55f),
                     Spot("Slag Field", MinigameKind.Mine, iron, 8, 0.5f),
                     Spot("Deep Bore", MinigameKind.Drill, crystal, 2, 0.65f)),
                 Planet("arbor", "Arbor Prime", "A planet-sized jungle. Titanic trees, dense crystal roots.", 3,
-                    new Vector2(0.85f, 0.3f), 3f, new Color(0.25f, 1f, 0.25f), new Color(0.02f, 0.18f, 0.04f), new Color(1f, 2.4f, 0.5f),
+                    new Vector2(0.4f, 0.66f), 3f, new Color(0.25f, 1f, 0.25f), new Color(0.02f, 0.18f, 0.04f), new Color(1f, 2.4f, 0.5f),
                     Spot("Titan Grove", MinigameKind.Chop, wood, 30, 0.5f),
                     Spot("Root Crystals", MinigameKind.Mine, crystal, 5, 0.55f)),
                 Planet("nyx", "Nyx", "A dark hive world. Dangerous, valuable.", 4,
-                    new Vector2(0.55f, 0.1f), 4.5f, new Color(0.7f, 0.25f, 1f), new Color(0.08f, 0.02f, 0.2f), new Color(2f, 0.5f, 2.4f),
+                    new Vector2(0.3f, 0.5f), 4.5f, new Color(0.7f, 0.25f, 1f), new Color(0.08f, 0.02f, 0.2f), new Color(2f, 0.5f, 2.4f),
                     Spot("Crystal Heart", MinigameKind.Drill, crystal, 10, 0.7f),
                     Spot("Hive Breach", MinigameKind.Drill, core, 3, 0.75f),
                     Spot("Void Ore", MinigameKind.Mine, iron, 12, 0.6f)),
+
+                Extra(Planet("aurum", "Aurum", "Endless golden dunes hiding dense mineral beds.", 2,
+                    new Vector2(0.52f, 0.9f), 2.4f, new Color(1f, 0.78f, 0.25f), new Color(0.35f, 0.16f, 0.03f), new Color(2.4f, 1.6f, 0.4f),
+                    Spot("Dune Quarry", MinigameKind.Mine, stone, 12, 0.4f),
+                    Spot("Gilded Seam", MinigameKind.Mine, iron, 7, 0.5f)), 1, WeatherKind.Dust),
+                Extra(Planet("tide", "Tidewater", "An ocean world of floating kelp forests and fuel-rich brine.", 3,
+                    new Vector2(0.58f, 0.7f), 3.2f, new Color(0.1f, 0.5f, 1f), new Color(0.02f, 0.08f, 0.3f), new Color(0.3f, 1.6f, 2.6f),
+                    Spot("Kelp Forest", MinigameKind.Chop, wood, 22, 0.45f),
+                    Spot("Brine Wells", MinigameKind.Drill, fuel, 7, 0.5f)), 1, WeatherKind.Rain),
+                Extra(Planet("zephyr", "Zephyr", "A pastel gas giant with floating platforms in the storm bands.", 3,
+                    new Vector2(0.74f, 0.55f), 3.6f, new Color(0.95f, 0.6f, 0.85f), new Color(0.3f, 0.2f, 0.6f), new Color(2.2f, 1.2f, 2.2f),
+                    Spot("Gas Siphon", MinigameKind.Drill, fuel, 10, 0.55f),
+                    Spot("Cloud Crystals", MinigameKind.Mine, crystal, 5, 0.55f)), 1, WeatherKind.Storm),
+                Extra(Planet("pyre", "Pyre", "A molten shell cracked open by rivers of lava.", 4,
+                    new Vector2(0.5f, 0.42f), 4.8f, new Color(1f, 0.55f, 0.05f), new Color(0.08f, 0.01f, 0.01f), new Color(3f, 0.9f, 0.1f),
+                    Spot("Lava Tap", MinigameKind.Drill, iron, 16, 0.6f),
+                    Spot("Cinder Vein", MinigameKind.Drill, crystal, 5, 0.7f)), 3, WeatherKind.Embers),
+                Extra(Planet("halcyon", "Halcyon", "A serene teal ice world, still and deceptively rich.", 4,
+                    new Vector2(0.12f, 0.4f), 4.2f, new Color(0.5f, 1f, 0.9f), new Color(0.02f, 0.25f, 0.3f), new Color(0.4f, 2.4f, 2.2f),
+                    Spot("Glacier Core", MinigameKind.Drill, fuel, 12, 0.6f),
+                    Spot("Frost Geodes", MinigameKind.Mine, crystal, 7, 0.6f)), 4, WeatherKind.Snow),
+                Extra(Planet("mire", "Mire", "A rotting swamp world. Spore storms and enormous fungal trees.", 4,
+                    new Vector2(0.42f, 0.22f), 5f, new Color(0.55f, 0.75f, 0.15f), new Color(0.1f, 0.12f, 0.02f), new Color(1.6f, 2.4f, 0.3f),
+                    Spot("Fungal Giants", MinigameKind.Chop, wood, 45, 0.55f),
+                    Spot("Bog Wells", MinigameKind.Drill, fuel, 8, 0.6f),
+                    Spot("Husk Nest", MinigameKind.Drill, core, 2, 0.7f)), 2, WeatherKind.Spores),
+                Extra(Planet("obsidian", "Obsidian", "Black glass plains threaded with violet crystal.", 5,
+                    new Vector2(0.82f, 0.78f), 6f, new Color(0.15f, 0.1f, 0.25f), new Color(0.02f, 0.0f, 0.06f), new Color(1.6f, 0.4f, 2.8f),
+                    Spot("Glass Shelf", MinigameKind.Mine, iron, 20, 0.65f),
+                    Spot("Violet Spires", MinigameKind.Mine, crystal, 9, 0.7f)), 4, WeatherKind.Storm),
+                Extra(Planet("vesper", "Vesper", "Twilight world of endless dusk and warring hives.", 5,
+                    new Vector2(0.64f, 0.16f), 6.5f, new Color(0.5f, 0.25f, 0.9f), new Color(0.12f, 0.02f, 0.3f), new Color(1.8f, 0.8f, 2.8f),
+                    Spot("Dusk Ore", MinigameKind.Mine, iron, 22, 0.7f),
+                    Spot("Hive Heart", MinigameKind.Drill, core, 5, 0.75f)), 2, WeatherKind.Dust),
+                Extra(Planet("prism", "Prism", "A crystalline world that fractures light into rainbows. Rare.", 6,
+                    new Vector2(0.88f, 0.4f), 7.5f, new Color(0.4f, 1f, 1f), new Color(0.7f, 0.2f, 1f), new Color(2f, 2f, 2.8f),
+                    Spot("Prism Fields", MinigameKind.Mine, crystal, 18, 0.75f),
+                    Spot("Refraction Bore", MinigameKind.Drill, fuel, 14, 0.75f)), 4, WeatherKind.Snow, true),
+                Extra(Planet("kaos", "Kaos", "A shattered world orbiting nothing. The end of the map.", 7,
+                    new Vector2(0.9f, 0.08f), 9f, new Color(0.9f, 0.9f, 1f), new Color(0.03f, 0.03f, 0.06f), new Color(2.8f, 2.8f, 3.2f),
+                    Spot("Null Seam", MinigameKind.Drill, core, 9, 0.85f),
+                    Spot("Singular Ore", MinigameKind.Mine, crystal, 24, 0.8f)), 2, WeatherKind.Storm, true),
+                Extra(Planet("tundra", "Tundra Rho", "A windswept frozen steppe on the outer ring.", 3,
+                    new Vector2(0.14f, 0.12f), 3.4f, new Color(0.85f, 0.95f, 1f), new Color(0.25f, 0.3f, 0.45f), new Color(0.8f, 1.6f, 2.4f),
+                    Spot("Frozen Pines", MinigameKind.Chop, wood, 26, 0.5f),
+                    Spot("Permafrost Pit", MinigameKind.Mine, stone, 16, 0.5f)), 0, WeatherKind.Snow),
+                Extra(Planet("coral", "Coralis", "A living reef world with bioluminescent forests.", 4,
+                    new Vector2(0.32f, 0.3f), 4.4f, new Color(1f, 0.4f, 0.6f), new Color(0.3f, 0.05f, 0.2f), new Color(2.6f, 0.8f, 1.6f),
+                    Spot("Glow Reef", MinigameKind.Chop, wood, 30, 0.55f),
+                    Spot("Pearl Beds", MinigameKind.Mine, crystal, 8, 0.6f)), 2, WeatherKind.Spores),
             };
+
+            planets[1].style = 2; planets[2].style = 4; planets[3].style = 3; planets[4].style = 1; planets[5].style = 4;
 
             planets[0].weather = WeatherKind.Rain;
             planets[1].weather = WeatherKind.Dust;

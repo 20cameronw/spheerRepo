@@ -26,6 +26,70 @@ namespace Frontier
         bool usesModel;
         List<Material> modelMats;
 
+        // Raycasts the real mesh from outside so structures sit on the true surface, not an assumed radius.
+        Vector3[] surfDirs;
+        float[] surfR;
+
+        void SampleSurface(Transform model)
+        {
+            var cols = new List<MeshCollider>();
+            foreach (var mf in model.GetComponentsInChildren<MeshFilter>())
+            {
+                if (mf.sharedMesh == null) continue;
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+                cols.Add(mc);
+            }
+            if (cols.Count == 0) return;
+            var set = new HashSet<Collider>(cols);
+            var savedScale = root.localScale;
+            root.localScale = Vector3.one;
+            Physics.SyncTransforms();
+
+            const int N = 400;
+            var dirs = new Vector3[N]; var rs = new float[N];
+            int hitCount = 0;
+            for (int i = 0; i < N; i++)
+            {
+                float y = 1f - 2f * (i + 0.5f) / N;
+                float r = Mathf.Sqrt(1f - y * y);
+                float a = i * 2.39996323f;
+                var d = new Vector3(Mathf.Cos(a) * r, y, Mathf.Sin(a) * r);
+                dirs[i] = d;
+                Vector3 from = Spin.TransformPoint(d * Radius * 5f);
+                Vector3 to = Spin.TransformDirection(-d);
+                float best = float.MaxValue; Vector3 bp = Vector3.zero;
+                foreach (var h in Physics.RaycastAll(from, to, Radius * 8f))
+                    if (set.Contains(h.collider) && h.distance < best) { best = h.distance; bp = h.point; }
+                if (best < float.MaxValue) { rs[i] = Spin.InverseTransformPoint(bp).magnitude; hitCount++; }
+                else rs[i] = Radius;
+            }
+            root.localScale = savedScale;
+            foreach (var c in cols) Destroy(c);
+            if (hitCount < N / 2) return;
+            surfDirs = dirs; surfR = rs;
+        }
+
+        public float SurfaceRadius(Vector3 localDir)
+        {
+            if (surfR == null) return Radius;
+            localDir.Normalize();
+            float sum = 0f; int n = 0;
+            for (int i = 0; i < surfDirs.Length; i++)
+                if (Vector3.Dot(surfDirs[i], localDir) > 0.985f) { sum += surfR[i]; n++; }
+            if (n == 0)
+            {
+                float bd = -2f; int bi = 0;
+                for (int i = 0; i < surfDirs.Length; i++)
+                {
+                    float d = Vector3.Dot(surfDirs[i], localDir);
+                    if (d > bd) { bd = d; bi = i; }
+                }
+                return surfR[bi];
+            }
+            return sum / n;
+        }
+
         // Rescales a hand-made model so its typical surface sits exactly at Radius, whatever its shape or import scale.
         void NormalizeModel(Transform model, Transform center)
         {
@@ -60,6 +124,7 @@ namespace Frontier
                 mat.SetColor("_RimColor", p.rim);
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
+                mat.SetFloat("_Style", p.style);
                 var lb = r.localBounds.center;
                 mat.SetVector("_Center", new Vector4(lb.x, lb.y, lb.z, 0f));
                 var arr = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
@@ -89,10 +154,12 @@ namespace Frontier
             baseRim = p.rim;
             coreMat = null; modelMats = null;
             var model = ModelLibrary.Spawn(p.id, core, Radius * 2f);
+            surfDirs = null; surfR = null;
             if (model != null)
             {
                 NormalizeModel(model, core);
                 StyleModel(model, p, rng);
+                SampleSurface(model);
             }
             if (model == null)
             {
@@ -108,6 +175,7 @@ namespace Frontier
                 coreMat.SetColor("_RimColor", p.rim);
                 coreMat.SetFloat("_Bands", 4f + (float)rng.NextDouble() * 6f);
                 coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
+                coreMat.SetFloat("_Style", p.style);
                 sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
             }
             usesModel = model != null;

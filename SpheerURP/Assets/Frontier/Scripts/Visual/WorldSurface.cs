@@ -12,6 +12,7 @@ namespace Frontier
     public class WorldSurface : MonoBehaviour
     {
         public const int SlotCount = 12;
+        const float OrbitRadius = 2.5f;
 
         public event Action<PlacedStructure, Transform> StructureTapped;
         public event Action<int, Transform> SlotTapped;
@@ -40,6 +41,7 @@ namespace Frontier
             public float phase;
             public Transform glow;
             public Renderer labelRenderer;
+            public bool orbit;
         }
 
         // drag state
@@ -152,7 +154,7 @@ namespace Frontier
             var go = new GameObject(name);
             go.transform.SetParent(view.Spin, false);
             Vector3 n = dirs[slot];
-            go.transform.localPosition = n * PlanetView.Radius;
+            go.transform.localPosition = n * (view.SurfaceRadius(n) - 0.02f);
             go.transform.localRotation = Quaternion.FromToRotation(Vector3.up, n);
             var col = go.AddComponent<SphereCollider>();
             col.radius = 0.42f;
@@ -170,6 +172,7 @@ namespace Frontier
             it.glow = Fx.GlowQuad(it.t, new Color(c.r, c.g, c.b, 0.5f), 1.8f, new Vector3(0f, 0.3f, 0f)).transform;
             it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, UiKit.Ui(c), 1.0f, 0.34f, out it.labelRenderer);
             it.phase = s.slot * 0.4f;
+            it.orbit = s.def.kind == StructureKind.Satellite;
             return it;
         }
 
@@ -278,6 +281,15 @@ namespace Frontier
             foreach (var it in list)
             {
                 if (it.t == null) continue;
+                if (it.orbit)
+                {
+                    Vector3 n = dirs[it.slot];
+                    Vector3 axis = Vector3.Cross(n, Vector3.up);
+                    if (axis.sqrMagnitude < 0.01f) axis = Vector3.right;
+                    Vector3 pos = Quaternion.AngleAxis(Time.time * 18f + it.slot * 40f, axis.normalized) * n * OrbitRadius;
+                    it.t.localPosition = pos;
+                    it.t.localRotation = Quaternion.FromToRotation(Vector3.up, pos.normalized);
+                }
                 bool facing = Facing(it.t.position);
                 float bob = 0.04f * Mathf.Sin(Time.time * 2.2f + it.phase);
                 if (it.label != null)

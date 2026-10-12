@@ -33,10 +33,12 @@ namespace Frontier
         public WeatherKind weather = WeatherKind.Clear;
         [Tooltip("Rings are reserved for rare planets.")]
         public bool hasRings;
+        [Tooltip("Surface pattern: 0 bands, 1 swirls, 2 craters, 3 lava veins, 4 crystalline facets.")]
+        public int style;
 
         public List<GatherSpot> spots = new List<GatherSpot>();
 
-        public const float MapScale = 20f;
+        public const float MapScale = 40f;
 
         public static float Distance(PlanetSO a, PlanetSO b)
         {

@@ -7,8 +7,8 @@ namespace Frontier
 {
     public partial class UIRoot
     {
-        const float MapSize = 1600f;
-        const float MinZoom = 0.3f, MaxZoom = 2.4f;
+        const float MapSize = 4000f;
+        const float MinZoom = 0.14f, MaxZoom = 2.4f;
 
         PlanetSO selected;
         bool mapOpen;
@@ -33,7 +33,7 @@ namespace Frontier
             if (stars.Count == 0)
             {
                 var rng = new System.Random(99);
-                for (int i = 0; i < 160; i++) stars.Add(new Vector2((float)rng.NextDouble() * MapSize, (float)rng.NextDouble() * MapSize));
+                for (int i = 0; i < 600; i++) stars.Add(new Vector2((float)rng.NextDouble() * MapSize, (float)rng.NextDouble() * MapSize));
             }
 
             mapView = UiKit.Div("fr-map");
@@ -181,7 +181,7 @@ namespace Frontier
             var p = ctx.painter2D;
             p.lineWidth = 2f;
             p.strokeColor = new Color(0.1f, 0.9f, 1f, 0.07f);
-            for (int i = 0; i <= 16; i++)
+            for (int i = 0; i <= 40; i++)
             {
                 float v = i * 100f;
                 p.BeginPath(); p.MoveTo(new Vector2(v, 0f)); p.LineTo(new Vector2(v, MapSize)); p.Stroke();
