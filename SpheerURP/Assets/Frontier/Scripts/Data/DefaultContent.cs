@@ -332,6 +332,8 @@ namespace Frontier
                     0, 14f, 1.3f, 11f, 0.12f),
                 Struct("satellite", "Satellite", "Uplink relay. Does nothing yet - future upgrades will plug in here.",
                     StructureKind.Satellite, new Color(0.6f, 1.4f, 2.4f), "struct_satellite", L(A(alloy, 6), A(crystal, 3)), 0.1f),
+                Struct("warehouse", "Warehouse", "Stores resources on this planet. Drag stacks between your backpack and storage. Upgrades add 9 slots.",
+                    StructureKind.Warehouse, new Color(0.4f, 1.4f, 1.8f), "", L(A(scrap, 20), A(wood, 10)), 0f, 0),
             };
 
             var db = New<GameDatabase>("GameDatabase");

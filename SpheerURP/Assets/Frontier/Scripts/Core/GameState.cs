@@ -21,6 +21,22 @@ namespace Frontier
         public int xp;
         public string planetId;
         public int totalWavesCleared;
+        public List<WarehouseStorage> warehouses = new List<WarehouseStorage>();
+    }
+
+    [Serializable]
+    public class StoredStack
+    {
+        public string resourceId;
+        public int count;
+    }
+
+    [Serializable]
+    public class WarehouseStorage
+    {
+        public string planetId;
+        public int structureSlot;
+        public List<StoredStack> slots = new List<StoredStack>();
     }
 
     [Serializable]
@@ -46,14 +62,15 @@ namespace Frontier
         readonly Dictionary<ResourceSO, int> items = new Dictionary<ResourceSO, int>();
         readonly Dictionary<UpgradeSO, int> levels = new Dictionary<UpgradeSO, int>();
         readonly Dictionary<string, int> wavesCleared = new Dictionary<string, int>();
+        readonly List<WarehouseStorage> warehouses = new List<WarehouseStorage>();
 
         static string SavePath { get { return Path.Combine(Application.persistentDataPath, "frontier_save.json"); } }
 
-        public GameState(GameDatabase db)
+        public GameState(GameDatabase db, bool loadExistingSave = true)
         {
             this.db = db;
             I = this;
-            if (!Load())
+            if (!loadExistingSave || !Load())
             {
                 planet = db.startPlanet;
                 foreach (var s in db.startingItems) if (s.resource != null) items[s.resource] = s.amount;
@@ -253,6 +270,71 @@ namespace Frontier
             return true;
         }
 
+        public WarehouseStorage StorageFor(PlacedStructure warehouse)
+        {
+            if (warehouse == null || warehouse.def.kind != StructureKind.Warehouse || !structures.Contains(warehouse))
+                throw new ArgumentException("Storage requires a placed warehouse.");
+            var storage = warehouses.Find(w => w.planetId == warehouse.planetId && w.structureSlot == warehouse.slot);
+            if (storage == null)
+            {
+                storage = new WarehouseStorage { planetId = warehouse.planetId, structureSlot = warehouse.slot };
+                warehouses.Add(storage);
+            }
+            while (storage.slots.Count < warehouse.def.StorageCapacity(warehouse.level)) storage.slots.Add(new StoredStack());
+            return storage;
+        }
+
+        public int Deposit(PlacedStructure warehouse, int slot, ResourceSO resource, int amount, bool notify = true)
+        {
+            if (warehouse.planetId != planet.id || resource == null || amount <= 0) return 0;
+            var storage = StorageFor(warehouse);
+            if (slot < 0 || slot >= warehouse.def.StorageCapacity(warehouse.level)) return 0;
+            var target = storage.slots[slot];
+            if (target.count > 0 && target.resourceId != resource.id) return 0;
+            int moved = Mathf.Min(amount, Mathf.Min(Count(resource), Mathf.Max(0, resource.stackSize - target.count)));
+            if (moved <= 0) return 0;
+            items[resource] = Count(resource) - moved;
+            target.resourceId = resource.id; target.count += moved;
+            if (notify) Notify();
+            return moved;
+        }
+
+        public int Withdraw(PlacedStructure warehouse, int slot, int amount, bool notify = true)
+        {
+            if (warehouse.planetId != planet.id || amount <= 0) return 0;
+            var storage = StorageFor(warehouse);
+            if (slot < 0 || slot >= storage.slots.Count) return 0;
+            var source = storage.slots[slot];
+            var resource = db.FindResource(source.resourceId);
+            if (resource == null || source.count <= 0) return 0;
+            int moved = Add(resource, Mathf.Min(source.count, amount), false);
+            if (moved <= 0) return 0;
+            source.count -= moved;
+            if (source.count == 0) source.resourceId = null;
+            if (notify) Notify();
+            return moved;
+        }
+
+        public bool MoveStoredSlot(PlacedStructure warehouse, int from, int to, bool notify = true)
+        {
+            var storage = StorageFor(warehouse);
+            if (warehouse.planetId != planet.id || from < 0 || to < 0 || from >= storage.slots.Count || to >= storage.slots.Count || from == to) return false;
+            var source = storage.slots[from]; var target = storage.slots[to];
+            if (source.count <= 0) return false;
+            if (source.resourceId == target.resourceId && target.count > 0)
+            {
+                var resource = db.FindResource(source.resourceId);
+                if (resource == null) return false;
+                int moved = Mathf.Min(source.count, Mathf.Max(0, resource.stackSize - target.count));
+                if (moved == 0) return false;
+                source.count -= moved; target.count += moved;
+                if (source.count == 0) source.resourceId = null;
+            }
+            else { storage.slots[from] = target; storage.slots[to] = source; }
+            if (notify) Notify();
+            return true;
+        }
+
         public float StructureBonus(PlacedStructure s) { return s == null ? 0f : s.def.bonusPerLevel * (s.level - 1); }
 
         public float AlarmBonus(PlanetSO p)
@@ -333,6 +415,7 @@ namespace Frontier
                 foreach (var kv in levels) { s.upgradeIds.Add(kv.Key.id); s.upgradeLevels.Add(kv.Value); }
                 foreach (var kv in wavesCleared) { s.waveIds.Add(kv.Key); s.waveCounts.Add(kv.Value); }
                 s.xp = xp;
+                s.warehouses = warehouses;
                 foreach (var st in structures) { s.structPlanets.Add(st.planetId); s.structIds.Add(st.def.id); s.structSlots.Add(st.slot); s.structLevels.Add(st.level); }
                 File.WriteAllText(SavePath, JsonUtility.ToJson(s));
             }
@@ -365,6 +448,7 @@ namespace Frontier
                     var def = db.FindStructure(s.structIds[i]);
                     if (def != null) structures.Add(new PlacedStructure { planetId = s.structPlanets[i], def = def, slot = s.structSlots[i], level = s.structLevels[i] });
                 }
+                if (s.warehouses != null) warehouses.AddRange(s.warehouses);
                 return true;
             }
             catch { return false; }
@@ -373,7 +457,7 @@ namespace Frontier
         public void ResetProgress()
         {
             try { if (File.Exists(SavePath)) File.Delete(SavePath); } catch { }
-            items.Clear(); levels.Clear(); wavesCleared.Clear(); structures.Clear(); xp = 0; totalWavesCleared = 0;
+            items.Clear(); levels.Clear(); wavesCleared.Clear(); structures.Clear(); warehouses.Clear(); xp = 0; totalWavesCleared = 0;
             planet = db.startPlanet;
             foreach (var s in db.startingItems) if (s.resource != null) items[s.resource] = s.amount;
             Notify();

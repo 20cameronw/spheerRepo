@@ -282,6 +282,7 @@ namespace Frontier
         {
             int pct = Mathf.RoundToInt(d.bonusPerLevel * (level - 1) * 100f);
             if (d.kind.IsTurret()) return "dmg " + Mathf.RoundToInt(d.damage * (1f + d.bonusPerLevel * (level - 1)));
+            if (d.kind == StructureKind.Warehouse) return d.StorageCapacity(level) + " storage slots";
             if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";
             if (d.kind.IsGather()) return "+" + pct + "% yield";
             return "+" + pct + "% rewards, XP";
@@ -312,6 +313,7 @@ namespace Frontier
                 case StructureKind.Laser: return "bolt";
                 case StructureKind.Satellite: return "warp";
                 case StructureKind.Fabricator: return "build";
+                case StructureKind.Warehouse: return "base";
                 default: return "alarm";
             }
         }

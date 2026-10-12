@@ -8,6 +8,12 @@ Tune `WaveFormulaSO` for threat budget, health/damage/speed per fuel cell, spawn
 
 Structures use non-emissive materials, with a glowing mesh outline only while selected. Alien bodies use species-colored surfaces, bright veins, arrival pulses, trails, and hit flashes. Run **Frontier > Validate Combat Balance** to check repeatable previews, monotonic fuel rewards/difficulty, enemy-sequence prefixes, and selection-shader import.
 
+### Frontier warehouses
+
+Build a **Warehouse** from Build > Econ (20 Scrap + 10 Wood). Each warehouse starts with 18 slots and gains 9 per upgrade, to 54 at level 5. `StructureSO.storageSlots` and `storageSlotsPerLevel` control capacity. Warehouses take normal planet building slots; each warehouse stores its own resources, saved by planet and building slot.
+
+Tap a warehouse to open its storage and your backpack together. Drag stacks in either direction or rearrange either grid. Matching resources merge up to the resource's stack limit; transfers move only what fits and never discard the remainder. Stored resources stay on that planet and are not used automatically for crafting, fuel or construction. Old saves load with empty warehouse storage. An opaque icon and stack count follow mouse/touch drags, including ordinary backpack rearrangement.
+
 The sections below describe the legacy Spheer scene.
 
 ## What the Game Is

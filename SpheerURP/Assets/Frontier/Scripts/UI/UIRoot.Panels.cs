@@ -49,6 +49,12 @@ namespace Frontier
 
         void CloseModal()
         {
+            EndInventoryDrag();
+            if (modalKey == "warehouse")
+            {
+                planetView.Frozen = false;
+                world.Selected = null;
+            }
             if (modal != null) modal.RemoveFromHierarchy();
             modal = null; modalScroll = null; modalBuild = null; modalKey = null;
         }
@@ -57,6 +63,7 @@ namespace Frontier
         {
             if (modal == null || modalBuild == null || modalScroll == null) return;
             var offset = modalScroll.scrollOffset;
+            EndInventoryDrag();
             modalScroll.contentContainer.Clear();
             modalBuild(modalScroll.contentContainer);
             modalScroll.schedule.Execute(() => modalScroll.scrollOffset = offset).StartingIn(1);
@@ -93,7 +100,7 @@ namespace Frontier
             body.Add(UiKit.Text("Build on " + gs.planet.displayName + ". Tap a structure on the planet to use it.", "fr-muted"));
             switch (shopTab)
             {
-                case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm); break;
+                case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Warehouse); break;
                 case 1: ShopSection(body, StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill); break;
                 case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;
                 default: ShopSection(body, StructureKind.Satellite); break;
@@ -504,35 +511,16 @@ namespace Frontier
                 UiKit.Border(s, Color.white, 5f);
                 UiKit.Halo(s, c, 18f, 0.6f);
             }
-            Vector2 down = Vector2.zero;
-            bool pressed = false;
-            s.RegisterCallback<PointerDownEvent>(e =>
+            BindInventoryDrag(s, packRes[index], packCnt[index], () =>
             {
-                pressed = true; down = e.position;
-                s.CapturePointer(e.pointerId);
-                if (packRes[index] != null) s.style.opacity = 0.6f;
-            });
-            s.RegisterCallback<PointerUpEvent>(e =>
+                packSel = (packRes[index] != null && packSel != index) ? index : -1;
+                Sfx.Click(); RefreshModal();
+            }, position =>
             {
-                if (!pressed) return;
-                pressed = false;
-                if (s.HasPointerCapture(e.pointerId)) s.ReleasePointer(e.pointerId);
-                if (((Vector2)e.position - down).magnitude < 14f)
+                int target = SlotAt(all, position);
+                if (target >= 0 && target < packRes.Length && target != index && packRes[index] != null)
                 {
-                    packSel = (packRes[index] != null && packSel != index) ? index : -1;
-                    Sfx.Click();
-                }
-                else
-                {
-                    int target = -1;
-                    for (int i = 0; i < packRes.Length; i++)
-                        if (all[i].worldBound.Contains(e.position)) { target = i; break; }
-                    if (target >= 0 && target != index && packRes[index] != null)
-                    {
-                        MovePackSlot(index, target);
-                        packSel = target;
-                        Sfx.Click();
-                    }
+                    MovePackSlot(index, target); packSel = target; Sfx.Click();
                 }
                 RefreshModal();
             });

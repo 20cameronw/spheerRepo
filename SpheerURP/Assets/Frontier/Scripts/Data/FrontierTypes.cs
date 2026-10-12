@@ -28,7 +28,8 @@ namespace Frontier
         Gunner,
         Laser,
         Satellite,
-        Fabricator
+        Fabricator,
+        Warehouse
     }
 
     public enum BackdropMood { Auto, Calm, Rush, Gloom, Glow, Storm }

@@ -91,7 +91,8 @@ namespace Frontier
             if (popup != null && popupAnchor == t) { ClosePopup(); return; }
             CloseModal();
             var k = s.def.kind;
-            if (k == StructureKind.Refinery || k == StructureKind.Fabricator) OpenRefinery(s, t);
+            if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
+            else if (k == StructureKind.Refinery || k == StructureKind.Fabricator) OpenRefinery(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);

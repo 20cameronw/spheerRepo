@@ -317,6 +317,15 @@ namespace Frontier
         {
             var metal = Lit(new Color(0.45f, 0.5f, 0.6f), 0.15f);
             var glow = Lit(c, 1.2f);
+            if (kind == StructureKind.Warehouse)
+            {
+                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.25f, 0f), new Vector3(0.65f, 0.5f, 0.55f), metal);
+                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.53f, 0f), new Vector3(0.73f, 0.08f, 0.63f), glow);
+                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.18f, -0.285f), new Vector3(0.25f, 0.34f, 0.025f), glow);
+                for (int i = 0; i < 3; i++)
+                    Prim(t, PrimitiveType.Cube, new Vector3(-0.2f + i * 0.2f, 0.25f, -0.3f), new Vector3(0.025f, 0.42f, 0.03f), metal);
+                return;
+            }
             if (kind == StructureKind.Lumber)
             {
                 var bark = Lit(new Color(0.35f, 0.2f, 0.1f));

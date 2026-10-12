@@ -25,6 +25,14 @@ namespace Frontier
         public float fireInterval = 0.7f;
         public float range = 8f;
         public float beamWidth = 0.07f;
+        [Header("Warehouse")]
+        public int storageSlots = 18;
+        public int storageSlotsPerLevel = 9;
+
+        public int StorageCapacity(int level)
+        {
+            return Mathf.Max(1, storageSlots + Mathf.Max(0, level - 1) * storageSlotsPerLevel);
+        }
 
         public List<ItemAmount> UpgradeCost(int currentLevel)
         {
