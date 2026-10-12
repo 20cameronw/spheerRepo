@@ -34,6 +34,7 @@ Shader "Frontier/NeonPlanet"
                 float4 _Center;
                 float _Style;
                 float _Lines;
+            CBUFFER_END
 
             struct Attributes
             {
