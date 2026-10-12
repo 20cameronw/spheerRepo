@@ -182,7 +182,7 @@ namespace Frontier
         {
             grid.RegisterCallback<GeometryChangedEvent>(e =>
             {
-                float cell = Mathf.Floor(grid.resolvedStyle.width / PackColumns);
+                float cell = Mathf.Floor((grid.contentRect.width - 1f) / PackColumns);
                 if (float.IsNaN(cell) || cell < 8f) return;
                 foreach (var slot in slots) { slot.style.width = cell; slot.style.height = cell; }
             });

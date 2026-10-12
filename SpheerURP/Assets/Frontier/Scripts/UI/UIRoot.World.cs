@@ -12,16 +12,19 @@ namespace Frontier
         string popupKey;
         Action<VisualElement> popupBuild;
         Color popupColor;
+        ScrollView popupScroll;
+        bool popupCompact;
 
         StructureSO buildDef;
         VisualElement banner;
         int alarmFuel = 3;
 
         // ------------------------------------------------------------ popup core
-        void OpenPopup(string key, Transform anchor, Color accent, Action<VisualElement> build)
+        void OpenPopup(string key, Transform anchor, Color accent, Action<VisualElement> build, bool compact = false)
         {
             ClosePopup();
             popupKey = key; popupAnchor = anchor; popupBuild = build; popupColor = accent;
+            popupCompact = compact;
             popup = UiKit.Div("fr-popup");
             popup.pickingMode = PickingMode.Position;
             UiKit.Border(popup, UiKit.Ui(accent, 0.9f), 3f);
@@ -36,10 +39,9 @@ namespace Frontier
 
         void BuildPopupBody()
         {
-            var scroll = new ScrollView(ScrollViewMode.Vertical);
-            scroll.AddToClassList("fr-popup-scroll");
-            popup.Add(scroll);
-            popupBuild(scroll.contentContainer);
+            popupScroll = UiKit.VerticalScroll("fr-popup-scroll");
+            popup.Add(popupScroll);
+            popupBuild(popupScroll.contentContainer);
             popup.Add(PopupClose());
         }
 
@@ -54,6 +56,7 @@ namespace Frontier
         {
             if (popup != null) popup.RemoveFromHierarchy();
             popup = null; popupAnchor = null; popupBuild = null; popupKey = null;
+            popupScroll = null;
             if (planetView != null) planetView.Frozen = false;
             if (world != null) world.Selected = null;
         }
@@ -61,8 +64,11 @@ namespace Frontier
         void RefreshPopup()
         {
             if (popup == null || popupBuild == null) return;
-            popup.Clear();
-            BuildPopupBody();
+            var offset = popupScroll.scrollOffset;
+            popupScroll.contentContainer.Clear();
+            popupBuild(popupScroll.contentContainer);
+            var scroll = popupScroll;
+            scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
         }
 
         void UpdatePopupPosition()
@@ -72,12 +78,19 @@ namespace Frontier
 
             float w = popup.resolvedStyle.width, h = popup.resolvedStyle.height;
             if (float.IsNaN(w) || float.IsNaN(h) || w < 1f) return;
-            Vector3 sp = cam.WorldToScreenPoint(popupAnchor.position + popupAnchor.up * 0.35f);
-            if (sp.z <= 0f) { ClosePopup(); return; }
-            Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(sp.x, Screen.height - sp.y));
-            float rw = root.resolvedStyle.width, rh = root.resolvedStyle.height;
-            float left = Mathf.Clamp(pp.x - w * 0.5f, 8f + inset.x, Mathf.Max(8f, rw - w - 8f - inset.z));
-            float top = Mathf.Clamp(pp.y - h - 30f, 8f + inset.y, Mathf.Max(8f, rh - h - 8f - inset.w));
+            float rw = popupLayer.resolvedStyle.width, rh = popupLayer.resolvedStyle.height;
+            float left = (rw - w) * 0.5f, top = (rh - h) * 0.5f;
+            if (popupCompact && h <= 420f && h < rh * 0.65f)
+            {
+                Vector3 sp = cam.WorldToScreenPoint(popupAnchor.TransformPoint(Vector3.up * 0.35f));
+                if (sp.z > 0f)
+                {
+                    Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(sp.x, Screen.height - sp.y));
+                    pp = popupLayer.WorldToLocal(pp);
+                    left = Mathf.Clamp(pp.x - w * 0.5f, 0f, Mathf.Max(0f, rw - w));
+                    top = Mathf.Clamp(pp.y - h - 24f, 0f, Mathf.Max(0f, rh - h));
+                }
+            }
             popup.style.left = left;
             popup.style.top = top;
             popup.style.opacity = 1f;
@@ -152,7 +165,7 @@ namespace Frontier
                 StructureHeader(body, s, c, "Fires automatically during waves");
                 body.Add(UiKit.Text("DAMAGE " + gs.TurretPower(s).ToString("0.#") + "     RANGE " + s.def.range.ToString("0"), "fr-small"));
                 UpgradeButton(body, s, c);
-            });
+            }, true);
         }
 
         void OpenGatherer(PlacedStructure s, Transform t)

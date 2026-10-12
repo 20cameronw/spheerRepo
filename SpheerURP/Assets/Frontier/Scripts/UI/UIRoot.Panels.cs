@@ -39,8 +39,7 @@ namespace Frontier
             head.Add(Icons.IconButton("close", UiKit.Red, CloseModal, 76f));
             panel.Add(head);
 
-            modalScroll = new ScrollView(ScrollViewMode.Vertical);
-            modalScroll.AddToClassList("fr-modal-scroll");
+            modalScroll = UiKit.VerticalScroll("fr-modal-scroll");
             panel.Add(modalScroll);
             backdropEl.Add(panel);
             modalLayer.Add(backdropEl);
@@ -66,7 +65,8 @@ namespace Frontier
             EndInventoryDrag();
             modalScroll.contentContainer.Clear();
             modalBuild(modalScroll.contentContainer);
-            modalScroll.schedule.Execute(() => modalScroll.scrollOffset = offset).StartingIn(1);
+            var scroll = modalScroll;
+            scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
         }
 
         void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", "BUILD", UiKit.Lime, BuildShop); }
@@ -439,16 +439,12 @@ namespace Frontier
             while (padded < rows * PackColumns) { slots.Add(Slot(null, 0, true)); padded++; }
             foreach (var s in slots) grid.Add(s);
 
-            grid.RegisterCallback<GeometryChangedEvent>(e =>
-            {
-                float cell = Mathf.Floor(grid.resolvedStyle.width / PackColumns);
-                if (float.IsNaN(cell) || cell < 8f) return;
-                foreach (var s in slots) { s.style.width = cell; s.style.height = cell; }
-            });
+            SizeInventoryGrid(grid, slots);
             body.Add(grid);
 
             var detail = Card(UiKit.Cyan);
             detail.style.marginTop = 14;
+            detail.style.minHeight = 190;
             if (packSel >= 0 && packSel < packRes.Length && packRes[packSel] != null)
             {
                 var r = packRes[packSel];

@@ -112,7 +112,19 @@ namespace Frontier
                 waveHud.style.paddingLeft = 40; waveHud.style.paddingRight = 40;
                 waveHud.style.paddingTop = 150; waveHud.style.paddingBottom = 40;
             }
+            LayoutContentLayer(popupLayer, inset, false);
+            LayoutContentLayer(modalLayer, inset, true);
+            LayoutContentLayer(overlayLayer, inset, true);
             if (mapOpen) LayoutMapChrome();
+        }
+
+        public static void LayoutContentLayer(VisualElement layer, Vector4 safeInsets, bool coverDock)
+        {
+            layer.style.left = safeInsets.x + 12;
+            layer.style.right = safeInsets.z + 12;
+            layer.style.top = safeInsets.y + 130;
+            layer.style.bottom = safeInsets.w + (coverDock ? 16 : 180);
+            layer.style.overflow = Overflow.Hidden;
         }
 
         // ------------------------------------------------------------ HUD

@@ -77,7 +77,8 @@
 }
 .fr-modal {
     flex-direction: column;
-    min-width: 560px; max-width: 96%; max-height: 92%;
+    width: 640px; min-width: 0; max-width: 100%; max-height: 100%;
+    overflow: hidden;
     border-radius: 30px; border-width: 3px;
     background-color: rgba(4, 7, 24, 0.96);
     padding: 18px 22px 22px 22px;
@@ -85,7 +86,7 @@
 .fr-modal-wide { width: 940px; }
 .fr-modal-head { flex-direction: row; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
 .fr-modal-title { font-size: 36px; margin-left: 12px; flex-grow: 1; }
-.fr-modal-scroll { flex-shrink: 1; flex-grow: 0; }
+.fr-modal-scroll { flex-shrink: 1; flex-grow: 0; min-height: 0; min-width: 0; }
 .fr-tabs { flex-direction: row; margin-bottom: 12px; flex-shrink: 0; }
 .fr-tab {
     flex-grow: 1; margin: 0 6px 0 0; padding: 10px 6px;
@@ -116,6 +117,10 @@
 }
 .fr-btn:hover { scale: 1.04 1.04; }
 .fr-btn:active { scale: 0.96 0.96; }
+.fr-scroll .fr-btn:hover, .fr-scroll .fr-btn:active,
+.fr-scroll .fr-iconbtn:hover, .fr-scroll .fr-iconbtn:active { scale: 1 1; }
+.fr-scroll .fr-btn:hover { background-color: rgb(26, 40, 57); }
+.fr-scroll .fr-btn:active { background-color: rgb(12, 24, 36); }
 .fr-btn-big { font-size: 36px; padding: 20px 36px; border-radius: 26px; }
 .fr-btn-mini { margin-top: 0; margin-left: 8px; padding: 8px 16px; font-size: 24px; border-radius: 14px; }
 
@@ -129,7 +134,7 @@
 .fr-dot { width: 18px; height: 18px; border-radius: 9px; }
 
 /* ---------- Backpack (Minecraft style grid) ---------- */
-.fr-grid { flex-direction: row; flex-wrap: wrap; align-content: flex-start; }
+.fr-grid { flex-direction: row; flex-wrap: wrap; align-content: flex-start; min-width: 0; flex-shrink: 0; }
 .fr-slot {
     margin: 0;
     border-width: 2px; border-color: rgba(120, 160, 200, 0.28);
@@ -165,12 +170,13 @@
 .fr-popup {
     position: absolute;
     flex-direction: column;
-    min-width: 480px; max-width: 780px; max-height: 78%;
+    width: 740px; min-width: 0; max-width: 100%; max-height: 100%;
+    overflow: hidden;
     padding: 20px 24px 22px 24px;
     border-radius: 30px; border-width: 3px;
     background-color: rgba(4, 7, 24, 0.96);
 }
-.fr-popup-scroll { flex-shrink: 1; }
+.fr-popup-scroll { flex-shrink: 1; min-height: 0; min-width: 0; }
 .fr-popup-close { position: absolute; top: 14px; right: 14px; }
 .fr-popup-head { padding-right: 70px; margin-bottom: 8px; }
 .fr-popup .fr-tiny { font-size: 24px; }
@@ -236,14 +242,36 @@
     background-color: rgba(2, 3, 14, 0.9);
     align-items: center; justify-content: center;
     padding: 30px;
+    overflow: hidden;
 }
+.fr-overlay > Label, .fr-overlay > .fr-row { flex-shrink: 0; max-width: 100%; white-space: normal; }
 .fr-arena {
-    width: 100%; flex-grow: 1; margin: 20px 0;
+    width: 100%; flex-grow: 1; flex-basis: 0; min-height: 120px; margin: 16px 0;
     border-radius: 28px;
     border-width: 3px; border-color: rgba(26, 242, 255, 0.6);
     background-color: rgba(8, 14, 38, 0.9);
     overflow: hidden;
 }
+
+/* Fixed gutters prevent content changes and pointer interactions from creating bars. */
+.fr-scroll .unity-scroller--horizontal { display: none; }
+.fr-scroll .unity-scroller--vertical {
+    width: 24px; min-width: 24px; margin-left: 8px;
+    background-color: rgba(0, 0, 0, 0);
+}
+.fr-scroll .unity-scroller__low-button, .fr-scroll .unity-scroller__high-button { display: none; }
+.fr-scroll .unity-scroller--vertical .unity-base-slider { flex-grow: 1; margin: 0; }
+.fr-scroll .unity-scroller--vertical .unity-base-slider__tracker {
+    width: 10px; left: 7px; border-width: 0; border-radius: 5px;
+    background-color: rgb(30, 38, 51);
+}
+.fr-scroll .unity-scroller--vertical .unity-base-slider__dragger {
+    width: 10px; min-height: 44px; left: 7px; border-width: 0; border-radius: 5px;
+    background-color: rgb(190, 205, 220);
+}
+.fr-scroll .unity-scroller--vertical .unity-base-slider__dragger:hover { background-color: rgb(225, 239, 250); }
+.fr-scroll .unity-scroller--vertical .unity-base-slider__dragger:active { background-color: rgb(110, 210, 225); }
+.fr-scroll .unity-scroller--vertical .unity-base-slider__dragger-border { display: none; }
 .fr-toasts { position: absolute; left: 0; right: 0; top: 210px; align-items: center; }
 .fr-toast {
     padding: 10px 26px; margin-bottom: 8px; border-radius: 26px;

@@ -36,6 +36,20 @@ namespace Frontier
             return l;
         }
 
+        public static ScrollView VerticalScroll(string cls)
+        {
+            var scroll = new ScrollView(ScrollViewMode.Vertical);
+            scroll.AddToClassList("fr-scroll");
+            scroll.AddToClassList(cls);
+            scroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+            // Reserve the gutter from the first frame, including content rebuilds.
+            scroll.verticalScrollerVisibility = ScrollerVisibility.AlwaysVisible;
+            scroll.contentContainer.style.minWidth = 0;
+            scroll.contentContainer.style.width = Length.Percent(100);
+            scroll.contentContainer.style.paddingRight = 8;
+            return scroll;
+        }
+
         public static void Border(VisualElement e, Color c, float w = 2f)
         {
             e.style.borderTopColor = c; e.style.borderBottomColor = c;

@@ -22,6 +22,10 @@ All Frontier planets retain a displayed radius of 1.5 and atmosphere scale 5. Lo
 
 Menu > Settings > **Structure Labels** switches between always-visible labels and selected-only labels, and remembers the choice. Empty build-pad markers remain available in build mode.
 
+### Frontier panel layout
+
+Structure panels stay centered in the area below the top HUD and above the dock. Only short, upgrade-only turret panels can follow their structure, and remain clamped to that area. Larger menus, warehouse panels, minigames and wave results may cover the dock but never the top HUD; all respect device safe-area insets. Scrollable panels use a fixed vertical gutter with a slim rounded handle and no horizontal scrollbar. Inventory moves and crafting refresh the existing scroll view instead of changing its scrollbar visibility. **Frontier > Validate Panel Layout** checks portrait/landscape panel bounds and inventory rebuilds in the Editor.
+
 Travel plays the departure warp first, the flight minigame second, and the destination approach last. The star map separates six existing solar systems into three spiral galaxy regions. Curved departure/arrival tangents and a moving ship show the route; the map is illustrative, not a gravity simulation or optimal-path solver. Its expanded visual spacing and route curvature do not change fuel costs or authored planet coordinates.
 
 The sections below describe the legacy Spheer scene.
