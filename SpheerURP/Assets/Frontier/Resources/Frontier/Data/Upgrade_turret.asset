@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Upgrade_turret
   m_EditorClassIdentifier: Assembly-CSharp::Frontier.UpgradeSO
   id: turret
-  displayName: Orbital Turret
-  description: +1 automatic turret during waves.
+  displayName: Turret Actuators
+  description: +15% firing speed for placed turrets. Does not spawn turrets.
   category: 2
   effect: 3
   tool: 0
-  valuePerLevel: 1
+  valuePerLevel: 0.15
   maxLevel: 6
   baseCost:
   - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}

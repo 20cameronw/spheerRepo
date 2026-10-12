@@ -1,5 +1,15 @@
 # Spheer — Game Design Document & Developer Reference
 
+## Frontier rework — combat
+
+The separate Frontier scene uses player-built surface turrets and fuel-funded alarm waves; alarms never spawn orbital turrets. The former Orbital Turret research is now **Turret Actuators**, increasing placed-turret firing speed by 15% per level. Its saved upgrade ID and effect index are preserved.
+
+Tune `WaveFormulaSO` for threat budget, health/damage/speed per fuel cell, spawn interval, and visible approach time (default 1.2 seconds). Increasing fuel extends a repeatable enemy sequence and increases individual difficulty; victory rewards do not decrease when fuel increases. Enemies enter just outside the side edges of the camera and cannot be automatically targeted until they have spent the approach time on screen. Placed turrets still respect their configured range.
+
+Structures use non-emissive materials, with a glowing mesh outline only while selected. Alien bodies use species-colored surfaces, bright veins, arrival pulses, trails, and hit flashes. Run **Frontier > Validate Combat Balance** to check repeatable previews, monotonic fuel rewards/difficulty, enemy-sequence prefixes, and selection-shader import.
+
+The sections below describe the legacy Spheer scene.
+
 ## What the Game Is
 
 Spheer is a **mobile idle/clicker base-builder** inspired by *Clash of Clans* and *Egg Inc* — your world is your base. Tap it to earn money, buy structures that generate passive income, research powerful upgrades, and defend against alien invasion waves. The goal is a satisfying loop of building, earning, defending, and prestiging that keeps you coming back.

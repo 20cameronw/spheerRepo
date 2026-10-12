@@ -151,8 +151,7 @@ namespace Frontier
             return k.ToString();
         }
 
-        public int TurretCount { get { return 1 + Mathf.RoundToInt(EffectSum(UpgradeEffect.TurretCount)); } }
-        public float TurretDamage { get { return 5f * (1f + EffectSum(UpgradeEffect.TurretDamage)); } }
+        public float TurretFireRate { get { return 1f + EffectSum(UpgradeEffect.TurretFireRate); } }
         public float TapDamage { get { return 8f * (1f + EffectSum(UpgradeEffect.TapDamage)); } }
         public float ReactorMax { get { return db.baseReactorHealth + EffectSum(UpgradeEffect.ReactorHealth); } }
         public float RewardBonus { get { return 1f + EffectSum(UpgradeEffect.RewardBonus) + 0.03f * (PlayerLevel - 1); } }

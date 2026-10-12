@@ -34,6 +34,7 @@ namespace Frontier
         string signature = "";
         static Font font;
         static Shader litShader;
+        Material outlineMaterial;
 
         class Item
         {
@@ -45,6 +46,8 @@ namespace Frontier
             public Transform glow;
             public Renderer labelRenderer;
             public bool orbit;
+            public readonly List<Renderer> outlines = new List<Renderer>();
+            public readonly List<Material> materials = new List<Material>();
         }
 
         // drag state
@@ -72,6 +75,8 @@ namespace Frontier
         {
             if (view != null) view.Rebuilt -= OnPlanet;
             if (gs != null) gs.Changed -= OnChanged;
+            ClearAll();
+            if (outlineMaterial != null) Destroy(outlineMaterial);
         }
 
         public List<KeyValuePair<PlacedStructure, Transform>> TurretAnchors()
@@ -106,9 +111,15 @@ namespace Frontier
 
         void ClearAll()
         {
-            foreach (var i in items) if (i.t != null) Destroy(i.t.gameObject);
+            foreach (var i in items) DestroyItem(i);
             foreach (var i in pads) if (i.t != null) Destroy(i.t.gameObject);
             items.Clear(); pads.Clear();
+        }
+
+        void DestroyItem(Item item)
+        {
+            foreach (var material in item.materials) if (material != null) Destroy(material);
+            if (item.t != null) Destroy(item.t.gameObject);
         }
 
         void RebuildStructures()
@@ -119,7 +130,7 @@ namespace Frontier
             if (sig == signature) return;
             signature = sig;
             for (int i = items.Count - 1; i >= 0; i--)
-                if (items[i].structure != null) { Destroy(items[i].t.gameObject); items.RemoveAt(i); }
+                if (items[i].structure != null) { DestroyItem(items[i]); items.RemoveAt(i); }
             foreach (var s in gs.structures)
             {
                 if (s.planetId != gs.planet.id) continue;
@@ -171,12 +182,56 @@ namespace Frontier
             Color c = s.def.color;
             var model = SpawnModel(s.def.modelKey, it.t, 0.75f);
             if (model == null) BuildFallbackStructure(it.t, s.def.kind, c);
+            PrepareStructure(it, c);
             if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
-            it.glow = Fx.GlowQuad(it.t, new Color(c.r, c.g, c.b, 0.5f), 1.8f, new Vector3(0f, 0.3f, 0f)).transform;
             it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, UiKit.Ui(c), 1.0f, 0.34f, out it.labelRenderer);
             it.phase = s.slot * 0.4f;
             it.orbit = s.def.kind == StructureKind.Satellite;
             return it;
+        }
+
+        void PrepareStructure(Item item, Color color)
+        {
+            if (outlineMaterial == null)
+            {
+                var shader = Resources.Load<Shader>("Frontier/StructureOutline");
+                if (shader == null) { Debug.LogError("Frontier: StructureOutline shader is missing.", this); return; }
+                outlineMaterial = new Material(shader);
+            }
+            foreach (var renderer in item.t.GetComponentsInChildren<MeshRenderer>())
+            {
+                var source = renderer.sharedMaterials;
+                var materials = new Material[source.Length];
+                for (int i = 0; i < source.Length; i++)
+                {
+                    var src = source[i];
+                    Color tint = src != null && src.HasProperty("_BaseColor") ? src.GetColor("_BaseColor")
+                        : src != null && src.HasProperty("_Color") ? src.GetColor("_Color") : Color.gray;
+                    var material = Lit(UiKit.Ui(tint));
+                    if (src != null && src.HasProperty("_BaseMap"))
+                        material.SetTexture("_BaseMap", src.GetTexture("_BaseMap"));
+                    material.SetFloat("_Smoothness", 0.25f);
+                    materials[i] = material;
+                    item.materials.Add(material);
+                }
+                renderer.sharedMaterials = materials;
+                var mesh = renderer.GetComponent<MeshFilter>();
+                if (mesh == null || mesh.sharedMesh == null) continue;
+                var go = new GameObject("SelectionOutline");
+                go.transform.SetParent(renderer.transform, false);
+                go.AddComponent<MeshFilter>().sharedMesh = mesh.sharedMesh;
+                var outline = go.AddComponent<MeshRenderer>();
+                var shells = new Material[mesh.sharedMesh.subMeshCount];
+                for (int i = 0; i < shells.Length; i++) shells[i] = outlineMaterial;
+                outline.sharedMaterials = shells;
+                outline.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                outline.receiveShadows = false;
+                var props = new MaterialPropertyBlock();
+                props.SetColor("_Color", UiKit.Ui(color) * 2f);
+                outline.SetPropertyBlock(props);
+                outline.enabled = false;
+                item.outlines.Add(outline);
+            }
         }
 
         // Models are fitted in an unrotated, unscaled holder so bounds are correct, then moved onto the surface.
@@ -358,7 +413,7 @@ namespace Frontier
             foreach (var it in list)
             {
                 if (it.t == null) continue;
-                if (it.orbit)
+                if (it.orbit && !view.Frozen)
                 {
                     Vector3 n = dirs[it.slot];
                     Vector3 axis = Vector3.Cross(n, Vector3.up);
@@ -369,6 +424,7 @@ namespace Frontier
                 }
                 bool facing = Visible(ProbePoint(it));
                 bool selected = Selected != null && Selected == it.t;
+                foreach (var outline in it.outlines) outline.enabled = selected && !Locked;
                 float bob = 0.04f * Mathf.Sin(Time.time * 2.2f + it.phase);
                 if (it.label != null)
                 {
@@ -377,7 +433,7 @@ namespace Frontier
                 }
                 if (it.glow != null)
                 {
-                    float k = selected ? 1.35f + 0.25f * Mathf.Sin(Time.time * 6f) : 1f + 0.12f * Mathf.Sin(Time.time * 3f + it.phase);
+                    float k = 1f + 0.12f * Mathf.Sin(Time.time * 3f + it.phase);
                     it.glow.localScale = Vector3.one * (it.structure != null ? 1.8f : 1.6f) * k;
                     it.glow.gameObject.SetActive(facing);
                 }

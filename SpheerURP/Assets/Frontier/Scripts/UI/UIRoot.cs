@@ -294,7 +294,7 @@ namespace Frontier
             {
                 case UpgradeEffect.ToolPower: return "x" + (1f + v).ToString("0.0") + " yield";
                 case UpgradeEffect.BackpackSlots: return "+" + Mathf.RoundToInt(v) + " slots";
-                case UpgradeEffect.TurretCount: return "+" + Mathf.RoundToInt(v) + " turrets";
+                case UpgradeEffect.TurretFireRate: return "+" + Mathf.RoundToInt(v * 100f) + "% firing speed";
                 case UpgradeEffect.ReactorHealth: return "+" + Mathf.RoundToInt(v) + " HP";
                 default: return "+" + Mathf.RoundToInt(v * 100f) + "%";
             }

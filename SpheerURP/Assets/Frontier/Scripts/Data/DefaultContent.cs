@@ -279,7 +279,7 @@ namespace Frontier
                     new Color(1.6f, 1.6f, 0.4f), L(A(wood, 25), A(stone, 10))),
                 Up("engine", "Engine Efficiency", "-8% fuel for every trip.", UpgradeCategory.Ship, UpgradeEffect.FuelEfficiency, 0.08f, 8, 1.6f,
                     fuel.color, L(A(wood, 10), A(iron, 10), A(crystal, 3))),
-                Up("turret", "Orbital Turret", "+1 automatic turret during waves.", UpgradeCategory.Defense, UpgradeEffect.TurretCount, 1f, 6, 1.7f,
+                Up("turret", "Turret Actuators", "+15% firing speed for placed turrets. Does not spawn turrets.", UpgradeCategory.Defense, UpgradeEffect.TurretFireRate, 0.15f, 6, 1.7f,
                     new Color(2f, 0.5f, 1.6f), L(A(wood, 15), A(iron, 12))),
                 Up("turretdmg", "Turret Damage", "+35% turret damage.", UpgradeCategory.Defense, UpgradeEffect.TurretDamage, 0.35f, 10, 1.6f,
                     crystal.color, L(A(iron, 10), A(crystal, 5))),

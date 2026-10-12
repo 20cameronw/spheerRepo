@@ -287,14 +287,13 @@ namespace Frontier
             {
                 int have = gs.Count(gs.db.fuel);
                 alarmFuel = Mathf.Clamp(alarmFuel, 1, Mathf.Max(1, Mathf.Min(have, 40)));
-                var head = UiKit.Div("fr-row");
-                head.Add(Icons.Make("alarm", c, 48f));
-                head.Add(UiKit.Text("ALARM  LV " + s.level, "fr-h2", c));
-                body.Add(head);
+                StructureHeader(body, s, c, "More fuel attracts more aliens, with higher health, damage and speed.");
 
                 var stepper = UiKit.Div("fr-stepper");
                 var minus = Icons.IconButton("minus", UiKit.Amber, () => { alarmFuel = Mathf.Max(1, alarmFuel - 1); RefreshPopup(); }, 72f);
                 var plus = Icons.IconButton("plus", UiKit.Amber, () => { alarmFuel = Mathf.Min(Mathf.Max(1, Mathf.Min(have, 40)), alarmFuel + 1); RefreshPopup(); }, 72f);
+                UiKit.SetEnabledLook(minus, alarmFuel > 1);
+                UiKit.SetEnabledLook(plus, alarmFuel < Mathf.Min(have, 40));
                 var val = UiKit.Div("fr-row");
                 val.style.minWidth = 130; val.style.justifyContent = Justify.Center;
                 val.Add(Icons.Make("fuel", UiKit.Amber, 40f));
@@ -303,7 +302,8 @@ namespace Frontier
                 body.Add(stepper);
 
                 var info = defense.Preview(alarmFuel);
-                body.Add(UiKit.Text("WAVE " + info.waveNumber + "  -  " + info.aliens.Count + " aliens  -  HP x" + info.healthMult.ToString("0.0"), "fr-tiny"));
+                body.Add(SectionLabel("WAVE " + info.waveNumber + "  -  " + info.aliens.Count + " ALIENS"));
+                body.Add(UiKit.Text("Health x" + info.healthMult.ToString("0.00") + "   Damage x" + info.damageMult.ToString("0.00") + "   Speed x" + info.speedMult.ToString("0.00"), "fr-tiny"));
                 var counts = new Dictionary<EnemySO, int>();
                 foreach (var a in info.aliens) { int n; counts.TryGetValue(a, out n); counts[a] = n + 1; }
                 var cr = UiKit.Div("fr-row-wrap"); cr.style.marginTop = 4;
@@ -314,18 +314,19 @@ namespace Frontier
                     var dot = UiKit.Div("fr-dot"); dot.style.backgroundColor = UiKit.Ui(kv.Key.color);
                     dot.style.marginRight = 6;
                     chip.Add(dot);
-                    chip.Add(UiKit.Text("x" + kv.Value, "fr-small"));
+                    chip.Add(UiKit.Text(kv.Key.displayName + " x" + kv.Value, "fr-small"));
                     cr.Add(chip);
                 }
                 body.Add(cr);
 
+                body.Add(SectionLabel("VICTORY REWARDS"));
                 var rr = UiKit.Div("fr-row-wrap"); rr.style.marginTop = 4;
                 foreach (var i in info.reward)
-                    if (i.resource != null) rr.Add(ResourceIconChip(i.resource, i.amount.ToString()));
+                    if (i.resource != null) rr.Add(ResourceIconChip(i.resource, i.amount + " " + i.resource.displayName));
                 var xp = UiKit.Div("fr-itemchip");
                 UiKit.Border(xp, UiKit.Ui(UiKit.Magenta, 0.8f), 2f);
                 xp.Add(Icons.Make("star", UiKit.Magenta));
-                xp.Add(UiKit.Text(info.xp.ToString(), "fr-small"));
+                xp.Add(UiKit.Text(info.xp + " XP", "fr-small"));
                 rr.Add(xp);
                 body.Add(rr);
 
@@ -333,7 +334,7 @@ namespace Frontier
                 var call = IconBtn(can ? "CALL" : "NEED FUEL", "alarm", can ? UiKit.Magenta : UiKit.Red, () =>
                 {
                     ClosePopup();
-                    defense.StartWave(alarmFuel);
+                    if (!defense.StartWave(alarmFuel)) Toast("Cannot call this wave. Check your fuel or wait for the current wave.", UiKit.Red);
                 }, true);
                 UiKit.SetEnabledLook(call, can);
                 body.Add(call);

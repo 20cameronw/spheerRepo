@@ -11,7 +11,7 @@ namespace Frontier
         ToolPower,
         BackpackSlots,
         FuelEfficiency,
-        TurretCount,
+        TurretFireRate,
         TurretDamage,
         TapDamage,
         ReactorHealth,
