@@ -29,4 +29,10 @@
     <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Universe/**/*.cs" Link="Universe/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
+
+  <!-- A moved or renamed folder would link zero files and the run would "pass" with no tests, so fail loudly instead. -->
+  <Target Name="RequireLinkedTestFolders" BeforeTargets="CoreCompile">
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)../../SpheerURP/Assets/Frontier/Tests/EditMode/Core')" Text="SpheerURP/Assets/Frontier/Tests/EditMode/Core is missing; this project links it. Update Frontier.Core.Tests.csproj if the folder moved." />
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)../../SpheerURP/Assets/Frontier/Tests/EditMode/Universe')" Text="SpheerURP/Assets/Frontier/Tests/EditMode/Universe is missing; this project links it. Update Frontier.Core.Tests.csproj if the folder moved." />
+  </Target>
 </Project>

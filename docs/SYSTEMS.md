@@ -60,4 +60,26 @@ Sizes, colours, fonts and icons follow [DESIGN.md](DESIGN.md).
 ## Procedural worlds
 
 `PlanetGenerator` builds deterministic worlds (biome palettes, capacity, gather spots) and **Frontier > Generate Deep Space
-Planets** persists them as assets. The infinite, coordinate-driven universe that replaces this is described in the roadmap.
+Planets** persists them as assets. The infinite, coordinate-driven universe that replaces this is described in the roadmap and its
+generator already exists (next section).
+
+## Universe core (generator V1, not wired into gameplay yet)
+
+`Frontier.Core/Universe` (namespace `Frontier.Universe`, `Scripts/Core/Universe`) is the engine-free generator behind the infinite
+map of [ROADMAP.md](ROADMAP.md) section 4. It is a pure function of `(UniverseConfig.Seed, GeneratorVersion, authored content,
+coordinates)`; only deltas will ever be saved. Nothing in the game calls it yet: turning it into `PlanetData`, the map and travel
+are the `m3-*` work packages.
+
+* **Coordinates and ids.** Positions are doubles in light-years, home at (0, 0), a sector is 64 ly. Ids are exact bit packings
+  (`SectorCoord`, `SystemKey`, `PlanetKey`; string forms like `s:X:Y:I`), never hashes.
+* **API.** `new Universe(new UniverseConfig(), Landmarks.CreateDefault())`, then `SystemsInSector`, `SystemsInRect`,
+  `PlanetsOf`, `GetPlanet(key[, storedGeneratorVersion])`, `Density`, `SampleDensity`, `TierAt`, `GalaxyAt`. Landmark galaxies and
+  authored Core Worlds come in through `AuthoredContent`. `Universe` is both a namespace and a class: in code inside
+  `namespace Frontier` write `using Uni = Frontier.Universe.Universe;`.
+* **Determinism.** One named hash stream per attribute (`StreamSalts`), `DetMath` instead of the platform `Math` functions, double
+  arithmetic with a single explicit rounding to float. Golden digests and source-hygiene tests enforce it ([TESTING.md](TESTING.md));
+  V1 is frozen, every change to its output is a new generator version.
+* **Cost.** On a desktop editor 1,000 sectors with every planet generate in about 4 ms (1,326 planets) and repeated lookups
+  allocate nothing; sectors and planet blocks are cached in bounded LRU caches and the type is safe to use from a background worker.
+* **Look at it.** **Frontier > Universe > Render Density PNG** writes the galaxy density map (30,000 ly across) to
+  `SpheerURP/Screens/universe/`.

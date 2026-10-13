@@ -6,7 +6,7 @@ Everything that can run without Unity does. Five layers, fastest first:
 |-------|--------|-------|--------|----|
 | **Core tests** (plain .NET) | `Frontier.Core`: the universe generator (99 tests incl. the golden hashes) and the frozen shared enums (4) | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
 | **EditMode** (Unity) | the Core tests again, in the editor's Mono, plus Data/Game tests: storage, waves, planets and models, content integrity, saves (33) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode` | `unity-tests.yml` (needs a licence) |
-| **PlayMode** (Unity) | smoke: the authored database loads, `FrontierBootstrap` builds camera, planet, backdrop, defense, UI and world surface without errors | Unity + GPU | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
+| **PlayMode** (Unity) | smoke: the authored database loads, `FrontierBootstrap` builds camera, planet, backdrop, defense, UI and world surface without errors; the universe golden digest on the PlayMode runtime (also runnable on a device) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
 | **Check suites** (Unity editor) | the five `Frontier > Validate ...` checks: the pass/fail **gate** for every change | Unity | `tools/run-checks.ps1` | local only |
 | **Screenshot harness** (Unity, GPU) | every screen on four virtual devices + UI lint | Unity + GPU | `tools/capture-screens.ps1` | local only |
 
@@ -41,8 +41,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\image-diff.ps1 -A <r
 `run-tests.ps1` goes through `run-unity.ps1`, so it shares the named mutex (only one editor opens the project at a time), the
 watchdog and the filtered log. It prints every failing test with its message and the first stack lines, plus a
 `passed/failed/skipped` line, and exits `0` (all passed or skipped), `1` (a test failed), `2` (no results: compile error, crash or
-timeout) or `3` (no test ran, usually a wrong filter). It never passes `-quit` (the test runner exits by itself) and never
-`-nographics` (PlayMode renders). In the Unity editor the same tests are in **Window > General > Test Runner**.
+timeout) or `3` (no test ran, usually a wrong filter). It never passes `-quit` (the test runner exits by itself) and does not pass
+`-nographics`, so tests that render keep working. In the Unity editor the same tests are in **Window > General > Test Runner**.
 
 Never let tests or tools touch the real save: set `GameState.SaveDirectoryOverride` first. The EditMode tests do it with
 `SaveSandbox` (`Tests/EditMode/Game/SaveSandbox.cs`), the PlayMode tests in their `SetUp`, the editor checks with
@@ -86,6 +86,10 @@ enforced by:
   `Scripts/Core/Universe` (found from the project folder, the bin folder of the CI project or the working directory) and fails
   if it cannot find them.
 * The `Frontier.Core` assembly must reference only `netstandard` (`CoreAssembly_ReferencesOnlyNetStandard`).
+* **Device determinism** (`Tests/PlayMode/UniverseDeterminismTests`): the plain-generator golden digest as a PlayMode test, so it
+  can run on a player build (Test Runner > PlayMode > Run on a connected device). **Not yet run on an IL2CPP/ARM64 phone**: the C++
+  compiler may contract `a * b + c` into a fused multiply-add there, which would change the last bit of double results and, in
+  the worst case, the generated universe. Run it on a real device before any generator output is persisted for players.
 
 A failing golden test means generator V1 output changed. That is only acceptable as a **new generator version** (see the header of
 `Universe.cs`); V1 stays frozen and its goldens keep passing. Never "fix" a golden constant to make a test green.
@@ -127,7 +131,7 @@ Runs EditMode and PlayMode through [GameCI](https://game.ci) (`game-ci/unity-tes
 is skipped, not failed**. What the owner has to do once:
 
 1. Create the licence file: for a **Personal** licence follow the GameCI activation guide
-   (<https://game.ci/docs/github/activation>) and keep the resulting `.ulf` file. For a Pro/Plus licence you only need the serial.
+   (<https://game.ci/docs/github/activation>) and keep the resulting `.ulf` file. A Pro/Plus licence uses its serial number instead.
 2. Add repository secrets (Settings > Secrets and variables > Actions):
    `UNITY_LICENSE` (the whole `.ulf` file content), `UNITY_EMAIL`, `UNITY_PASSWORD`; or, for Pro/Plus, `UNITY_SERIAL` with
    `UNITY_EMAIL` and `UNITY_PASSWORD`.
@@ -137,7 +141,8 @@ is skipped, not failed**. What the owner has to do once:
    needs a matching `unityci/editor` image (6000.4.0f1 images existed on Docker Hub in March 2026).
 
 Not covered in CI: the check suites, the screenshot harness and player builds (they need a licence plus a GPU or platform
-modules). Run `tools/run-checks.ps1` before every commit.
+modules). Run `tools/run-checks.ps1` before every commit. The PlayMode smoke tests do not need a GPU: they also pass with
+`-nographics` (verified locally), which is how GameCI-style containers usually run Unity.
 
 ## Troubleshooting
 
