@@ -98,7 +98,7 @@ namespace Frontier
             tabs.Add(TabButton("shield", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
             tabs.Add(TabButton("satellite", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
             body.Add(tabs);
-            var note = UiKit.Text("Build on " + gs.planet.displayName + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots + " free slots. Tap a structure on the planet to use it.", "fr-muted");
+            var note = UiKit.Text("Build on " + gs.planet.Name + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots + " free slots. Tap a structure on the planet to use it.", "fr-muted");
             note.style.marginBottom = UiKit.Space.S12;
             body.Add(note);
             switch (shopTab)
@@ -382,19 +382,29 @@ namespace Frontier
 
         void BuildBases(VisualElement body)
         {
-            var planets = new List<PlanetSO>(gs.db.planets);
-            planets.Sort((a, b) => (b == gs.planet ? 1 : 0).CompareTo(a == gs.planet ? 1 : 0));
+            // The Core Worlds first (in their list order), then any generated world with a base; the current world always leads.
+            var planets = new List<PlanetData>(gs.universe.AuthoredPlanets);
+            var known = new HashSet<string>();
+            foreach (var p in planets) known.Add(p.Id);
+            foreach (var s in gs.structures)
+            {
+                if (!known.Add(s.planetId)) continue;
+                var found = gs.universe.Get(s.planetId);
+                if (found != null) planets.Add(found);
+            }
+            if (known.Add(gs.planet.Id)) planets.Add(gs.planet);
+            planets.Sort((a, b) => (b.Id == gs.planet.Id ? 1 : 0).CompareTo(a.Id == gs.planet.Id ? 1 : 0));
             bool any = false;
             foreach (var p in planets)
             {
-                var here = gs.structures.FindAll(s => s.planetId == p.id);
-                if (p != gs.planet && here.Count == 0) continue;
+                var here = gs.StructuresOn(p);
+                if (p.Id != gs.planet.Id && here.Count == 0) continue;
                 any = true;
                 var h = UiKit.Div("fr-row"); h.style.marginTop = UiKit.Space.S8; h.style.marginBottom = UiKit.Space.S8;
-                var hn = UiKit.Text(p.displayName.ToUpper(), "fr-small", UiKit.Ui(p.rim));
+                var hn = UiKit.Text(p.Name.ToUpper(), "fr-small", UiKit.Ui(p.Rim));
                 hn.style.marginRight = UiKit.Space.S12;
                 h.Add(hn);
-                if (p == gs.planet) h.Add(UiKit.Text("YOU ARE HERE", "fr-tiny"));
+                if (p.Id == gs.planet.Id) h.Add(UiKit.Text("YOU ARE HERE", "fr-tiny"));
                 body.Add(h);
                 if (here.Count == 0) body.Add(UiKit.Text("No base yet - place structures from the build menu.", "fr-muted"));
                 foreach (var st in here)
@@ -645,20 +655,21 @@ namespace Frontier
 
             var tp = Card(UiKit.Cyan);
             tp.Add(UiKit.Text("TELEPORT (free)", "fr-h2"));
-            foreach (var p in gs.db.planets)
+            foreach (var p in gs.universe.AuthoredPlanets)
             {
                 var pl = p;
-                if (pl == null) continue;
-                var sys = PlanetSO.SystemOf(pl.systemId);
-                tp.Add(IconBtn(pl.displayName.ToUpper() + (sys != null ? "  -  " + sys.name : ""), "map", pl == gs.planet ? UiKit.Lime : UiKit.Cyan, () =>
-                {
-                    CloseModal();
-                    gs.DebugTeleport(pl);
-                    planetView.Show(pl, true);
-                    selected = pl;
-                }));
+                tp.Add(IconBtn(pl.Name.ToUpper() + "  -  " + pl.SystemName, "map", pl.Id == gs.planet.Id ? UiKit.Lime : UiKit.Cyan, () => DebugTeleportTo(pl)));
             }
             body.Add(tp);
+        }
+
+        /// <summary>Moves the player to a world for free and shows it (debug tools).</summary>
+        void DebugTeleportTo(PlanetData target)
+        {
+            CloseModal();
+            gs.DebugTeleport(target);
+            planetView.Show(target, true);
+            selected = target;
         }
 
         VisualElement Slot(ResourceSO r, int count, bool locked)

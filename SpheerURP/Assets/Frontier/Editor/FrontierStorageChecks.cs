@@ -18,9 +18,9 @@ namespace Frontier.EditorTools
                 var state = new GameState(db, false);
                 var def = db.StructureOfKind(StructureKind.Warehouse);
                 var wood = db.FindResource("wood");
-                var warehouse = new PlacedStructure { planetId = state.planet.id, slot = 1, def = def };
-                var second = new PlacedStructure { planetId = state.planet.id, slot = 2, def = def };
-                state.structures.Add(warehouse); state.structures.Add(second);
+                var warehouse = state.DebugPlace(def, 1);
+                var second = state.DebugPlace(def, 2);
+                Check(warehouse != null && second != null, "Placing the test warehouses.");
                 var storage = state.StorageFor(warehouse);
                 Check(storage.slots.Count == 18, "Initial capacity.");
                 state.Add(wood, 120, false);
@@ -34,18 +34,18 @@ namespace Frontier.EditorTools
                 Check(state.Withdraw(warehouse, 1, 20, false) == 20, "Withdrawal.");
                 Check(state.Count(wood) + storage.slots[1].count == total, "Withdrawal conservation.");
                 Check(state.StorageFor(second).slots[1].count == 0, "Warehouse isolation.");
-                warehouse.level = 5;
+                state.DebugSetStructureLevel(warehouse, 5);
                 Check(state.StorageFor(warehouse).slots.Count == 54 && storage.slots[1].count > 0, "Upgrade preserves storage.");
-                var saved = new SaveData();
-                saved.warehouses.Add(storage);
-                var loaded = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(saved));
-                Check(loaded.warehouses[0].planetId == warehouse.planetId &&
-                    loaded.warehouses[0].structureSlot == warehouse.slot &&
-                    loaded.warehouses[0].slots[1].count == storage.slots[1].count &&
-                    loaded.warehouses[0].slots[1].resourceId == wood.id, "Serialized storage round trip.");
-                state.planet = db.planets[1];
+                var saved = new PlanetDelta { planetId = warehouse.planetId };
+                saved.storages.Add(storage);
+                var loaded = JsonUtility.FromJson<PlanetDelta>(JsonUtility.ToJson(saved));
+                Check(loaded.planetId == warehouse.planetId &&
+                    loaded.storages[0].structureSlot == warehouse.slot &&
+                    loaded.storages[0].slots[1].count == storage.slots[1].count &&
+                    loaded.storages[0].slots[1].resourceId == wood.id, "Serialized storage round trip.");
+                state.DebugTeleport(state.universe.Get(db.planets[1].id));
                 Check(state.Deposit(warehouse, 2, wood, 1, false) == 0 && state.Withdraw(warehouse, 1, 1, false) == 0, "Remote access rejected.");
-                state.planet = db.startPlanet;
+                state.DebugTeleport(state.universe.Home);
                 foreach (var resource in db.resources) state.Add(resource, 100000, false);
                 Check(state.Withdraw(warehouse, 1, 1, false) == 0, "Full backpack rejected.");
                 var authored = GameDatabase.Load().StructureOfKind(StructureKind.Warehouse);

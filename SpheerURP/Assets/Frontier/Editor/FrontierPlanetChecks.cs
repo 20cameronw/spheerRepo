@@ -89,11 +89,15 @@ namespace Frontier.EditorTools
                 Debug.Log("Frontier: structure diameters and tier capacities passed (" + slots + " total planet slots).");
                 var route = typeof(UIRoot).GetMethod("RoutePoint", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
                 var point = typeof(UIRoot).GetMethod("MapPoint", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-                var planets = GameDatabase.Load().planets;
+                var universe = UniverseService.For(GameDatabase.Load());
+                var planets = new System.Collections.Generic.List<PlanetData>(universe.AuthoredPlanets);
+                // a few generated worlds are only ever shown as a marker, but routes to and from them must still be well formed
+                planets.Add(universe.FindGenerated(Frontier.Universe.Biome.Lush, null));
+                planets.Add(universe.FindGenerated(Frontier.Universe.Biome.GasGiant, Frontier.Universe.SizeClass.Colossal, 6));
                 foreach (var from in planets)
                     foreach (var to in planets)
                     {
-                        if (from == to) continue;
+                        if (from.Id == to.Id) continue;
                         Vector2 start = (Vector2)route.Invoke(null, new object[] { from, to, 0f });
                         Vector2 end = (Vector2)route.Invoke(null, new object[] { from, to, 1f });
                         if (Vector2.Distance(start, (Vector2)point.Invoke(null, new object[] { from })) > 0.01f ||

@@ -22,7 +22,7 @@ namespace Frontier.EditorTools
                 int previews = 0;
                 foreach (var planet in db.planets)
                 {
-                    state.planet = planet;
+                    state.DebugTeleport(state.universe.Get(planet.id));
                     WaveInfo previous = null;
                     for (int fuel = 1; fuel <= 40; fuel++)
                     {

@@ -101,4 +101,3 @@ MonoBehaviour:
     amount: 30
   baseBackpackSlots: 9
   baseReactorHealth: 100
-  fuelPerMapUnit: 1

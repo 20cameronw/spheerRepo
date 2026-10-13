@@ -37,6 +37,8 @@ namespace Frontier.Tests
         [TearDown]
         public void TearDown()
         {
+            // Write anything pending while the folder still exists (the app component flushes again when it is destroyed at the end of the frame).
+            if (FrontierRuntime.Current != null && FrontierRuntime.Current.State != null) FrontierRuntime.Current.State.Flush();
             foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects())
                 if (!rootsBefore.Contains(root)) Object.Destroy(root);
             FrontierRuntime.Clear();
@@ -62,7 +64,10 @@ namespace Frontier.Tests
             var state = new GameState(GameDatabase.Load(), false);
             state.AddXp(10);
             Assert.AreEqual(10, state.xp);
-            Assert.IsTrue(File.Exists(Path.Combine(saveDir, "frontier_save.json")), "the save must go to the override folder");
+            string file = Path.Combine(saveDir, "frontier_save.json");
+            Assert.IsFalse(File.Exists(file), "changes only mark the state dirty; the write is debounced");
+            Assert.IsTrue(state.Flush(), "Flush writes the pending changes");
+            Assert.IsTrue(File.Exists(file), "the save must go to the override folder");
         }
 
         [UnityTest]
@@ -105,7 +110,7 @@ namespace Frontier.Tests
             var runtime = FrontierRuntime.Current;
             Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
 
-            var destination = runtime.Db.planets[1];
+            var destination = runtime.State.universe.Get(runtime.Db.planets[1].id);
             Assert.AreNotSame(runtime.State.planet, destination);
             runtime.State.DebugTeleport(destination);
             for (int i = 0; i < 5; i++) yield return null;

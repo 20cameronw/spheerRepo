@@ -64,13 +64,13 @@ namespace Frontier
             fuel = Mathf.Clamp(fuel, 1, 40);
             var info = new WaveInfo { waveNumber = gs.NextWave(p), fuel = fuel };
             float rm = FuelMult(fuel);
-            info.budget = f.Budget(info.waveNumber, p.danger, rm);
+            info.budget = f.Budget(info.waveNumber, p.Danger, rm);
             info.healthMult = f.HealthMult(info.waveNumber) * (1f + f.healthPerFuel * (fuel - 1));
             info.damageMult = 1f + f.damagePerFuel * (fuel - 1);
             info.speedMult = 1f + f.speedPerFuel * (fuel - 1);
             info.rewardMult = f.RewardMult(info.waveNumber, rm) * gs.RewardBonus * gs.AlarmBonus(p);
             info.xp = Mathf.Max(1, Mathf.RoundToInt(info.budget * 6f * gs.AlarmBonus(p)));
-            var rng = new System.Random(PlanetSeed(p.id) ^ (info.waveNumber * 7919));
+            var rng = new System.Random(PlanetSeed(p.AuthoredId ?? p.Id) ^ (info.waveNumber * 7919));
             info.aliens = f.Build(gs.db.enemies, info.waveNumber, info.budget, rng);
 
             var totals = new Dictionary<ResourceSO, float>();

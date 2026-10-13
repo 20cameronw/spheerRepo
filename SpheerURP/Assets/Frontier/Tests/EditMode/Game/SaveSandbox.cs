@@ -19,9 +19,11 @@ namespace Frontier.Tests
             previousOverride = GameState.SaveDirectoryOverride;
             previousState = GameState.I;
             dir = Path.Combine(Application.temporaryCachePath, "frontier-tests-" + Guid.NewGuid().ToString("N").Substring(0, 8));
-            Directory.CreateDirectory(dir);
+            System.IO.Directory.CreateDirectory(dir);
             GameState.SaveDirectoryOverride = dir;
         }
+
+        public string Directory { get { return dir; } }
 
         public string SaveFile { get { return Path.Combine(dir, "frontier_save.json"); } }
 
@@ -29,7 +31,7 @@ namespace Frontier.Tests
         {
             GameState.SaveDirectoryOverride = previousOverride;
             GameState.I = previousState;
-            try { Directory.Delete(dir, true); } catch (IOException) { }
+            try { System.IO.Directory.Delete(dir, true); } catch (IOException) { }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Frontier.Tests
         GameState state;
         ResourceSO wood;
         PlacedStructure warehouse, second;
-        WarehouseStorage storage;
+        StorageRecord storage;
         int total;
 
         [SetUp]
@@ -26,10 +26,8 @@ namespace Frontier.Tests
             state = new GameState(db, false);
             wood = db.FindResource("wood");
             var def = db.StructureOfKind(StructureKind.Warehouse);
-            warehouse = new PlacedStructure { planetId = state.planet.id, slot = 1, def = def };
-            second = new PlacedStructure { planetId = state.planet.id, slot = 2, def = def };
-            state.structures.Add(warehouse);
-            state.structures.Add(second);
+            warehouse = state.DebugPlace(def, 1);
+            second = state.DebugPlace(def, 2);
             storage = state.StorageFor(warehouse);
             state.Add(wood, 120, false);
             total = state.Count(wood);
@@ -106,7 +104,7 @@ namespace Frontier.Tests
         public void Upgrading_GrowsTheCapacityAndKeepsTheContents()
         {
             StockSlotOne();
-            warehouse.level = 5;
+            state.DebugSetStructureLevel(warehouse, 5);
             var upgraded = state.StorageFor(warehouse);
             Assert.AreEqual(54, upgraded.slots.Count);
             Assert.Greater(upgraded.slots[1].count, 0);
@@ -116,20 +114,20 @@ namespace Frontier.Tests
         public void Storage_SurvivesAJsonRoundTrip()
         {
             StockSlotOne();
-            var saved = new SaveData();
-            saved.warehouses.Add(storage);
-            var loaded = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(saved));
-            Assert.AreEqual(warehouse.planetId, loaded.warehouses[0].planetId);
-            Assert.AreEqual(warehouse.slot, loaded.warehouses[0].structureSlot);
-            Assert.AreEqual(storage.slots[1].count, loaded.warehouses[0].slots[1].count);
-            Assert.AreEqual(wood.id, loaded.warehouses[0].slots[1].resourceId);
+            var saved = new PlanetDelta { planetId = warehouse.planetId };
+            saved.storages.Add(storage);
+            var loaded = JsonUtility.FromJson<PlanetDelta>(JsonUtility.ToJson(saved));
+            Assert.AreEqual(warehouse.planetId, loaded.planetId);
+            Assert.AreEqual(warehouse.slot, loaded.storages[0].structureSlot);
+            Assert.AreEqual(storage.slots[1].count, loaded.storages[0].slots[1].count);
+            Assert.AreEqual(wood.id, loaded.storages[0].slots[1].resourceId);
         }
 
         [Test]
         public void AWarehouseOnAnotherPlanet_CannotBeUsedFromHere()
         {
             StockSlotOne();
-            state.planet = db.planets[1];
+            state.DebugTeleport(state.universe.Get(db.planets[1].id));
             Assert.AreEqual(0, state.Deposit(warehouse, 2, wood, 1, false));
             Assert.AreEqual(0, state.Withdraw(warehouse, 1, 1, false));
         }

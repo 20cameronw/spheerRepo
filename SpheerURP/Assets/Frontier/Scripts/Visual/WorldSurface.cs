@@ -87,11 +87,11 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ build
-        void OnPlanet(PlanetSO p)
+        void OnPlanet(PlanetData p)
         {
             int count = p.BuildingSlots;
             foreach (var structure in gs.structures)
-                if (structure.planetId == p.id) count = Mathf.Max(count, structure.slot + 1);
+                if (structure.planetId == p.Id) count = Mathf.Max(count, structure.slot + 1);
             dirs = SlotDirections(count);
             signature = null;
             ClearAll();
@@ -148,8 +148,8 @@ namespace Frontier
 
         void RebuildStructures()
         {
-            var sb = new StringBuilder(gs.planet.id);
-            foreach (var s in gs.structures) if (s.planetId == gs.planet.id) sb.Append('|').Append(s.def.id).Append(s.slot).Append(':').Append(s.level);
+            var sb = new StringBuilder(gs.planet.Id);
+            foreach (var s in gs.structures) if (s.planetId == gs.planet.Id) sb.Append('|').Append(s.def.id).Append(s.slot).Append(':').Append(s.level);
             string sig = sb.ToString();
             if (sig == signature) return;
             signature = sig;
@@ -157,7 +157,7 @@ namespace Frontier
                 if (items[i].structure != null) { DestroyItem(items[i]); items.RemoveAt(i); }
             foreach (var s in gs.structures)
             {
-                if (s.planetId != gs.planet.id) continue;
+                if (s.planetId != gs.planet.Id) continue;
                 items.Add(MakeStructure(s));
             }
             if (buildMode) RebuildPads();

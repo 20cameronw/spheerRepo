@@ -24,7 +24,7 @@ namespace Frontier
         public string displayName;
         [TextArea] public string description;
         public int tier;
-        [Tooltip("Position on the star map (0..1). Travel fuel is based on distance.")]
+        [Tooltip("Position on the star map (0..1). Only the map layout uses it; travel fuel comes from the TravelModel (system distance in light-years).")]
         public Vector2 mapPosition = new Vector2(0.5f, 0.5f);
         [Tooltip("Scales wave difficulty on this planet.")]
         public float danger = 1f;
@@ -93,13 +93,6 @@ namespace Frontier
         {
             foreach (var s in Systems) if (s.id == id) return s;
             return null;
-        }
-
-        public static float MapScale { get { return FrontierSettings.I.mapScale; } }
-
-        public static float Distance(PlanetSO a, PlanetSO b)
-        {
-            return Vector2.Distance(a.mapPosition, b.mapPosition) * MapScale;
         }
     }
 }

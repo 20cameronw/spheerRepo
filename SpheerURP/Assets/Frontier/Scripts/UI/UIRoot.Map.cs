@@ -10,7 +10,7 @@ namespace Frontier
         const float MapSize = 9000f;
         const float MinZoom = 0.07f, MaxZoom = 2.4f;
 
-        PlanetSO selected;
+        PlanetData selected;
         bool mapOpen;
         VisualElement mapView, mapWorld, mapCard, mapTools;
         Vector2 mapPan;
@@ -116,19 +116,39 @@ namespace Frontier
             return GalaxyCenter(i / 2) + offset;
         }
 
-        static Vector2 MapPoint(PlanetSO planet)
+        static Vector2 MapPoint(PlanetData planet)
         {
-            var system = PlanetSO.SystemOf(planet.systemId);
-            if (system == null) return new Vector2(planet.mapPosition.x, 1f - planet.mapPosition.y) * MapSize;
-            Vector2 offset = planet.mapPosition - system.center;
+            var so = planet.Authored;
+            if (so == null) return GeneratedMapPoint(planet);
+            var system = PlanetSO.SystemOf(so.systemId);
+            if (system == null) return new Vector2(so.mapPosition.x, 1f - so.mapPosition.y) * MapSize;
+            Vector2 offset = so.mapPosition - system.center;
             return SystemPoint(system) + new Vector2(offset.x, -offset.y) * 6200f;
         }
 
-        static Vector2 RoutePoint(PlanetSO from, PlanetSO to, float time)
+        /// <summary>Map pixels per light-year for the marker of a generated world (the full star map for generated space comes later).</summary>
+        const float GeneratedPxPerLy = 3.5f;
+        const float GeneratedMarkerMargin = 320f;
+
+        // A generated world is shown as a single marker: its light-year offset from the home system, scaled onto the old map and kept inside it.
+        static Vector2 GeneratedMapPoint(PlanetData planet)
+        {
+            Vector2 home = SystemPoint(PlanetSO.Systems[0]);
+            Vector2 point = home + new Vector2((float)planet.Star.X, -(float)planet.Star.Y) * GeneratedPxPerLy;
+            float lo = GeneratedMarkerMargin, hi = MapSize - GeneratedMarkerMargin;
+            return new Vector2(Mathf.Clamp(point.x, lo, hi), Mathf.Clamp(point.y, lo, hi));
+        }
+
+        static PlanetSO.StarSystem SystemOfPlanet(PlanetData planet)
+        {
+            return planet.Authored != null ? PlanetSO.SystemOf(planet.Authored.systemId) : null;
+        }
+
+        static Vector2 RoutePoint(PlanetData from, PlanetData to, float time)
         {
             Vector2 a = MapPoint(from), b = MapPoint(to);
-            var fromSystem = PlanetSO.SystemOf(from.systemId);
-            var toSystem = PlanetSO.SystemOf(to.systemId);
+            var fromSystem = SystemOfPlanet(from);
+            var toSystem = SystemOfPlanet(to);
             Vector2 ar = fromSystem != null ? a - SystemPoint(fromSystem) : a - b;
             Vector2 br = toSystem != null ? b - SystemPoint(toSystem) : b - a;
             Vector2 ac = a - ar, bc = b - br;
@@ -153,7 +173,7 @@ namespace Frontier
             return new Vector2(point.x * c - point.y * s, point.x * s + point.y * c);
         }
 
-        void CenterOn(PlanetSO p)
+        void CenterOn(PlanetData p)
         {
             if (mapView == null) return;
             mapPan = ViewCenter() - MapPoint(p) * mapZoom;
@@ -222,7 +242,7 @@ namespace Frontier
         void UpdateMapInput()
         {
             if (!mapOpen || mapView == null) return;
-            if (selected != gs.planet) mapWorld.MarkDirtyRepaint();
+            if (selected == null || selected.Id != gs.planet.Id) mapWorld.MarkDirtyRepaint();
             if (Input.touchCount == 2)
             {
                 var a = Input.GetTouch(0).position; var b = Input.GetTouch(1).position;
@@ -280,9 +300,9 @@ namespace Frontier
             {
                 Vector2 c = SystemPoint(sys);
                 float maxR = 0f;
-                foreach (var pl in gs.db.planets)
+                foreach (var pl in gs.universe.AuthoredPlanets)
                 {
-                    if (pl.systemId != sys.id) continue;
+                    if (pl.Authored.systemId != sys.id) continue;
                     float d = (MapPoint(pl) - c).magnitude;
                     if (d <= 900f) maxR = Mathf.Max(maxR, d); // far-flung members keep their orbit ring but do not inflate the halo
                 }
@@ -290,9 +310,9 @@ namespace Frontier
                 p.fillColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.012f);
                 p.BeginPath(); p.Arc(c, maxR + 150f, Angle.Degrees(0f), Angle.Degrees(360f)); p.Fill();
                 p.lineWidth = 3f;
-                foreach (var pl in gs.db.planets)
+                foreach (var pl in gs.universe.AuthoredPlanets)
                 {
-                    if (pl.systemId != sys.id) continue;
+                    if (pl.Authored.systemId != sys.id) continue;
                     p.strokeColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.25f);
                     p.BeginPath(); p.Arc(c, (MapPoint(pl) - c).magnitude, Angle.Degrees(0f), Angle.Degrees(360f)); p.Stroke();
                 }
@@ -304,7 +324,7 @@ namespace Frontier
                 p.fillColor = Color.Lerp(sys.color, Color.white, 0.6f);
                 p.BeginPath(); p.Arc(c, 30f, Angle.Degrees(0f), Angle.Degrees(360f)); p.Fill();
             }
-            if (selected != null && selected != gs.planet)
+            if (selected != null && selected.Id != gs.planet.Id)
             {
                 p.lineWidth = 6f;
                 p.strokeColor = new Color(1f, 0.25f, 0.95f, 0.9f);
@@ -347,54 +367,62 @@ namespace Frontier
                 lbl.style.unityTextAlign = TextAnchor.UpperCenter;
                 mapWorld.Add(lbl);
             }
-            foreach (var pl in gs.db.planets)
+            foreach (var pl in gs.universe.AuthoredPlanets) AddMapNode(pl);
+            // A generated world is not part of the hand made map: it only gets a marker, and only while the player is on it.
+            if (!gs.planet.IsAuthored) AddMapNode(gs.planet);
+        }
+
+        void AddMapNode(PlanetData planet)
+        {
+            var node = UiKit.Div("fr-map-node");
+            Vector2 mp = MapPoint(planet);
+            node.style.left = mp.x; node.style.top = mp.y;
+            node.style.backgroundColor = UiKit.Ui(planet.Primary);
+            bool cur = planet.Id == gs.planet.Id, sel = selected != null && planet.Id == selected.Id;
+            UiKit.Border(node, cur ? Color.white : sel ? UiKit.Magenta : UiKit.Ui(planet.Rim, 0.8f), cur || sel ? 6f : 3f);
+            UiKit.Halo(node, UiKit.Ui(planet.Rim), 60f, sel ? 0.7f : 0.3f);
+            node.RegisterCallback<ClickEvent>(e =>
             {
-                var planet = pl;
-                var node = UiKit.Div("fr-map-node");
-                Vector2 mp = MapPoint(planet);
-                node.style.left = mp.x; node.style.top = mp.y;
-                node.style.backgroundColor = UiKit.Ui(planet.primary);
-                bool cur = planet == gs.planet, sel = planet == selected;
-                UiKit.Border(node, cur ? Color.white : sel ? UiKit.Magenta : UiKit.Ui(planet.rim, 0.8f), cur || sel ? 6f : 3f);
-                UiKit.Halo(node, UiKit.Ui(planet.rim), 60f, sel ? 0.7f : 0.3f);
-                node.RegisterCallback<ClickEvent>(e =>
-                {
-                    Sfx.Click();
-                    selected = planet;
-                    mapView.schedule.Execute(() => { BuildMapNodes(); BuildMapCard(); mapWorld.MarkDirtyRepaint(); }).StartingIn(1);
-                });
-                bool hasBase = gs.structures.Exists(s => s.planetId == planet.id);
-                if (hasBase)
-                {
-                    var b = Icons.Make("base", UiKit.Lime, 52f);
-                    b.style.position = Position.Absolute; b.style.left = 29; b.style.top = -46;
-                    node.Add(b);
-                }
-                var name = UiKit.Text(planet.displayName, "fr-small");
-                name.style.position = Position.Absolute; name.style.top = 116; name.style.left = -45; name.style.width = 200;
-                name.style.unityTextAlign = TextAnchor.UpperCenter;
-                node.Add(name);
-                mapWorld.Add(node);
+                Sfx.Click();
+                selected = planet;
+                mapView.schedule.Execute(() => { BuildMapNodes(); BuildMapCard(); mapWorld.MarkDirtyRepaint(); }).StartingIn(1);
+            });
+            if (gs.HasBase(planet))
+            {
+                var b = Icons.Make("base", UiKit.Lime, 52f);
+                b.style.position = Position.Absolute; b.style.left = 29; b.style.top = -46;
+                node.Add(b);
             }
+            var name = UiKit.Text(planet.Name, "fr-small");
+            name.style.position = Position.Absolute; name.style.top = 116; name.style.left = -45; name.style.width = 200;
+            name.style.unityTextAlign = TextAnchor.UpperCenter;
+            node.Add(name);
+            mapWorld.Add(node);
         }
 
         void BuildMapCard()
         {
             if (mapCard != null) mapCard.RemoveFromHierarchy();
             var p2 = selected ?? gs.planet;
-            Color pc = UiKit.Ui(p2.rim);
+            Color pc = UiKit.Ui(p2.Rim);
             mapCard = UiKit.Div("fr-map-card");
             UiKit.SetAccent(mapCard, pc);
             var top = UiKit.Div("fr-row");
-            top.Add(UiKit.Text(p2.displayName.ToUpper(), "fr-h2", pc));
+            top.Add(UiKit.Text(p2.Name.ToUpper(), "fr-h2", pc));
             top.Add(UiKit.Div("fr-spacer"));
             var skull = Icons.Make("skull", UiKit.Red, UiKit.Size.IconSm);
             skull.style.marginRight = UiKit.Space.S8;
             top.Add(skull);
-            top.Add(UiKit.Text(p2.danger.ToString("0.0"), "fr-small"));
+            top.Add(UiKit.Text(p2.Danger.ToString("0.0"), "fr-small"));
             mapCard.Add(top);
-            mapCard.Add(UiKit.Text(p2.description, "fr-tiny"));
-            var slots = UiKit.Text(p2.BuildingSlots + " building slots  -  world size x" + p2.worldSize.ToString("0.00"), "fr-small");
+            mapCard.Add(UiKit.Text(p2.Description, "fr-tiny"));
+            if (!p2.IsAuthored)
+            {
+                var kind = UiKit.Text(p2.Star.Name + "  -  " + p2.BiomeName + ", " + p2.SizeName.ToLower() + "  -  tier " + p2.Tier, "fr-tiny", UiKit.Cyan);
+                kind.style.marginTop = UiKit.Space.S4;
+                mapCard.Add(kind);
+            }
+            var slots = UiKit.Text(p2.BuildingSlots + " building slots  -  world size x" + p2.WorldSize.ToString("0.00"), "fr-small");
             slots.style.marginTop = UiKit.Space.S8;
             mapCard.Add(slots);
 
@@ -402,10 +430,10 @@ namespace Frontier
             var res = UiKit.Div("fr-row-wrap");
             foreach (var resource in gs.ResourcesFor(p2))
                 res.Add(ResourceIconChip(resource, resource.displayName));
-            if (gs.structures.Exists(s => s.planetId == p2.id)) res.Add(UiKit.Chip("base", UiKit.Lime, "BASE"));
+            if (gs.HasBase(p2)) res.Add(UiKit.Chip("base", UiKit.Lime, "BASE"));
             mapCard.Add(res);
 
-            if (p2 == gs.planet)
+            if (p2.Id == gs.planet.Id)
             {
                 var here = UiKit.Text("You are here", "fr-small", UiKit.Cyan);
                 here.style.marginTop = UiKit.Space.S12;

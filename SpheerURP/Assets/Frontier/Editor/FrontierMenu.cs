@@ -194,8 +194,9 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Reset Save")]
         public static void ResetSave()
         {
-            string p = Path.Combine(Application.persistentDataPath, "frontier_save.json");
-            if (File.Exists(p)) File.Delete(p);
+            // the save, its backup, a leftover temp file and the legacy v1 backup
+            if (!Directory.Exists(Application.persistentDataPath)) return;
+            foreach (string file in Directory.GetFiles(Application.persistentDataPath, "frontier_save*")) File.Delete(file);
         }
     }
 }

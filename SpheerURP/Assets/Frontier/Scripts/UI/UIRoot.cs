@@ -244,9 +244,9 @@ namespace Frontier
             fuelLabel.text = gs.Count(gs.db.fuel).ToString();
             packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
             levelLabel.text = "LV " + gs.PlayerLevel;
-            planetLabel.text = gs.planet.displayName.ToUpper();
-            planetLabel.style.color = UiKit.Ui(gs.planet.rim);
-            UiKit.Border(planetTag, UiKit.Tint(gs.planet.rim, 0.5f), 2f);
+            planetLabel.text = gs.planet.Name.ToUpper();
+            planetLabel.style.color = UiKit.Ui(gs.planet.Rim);
+            UiKit.Border(planetTag, UiKit.Tint(gs.planet.Rim, 0.5f), 2f);
             UiKit.SetFill(xpFill, gs.LevelProgress);
             RefreshModal();
             RefreshPopup();
@@ -409,7 +409,7 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ travel
-        void StartTravel(PlanetSO target)
+        void StartTravel(PlanetData target)
         {
             if (busy || defense.Active || backdrop.Warping) return;
             int cost = gs.FuelCost(target);
@@ -419,13 +419,13 @@ namespace Frontier
             StartCoroutine(TravelSequence(target, cost));
         }
 
-        IEnumerator TravelSequence(PlanetSO target, int cost)
+        IEnumerator TravelSequence(PlanetData target, int cost)
         {
             StartCoroutine(backdrop.DoWarp(null));
             yield return planetView.Depart();
             while (backdrop.Warping) yield return null;
             var tg = new TravelGame();
-            float tier = Mathf.Clamp01(target.tier / 8f);
+            float tier = Mathf.Clamp01(target.Tier / 8f);
             MinigameResult result = default;
             bool completed = false;
             tg.Run(overlayLayer, UiKit.Magenta, 1f, tier, r =>
@@ -446,7 +446,7 @@ namespace Frontier
             selected = target;
             yield return planetView.Approach(target);
             busy = false;
-            Toast("Arrived at " + target.displayName + (refund > 0 ? "  -  +" + refund + " fuel back" : ""), UiKit.Cyan);
+            Toast("Arrived at " + target.Name + (refund > 0 ? "  -  +" + refund + " fuel back" : ""), UiKit.Cyan);
         }
 
         // ------------------------------------------------------------ toast

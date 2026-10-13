@@ -86,8 +86,18 @@ namespace Frontier
         /// <summary>True after loading a file from a newer schema: <see cref="Write"/> refuses.</summary>
         public bool ReadOnly { get; private set; }
 
+        /// <summary>Why <see cref="ReadOnly"/> is set (shown to the player and in logs); empty otherwise.</summary>
+        public string ReadOnlyReason { get; private set; }
+
         /// <summary>The message of the last failed <see cref="Write"/>, or null.</summary>
         public string LastWriteError { get; private set; }
+
+        /// <summary>Protects the loaded file from being overwritten, for example when it belongs to a newer universe generator than this build has.</summary>
+        public void MarkReadOnly(string reason)
+        {
+            ReadOnly = true;
+            ReadOnlyReason = string.IsNullOrEmpty(reason) ? "the save file is read-only" : reason;
+        }
 
         // ---- loading ---------------------------------------------------------------------------------------------------
 
@@ -96,6 +106,7 @@ namespace Frontier
             var result = new SaveLoadResult();
             var report = result.report;
             ReadOnly = false;
+            ReadOnlyReason = "";
             string[] paths = { PrimaryPath, BackupPath, TempPath };
             SaveSource[] sources = { SaveSource.Primary, SaveSource.Backup, SaveSource.TempRecovery };
             string primaryProblem = null;
@@ -144,10 +155,10 @@ namespace Frontier
                 if (version > SaveSchema.Current)
                 {
                     save = codec.DeserializeV2(text).Normalize();
-                    ReadOnly = true;
-                    report.readOnly = true;
                     report.error = "The save was written by a newer version of the game (schema " + version + ", this build reads " + SaveSchema.Current +
                                    "). It is loaded read-only and will not be overwritten.";
+                    MarkReadOnly(report.error);
+                    report.readOnly = true;
                 }
                 else if (version == SaveSchema.Current)
                 {
@@ -185,7 +196,7 @@ namespace Frontier
             LastWriteError = null;
             if (ReadOnly)
             {
-                LastWriteError = "the save file is from a newer version and is read-only";
+                LastWriteError = ReadOnlyReason;
                 return false;
             }
             try
@@ -258,6 +269,7 @@ namespace Frontier
                 catch (Exception) { /* best effort */ }
             }
             ReadOnly = false;
+            ReadOnlyReason = "";
             LastWriteError = null;
         }
     }

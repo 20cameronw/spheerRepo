@@ -15,8 +15,8 @@ namespace Frontier
         Transform root;
         public Transform Spin { get; private set; }
         public Transform Root { get { return root; } }
-        public PlanetSO Current { get; private set; }
-        public event System.Action<PlanetSO> Rebuilt;
+        public PlanetData Current { get; private set; }
+        public event System.Action<PlanetData> Rebuilt;
         float punch;
         public bool IdleSpin = true;
         /// <summary>Holds the planet completely still (used while a structure is selected).</summary>
@@ -36,10 +36,10 @@ namespace Frontier
         public SphereCollider Surface { get; private set; }
 
         public float SurfaceRadius() { return Surface != null ? Surface.radius : Radius; }
-        void StyleModel(Transform model, PlanetSO p, System.Random rng)
+        void StyleModel(Transform model, PlanetData p, System.Random rng)
         {
             float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
-            if (p.surfaceBands > 0f) bands = p.surfaceBands;
+            if (p.SurfaceBands > 0f) bands = p.SurfaceBands;
             var mats = new List<Material>();
             int layer = 0;
             foreach (var r in solids)
@@ -47,12 +47,12 @@ namespace Frontier
                 // Stacked layers (land/ocean) alternate the palette so they read as different terrain.
                 bool alt = (layer++ % 2) == 1;
                 var mat = new Material(Fx.PlanetShader);
-                mat.SetColor("_BaseColor", alt ? Color.Lerp(p.secondary, p.primary, 0.35f) : p.primary);
-                mat.SetColor("_AltColor", alt ? p.secondary * 0.6f : p.secondary);
+                mat.SetColor("_BaseColor", alt ? Color.Lerp(p.Secondary, p.Primary, 0.35f) : p.Primary);
+                mat.SetColor("_AltColor", alt ? p.Secondary * 0.6f : p.Secondary);
                 mat.SetColor("_RimColor", baseRim);
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
-                mat.SetFloat("_Style", p.style);
+                mat.SetFloat("_Style", p.Style);
                 var lb = r.localBounds.center;
                 mat.SetVector("_Center", new Vector4(lb.x, lb.y, lb.z, 0f));
                 var arr = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
@@ -63,7 +63,7 @@ namespace Frontier
             modelMats = mats;
         }
 
-        public void Show(PlanetSO p, bool animate)
+        public void Show(PlanetData p, bool animate)
         {
             if (root != null) Destroy(root.gameObject);
             orbiters.Clear(); orbiterSpeed.Clear();
@@ -74,15 +74,16 @@ namespace Frontier
             root.localRotation = Quaternion.Euler(16f, 0f, -7f);
             Spin = new GameObject("Spin").transform;
             Spin.SetParent(root, false);
-            var rng = new System.Random(p.id.GetHashCode());
+            // The stable visual seed (never string.GetHashCode): for the 30 Core Worlds it equals the legacy id hash, so their look is unchanged.
+            var rng = new System.Random(unchecked((int)p.Seed));
 
             var sphere = new GameObject("Core");
             sphere.transform.SetParent(Spin, false);
             core = sphere.transform;
-            baseRim = p.rim * p.glowIntensity;
+            baseRim = p.Rim * p.GlowIntensity;
             coreMat = null; modelMats = null;
-            displayedRadius = p.surfaceRadius > 0.01f ? p.surfaceRadius : Radius;
-            displayedModelScale = p.modelScale > 0f ? p.modelScale : 1f;
+            displayedRadius = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
+            displayedModelScale = p.ModelScale > 0f ? p.ModelScale : 1f;
             lastRadius = displayedRadius;
             var model = ModelLibrary.Spawn(p.ModelKey, core, displayedRadius * 2f * displayedModelScale, false);
             if (model != null)
@@ -100,12 +101,12 @@ namespace Frontier
                 sphere.transform.localScale = Vector3.one * Radius * 2f;
                 core = sphere.transform;
                 coreMat = new Material(Fx.PlanetShader);
-                coreMat.SetColor("_BaseColor", p.primary);
-                coreMat.SetColor("_AltColor", p.secondary);
+                coreMat.SetColor("_BaseColor", p.Primary);
+                coreMat.SetColor("_AltColor", p.Secondary);
                 coreMat.SetColor("_RimColor", baseRim);
-                coreMat.SetFloat("_Bands", p.surfaceBands > 0f ? p.surfaceBands : 4f + (float)rng.NextDouble() * 6f);
+                coreMat.SetFloat("_Bands", p.SurfaceBands > 0f ? p.SurfaceBands : 4f + (float)rng.NextDouble() * 6f);
                 coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
-                coreMat.SetFloat("_Style", p.style);
+                coreMat.SetFloat("_Style", p.Style);
                 sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
             }
             usesModel = model != null;
@@ -113,26 +114,26 @@ namespace Frontier
             var surfGo = new GameObject("Surface");
             surfGo.transform.SetParent(Spin, false);
             Surface = surfGo.AddComponent<SphereCollider>();
-            Surface.radius = p.surfaceRadius > 0.01f ? p.surfaceRadius : Radius;
+            Surface.radius = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
 
             var atmo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             atmo.name = "Atmosphere";
             Destroy(atmo.GetComponent<Collider>());
             atmo.transform.SetParent(root, false);
             atmosphere = atmo.transform;
-            atmo.transform.localScale = Vector3.one * p.atmosphereScale;
-            Color atmosphereColor = p.rim * (1.2f * p.atmosphereIntensity);
+            atmo.transform.localScale = Vector3.one * p.AtmosphereScale;
+            Color atmosphereColor = p.Rim * (1.2f * p.AtmosphereIntensity);
             atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
 
             glow = Fx.GlowQuad(root, new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
 
-            if (p.hasRings)
+            if (p.HasRings)
                 for (int i = 0; i < 2; i++)
-                    BuildRing(Radius * (1.7f + i * 0.35f), p.rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
+                    BuildRing(Radius * (1.7f + i * 0.35f), p.Rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
 
-            int moons = p.tier / 2;
+            int moons = p.MoonCount;
             for (int i = 0; i < moons; i++)
-                BuildMoon(Radius * (2.1f + i * 0.45f), p.rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f);
+                BuildMoon(Radius * (2.1f + i * 0.45f), p.Rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f);
 
             Weather.Build(root, p);
 
@@ -224,7 +225,7 @@ namespace Frontier
             root.gameObject.SetActive(false);
         }
 
-        public IEnumerator Approach(PlanetSO planet)
+        public IEnumerator Approach(PlanetData planet)
         {
             Show(planet, false);
             Frozen = true;
@@ -254,9 +255,9 @@ namespace Frontier
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
             float pulse = 1f + punch * 0.08f;
             float size = SurfaceRadius() / Mathf.Max(0.01f, displayedRadius) *
-                (Current.modelScale > 0f ? Current.modelScale : 1f) / displayedModelScale;
+                (Current.ModelScale > 0f ? Current.ModelScale : 1f) / displayedModelScale;
             core.localScale = Vector3.one * (usesModel ? 1f : displayedRadius * 2f * displayedModelScale) * size * pulse;
-            if (atmosphere != null) atmosphere.localScale = Vector3.one * Current.atmosphereScale;
+            if (atmosphere != null) atmosphere.localScale = Vector3.one * Current.AtmosphereScale;
             if (Frozen) { angVel = Vector3.zero; }
             else if (!grabbed)
             {
@@ -275,16 +276,21 @@ namespace Frontier
             }
             punchWas = punch > 0f;
 #if UNITY_EDITOR
-            if (!Mathf.Approximately(Current.surfaceRadius, lastRadius))
+            // Authoring aid for the hand made worlds: the surface collider and the asset's radius follow each other. Generated worlds have no asset.
+            var authored = Current.Authored;
+            if (authored != null)
             {
-                Surface.radius = Mathf.Max(0.01f, Current.surfaceRadius);
-                lastRadius = Surface.radius;
-            }
-            else if (!Mathf.Approximately(Surface.radius, lastRadius))
-            {
-                Current.surfaceRadius = Surface.radius;
-                lastRadius = Surface.radius;
-                UnityEditor.EditorUtility.SetDirty(Current);
+                if (!Mathf.Approximately(authored.surfaceRadius, lastRadius))
+                {
+                    Surface.radius = Mathf.Max(0.01f, authored.surfaceRadius);
+                    lastRadius = Surface.radius;
+                }
+                else if (!Mathf.Approximately(Surface.radius, lastRadius))
+                {
+                    authored.surfaceRadius = Surface.radius;
+                    lastRadius = Surface.radius;
+                    UnityEditor.EditorUtility.SetDirty(authored);
+                }
             }
 #endif
         }

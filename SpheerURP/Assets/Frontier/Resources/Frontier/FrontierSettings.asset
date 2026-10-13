@@ -17,7 +17,6 @@ MonoBehaviour:
   xpPerLevelBase: 40
   toolDamagePerLevel: 0.7
   travelRefundMax: 0.4
-  mapScale: 40
   lightColor: {r: 0.85, g: 0.9, b: 1, a: 1}
   lightIntensity: 1.6
   ambientColor: {r: 0.32, g: 0.34, b: 0.5, a: 1}

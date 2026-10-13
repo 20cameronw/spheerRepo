@@ -21,7 +21,6 @@ namespace Frontier
 
         public int baseBackpackSlots = 9;
         public float baseReactorHealth = 100f;
-        public float fuelPerMapUnit = 1f;
 
         /// <summary>Loads the data asset from Resources, or builds the default content in memory.</summary>
         public static GameDatabase Load()

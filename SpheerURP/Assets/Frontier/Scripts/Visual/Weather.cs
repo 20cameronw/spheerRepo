@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace Frontier
 {
-    /// <summary>Particle weather that hugs the planet's atmosphere. Built per planet from PlanetSO.weather.</summary>
+    /// <summary>Particle weather that hugs the planet's atmosphere. Built per planet from <see cref="PlanetData.Weather"/>.</summary>
     public static class Weather
     {
-        public static void Build(Transform root, PlanetSO p)
+        public static void Build(Transform root, PlanetData p)
         {
-            if (p.weather == WeatherKind.Clear) return;
-            var go = new GameObject("Weather_" + p.weather);
+            if (p.Weather == WeatherKind.Clear) return;
+            var go = new GameObject("Weather_" + p.Weather);
             go.transform.SetParent(root, false);
             var ps = go.AddComponent<ParticleSystem>();
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -27,12 +27,12 @@ namespace Frontier
             var em = ps.emission;
             em.enabled = true;
 
-            Color rim = p.rim;
+            Color rim = p.Rim;
             Color tint;
             float noise = 0f;
             var r = go.GetComponent<ParticleSystemRenderer>();
 
-            switch (p.weather)
+            switch (p.Weather)
             {
                 case WeatherKind.Rain:
                 case WeatherKind.Storm:
@@ -40,7 +40,7 @@ namespace Frontier
                     main.startLifetime = 0.22f;
                     main.startSpeed = new ParticleSystem.MinMaxCurve(-1.6f, -2.4f);
                     main.startSize = new ParticleSystem.MinMaxCurve(0.025f, 0.05f);
-                    em.rateOverTime = p.weather == WeatherKind.Storm ? 260f : 150f;
+                    em.rateOverTime = p.Weather == WeatherKind.Storm ? 260f : 150f;
                     r.renderMode = ParticleSystemRenderMode.Stretch;
                     r.lengthScale = 5f;
                     r.velocityScale = 0.1f;
@@ -101,7 +101,7 @@ namespace Frontier
             r.sharedMaterial = Fx.AddMat(Color.white, Fx.Glow);
             ps.Play();
 
-            if (p.weather == WeatherKind.Storm) go.AddComponent<Lightning>().Init(root, p.rim);
+            if (p.Weather == WeatherKind.Storm) go.AddComponent<Lightning>().Init(root, p.Rim);
         }
     }
 

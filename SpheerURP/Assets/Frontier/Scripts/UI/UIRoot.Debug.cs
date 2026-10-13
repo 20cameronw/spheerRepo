@@ -48,7 +48,7 @@ namespace Frontier
             RefreshModal();
         }
 
-        public void DebugMap(PlanetSO pick, float zoom)
+        public void DebugMap(PlanetData pick, float zoom)
         {
             DebugReset();
             OpenMap();

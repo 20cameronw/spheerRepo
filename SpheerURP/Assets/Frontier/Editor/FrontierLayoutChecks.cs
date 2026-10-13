@@ -117,7 +117,7 @@ namespace Frontier.EditorTools
                     else
                     {
                         Call("CloseModal");
-                        var placed = new PlacedStructure { def = state.db.StructureOfKind(StructureKind.Refinery), planetId = state.planet.id };
+                        var placed = state.StructureAt(state.planet, 0) ?? state.DebugPlace(state.db.StructureOfKind(StructureKind.Refinery), 0);
                         Call("OpenRefinery", placed, host.transform);
                     }
                 }

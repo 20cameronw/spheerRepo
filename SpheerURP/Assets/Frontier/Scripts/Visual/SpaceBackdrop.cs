@@ -46,11 +46,11 @@ namespace Frontier
             }
         }
 
-        static BackdropMood Derive(PlanetSO p)
+        static BackdropMood Derive(PlanetData p)
         {
-            if (p.mood != BackdropMood.Auto) return p.mood;
-            if (p.tier <= 1) return BackdropMood.Calm;
-            switch (p.weather)
+            if (p.Mood != BackdropMood.Auto) return p.Mood;
+            if (p.Tier <= 1) return BackdropMood.Calm;
+            switch (p.Weather)
             {
                 case WeatherKind.Storm: return BackdropMood.Storm;
                 case WeatherKind.Rain: return BackdropMood.Gloom;
@@ -59,15 +59,17 @@ namespace Frontier
                 case WeatherKind.Dust: return BackdropMood.Rush;
                 case WeatherKind.Spores: return BackdropMood.Gloom;
             }
-            int h = Mathf.Abs((p.id ?? "").GetHashCode()) % 3;
+            // Clear skies: a stable pick from the world's visual seed (for the Core Worlds this is the legacy id hash, so the mood is unchanged).
+            int seed = unchecked((int)p.Seed);
+            int h = (seed == int.MinValue ? 0 : Mathf.Abs(seed)) % 3;
             return h == 0 ? BackdropMood.Calm : h == 1 ? BackdropMood.Glow : BackdropMood.Rush;
         }
 
-        public void Apply(PlanetSO p)
+        public void Apply(PlanetData p)
         {
             if (p == null) return;
             target = MakeMood(Derive(p), baseBg);
-            if (p.tier <= 1 && p.mood == BackdropMood.Auto)
+            if (p.Tier <= 1 && p.Mood == BackdropMood.Auto)
             {
                 target.bright *= 0.65f;
                 target.nebMul *= 0.3f;

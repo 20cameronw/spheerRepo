@@ -144,6 +144,9 @@ namespace Frontier
         public SizeClass Size { get { return Descriptor.Size; } }
         public PlanetKind Kind { get { return Descriptor.Kind; } }
         public Hazards Hazards { get { return Descriptor.Hazards; } }
+        /// <summary>Readable biome ("Gas giant", "Lush").</summary>
+        public string BiomeName { get { return Biome == Biome.GasGiant ? "Gas giant" : Biome.ToString(); } }
+        public string SizeName { get { return Size.ToString(); } }
 
         // ---- resources and gather spots --------------------------------------------------------------------------------
 
@@ -199,5 +202,15 @@ namespace Frontier
         }
 
         public override string ToString() { return Name + " [" + Id + "]"; }
+
+        // Worlds are identified by their canonical id: the generated-world cache may hand out a new object for the same world, so
+        // compare with Equals (or .Id), never with ==.
+        public override bool Equals(object obj)
+        {
+            var other = obj as PlanetData;
+            return other != null && string.Equals(other.Id, Id, StringComparison.Ordinal);
+        }
+
+        public override int GetHashCode() { return Id.GetHashCode(); }
     }
 }

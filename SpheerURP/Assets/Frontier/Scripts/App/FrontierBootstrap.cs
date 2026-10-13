@@ -28,6 +28,7 @@ namespace Frontier
             HarnessRunner.PrepareFromCommandLine();
 #endif
             var gs = new GameState(db);
+            new GameObject("App").AddComponent<FrontierApp>().Init(gs);
 
             var cam = sceneCamera != null ? sceneCamera : Camera.main;
             GameObject camGo;

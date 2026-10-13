@@ -84,8 +84,7 @@ namespace Frontier
             OutputDir = Path.GetFullPath(OutputDir);
             string saveDir = Path.Combine(OutputDir, "_save");
             Directory.CreateDirectory(saveDir);
-            string saveFile = Path.Combine(saveDir, "frontier_save.json");
-            if (File.Exists(saveFile)) File.Delete(saveFile);
+            foreach (string file in Directory.GetFiles(saveDir, "frontier_save*")) File.Delete(file);
             GameState.SaveDirectoryOverride = saveDir;
         }
 
@@ -149,7 +148,7 @@ namespace Frontier
             {
                 var def = db.FindStructure(id);
                 if (def == null) continue;
-                gs.structures.Add(new PlacedStructure { planetId = gs.planet.id, def = def, slot = slot, level = 1 + slot % 3 });
+                gs.DebugPlace(def, slot, 1 + slot % 3);
                 slot++;
             }
             foreach (var u in db.upgrades) if (u != null && u.category == UpgradeCategory.Tools) gs.DebugSetUpgrade(u, 2);
@@ -224,7 +223,11 @@ namespace Frontier
 
         void GoTo(string planetId)
         {
-            var p = rt.Db.FindPlanet(planetId);
+            GoTo(rt.State.universe.Get(planetId));
+        }
+
+        void GoTo(PlanetData p)
+        {
             if (p == null) return;
             rt.State.DebugTeleport(p);
             rt.Planet.Show(p, false);
@@ -239,7 +242,7 @@ namespace Frontier
         IEnumerable<Shot> BuildShots()
         {
             var db = rt.Db; var gs = rt.State; var ui = rt.Ui;
-            PlacedStructure At(StructureKind k) { return gs.structures.Find(s => s.planetId == gs.planet.id && s.def.kind == k); }
+            PlacedStructure At(StructureKind k) { return gs.StructureOfKind(gs.planet, k); }
 
             yield return new Shot("hud", ResetView);
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
@@ -259,9 +262,9 @@ namespace Frontier
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
             }
             yield return new Shot("map", () => ui.DebugMap(null, 0.7f), 0.6f);
-            yield return new Shot("map-selected", () => ui.DebugMap(db.FindPlanet("nyx"), 0.9f), 0.6f);
-            yield return new Shot("map-zoom-out", () => ui.DebugMap(db.FindPlanet("glacia"), 0.14f), 0.6f);
-            yield return new Shot("map-zoom-in", () => ui.DebugMap(db.FindPlanet("ferrum"), 1.7f), 0.6f);
+            yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 0.9f), 0.6f);
+            yield return new Shot("map-zoom-out", () => ui.DebugMap(gs.universe.Get("glacia"), 0.14f), 0.6f);
+            yield return new Shot("map-zoom-in", () => ui.DebugMap(gs.universe.Get("ferrum"), 1.7f), 0.6f);
 
             foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Gunner, StructureKind.Laser, StructureKind.Warehouse })
             {

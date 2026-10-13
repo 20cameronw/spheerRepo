@@ -103,7 +103,7 @@ namespace Frontier
             var storage = gs.StorageFor(warehouse);
             int capacity = warehouse.def.StorageCapacity(warehouse.level);
             int used = storage.slots.FindAll(s => s.count > 0).Count;
-            body.Add(UiKit.Text(gs.planet.displayName + "  -  LV " + warehouse.level + "  -  " + used + " / " + capacity + " storage slots", "fr-muted"));
+            body.Add(UiKit.Text(gs.planet.Name + "  -  LV " + warehouse.level + "  -  " + used + " / " + capacity + " storage slots", "fr-muted"));
             body.Add(UiKit.Text("Drag a stack between the grids. Resources stay on this planet. If a stack won't fit, only the amount that fits is moved.", "fr-tiny"));
 
             var packSlots = new List<VisualElement>();

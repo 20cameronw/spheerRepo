@@ -20,10 +20,6 @@ namespace Frontier
         [Tooltip("Share of travel fuel refunded by a perfect travel mini-game (0-1).")]
         [Range(0f, 1f)] public float travelRefundMax = 0.4f;
 
-        [Header("Map")]
-        [Tooltip("Multiplier from map distance to fuel cost distance.")]
-        public float mapScale = 40f;
-
         [Header("Scene")]
         public Color lightColor = new Color(0.85f, 0.9f, 1f);
         public float lightIntensity = 1.6f;
