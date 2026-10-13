@@ -4,230 +4,130 @@ using UnityEngine.UIElements;
 
 namespace Frontier
 {
-    /// <summary>Vector icons drawn with Painter2D so the UI never needs words or imported sprites.</summary>
+    /// <summary>
+    /// Icon system v2. Minimal line icons authored as SVG on a 48-unit grid (2.5 unit stroke, round caps and joins, one
+    /// metaphor each, white) in Resources/Frontier/Icons. Unity's built-in SVG importer turns them into VectorImage assets
+    /// (antialiased arc encoding, resolution independent) and every use tints them with -unity-background-image-tint-color.
+    /// Each SVG carries an invisible full-viewBox rect so the importer keeps the 48x48 grid instead of cropping to the shapes.
+    /// </summary>
     public static class Icons
     {
-        struct Shape
+        /// <summary>Generic glyph for anything without its own icon.</summary>
+        public const string Fallback = "cube";
+        const string Folder = "Frontier/Icons/";
+
+        static readonly Dictionary<string, VectorImage> cache = new Dictionary<string, VectorImage>();
+
+        /// <summary>Every icon the game ships, grouped for the harness contact sheet and for tooling.</summary>
+        public static readonly string[][] Groups =
         {
-            public Vector2[] pts;
-            public bool closed, fill, dim;
-        }
-
-        static Shape S(bool closed, bool fill, params float[] xy)
-        {
-            var p = new Vector2[xy.Length / 2];
-            for (int i = 0; i < p.Length; i++) p[i] = new Vector2(xy[i * 2], xy[i * 2 + 1]);
-            return new Shape { pts = p, closed = closed, fill = fill };
-        }
-
-        static Shape Circle(float cx, float cy, float r, bool fill = false, int n = 22)
-        {
-            var p = new Vector2[n];
-            for (int i = 0; i < n; i++)
-            {
-                float a = i / (float)n * Mathf.PI * 2f;
-                p[i] = new Vector2(cx + Mathf.Cos(a) * r, cy + Mathf.Sin(a) * r);
-            }
-            return new Shape { pts = p, closed = true, fill = fill };
-        }
-
-        static Shape Star(float cx, float cy, float ro, float ri, int points, bool fill)
-        {
-            var p = new Vector2[points * 2];
-            for (int i = 0; i < p.Length; i++)
-            {
-                float a = -Mathf.PI / 2f + i / (float)p.Length * Mathf.PI * 2f;
-                float r = i % 2 == 0 ? ro : ri;
-                p[i] = new Vector2(cx + Mathf.Cos(a) * r, cy + Mathf.Sin(a) * r);
-            }
-            return new Shape { pts = p, closed = true, fill = fill };
-        }
-
-        static Shape Arc(float cx, float cy, float rx, float ry, float rotDeg, float a0Deg, float a1Deg, bool dim = false, int n = 28)
-        {
-            var p = new Vector2[n + 1];
-            float rot = rotDeg * Mathf.Deg2Rad, cr = Mathf.Cos(rot), sr = Mathf.Sin(rot);
-            for (int i = 0; i <= n; i++)
-            {
-                float a = Mathf.Lerp(a0Deg, a1Deg, i / (float)n) * Mathf.Deg2Rad;
-                float x = Mathf.Cos(a) * rx, y = Mathf.Sin(a) * ry;
-                p[i] = new Vector2(cx + x * cr - y * sr, cy + x * sr + y * cr);
-            }
-            return new Shape { pts = p, closed = false, fill = false, dim = dim };
-        }
-
-        static Shape Dim(Shape s) { s.dim = true; return s; }
-
-        static readonly Dictionary<string, Shape[]> Library = new Dictionary<string, Shape[]>
-        {
-            { "map", new[] {
-                Circle(.5f,.5f,.36f, false, 36),
-                Dim(Arc(.5f,.5f,.36f,.13f,0f,0f,360f,false,36)),
-                Arc(.5f,.5f,.15f,.36f,0f,0f,360f,true,36),
-                Dim(S(false, false, .5f,.14f, .5f,.86f)),
-                Arc(.5f,.5f,.47f,.15f,-28f,200f,340f,false,24),
-                Circle(.88f,.34f,.05f,true,12) } },
-            { "build", new[] {
-                Arc(.5f,.62f,.36f,.4f,0f,180f,360f,false,28),
-                S(false, false, .14f,.62f, .86f,.62f),
-                S(false, false, .22f,.62f, .22f,.84f, .78f,.84f, .78f,.62f),
-                Arc(.5f,.84f,.1f,.2f,0f,180f,360f,true,12),
-                S(false, false, .5f,.22f, .5f,.06f), Circle(.5f,.06f,.04f,true,10),
-                Circle(.34f,.46f,.04f,true,10), Circle(.66f,.46f,.04f,true,10) } },
-            { "pack", new[] {
-                Arc(.5f,.42f,.3f,.28f,0f,180f,360f,false,24),
-                S(false, false, .2f,.42f, .16f,.86f, .84f,.86f, .8f,.42f),
-                Arc(.5f,.16f,.1f,.1f,0f,180f,360f,true,12),
-                S(true, true, .3f,.58f, .7f,.58f, .7f,.8f, .3f,.8f),
-                S(false, false, .3f,.66f, .7f,.66f),
-                S(false, false, .5f,.66f, .5f,.72f),
-                Dim(S(false, false, .12f,.5f, .08f,.74f, .13f,.8f)), Dim(S(false, false, .88f,.5f, .92f,.74f, .87f,.8f)) } },
-            { "research", new[] {
-                S(false, false, .38f,.1f, .38f,.4f, .16f,.8f, .2f,.9f, .8f,.9f, .84f,.8f, .62f,.4f, .62f,.1f),
-                S(false, false, .3f,.1f, .7f,.1f),
-                S(false, false, .24f,.7f, .76f,.7f),
-                Circle(.46f,.8f,.04f,true,10), Circle(.6f,.76f,.03f,true,10), Dim(Circle(.5f,.55f,.035f,false,10)) } },
-
-            { "fuel", new[] {
-                S(true, true, .5f,.08f, .74f,.44f, .8f,.62f, .72f,.8f, .5f,.92f, .28f,.8f, .2f,.62f, .26f,.44f) } },
-            { "wood", new[] {
-                S(true, false, .26f,.3f, .86f,.3f, .86f,.7f, .26f,.7f), Circle(.26f,.5f,.2f), Circle(.26f,.5f,.08f),
-                S(false, false, .5f,.42f, .76f,.42f), S(false, false, .5f,.58f, .76f,.58f) } },
-            { "stone", new[] {
-                S(true, true, .12f,.76f, .2f,.44f, .4f,.22f, .66f,.28f, .88f,.54f, .84f,.78f) } },
-            { "iron", new[] {
-                S(true, true, .3f,.3f, .86f,.3f, .7f,.5f, .14f,.5f), S(true, false, .14f,.5f, .7f,.5f, .7f,.76f, .14f,.76f),
-                S(false, false, .7f,.5f, .86f,.3f, .86f,.56f, .7f,.76f) } },
-            { "crystal", new[] {
-                S(true, true, .5f,.06f, .8f,.38f, .5f,.94f, .2f,.38f), S(false, false, .2f,.38f, .8f,.38f),
-                S(false, false, .5f,.06f, .38f,.38f, .5f,.94f), S(false, false, .5f,.06f, .62f,.38f, .5f,.94f) } },
-            { "core", new[] {
-                Circle(.5f,.5f,.38f), S(false, false, .14f,.5f, .3f,.62f, .5f,.68f, .7f,.62f, .86f,.5f), Circle(.36f,.34f,.06f,true) } },
-            { "alarm", new[] {
-                S(true, true, .3f,.76f, .3f,.46f, .4f,.26f, .6f,.26f, .7f,.46f, .7f,.76f),
-                S(false, false, .18f,.76f, .82f,.76f), Circle(.5f,.88f,.06f,true), S(false, false, .5f,.08f, .5f,.16f),
-                S(false, false, .12f,.3f, .2f,.36f), S(false, false, .88f,.3f, .8f,.36f) } },
-            { "refinery", new[] {
-                S(true, true, .1f,.86f, .1f,.46f, .36f,.62f, .36f,.4f, .62f,.62f, .62f,.16f, .82f,.16f, .82f,.86f),
-                S(false, false, .7f,.1f, .74f,.04f) } },
-            { "grid", new[] {
-                Circle(.2f,.2f,.07f,true), Circle(.5f,.2f,.07f,true), Circle(.8f,.2f,.07f,true),
-                Circle(.2f,.5f,.07f,true), Circle(.5f,.5f,.07f,true), Circle(.8f,.5f,.07f,true),
-                Circle(.2f,.8f,.07f,true), Circle(.5f,.8f,.07f,true), Circle(.8f,.8f,.07f,true) } },
-            { "ranks", new[] {
-                S(true, false, .12f,.9f, .12f,.58f, .34f,.58f, .34f,.9f), S(true, false, .38f,.9f, .38f,.3f, .62f,.3f, .62f,.9f),
-                S(true, false, .66f,.9f, .66f,.7f, .88f,.7f, .88f,.9f) } },
-            { "tutorial", new[] {
-                S(true, false, .18f,.14f, .82f,.14f, .82f,.9f, .18f,.9f), S(false, false, .3f,.34f, .7f,.34f),
-                S(false, false, .3f,.52f, .7f,.52f), S(false, false, .3f,.7f, .56f,.7f) } },
-            { "about", new[] { Circle(.5f,.5f,.4f), S(false, false, .5f,.46f, .5f,.72f), Circle(.5f,.3f,.04f,true) } },
-            { "alien", new[] {
-                S(true, false, .2f,.3f, .5f,.1f, .8f,.3f, .72f,.7f, .5f,.9f, .28f,.7f), Circle(.38f,.46f,.07f,true), Circle(.62f,.46f,.07f,true) } },
-            { "tools", new[] { S(false, false, .2f,.8f, .62f,.38f), Circle(.7f,.3f,.18f), S(false, false, .8f,.8f, .3f,.3f) } },
-            { "sound", new[] {
-                S(true, true, .14f,.4f, .34f,.4f, .56f,.2f, .56f,.8f, .34f,.6f, .14f,.6f),
-                S(false, false, .7f,.35f, .78f,.5f, .7f,.65f) } },
-            { "close", new[] { S(false, false, .22f,.22f, .78f,.78f), S(false, false, .78f,.22f, .22f,.78f) } },
-            { "plus", new[] { S(false, false, .5f,.2f, .5f,.8f), S(false, false, .2f,.5f, .8f,.5f) } },
-            { "minus", new[] { S(false, false, .2f,.5f, .8f,.5f) } },
-            { "up", new[] { S(true, true, .5f,.1f, .14f,.52f, .38f,.52f, .38f,.9f, .62f,.9f, .62f,.52f, .86f,.52f) } },
-            { "bolt", new[] { S(true, true, .58f,.06f, .22f,.54f, .46f,.54f, .38f,.94f, .78f,.4f, .54f,.4f) } },
-            { "play", new[] { S(true, true, .28f,.14f, .86f,.5f, .28f,.86f) } },
-            { "star", new[] { Star(.5f,.52f,.44f,.18f,5,true) } },
-            { "gear", new[] { Star(.5f,.5f,.44f,.34f,8,false), Circle(.5f,.5f,.14f) } },
-            { "base", new[] {
-                S(true, false, .1f,.84f, .1f,.5f, .5f,.16f, .9f,.5f, .9f,.84f), S(false, false, .4f,.84f, .4f,.6f, .6f,.6f, .6f,.84f) } },
-            { "warp", new[] {
-                Circle(.5f,.5f,.36f), Circle(.5f,.5f,.16f), S(false, false, .5f,.04f, .5f,.14f), S(false, false, .5f,.86f, .5f,.96f) } },
-            { "skull", new[] {
-                Circle(.5f,.42f,.32f), S(true, false, .36f,.7f, .36f,.9f, .64f,.9f, .64f,.7f),
-                Circle(.38f,.42f,.07f,true), Circle(.62f,.42f,.07f,true) } },
+            new[] { "research", "map", "pack", "build", "menu", "close", "plus", "minus", "up", "back", "check", "lock", "play" },
+            new[] { "fuel", "star", "bolt", "skull", "sound", "mute", "gear", "ranks", "tutorial", "about", "alien", "shield", "tools", "base", "warp", "ship" },
+            new[] { "wood", "stone", "iron", "crystal", "fuel", "core", "scrap", "alloy", "plasma", "cube" },
+            new[] { "refinery", "fabricator", "alarm", "lumber", "mine", "drill", "gunner", "laser", "satellite", "warehouse" }
         };
 
-        public static bool Has(string name) { return Library.ContainsKey(name); }
+        static VectorImage Load(string name)
+        {
+            if (string.IsNullOrEmpty(name)) name = Fallback;
+            VectorImage image;
+            if (cache.TryGetValue(name, out image)) return image;
+            image = Resources.Load<VectorImage>(Folder + name);
+            if (image == null && name != Fallback) image = Load(Fallback);
+            cache[name] = image;
+            return image;
+        }
 
+        public static bool Has(string name)
+        {
+            return !string.IsNullOrEmpty(name) && Resources.Load<VectorImage>(Folder + name) != null;
+        }
+
+        // ------------------------------------------------------------ names
+        static readonly string[] ResourceKinds = { "wood", "stone", "iron", "crystal", "fuel", "alloy", "plasma", "scrap", "core" };
+
+        static readonly string[][] ResourceWords =
+        {
+            new[] { "wood", "log", "timber", "plank", "lumber", "bark", "resin", "sap" },
+            new[] { "stone", "rock", "granite", "basalt", "clay", "sand", "gravel", "mineral", "obsidian" },
+            new[] { "iron", "ore", "metal", "copper", "nickel", "titan", "tin", "lead" },
+            new[] { "crystal", "gem", "prism", "shard", "quartz", "diamond", "jewel" },
+            new[] { "fuel", "gas", "oil", "fluid", "liquid", "water", "ice", "helium", "methane" },
+            new[] { "alloy", "ingot", "plate", "steel", "bronze", "composite" },
+            new[] { "plasma", "energy", "charge", "volt", "battery", "antimatter", "ion" },
+            new[] { "scrap", "junk", "debris", "salvage", "bolt", "cog", "gear", "wreck" },
+            new[] { "core", "xeno", "alien", "relic", "artifact", "organ", "spore", "egg" }
+        };
+
+        /// <summary>Exact id first, then a keyword-based category (so future resource ids get a sensible glyph), then the generic cube.</summary>
         public static string ForResource(ResourceSO r)
         {
-            if (r == null) return "core";
-            string id = (r.id ?? "").ToLower();
-            foreach (var k in new[] { "wood", "stone", "iron", "crystal", "fuel", "core" })
-                if (id.Contains(k)) return k;
-            if (id.Contains("ore") || id.Contains("metal")) return "iron";
-            if (id.Contains("gem")) return "crystal";
-            return "core";
+            if (r == null) return Fallback;
+            return ForResourceId(r.id);
         }
 
-        static readonly Dictionary<string, Texture2D> spriteCache = new Dictionary<string, Texture2D>();
-
-        // These use the redrawn neon vector versions instead of the old bitmap icons.
-        static readonly HashSet<string> VectorOnly = new HashSet<string> { "map", "build", "pack", "research" };
-
-        static Texture2D Sprite(string name)
+        public static string ForResourceId(string id)
         {
-            if (VectorOnly.Contains(name)) return null;
-            Texture2D t;
-            if (!spriteCache.TryGetValue(name, out t))
-            {
-                t = Resources.Load<Texture2D>("Frontier/Icons/" + name);
-                spriteCache[name] = t;
-            }
-            return t;
+            id = (id ?? "").Trim().ToLowerInvariant();
+            if (id.Length == 0) return Fallback;
+            for (int i = 0; i < ResourceKinds.Length; i++)
+                if (id == ResourceKinds[i]) return ResourceKinds[i];
+            for (int i = 0; i < ResourceWords.Length; i++)
+                foreach (var word in ResourceWords[i])
+                    if (id.Contains(word)) return ResourceKinds[i];
+            return Fallback;
         }
 
+        public static string ForStructure(StructureKind kind)
+        {
+            switch (kind)
+            {
+                case StructureKind.Refinery: return "refinery";
+                case StructureKind.Fabricator: return "fabricator";
+                case StructureKind.Alarm: return "alarm";
+                case StructureKind.Lumber: return "lumber";
+                case StructureKind.Mine: return "mine";
+                case StructureKind.Drill: return "drill";
+                case StructureKind.Gunner: return "gunner";
+                case StructureKind.Laser: return "laser";
+                case StructureKind.Satellite: return "satellite";
+                case StructureKind.Warehouse: return "warehouse";
+                default: return Fallback;
+            }
+        }
+
+        public static string ForTool(MinigameKind kind)
+        {
+            return kind == MinigameKind.Chop ? "lumber" : kind == MinigameKind.Mine ? "mine" : "drill";
+        }
+
+        // ------------------------------------------------------------ elements
+        /// <summary>A tinted icon element. Size 0 leaves sizing to the stylesheet (.fr-icon).</summary>
         public static VisualElement Make(string name, Color color, float size = 0f)
         {
             var e = new VisualElement { pickingMode = PickingMode.Ignore };
             e.AddToClassList("fr-icon");
             if (size > 0f) { e.style.width = size; e.style.height = size; e.style.flexShrink = 0; }
-            var tex = Sprite(name);
-            if (tex != null)
-            {
-                e.style.backgroundImage = new StyleBackground(tex);
-                e.style.unityBackgroundImageTintColor = UiKit.Ui(color);
-                return e;
-            }
-            Shape[] shapes;
-            if (!Library.TryGetValue(name, out shapes)) shapes = Library["core"];
-            Color c = UiKit.Ui(color);
-            e.generateVisualContent += ctx =>
-            {
-                var r = e.contentRect;
-                if (r.width < 1f || r.height < 1f) return;
-                float s = Mathf.Min(r.width, r.height);
-                Vector2 o = new Vector2((r.width - s) * 0.5f, (r.height - s) * 0.5f);
-                var p = ctx.painter2D;
-                float lw = Mathf.Max(1.5f, s * 0.05f);
-                p.lineJoin = LineJoin.Round;
-                p.lineCap = LineCap.Round;
-                foreach (var sh in shapes)
-                {
-                    float a = sh.dim ? 0.55f : 1f;
-                    p.lineWidth = lw;
-                    p.strokeColor = new Color(c.r, c.g, c.b, a);
-                    p.fillColor = new Color(c.r, c.g, c.b, 0.22f);
-                    p.BeginPath();
-                    p.MoveTo(o + sh.pts[0] * s);
-                    for (int i = 1; i < sh.pts.Length; i++) p.LineTo(o + sh.pts[i] * s);
-                    if (sh.closed) p.ClosePath();
-                    if (sh.fill) p.Fill();
-                    p.Stroke();
-                }
-            };
-            e.RegisterCallback<GeometryChangedEvent>(_ => e.MarkDirtyRepaint());
+            Apply(e, name, color);
             return e;
         }
 
-        /// <summary>A square neon icon button.</summary>
+        public static void Apply(VisualElement e, string name, Color color)
+        {
+            var image = Load(name);
+            e.style.backgroundImage = image != null ? new StyleBackground(image) : new StyleBackground(StyleKeyword.None);
+            e.style.unityBackgroundImageTintColor = UiKit.Ui(color);
+        }
+
+        /// <summary>A square tonal icon button with a thin accent outline (glow and fill only while pressed).</summary>
         public static Button IconButton(string icon, Color color, System.Action onClick, float size = 0f, bool round = false)
         {
             var b = new Button();
             b.AddToClassList("fr-iconbtn");
             if (round) b.AddToClassList("fr-round");
-            Color c = UiKit.Ui(color);
-            UiKit.Border(b, c, 3f);
-            b.style.backgroundColor = new Color(c.r * 0.12f, c.g * 0.12f, c.b * 0.12f, 0.88f);
-            if (size > 0f) { b.style.width = size; b.style.height = size; }
-            var ic = Make(icon, c);
+            UiKit.SetAccent(b, color);
+            if (size > 0f) { b.style.width = size; b.style.height = size; b.style.minHeight = size; }
+            var ic = Make(icon, color);
             ic.AddToClassList("fr-iconbtn-icon");
             b.Add(ic);
             b.clicked += () => { Sfx.Click(); if (onClick != null) onClick(); };
