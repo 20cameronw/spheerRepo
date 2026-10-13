@@ -4,11 +4,11 @@ Everything that can run without Unity does. Five layers, fastest first:
 
 | Layer | Covers | Needs | Run it | CI |
 |-------|--------|-------|--------|----|
-| **Core tests** (plain .NET) | `Frontier.Core`: the universe generator (99 tests incl. the golden hashes) and the frozen shared enums (4) | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
-| **EditMode** (Unity) | the Core tests again, in the editor's Mono, plus Data/Game tests: storage, waves, planets and models, content integrity, saves (33) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode` | `unity-tests.yml` (needs a licence) |
-| **PlayMode** (Unity) | smoke: the authored database loads, `FrontierBootstrap` builds camera, planet, backdrop, defense, UI and world surface without errors; the universe golden digest on the PlayMode runtime (also runnable on a device) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
+| **Core tests** (plain .NET) | `Frontier.Core`: the universe generator and its flavour text (109 tests incl. the golden hashes) and the engine-free session logic: inventory, progression, world store, save schema/migrator/store/debounce, travel model, frozen shared enums (84): 193 in total | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
+| **EditMode** (Unity) | the Core tests again, in the editor's Mono, plus Data/Game tests: authored worlds, universe service, planet data and models, game state, storage, waves, content integrity, saves with the real `JsonUtility` codec (116): 309 in total | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode` | `unity-tests.yml` (needs a licence) |
+| **PlayMode** (Unity) | smoke (8): the authored database loads, `FrontierBootstrap` builds camera, planet, backdrop, defense, UI and world surface without errors, the app component writes the debounced save, every biome / size / ring / moon / model key renders, travelling between worlds of different sizes keeps the surface consistent; the universe golden digest on the PlayMode runtime (also runnable on a device) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
 | **Check suites** (Unity editor) | the five `Frontier > Validate ...` checks: the pass/fail **gate** for every change | Unity | `tools/run-checks.ps1` | local only |
-| **Screenshot harness** (Unity, GPU) | every screen on four virtual devices + UI lint | Unity + GPU | `tools/capture-screens.ps1` | local only |
+| **Screenshot harness** (Unity, GPU) | 65 screens on each of four virtual devices (the original 45 plus 20 generated-world screens) + UI lint | Unity + GPU | `tools/capture-screens.ps1` | local only |
 
 Why the Core tests run twice: Unity's runner proves the code under the runtime the game actually uses (Mono in the editor), the
 plain .NET project proves it in seconds on any machine and checks the determinism hashes on other operating systems. The same
@@ -33,8 +33,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platf
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-checks.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-checks.ps1 -Only Storage,Layout
 
-# Screens and visual regression (see ARCHITECTURE.md)
+# Screens and visual regression (see ARCHITECTURE.md; acceptance rules below)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920 -Only "gen-,map-generated,menu-debug-teleport"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\image-diff.ps1 -A <runA>\phone-1080x1920 -B <runB>\phone-1080x1920
 ```
 
@@ -46,16 +47,30 @@ timeout) or `3` (no test ran, usually a wrong filter). It never passes `-quit` (
 
 Never let tests or tools touch the real save: set `GameState.SaveDirectoryOverride` first. The EditMode tests do it with
 `SaveSandbox` (`Tests/EditMode/Game/SaveSandbox.cs`), the PlayMode tests in their `SetUp`, the editor checks with
-`CheckSupport.IsolateSaves()`.
+`CheckSupport.IsolateSaves()`. Changes are saved *debounced*, so a test that looks at the file calls `GameState.Flush()` or `Save()`
+first; tests of the debounce itself drive a `FakeClock` instead of waiting (`GameState(db, loadSave, clock)`).
+
+## Screenshot harness acceptance
+
+`tools/capture-screens.ps1` is the visual gate for anything that draws. A run is accepted when it reports **0 errors** (an exception
+inside a shot's setup is recorded, and counted, per device and shot in `report.json`) and the UI lint is **0 / 0 / 0** on all four
+devices (text under 12 dp, touch targets under 48 dp, panels spilling off screen). Compare the static screens with an earlier run
+using `tools/image-diff.ps1` (mean RGB difference per screen, under about 0.5 for a screen nothing should have touched). Some shots
+are never stable: the three mini-game shots start from randomised layouts and differ by about 10 points between *any* two runs, the
+travel game and the wave HUD by a few points, and every world with weather or moons by one or two. The generated-world shots wait
+2.5 s so the backdrop has eased into the world's mood; `-Only "gen-,map-generated,menu-debug-teleport"` captures just those 20
+(names are stable, numbers 46-65).
+Each of them writes the world's `PlanetData.Dump()` to the Unity log (`%TEMP%\frontier-unity-*.log`).
 
 ## Where tests live
 
 ```
 SpheerURP/Assets/Frontier/Tests/
   EditMode/   Frontier.Tests.EditMode (Editor only; references Core, Data, Game; NUnit)
-    Core/       engine-free fixtures that only need Frontier.Core   -> also run by the plain .NET project
-    Universe/   the universe generator tests (namespace Frontier.Universe.Tests)  -> also run by the plain .NET project
-    Game/       fixtures that need ScriptableObjects, GameState, AssetDatabase    -> Unity only
+    Core/       engine-free fixtures that only need Frontier.Core: session services, save, travel  -> also run by the plain .NET project
+    Universe/   the universe generator and planet flavour tests (namespace Frontier.Universe.Tests)  -> also run by the plain .NET project
+    Game/       fixtures that need ScriptableObjects, GameState, AssetDatabase, JsonUtility        -> Unity only
+    Fixtures/   real legacy v1 save files (JSON) written by the original game; read by Game/SaveFormatTests and GameStateTests
   PlayMode/   Frontier.Tests.PlayMode (references everything up to Frontier.App)
 tests/                              plain .NET projects, outside the Unity project (Unity never imports this folder)
   Frontier.Core/Frontier.Core.csproj          netstandard2.1, C# 9, warnings are errors; LINKS Scripts/Core/**/*.cs
@@ -65,13 +80,16 @@ tests/                              plain .NET projects, outside the Unity proje
 
 Where does a new test go?
 
-* Pure logic that only needs `Frontier.Core` (hashing, noise, universe, later score and economy formulas): `Tests/EditMode/Core`
-  (or `Universe`). It must not use `UnityEngine`. It is picked up automatically by Unity **and** by `core-tests.yml`: the csproj
-  globs the folders, so new files need no registration.
-* Needs ScriptableObjects, `GameState`, `AssetDatabase` or models: `Tests/EditMode/Game`.
+* Pure logic that only needs `Frontier.Core` (hashing, noise, universe, inventory, world store, save protocol and migrations,
+  travel, later score and economy formulas): `Tests/EditMode/Core` (or `Universe`). It must not use `UnityEngine` (so no
+  `JsonUtility`: the Core tests use a tiny fake `ISaveCodec`). It is picked up automatically by Unity **and** by `core-tests.yml`:
+  the csproj globs the folders, so new files need no registration.
+* Needs ScriptableObjects, `GameState`, `AssetDatabase`, models or `JsonUtility`: `Tests/EditMode/Game`.
 * Needs a running scene, the UI, rendering or coroutines: `Tests/PlayMode` (`[UnityTest]`). Destroy what you create and restore
   statics (`FrontierRuntime.Clear()`, `GameState.I`).
 * Keep tests deterministic: fixed seeds, no wall-clock thresholds tighter than a few hundred milliseconds.
+* **A migration test starts from a real file.** Run the old build through a representative scenario, store its save under
+  `Tests/EditMode/Fixtures`, and migrate that (see [RUNTIME_MODEL.md](RUNTIME_MODEL.md) section 9).
 
 ## The universe generator and its golden hashes
 
@@ -95,13 +113,36 @@ A failing golden test means generator V1 output changed. That is only acceptable
 `Universe.cs`); V1 stays frozen and its goldens keep passing. Never "fix" a golden constant to make a test green.
 Print the current values with `-OutputMatch "digest"`.
 
+## Session, save and planet tests
+
+What proves the foundation (the id based session services, save v2 and the runtime planet; see [RUNTIME_MODEL.md](RUNTIME_MODEL.md)):
+
+* **Inventory parity** (`Core/InventoryParityTests`): a copy of the *original* `GameState` inventory algorithm lives inside the test as
+  an oracle and is compared with `Inventory` over more than 10,000 seeded random operations (add, spend, free space, craft fit) with
+  varied stack sizes and capacities. `ProgressionTests` does the same for the level curve.
+* **Save** (`Core/SaveMigratorTests`, `SaveStoreTests`, `SaveDebouncerTests`; `Game/SaveFormatTests`, `SaveRoundTripTests`,
+  `GameStateTests`): v1 -> v2 migration from a real v1 fixture (structures, warehouses with contents, waves, upgrades, xp, a non
+  start planet), the v2 round trip through the real `JsonUtility` codec, a corrupt primary recovered from the backup, a leftover temp
+  file recovered, a future schema version loaded read-only and never overwritten, unknown ids dropped with warnings, and the
+  debounce / flush behaviour driven by a `FakeClock`.
+* **Authored worlds** (`Game/AuthoredWorldsTests`): all 30 `PlanetSO` converted, ids unique, the canonical id to key table frozen
+  (a golden table), the tier at each system's position against its authored tiers, valid deposits, no generated system overlapping
+  an authored one, two builds identical.
+* **Generated planets** (`Game/UniverseServiceTests`, `PlanetRuntimeTests`, `PlanetBiomeTests`): 500 random generated planets resolve
+  with finite colours, a model key that exists in the `ModelLibrary`, at least 12 slots, a world size in range, gather spots that
+  include scrap and a stable visual seed; every biome and size class can be found quickly enough for a debug menu; the authoring
+  `PlanetBiome` enum equals the generator's. `Universe/PlanetFlavorTests` covers the generated descriptions (never empty, well
+  formed, varied, deterministic, independent hash streams).
+* **Travel** (`Core/TravelModelTests`): a same-system hop is cheaper than any inter-system hop, cost never decreases with distance,
+  at least 1, Sylva to Glacia is 5.
+
 ## The check suites (the gate)
 
 Every change must keep all five passing, and the Unity log must show no `warning CS` from Frontier code:
 
 | Suite | Menu item / method | Asserts |
 |-------|--------------------|---------|
-| Planet | `Frontier > Validate Planet Model Sizes` / `FrontierPlanetChecks` | source models import at unit size, planet models fit diameter 3, structure diameters and tier capacities, map route endpoints and orbital joins |
+| Planet | `Frontier > Validate Planet Model Sizes` / `FrontierPlanetChecks` | source models import at unit size, planet models fit diameter 3, structure diameters and tier capacities, map route endpoints and orbital joins, baked model ground radii match a fresh measurement (fix: `Frontier > Bake Model Ground Radii`) |
 | Storage | `Frontier > Validate Warehouse Storage` / `FrontierStorageChecks` | warehouse capacity, transfers, conservation, isolation, upgrades, persistence, full backpack |
 | Combat | `Frontier > Validate Combat Balance` / `FrontierCombatChecks` | repeatable previews for fuel 1-40 on every planet, monotonic rewards and difficulty, wave prefixes 1-20, selection shader import |
 | Icons | `Frontier > Validate Icons` / `FrontierIconChecks` | 48 icons import as 48x48 `VectorImage`, every SVG listed, every resource and structure has its own glyph |
@@ -121,7 +162,7 @@ command once.
 
 Runs on every push and pull request on `ubuntu-latest` and `windows-latest`: `actions/setup-dotnet` (8.0.x), then
 `dotnet test` from `tests/` (where `global.json` pins the 8.0 SDK even though runners carry newer ones). It compiles
-`Frontier.Core` as netstandard2.1 / C# 9 with warnings as errors (what Unity compiles) and runs the 103 Core tests, so the golden
+`Frontier.Core` as netstandard2.1 / C# 9 with warnings as errors (what Unity compiles) and runs the 193 Core tests, so the golden
 hashes are verified on both operating systems. Results are uploaded as `.trx` artifacts.
 
 ### `unity-tests.yml` (needs a Unity licence from the repository owner)

@@ -36,16 +36,36 @@ tier (up to 63).
 Planet and structure source FBX import scales are calibrated to common units, and each `ModelLibrary` entry stores a
 measured correction for its assembled prefab. **Frontier > Calibrate Model Scales** repeats this after replacing models.
 
-All planets keep a displayed radius of 1.5 and atmosphere scale 5. Logical **World Size** grows with depth (1.00 to 2.12),
-shrinking buildings, pads and pick colliders proportionally, while **Building Slots** grows from 12 to 40. Both are authored
-on each `PlanetSO`, independent of display size. Saved buildings keep their slot positions. **Validate Planet Model Sizes**
-checks calibrated mesh diameters and capacity.
+All planets keep a displayed radius of 1.5 and atmosphere scale 5. Logical **World Size** grows with depth (1.00 to 2.12 for the
+Core Worlds), shrinking buildings, pads and pick colliders proportionally, while **Building Slots** grows from 12 to 40. The Core
+Worlds author both on their `PlanetSO`; a generated world takes them from its size class (Dwarf, Small, Medium, Large, Giant,
+Colossal: World Size 1.00, 1.15, 1.40, 1.75, 2.10, 2.50 and 12, 16, 24, 36, 48, 64 slots). Saved buildings keep their slot
+positions. **Validate Planet Model Sizes** checks calibrated mesh diameters and capacity.
+
+Some meshes have a visible body smaller than their bounds (spiky or lens shaped models), so each `ModelLibrary` entry also carries a
+baked **ground scale** (`Frontier > Bake Model Ground Radii`): a generated world's ground radius is 1.5 times it, which keeps pads
+and buildings touching the surface while the planet keeps its on-screen size. A generated world is never larger or smaller on
+screen than a Core World; only its pads and buildings scale.
 
 Menu > Settings > **Structure Labels** switches between always-visible and selected-only labels and remembers the choice.
 
 Travel plays the departure warp first, the flight mini-game second and the destination approach last. The star map separates
 the six solar systems into three spiral galaxy regions; curved departure/arrival tangents and a moving ship show the route.
-The map is illustrative, not a gravity simulation, and its spacing does not change fuel costs.
+The map is illustrative and does not set the price: fuel comes from `TravelModel` ([RUNTIME_MODEL.md](RUNTIME_MODEL.md) section 6),
+`min(3 + AU, 8)` inside a system and `11 + 0.017 x light-years` between systems, scaled by the engine efficiency upgrades, at least
+1 (Sylva to Glacia is 5). Every arrival is recorded: the world's visits and first visit, the number of worlds landed on and the
+farthest distance from home. If the current world is generated, the map shows a marker for it and a short info line; the full map
+for generated space is a later work package.
+
+## Saves
+
+Progress is saved to `frontier_save.json` (schema v2: the player's state plus *deltas*, only what the player changed on each
+world; see [RUNTIME_MODEL.md](RUNTIME_MODEL.md) section 7). Changes are written about a second after the last one (at most 10 s
+after the first), and immediately when the app is paused, loses focus or quits, and when the player travels. Each write goes
+through a temp file that is verified before it replaces the old save, and the previous good save is kept as
+`frontier_save.json.bak`; if the main file is damaged the game loads the backup. An old v1 save is migrated on first start (the
+original is kept as `frontier_save.v1.bak.json`). A save written by a newer version of the game is played read-only and never
+overwritten. **Menu > Settings > Reset Progress** (and **Frontier > Reset Save**) delete all of these files.
 
 ## Panel layout
 
@@ -59,16 +79,23 @@ Sizes, colours, fonts and icons follow [DESIGN.md](DESIGN.md).
 
 ## Procedural worlds
 
-`PlanetGenerator` builds deterministic worlds (biome palettes, capacity, gather spots) and **Frontier > Generate Deep Space
-Planets** persists them as assets. The infinite, coordinate-driven universe that replaces this is described in the roadmap and its
-generator already exists (next section).
+Every planet the player can visit comes from the universe generator (next section); the 30 hand made **Core Worlds** are authored
+content inside that same universe (`PlanetSO` assets, merged by `AuthoredWorlds`). `PlanetGenerator` and **Frontier > Generate Deep
+Space Planets** remain as an authoring tool that persists extra `PlanetSO` assets; they no longer define the playable universe.
 
-## Universe core (generator V1, not wired into gameplay yet)
+All generator biomes render: Lush, Mineral, Glacial, Volcanic, Fungal, Crystal, Obsidian, Shattered, Desert, Oceanic, Gas giant and
+Barren, with every size class, rings, up to seven moons and every weather kind. A generated world gets a short deterministic
+description (biome, weather, hazards, size, rings and moons) and a stable 64 bit visual seed, so it looks the same on every device
+and run. **Menu > Debug > Generated world** (editor and development builds only) teleports to a world with a chosen biome, size and
+minimum tier, and **Dump descriptor** copies the current world's descriptor to the log and the clipboard.
+
+## Universe core (generator V1)
 
 `Frontier.Core/Universe` (namespace `Frontier.Universe`, `Scripts/Core/Universe`) is the engine-free generator behind the infinite
 map of [ROADMAP.md](ROADMAP.md) section 4. It is a pure function of `(UniverseConfig.Seed, GeneratorVersion, authored content,
-coordinates)`; only deltas will ever be saved. Nothing in the game calls it yet: turning it into `PlanetData`, the map and travel
-are the `m3-*` work packages.
+coordinates)`; only deltas are ever saved. The game reaches it through `UniverseService` (planets as `PlanetData`, lookups by id,
+travel pricing); the map and travel UI that exploit the whole universe are the `m3-*` work packages. How the pieces fit together
+is in [RUNTIME_MODEL.md](RUNTIME_MODEL.md).
 
 * **Coordinates and ids.** Positions are doubles in light-years, home at (0, 0), a sector is 64 ly. Ids are exact bit packings
   (`SectorCoord`, `SystemKey`, `PlanetKey`; string forms like `s:X:Y:I`), never hashes.

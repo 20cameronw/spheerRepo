@@ -552,3 +552,35 @@ What I cannot verify from this machine: on-device performance, touch/haptics, au
 Phase A acceptance: harness produces ≥ 40 screens × 4 sizes; purge compiles clean and all existing checks pass; ≥ 25 EditMode tests green; save v1 → v2 migration fixture passes; new dock/top-bar/menu icons and **unique glyphs for the 9 existing resources** reviewed by you (the remaining resource glyphs arrive with `m4-resource-taxonomy`).
 
 The authoritative todo list with dependencies lives in the session database (`todos`, `todo_deps`).
+
+---
+
+## Progress
+
+### Foundation rework: runtime planet model, session split, save v2 (done on this branch)
+
+Covers `m2-session-split`, `m2-save-v2`, `m3-planet-data-adapter` and the interim part of `m3-travel-system`; closes audit findings E1
+(`GameState` monolith), E2 (synchronous, non-atomic save), E4 (`string.GetHashCode` seeds) and the `PlanetSO`-as-runtime-type half
+of E3. As built, with types, data flow, save schema and the migration policy: [RUNTIME_MODEL.md](RUNTIME_MODEL.md).
+
+* **Every planet is a `PlanetData`.** It wraps a generator `PlanetDescriptor` plus the optional authored `PlanetSO`; the 30 Core
+  Worlds are authored content merged into the same universe (`AuthoredWorlds`, `UniverseService`) at distances where the tier
+  formula matches their tiers (Sylva at the origin, the `edge` system at about 1,300 ly). All twelve generator biomes, every size
+  class, rings and moons render; visual seeds are stable 64 bit values, never string hashes.
+* **`GameState` is a facade** over engine-free Core services (`Inventory`, `Progression`, `WorldStore` + `PlayerStats`, `TravelModel`,
+  `IClock`), all id based, unit-tested and compiled by the plain .NET project. The inventory is proven against a copy of the old
+  algorithm over 10,000+ random operations.
+* **Save v2** stores only deltas per canonical planet id; atomic write with verification, rolling `.bak`, recovery from backup and
+  temp file, read-only mode for saves from a newer build, a v1 migrator tested against a real v1 file, and a debounced writer
+  (1.0 s quiet, 10 s cap; plan said about 1.5 s) with immediate flush on pause, focus loss, quit and travel.
+* **Interim travel** (`TravelModel`: orbit distance inside a system, light-years between systems) records visits, first visits and
+  the stats behind the future Frontier Score.
+* **Numbers.** EditMode 309, PlayMode 8, plain .NET 193 tests; the five check suites pass; the harness renders 65 screens on each
+  of four devices with 0 errors and UI lint 0 / 0 / 0.
+
+Open items this leaves for the next packages: the star map and Worlds card for generated space (`m3-map-ui`: semantic zoom, fog of
+war; today a generated world is only a marker), the real travel rules (`m3-travel-system`: jump range, energy-dense fuels,
+multi-hop), a stored generator version per discovered planet before any generator V2, dedicated mini-games for Siphon, Excavate,
+Salvage and Harvest deposits (`HarvestMapping` borrows the nearest existing one), and a device run of the determinism digest on
+IL2CPP/ARM64. Core Worlds that use the spiky or lens shaped models keep their authored `surfaceRadius`, so their buildings can still
+float slightly (generated worlds use a baked per-model ground radius).

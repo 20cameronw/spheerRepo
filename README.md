@@ -13,7 +13,8 @@ data-driven ScriptableObjects.
 2. Open the `SpheerURP` folder as a project.
 3. Open `Assets/Frontier/Scenes/Frontier.unity` and press Play. Everything else is created from code and the data assets.
 
-Saves live in `Application.persistentDataPath/frontier_save.json`. **Frontier > Reset Save** deletes it.
+Saves live in `Application.persistentDataPath/frontier_save.json` (written atomically, with a rolling `frontier_save.json.bak`; the old
+v1 format is migrated on first start). **Frontier > Reset Save** deletes them.
 
 ## Tools
 
@@ -25,7 +26,7 @@ Saves live in `Application.persistentDataPath/frontier_save.json`. **Frontier > 
 | Compare two capture runs | `tools/image-diff.ps1` |
 | Apply the mobile baseline (portrait, IL2CPP, ARM64) | **Frontier > Apply Mobile Project Settings** |
 
-Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); how to run and extend the tests (and what CI needs) is in [docs/TESTING.md](docs/TESTING.md).
+Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); the world, session and save model is in [docs/RUNTIME_MODEL.md](docs/RUNTIME_MODEL.md); how to run and extend the tests (and what CI needs) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Documents
 
@@ -35,6 +36,7 @@ Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITE
 | [docs/AUDIT.md](docs/AUDIT.md) | baseline UI audit from real screenshots and lint numbers, plus the after-tokens/icons results |
 | [docs/DESIGN.md](docs/DESIGN.md) | design system: tokens, type scale, spacing, hierarchy rules, icon system and how to extend them |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | assemblies and dependency rules, code map, rules, tooling |
+| [docs/RUNTIME_MODEL.md](docs/RUNTIME_MODEL.md) | how worlds, the game session and the save file fit together: types, data flow, ids, save schema v2, migration policy, how to add a field |
 | [docs/TESTING.md](docs/TESTING.md) | tests, check suites, CI workflows and what the owner must set up |
-| [docs/SYSTEMS.md](docs/SYSTEMS.md) | how combat, warehouses, sizing, travel and panels behave today |
+| [docs/SYSTEMS.md](docs/SYSTEMS.md) | how combat, warehouses, sizing, travel, saves and panels behave today |
 | [docs/LEGACY_REMOVED.md](docs/LEGACY_REMOVED.md) | what was removed from the old prototype and how to recover it |
