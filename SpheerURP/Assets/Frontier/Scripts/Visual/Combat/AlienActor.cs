@@ -59,7 +59,7 @@ namespace Frontier
                     var materials = new Material[renderer.sharedMaterials.Length];
                     for (int i = 0; i < materials.Length; i++)
                     {
-                        Color tint = Color.Lerp(new Color(0.08f, 0.1f, 0.16f), UiKit.Ui(baseColor), (layer++ % 2) == 0 ? 0.75f : 0.35f);
+                        Color tint = Color.Lerp(new Color(0.08f, 0.1f, 0.16f), Fx.Displayable(baseColor), (layer++ % 2) == 0 ? 0.75f : 0.35f);
                         var material = new Material(Fx.PlanetShader);
                         material.SetColor("_BaseColor", tint);
                         material.SetColor("_AltColor", tint * 0.4f);

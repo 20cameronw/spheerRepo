@@ -6,7 +6,7 @@ namespace Frontier
 {
     public class PlanetView : MonoBehaviour
     {
-        public const float Radius = 1.5f;
+        public const float Radius = PlanetSO.StandardSurfaceRadius;
 
         Transform core;
         Material coreMat;

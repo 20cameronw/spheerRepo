@@ -17,6 +17,9 @@ namespace Frontier
     [CreateAssetMenu(fileName = "New Planet", menuName = "Frontier/Planet")]
     public class PlanetSO : ScriptableObject
     {
+        /// <summary>Standard planet ground radius (world units). The single source of truth; <c>PlanetView.Radius</c> aliases it.</summary>
+        public const float StandardSurfaceRadius = 1.5f;
+
         public string id;
         public string displayName;
         [TextArea] public string description;
@@ -52,7 +55,7 @@ namespace Frontier
         public string ModelKey { get { return !string.IsNullOrEmpty(modelKey) ? modelKey : id; } }
         [Tooltip("Radius of the planet's ground SphereCollider. Structures sit on this sphere; satellites orbit above it. 1.5 = standard. " +
                  "In Play mode you can also edit the collider on PlanetRoot/Spin/Surface and it saves back here.")]
-        public float surfaceRadius = PlanetView.Radius;
+        public float surfaceRadius = StandardSurfaceRadius;
         [Tooltip("Multiplier on the standard planet model size (every model is first fitted to the same diameter).")]
         public float modelScale = 1f;
         [Tooltip("Atmosphere sphere diameter (Transform scale). Default is 5 on every world.")]

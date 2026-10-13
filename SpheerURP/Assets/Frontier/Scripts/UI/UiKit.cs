@@ -44,9 +44,7 @@ namespace Frontier
         /// <summary>Clamps an HDR resource color into displayable UI space.</summary>
         public static Color Ui(Color c, float alpha = 1f)
         {
-            float m = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
-            if (m > 1f) c = new Color(c.r / m, c.g / m, c.b / m);
-            return new Color(c.r, c.g, c.b, alpha);
+            return Fx.Displayable(c, alpha);
         }
 
         /// <summary>The stylesheet accent class (.fr-acc-*) nearest to a colour; data-driven colours snap to the palette.</summary>

@@ -1,0 +1,16 @@
+{
+    "name": "Frontier.Data",
+    "rootNamespace": "Frontier",
+    "references": [
+        "Frontier.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

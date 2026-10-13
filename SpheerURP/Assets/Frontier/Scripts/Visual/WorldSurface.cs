@@ -227,7 +227,7 @@ namespace Frontier
             }
             PrepareStructure(it, c);
             if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
-            it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, UiKit.Ui(c), 1.0f, 0.34f, out it.labelRenderer);
+            it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, Fx.Displayable(c), 1.0f, 0.34f, out it.labelRenderer);
             it.phase = s.slot * 0.4f;
             it.orbit = s.def.kind == StructureKind.Satellite;
             return it;
@@ -250,7 +250,7 @@ namespace Frontier
                     var src = source[i];
                     Color tint = src != null && src.HasProperty("_BaseColor") ? src.GetColor("_BaseColor")
                         : src != null && src.HasProperty("_Color") ? src.GetColor("_Color") : Color.gray;
-                    var material = Lit(UiKit.Ui(tint));
+                    var material = Lit(Fx.Displayable(tint));
                     if (src != null && src.HasProperty("_BaseMap"))
                         material.SetTexture("_BaseMap", src.GetTexture("_BaseMap"));
                     material.SetFloat("_Smoothness", 0.25f);
@@ -270,7 +270,7 @@ namespace Frontier
                 outline.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 outline.receiveShadows = false;
                 var props = new MaterialPropertyBlock();
-                props.SetColor("_Color", UiKit.Ui(color) * 2f);
+                props.SetColor("_Color", Fx.Displayable(color) * 2f);
                 props.SetFloat("_Width", 0.018f * view.Current.StructureScale);
                 outline.SetPropertyBlock(props);
                 outline.enabled = false;

@@ -64,6 +64,14 @@ namespace Frontier
         public static Texture2D Glow { get { if (glow == null) glow = MakeRadial(128, 2.2f, false); return glow; } }
         public static Texture2D Ring { get { if (ring == null) ring = MakeRadial(128, 1f, true); return ring; } }
 
+        /// <summary>Clamps an HDR resource/accent colour into displayable range (largest channel at most 1), keeping its hue.</summary>
+        public static Color Displayable(Color c, float alpha = 1f)
+        {
+            float m = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
+            if (m > 1f) c = new Color(c.r / m, c.g / m, c.b / m);
+            return new Color(c.r, c.g, c.b, alpha);
+        }
+
         static Texture2D MakeRadial(int size, float power, bool asRing)
         {
             var t = new Texture2D(size, size, TextureFormat.RGBA32, true) { wrapMode = TextureWrapMode.Clamp };

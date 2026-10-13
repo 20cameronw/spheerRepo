@@ -58,7 +58,7 @@ namespace Frontier
             p.worldSize = 1f + tier * 0.16f;
             p.buildingSlots = 12 + tier * 4;
             p.danger = 0.6f + tier * 1.1f;
-            p.surfaceRadius = PlanetView.Radius;
+            p.surfaceRadius = PlanetSO.StandardSurfaceRadius;
             p.modelScale = 1f;
             p.atmosphereScale = 5f;
 

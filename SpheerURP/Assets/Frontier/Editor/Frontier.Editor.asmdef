@@ -1,0 +1,23 @@
+{
+    "name": "Frontier.Editor",
+    "rootNamespace": "Frontier.EditorTools",
+    "references": [
+        "Frontier.Core",
+        "Frontier.Data",
+        "Frontier.Game",
+        "Frontier.Visual",
+        "Frontier.UI",
+        "Frontier.App"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

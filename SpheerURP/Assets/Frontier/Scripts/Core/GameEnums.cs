@@ -1,7 +1,7 @@
-using System;
-
 namespace Frontier
 {
+    // Plain data enums shared by every layer. They live in Frontier.Core (no engine references), so ScriptableObjects,
+    // game logic, rendering and the pure universe/economy code can all use them. Serialized values are the integers: never reorder.
     public enum MinigameKind { Chop, Mine, Drill }
 
     public enum UpgradeCategory { Tools, Ship, Defense }
@@ -44,19 +44,6 @@ namespace Frontier
         public static MinigameKind Game(this StructureKind k)
         {
             return k == StructureKind.Lumber ? MinigameKind.Chop : k == StructureKind.Mine ? MinigameKind.Mine : MinigameKind.Drill;
-        }
-    }
-
-    [Serializable]
-    public struct ItemAmount
-    {
-        public ResourceSO resource;
-        public int amount;
-
-        public ItemAmount(ResourceSO resource, int amount)
-        {
-            this.resource = resource;
-            this.amount = amount;
         }
     }
 }
