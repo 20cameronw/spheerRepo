@@ -535,7 +535,7 @@ namespace Frontier
             }
 
             // Generous screen-space fallback: anything visible near the tap counts.
-            float best = 95f * Mathf.Max(0.6f, Screen.height / 1080f);
+            float best = 95f * Mathf.Max(0.6f, ScreenMetrics.Height / 1080f);
             Item pick = null;
             foreach (var list in new[] { items, pads })
                 foreach (var it in list)
@@ -555,6 +555,14 @@ namespace Frontier
             Sfx.Click();
             if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
             else if (SlotTapped != null) SlotTapped(it.slot, it.t);
+        }
+
+        /// <summary>Taps a placed structure exactly as a finger would (harness and tests).</summary>
+        public bool SimulateTap(PlacedStructure structure)
+        {
+            foreach (var it in items)
+                if (it.structure == structure && it.t != null) { Tap(it); return true; }
+            return false;
         }
     }
 }

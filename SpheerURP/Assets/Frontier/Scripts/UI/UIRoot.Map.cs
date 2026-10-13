@@ -230,7 +230,7 @@ namespace Frontier
                 if (lastPinch > 1f && d > 1f)
                 {
                     Vector2 mid = (a + b) * 0.5f;
-                    Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(mid.x, Screen.height - mid.y));
+                    Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(mid.x, ScreenMetrics.Height - mid.y));
                     ZoomAt(mapView.WorldToLocal(pp), d / lastPinch);
                 }
                 lastPinch = d;

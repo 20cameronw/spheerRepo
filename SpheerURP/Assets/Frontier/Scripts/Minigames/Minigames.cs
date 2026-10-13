@@ -82,7 +82,7 @@ namespace Frontier
 
         bool SyncStage()
         {
-            float k = Mathf.Min(Screen.width, Screen.height) / Mathf.Max(100f, FrontierSettings.I.uiReferenceHeight);
+            float k = ScreenMetrics.ShortSide / Mathf.Max(100f, FrontierSettings.I.uiReferenceHeight);
             if (!stage.Resize(ArenaW * k, ArenaH * k)) return false;
             arena.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(stage.rt));
             arena.style.backgroundSize = new BackgroundSize(Length.Percent(100f), Length.Percent(100f));

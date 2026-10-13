@@ -196,7 +196,7 @@ namespace Frontier
             if (IsOverUi != null && IsOverUi(sp)) return;
             tapCooldown = 0.1f;
 
-            AlienActor best = null; float bd = Screen.height * 0.09f;
+            AlienActor best = null; float bd = ScreenMetrics.Height * 0.09f;
             foreach (var a in AlienActor.All)
             {
                 if (a == null || !OnScreen(a.transform.position)) continue;
@@ -259,5 +259,10 @@ namespace Frontier
             else Sfx.Bad();
             if (WaveEnded != null) WaveEnded(result);
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        /// <summary>Ends the active wave immediately (screenshot harness and tests).</summary>
+        public void DebugEnd(bool victory) { End(victory); }
+#endif
     }
 }

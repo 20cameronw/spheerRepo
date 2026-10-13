@@ -36,7 +36,7 @@ namespace Frontier
         public bool IsOverUi(Vector2 screenPos)
         {
             if (root == null || root.panel == null) return false;
-            var p = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screenPos.x, Screen.height - screenPos.y));
+            var p = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screenPos.x, ScreenMetrics.Height - screenPos.y));
             return root.panel.Pick(p) != null;
         }
 
@@ -98,12 +98,13 @@ namespace Frontier
         // ------------------------------------------------------------ responsive layout
         void ApplyLayout(bool force)
         {
-            var sa = Screen.safeArea;
-            if (!force && Screen.width == lastW && Screen.height == lastH && sa == lastSafe) return;
-            lastW = Screen.width; lastH = Screen.height; lastSafe = sa;
-            float scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / 1080f) * UiBoost;
+            var sa = ScreenMetrics.SafeArea;
+            int sw = ScreenMetrics.Width, sh = ScreenMetrics.Height;
+            if (!force && sw == lastW && sh == lastH && sa == lastSafe) return;
+            lastW = sw; lastH = sh; lastSafe = sa;
+            float scale = Mathf.Max(0.2f, ScreenMetrics.ShortSide / 1080f) * UiBoost;
             if (panelSettings != null) panelSettings.scale = scale;
-            inset = new Vector4(sa.xMin / scale, (Screen.height - sa.yMax) / scale, (Screen.width - sa.xMax) / scale, sa.yMin / scale);
+            inset = new Vector4(sa.xMin / scale, (sh - sa.yMax) / scale, (sw - sa.xMax) / scale, sa.yMin / scale);
             hud.style.left = inset.x; hud.style.top = inset.y;
             hud.style.right = inset.z; hud.style.bottom = inset.w;
             if (waveHud != null)

@@ -64,7 +64,17 @@ namespace Frontier
         readonly Dictionary<string, int> wavesCleared = new Dictionary<string, int>();
         readonly List<WarehouseStorage> warehouses = new List<WarehouseStorage>();
 
-        static string SavePath { get { return Path.Combine(Application.persistentDataPath, "frontier_save.json"); } }
+        /// <summary>Redirects the save file (screenshot harness, tests) so they never touch the player's real save.</summary>
+        public static string SaveDirectoryOverride;
+
+        static string SavePath
+        {
+            get
+            {
+                string dir = string.IsNullOrEmpty(SaveDirectoryOverride) ? Application.persistentDataPath : SaveDirectoryOverride;
+                return Path.Combine(dir, "frontier_save.json");
+            }
+        }
 
         public GameState(GameDatabase db, bool loadExistingSave = true)
         {

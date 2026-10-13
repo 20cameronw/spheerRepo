@@ -86,7 +86,7 @@ namespace Frontier
                 Vector3 sp = cam.WorldToScreenPoint(popupAnchor.TransformPoint(Vector3.up * 0.35f));
                 if (sp.z > 0f)
                 {
-                    Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(sp.x, Screen.height - sp.y));
+                    Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(sp.x, ScreenMetrics.Height - sp.y));
                     pp = popupLayer.WorldToLocal(pp);
                     left = Mathf.Clamp(pp.x - w * 0.5f, 0f, Mathf.Max(0f, rw - w));
                     top = Mathf.Clamp(pp.y - h - 24f, 0f, Mathf.Max(0f, rh - h));

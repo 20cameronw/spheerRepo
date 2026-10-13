@@ -24,6 +24,9 @@ namespace Frontier
             Application.targetFrameRate = cfg.targetFrameRate;
 
             var db = database != null ? database : GameDatabase.Load();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            HarnessRunner.PrepareFromCommandLine();
+#endif
             var gs = new GameState(db);
 
             var cam = sceneCamera != null ? sceneCamera : Camera.main;
@@ -59,7 +62,7 @@ namespace Frontier
 
             var panel = panelSettings != null ? panelSettings : ScriptableObject.CreateInstance<PanelSettings>();
             panel.scaleMode = PanelScaleMode.ConstantPixelSize;
-            panel.scale = Mathf.Max(0.2f, Mathf.Min(Screen.width, Screen.height) / Mathf.Max(100f, cfg.uiReferenceHeight));
+            panel.scale = Mathf.Max(0.2f, ScreenMetrics.ShortSide / Mathf.Max(100f, cfg.uiReferenceHeight));
             panel.clearColor = false;
             if (panel.themeStyleSheet == null) panel.themeStyleSheet = Resources.Load<ThemeStyleSheet>("Frontier/FrontierTheme");
 
@@ -86,6 +89,15 @@ namespace Frontier
             defense.IsOverUi = ui.IsOverUi;
             defense.World = surface;
             ui.Init(doc, gs, defense, planet, backdrop, surface, cam);
+
+            FrontierRuntime.Publish(new FrontierRuntime
+            {
+                Db = db, State = gs, Camera = cam, Backdrop = backdrop, Planet = planet,
+                Defense = defense, Surface = surface, Ui = ui, Document = doc
+            });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (HarnessRunner.Requested) new GameObject("Harness").AddComponent<HarnessRunner>().Begin(FrontierRuntime.Current);
+#endif
         }
     }
 
@@ -100,7 +112,7 @@ namespace Frontier
         void LateUpdate()
         {
             if (cam == null) return;
-            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            float aspect = ScreenMetrics.Aspect;
             if (Mathf.Approximately(aspect, lastAspect)) return;
             lastAspect = aspect;
             const float need = 3.5f;
