@@ -7,30 +7,39 @@ forbidden dependency (a data asset reaching into rendering, game logic reaching 
 
 ```mermaid
 flowchart BT
-  Core["<b>Frontier.Core</b><br/>pure C#, no UnityEngine<br/>enums, universe generator (next)"]
+  Core["<b>Frontier.Core</b><br/>pure C#, no UnityEngine<br/>shared enums, universe generator"]
   Data["<b>Frontier.Data</b><br/>ScriptableObjects, GameDatabase,<br/>ModelLibrary, DefaultContent"]
   Game["<b>Frontier.Game</b><br/>GameState: inventory, upgrades,<br/>structures, storage, waves, save"]
   Visual["<b>Frontier.Visual</b><br/>planet, backdrop, weather, world surface,<br/>Fx/Sfx, ScreenMetrics, combat"]
   UI["<b>Frontier.UI</b><br/>UI Toolkit screens, UiKit, Icons,<br/>mini-games"]
   App["<b>Frontier.App</b><br/>FrontierBootstrap, FrontierRuntime,<br/>screenshot harness + UI lint"]
   Editor["<b>Frontier.Editor</b> (Editor only)<br/>menus, check suites, tools"]
+  TE["<b>Frontier.Tests.EditMode</b><br/>(Editor only)"]
+  TP["<b>Frontier.Tests.PlayMode</b>"]
   Data --> Core
   Game --> Data
   Visual --> Game
   UI --> Visual
   App --> UI
   Editor --> App
+  TE --> Game
+  TP --> App
 ```
 
 | Assembly | Folder | Contents | Engine |
 |----------|--------|----------|--------|
-| `Frontier.Core` | `Scripts/Core` | `GameEnums` (`StructureKind`, `MinigameKind`, `UpgradeEffect`, `WeatherKind`, ...); the universe generator lands here | **none** (`noEngineReferences`) |
+| `Frontier.Core` | `Scripts/Core` | `GameEnums` (`StructureKind`, `MinigameKind`, `UpgradeEffect`, `WeatherKind`, ...); `Universe/`: the infinite deterministic universe generator (namespace `Frontier.Universe`, 15 files) | **none** (`noEngineReferences`) |
 | `Frontier.Data` | `Scripts/Data` | `ResourceSO`, `PlanetSO`, `StructureSO`, `RecipeSO`, `UpgradeSO`, `EnemySO`, `WaveFormulaSO`, `GameDatabase`, `FrontierSettings`, `ModelLibrary`, `ItemAmount`, `PlanetGenerator`, `DefaultContent` | UnityEngine |
 | `Frontier.Game` | `Scripts/Game` | `GameState` (+ `SaveData`, `PlacedStructure`, `WarehouseStorage`): the whole non-rendering game model and the save file | UnityEngine |
 | `Frontier.Visual` | `Scripts/Visual` | `PlanetView`, `SpaceBackdrop`, `Weather`, `WorldSurface` (structures, pads, picking), `Fx` + `Sfx`, `ScreenMetrics`; `Combat/`: `DefenseController`, `AlienActor` | UnityEngine, URP |
 | `Frontier.UI` | `Scripts/UI` | `UIRoot*.cs` partials, `UiKit` (tokens mirror, buttons, chips), `Icons`; `Minigames/`: `Minigame` base, `NodeGame`, `DrillGame`, `TravelGame`, `MinigameStage` | UI Toolkit, URP |
 | `Frontier.App` | `Scripts/App` | `FrontierBootstrap` (scene entry), `FrontierRuntime`; `Harness/`: `HarnessRunner`, `UiLint` (compiled only in the editor and development builds) | everything |
 | `Frontier.Editor` | `Editor` | menu tools and validation suites (`Frontier.EditorTools.*`) | UnityEditor, all of the above |
+| `Frontier.Tests.EditMode` | `Tests/EditMode` | NUnit tests for Core, Data and Game (`Core/`, `Universe/`, `Game/`); Editor only | UnityEditor, Test Runner |
+| `Frontier.Tests.PlayMode` | `Tests/PlayMode` | smoke tests that boot the real session; the universe golden digest (so it can also run on a device) | everything |
+
+All asmdefs are `autoReferenced: false` and reference each other by name. There is no `Assembly-CSharp` any more: a script placed
+outside the folders above would compile into a new one that cannot see any Frontier type, so every new script goes under one of them.
 
 Why these boundaries (and not one assembly per folder):
 
@@ -78,7 +87,7 @@ reference upward.
 
 | Folder | Contents |
 |--------|----------|
-| `Scripts/Core` | `Frontier.Core`: `GameEnums.cs` (pure C#) |
+| `Scripts/Core` | `Frontier.Core`: `GameEnums.cs`; `Universe/` (15 files): the pure, deterministic universe generator |
 | `Scripts/Data` | `Frontier.Data`: ScriptableObject definitions (`ResourceSO`, `PlanetSO`, `StructureSO`, `RecipeSO`, `UpgradeSO`, `EnemySO`, `WaveFormulaSO`, `GameDatabase`, `FrontierSettings`, `ModelLibrary`), `ItemAmount`, `PlanetGenerator`, `DefaultContent` |
 | `Scripts/Game` | `Frontier.Game`: `GameState`: inventory, upgrades, structures, storage, waves, travel, save/load (to be split, see roadmap) |
 | `Scripts/Visual` | `Frontier.Visual`: planet view, space backdrop, weather, world surface (structures, pads, picking), FX and procedural audio, `ScreenMetrics`; `Combat/` holds `DefenseController` and `AlienActor` |
@@ -87,6 +96,10 @@ reference upward.
 | `Art` | models, model prefabs, materials, `Fonts` (Chakra Petch and Barlow TTFs, OFL licences, generated SDF FontAssets) |
 | `Resources/Frontier` | data assets, shaders, `Tokens.uss` + `Frontier.uss`, `Icons/*.svg`, panel settings, `ModelLibrary` |
 | `Editor` | `Frontier.Editor`: menu tools and validation scripts |
+| `Tests` | `EditMode/` (`Core/`, `Universe/`, `Game/`) and `PlayMode/` NUnit tests, see [TESTING.md](TESTING.md) |
+
+`tests/` at the repository root holds the plain .NET projects that compile `Frontier.Core` (netstandard2.1) and run the engine-free
+tests without Unity; it sits outside `SpheerURP/` so Unity never imports it.
 
 `FrontierBootstrap` (the only object in `Scenes/Frontier.unity` besides a camera and light) builds the camera, post-processing,
 planet, backdrop, defense, UI and world surface from the `GameDatabase` asset, then publishes a `FrontierRuntime`.
@@ -96,7 +109,7 @@ planet, backdrop, defense, UI and world surface from the `GameDatabase` asset, t
 - **Never read `Screen.*` directly in game or UI code.** Use `ScreenMetrics` (size, safe area, density) so the screenshot harness
   and layout tests can render any virtual device.
 - **Tools and tests must not touch the real save.** Set `GameState.SaveDirectoryOverride` first (`CheckSupport.IsolateSaves()` in
-  editor checks, handled automatically by the harness).
+  editor checks, `SaveSandbox` in EditMode tests, handled automatically by the harness).
 - **Never modify a loaded asset at runtime.** `FrontierBootstrap` instantiates its `PanelSettings`; do the same for any other
   asset you need to change in play mode, otherwise Unity serializes the change back into the asset.
 - Data lives in ScriptableObjects under `Resources/Frontier`. `DefaultContent` only bootstraps missing data.
@@ -108,7 +121,8 @@ planet, backdrop, defense, UI and world surface from the `GameDatabase` asset, t
 |------|---------|
 | Generate Editable Data Assets / Generate Deep Space Planets | bootstrap or extend data assets |
 | Build Model Library / Calibrate Model Scales | rebuild the model library and bake scale corrections |
-| Validate Planet Model Sizes / Storage / Combat Balance / Panel Layout / Icons | validation suites |
+| Validate Planet Model Sizes / Storage / Combat Balance / Panel Layout / Icons | validation suites (the batch gate, see [TESTING.md](TESTING.md)) |
+| Universe > Render Density PNG | draws the galaxy density map of the universe generator (30,000 ly across) to `SpheerURP/Screens/universe/` |
 | Build Font Assets | regenerate the SDF FontAssets next to the TTFs in `Art/Fonts` |
 | Capture Screens | screenshot harness from inside the editor |
 | Apply Mobile Project Settings | portrait lock, IL2CPP, ARM64, stripping |
@@ -121,9 +135,12 @@ All scripts live in `tools/`. If script execution is disabled, prefix with `powe
 ```powershell
 tools/run-unity.ps1 -Method Frontier.EditorTools.FrontierPlanetChecks.Run          # any editor method, with watchdog + lock
 tools/run-unity.ps1 -Method Frontier.EditorTools.FrontierLayoutChecks.Run -NoQuit   # checks that exit by themselves
+tools/run-checks.ps1 [-Only Storage,Layout]                                        # the five check suites (the gate)
+tools/run-tests.ps1 -Platform EditMode|PlayMode [-TestFilter ...] [-ShowAll]       # Unity Test Framework, pass/fail summary
 tools/capture-screens.ps1 [-Devices phone-1080x1920] [-Only hud,map]               # screenshots + report.json (UI lint)
 tools/contact-sheet.ps1 -Dir SpheerURP/Screens/<run>/phone-1080x1920               # labelled overview sheets
 tools/image-diff.ps1 -A <runA>/<device> -B <runB>/<device>                         # per-screen visual regression numbers
+cd tests; dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj               # engine-free tests, no Unity needed
 ```
 
 Virtual devices: `phone-1080x1920`, `phone-1170x2532`, `phone-1440x3200`, `tablet-1536x2048`, plus the opt-in 360 dp phone

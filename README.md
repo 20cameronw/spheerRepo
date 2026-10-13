@@ -19,12 +19,13 @@ Saves live in `Application.persistentDataPath/frontier_save.json`. **Frontier > 
 
 | Do this | Run |
 |---------|-----|
-| Validate planets, storage, combat, layout, icons | **Frontier > Validate ...** menu items, or `tools/run-unity.ps1 -Method Frontier.EditorTools.<Check>.Run` |
+| Validate planets, storage, combat, layout, icons (the gate) | **Frontier > Validate ...** menu items, or `tools/run-checks.ps1` |
+| Run the unit and smoke tests | `tools/run-tests.ps1 -Platform EditMode` / `PlayMode`; engine-free tests without Unity: `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` |
 | See every screen on virtual phones/tablets | `tools/capture-screens.ps1` (PNGs, UI lint in `report.json`) |
 | Compare two capture runs | `tools/image-diff.ps1` |
 | Apply the mobile baseline (portrait, IL2CPP, ARM64) | **Frontier > Apply Mobile Project Settings** |
 
-Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); how to run and extend the tests (and what CI needs) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Documents
 
@@ -33,6 +34,7 @@ Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITE
 | [docs/ROADMAP.md](docs/ROADMAP.md) | the approved master plan: audit, architecture, universe, economy, mini-games, UI, monetization, release |
 | [docs/AUDIT.md](docs/AUDIT.md) | baseline UI audit from real screenshots and lint numbers, plus the after-tokens/icons results |
 | [docs/DESIGN.md](docs/DESIGN.md) | design system: tokens, type scale, spacing, hierarchy rules, icon system and how to extend them |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | code map, rules, tooling |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | assemblies and dependency rules, code map, rules, tooling |
+| [docs/TESTING.md](docs/TESTING.md) | tests, check suites, CI workflows and what the owner must set up |
 | [docs/SYSTEMS.md](docs/SYSTEMS.md) | how combat, warehouses, sizing, travel and panels behave today |
 | [docs/LEGACY_REMOVED.md](docs/LEGACY_REMOVED.md) | what was removed from the old prototype and how to recover it |

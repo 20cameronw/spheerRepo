@@ -1,0 +1,54 @@
+name: Core tests
+
+# The engine-free Frontier.Core code (universe generator, shared enums) and its tests run as a plain .NET project: no Unity, no
+# licence, a few seconds. Frontier.Core is compiled as netstandard2.1 / C# 9 / warnings-as-errors, exactly the way Unity compiles it.
+# The same test sources also run in Unity (EditMode); see docs/TESTING.md.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-tests:
+    name: Core tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # The golden universe hashes must be identical on every platform.
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        # tests/global.json pins the SDK to 8.0.x (runners also carry newer SDKs); dotnet reads it from the working directory.
+        working-directory: tests
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Show the SDK in use
+        run: dotnet --info
+
+      - name: Test
+        run: dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj --configuration Release --logger "trx;LogFileName=core-tests.trx" --logger "console;verbosity=normal" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-test-results-${{ matrix.os }}
+          path: tests/TestResults/*.trx
+          if-no-files-found: ignore

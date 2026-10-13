@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Runs the engine-free tests on any machine with the .NET 8 SDK, no Unity and no licence:
+      cd tests && dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj
+    The test sources are LINKED from the Unity project (SpheerURP/Assets/Frontier/Tests/EditMode/Core and /Universe). They are the
+    same files the Unity Test Runner compiles into Frontier.Tests.EditMode, so they must only depend on Frontier.Core and NUnit.
+    Frontier.Core itself is a separate netstandard2.1 project (see ../Frontier.Core) so that it stays a real engine-free assembly.
+    Paths use forward slashes so the same file builds on Windows, Linux and macOS.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Frontier.Core.Tests</AssemblyName>
+    <RootNamespace>Frontier</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Frontier.Core/Frontier.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Universe/**/*.cs" Link="Universe/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>
