@@ -28,7 +28,7 @@ namespace Frontier
             popup = UiKit.Div("fr-popup");
             if (compact) popup.AddToClassList("fr-popup-compact");
             popup.pickingMode = PickingMode.Position;
-            UiKit.Border(popup, UiKit.Ui(accent, 0.9f), 3f);
+            UiKit.SetAccent(popup, accent);
             popup.style.opacity = 0f;
             popupLayer.Add(popup);
             BuildPopupBody();
@@ -48,7 +48,7 @@ namespace Frontier
 
         VisualElement PopupClose()
         {
-            var x = Icons.IconButton("close", UiKit.Red, ClosePopup, 60f, true);
+            var x = Icons.IconButton("close", UiKit.Muted, ClosePopup, 0f, true);
             x.AddToClassList("fr-popup-close");
             return x;
         }
@@ -115,13 +115,11 @@ namespace Frontier
 
         void StructureHeader(VisualElement body, PlacedStructure s, Color c, string subtitle = null)
         {
-            var head = UiKit.Div("fr-row");
+            var head = UiKit.Div("fr-card-head");
             head.AddToClassList("fr-popup-head");
-            head.Add(Icons.Make(StructureIcon(s.def.kind), c, 60f));
-            var col = UiKit.Div();
-            col.style.flexShrink = 1;
-            col.style.marginLeft = 10;
-            col.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level, "fr-h2", c));
+            head.Add(Icons.Make(StructureIcon(s.def.kind), c, UiKit.Size.IconXl));
+            var col = UiKit.Div("fr-card-text");
+            col.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV\u00A0" + s.level, "fr-h2"));
             if (!string.IsNullOrEmpty(subtitle)) col.Add(UiKit.Text(subtitle, "fr-tiny"));
             head.Add(col);
             body.Add(head);
@@ -135,7 +133,7 @@ namespace Frontier
 
         void UpgradeButton(VisualElement body, PlacedStructure s, Color c)
         {
-            if (s.level >= s.def.maxLevel) { body.Add(UiKit.Text("MAX LEVEL", "fr-small", UiKit.Lime)); return; }
+            if (s.level >= s.def.maxLevel) { body.Add(Note("MAX LEVEL", UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
             body.Add(SectionLabel("UPGRADE TO LV " + (s.level + 1) + "  (" + StructureEffect(s.def, s.level + 1) + ")"));
             body.Add(UiKit.CostRow(cost, gs, true));
@@ -187,13 +185,12 @@ namespace Frontier
                     var row = UiKit.Div("fr-row");
                     row.AddToClassList("fr-popup-line");
                     int est = Mathf.Max(1, Mathf.RoundToInt(sp.baseYield * gs.ToolMultiplier(game) * (1f + bonus)));
-                    row.Add(Icons.Make(Icons.ForResource(sp.resource), rc, 48f));
-                    var txt = UiKit.Div(); txt.style.marginLeft = 10; txt.style.flexShrink = 1;
-                    txt.Add(UiKit.Text(sp.resource.displayName, "fr-small", rc));
+                    row.Add(Icons.Make(Icons.ForResource(sp.resource), rc, UiKit.Size.IconLg));
+                    var txt = UiKit.Div("fr-card-text");
+                    txt.Add(UiKit.Text(sp.resource.displayName, "fr-small"));
                     txt.Add(UiKit.Text("about " + est + " per run", "fr-tiny"));
                     row.Add(txt);
-                    row.Add(UiKit.Div("fr-spacer"));
-                    var go = IconBtn(verb, "play", rc, () => { ClosePopup(); StartGather(sp, t, bonus); });
+                    var go = IconBtn(verb, "play", c, () => { ClosePopup(); StartGather(sp, t, bonus); });
                     go.style.marginTop = 0;
                     row.Add(go);
                     body.Add(row);
@@ -213,8 +210,8 @@ namespace Frontier
         VisualElement RecipeResource(ResourceSO resource, int amount, bool lack = false)
         {
             var row = UiKit.Div("fr-recipe-resource");
-            row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), 32f));
-            row.Add(UiKit.Text(amount + " " + resource.displayName, "fr-small", lack ? UiKit.Red : Color.white));
+            row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
+            row.Add(UiKit.Text(amount + " " + resource.displayName, "fr-small", lack ? UiKit.Red : (Color?)null));
             return row;
         }
 
@@ -234,7 +231,7 @@ namespace Frontier
                     int can = MaxCrafts(r);
                     var card = Card(c);
                     card.AddToClassList("fr-recipe");
-                    if (can <= 0) card.style.opacity = 0.7f;
+                    if (can <= 0) card.AddToClassList("fr-card-dim");
 
                     var line = UiKit.Div("fr-recipe-flow");
                     var inputs = UiKit.Div("fr-recipe-side");
@@ -242,7 +239,7 @@ namespace Frontier
                     foreach (var i in r.inputs)
                         if (i.resource != null) inputs.Add(RecipeResource(i.resource, i.amount, gs.Count(i.resource) < i.amount));
                     line.Add(inputs);
-                    var arrow = UiKit.Text(">", "fr-h2", c);
+                    var arrow = UiKit.Text(">", "fr-h2");
                     arrow.AddToClassList("fr-recipe-arrow");
                     line.Add(arrow);
                     var outputs = UiKit.Div("fr-recipe-side");
@@ -253,6 +250,7 @@ namespace Frontier
                     card.Add(line);
 
                     var have = UiKit.Div("fr-row-wrap");
+                    have.style.marginTop = UiKit.Space.S8;
                     var haveText = new System.Text.StringBuilder("You have: ");
                     bool first = true;
                     foreach (var i in r.inputs)
@@ -267,11 +265,11 @@ namespace Frontier
 
                     var btns = UiKit.Div("fr-row");
                     btns.style.justifyContent = Justify.FlexEnd;
-                    btns.style.marginTop = 6;
+                    btns.style.marginTop = UiKit.Space.S4;
                     var one = UiKit.Btn("MAKE 1", c, () => Craft(r, bonus, 1));
                     UiKit.SetEnabledLook(one, can > 0);
                     var max = UiKit.Btn(can > 1 ? "MAKE ALL (" + can + ")" : "MAKE ALL", c, () => Craft(r, bonus, 100));
-                    max.style.marginLeft = 12;
+                    max.style.marginLeft = UiKit.Space.S12;
                     UiKit.SetEnabledLook(max, can > 1);
                     btns.Add(one); btns.Add(max);
                     card.Add(btns);
@@ -305,14 +303,16 @@ namespace Frontier
                 StructureHeader(body, s, c, "More fuel attracts more aliens, with higher health, damage and speed.");
 
                 var stepper = UiKit.Div("fr-stepper");
-                var minus = Icons.IconButton("minus", UiKit.Amber, () => { alarmFuel = Mathf.Max(1, alarmFuel - 1); RefreshPopup(); }, 72f);
-                var plus = Icons.IconButton("plus", UiKit.Amber, () => { alarmFuel = Mathf.Min(Mathf.Max(1, Mathf.Min(have, 40)), alarmFuel + 1); RefreshPopup(); }, 72f);
+                var minus = Icons.IconButton("minus", UiKit.Amber, () => { alarmFuel = Mathf.Max(1, alarmFuel - 1); RefreshPopup(); });
+                var plus = Icons.IconButton("plus", UiKit.Amber, () => { alarmFuel = Mathf.Min(Mathf.Max(1, Mathf.Min(have, 40)), alarmFuel + 1); RefreshPopup(); });
                 UiKit.SetEnabledLook(minus, alarmFuel > 1);
                 UiKit.SetEnabledLook(plus, alarmFuel < Mathf.Min(have, 40));
                 var val = UiKit.Div("fr-row");
-                val.style.minWidth = 130; val.style.justifyContent = Justify.Center;
-                val.Add(Icons.Make("fuel", UiKit.Amber, 40f));
-                val.Add(UiKit.Text(alarmFuel.ToString(), "fr-stepper-val", have >= alarmFuel ? Color.white : UiKit.Red));
+                val.style.minWidth = 150; val.style.justifyContent = Justify.Center;
+                var fuelIcon = Icons.Make("fuel", UiKit.Amber, UiKit.Size.IconMd);
+                fuelIcon.style.marginRight = UiKit.Space.S8;
+                val.Add(fuelIcon);
+                val.Add(UiKit.Text(alarmFuel.ToString(), "fr-stepper-val", have >= alarmFuel ? (Color?)null : UiKit.Red));
                 stepper.Add(minus); stepper.Add(val); stepper.Add(plus);
                 body.Add(stepper);
 
@@ -321,13 +321,12 @@ namespace Frontier
                 body.Add(UiKit.Text("Health x" + info.healthMult.ToString("0.00") + "   Damage x" + info.damageMult.ToString("0.00") + "   Speed x" + info.speedMult.ToString("0.00"), "fr-tiny"));
                 var counts = new Dictionary<EnemySO, int>();
                 foreach (var a in info.aliens) { int n; counts.TryGetValue(a, out n); counts[a] = n + 1; }
-                var cr = UiKit.Div("fr-row-wrap"); cr.style.marginTop = 4;
+                var cr = UiKit.Div("fr-row-wrap"); cr.style.marginTop = UiKit.Space.S4;
                 foreach (var kv in counts)
                 {
                     var chip = UiKit.Div("fr-itemchip");
-                    UiKit.Border(chip, UiKit.Ui(kv.Key.color, 0.8f), 2f);
                     var dot = UiKit.Div("fr-dot"); dot.style.backgroundColor = UiKit.Ui(kv.Key.color);
-                    dot.style.marginRight = 6;
+                    dot.style.marginRight = UiKit.Space.S8; dot.style.marginLeft = UiKit.Space.S4;
                     chip.Add(dot);
                     chip.Add(UiKit.Text(kv.Key.displayName + " x" + kv.Value, "fr-small"));
                     cr.Add(chip);
@@ -335,14 +334,10 @@ namespace Frontier
                 body.Add(cr);
 
                 body.Add(SectionLabel("VICTORY REWARDS"));
-                var rr = UiKit.Div("fr-row-wrap"); rr.style.marginTop = 4;
+                var rr = UiKit.Div("fr-row-wrap"); rr.style.marginTop = UiKit.Space.S4;
                 foreach (var i in info.reward)
                     if (i.resource != null) rr.Add(ResourceIconChip(i.resource, i.amount + " " + i.resource.displayName));
-                var xp = UiKit.Div("fr-itemchip");
-                UiKit.Border(xp, UiKit.Ui(UiKit.Magenta, 0.8f), 2f);
-                xp.Add(Icons.Make("star", UiKit.Magenta));
-                xp.Add(UiKit.Text(info.xp + " XP", "fr-small"));
-                rr.Add(xp);
+                rr.Add(UiKit.Chip("star", UiKit.Magenta, info.xp + " XP"));
                 body.Add(rr);
 
                 bool can = have >= alarmFuel;
@@ -350,7 +345,8 @@ namespace Frontier
                 {
                     ClosePopup();
                     if (!defense.StartWave(alarmFuel)) Toast("Cannot call this wave. Check your fuel or wait for the current wave.", UiKit.Red);
-                }, true);
+                }, true, can);
+                call.style.marginTop = UiKit.Space.S16;
                 UiKit.SetEnabledLook(call, can);
                 body.Add(call);
             });
@@ -365,12 +361,12 @@ namespace Frontier
             Color c = UiKit.Ui(def.color);
             banner = UiKit.Div("fr-banner"); banner.pickingMode = PickingMode.Ignore;
             var box = UiKit.Div("fr-banner-box");
-            UiKit.Border(box, c, 3f);
-            UiKit.Halo(box, c, 26f, 0.3f);
-            box.Add(Icons.Make(StructureIcon(def.kind), c, 44f));
+            UiKit.SetAccent(box, c);
+            UiKit.Halo(box, c, 26f, 0.14f);
+            box.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconLg));
             box.Add(UiKit.Text("TAP A GLOWING PAD", "fr-h2", c));
-            var cancel = Icons.IconButton("close", UiKit.Red, ExitBuild, 72f);
-            cancel.style.marginLeft = 16;
+            var cancel = Icons.IconButton("close", UiKit.Muted, ExitBuild, 0f, true);
+            cancel.style.marginLeft = UiKit.Space.S16;
             box.Add(cancel);
             banner.Add(box);
             bannerLayer.Add(banner);

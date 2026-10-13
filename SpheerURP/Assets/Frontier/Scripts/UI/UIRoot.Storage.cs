@@ -48,7 +48,7 @@ namespace Frontier
                     slot.style.opacity = 0.5f;
                     dragGhost = UiKit.Div("fr-drag-ghost");
                     dragGhost.pickingMode = PickingMode.Ignore;
-                    var icon = Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), 44f);
+                    var icon = Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconLg);
                     icon.pickingMode = PickingMode.Ignore;
                     dragGhost.Add(icon);
                     var label = UiKit.Text(count.ToString(), "fr-drag-count");
@@ -59,8 +59,8 @@ namespace Frontier
                 if (dragGhost != null)
                 {
                     Vector2 local = root.WorldToLocal(e.position);
-                    dragGhost.style.left = local.x - 28f;
-                    dragGhost.style.top = local.y - 72f;
+                    dragGhost.style.left = local.x - 32f;
+                    dragGhost.style.top = local.y - 80f;
                     e.StopPropagation();
                 }
             });
@@ -91,7 +91,7 @@ namespace Frontier
 
         void OpenWarehouse(PlacedStructure warehouse, Transform anchor)
         {
-            OpenModal("warehouse", "base", warehouse.def.displayName.ToUpper(), UiKit.Cyan,
+            OpenModal("warehouse", "warehouse", warehouse.def.displayName.ToUpper(), UiKit.Cyan,
                 body => BuildWarehouse(body, warehouse), true);
             planetView.Frozen = true;
             world.Selected = anchor;

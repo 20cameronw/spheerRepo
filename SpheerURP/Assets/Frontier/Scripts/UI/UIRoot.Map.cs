@@ -65,9 +65,9 @@ namespace Frontier
             mapView.RegisterCallback<GeometryChangedEvent>(e => { ApplyMapTransform(); });
 
             mapTools = UiKit.Div("fr-map-tools"); mapTools.pickingMode = PickingMode.Ignore;
-            mapTools.Add(Icons.IconButton("close", UiKit.Red, CloseMap, 96f));
-            mapTools.Add(Icons.IconButton("plus", UiKit.Cyan, () => ZoomAt(ViewCenter(), 1.3f), 96f));
-            mapTools.Add(Icons.IconButton("minus", UiKit.Cyan, () => ZoomAt(ViewCenter(), 1f / 1.3f), 96f));
+            mapTools.Add(Icons.IconButton("close", UiKit.Muted, CloseMap));
+            mapTools.Add(Icons.IconButton("plus", UiKit.Muted, () => ZoomAt(ViewCenter(), 1.3f)));
+            mapTools.Add(Icons.IconButton("minus", UiKit.Muted, () => ZoomAt(ViewCenter(), 1f / 1.3f)));
             mapView.Add(mapTools);
             LayoutMapChrome();
 
@@ -88,9 +88,9 @@ namespace Frontier
         void LayoutMapChrome()
         {
             if (mapTools == null) return;
-            mapTools.style.right = 16 + inset.z;
-            mapTools.style.top = 16 + inset.y;
-            if (mapCard != null) mapCard.style.marginBottom = 16 + inset.w;
+            mapTools.style.right = UiKit.Space.S16 + inset.z;
+            mapTools.style.top = UiKit.Space.S16 + inset.y;
+            if (mapCard != null) mapCard.style.marginBottom = UiKit.Space.S16 + inset.w;
         }
 
         Vector2 ViewCenter()
@@ -243,7 +243,8 @@ namespace Frontier
         {
             var p = ctx.painter2D;
             p.lineWidth = 2f;
-            p.strokeColor = new Color(0.1f, 0.9f, 1f, 0.07f);
+            // Painter2D alphas look about twice as strong as authored here (linear colour space), so these are kept very low.
+            p.strokeColor = new Color(0.1f, 0.9f, 1f, 0.025f);
             for (int i = 0; i <= 30; i++)
             {
                 float v = i * 300f;
@@ -260,7 +261,7 @@ namespace Frontier
             for (int galaxy = 0; galaxy < 3; galaxy++)
             {
                 Color tint = galaxy == 0 ? UiKit.Cyan : galaxy == 1 ? UiKit.Magenta : UiKit.Amber;
-                p.strokeColor = new Color(tint.r, tint.g, tint.b, 0.045f);
+                p.strokeColor = new Color(tint.r, tint.g, tint.b, 0.012f);
                 p.lineWidth = 85f;
                 for (int arm = 0; arm < galaxy + 2; arm++)
                 {
@@ -280,9 +281,13 @@ namespace Frontier
                 Vector2 c = SystemPoint(sys);
                 float maxR = 0f;
                 foreach (var pl in gs.db.planets)
-                    if (pl.systemId == sys.id) maxR = Mathf.Max(maxR, (MapPoint(pl) - c).magnitude);
+                {
+                    if (pl.systemId != sys.id) continue;
+                    float d = (MapPoint(pl) - c).magnitude;
+                    if (d <= 900f) maxR = Mathf.Max(maxR, d); // far-flung members keep their orbit ring but do not inflate the halo
+                }
                 if (maxR <= 0f) continue;
-                p.fillColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.05f);
+                p.fillColor = new Color(sys.color.r, sys.color.g, sys.color.b, 0.012f);
                 p.BeginPath(); p.Arc(c, maxR + 150f, Angle.Degrees(0f), Angle.Degrees(360f)); p.Fill();
                 p.lineWidth = 3f;
                 foreach (var pl in gs.db.planets)
@@ -351,7 +356,7 @@ namespace Frontier
                 node.style.backgroundColor = UiKit.Ui(planet.primary);
                 bool cur = planet == gs.planet, sel = planet == selected;
                 UiKit.Border(node, cur ? Color.white : sel ? UiKit.Magenta : UiKit.Ui(planet.rim, 0.8f), cur || sel ? 6f : 3f);
-                UiKit.Halo(node, UiKit.Ui(planet.rim), 60f, sel ? 0.7f : 0.4f);
+                UiKit.Halo(node, UiKit.Ui(planet.rim), 60f, sel ? 0.7f : 0.3f);
                 node.RegisterCallback<ClickEvent>(e =>
                 {
                     Sfx.Click();
@@ -379,39 +384,42 @@ namespace Frontier
             var p2 = selected ?? gs.planet;
             Color pc = UiKit.Ui(p2.rim);
             mapCard = UiKit.Div("fr-map-card");
-            UiKit.Border(mapCard, pc, 3f);
-            UiKit.Halo(mapCard, pc, 28f, 0.2f);
+            UiKit.SetAccent(mapCard, pc);
             var top = UiKit.Div("fr-row");
             top.Add(UiKit.Text(p2.displayName.ToUpper(), "fr-h2", pc));
             top.Add(UiKit.Div("fr-spacer"));
-            top.Add(Icons.Make("skull", UiKit.Red, 32f));
+            var skull = Icons.Make("skull", UiKit.Red, UiKit.Size.IconSm);
+            skull.style.marginRight = UiKit.Space.S8;
+            top.Add(skull);
             top.Add(UiKit.Text(p2.danger.ToString("0.0"), "fr-small"));
             mapCard.Add(top);
             mapCard.Add(UiKit.Text(p2.description, "fr-tiny"));
-            mapCard.Add(UiKit.Text(p2.BuildingSlots + " building slots  -  world size x" + p2.worldSize.ToString("0.00"), "fr-small"));
+            var slots = UiKit.Text(p2.BuildingSlots + " building slots  -  world size x" + p2.worldSize.ToString("0.00"), "fr-small");
+            slots.style.marginTop = UiKit.Space.S8;
+            mapCard.Add(slots);
 
-            mapCard.Add(UiKit.Text("AVAILABLE RESOURCES", "fr-small"));
+            mapCard.Add(SectionLabel("AVAILABLE RESOURCES"));
             var res = UiKit.Div("fr-row-wrap");
             foreach (var resource in gs.ResourcesFor(p2))
                 res.Add(ResourceIconChip(resource, resource.displayName));
-            if (gs.structures.Exists(s => s.planetId == p2.id))
-            {
-                var bc = UiKit.Div("fr-itemchip");
-                UiKit.Border(bc, UiKit.Ui(UiKit.Lime, 0.8f), 2f);
-                bc.Add(Icons.Make("base", UiKit.Lime));
-                res.Add(bc);
-            }
+            if (gs.structures.Exists(s => s.planetId == p2.id)) res.Add(UiKit.Chip("base", UiKit.Lime, "BASE"));
             mapCard.Add(res);
 
-            if (p2 == gs.planet) mapCard.Add(UiKit.Text("You are here", "fr-small", UiKit.Cyan));
+            if (p2 == gs.planet)
+            {
+                var here = UiKit.Text("You are here", "fr-small", UiKit.Cyan);
+                here.style.marginTop = UiKit.Space.S12;
+                mapCard.Add(here);
+            }
             else
             {
                 int cost = gs.FuelCost(p2);
                 bool can = gs.Count(gs.db.fuel) >= cost;
                 var row = UiKit.Div("fr-row-wrap");
+                row.style.marginTop = UiKit.Space.S8;
                 row.Add(ResourceIconChip(gs.db.fuel, cost + " / " + gs.Count(gs.db.fuel), !can));
                 mapCard.Add(row);
-                var go = IconBtn(can ? "WARP" : "NEED FUEL", "warp", can ? UiKit.Magenta : UiKit.Red, () => StartTravel(p2), true);
+                var go = IconBtn(can ? "WARP" : "NEED FUEL", "warp", can ? UiKit.Magenta : UiKit.Red, () => StartTravel(p2), true, can);
                 UiKit.SetEnabledLook(go, can);
                 mapCard.Add(go);
             }

@@ -7,8 +7,8 @@ using UnityEngine.UIElements;
 namespace Frontier
 {
     /// <summary>
-    /// Icon-driven, responsive UI Toolkit interface. Layout is authored for a 1080 logical-pixel short side
-    /// and the panel scale is recomputed whenever the screen size changes.
+    /// Icon-driven, responsive UI Toolkit interface. The panel scale is recomputed whenever the screen size changes so that
+    /// 1 UI unit = 0.5 dp on phones (type and control tokens are authored in these half-dps, see docs/DESIGN.md).
     /// </summary>
     public partial class UIRoot : MonoBehaviour
     {
@@ -21,17 +21,30 @@ namespace Frontier
         UIDocument doc;
         PanelSettings panelSettings;
 
-        VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer;
+        VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
         Label waveLabel, reactorLabel, fuelLabel, packLabel, levelLabel, planetLabel;
         VisualElement planetTag;
 
         bool busy;
-        public const float UiBoost = 1.2f;
+        /// <summary>UI units per dp (1 unit = 0.5 dp).</summary>
+        public const float UnitsPerDp = 2f;
+        /// <summary>The canvas is never wider than this many units: tablets scale up instead of stretching the layout.</summary>
+        public const float MaxCanvasWidth = 900f;
+        /// <summary>Space reserved at the top of content layers for the top bar (units, below the safe-area inset).</summary>
+        public const float HudTopInset = 132f;
+        /// <summary>Space reserved at the bottom of popup layers for the dock (units, above the safe-area inset).</summary>
+        public const float DockInset = 176f;
         bool batching;
         Vector4 inset; // left, top, right, bottom in logical px
         int lastW, lastH;
         Rect lastSafe;
+
+        /// <summary>Physical pixels per UI unit: 0.5 dp on phones, capped so the canvas never exceeds <see cref="MaxCanvasWidth"/> units.</summary>
+        public static float ComputeScale(float shortSidePx, float density)
+        {
+            return Mathf.Max(0.2f, Mathf.Max(density / UnitsPerDp, shortSidePx / MaxCanvasWidth));
+        }
 
         public bool IsOverUi(Vector2 screenPos)
         {
@@ -51,8 +64,15 @@ namespace Frontier
             root.Clear();
             root.pickingMode = PickingMode.Ignore;
             root.AddToClassList("fr-root");
-            var uss = Resources.Load<StyleSheet>("Frontier/Frontier");
-            if (uss != null) root.styleSheets.Add(uss);
+            UiKit.ApplyStyles(root);
+
+            // Full-screen dim under the HUD: modals keep the top bar and dock live while the world behind them is dimmed evenly.
+            scrimLayer = Layer();
+            scrimLayer.AddToClassList("fr-scrim");
+            scrimLayer.pickingMode = PickingMode.Position;
+            scrimLayer.style.display = DisplayStyle.None;
+            scrimLayer.RegisterCallback<PointerDownEvent>(e => CloseModal());
+            root.Add(scrimLayer);
 
             safe = Layer(); safe.style.display = DisplayStyle.Flex;
             root.Add(safe);
@@ -102,7 +122,7 @@ namespace Frontier
             int sw = ScreenMetrics.Width, sh = ScreenMetrics.Height;
             if (!force && sw == lastW && sh == lastH && sa == lastSafe) return;
             lastW = sw; lastH = sh; lastSafe = sa;
-            float scale = Mathf.Max(0.2f, ScreenMetrics.ShortSide / 1080f) * UiBoost;
+            float scale = ComputeScale(ScreenMetrics.ShortSide, ScreenMetrics.Density);
             if (panelSettings != null) panelSettings.scale = scale;
             inset = new Vector4(sa.xMin / scale, (sh - sa.yMax) / scale, (sw - sa.xMax) / scale, sa.yMin / scale);
             hud.style.left = inset.x; hud.style.top = inset.y;
@@ -110,21 +130,23 @@ namespace Frontier
             if (waveHud != null)
             {
                 waveHud.style.left = inset.x; waveHud.style.right = inset.z; waveHud.style.top = inset.y; waveHud.style.bottom = inset.w;
-                waveHud.style.paddingLeft = 40; waveHud.style.paddingRight = 40;
-                waveHud.style.paddingTop = 150; waveHud.style.paddingBottom = 40;
+                waveHud.style.paddingLeft = UiKit.Space.S32; waveHud.style.paddingRight = UiKit.Space.S32;
+                waveHud.style.paddingTop = HudTopInset + UiKit.Space.S16; waveHud.style.paddingBottom = UiKit.Space.S32;
             }
             LayoutContentLayer(popupLayer, inset, false);
-            LayoutContentLayer(modalLayer, inset, true);
+            LayoutContentLayer(modalLayer, inset, false);
+            LayoutContentLayer(bannerLayer, inset, false);
             LayoutContentLayer(overlayLayer, inset, true);
+            toastLayer.style.top = inset.y + HudTopInset + UiKit.Space.S8;
             if (mapOpen) LayoutMapChrome();
         }
 
         public static void LayoutContentLayer(VisualElement layer, Vector4 safeInsets, bool coverDock)
         {
-            layer.style.left = safeInsets.x + 12;
-            layer.style.right = safeInsets.z + 12;
-            layer.style.top = safeInsets.y + 130;
-            layer.style.bottom = safeInsets.w + (coverDock ? 16 : 180);
+            layer.style.left = safeInsets.x + UiKit.Space.S16;
+            layer.style.right = safeInsets.z + UiKit.Space.S16;
+            layer.style.top = safeInsets.y + HudTopInset;
+            layer.style.bottom = safeInsets.w + (coverDock ? UiKit.Space.S16 : DockInset);
             layer.style.overflow = Overflow.Hidden;
         }
 
@@ -143,22 +165,30 @@ namespace Frontier
             packLabel = Chip(planetTag, "pack", UiKit.Cyan, null);
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
-            var menuBtn = Icons.IconButton("grid", UiKit.Amber, OpenMenu, 104f, true);
-            menuBtn.style.borderTopLeftRadius = 52; menuBtn.style.borderTopRightRadius = 52;
-            menuBtn.style.borderBottomLeftRadius = 52; menuBtn.style.borderBottomRightRadius = 52;
-            menuBtn.style.position = Position.Absolute;
-            menuBtn.style.right = 8; menuBtn.style.top = 4; menuBtn.style.flexShrink = 0;
-            menuBtn.style.backgroundColor = new Color(0.02f, 0.04f, 0.12f, 0.97f);
-            planetTag.style.paddingRight = 120;
+            var menuBtn = Icons.IconButton("menu", UiKit.Cyan, OpenMenu, 0f, true);
+            menuBtn.AddToClassList("fr-menubtn");
+            menuBtn.name = "menu-button";
             top.Add(menuBtn);
             hud.Add(top);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
-            dock.Add(Icons.IconButton("research", UiKit.Magenta, OpenResearch, 0f, true));
-            dock.Add(Icons.IconButton("map", UiKit.Cyan, OpenMap, 0f, true));
-            dock.Add(Icons.IconButton("pack", UiKit.Cyan, OpenPack, 0f, true));
-            dock.Add(Icons.IconButton("build", UiKit.Lime, OpenShop, 0f, true));
+            dock.Add(DockButton("research", "COMMAND", UiKit.Magenta, OpenResearch));
+            dock.Add(DockButton("map", "MAP", UiKit.Cyan, OpenMap));
+            dock.Add(DockButton("pack", "PACK", UiKit.Amber, OpenPack));
+            dock.Add(DockButton("build", "BUILD", UiKit.Lime, OpenShop));
             hud.Add(dock);
+        }
+
+        /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>
+        Button DockButton(string icon, string caption, Color accent, Action onClick)
+        {
+            var b = new Button { name = "dock-" + icon };
+            b.AddToClassList("fr-dock-btn");
+            UiKit.SetAccent(b, accent);
+            b.Add(Icons.Make(icon, accent));
+            b.Add(UiKit.Text(caption, "fr-dock-label"));
+            b.clicked += () => { Sfx.Click(); onClick(); };
+            return b;
         }
 
         Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp)
@@ -167,15 +197,18 @@ namespace Frontier
             Color c = UiKit.Ui(color);
             chip.Add(Icons.Make(icon, c));
             var l = UiKit.Text("0", "fr-chip-text");
-            chip.Add(l);
             if (xp != null)
             {
+                var col = UiKit.Div("fr-chip-col"); col.pickingMode = PickingMode.Ignore;
+                col.Add(l);
                 VisualElement fill;
                 var bar = UiKit.Bar(color, out fill);
                 bar.AddToClassList("fr-chip-xp");
-                chip.Add(bar);
+                col.Add(bar);
                 xp(fill);
+                chip.Add(col);
             }
+            else chip.Add(l);
             parent.Add(chip);
             return l;
         }
@@ -190,14 +223,16 @@ namespace Frontier
             waveLabel = UiKit.Text("", "fr-h2", UiKit.Cyan);
             top.Add(waveLabel);
             top.Add(UiKit.Bar(UiKit.Cyan, out waveFill));
-            top.Add(UiKit.Text("Tap aliens to zap them", "fr-tiny"));
+            var hint = UiKit.Text("Tap aliens to zap them", "fr-tiny");
+            hint.style.marginTop = UiKit.Space.S8;
+            top.Add(hint);
             waveHud.Add(top);
 
             var bottom = UiKit.Div(); bottom.pickingMode = PickingMode.Ignore;
             reactorLabel = UiKit.Text("", "fr-h2", UiKit.Lime);
             bottom.Add(reactorLabel);
             var rb = UiKit.Bar(UiKit.Lime, out reactorFill);
-            rb.style.height = 24;
+            rb.style.height = UiKit.Space.S24;
             bottom.Add(rb);
             waveHud.Add(bottom);
             root.Add(waveHud);
@@ -211,6 +246,7 @@ namespace Frontier
             levelLabel.text = "LV " + gs.PlayerLevel;
             planetLabel.text = gs.planet.displayName.ToUpper();
             planetLabel.style.color = UiKit.Ui(gs.planet.rim);
+            UiKit.Border(planetTag, UiKit.Tint(gs.planet.rim, 0.5f), 2f);
             UiKit.SetFill(xpFill, gs.LevelProgress);
             RefreshModal();
             RefreshPopup();
@@ -241,13 +277,6 @@ namespace Frontier
             hud.style.display = wave ? DisplayStyle.None : DisplayStyle.Flex;
             if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
 
-            if (planetTag != null)
-            {
-                float pulse = 0.65f + 0.35f * Mathf.Sin(Time.time * 3f);
-                Color c = UiKit.Ui(gs.planet.rim, 0.5f + 0.4f * pulse);
-                UiKit.Border(planetTag, c, 2f);
-            }
-
             UpdatePopupPosition();
             UpdateMapInput();
         }
@@ -261,34 +290,26 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ helpers
-        VisualElement Card(Color accent)
+        /// <summary>A tonal glass card. Only the selected/equipped one (<paramref name="highlight"/>) gets accent colour.</summary>
+        VisualElement Card(Color accent, bool highlight = false)
         {
             var c = UiKit.Div("fr-card");
-            UiKit.Border(c, UiKit.Ui(accent, 0.55f), 2f);
+            if (highlight) { UiKit.SetAccent(c, accent); c.AddToClassList("fr-card-on"); }
             return c;
         }
 
-        Button IconBtn(string text, string icon, Color color, Action onClick, bool big = false)
+        /// <summary>A tonal action button with an icon. <paramref name="primary"/> marks the screen's single main action.</summary>
+        Button IconBtn(string text, string icon, Color color, Action onClick, bool big = false, bool primary = false)
         {
-            var b = UiKit.Btn("", color, onClick, big);
-            var ic = Icons.Make(icon, color, big ? 44f : 34f);
-            ic.style.marginRight = 12;
-            b.Add(ic);
-            var l = UiKit.Text(text, null, UiKit.Ui(color));
-            l.style.flexShrink = 1;
-            l.style.whiteSpace = WhiteSpace.Normal;
-            b.Add(l);
+            var b = UiKit.Btn("", color, onClick, big, primary);
+            b.Add(Icons.Make(icon, color, big ? UiKit.Size.IconLg : UiKit.Size.IconMd));
+            b.Add(UiKit.Text(text, "fr-btn-label"));
             return b;
         }
 
         VisualElement ResourceIconChip(ResourceSO r, string text, bool lack = false)
         {
-            var chip = UiKit.Div("fr-itemchip");
-            Color c = UiKit.Ui(r.color);
-            UiKit.Border(chip, new Color(c.r, c.g, c.b, 0.8f), 2f);
-            chip.Add(Icons.Make(Icons.ForResource(r), c));
-            chip.Add(UiKit.Text(text, "fr-small", lack ? UiKit.Red : Color.white));
-            return chip;
+            return UiKit.Chip(Icons.ForResource(r), UiKit.Ui(r.color), text, lack);
         }
 
         string StructureEffect(StructureSO d, int level)
@@ -314,22 +335,7 @@ namespace Frontier
             }
         }
 
-        static string StructureIcon(StructureKind k)
-        {
-            switch (k)
-            {
-                case StructureKind.Refinery: return "refinery";
-                case StructureKind.Lumber: return "wood";
-                case StructureKind.Mine: return "iron";
-                case StructureKind.Drill: return "tools";
-                case StructureKind.Gunner: return "alien";
-                case StructureKind.Laser: return "bolt";
-                case StructureKind.Satellite: return "warp";
-                case StructureKind.Fabricator: return "build";
-                case StructureKind.Warehouse: return "base";
-                default: return "alarm";
-            }
-        }
+        static string StructureIcon(StructureKind k) { return Icons.ForStructure(k); }
 
         // ------------------------------------------------------------ settings
         void LoadPrefs()
@@ -374,19 +380,13 @@ namespace Frontier
             var panel = UiKit.Div("fr-overlay");
             panel.pickingMode = PickingMode.Position;
             Color c = r.victory ? UiKit.Lime : UiKit.Red;
+            UiKit.SetAccent(panel, c);
             panel.Add(UiKit.Text(r.victory ? "WAVE CLEARED" : "REACTOR OVERLOADED", "fr-title", c));
             if (r.victory)
             {
                 panel.Add(UiKit.Text("Salvage recovered", "fr-muted"));
                 panel.Add(UiKit.CostRow(r.granted, gs, false));
-                if (defense.Current != null)
-                {
-                    var xp = UiKit.Div("fr-itemchip");
-                    UiKit.Border(xp, UiKit.Ui(UiKit.Magenta, 0.8f), 2f);
-                    xp.Add(Icons.Make("star", UiKit.Magenta));
-                    xp.Add(UiKit.Text("+" + defense.Current.xp + " XP", "fr-small"));
-                    panel.Add(xp);
-                }
+                if (defense.Current != null) panel.Add(UiKit.Chip("star", UiKit.Magenta, "+" + defense.Current.xp + " XP"));
                 if (r.lost.Count > 0)
                 {
                     panel.Add(UiKit.Text("Backpack full - lost:", "fr-muted", UiKit.Amber));
@@ -394,9 +394,9 @@ namespace Frontier
                 }
             }
             else panel.Add(UiKit.Text("The aliens broke through. No salvage this time.", "fr-muted"));
-            var b = UiKit.Btn("CONTINUE", c, null, true);
+            var b = UiKit.Btn("CONTINUE", c, null, true, true);
             b.clicked += () => panel.RemoveFromHierarchy();
-            b.style.marginTop = 30;
+            b.style.marginTop = UiKit.Space.S32;
             panel.Add(b);
             overlayLayer.Add(panel);
             OnStateChanged();

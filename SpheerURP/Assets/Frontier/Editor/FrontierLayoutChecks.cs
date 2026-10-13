@@ -16,6 +16,7 @@ namespace Frontier.EditorTools
         VisualElement canvas, popupLayer, modalLayer, overlayLayer;
         int step;
         double next;
+        const float InsetTop = 30f;
         static readonly Vector2[] Sizes = { new Vector2(900, 1600), new Vector2(1600, 900) };
 
         public static void Run()
@@ -50,7 +51,8 @@ namespace Frontier.EditorTools
             canvas.style.flexGrow = 0;
             canvas.style.flexShrink = 0;
             canvas.style.position = Position.Relative;
-            canvas.styleSheets.Add(Resources.Load<StyleSheet>("Frontier/Frontier"));
+            canvas.styleSheets.Clear();
+            UiKit.ApplyStyles(canvas);
             rootVisualElement.Add(canvas);
             popupLayer = UiKit.Div("fr-fill");
             modalLayer = UiKit.Div("fr-fill");
@@ -65,9 +67,9 @@ namespace Frontier.EditorTools
         void PrepareSize(int index)
         {
             canvas.style.width = Sizes[index].x; canvas.style.height = Sizes[index].y;
-            var insets = new Vector4(20, 30, 20, 24);
+            var insets = new Vector4(20, InsetTop, 20, 24);
             UIRoot.LayoutContentLayer(popupLayer, insets, false);
-            UIRoot.LayoutContentLayer(modalLayer, insets, true);
+            UIRoot.LayoutContentLayer(modalLayer, insets, false);
             UIRoot.LayoutContentLayer(overlayLayer, insets, true);
             Call("OpenModal", "pack", "pack", "BACKPACK", UiKit.Amber,
                 (Action<VisualElement>)(body => Call("BuildPack", body)), true);
@@ -87,7 +89,7 @@ namespace Frontier.EditorTools
         void CheckBounds(VisualElement panel, VisualElement area)
         {
             Check(!float.IsNaN(panel.layout.height) && panel.layout.height > 1, "Panel did not lay out.");
-            Check(panel.worldBound.yMin >= canvas.worldBound.yMin + 160f - 1f, "Panel covers top bar.");
+            Check(panel.worldBound.yMin >= canvas.worldBound.yMin + InsetTop + UIRoot.HudTopInset - 1f, "Panel covers top bar.");
             Check(panel.worldBound.yMax <= area.worldBound.yMax + 1f, "Panel escapes content area.");
             Check(panel.worldBound.xMin >= area.worldBound.xMin - 1f && panel.worldBound.xMax <= area.worldBound.xMax + 1f,
                 "Panel escapes safe width.");

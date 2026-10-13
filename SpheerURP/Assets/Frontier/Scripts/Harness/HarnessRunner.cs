@@ -41,7 +41,9 @@ namespace Frontier
         struct Device
         {
             public string name; public int w, h; public float density; public Rect safe;
-            public Device(string name, int w, int h, float density, Rect safe) { this.name = name; this.w = w; this.h = h; this.density = density; this.safe = safe; }
+            /// <summary>Only captured when named explicitly in -frontierShotDevices (keeps the default run at the four standard devices).</summary>
+            public bool optIn;
+            public Device(string name, int w, int h, float density, Rect safe, bool optIn = false) { this.name = name; this.w = w; this.h = h; this.density = density; this.safe = safe; this.optIn = optIn; }
         }
 
         struct Shot
@@ -56,6 +58,8 @@ namespace Frontier
             new Device("phone-1170x2532", 1170, 2532, 3.0f, new Rect(0, 102, 1170, 2532 - 141 - 102)),
             new Device("phone-1440x3200", 1440, 3200, 3.5f, new Rect(0, 0, 1440, 3200 - 110)),
             new Device("tablet-1536x2048", 1536, 2048, 2.0f, new Rect(0, 0, 1536, 2048)),
+            // 360 dp wide: the narrowest common phone class (many Samsung/Pixel-A devices).
+            new Device("phone-1080x2340", 1080, 2340, 3.0f, new Rect(0, 0, 1080, 2340 - 80), true),
         };
 
         public static string OutputDir { get; private set; }
@@ -101,6 +105,11 @@ namespace Frontier
             return false;
         }
 
+        static bool MatchExplicit(string value, string filter)
+        {
+            return !string.IsNullOrEmpty(filter) && Match(value, filter);
+        }
+
         IEnumerator RunAll()
         {
             var report = new HarnessReport { unity = Application.unityVersion, started = DateTime.Now.ToString("s") };
@@ -111,7 +120,7 @@ namespace Frontier
 
             foreach (var dev in AllDevices)
             {
-                if (!Match(dev.name, devicesFilter)) continue;
+                if (dev.optIn ? !MatchExplicit(dev.name, devicesFilter) : !Match(dev.name, devicesFilter)) continue;
                 yield return RunDevice(dev, report);
             }
 
@@ -269,6 +278,10 @@ namespace Frontier
             yield return new Shot("wave-hud", () => { GoTo("sylva"); ResetView(); rt.Defense.StartWave(3); }, 4.0f);
             yield return new Shot("wave-result", () => rt.Defense.DebugEnd(true), 0.5f);
             yield return new Shot("hud-after", ResetView, 0.3f);
+            yield return new Shot("menu-release", () => ui.DebugMenuAsRelease(), 0.2f);
+            yield return new Shot("icons-ui", () => ui.DebugIconSheet(0), 0.3f);
+            yield return new Shot("icons-items", () => ui.DebugIconSheet(1), 0.3f);
+            yield return new Shot("icons-color", () => ui.DebugIconSheet(2), 0.3f);
         }
     }
 }

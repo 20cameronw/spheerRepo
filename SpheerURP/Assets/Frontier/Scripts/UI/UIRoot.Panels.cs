@@ -31,24 +31,25 @@ namespace Frontier
 
             var panel = UiKit.Div("fr-modal");
             if (wide) panel.AddToClassList("fr-modal-wide");
-            UiKit.Border(panel, c, 3f);
-            UiKit.Halo(panel, c, 30f, 0.22f);
+            UiKit.SetAccent(panel, c);
             var head = UiKit.Div("fr-modal-head");
-            head.Add(Icons.Make(icon, c, 52f));
-            head.Add(UiKit.Text(title, "fr-modal-title", c));
-            head.Add(Icons.IconButton("close", UiKit.Red, CloseModal, 76f));
+            head.Add(Icons.Make(icon, c));
+            head.Add(UiKit.Text(title, "fr-modal-title"));
+            head.Add(Icons.IconButton("close", UiKit.Muted, CloseModal));
             panel.Add(head);
 
             modalScroll = UiKit.VerticalScroll("fr-modal-scroll");
             panel.Add(modalScroll);
             backdropEl.Add(panel);
             modalLayer.Add(backdropEl);
+            if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             build(modalScroll.contentContainer);
         }
 
         void CloseModal()
         {
             EndInventoryDrag();
+            if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.None;
             if (modalKey == "warehouse")
             {
                 planetView.Frozen = false;
@@ -79,12 +80,12 @@ namespace Frontier
 
         VisualElement TabButton(string icon, string label, bool on, Color accent, Action onClick)
         {
-            Color c = on ? accent : new Color(0.55f, 0.65f, 0.8f);
             var t = new Button();
             t.AddToClassList("fr-tab");
-            UiKit.Border(t, UiKit.Ui(c, on ? 1f : 0.4f), 2f);
-            t.Add(Icons.Make(icon, c, 32f));
-            t.Add(UiKit.Text(label, "fr-small", UiKit.Ui(c)));
+            UiKit.SetAccent(t, accent);
+            if (on) t.AddToClassList("fr-tab-on");
+            t.Add(Icons.Make(icon, on ? UiKit.Ui(accent) : UiKit.Muted, UiKit.Size.IconMd));
+            t.Add(UiKit.Text(label, "fr-tab-label"));
             t.clicked += () => { Sfx.Click(); onClick(); RefreshModal(); };
             return t;
         }
@@ -93,11 +94,13 @@ namespace Frontier
         {
             var tabs = UiKit.Div("fr-tabs");
             tabs.Add(TabButton("refinery", "ECON", shopTab == 0, UiKit.Lime, () => shopTab = 0));
-            tabs.Add(TabButton("tools", "GATHER", shopTab == 1, UiKit.Lime, () => shopTab = 1));
-            tabs.Add(TabButton("alien", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
-            tabs.Add(TabButton("warp", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
+            tabs.Add(TabButton("mine", "GATHER", shopTab == 1, UiKit.Lime, () => shopTab = 1));
+            tabs.Add(TabButton("shield", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
+            tabs.Add(TabButton("satellite", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
             body.Add(tabs);
-            body.Add(UiKit.Text("Build on " + gs.planet.displayName + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots + " free slots. Tap a structure on the planet to use it.", "fr-muted"));
+            var note = UiKit.Text("Build on " + gs.planet.displayName + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots + " free slots. Tap a structure on the planet to use it.", "fr-muted");
+            note.style.marginBottom = UiKit.Space.S12;
+            body.Add(note);
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Warehouse); break;
@@ -118,23 +121,25 @@ namespace Frontier
                 var def = sd;
                 Color c = UiKit.Ui(def.color);
                 var card = Card(c);
-                var top = UiKit.Div("fr-row");
-                top.Add(Icons.Make(StructureIcon(def.kind), c, 56f));
-                var col = UiKit.Div(); col.style.flexGrow = 1; col.style.marginLeft = 10; col.pickingMode = PickingMode.Ignore;
-                col.Add(UiKit.Text(def.displayName.ToUpper(), "fr-h2", c));
+                var top = UiKit.Div("fr-card-head");
+                top.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconXl));
+                var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
+                col.Add(UiKit.Text(def.displayName.ToUpper(), "fr-h2"));
                 col.Add(UiKit.Text(def.description, "fr-tiny"));
                 top.Add(col);
                 int have = gs.CountOnPlanet(gs.planet, def);
-                top.Add(UiKit.Text(def.maxPerPlanet > 0 ? have + "/" + def.maxPerPlanet : "x" + have, "fr-small", c));
+                var count = UiKit.Text(def.maxPerPlanet > 0 ? have + "/" + def.maxPerPlanet : "x" + have, "fr-small");
+                count.style.marginLeft = UiKit.Space.S12;
+                top.Add(count);
                 card.Add(top);
 
-                if (gs.AtLimit(gs.planet, def)) card.Add(UiKit.Text("BUILT - tap it on the planet", "fr-small", UiKit.Lime));
-                else if (!gs.CanBuildHere(def)) card.Add(UiKit.Text("Nothing to harvest on this planet", "fr-small", UiKit.Amber));
+                if (gs.AtLimit(gs.planet, def)) card.Add(Note("BUILT - tap it on the planet", UiKit.Lime));
+                else if (!gs.CanBuildHere(def)) card.Add(Note("Nothing to harvest on this planet", UiKit.Amber));
                 else
                 {
                     card.Add(UiKit.CostRow(def.buildCost, gs, true));
                     bool can = gs.Has(def.buildCost);
-                    var place = IconBtn("PLACE", "build", c, () => { CloseModal(); EnterBuild(def); });
+                    var place = IconBtn("PLACE", "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
                     UiKit.SetEnabledLook(place, can);
                     card.Add(place);
                 }
@@ -142,16 +147,42 @@ namespace Frontier
             }
         }
 
+        /// <summary>A short status line inside a card (built, locked, maxed).</summary>
+        static Label Note(string text, Color color)
+        {
+            var l = UiKit.Text(text, "fr-small", color);
+            l.style.marginTop = UiKit.Space.S8;
+            return l;
+        }
+
         // ------------------------------------------------------------ menu (leaderboard, tutorial, about, settings)
-        void OpenMenu() { if (defense.Active || busy) return; menuPage = ""; OpenModal("menu", "grid", "MENU", UiKit.Cyan, BuildMenu, true); }
+        void OpenMenu() { if (defense.Active || busy) return; menuPage = ""; OpenModal("menu", "menu", "MENU", UiKit.Cyan, BuildMenu, true); }
 
         string menuPage = "";
 
+        /// <summary>The DEBUG tile and its cheat tools exist only in the editor and development builds.</summary>
+        public static bool DebugToolsAvailable
+        {
+            get
+            {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (debugToolsOverride.HasValue) return debugToolsOverride.Value;
+#endif
+                return Debug.isDebugBuild || Application.isEditor;
+            }
+        }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        static bool? debugToolsOverride;
+#endif
+
         void BuildMenu(VisualElement body)
         {
+            if (menuPage == "debug" && !DebugToolsAvailable) menuPage = "";
             if (menuPage != "")
             {
-                var back = IconBtn("BACK", "up", UiKit.Cyan, () => { menuPage = ""; RefreshModal(); });
+                var back = IconBtn("BACK", "back", UiKit.Muted, () => { menuPage = ""; RefreshModal(); });
+                back.AddToClassList("fr-btn-ghost");
                 back.AddToClassList("fr-back");
                 body.Add(back);
                 switch (menuPage)
@@ -169,7 +200,7 @@ namespace Frontier
             grid.Add(MenuTile("tutorial", "HOW TO PLAY", UiKit.Cyan, "tutorial"));
             grid.Add(MenuTile("about", "ABOUT", UiKit.Magenta, "about"));
             grid.Add(MenuTile("gear", "SETTINGS", UiKit.Cyan, "settings"));
-            grid.Add(MenuTile("tools", "DEBUG", UiKit.Red, "debug"));
+            if (DebugToolsAvailable) grid.Add(MenuTile("tools", "DEBUG", UiKit.Red, "debug"));
             body.Add(grid);
         }
 
@@ -178,27 +209,29 @@ namespace Frontier
             Color c = UiKit.Ui(color);
             var b = new Button();
             b.AddToClassList("fr-menu-tile");
-            UiKit.Border(b, c, 2f);
+            UiKit.SetAccent(b, c);
             b.Add(Icons.Make(icon, c));
-            b.Add(UiKit.Text(label, "fr-small", c));
+            b.Add(UiKit.Text(label, "fr-menu-tile-label"));
             b.clicked += () => { Sfx.Click(); menuPage = page; RefreshModal(); };
             return b;
         }
 
         void StatRow(VisualElement body, string icon, Color color, string label, string value)
         {
-            var row = UiKit.Div("fr-row"); row.style.marginBottom = 10;
-            row.Add(Icons.Make(icon, UiKit.Ui(color), 44f));
+            var row = UiKit.Div("fr-row"); row.style.marginTop = UiKit.Space.S12;
+            var ic = Icons.Make(icon, UiKit.Ui(color), UiKit.Size.IconMd);
+            ic.style.marginRight = UiKit.Space.S12;
+            row.Add(ic);
             row.Add(UiKit.Text(label, "fr-small"));
             row.Add(UiKit.Div("fr-spacer"));
-            row.Add(UiKit.Text(value, "fr-h2", color));
+            row.Add(UiKit.Text(value, "fr-h2"));
             body.Add(row);
         }
 
         void BuildLeaderboard(VisualElement body)
         {
             var card = Card(UiKit.Lime);
-            card.Add(UiKit.Text("YOUR RECORD", "fr-h2", UiKit.Lime));
+            card.Add(UiKit.Text("YOUR RECORD", "fr-h2"));
             StatRow(card, "star", UiKit.Magenta, "Level", gs.PlayerLevel.ToString());
             StatRow(card, "alien", UiKit.Red, "Waves cleared", gs.totalWavesCleared.ToString());
             StatRow(card, "base", UiKit.Cyan, "Structures", gs.structures.Count.ToString());
@@ -223,10 +256,11 @@ namespace Frontier
         void TutorialStep(VisualElement body, string icon, Color color, string title, string text)
         {
             var card = Card(color);
-            var row = UiKit.Div("fr-row");
-            row.Add(Icons.Make(icon, UiKit.Ui(color), 56f));
-            var col = UiKit.Div(); col.style.marginLeft = 12; col.style.flexShrink = 1; col.pickingMode = PickingMode.Ignore;
-            col.Add(UiKit.Text(title, "fr-h2", color));
+            var row = UiKit.Div("fr-card-head");
+            row.style.alignItems = Align.FlexStart;
+            row.Add(Icons.Make(icon, UiKit.Ui(color), UiKit.Size.IconLg));
+            var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
+            col.Add(UiKit.Text(title, "fr-h2"));
             col.Add(UiKit.Text(text, "fr-muted"));
             row.Add(col);
             card.Add(row);
@@ -237,8 +271,12 @@ namespace Frontier
         {
             var card = Card(UiKit.Magenta);
             card.Add(UiKit.Text("FRONTIER", "fr-title", UiKit.Magenta));
-            card.Add(UiKit.Text("Build bases across the stars. Gather, refine, travel, and defend your worlds from alien waves.", "fr-muted"));
-            card.Add(UiKit.Text("Version " + Application.version, "fr-tiny"));
+            var blurb = UiKit.Text("Build bases across the stars. Gather, refine, travel, and defend your worlds from alien waves.", "fr-muted");
+            blurb.style.marginTop = UiKit.Space.S8;
+            card.Add(blurb);
+            var version = UiKit.Text("Version " + Application.version, "fr-tiny");
+            version.style.marginTop = UiKit.Space.S8;
+            card.Add(version);
             body.Add(card);
         }
 
@@ -246,12 +284,13 @@ namespace Frontier
 
         void BuildSettings(VisualElement body)
         {
-            var snd = IconBtn(Sfx.Muted ? "SOUND OFF" : "SOUND ON", "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
+            var snd = IconBtn(Sfx.Muted ? "SOUND OFF" : "SOUND ON", Sfx.Muted ? "mute" : "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
             {
                 Sfx.Muted = !Sfx.Muted;
                 PlayerPrefs.SetInt("fr_muted", Sfx.Muted ? 1 : 0);
                 RefreshModal();
             });
+            snd.style.marginTop = 0;
             body.Add(snd);
             body.Add(IconBtn(world.ShowStructureLabels ? "STRUCTURE LABELS: ALWAYS" : "STRUCTURE LABELS: SELECTED ONLY", "base", UiKit.Cyan, () =>
             {
@@ -270,6 +309,7 @@ namespace Frontier
                 planetView.Show(gs.planet, true);
                 selected = gs.planet;
             });
+            reset.style.marginTop = UiKit.Space.S24;
             body.Add(reset);
         }
 
@@ -279,8 +319,8 @@ namespace Frontier
             var tabs = UiKit.Div("fr-tabs");
             tabs.Add(TabButton("base", "BASES", researchTab == 0, UiKit.Magenta, () => researchTab = 0));
             tabs.Add(TabButton("tools", "TOOLS", researchTab == 1, UiKit.Magenta, () => researchTab = 1));
-            tabs.Add(TabButton("warp", "SHIP", researchTab == 2, UiKit.Magenta, () => researchTab = 2));
-            tabs.Add(TabButton("alien", "DEFENSE", researchTab == 3, UiKit.Magenta, () => researchTab = 3));
+            tabs.Add(TabButton("ship", "SHIP", researchTab == 2, UiKit.Magenta, () => researchTab = 2));
+            tabs.Add(TabButton("shield", "DEFENSE", researchTab == 3, UiKit.Magenta, () => researchTab = 3));
             body.Add(tabs);
             switch (researchTab)
             {
@@ -302,33 +342,33 @@ namespace Frontier
             for (int i = 0; i < tools.Count; i++)
             {
                 int idx = i;
-                string ic = tools[i].tool == MinigameKind.Chop ? "wood" : tools[i].tool == MinigameKind.Mine ? "iron" : "tools";
-                sub.Add(TabButton(ic, tools[i].displayName.ToUpper(), toolTab == i, tools[i].color, () => toolTab = idx));
+                sub.Add(TabButton(Icons.ForTool(tools[i].tool), tools[i].displayName.ToUpper(), toolTab == i, UiKit.Magenta, () => toolTab = idx));
             }
             body.Add(sub);
 
             var u2 = tools[toolTab];
             int lvl = gs.Level(u2);
             body.Add(UiKit.Text(u2.description, "fr-muted"));
-            body.Add(UiKit.Text("Equipped: " + u2.NameAtLevel(lvl) + "   DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * lvl).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * lvl).ToString("0.0"), "fr-small", UiKit.Ui(u2.color)));
+            var equipped = UiKit.Text("Equipped: " + u2.NameAtLevel(lvl) + "   DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * lvl).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * lvl).ToString("0.0"), "fr-small");
+            equipped.style.marginTop = UiKit.Space.S8; equipped.style.marginBottom = UiKit.Space.S12;
+            body.Add(equipped);
             for (int l = 0; l <= u2.maxLevel; l++)
             {
                 int level = l;
                 bool owned = l <= lvl, next = l == lvl + 1;
-                Color c = UiKit.Ui(u2.color);
-                var card = Card(owned ? c : new Color(0.5f, 0.6f, 0.75f));
-                card.style.opacity = owned || next ? 1f : 0.55f;
+                var card = Card(UiKit.Magenta, l == lvl);
+                if (!owned && !next) card.AddToClassList("fr-card-dim");
                 var top = UiKit.Div("fr-row");
-                top.Add(UiKit.Text(u2.NameAtLevel(l), "fr-h2", owned ? c : Color.white));
+                top.Add(UiKit.Text(u2.NameAtLevel(l), "fr-h2"));
                 top.Add(UiKit.Div("fr-spacer"));
-                top.Add(UiKit.Text(owned ? (l == lvl ? "EQUIPPED" : "OWNED") : next ? "NEXT" : "LOCKED", "fr-tiny", owned ? UiKit.Lime : UiKit.Amber));
+                top.Add(UiKit.Text(owned ? (l == lvl ? "EQUIPPED" : "OWNED") : next ? "NEXT" : "LOCKED", "fr-tiny", l == lvl ? UiKit.Lime : (Color?)null));
                 card.Add(top);
                 card.Add(UiKit.Text("DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * l).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * l).ToString("0.0") + "   Faster swing", "fr-tiny"));
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);
                     card.Add(UiKit.CostRow(cost, gs, true));
-                    var buy = IconBtn("UPGRADE", "up", u2.color, () =>
+                    var buy = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
                     {
                         if (gs.Buy(u2)) { Sfx.Good(); Toast(u2.NameAtLevel(gs.Level(u2)) + " ready!", UiKit.Ui(u2.color)); planetView.Punch(); }
                         else Sfx.Bad();
@@ -350,8 +390,10 @@ namespace Frontier
                 var here = gs.structures.FindAll(s => s.planetId == p.id);
                 if (p != gs.planet && here.Count == 0) continue;
                 any = true;
-                var h = UiKit.Div("fr-row"); h.style.marginTop = 6; h.style.marginBottom = 8;
-                h.Add(UiKit.Text(p.displayName.ToUpper(), "fr-small", UiKit.Ui(p.rim)));
+                var h = UiKit.Div("fr-row"); h.style.marginTop = UiKit.Space.S8; h.style.marginBottom = UiKit.Space.S8;
+                var hn = UiKit.Text(p.displayName.ToUpper(), "fr-small", UiKit.Ui(p.rim));
+                hn.style.marginRight = UiKit.Space.S12;
+                h.Add(hn);
                 if (p == gs.planet) h.Add(UiKit.Text("YOU ARE HERE", "fr-tiny"));
                 body.Add(h);
                 if (here.Count == 0) body.Add(UiKit.Text("No base yet - place structures from the build menu.", "fr-muted"));
@@ -360,10 +402,10 @@ namespace Frontier
                     var s = st;
                     Color c = UiKit.Ui(s.def.color);
                     var card = Card(c);
-                    var top = UiKit.Div("fr-row");
-                    top.Add(Icons.Make(StructureIcon(s.def.kind), c, 48f));
-                    var col = UiKit.Div(); col.style.flexGrow = 1; col.style.marginLeft = 10; col.pickingMode = PickingMode.Ignore;
-                    col.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level + "/" + s.def.maxLevel, "fr-h2", c));
+                    var top = UiKit.Div("fr-card-head");
+                    top.Add(Icons.Make(StructureIcon(s.def.kind), c, UiKit.Size.IconLg));
+                    var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
+                    col.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level + "/" + s.def.maxLevel, "fr-h2"));
                     bool max = s.level >= s.def.maxLevel;
                     col.Add(UiKit.Text(StructureEffect(s.def, s.level) + (max ? "" : "  >  " + StructureEffect(s.def, s.level + 1)), "fr-tiny"));
                     top.Add(col);
@@ -372,7 +414,7 @@ namespace Frontier
                     {
                         var cost = s.def.UpgradeCost(s.level);
                         card.Add(UiKit.CostRow(cost, gs, true));
-                        var up = IconBtn("UPGRADE", "up", c, () =>
+                        var up = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
                         {
                             if (gs.UpgradeStructure(s)) { Sfx.Good(); Toast(s.def.displayName + " LV " + s.level, c); }
                             else Sfx.Bad();
@@ -380,7 +422,7 @@ namespace Frontier
                         UiKit.SetEnabledLook(up, gs.Has(cost));
                         card.Add(up);
                     }
-                    else card.Add(UiKit.Text("MAXED", "fr-small", UiKit.Lime));
+                    else card.Add(Note("MAXED", UiKit.Lime));
                     body.Add(card);
                 }
             }
@@ -396,9 +438,9 @@ namespace Frontier
                     var u = up;
                     int lvl = gs.Level(u);
                     bool max = lvl >= u.maxLevel;
-                    var card = Card(u.color);
+                    var card = Card(UiKit.Magenta);
                     var top = UiKit.Div("fr-row");
-                    top.Add(UiKit.Text(u.NameAtLevel(lvl), "fr-h2", UiKit.Ui(u.color)));
+                    top.Add(UiKit.Text(u.NameAtLevel(lvl), "fr-h2"));
                     top.Add(UiKit.Div("fr-spacer"));
                     top.Add(UiKit.Text("LV " + lvl + "/" + u.maxLevel, "fr-small"));
                     card.Add(top);
@@ -408,7 +450,7 @@ namespace Frontier
                     {
                         var cost = u.CostAt(lvl);
                         card.Add(UiKit.CostRow(cost, gs, true));
-                        var buy = IconBtn("UPGRADE", "up", u.color, () =>
+                        var buy = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
                         {
                             if (gs.Buy(u)) { Sfx.Good(); Toast(u.NameAtLevel(gs.Level(u)) + " ready!", UiKit.Ui(u.color)); planetView.Punch(); }
                             else Sfx.Bad();
@@ -416,7 +458,7 @@ namespace Frontier
                         UiKit.SetEnabledLook(buy, gs.Has(cost));
                         card.Add(buy);
                     }
-                    else card.Add(UiKit.Text("MAXED", "fr-small", UiKit.Lime));
+                    else card.Add(Note("MAXED", UiKit.Lime));
                     body.Add(card);
                 }
             }
@@ -430,7 +472,7 @@ namespace Frontier
             SyncPack();
             body.Add(UiKit.Text(gs.SlotsUsed + " / " + gs.Slots + " slots used  -  drag to rearrange", "fr-muted"));
             var grid = UiKit.Div("fr-grid");
-            grid.style.marginTop = 8;
+            grid.style.marginTop = UiKit.Space.S8;
 
             var slots = new List<VisualElement>();
             for (int i = 0; i < packRes.Length; i++) slots.Add(PackSlot(i, slots));
@@ -443,22 +485,27 @@ namespace Frontier
             SizeInventoryGrid(grid, slots);
             body.Add(grid);
 
-            var detail = Card(UiKit.Cyan);
-            detail.style.marginTop = 14;
-            detail.style.minHeight = 190;
+            var detail = Card(UiKit.Amber);
+            detail.style.marginTop = UiKit.Space.S16;
+            detail.style.minHeight = 200;
             if (packSel >= 0 && packSel < packRes.Length && packRes[packSel] != null)
             {
                 var r = packRes[packSel];
                 Color c = UiKit.Ui(r.color);
-                var row = UiKit.Div("fr-row");
-                row.Add(Icons.Make(Icons.ForResource(r), c, 72f));
-                var col = UiKit.Div(); col.style.marginLeft = 12; col.style.flexShrink = 1; col.pickingMode = PickingMode.Ignore;
-                col.Add(UiKit.Text(r.displayName.ToUpper(), "fr-h2", c));
+                var row = UiKit.Div("fr-card-head");
+                row.Add(Icons.Make(Icons.ForResource(r), c, UiKit.Size.IconXl));
+                var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
+                col.Add(UiKit.Text(r.displayName.ToUpper(), "fr-h2"));
                 col.Add(UiKit.Text("In this slot: " + packCnt[packSel] + " / " + r.stackSize, "fr-small"));
                 col.Add(UiKit.Text("Total carried: " + gs.Count(r), "fr-small"));
                 row.Add(col);
                 detail.Add(row);
-                if (!string.IsNullOrEmpty(r.description)) detail.Add(UiKit.Text(r.description, "fr-muted"));
+                if (!string.IsNullOrEmpty(r.description))
+                {
+                    var desc = UiKit.Text(r.description, "fr-muted");
+                    desc.style.marginTop = UiKit.Space.S8;
+                    detail.Add(desc);
+                }
             }
             else detail.Add(UiKit.Text("Tap an item to see its details.", "fr-muted"));
             body.Add(detail);
@@ -553,19 +600,22 @@ namespace Frontier
             body.Add(UiKit.Text("DEBUG TOOLS - for testing only", "fr-muted", UiKit.Red));
 
             var give = Card(UiKit.Amber);
-            give.Add(UiKit.Text("GIVE ITEMS", "fr-h2", UiKit.Amber));
+            give.Add(UiKit.Text("GIVE ITEMS", "fr-h2"));
             var amt = UiKit.Div("fr-tabs");
+            amt.style.marginTop = UiKit.Space.S8;
             foreach (int a in new[] { 10, 100, 1000 })
             {
                 int v = a;
                 amt.Add(TabButton("star", "x" + a, debugAmount == v, UiKit.Amber, () => debugAmount = v));
             }
             give.Add(amt);
-            var res = UiKit.Div("fr-tabs");
+            var res = UiKit.Div("fr-row-wrap");
             foreach (var r in gs.db.resources)
             {
                 var rr = r;
                 var b = IconBtn(r.displayName.ToUpper(), Icons.ForResource(r), UiKit.Ui(r.color), () => { gs.Add(rr, debugAmount); Sfx.Good(); RefreshModal(); });
+                b.AddToClassList("fr-btn-mini");
+                b.style.marginBottom = UiKit.Space.S8;
                 res.Add(b);
             }
             give.Add(res);
@@ -577,7 +627,7 @@ namespace Frontier
             body.Add(give);
 
             var prog = Card(UiKit.Magenta);
-            prog.Add(UiKit.Text("PROGRESS", "fr-h2", UiKit.Magenta));
+            prog.Add(UiKit.Text("PROGRESS", "fr-h2"));
             prog.Add(UiKit.Text("Player level " + gs.PlayerLevel, "fr-small"));
             prog.Add(IconBtn("LEVEL +1", "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 1); Sfx.Good(); RefreshModal(); }));
             prog.Add(IconBtn("LEVEL +10", "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 10); Sfx.Good(); RefreshModal(); }));
@@ -594,7 +644,7 @@ namespace Frontier
             body.Add(prog);
 
             var tp = Card(UiKit.Cyan);
-            tp.Add(UiKit.Text("TELEPORT (free)", "fr-h2", UiKit.Cyan));
+            tp.Add(UiKit.Text("TELEPORT (free)", "fr-h2"));
             foreach (var p in gs.db.planets)
             {
                 var pl = p;
@@ -617,9 +667,7 @@ namespace Frontier
             if (locked) s.AddToClassList("fr-slot-locked");
             if (r != null)
             {
-                Color c = UiKit.Ui(r.color);
-                UiKit.Border(s, new Color(c.r, c.g, c.b, 0.9f), 2f);
-                s.Add(Icons.Make(Icons.ForResource(r), c));
+                s.Add(Icons.Make(Icons.ForResource(r), UiKit.Ui(r.color)));
                 s.Add(UiKit.Text(count.ToString(), "fr-slot-count"));
             }
             return s;
