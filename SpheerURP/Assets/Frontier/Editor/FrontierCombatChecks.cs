@@ -10,12 +10,13 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Validate Combat Balance")]
         public static void Run()
         {
+            CheckSupport.IsolateSaves();
             var db = GameDatabase.Load();
             var previousState = GameState.I;
             var go = new GameObject("CombatValidation");
             try
             {
-                var state = new GameState(db);
+                var state = new GameState(db, false);
                 var defense = go.AddComponent<DefenseController>();
                 defense.Init(null, null, state);
                 int previews = 0;

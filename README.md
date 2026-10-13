@@ -1,164 +1,37 @@
-# Spheer — Game Design Document & Developer Reference
+# Frontier
 
-## Frontier rework — combat
+A portrait mobile space game: land on procedurally styled worlds, harvest resources through 3D mini-games, refine and build,
+call in alien waves for loot, then spend fuel to warp to new worlds. Built with Unity 6 (URP) and UI Toolkit; all content is
+data-driven ScriptableObjects.
 
-The separate Frontier scene uses player-built surface turrets and fuel-funded alarm waves; alarms never spawn orbital turrets. The former Orbital Turret research is now **Turret Actuators**, increasing placed-turret firing speed by 15% per level. Its saved upgrade ID and effect index are preserved.
+> Working title. The repository was formerly the original *Spheer* prototype; that game was removed
+> ([docs/LEGACY_REMOVED.md](docs/LEGACY_REMOVED.md), tag `legacy-spheer-v1`).
 
-Tune `WaveFormulaSO` for threat budget, health/damage/speed per fuel cell, spawn interval, and visible approach time (default 1.2 seconds). Increasing fuel extends a repeatable enemy sequence and increases individual difficulty; victory rewards do not decrease when fuel increases. Enemies enter just outside the side edges of the camera and cannot be automatically targeted until they have spent the approach time on screen. Placed turrets still respect their configured range.
+## Open it
 
-Structures use non-emissive materials, with a glowing mesh outline only while selected. Alien bodies use species-colored surfaces, bright veins, arrival pulses, trails, and hit flashes. Run **Frontier > Validate Combat Balance** to check repeatable previews, monotonic fuel rewards/difficulty, enemy-sequence prefixes, and selection-shader import.
+1. Install **Unity 6000.4.0f1** (Android and iOS modules recommended).
+2. Open the `SpheerURP` folder as a project.
+3. Open `Assets/Frontier/Scenes/Frontier.unity` and press Play. Everything else is created from code and the data assets.
 
-### Frontier warehouses
+Saves live in `Application.persistentDataPath/frontier_save.json`. **Frontier > Reset Save** deletes it.
 
-Build a **Warehouse** from Build > Econ (20 Scrap + 10 Wood). Each warehouse starts with 18 slots and gains 9 per upgrade, to 54 at level 5. `StructureSO.storageSlots` and `storageSlotsPerLevel` control capacity. Warehouses take normal planet building slots; each warehouse stores its own resources, saved by planet and building slot.
+## Tools
 
-Tap a warehouse to open its storage and your backpack together. Drag stacks in either direction or rearrange either grid. Matching resources merge up to the resource's stack limit; transfers move only what fits and never discard the remainder. Stored resources stay on that planet and are not used automatically for crafting, fuel or construction. Old saves load with empty warehouse storage. An opaque icon and stack count follow mouse/touch drags, including ordinary backpack rearrangement.
+| Do this | Run |
+|---------|-----|
+| Validate planets, storage, combat, layout | **Frontier > Validate ...** menu items, or `tools/run-unity.ps1 -Method Frontier.EditorTools.<Check>.Run` |
+| See every screen on virtual phones/tablets | `tools/capture-screens.ps1` (PNGs, UI lint in `report.json`) |
+| Compare two capture runs | `tools/image-diff.ps1` |
+| Apply the mobile baseline (portrait, IL2CPP, ARM64) | **Frontier > Apply Mobile Project Settings** |
 
-### Frontier planet sizing and travel
+Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-Planet and structure source FBX import scales are calibrated directly to common units; each ModelLibrary entry also stores a measured correction for its assembled prefab. **Frontier > Calibrate Model Scales** repeats this process after replacing models. It preserves assembled prefab part offsets. The source imports are shared with the legacy scene, so bare model instances there also use the corrected units.
+## Documents
 
-All Frontier planets retain a displayed radius of 1.5 and atmosphere scale 5. Logical **World Size** increases with depth (1.00 to 2.12), shrinking buildings, build pads and their pick colliders proportionally, while **Building Slots** increases from 12 to 40. Both are authored on each PlanetSO, independently of display sizing; size resets preserve capacity. Existing saved buildings keep their original slot positions. **Validate Planet Model Sizes** checks calibrated planet/structure mesh diameters and capacity.
-
-Menu > Settings > **Structure Labels** switches between always-visible labels and selected-only labels, and remembers the choice. Empty build-pad markers remain available in build mode.
-
-### Frontier panel layout
-
-Structure panels stay centered in the area below the top HUD and above the dock. Only short, upgrade-only turret panels can follow their structure, and remain clamped to that area. Larger menus, warehouse panels, minigames and wave results may cover the dock but never the top HUD; all respect device safe-area insets. Scrollable panels use a fixed vertical gutter with a slim rounded handle and no horizontal scrollbar. Inventory moves and crafting refresh the existing scroll view instead of changing its scrollbar visibility. **Frontier > Validate Panel Layout** checks portrait/landscape panel bounds and inventory rebuilds in the Editor.
-
-Travel plays the departure warp first, the flight minigame second, and the destination approach last. The star map separates six existing solar systems into three spiral galaxy regions. Curved departure/arrival tangents and a moving ship show the route; the map is illustrative, not a gravity simulation or optimal-path solver. Its expanded visual spacing and route curvature do not change fuel costs or authored planet coordinates.
-
-The sections below describe the legacy Spheer scene.
-
-## What the Game Is
-
-Spheer is a **mobile idle/clicker base-builder** inspired by *Clash of Clans* and *Egg Inc* — your world is your base. Tap it to earn money, buy structures that generate passive income, research powerful upgrades, and defend against alien invasion waves. The goal is a satisfying loop of building, earning, defending, and prestiging that keeps you coming back.
-
-### Core Loop
-1. **Spin / tap the world** → earn dollars based on your current `power` stat.
-2. **Buy structures** in the shop → each one adds to your passive income-per-second and physically appears on your world. Each world has a **limited number of building slots** — choose wisely.
-3. **Passive income** accrues every second (and a portion accrues while you're offline).
-4. **Research upgrades** unlock multipliers: click power, production rate, turret stats, XP rate, sell-back rate, and more.
-5. **Enemy waves** (UFOs / aliens) invade at increasing difficulty. Turrets and lazers auto-attack; you can also **tap an alien directly** to deal bonus damage + see a hit marker.
-6. **XP levels** unlock higher-tier structures.
-7. **Prestige** when you're ready to reset — earn **Dark Matter** (permanent currency) that boosts all future earnings.
-8. **Multiple worlds** unlock as you progress (Lerth → Domny → Chotis → Purp → Dark → Saturn → Spiky…).
-
-### Tech Stack
-- **Unity (URP)** — 3D mobile game targeting iOS/Android
-- **LeanTween** — UI and world animations
-- **Unity Ads** — banner, interstitial, and rewarded video
-- **JSON file-based save system** with offline-earnings calculation
-
----
-
-## Vision — *Spheer: Clash of Worlds*
-
-Think **Clash of Clans** meets **Egg Inc**:
-- Your planet surface is your base. Structures are placed on limited slots, so layout matters.
-- Income compounds with smart building choices (Egg Inc–style scaling).
-- Defense towers protect your base from alien waves that get harder forever.
-- Prestige resets progress but unlocks permanent bonuses — the offline grind loop.
-
----
-
-## Future Scope (Planned Features)
-
-| Feature | Description |
-|---------|-------------|
-| **Build Timers** | Structures take real time to construct (Clash of Clans–style). Higher tiers take longer. |
-| **Builder's Huts** | Buy extra builder slots to construct/upgrade multiple buildings simultaneously. |
-| **Science & Research Rework** | Research tiers require accumulated "Science" points (earned by buying upgrades), not XP level — like Egg Inc's research progression. |
-| **In-App Purchases** | Gem packs, instant-build skips, Dark Matter boosts. |
-| **Rewarded Ads** | Watch an ad to double offline earnings, get a free research boost, etc. |
-| **Piggy Bank** | Passively collects in-game currency. Break it (via real purchase or ad) to collect. |
-| **More Structures** | New buildings with unique effects (e.g., Shield Generator, Warp Drive income booster, DNA Splicer). |
-| **Mission Rewards** | Completing missions will grant real rewards (currency, Dark Matter, boosts). |
-| **Leaderboard Polish** | Cross-platform leaderboards via Unity Gaming Services. |
-
-
-| World | Suggested `maxBuildingSlots` |
-|-------|------------------------------|
-| Lerth (starter) | 12 |
-| Domny | 16 |
-| Chotis | 20 |
-| Purp | 24 |
-| Dark | 28 |
-| Saturn | 32 |
-| Spiky | 36 |
-
-
-| Building | Suggested `slotSize` |
-|----------|-----------------------|
-| Windmill | 1 |
-| Drill | 1 |
-| Cell Tower | 2 |
-| Sat Dish | 2 |
-| Gunner | 2 |
-| Laser | 3 |
-| Missile Silo | 3 |
-| Satellite *(orbit)* | — (ignored, orbit items skip placement) |
-
-## Repository Structure
-
-```
-SpheerURP/
-  Assets/
-    _Scripts/
-      Monobehaviors/
-        EnemyScripts/          # Enemy state machine (Idle, Approaching, Attack, Leaving)
-        UI/                    # All panel scripts (UIManager, MissionsPanel, ResearchPanel, etc.)
-        Player.cs              # Singleton: money, XP, prestige, targeting, save/load
-        EnemySpawner.cs        # Wave generation & enemy scaling
-        PopupManager.cs        # Notification icon stack (Egg Inc-style)
-        PopupMessage.cs        # Individual notification: slide-in, wiggle, expand
-        TutorialManager.cs     # First-time player timed tutorial messages
-        Turret.cs / lazer.cs   # Defense building logic
-        PlacementManager.cs    # Interactive building placement
-        TransactionManager.cs  # Purchase validation
-        WorldSpawner.cs        # World model swapping & object loading
-      ScriptableObjects/
-        Missions/
-          MissionSO.cs         # Mission data class + MissionType enum
-          MissionsListSO.cs    # List container ScriptableObject
-          MissionDefinitions.cs # Hard-coded mission list (45 missions, 9 types × 5 tiers)
-        Research/              # ResearchItemSO per upgrade
-        Upgrade/               # ShopItemSO per building
-        World/                 # WorldSO per planet
-        Lists/                 # Combined list SOs (research info.asset, shop items.asset, etc.)
-      SaveSystem/
-        PlayerData.cs          # Serializable snapshot of Player state
-        SaveSystem.cs          # JSON read/write to persistent data path
-    Prefabs/                   # UFO enemy, buildings, slot marker, UI cards
-    Scenes/                    # MainGame + PhotoBooth
-    Sounds/                    # Audio clips
-    Models/                    # 3D world/building models
-```
-
----
-
-## Key Systems Reference
-
-### Panel System
-All panels extend `MenuPanel` and are registered in `UIManager.getPanelFromName()`.
-Keys: `"main"`, `"worlds"`, `"research"`, `"structures"`, `"debug menu"`, `"info"`, `"prestige"`, `"missions"`, `"leaderboard"`, `"stats"`.
-
-### Enemy Tap Damage
-A UI button is placed over each enemy prefab. Add the following to its **OnClick** list:
-- `EnemyStateManager → TapEnemy()`
-
-This deals configurable tap damage and spawns a hit marker via UIManager.
-
-### Research System
-30 research items (indices 0–29). Indices 13/18/19/23 all contribute to `productionRateMultiplier` — always call `RecalculateProductionRate()` when adding new indices that affect it. `EnsureResearchCountSize()` auto-pads saves.
-
-### Missions System
-45 missions in 9 categories × 5 difficulty tiers, defined in `MissionDefinitions.cs`. Missions never reset. Completing a mission toggles the checkbox image on its card. No rewards yet (planned for future release).
-
-### Notification / Popup System
-`PopupManager.ShowPopup(message)` creates an icon that slides up the right side of the screen. If the icon is not tapped within 5 seconds it starts wiggling. Tapping expands it to a full message; tapping again closes it.
-
-### Tutorial
-`TutorialManager` detects first-time players (via `Player.hasSeenTutorial`) and sends 7 timed messages explaining spinning, structures, building slots, research, alien waves, defense, and prestige.
-
----
+| Document | What it covers |
+|----------|----------------|
+| [docs/ROADMAP.md](docs/ROADMAP.md) | the approved master plan: audit, architecture, universe, economy, mini-games, UI, monetization, release |
+| [docs/AUDIT.md](docs/AUDIT.md) | baseline UI audit from real screenshots and lint numbers |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | code map, rules, tooling |
+| [docs/SYSTEMS.md](docs/SYSTEMS.md) | how combat, warehouses, sizing, travel and panels behave today |
+| [docs/LEGACY_REMOVED.md](docs/LEGACY_REMOVED.md) | what was removed from the old prototype and how to recover it |

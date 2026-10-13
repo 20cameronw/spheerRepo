@@ -60,7 +60,8 @@ namespace Frontier
             var defense = new GameObject("Defense").AddComponent<DefenseController>();
             defense.Init(planet, cam, gs);
 
-            var panel = panelSettings != null ? panelSettings : ScriptableObject.CreateInstance<PanelSettings>();
+            // Work on a copy: runtime scale/target changes must never be serialized back into the asset.
+            var panel = panelSettings != null ? Instantiate(panelSettings) : ScriptableObject.CreateInstance<PanelSettings>();
             panel.scaleMode = PanelScaleMode.ConstantPixelSize;
             panel.scale = Mathf.Max(0.2f, ScreenMetrics.ShortSide / Mathf.Max(100f, cfg.uiReferenceHeight));
             panel.clearColor = false;

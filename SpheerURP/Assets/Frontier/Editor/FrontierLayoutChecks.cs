@@ -34,8 +34,11 @@ namespace Frontier.EditorTools
 
         void StartChecks()
         {
+            CheckSupport.IsolateSaves();
             previous = GameState.I;
             state = new GameState(GameDatabase.Load(), false);
+            var pack = state.db.FindUpgrade("pack");
+            if (pack != null) state.DebugSetUpgrade(pack, pack.maxLevel);
             foreach (var resource in state.db.resources) state.Add(resource, resource.stackSize, false);
             host = new GameObject("LayoutCheckHost");
             host.SetActive(false);

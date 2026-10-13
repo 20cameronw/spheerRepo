@@ -130,43 +130,48 @@ namespace Frontier.EditorTools
             Debug.Log("Frontier: added " + added + " deep space planets to GameDatabase (total " + db.planets.Length + ").");
         }
 
+        const string PrefabDir = "Assets/Frontier/Art/Models/Prefabs/";
+        const string SourceDir = "Assets/Frontier/Art/Models/Source/";
+
         [MenuItem("Frontier/Build Model Library")]
         public static void BuildModelLibrary()
         {
             // key -> hand-made model. Reassign these in the generated asset to taste.
+            string P(string name) { return PrefabDir + name + ".prefab"; }
+            string F(string name) { return SourceDir + name + ".fbx"; }
             var map = new (string key, string path, float scale)[]
             {
-                ("sylva", "Assets/Prefabs/lerth.prefab", 1f),
-                ("ferrum", "Assets/Models/planet_2.fbx", 1f),
-                ("glacia", "Assets/Prefabs/purp.prefab", 1f),
-                ("cinder", "Assets/Models/planet_2.fbx", 1f),
-                ("arbor", "Assets/Models/planet_3.fbx", 1f),
-                ("nyx", "Assets/Prefabs/domny.prefab", 1f),
-                ("aurum", "Assets/Models/planet_1.fbx", 1f),
-                ("tide", "Assets/Prefabs/lerth.prefab", 1f),
-                ("zephyr", "Assets/Models/tiny world.fbx", 1f),
-                ("pyre", "Assets/Models/tiny world.fbx", 1f),
-                ("halcyon", "Assets/Prefabs/purp.prefab", 1f),
-                ("mire", "Assets/Models/planet_3.fbx", 1f),
-                ("obsidian", "Assets/Prefabs/domny.prefab", 1f),
-                ("vesper", "Assets/Models/planet_2.fbx", 1f),
-                ("prism", "Assets/Models/planet_1.fbx", 1f),
-                ("kaos", "Assets/Models/planet_3.fbx", 1f),
-                ("tundra", "Assets/Models/tiny world.fbx", 1f),
-                ("coral", "Assets/Prefabs/lerth.prefab", 1f),
-                ("scout", "Assets/Models/ufo (2).fbx", 1f),
-                ("swarmer", "Assets/Models/space_trash.fbx", 1f),
-                ("raider", "Assets/Models/spaceship.fbx", 1f),
-                ("brute", "Assets/Models/ufo (2).fbx", 1f),
-                ("titan", "Assets/Models/ufo (2).fbx", 1f),
-                ("turret", "Assets/Models/gunner.fbx", 1f),
-                ("struct_refinery", "Assets/Prefabs/silo_with_missil.prefab", 1f),
-                ("struct_alarm", "Assets/Prefabs/sat_dish.prefab", 1f),
-                ("struct_mine", "Assets/Models/space_trash.fbx", 1f),
-                ("struct_drill", "Assets/Prefabs/drill.prefab", 1f),
-                ("struct_gunner", "Assets/Models/gunner.fbx", 1f),
-                ("struct_laser", "Assets/Prefabs/lazer.prefab", 1f),
-                ("struct_satellite", "Assets/Prefabs/satellite.prefab", 1f),
+                ("sylva", P("lerth"), 1f),
+                ("ferrum", F("planet_2"), 1f),
+                ("glacia", P("purp"), 1f),
+                ("cinder", F("planet_2"), 1f),
+                ("arbor", F("planet_3"), 1f),
+                ("nyx", P("domny"), 1f),
+                ("aurum", F("planet_1"), 1f),
+                ("tide", P("lerth"), 1f),
+                ("zephyr", F("tiny world"), 1f),
+                ("pyre", F("tiny world"), 1f),
+                ("halcyon", P("purp"), 1f),
+                ("mire", F("planet_3"), 1f),
+                ("obsidian", P("domny"), 1f),
+                ("vesper", F("planet_2"), 1f),
+                ("prism", F("planet_1"), 1f),
+                ("kaos", F("planet_3"), 1f),
+                ("tundra", F("tiny world"), 1f),
+                ("coral", P("lerth"), 1f),
+                ("scout", F("ufo (2)"), 1f),
+                ("swarmer", F("space_trash"), 1f),
+                ("raider", F("spaceship"), 1f),
+                ("brute", F("ufo (2)"), 1f),
+                ("titan", F("ufo (2)"), 1f),
+                ("turret", F("gunner"), 1f),
+                ("struct_refinery", P("silo_with_missil"), 1f),
+                ("struct_alarm", P("sat_dish"), 1f),
+                ("struct_mine", F("space_trash"), 1f),
+                ("struct_drill", P("drill"), 1f),
+                ("struct_gunner", F("gunner"), 1f),
+                ("struct_laser", P("lazer"), 1f),
+                ("struct_satellite", P("satellite"), 1f),
             };
             var list = new System.Collections.Generic.List<ModelLibrary.Entry>();
             foreach (var m in map)
@@ -184,43 +189,6 @@ namespace Frontier.EditorTools
             EditorUtility.SetDirty(lib);
             AssetDatabase.SaveAssets();
             Debug.Log("Frontier: model library built with " + list.Count + " entries");
-        }
-
-        [MenuItem("Frontier/Build Icons")]
-        public static void BuildIcons()
-        {
-            // icon key -> your original sprite. Dark sprites are recolored white so the UI can tint them neon.
-            var map = new (string key, string path)[]
-            {
-                ("build", "Assets/Dark UI/Free/Shop.png"),
-                ("map", "Assets/Dark UI/Free/World.png"),
-                ("gear", "Assets/Dark UI/Free/Settings.png"),
-                ("ranks", "Assets/Dark UI/Free/Ranks.png"),
-                ("about", "Assets/Dark UI/Free/Info.png"),
-                ("tutorial", "Assets/Dark UI/Free/Missions.png"),
-                ("pack", "Assets/Dark UI/Free/Inventory.png"),
-                ("grid", "Assets/Images/apps-grid-icon.png"),
-                ("research", "Assets/Images/flask-icon.png"),
-                ("tools", "Assets/Images/tools-icon.png"),
-                ("alien", "Assets/Images/aliens-icon.png"),
-            };
-            string outDir = "Assets/Frontier/Resources/Frontier/Icons";
-            Directory.CreateDirectory(outDir);
-            int n = 0;
-            foreach (var m in map)
-            {
-                if (!File.Exists(m.path)) { Debug.LogWarning("Frontier: missing icon " + m.path); continue; }
-                var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                if (!tex.LoadImage(File.ReadAllBytes(m.path))) continue;
-                var px = tex.GetPixels32();
-                for (int i = 0; i < px.Length; i++) { px[i].r = 255; px[i].g = 255; px[i].b = 255; }
-                tex.SetPixels32(px);
-                tex.Apply();
-                File.WriteAllBytes(outDir + "/" + m.key + ".png", tex.EncodeToPNG());
-                n++;
-            }
-            AssetDatabase.Refresh();
-            Debug.Log("Frontier: built " + n + " icons");
         }
 
         [MenuItem("Frontier/Reset Save")]

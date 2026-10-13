@@ -10,6 +10,7 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Validate Warehouse Storage")]
         public static void Run()
         {
+            CheckSupport.IsolateSaves();
             var previous = GameState.I;
             try
             {

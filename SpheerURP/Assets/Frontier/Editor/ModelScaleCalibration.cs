@@ -47,7 +47,7 @@ namespace Frontier.EditorTools
                 }
                 finally { UnityEngine.Object.DestroyImmediate(instance); }
             }
-            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefabs" }))
+            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Frontier/Art/Models/Prefabs" }))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 bool affected = false;
