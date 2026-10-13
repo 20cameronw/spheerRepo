@@ -378,7 +378,9 @@ namespace Frontier
         void OnWaveEnded(WaveResult r)
         {
             var panel = UiKit.Div("fr-overlay");
+            panel.AddToClassList("fr-overlay-clear");
             panel.pickingMode = PickingMode.Position;
+            if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             Color c = r.victory ? UiKit.Lime : UiKit.Red;
             UiKit.SetAccent(panel, c);
             panel.Add(UiKit.Text(r.victory ? "WAVE CLEARED" : "REACTOR OVERLOADED", "fr-title", c));
@@ -395,7 +397,11 @@ namespace Frontier
             }
             else panel.Add(UiKit.Text("The aliens broke through. No salvage this time.", "fr-muted"));
             var b = UiKit.Btn("CONTINUE", c, null, true, true);
-            b.clicked += () => panel.RemoveFromHierarchy();
+            b.clicked += () =>
+            {
+                panel.RemoveFromHierarchy();
+                if (scrimLayer != null && modal == null) scrimLayer.style.display = DisplayStyle.None;
+            };
             b.style.marginTop = UiKit.Space.S32;
             panel.Add(b);
             overlayLayer.Add(panel);

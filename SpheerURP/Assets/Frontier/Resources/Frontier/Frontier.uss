@@ -362,6 +362,7 @@
     padding: var(--fr-sp-24);
     overflow: hidden;
 }
+.fr-overlay.fr-overlay-clear { background-color: rgba(0, 0, 0, 0); }
 .fr-overlay > Label, .fr-overlay > .fr-row { flex-shrink: 0; max-width: 100%; white-space: normal; -unity-text-align: middle-center; }
 .fr-arena {
     width: 100%; flex-grow: 1; flex-basis: 0; min-height: 120px; margin: var(--fr-sp-16) 0;
