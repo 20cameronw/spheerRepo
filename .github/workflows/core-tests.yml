@@ -1,8 +1,9 @@
 name: Core tests
 
-# The engine-free Frontier.Core code (universe generator, shared enums) and its tests run as a plain .NET project: no Unity, no
-# licence, a few seconds. Frontier.Core is compiled as netstandard2.1 / C# 9 / warnings-as-errors, exactly the way Unity compiles it.
-# The same test sources also run in Unity (EditMode); see docs/TESTING.md.
+# The engine-free assemblies, Frontier.Core (universe generator, session services, save schema) and Frontier.Economy (the game economy and
+# its balance simulator), and their tests run as plain .NET projects: no Unity, no licence, about a minute. Both are compiled as
+# netstandard2.1 / C# 9 / warnings-as-errors, exactly the way Unity compiles them. The same test sources also run in Unity (EditMode);
+# see docs/TESTING.md.
 
 on:
   push:
@@ -42,7 +43,7 @@ jobs:
       - name: Show the SDK in use
         run: dotnet --info
 
-      - name: Test
+      - name: Test (Core + Economy)
         run: dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj --configuration Release --logger "trx;LogFileName=core-tests.trx" --logger "console;verbosity=normal" --results-directory TestResults
 
       - name: Upload test results

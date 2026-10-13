@@ -2,9 +2,10 @@
   <!--
     Runs the engine-free tests on any machine with the .NET 8 SDK, no Unity and no licence:
       cd tests && dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj
-    The test sources are LINKED from the Unity project (SpheerURP/Assets/Frontier/Tests/EditMode/Core and /Universe). They are the
-    same files the Unity Test Runner compiles into Frontier.Tests.EditMode, so they must only depend on Frontier.Core and NUnit.
-    Frontier.Core itself is a separate netstandard2.1 project (see ../Frontier.Core) so that it stays a real engine-free assembly.
+    The test sources are LINKED from the Unity project (SpheerURP/Assets/Frontier/Tests/EditMode/Core, /Universe and /Economy). They are the
+    same files the Unity Test Runner compiles into Frontier.Tests.EditMode, so they must only depend on Frontier.Core, Frontier.Economy and
+    NUnit. Frontier.Core and Frontier.Economy are separate netstandard2.1 projects (see ../Frontier.Core and ../Frontier.Economy) so that they
+    stay real engine-free assemblies. The Economy tests include the balance simulator (about 25 s on .NET 8); nothing is filtered here.
     Paths use forward slashes so the same file builds on Windows, Linux and macOS.
   -->
   <PropertyGroup>
@@ -23,16 +24,19 @@
 
   <ItemGroup>
     <ProjectReference Include="../Frontier.Core/Frontier.Core.csproj" />
+    <ProjectReference Include="../Frontier.Economy/Frontier.Economy.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Universe/**/*.cs" Link="Universe/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../SpheerURP/Assets/Frontier/Tests/EditMode/Economy/**/*.cs" Link="Economy/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- A moved or renamed folder would link zero files and the run would "pass" with no tests, so fail loudly instead. -->
   <Target Name="RequireLinkedTestFolders" BeforeTargets="CoreCompile">
     <Error Condition="!Exists('$(MSBuildThisFileDirectory)../../SpheerURP/Assets/Frontier/Tests/EditMode/Core')" Text="SpheerURP/Assets/Frontier/Tests/EditMode/Core is missing; this project links it. Update Frontier.Core.Tests.csproj if the folder moved." />
     <Error Condition="!Exists('$(MSBuildThisFileDirectory)../../SpheerURP/Assets/Frontier/Tests/EditMode/Universe')" Text="SpheerURP/Assets/Frontier/Tests/EditMode/Universe is missing; this project links it. Update Frontier.Core.Tests.csproj if the folder moved." />
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)../../SpheerURP/Assets/Frontier/Tests/EditMode/Economy')" Text="SpheerURP/Assets/Frontier/Tests/EditMode/Economy is missing; this project links it. Update Frontier.Core.Tests.csproj if the folder moved." />
   </Target>
 </Project>
