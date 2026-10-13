@@ -7,11 +7,15 @@
   passed or was skipped, 1 when a test failed, 2 when no results were produced (compile error, crash, timeout), 3 when no test ran.
 .EXAMPLE
   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -IncludeSlow      # everything, including the balance simulator
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -Category Slow     # only the slow tests
   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform PlayMode
   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -TestFilter "Frontier.Universe.Tests.DeterminismTests" -OutputMatch "digest"
 .NOTES
   Never pass -nographics: PlayMode tests render. Results: SpheerURP\TestResults\<platform>.xml, log: SpheerURP\Logs\tests-<platform>.log
   (both git-ignored). Set UNITY_PATH to override the editor location (see run-unity.ps1).
+  Tests marked [Category("Slow")] (the balance simulator fixtures of Frontier.Economy, about a minute in the editor's Mono) are skipped
+  unless -IncludeSlow or -Category is given; the plain .NET CI project and the Unity CI workflow always run them.
 #>
 param(
     [Parameter(Position = 0)][ValidateSet("EditMode", "PlayMode")][string]$Platform = "EditMode",
@@ -19,8 +23,11 @@ param(
     [string[]]$Assemblies = @(),
     # Unity -testFilter: semicolon separated test names (full or partial) or regular expressions (prefix with '!' to exclude).
     [string]$TestFilter = "",
-    # Unity -testCategory: semicolon separated NUnit categories.
+    # Unity -testCategory: semicolon separated NUnit categories ("Slow" runs only the slow tests). Without it the default is every test
+    # except the ones marked Slow.
     [string]$Category = "",
+    # Also run the tests marked [Category("Slow")].
+    [switch]$IncludeSlow,
     [string]$Results = "",
     [string]$Log = "",
     [int]$TimeoutSec = 1800,
@@ -46,8 +53,10 @@ if (Test-Path $Results) { Remove-Item $Results -Force }
 $extra = @("-runTests", "-testPlatform", $Platform, "-assemblyNames", ("`"" + ($Assemblies -join ";") + "`""), "-testResults", "`"$Results`"")
 if ($TestFilter) { $extra += @("-testFilter", "`"$TestFilter`"") }
 if ($Category) { $extra += @("-testCategory", "`"$Category`"") }
+elseif (-not $IncludeSlow) { $extra += @("-testCategory", "`"!Slow`"") }
 
 Write-Host "Unity $Platform tests: $($Assemblies -join ', ')"
+if (-not $Category -and -not $IncludeSlow) { Write-Host "(tests marked Slow are skipped; add -IncludeSlow to run everything)" }
 $unityLines = & "$PSScriptRoot\run-unity.ps1" -NoQuit -ExtraArgs $extra -TimeoutSec $TimeoutSec -Log $Log -Filter "error CS|Scripts have compiler errors|Compilation failed|Unable to find|No tests"
 $unityExit = $LASTEXITCODE
 $unityLines | Where-Object { $_ -match "error CS|compiler errors|Compilation failed|Unable to find|No tests" } | Select-Object -First 30 | ForEach-Object { Write-Host $_ }
