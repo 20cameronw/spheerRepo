@@ -1,0 +1,47 @@
+# Normalise line endings: text files are stored with LF and checked out with LF so Windows and macOS
+# contributors stop producing "LF will be replaced by CRLF" noise.
+* text=auto
+
+*.cs text eol=lf
+*.shader text eol=lf
+*.cginc text eol=lf
+*.hlsl text eol=lf
+*.uss text eol=lf
+*.uxml text eol=lf
+*.tss text eol=lf
+*.asmdef text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.meta text eol=lf
+
+# Unity YAML assets: LF, and mergeable with UnityYAMLMerge (configure the merge driver locally, see docs/ARCHITECTURE.md).
+*.unity text eol=lf merge=unityyamlmerge
+*.prefab text eol=lf merge=unityyamlmerge
+*.asset text eol=lf merge=unityyamlmerge
+*.mat text eol=lf merge=unityyamlmerge
+*.anim text eol=lf merge=unityyamlmerge
+*.controller text eol=lf merge=unityyamlmerge
+
+# Binary assets.
+*.fbx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tga binary
+*.psd binary
+*.exr binary
+*.hdr binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.ttf binary
+*.otf binary
+*.mp4 binary
+*.dll binary
+*.so binary
+*.a binary
+
+# Git LFS is intentionally not enabled yet. Enable it for the binary types above once the team decides
+# (git lfs track "*.fbx" "*.wav" "*.mp3" ...) before the first large audio or model drop.

@@ -60,3 +60,26 @@ sysinfo.txt
 crashlytics-build.properties
 
 SpheerURP/UserSettings/Layouts/default-2021.dwlt
+
+# --- Frontier additions -------------------------------------------------------
+# Unity-generated project files (the .slnx is rewritten by the editor on every open)
+*.slnx
+*.sln
+*.csproj
+SpheerURP/UIElementsSchema/
+SpheerURP/UserSettings/
+SpheerURP/.vscode/
+SpheerURP/.idea/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
+
+# Harness and tool output (screenshots, test results, builds)
+SpheerURP/Screens/
+SpheerURP/TestResults/
+SpheerURP/Recordings/
+*.aab
+*.ipa
+*.apk
