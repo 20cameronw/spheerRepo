@@ -50,9 +50,12 @@ The map is illustrative, not a gravity simulation, and its spacing does not chan
 ## Panel layout
 
 Structure panels stay centered below the top HUD and above the dock. Only short, upgrade-only turret panels can follow their
-structure, clamped to that area. Larger menus, warehouse panels, mini-games and wave results may cover the dock but never the
-top HUD, and all respect device safe-area insets. Scrollable panels use a fixed vertical gutter with a slim handle and no
-horizontal scrollbar. **Frontier > Validate Panel Layout** checks panel bounds and inventory rebuilds.
+structure, clamped to that area. Menus, the build/command/backpack panels and warehouse panels use the same area, so the top bar
+and dock stay visible and tappable while the world behind them is dimmed by one full-screen scrim (tapping the scrim closes the
+panel). Only mini-games and wave results cover the dock, and none of them cover the top HUD; all respect device safe-area insets.
+Toasts start below the top bar and the build-mode banner sits just above the dock. Scrollable panels use a fixed vertical gutter
+with a slim handle and no horizontal scrollbar. **Frontier > Validate Panel Layout** checks panel bounds and inventory rebuilds.
+Sizes, colours, fonts and icons follow [DESIGN.md](DESIGN.md).
 
 ## Procedural worlds
 

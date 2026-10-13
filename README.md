@@ -19,7 +19,7 @@ Saves live in `Application.persistentDataPath/frontier_save.json`. **Frontier > 
 
 | Do this | Run |
 |---------|-----|
-| Validate planets, storage, combat, layout | **Frontier > Validate ...** menu items, or `tools/run-unity.ps1 -Method Frontier.EditorTools.<Check>.Run` |
+| Validate planets, storage, combat, layout, icons | **Frontier > Validate ...** menu items, or `tools/run-unity.ps1 -Method Frontier.EditorTools.<Check>.Run` |
 | See every screen on virtual phones/tablets | `tools/capture-screens.ps1` (PNGs, UI lint in `report.json`) |
 | Compare two capture runs | `tools/image-diff.ps1` |
 | Apply the mobile baseline (portrait, IL2CPP, ARM64) | **Frontier > Apply Mobile Project Settings** |
@@ -31,7 +31,8 @@ Details, conventions and the code map are in [docs/ARCHITECTURE.md](docs/ARCHITE
 | Document | What it covers |
 |----------|----------------|
 | [docs/ROADMAP.md](docs/ROADMAP.md) | the approved master plan: audit, architecture, universe, economy, mini-games, UI, monetization, release |
-| [docs/AUDIT.md](docs/AUDIT.md) | baseline UI audit from real screenshots and lint numbers |
+| [docs/AUDIT.md](docs/AUDIT.md) | baseline UI audit from real screenshots and lint numbers, plus the after-tokens/icons results |
+| [docs/DESIGN.md](docs/DESIGN.md) | design system: tokens, type scale, spacing, hierarchy rules, icon system and how to extend them |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | code map, rules, tooling |
 | [docs/SYSTEMS.md](docs/SYSTEMS.md) | how combat, warehouses, sizing, travel and panels behave today |
 | [docs/LEGACY_REMOVED.md](docs/LEGACY_REMOVED.md) | what was removed from the old prototype and how to recover it |

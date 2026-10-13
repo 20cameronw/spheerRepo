@@ -43,3 +43,44 @@ powershell -ExecutionPolicy Bypass -File tools/contact-sheet.ps1 -Dir SpheerURP/
 ```
 
 Output goes to `SpheerURP/Screens/<timestamp>/` (git-ignored): PNGs per device, `report.json` (lint) and `done.txt`.
+
+## After tokens/icons (design tokens, fonts, icon system v2, HUD/dock)
+
+Same harness, same four devices, now 45 shots per device (180 captures, 0 errors): the 41 baseline shots plus `menu-release`
+(the menu without the DEBUG tile, as a release build shows it) and three icon contact sheets (`icons-ui`, `icons-items`,
+`icons-color`). The design system is documented in [DESIGN.md](DESIGN.md).
+
+| Device | Labels < 12 dp (before > after) | Touch targets < 48 dp (before > after) | Overflowing panels | Smallest text | Smallest touch target |
+|--------|------|------|------|------|------|
+| phone 1080x1920 | 570 > **0** | 196 > **0** | 0 > 0 | 9.1 > **13.0 dp** | 27.4 > **51.8 dp** |
+| phone 1170x2532 | 581 > **0** | 199 > **0** | 0 > 0 | 8.7 > **13.0 dp** | 26.0 > **52.0 dp** |
+| phone 1440x3200 | 593 > **0** | 204 > **0** | 0 > 0 | 9.1 > **13.0 dp** | 27.4 > **52.0 dp** |
+| tablet 1536x2048 | 0 > 0 | 0 > 0 | 0 > 0 | 17.1 > 22.2 dp | 51.0 > 88.5 dp |
+| phone 1080x2340, 360 dp (new, opt-in) | n/a > 0 | n/a > 0 | n/a > 0 | 13.0 dp | 52.0 dp |
+
+Totals over the four standard devices: **1744 > 0** labels under 12 dp and **599 > 0** touch targets under 48 dp. Every screen
+listed in the brief (hud, build-mode, shop-tab0-3, command-*, pack*, menu*, map* with the world/planet card, popup-*, toast,
+wave-hud, wave-result) is at zero on both reference phones, and so are the mini-game overlays (`game-*`, smallest text 13.0 dp).
+The four check suites (planets, storage, combat, layout) and the new icon check pass; the project compiles without warnings.
+
+Before and after, phone 1080x1920 (top row before, bottom row after):
+[screens 1](audit/after-tokens-icons-screens-1.jpg) · [screens 2](audit/after-tokens-icons-screens-2.jpg) ·
+[all icons at 24/32/48/64 px](audit/after-tokens-icons-icon-sheets.jpg).
+
+| # | Baseline finding | Status |
+|---|------------------|--------|
+| 1 | Unlabeled dock, robot-head build icon, menu button colliding with the top bar | **Fixed.** Four captioned dock buttons (COMMAND, MAP, PACK, BUILD), build = hammer crossed with a saw, hamburger menu button with its own slot beside the top bar. |
+| 2 | Map: muddy brown background, `+`/`-` over the galaxy title | **Mostly fixed.** The brown was oversized system halos at too much alpha; they are now faint and capped, the map is opaque deep navy, and the tools sit in a row at the top right. The selected world is still not re-centred (map track). |
+| 3 | Worlds card: names only, bare fuel cost | **Restyled only.** Tonal card, WARP is the single primary action; content changes belong to the map/atlas track. |
+| 4 | Build / Command: neon on every card, ~10 text sizes | **Fixed.** Tonal cards with thin outlines, accent only on the selected tab/card and the primary button, five type sizes. Satellite is still "coming soon" (content). |
+| 5 | Popups: world labels through the popup, 27 dp buttons | **Fixed** for buttons (52 dp) and surfaces (opaque). A world-space label can still peek out just below a popup edge. |
+| 6 | DEBUG tile visible to everyone | **Fixed.** Hidden unless `Debug.isDebugBuild || Application.isEditor`. Ranks still says leaderboards are not connected (content). |
+| 7 | Backpack: flat grid, no categories | Unchanged (components track). Slot layout tidied: icon on top, count bottom-right. |
+| 8 | Wave HUD 9 dp text | **Fixed** (13 dp or larger). |
+| 9 | Mini-games | Unchanged apart from text sizes. |
+| 10 | Same neon weight everywhere | **Fixed** by the hierarchy rule in DESIGN.md. |
+
+Known remaining issues: the mini-game arena render target is still sized from the old reference height (~75 % of native
+resolution on phones); the tutorial copy still describes the old button positions; map world labels stay small at the default
+zoom; dynamic FontAssets are stored empty (glyphs are added lazily from the TTF at runtime, so the first use of a character costs a
+little once). Details in [DESIGN.md](DESIGN.md#9-known-gaps).

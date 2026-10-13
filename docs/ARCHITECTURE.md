@@ -6,13 +6,13 @@
 |--------|----------|
 | `Scripts/Data` | ScriptableObject definitions (`ResourceSO`, `PlanetSO`, `StructureSO`, `RecipeSO`, `UpgradeSO`, `EnemySO`, `WaveFormulaSO`, `GameDatabase`, `FrontierSettings`, `ModelLibrary`), `PlanetGenerator`, `DefaultContent` |
 | `Scripts/Core` | `GameState`: inventory, upgrades, structures, storage, waves, travel, save/load (to be split, see roadmap) |
-| `Scripts/UI` | UI Toolkit interface built in code: `UIRoot*.cs` partials, `UiKit`, `Icons`, `ScreenMetrics` |
+| `Scripts/UI` | UI Toolkit interface built in code: `UIRoot*.cs` partials, `UiKit` (tokens mirror, buttons, chips), `Icons` (SVG icon loader and name lookups), `ScreenMetrics` |
 | `Scripts/Minigames` | `Minigame` base, Chop/Mine (`NodeGame`), `DrillGame`, `TravelGame`, `MinigameStage` (off-screen 3D stage shown in a UI element) |
 | `Scripts/Visual` | planet view, space backdrop, weather, world surface (structures, pads, picking), FX and procedural audio |
 | `Scripts/Combat` | `DefenseController`, `AlienActor` |
 | `Scripts/Harness` | screenshot harness runtime and UI lint (compiled only in the editor and development builds) |
-| `Art` | models, model prefabs, materials |
-| `Resources/Frontier` | data assets, shaders, USS, panel settings, `ModelLibrary` |
+| `Art` | models, model prefabs, materials, `Fonts` (Chakra Petch and Barlow TTFs, OFL licences, generated SDF FontAssets) |
+| `Resources/Frontier` | data assets, shaders, `Tokens.uss` + `Frontier.uss`, `Icons/*.svg`, panel settings, `ModelLibrary` |
 | `Editor` | menu tools and validation scripts |
 
 `FrontierBootstrap` (the only object in `Scenes/Frontier.unity` besides a camera and light) builds the camera, post-processing,
@@ -35,7 +35,8 @@ planet, backdrop, defense, UI and world surface from the `GameDatabase` asset, t
 |------|---------|
 | Generate Editable Data Assets / Generate Deep Space Planets | bootstrap or extend data assets |
 | Build Model Library / Calibrate Model Scales | rebuild the model library and bake scale corrections |
-| Validate Planet Model Sizes / Storage / Combat Balance / Panel Layout | validation suites |
+| Validate Planet Model Sizes / Storage / Combat Balance / Panel Layout / Icons | validation suites |
+| Build Font Assets | regenerate the SDF FontAssets next to the TTFs in `Art/Fonts` |
 | Capture Screens | screenshot harness from inside the editor |
 | Apply Mobile Project Settings | portrait lock, IL2CPP, ARM64, stripping |
 | Reset Save | delete the local save |
@@ -52,6 +53,10 @@ tools/contact-sheet.ps1 -Dir SpheerURP/Screens/<run>/phone-1080x1920            
 tools/image-diff.ps1 -A <runA>/<device> -B <runB>/<device>                         # per-screen visual regression numbers
 ```
 
+Virtual devices: `phone-1080x1920`, `phone-1170x2532`, `phone-1440x3200`, `tablet-1536x2048`, plus the opt-in 360 dp phone
+`phone-1080x2340` (only rendered when named in `-Devices`). Besides the screens, the harness captures the icon contact sheets
+(`icons-ui`, `icons-items`, `icons-color`) and `menu-release` (the menu as a release build sees it, without the DEBUG tile).
+
 Unity runs are serialised through a named mutex because only one editor can open the project. Do not pass `-nographics` to anything
 that renders. The harness writes to `SpheerURP/Screens/<timestamp>/` (git-ignored).
 
@@ -59,4 +64,5 @@ that renders. The harness writes to `SpheerURP/Screens/<timestamp>/` (git-ignore
 
 See [ROADMAP.md](ROADMAP.md): infinite deterministic universe with delta saves, ~34 resources and an Atlas, a Hyperspace Run
 shooter for travel, new harvest games, timers/obstacles, premium currency and rewarded ads, leaderboards, cinematics and release
-readiness. Baseline UI findings are in [AUDIT.md](AUDIT.md); today's behaviour is in [SYSTEMS.md](SYSTEMS.md).
+readiness. Baseline UI findings are in [AUDIT.md](AUDIT.md); the design system (tokens, fonts, icons) is in [DESIGN.md](DESIGN.md);
+today's behaviour is in [SYSTEMS.md](SYSTEMS.md).
