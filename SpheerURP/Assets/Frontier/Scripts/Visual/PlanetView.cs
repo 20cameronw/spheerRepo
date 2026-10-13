@@ -36,10 +36,21 @@ namespace Frontier
         public SphereCollider Surface { get; private set; }
 
         public float SurfaceRadius() { return Surface != null ? Surface.radius : Radius; }
+        /// <summary>The crater pattern (style 2) turns into black and white dice when its cells are big and the palette is dark: generated worlds get a finer grid and keep the terrain between the discs. Authored worlds keep their values and look.</summary>
+        const float MinGeneratedCraterBands = 9f;
+
+        static float EffectiveBands(PlanetData p, float bands)
+        {
+            return !p.IsAuthored && p.Style == 2 ? Mathf.Max(bands, MinGeneratedCraterBands) : bands;
+        }
+
+        static float CraterSoftness(PlanetData p) { return p.IsAuthored ? 0f : 1f; }
+
         void StyleModel(Transform model, PlanetData p, System.Random rng)
         {
             float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
             if (p.SurfaceBands > 0f) bands = p.SurfaceBands;
+            bands = EffectiveBands(p, bands);
             var mats = new List<Material>();
             int layer = 0;
             foreach (var r in solids)
@@ -53,6 +64,7 @@ namespace Frontier
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
                 mat.SetFloat("_Style", p.Style);
+                mat.SetFloat("_CraterSoft", CraterSoftness(p));
                 var lb = r.localBounds.center;
                 mat.SetVector("_Center", new Vector4(lb.x, lb.y, lb.z, 0f));
                 var arr = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
@@ -82,9 +94,11 @@ namespace Frontier
             core = sphere.transform;
             baseRim = p.Rim * p.GlowIntensity;
             coreMat = null; modelMats = null;
-            displayedRadius = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
+            float ground = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
+            // The model is fitted to its own radius (the standard 1.5 for generated worlds, whatever their ground radius), so every planet is the same size on screen.
+            displayedRadius = p.ModelRadius > 0.01f ? p.ModelRadius : Radius;
             displayedModelScale = p.ModelScale > 0f ? p.ModelScale : 1f;
-            lastRadius = displayedRadius;
+            lastRadius = ground;
             var model = ModelLibrary.Spawn(p.ModelKey, core, displayedRadius * 2f * displayedModelScale, false);
             if (model != null)
             {
@@ -104,9 +118,10 @@ namespace Frontier
                 coreMat.SetColor("_BaseColor", p.Primary);
                 coreMat.SetColor("_AltColor", p.Secondary);
                 coreMat.SetColor("_RimColor", baseRim);
-                coreMat.SetFloat("_Bands", p.SurfaceBands > 0f ? p.SurfaceBands : 4f + (float)rng.NextDouble() * 6f);
+                coreMat.SetFloat("_Bands", EffectiveBands(p, p.SurfaceBands > 0f ? p.SurfaceBands : 4f + (float)rng.NextDouble() * 6f));
                 coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
                 coreMat.SetFloat("_Style", p.Style);
+                coreMat.SetFloat("_CraterSoft", CraterSoftness(p));
                 sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
             }
             usesModel = model != null;
@@ -114,7 +129,7 @@ namespace Frontier
             var surfGo = new GameObject("Surface");
             surfGo.transform.SetParent(Spin, false);
             Surface = surfGo.AddComponent<SphereCollider>();
-            Surface.radius = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
+            Surface.radius = ground;
 
             var atmo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             atmo.name = "Atmosphere";
@@ -131,9 +146,14 @@ namespace Frontier
                 for (int i = 0; i < 2; i++)
                     BuildRing(Radius * (1.7f + i * 0.35f), p.Rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
 
+            // Moons: angle and speed come from the same stream as before (authored worlds keep their layout); the orbit tilt has its own seeded stream.
+            // More than four moons share the same outer limit instead of drifting off screen.
             int moons = p.MoonCount;
+            float moonStep = Mathf.Min(0.45f, 1.5f / Mathf.Max(1, moons - 1));
+            var tiltRng = new System.Random(unchecked((int)p.Seed ^ (int)(p.Seed >> 32) ^ 0x4D4F4F4E));
             for (int i = 0; i < moons; i++)
-                BuildMoon(Radius * (2.1f + i * 0.45f), p.Rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f);
+                BuildMoon(Radius * (2.1f + i * moonStep), p.Rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f,
+                    Mathf.Lerp(-25f, 25f, (float)tiltRng.NextDouble()), Mathf.Lerp(-15f, 15f, (float)tiltRng.NextDouble()));
 
             Weather.Build(root, p);
 
@@ -190,11 +210,11 @@ namespace Frontier
             lr.sharedMaterial = Fx.AddMat(new Color(c.r, c.g, c.b, 0.9f));
         }
 
-        void BuildMoon(float radius, Color c, float angle, float speed)
+        void BuildMoon(float radius, Color c, float angle, float speed, float tiltX, float tiltZ)
         {
             var pivot = new GameObject("MoonPivot").transform;
             pivot.SetParent(root, false);
-            pivot.localRotation = Quaternion.Euler(Random.Range(-25f, 25f), 0f, Random.Range(-15f, 15f));
+            pivot.localRotation = Quaternion.Euler(tiltX, 0f, tiltZ);
             pivot.localEulerAngles += new Vector3(0, Mathf.Rad2Deg * angle, 0);
             var moon = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(moon.GetComponent<Collider>());
@@ -254,7 +274,8 @@ namespace Frontier
             }
             punch = Mathf.MoveTowards(punch, 0f, Time.deltaTime * 4f);
             float pulse = 1f + punch * 0.08f;
-            float size = SurfaceRadius() / Mathf.Max(0.01f, displayedRadius) *
+            // Authored worlds tie the model to the ground sphere (tuning the collider in the editor resizes the planet); generated worlds keep the standard size.
+            float size = (Current.IsAuthored ? SurfaceRadius() / Mathf.Max(0.01f, displayedRadius) : 1f) *
                 (Current.ModelScale > 0f ? Current.ModelScale : 1f) / displayedModelScale;
             core.localScale = Vector3.one * (usesModel ? 1f : displayedRadius * 2f * displayedModelScale) * size * pulse;
             if (atmosphere != null) atmosphere.localScale = Vector3.one * Current.AtmosphereScale;

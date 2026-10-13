@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UBiome = Frontier.Universe.Biome;
+using USize = Frontier.Universe.SizeClass;
+using UDescriptor = Frontier.Universe.PlanetDescriptor;
 
 namespace Frontier
 {
@@ -117,9 +120,13 @@ namespace Frontier
             try { Seed(); }
             catch (Exception e) { Debug.LogError("Frontier harness: seeding failed " + e); report.errors++; }
 
+            bool firstDevice = true;
             foreach (var dev in AllDevices)
             {
                 if (dev.optIn ? !MatchExplicit(dev.name, devicesFilter) : !Match(dev.name, devicesFilter)) continue;
+                // The backdrop eases from the mood of the last world (the generated shots end somewhere else) to the home world's; let it settle.
+                if (!firstDevice) yield return new WaitForSecondsRealtime(4f);
+                firstDevice = false;
                 yield return RunDevice(dev, report);
             }
 
@@ -242,6 +249,7 @@ namespace Frontier
         IEnumerable<Shot> BuildShots()
         {
             var db = rt.Db; var gs = rt.State; var ui = rt.Ui;
+            string showcaseWorld = null;
             PlacedStructure At(StructureKind k) { return gs.StructureOfKind(gs.planet, k); }
 
             yield return new Shot("hud", ResetView);
@@ -285,6 +293,100 @@ namespace Frontier
             yield return new Shot("icons-ui", () => ui.DebugIconSheet(0), 0.3f);
             yield return new Shot("icons-items", () => ui.DebugIconSheet(1), 0.3f);
             yield return new Shot("icons-color", () => ui.DebugIconSheet(2), 0.3f);
+
+            // ---- generated worlds (appended: shots 1-45 above keep their names and numbers) ----
+            // Each shot waits for the backdrop to ease into the new world's mood (time constant under a second) so the picture shows the settled look.
+            foreach (var spec in GeneratedShots)
+            {
+                var s = spec;
+                yield return new Shot("gen-" + s.name, () =>
+                {
+                    var world = FindWorld(s);
+                    if (world == null) throw new InvalidOperationException("no generated world for " + s.name);
+                    Debug.Log("Frontier harness: world for " + s.name + "\n" + world.Dump());
+                    GoTo(world);
+                    ResetView();
+                }, 2.5f);
+            }
+            yield return new Shot("gen-colossal-built", () =>
+            {
+                var world = FindWorld(ColossalSpec);
+                if (world == null) throw new InvalidOperationException("no colossal world");
+                GoTo(world);
+                showcaseWorld = world.Id;
+                PlaceShowcase(gs, db);
+                ResetView();
+            }, 0.5f);
+            yield return new Shot("gen-colossal-pads", () =>
+            {
+                ResetView();
+                ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery));
+            }, 0.5f);
+            yield return new Shot("gen-colossal-popup", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.Gunner)); }, 0.3f);
+            yield return new Shot("map-generated", () => ui.DebugMap(null, 0.4f), 0.6f);
+            yield return new Shot("menu-debug-teleport", () => ui.DebugMenu("debug", true), 0.5f);
+
+            // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.
+            if (showcaseWorld != null)
+                foreach (var record in new List<StructureRecord>(gs.world.StructuresOn(showcaseWorld))) gs.world.Remove(showcaseWorld, record);
+            GoTo(gs.universe.Home);
+            ResetView();
+        }
+
+        struct WorldSpec
+        {
+            public string name; public UBiome? biome; public USize? size; public int minTier; public Func<UDescriptor, bool> filter;
+            public WorldSpec(string name, UBiome? biome, USize? size, int minTier, Func<UDescriptor, bool> filter = null)
+            { this.name = name; this.biome = biome; this.size = size; this.minTier = minTier; this.filter = filter; }
+        }
+
+        static readonly WorldSpec ColossalSpec = new WorldSpec("colossal", null, USize.Colossal, 4, d => d.Biome != UBiome.GasGiant);
+
+        // One deterministic world per biome (the first match in the universe's ring search), plus the cases the renderer must survive.
+        static readonly WorldSpec[] GeneratedShots =
+        {
+            new WorldSpec("lush", UBiome.Lush, null, 0),
+            new WorldSpec("mineral", UBiome.Mineral, null, 1),
+            new WorldSpec("glacial", UBiome.Glacial, null, 2),
+            new WorldSpec("volcanic", UBiome.Volcanic, null, 3),
+            new WorldSpec("fungal", UBiome.Fungal, null, 2),
+            new WorldSpec("crystal", UBiome.Crystal, null, 4),
+            new WorldSpec("obsidian", UBiome.Obsidian, null, 3),
+            new WorldSpec("shattered", UBiome.Shattered, null, 6),
+            new WorldSpec("desert", UBiome.Desert, null, 1),
+            new WorldSpec("oceanic", UBiome.Oceanic, null, 1),
+            new WorldSpec("gasgiant", UBiome.GasGiant, USize.Giant, 2),
+            new WorldSpec("gasgiant-rings-moons", UBiome.GasGiant, null, 3, d => d.HasRings && d.MoonCount >= 5),
+            new WorldSpec("barren", UBiome.Barren, null, 0),
+            new WorldSpec("dwarf", null, USize.Dwarf, 0, d => d.Biome != UBiome.GasGiant),
+            ColossalSpec,
+        };
+
+        PlanetData FindWorld(WorldSpec spec)
+        {
+            var universe = rt.State.universe;
+            if (spec.filter != null)
+            {
+                return universe.FindGenerated(d => (!spec.biome.HasValue || d.Biome == spec.biome.Value) && (!spec.size.HasValue || d.Size == spec.size.Value) && spec.filter(d), spec.minTier);
+            }
+            return universe.FindGenerated(spec.biome, spec.size, spec.minTier);
+        }
+
+        // Structures scattered over a 64 pad world: shows the pad layout and the structure scale of a Colossal planet.
+        static void PlaceShowcase(GameState gs, GameDatabase db)
+        {
+            StructureKind[] kinds =
+            {
+                StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm,
+                StructureKind.Gunner, StructureKind.Laser, StructureKind.Warehouse, StructureKind.Gunner, StructureKind.Laser, StructureKind.Satellite,
+                StructureKind.Gunner, StructureKind.Warehouse, StructureKind.Laser, StructureKind.Gunner
+            };
+            int[] slots = { 0, 4, 9, 13, 18, 22, 27, 31, 36, 40, 45, 49, 54, 58, 61, 63 };
+            for (int i = 0; i < kinds.Length; i++)
+            {
+                var def = db.StructureOfKind(kinds[i]);
+                if (def != null) gs.DebugPlace(def, slots[i], 1 + i % 3);
+            }
         }
     }
 }

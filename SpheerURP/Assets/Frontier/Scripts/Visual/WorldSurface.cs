@@ -129,6 +129,9 @@ namespace Frontier
         void OnChanged()
         {
             if (view == null || view.Spin == null) return;
+            // The state moves to a new world before the planet view shows it: until Rebuilt fires the pad layout still belongs to the previous world,
+            // and the new world may have buildings on pads that layout does not have.
+            if (view.Current == null || view.Current.Id != gs.planet.Id) return;
             RebuildStructures();
             if (buildMode) RebuildPads();
         }

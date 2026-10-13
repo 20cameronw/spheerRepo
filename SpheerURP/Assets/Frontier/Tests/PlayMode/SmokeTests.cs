@@ -116,5 +116,131 @@ namespace Frontier.Tests
             for (int i = 0; i < 5; i++) yield return null;
             Assert.AreSame(destination, runtime.State.planet);
         }
+
+        [UnityTest]
+        public IEnumerator TheAppComponent_WritesTheDebouncedSave_AfterAQuietSecond()
+        {
+            var host = new GameObject("TestBootstrap");
+            host.AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30f;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var runtime = FrontierRuntime.Current;
+            Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
+
+            string file = Path.Combine(saveDir, "frontier_save.json");
+            runtime.State.Flush();
+            File.Delete(file);
+            runtime.State.AddXp(3);
+            yield return null;
+            Assert.IsFalse(File.Exists(file), "nothing is written in the frame of the change");
+            yield return new WaitForSecondsRealtime(1.6f);
+            Assert.IsTrue(File.Exists(file), "the app component flushes after about a second of quiet");
+            Assert.IsFalse(runtime.State.saves.IsDirty);
+        }
+
+        // Every biome, size class, ring and moon flag and every model key the generator can produce must build a planet and its surface
+        // without errors (a Debug.LogError fails the test), and a generated world has the same on-screen size as a hand made one.
+        [UnityTest]
+        public IEnumerator GeneratedWorlds_OfEveryKind_Render()
+        {
+            var host = new GameObject("TestBootstrap");
+            host.AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30f;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var runtime = FrontierRuntime.Current;
+            Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
+
+            var universe = runtime.State.universe;
+            var worlds = new List<PlanetData>();
+            var ids = new HashSet<string>();
+            Action<PlanetData> add = p => { if (p != null && ids.Add(p.Id)) worlds.Add(p); };
+            foreach (Frontier.Universe.Biome biome in Enum.GetValues(typeof(Frontier.Universe.Biome)))
+                for (int skip = 0; skip < 2; skip++) add(universe.FindGenerated(biome, null, 0, skip, 3000));
+            foreach (Frontier.Universe.SizeClass size in Enum.GetValues(typeof(Frontier.Universe.SizeClass))) add(universe.FindGenerated(null, size, 0, 0, 3000));
+            add(universe.FindGenerated(d => d.HasRings, 0, 0, 3000));
+            add(universe.FindGenerated(d => d.HasRings && d.Biome == Frontier.Universe.Biome.GasGiant, 0, 0, 3000));
+            add(universe.FindGenerated(d => d.MoonCount >= 5, 0, 0, 3000));
+            add(universe.FindGenerated(d => d.Weather == Frontier.Universe.Weather.Storm, 0, 0, 3000));
+            foreach (string key in universe.Universe.Config.ModelKeys) add(universe.FindGenerated(d => d.ModelKey == key, 0, 0, 3000));
+            foreach (var authored in universe.AuthoredPlanets) add(authored);
+            Assert.GreaterOrEqual(worlds.Count, 40, "the sample must cover many kinds of world");
+
+            int withRings = 0, withMoons = 0;
+            foreach (var world in worlds)
+            {
+                runtime.State.DebugTeleport(world);
+                runtime.Planet.Show(world, false);
+                yield return null;
+                Assert.AreEqual(world.Id, runtime.Planet.Current.Id);
+                Assert.AreEqual(world.SurfaceRadius, runtime.Planet.SurfaceRadius(), 1e-4f, world.Id + ": the ground collider follows the world");
+                if (!world.IsAuthored)
+                    Assert.AreEqual(PlanetSO.StandardSurfaceRadius * ModelLibrary.GroundScale(world.ModelKey), runtime.Planet.SurfaceRadius(), 1e-4f, world.Id + ": standard radius scaled by the model's ground scale");
+                Assert.AreEqual(world.BuildingSlots, runtime.Surface.SlotCount, world.Id);
+                Assert.AreEqual(1f / world.WorldSize, world.StructureScale, 1e-5f);
+                Assert.IsNotNull(runtime.Planet.Spin.Find("Core"), world.Id + ": the planet body was not built");
+                int moons = 0;
+                foreach (Transform child in runtime.Planet.Root) if (child.name == "MoonPivot") moons++;
+                Assert.AreEqual(world.MoonCount, moons, world.Id + ": moons");
+                if (world.HasRings) withRings++;
+                if (moons > 0) withMoons++;
+            }
+            Assert.Greater(withRings, 2);
+            Assert.Greater(withMoons, 10);
+
+            // the star map and the debug page must cope with a generated current world, too
+            var generated = universe.FindGenerated(Frontier.Universe.Biome.Oceanic, null, 0, 0, 3000);
+            runtime.State.DebugTeleport(generated);
+            runtime.Planet.Show(generated, false);
+            yield return null;
+            runtime.Ui.DebugMap(null, 0.5f);
+            yield return null;
+            runtime.Ui.DebugMenu("debug", true);
+            yield return null;
+            runtime.Ui.DebugReset();
+            yield return null;
+        }
+
+        // The state moves to the destination before the planet view shows it. A destination with buildings on pads beyond the previous
+        // world's pad count used to throw an IndexOutOfRangeException from the state's change event in between (a trip from a small world
+        // to a big one the player had built on); any exception here fails the test.
+        [UnityTest]
+        public IEnumerator Travelling_ToABigWorldWithBuildingsOnHighPads_KeepsTheSurfaceConsistent()
+        {
+            var host = new GameObject("TestBootstrap");
+            host.AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30f;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var runtime = FrontierRuntime.Current;
+            Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
+
+            var gs = runtime.State;
+            var home = gs.planet;
+            var big = gs.universe.FindGenerated(null, Frontier.Universe.SizeClass.Colossal, 0, 0, 3000);
+            Assert.IsNotNull(big, "the universe must offer a colossal world near home");
+            Assert.Greater(big.BuildingSlots, home.BuildingSlots);
+            var gunner = runtime.Db.StructureOfKind(StructureKind.Gunner);
+
+            gs.DebugTeleport(big);
+            runtime.Planet.Show(big, false);
+            yield return null;
+            int highPad = big.BuildingSlots - 1;
+            Assert.IsNotNull(gs.DebugPlace(gunner, highPad));
+            yield return null;
+            Assert.AreEqual(1, runtime.Surface.TurretAnchors().Count);
+
+            gs.DebugTeleport(home);
+            runtime.Planet.Show(home, false);
+            yield return null;
+            Assert.AreEqual(0, runtime.Surface.TurretAnchors().Count);
+
+            gs.DebugTeleport(big);
+            yield return null;
+            Assert.AreEqual(0, runtime.Surface.TurretAnchors().Count, "the surface keeps showing the world the planet view shows until it is told otherwise");
+            runtime.Planet.Show(big, false);
+            yield return null;
+            var anchors = runtime.Surface.TurretAnchors();
+            Assert.AreEqual(1, anchors.Count);
+            Assert.AreEqual(highPad, anchors[0].Key.slot);
+        }
     }
 }

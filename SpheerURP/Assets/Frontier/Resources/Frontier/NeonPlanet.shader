@@ -11,6 +11,7 @@ Shader "Frontier/NeonPlanet"
         _Center ("Center (object space)", Vector) = (0,0,0,0)
         _Style ("Style", Float) = 0
         _Lines ("Latitude lines", Float) = 1
+        _CraterSoft ("Terrain between craters (style 2)", Range(0,1)) = 0
     }
     SubShader
     {
@@ -34,6 +35,7 @@ Shader "Frontier/NeonPlanet"
                 float4 _Center;
                 float _Style;
                 float _Lines;
+                float _CraterSoft;
             CBUFFER_END
 
             struct Attributes
@@ -85,7 +87,10 @@ Shader "Frontier/NeonPlanet"
                     float3 f = frac(c) - 0.5;
                     float d = length(f);
                     float h = frac(sin(dot(floor(c), float3(12.9898, 78.233, 37.719))) * 43758.5453);
-                    pat = (h > 0.45) ? smoothstep(0.38, 0.30, d) * 0.9 : sin(p) * 0.15 + 0.5;
+                    float disc = smoothstep(0.38, 0.30, d);
+                    float ground = sin(p) * 0.15 + 0.5;
+                    // _CraterSoft 0: a cell with a crater falls to the alt colour around its disc (the original look); 1: the terrain shows between the discs.
+                    pat = (h > 0.45) ? lerp(disc * 0.9, lerp(ground, 0.9, disc), _CraterSoft) : ground;
                 }
                 else if (_Style < 3.5)
                 {

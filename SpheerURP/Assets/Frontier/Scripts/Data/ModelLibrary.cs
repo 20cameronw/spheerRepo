@@ -15,6 +15,9 @@ namespace Frontier
             [Tooltip("Measured source-to-reference scale correction, baked by Frontier/Calibrate Model Scales.")]
             public float scale;
             public float referenceDiameter;
+            [Tooltip("Where structures sit, as a fraction of the standard ground radius (0 = not baked, treated as 1). Round models have 1; models with " +
+                     "spikes or a smaller core have less, so buildings touch the visible body instead of floating. Baked by Frontier/Bake Model Ground Radii.")]
+            public float groundScale;
         }
 
         public Entry[] entries;
@@ -29,6 +32,15 @@ namespace Frontier
                 if (!loaded) { cached = Resources.Load<ModelLibrary>("Frontier/ModelLibrary"); loaded = true; }
                 return cached;
             }
+        }
+
+        /// <summary>Ground radius of a planet model as a fraction of the standard ground radius: 1 for round models, less when the visible body is smaller than the model's bounds.</summary>
+        public static float GroundScale(string key)
+        {
+            var lib = Instance;
+            if (lib == null || lib.entries == null) return 1f;
+            foreach (var e in lib.entries) if (e.key == key) return e.groundScale > 0.01f ? Mathf.Min(1f, e.groundScale) : 1f;
+            return 1f;
         }
 
         /// <summary>Instantiates an inert model using its baked scale correction and the requested diameter.</summary>

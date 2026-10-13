@@ -121,6 +121,7 @@ namespace Frontier
         /// <summary>A world by canonical id ("p:X:Y:I:P") or by the legacy id of a Core World ("sylva"); null when it does not exist.</summary>
         public PlanetData Get(string id)
         {
+            if (string.IsNullOrEmpty(id)) return null;
             PlanetDescriptor d;
             return Universe.TryGetPlanetById(id, out d) ? Wrap(d) : null;
         }
@@ -214,9 +215,9 @@ namespace Frontier
         }
 
         /// <summary>The first generated world of a biome and/or size class (null means any) at or above a tier. See <see cref="FindGenerated(Func{PlanetDescriptor, bool}, int, int, int)"/>.</summary>
-        public PlanetData FindGenerated(Biome? biome, SizeClass? size, int minTier = 0, int skip = 0)
+        public PlanetData FindGenerated(Biome? biome, SizeClass? size, int minTier = 0, int skip = 0, int maxSectors = 60000)
         {
-            return FindGenerated(d => (!biome.HasValue || d.Biome == biome.Value) && (!size.HasValue || d.Size == size.Value), minTier, skip);
+            return FindGenerated(d => (!biome.HasValue || d.Biome == biome.Value) && (!size.HasValue || d.Size == size.Value), minTier, skip, maxSectors);
         }
 
         // Cell i of the square ring at Chebyshev distance r: the top row left to right, the bottom row, then the two columns between them.

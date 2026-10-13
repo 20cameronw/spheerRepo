@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UBiome = Frontier.Universe.Biome;
+using USize = Frontier.Universe.SizeClass;
 
 namespace Frontier
 {
@@ -661,6 +663,92 @@ namespace Frontier
                 tp.Add(IconBtn(pl.Name.ToUpper() + "  -  " + pl.SystemName, "map", pl.Id == gs.planet.Id ? UiKit.Lime : UiKit.Cyan, () => DebugTeleportTo(pl)));
             }
             body.Add(tp);
+            body.Add(BuildGeneratedPicker());
+        }
+
+        // ------------------------------------------------------------ debug: generated worlds
+        static readonly string[] DebugBiomeLabels = { "ANY", "LUSH", "MINERAL", "GLACIAL", "VOLCANIC", "FUNGAL", "CRYSTAL", "OBSIDIAN", "SHATTERED", "DESERT", "OCEANIC", "GAS GIANT", "BARREN" };
+        static readonly string[] DebugSizeLabels = { "ANY", "DWARF", "SMALL", "MEDIUM", "LARGE", "GIANT", "COLOSSAL" };
+        static readonly int[] DebugTierChoices = { 0, 2, 4, 6, 8, 12, 20 };
+        /// <summary>The menu searches this many sectors around home at most, so a rare combination cannot freeze the game.</summary>
+        const int DebugSearchSectors = 3000;
+        int debugBiome, debugSize, debugTier, debugSkip;
+
+        VisualElement BuildGeneratedPicker()
+        {
+            var gen = Card(UiKit.Lime);
+            gen.Add(UiKit.Text("GENERATED WORLD (free)", "fr-h2"));
+            gen.Add(UiKit.Text("Teleports to the first generated world that matches, searching outwards from home. NEXT cycles through the matches.", "fr-tiny"));
+            gen.Add(DebugChoiceRow("BIOME", DebugBiomeLabels, debugBiome, i => debugBiome = i));
+            gen.Add(DebugChoiceRow("SIZE", DebugSizeLabels, debugSize, i => debugSize = i));
+            var tiers = new string[DebugTierChoices.Length];
+            for (int i = 0; i < tiers.Length; i++) tiers[i] = DebugTierChoices[i] + "+";
+            gen.Add(DebugChoiceRow("MINIMUM TIER", tiers, debugTier, i => debugTier = i));
+            gen.Add(IconBtn("TELEPORT", "map", UiKit.Lime, () => DebugTeleportToGenerated(false)));
+            gen.Add(IconBtn("NEXT MATCH", "map", UiKit.Cyan, () => DebugTeleportToGenerated(true)));
+            var here = UiKit.Text("Now on: " + gs.planet.Name + "  " + gs.planet.Id, "fr-tiny");
+            here.style.marginTop = UiKit.Space.S12;
+            gen.Add(here);
+            gen.Add(IconBtn("DUMP DESCRIPTOR", "tools", UiKit.Amber, DebugDumpDescriptor));
+            return gen;
+        }
+
+        VisualElement DebugChoiceRow(string title, string[] labels, int selectedIndex, Action<int> pick)
+        {
+            var box = UiKit.Div();
+            box.Add(SectionLabel(title));
+            var row = UiKit.Div("fr-row-wrap");
+            for (int i = 0; i < labels.Length; i++)
+            {
+                int index = i;
+                row.Add(DebugChoice(labels[i], i == selectedIndex, () => { pick(index); debugSkip = 0; RefreshModal(); }));
+            }
+            box.Add(row);
+            return box;
+        }
+
+        Button DebugChoice(string label, bool on, Action click)
+        {
+            var b = new Button();
+            b.AddToClassList("fr-tab");
+            if (on) b.AddToClassList("fr-tab-on");
+            UiKit.SetAccent(b, UiKit.Lime);
+            // the tab style is for equal width rows; these wrap
+            b.style.flexGrow = 0; b.style.flexShrink = 0; b.style.flexBasis = StyleKeyword.Auto;
+            b.style.minWidth = UiKit.Size.Touch;
+            b.style.paddingLeft = UiKit.Space.S12; b.style.paddingRight = UiKit.Space.S12;
+            b.style.marginBottom = UiKit.Space.S8;
+            b.Add(UiKit.Text(label, "fr-tab-label"));
+            b.clicked += () => { Sfx.Click(); click(); };
+            return b;
+        }
+
+        void DebugTeleportToGenerated(bool next)
+        {
+            debugSkip = next ? debugSkip + 1 : 0;
+            UBiome? biome = debugBiome == 0 ? (UBiome?)null : (UBiome)(debugBiome - 1);
+            USize? size = debugSize == 0 ? (USize?)null : (USize)(debugSize - 1);
+            var found = gs.universe.FindGenerated(biome, size, DebugTierChoices[debugTier], debugSkip, DebugSearchSectors);
+            if (found == null)
+            {
+                debugSkip = 0;
+                Sfx.Bad();
+                Toast("No matching world found nearby", UiKit.Red);
+                return;
+            }
+            Sfx.Good();
+            DebugTeleportTo(found);
+            Toast(found.Name + "  -  " + found.BiomeName + ", " + found.SizeName.ToLower() + ", tier " + found.Tier, UiKit.Cyan);
+        }
+
+        /// <summary>Writes a readable description of the current world's descriptor to the log and the clipboard.</summary>
+        void DebugDumpDescriptor()
+        {
+            string text = gs.planet.Dump();
+            Debug.Log("Frontier: planet descriptor\n" + text);
+            GUIUtility.systemCopyBuffer = text;
+            Sfx.Click();
+            Toast("Descriptor copied to the log", UiKit.Amber);
         }
 
         /// <summary>Moves the player to a world for free and shows it (debug tools).</summary>

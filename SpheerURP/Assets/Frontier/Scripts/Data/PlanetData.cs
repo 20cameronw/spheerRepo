@@ -30,6 +30,7 @@ namespace Frontier
 
         readonly string description;
         readonly Color primary, secondary, rim;
+        readonly float generatedGroundRadius;
         readonly List<GatherSpot> spots = new List<GatherSpot>();
         readonly List<ResourceSO> resources = new List<ResourceSO>();
         readonly GatherSpot surfaceScrap;
@@ -47,6 +48,7 @@ namespace Frontier
             primary = ToColor(descriptor.Primary);
             secondary = ToColor(descriptor.Secondary);
             rim = ToColor(descriptor.Rim);
+            generatedGroundRadius = StandardSurfaceRadius * ModelLibrary.GroundScale(descriptor.ModelKey);
 
             if (authored != null)
             {
@@ -135,7 +137,13 @@ namespace Frontier
         /// <summary>Key into the ModelLibrary of the planet mesh.</summary>
         public string ModelKey { get { return Authored != null ? Authored.ModelKey : Descriptor.ModelKey; } }
         public float ModelScale { get { return Authored != null ? Authored.modelScale : 1f; } }
-        public float SurfaceRadius { get { return Authored != null ? Authored.surfaceRadius : StandardSurfaceRadius; } }
+        /// <summary>
+        /// The ground sphere structures sit on. Authored worlds use their asset's radius; a generated world uses the standard 1.5 corrected by its
+        /// model's baked ground scale (1 for round models, smaller for models whose visible body is smaller than their bounds, so buildings touch the surface).
+        /// </summary>
+        public float SurfaceRadius { get { return Authored != null ? Authored.surfaceRadius : generatedGroundRadius; } }
+        /// <summary>The radius the planet model is fitted to: always the standard 1.5 for generated worlds (every planet is the same size on screen); authored worlds tie it to their ground radius, as before.</summary>
+        public float ModelRadius { get { return Authored != null ? Authored.surfaceRadius : StandardSurfaceRadius; } }
         public float AtmosphereScale { get { return Authored != null ? Authored.atmosphereScale : StandardAtmosphereScale; } }
 
         // ---- what the universe says about it ---------------------------------------------------------------------------

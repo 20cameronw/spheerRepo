@@ -46,6 +46,21 @@ namespace Frontier.EditorTools
                     count++;
                 }
                 Debug.Log("Frontier: planet size checks passed (" + count + " models, diameter 3).");
+                int grounds = 0;
+                foreach (var entry in ModelLibrary.Instance.entries)
+                {
+                    if (entry.prefab == null || !ModelScaleCalibration.IsPlanetModel(entry.key)) continue;
+                    var fitted = ModelLibrary.Spawn(entry.key, holder.transform, 3f, true);
+                    float measured = ModelScaleCalibration.MeasureGroundScale(fitted.gameObject, entry);
+                    UnityEngine.Object.DestroyImmediate(fitted.gameObject);
+                    if (Mathf.Abs(measured - ModelLibrary.GroundScale(entry.key)) > 0.011f)
+                        throw new InvalidOperationException("The baked ground radius of '" + entry.key + "' is " + ModelLibrary.GroundScale(entry.key) + " but the model measures " +
+                            measured + ". Run Frontier > Bake Model Ground Radii.");
+                    if (ModelLibrary.GroundScale(entry.key) < 0.5f || ModelLibrary.GroundScale(entry.key) > 1f)
+                        throw new InvalidOperationException("Implausible ground radius for " + entry.key);
+                    grounds++;
+                }
+                Debug.Log("Frontier: baked model ground radii match the meshes (" + grounds + " planet models).");
                 foreach (var entry in ModelLibrary.Instance.entries)
                 {
                     if (!entry.key.StartsWith("struct_", StringComparison.Ordinal)) continue;

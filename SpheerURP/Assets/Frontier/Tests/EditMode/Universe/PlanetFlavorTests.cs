@@ -197,6 +197,37 @@ namespace Frontier.Universe.Tests
         }
 
         [Test]
+        public void Blurb_DoesNotRepeatAWeatherWordInItsFirstSentence()
+        {
+            var planets = SomePlanets(1500);
+            ulong seed = new UniverseConfig().Seed;
+            var stems = new Dictionary<Weather, string[]>
+            {
+                { Weather.Rain, new[] { "rain" } }, { Weather.Snow, new[] { "snow" } }, { Weather.Embers, new[] { "ember" } },
+                { Weather.Spores, new[] { "spore" } }, { Weather.Dust, new[] { "dust" } }, { Weather.Storm, new[] { "storm", "lightning" } }
+            };
+            int checkedWorlds = 0, withoutSky = 0;
+            foreach (var p in planets)
+            {
+                string[] words;
+                if (!stems.TryGetValue(p.Weather, out words)) continue;
+                string text = PlanetBlurb.Describe(p, seed);
+                string first = text.Substring(0, text.IndexOf('.'));
+                foreach (string word in words)
+                {
+                    int count = 0, at = 0;
+                    while ((at = first.IndexOf(word, at, StringComparison.OrdinalIgnoreCase)) >= 0) { count++; at += word.Length; }
+                    Assert.LessOrEqual(count, 1, "'" + word + "' is repeated: " + first);
+                }
+                checkedWorlds++;
+                if (!first.Contains(" under ") && !first.Contains(" beneath ") && !first.Contains(" with ") && !first.Contains(" wreathed") && !first.Contains(" wracked") &&
+                    !first.Contains(" lashed") && !first.Contains(" swept") && !first.Contains(" battered") && !first.Contains(" shrouded")) withoutSky++;
+            }
+            Assert.Greater(checkedWorlds, 100);
+            TestLog.Info(checkedWorlds + " worlds with weather; " + withoutSky + " left their sky clause out because the opener already said it");
+        }
+
+        [Test]
         public void EveryBiomeSizeWeatherAndHazardCombination_ProducesText()
         {
             ulong seed = 7UL;

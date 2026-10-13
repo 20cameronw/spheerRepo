@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace Frontier
 {
+    /// <summary>
+    /// Terrain presets of the authoring tool. The values and their order are those of the universe generator's biomes
+    /// (<c>Frontier.Universe.Biome</c>), so every biome a generated world can have can also be authored by hand; a test keeps them in step.
+    /// </summary>
     public enum PlanetBiome
     {
         Lush,
@@ -13,7 +17,11 @@ namespace Frontier
         Fungal,
         Crystal,
         Obsidian,
-        Shattered
+        Shattered,
+        Desert,
+        Oceanic,
+        GasGiant,
+        Barren
     }
 
     /// <summary>
@@ -151,6 +159,51 @@ namespace Frontier
                     p.modelKey = !string.IsNullOrEmpty(preferredModel) ? preferredModel : "obsidian";
                     break;
 
+                case PlanetBiome.Desert:
+                    p.primary = new Color(0.90f + (float)rng.NextDouble() * 0.08f, 0.68f + (float)rng.NextDouble() * 0.14f, 0.22f + (float)rng.NextDouble() * 0.12f);
+                    p.secondary = new Color(0.35f, 0.16f, 0.03f);
+                    p.rim = new Color(2.4f, 1.6f, 0.4f);
+                    p.weather = WeatherKind.Dust;
+                    p.style = 1;
+                    p.surfaceBands = 5f + (float)rng.NextDouble() * 4f;
+                    p.glowIntensity = 0.40f; p.atmosphereIntensity = 0.25f;
+                    p.modelKey = !string.IsNullOrEmpty(preferredModel) ? preferredModel : "aurum";
+                    break;
+
+                case PlanetBiome.Oceanic:
+                    p.primary = new Color(0.06f + (float)rng.NextDouble() * 0.08f, 0.42f + (float)rng.NextDouble() * 0.16f, 0.92f);
+                    p.secondary = new Color(0.02f, 0.08f, 0.30f);
+                    p.rim = new Color(0.3f, 1.6f, 2.6f);
+                    p.weather = rng.NextDouble() < 0.6 ? WeatherKind.Rain : WeatherKind.Clear;
+                    p.style = 1;
+                    p.surfaceBands = 3f + (float)rng.NextDouble() * 3f;
+                    p.glowIntensity = 0.55f; p.atmosphereIntensity = 0.65f;
+                    p.modelKey = !string.IsNullOrEmpty(preferredModel) ? preferredModel : "tide";
+                    break;
+
+                case PlanetBiome.GasGiant:
+                    p.primary = new Color(0.86f + (float)rng.NextDouble() * 0.10f, 0.62f + (float)rng.NextDouble() * 0.14f, 0.38f);
+                    p.secondary = new Color(0.45f, 0.24f, 0.12f);
+                    p.rim = new Color(2.2f, 1.5f, 0.7f);
+                    p.weather = rng.NextDouble() < 0.5 ? WeatherKind.Storm : WeatherKind.Clear;
+                    p.style = rng.NextDouble() < 0.7 ? 0 : 1;
+                    p.surfaceBands = 8f + (float)rng.NextDouble() * 8f;
+                    p.glowIntensity = 0.50f; p.atmosphereIntensity = 0.80f;
+                    p.hasRings = rng.NextDouble() < 0.4;
+                    p.modelKey = !string.IsNullOrEmpty(preferredModel) ? preferredModel : "zephyr";
+                    break;
+
+                case PlanetBiome.Barren:
+                    p.primary = new Color(0.50f + (float)rng.NextDouble() * 0.12f, 0.46f + (float)rng.NextDouble() * 0.10f, 0.42f);
+                    p.secondary = new Color(0.14f, 0.13f, 0.12f);
+                    p.rim = new Color(1.0f, 1.0f, 1.3f);
+                    p.weather = WeatherKind.Clear;
+                    p.style = 2;
+                    p.surfaceBands = 3f + (float)rng.NextDouble() * 3f;
+                    p.glowIntensity = 0.20f; p.atmosphereIntensity = 0.05f;
+                    p.modelKey = !string.IsNullOrEmpty(preferredModel) ? preferredModel : "vesper";
+                    break;
+
                 default: // Shattered / Deep Void
                     p.primary = new Color(0.85f + (float)rng.NextDouble() * 0.15f, 0.85f, 1.0f);
                     p.secondary = new Color(0.04f, 0.04f, 0.08f);
@@ -219,6 +272,29 @@ namespace Frontier
                     if (iron != null) p.spots.Add(new GatherSpot { label = "Black Glass Shelf", game = MinigameKind.Mine, resource = iron, baseYield = 16 + tier * 4, difficulty = diff });
                     if (crystal != null) p.spots.Add(new GatherSpot { label = "Violet Vein", game = MinigameKind.Mine, resource = crystal, baseYield = 8 + tier * 2, difficulty = diff + 0.05f });
                     if (core != null) p.spots.Add(new GatherSpot { label = "Void Rift", game = MinigameKind.Drill, resource = core, baseYield = 3 + tier, difficulty = diff + 0.1f });
+                    break;
+
+                case PlanetBiome.Desert:
+                    if (stone != null) p.spots.Add(new GatherSpot { label = "Dune Quarry", game = MinigameKind.Mine, resource = stone, baseYield = 10 + tier * 3, difficulty = diff - 0.05f });
+                    if (iron != null) p.spots.Add(new GatherSpot { label = "Rust Flats", game = MinigameKind.Mine, resource = iron, baseYield = 8 + tier * 4, difficulty = diff });
+                    if (fuel != null) p.spots.Add(new GatherSpot { label = "Tar Seep", game = MinigameKind.Drill, resource = fuel, baseYield = 8 + tier * 2, difficulty = diff + 0.05f });
+                    break;
+
+                case PlanetBiome.Oceanic:
+                    if (wood != null) p.spots.Add(new GatherSpot { label = "Kelp Forest", game = MinigameKind.Chop, resource = wood, baseYield = 16 + tier * 5, difficulty = diff });
+                    if (crystal != null) p.spots.Add(new GatherSpot { label = "Pearl Beds", game = MinigameKind.Mine, resource = crystal, baseYield = 6 + tier * 2, difficulty = diff + 0.05f });
+                    if (fuel != null) p.spots.Add(new GatherSpot { label = "Abyssal Vent", game = MinigameKind.Drill, resource = fuel, baseYield = 8 + tier * 2, difficulty = diff + 0.05f });
+                    break;
+
+                case PlanetBiome.GasGiant:
+                    if (fuel != null) p.spots.Add(new GatherSpot { label = "Cloud Skimmer", game = MinigameKind.Drill, resource = fuel, baseYield = 14 + tier * 4, difficulty = diff });
+                    if (core != null) p.spots.Add(new GatherSpot { label = "Storm Core", game = MinigameKind.Drill, resource = core, baseYield = 3 + tier, difficulty = diff + 0.1f });
+                    break;
+
+                case PlanetBiome.Barren:
+                    if (stone != null) p.spots.Add(new GatherSpot { label = "Regolith Pit", game = MinigameKind.Mine, resource = stone, baseYield = 10 + tier * 3, difficulty = diff - 0.05f });
+                    if (iron != null) p.spots.Add(new GatherSpot { label = "Meteor Scar", game = MinigameKind.Mine, resource = iron, baseYield = 8 + tier * 3, difficulty = diff });
+                    if (scrap != null) p.spots.Add(new GatherSpot { label = "Wreck Field", game = MinigameKind.Mine, resource = scrap, baseYield = 8 + tier * 2, difficulty = diff - 0.1f });
                     break;
 
                 default: // Shattered / Void

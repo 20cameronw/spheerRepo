@@ -178,7 +178,10 @@ namespace Frontier.Tests
                 Assert.GreaterOrEqual(p.WorldSize, 1f);
                 Assert.LessOrEqual(p.WorldSize, 2.5f);
                 Assert.AreEqual(1f / p.WorldSize, p.StructureScale, 1e-6f);
-                Assert.AreEqual(PlanetSO.StandardSurfaceRadius, p.SurfaceRadius, "generated worlds use the standard 1.5 ground radius");
+                Assert.AreEqual(PlanetSO.StandardSurfaceRadius, p.ModelRadius, "generated worlds fit the model to the standard radius, so every planet is the same size on screen");
+                Assert.AreEqual(PlanetSO.StandardSurfaceRadius * ModelLibrary.GroundScale(p.ModelKey), p.SurfaceRadius, 1e-5f, "the ground radius is the standard one corrected by the model's baked ground scale");
+                Assert.GreaterOrEqual(p.SurfaceRadius, 0.5f * PlanetSO.StandardSurfaceRadius);
+                Assert.LessOrEqual(p.SurfaceRadius, PlanetSO.StandardSurfaceRadius);
                 Assert.AreEqual(5f, p.AtmosphereScale);
                 Assert.AreEqual(1f, p.ModelScale);
                 Assert.AreEqual(BackdropMood.Auto, p.Mood);
@@ -266,6 +269,45 @@ namespace Frontier.Tests
             Assert.AreEqual(2, mine.Count, "stone and the world's own scrap; no duplicate surface scrap");
             Assert.IsFalse(mine.Exists(s => s.label == "Surface Scrap"));
             Assert.AreEqual(2, new List<ResourceSO>(p.Resources).Count);
+        }
+
+        [Test]
+        public void EveryPlanetModel_HasABakedGroundRadius_SoBuildingsTouchTheVisibleBody()
+        {
+            var keys = new HashSet<string>();
+            foreach (var so in db.planets) keys.Add(so.ModelKey);
+            foreach (string key in service.Universe.Config.ModelKeys) keys.Add(key);
+            foreach (string key in keys)
+            {
+                float g = ModelLibrary.GroundScale(key);
+                Assert.Greater(g, 0.5f, key);
+                Assert.LessOrEqual(g, 1f, key);
+            }
+            // round models sit on the standard ground sphere exactly; models whose body is smaller than their bounds get a smaller one
+            foreach (string round in new[] { "sylva", "glacia", "zephyr", "coral", "pyre", "tundra", "halcyon", "tide", "aurum", "prism" })
+                Assert.AreEqual(1f, ModelLibrary.GroundScale(round), round);
+            foreach (string core in new[] { "ferrum", "cinder", "nyx", "obsidian", "vesper" })
+                Assert.AreEqual(0.70f, ModelLibrary.GroundScale(core), 0.011f, core + " is a 1.05 body with spikes out to 1.3");
+            foreach (string lens in new[] { "arbor", "mire", "kaos" })
+                Assert.AreEqual(0.87f, ModelLibrary.GroundScale(lens), 0.011f, lens + " is a flattened body");
+            Assert.AreEqual(1f, ModelLibrary.GroundScale("no-such-model"));
+            Assert.AreEqual(1f, ModelLibrary.GroundScale("struct_drill"));
+        }
+
+        [Test]
+        public void AGeneratedWorldWithASpikyModel_SitsItsBuildingsOnTheBody_ButKeepsTheStandardSize()
+        {
+            var spiky = service.FindGenerated(d => d.ModelKey == "cinder" || d.ModelKey == "nyx" || d.ModelKey == "obsidian", 0, 0, 3000);
+            Assert.IsNotNull(spiky, "the generator uses the spiky models");
+            Assert.AreEqual(1.05f, spiky.SurfaceRadius, 0.02f);
+            Assert.AreEqual(PlanetSO.StandardSurfaceRadius, spiky.ModelRadius, "same size on screen");
+            var round = service.FindGenerated(d => d.ModelKey == "sylva", 0, 0, 3000);
+            Assert.AreEqual(PlanetSO.StandardSurfaceRadius, round.SurfaceRadius);
+            foreach (var authored in service.AuthoredPlanets)
+            {
+                Assert.AreEqual(authored.Authored.surfaceRadius, authored.SurfaceRadius, "authored values win: " + authored.Id);
+                Assert.AreEqual(authored.Authored.surfaceRadius, authored.ModelRadius, authored.Id);
+            }
         }
 
         [Test]

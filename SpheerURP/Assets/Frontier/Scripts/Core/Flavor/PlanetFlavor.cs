@@ -79,7 +79,7 @@ namespace Frontier.Universe
             new[] { "beneath clear skies", "under calm, open skies", "beneath a quiet sky" },
             new[] { "under steady rain", "beneath endless grey rain", "lashed by warm rain" },
             new[] { "under falling snow", "beneath drifting snowfall", "shrouded in a snowy haze" },
-            new[] { "under a drift of glowing embers", "beneath showers of embers", "with ash and embers on the wind" },
+            new[] { "under a slow drift of embers", "beneath showers of embers", "with ash and embers on the wind" },
             new[] { "wreathed in drifting spores", "under clouds of luminous spores", "with spores hanging in the air" },
             new[] { "under dust-laden winds", "beneath a veil of dust", "swept by dry, gritty winds" },
             new[] { "wracked by violent storms", "under constant lightning storms", "battered by howling storms" }
@@ -113,6 +113,28 @@ namespace Frontier.Universe
             return Hash.Index(Hash.Stream(universeSeed, key, salt), count);
         }
 
+        // Words a sky clause shares with the opener are a repeat ("drifting snow ... under falling snow"): the clause is changed or left out.
+        static readonly string[][] SkyStems =
+        {
+            new string[0], new[] { "rain" }, new[] { "snow" }, new[] { "ember" }, new[] { "spore" }, new[] { "dust" }, new[] { "storm", "lightning" }
+        };
+
+        static string ChooseSky(Weather weather, string opener, ulong universeSeed, ulong key)
+        {
+            string[] skies = Skies[(int)weather];
+            string[] stems = SkyStems[(int)weather];
+            int start = Pick(universeSeed, key, SeedSky, skies.Length);
+            for (int i = 0; i < skies.Length; i++)
+            {
+                string sky = skies[(start + i) % skies.Length];
+                bool repeats = false;
+                foreach (string stem in stems)
+                    if (opener.IndexOf(stem, StringComparison.OrdinalIgnoreCase) >= 0 && sky.IndexOf(stem, StringComparison.OrdinalIgnoreCase) >= 0) repeats = true;
+                if (!repeats) return sky;
+            }
+            return null;
+        }
+
         public static string Describe(PlanetDescriptor planet, ulong universeSeed)
         {
             if (planet == null) throw new ArgumentNullException("planet");
@@ -120,9 +142,11 @@ namespace Frontier.Universe
             var sb = new StringBuilder(160);
 
             string[] openers = planet.Kind == PlanetKind.AsteroidBelt ? BeltOpeners : Openers[(int)planet.Biome];
-            sb.Append(openers[Pick(universeSeed, key, SeedOpener, openers.Length)]);
-            string[] skies = Skies[(int)planet.Weather];
-            sb.Append(' ').Append(skies[Pick(universeSeed, key, SeedSky, skies.Length)]).Append('.');
+            string opener = openers[Pick(universeSeed, key, SeedOpener, openers.Length)];
+            sb.Append(opener);
+            string sky = ChooseSky(planet.Weather, opener, universeSeed, key);
+            if (sky != null) sb.Append(' ').Append(sky);
+            sb.Append('.');
 
             string[] sizes = Sizes[(int)planet.Size];
             sb.Append(' ').Append(sizes[Pick(universeSeed, key, SeedSize, sizes.Length)]);

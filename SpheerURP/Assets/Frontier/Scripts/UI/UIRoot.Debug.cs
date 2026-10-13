@@ -30,12 +30,17 @@ namespace Frontier
         public void DebugResearch(int tab, int tool = 0) { DebugReset(); researchTab = tab; toolTab = tool; OpenResearch(); }
         public void DebugPack(int select) { DebugReset(); packSel = select; OpenPack(); }
 
-        public void DebugMenu(string page)
+        public void DebugMenu(string page, bool scrollToEnd = false)
         {
             DebugReset();
             OpenMenu();
             menuPage = page ?? "";
             RefreshModal();
+            if (scrollToEnd && modalScroll != null)
+            {
+                var scroll = modalScroll;
+                scroll.schedule.Execute(() => scroll.scrollOffset = new Vector2(0f, scroll.contentContainer.layout.height)).StartingIn(60);
+            }
         }
 
         /// <summary>Opens the menu as a release build would see it: no DEBUG tile, and the debug page cannot be reached.</summary>
