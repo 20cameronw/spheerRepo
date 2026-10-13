@@ -1,0 +1,2306 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "research",
+  "items": [
+    {
+      "id": "survey_basics",
+      "displayName": "Survey Basics",
+      "description": "Calibrate the ship's sensors and raise a radar tower.",
+      "branch": "Navigation",
+      "tier": 1,
+      "cost": [
+        {
+          "resourceId": "scrap",
+          "amount": 50
+        },
+        {
+          "resourceId": "wood",
+          "amount": 25
+        },
+        {
+          "resourceId": "stone",
+          "amount": 17
+        },
+        {
+          "resourceId": "planks",
+          "amount": 8
+        }
+      ],
+      "prereqs": [],
+      "labLevel": 1,
+      "unlocks": [
+        "structure:radar_tower",
+        "upgrade:scanner_range:1"
+      ]
+    },
+    {
+      "id": "smelting",
+      "displayName": "Smelting",
+      "description": "Hot enough furnaces turn ore into plate and sand into glass.",
+      "branch": "Industry",
+      "tier": 1,
+      "cost": [
+        {
+          "resourceId": "scrap",
+          "amount": 50
+        },
+        {
+          "resourceId": "wood",
+          "amount": 35
+        },
+        {
+          "resourceId": "stone",
+          "amount": 50
+        },
+        {
+          "resourceId": "planks",
+          "amount": 11
+        }
+      ],
+      "prereqs": [],
+      "labLevel": 1,
+      "unlocks": [
+        "structure:foundry",
+        "recipe:smelt_iron_plate",
+        "recipe:smelt_glass"
+      ]
+    },
+    {
+      "id": "fabrication",
+      "displayName": "Fabrication",
+      "description": "Wire drawing and bench assembly.",
+      "branch": "Industry",
+      "tier": 1,
+      "cost": [
+        {
+          "resourceId": "scrap",
+          "amount": 55
+        },
+        {
+          "resourceId": "wood",
+          "amount": 40
+        },
+        {
+          "resourceId": "stone",
+          "amount": 25
+        },
+        {
+          "resourceId": "planks",
+          "amount": 18
+        }
+      ],
+      "prereqs": [],
+      "labLevel": 1,
+      "unlocks": [
+        "structure:fabricator",
+        "recipe:draw_copper_wire"
+      ]
+    },
+    {
+      "id": "deep_drilling",
+      "displayName": "Deep Drilling",
+      "description": "Bores deep enough to reach ore under the crust.",
+      "branch": "Harvest",
+      "tier": 1,
+      "cost": [
+        {
+          "resourceId": "scrap",
+          "amount": 40
+        },
+        {
+          "resourceId": "wood",
+          "amount": 30
+        },
+        {
+          "resourceId": "stone",
+          "amount": 40
+        },
+        {
+          "resourceId": "planks",
+          "amount": 9
+        }
+      ],
+      "prereqs": [],
+      "labLevel": 1,
+      "unlocks": [
+        "structure:driller",
+        "tool:drill:2"
+      ]
+    },
+    {
+      "id": "bio_cultivation",
+      "displayName": "Bio-Cultivation",
+      "description": "Tended domes harvest the fast growth of green worlds.",
+      "branch": "Harvest",
+      "tier": 1,
+      "cost": [
+        {
+          "resourceId": "scrap",
+          "amount": 40
+        },
+        {
+          "resourceId": "wood",
+          "amount": 30
+        },
+        {
+          "resourceId": "stone",
+          "amount": 21
+        },
+        {
+          "resourceId": "planks",
+          "amount": 14
+        }
+      ],
+      "prereqs": [],
+      "labLevel": 1,
+      "unlocks": [
+        "structure:biodome"
+      ]
+    },
+    {
+      "id": "jump_drive_1",
+      "displayName": "Jump Drive I",
+      "description": "The first jump coils: leave the home system.",
+      "branch": "Navigation",
+      "tier": 1,
+      "cost": [
+        {
+          "resourceId": "scrap",
+          "amount": 55
+        },
+        {
+          "resourceId": "wood",
+          "amount": 40
+        },
+        {
+          "resourceId": "stone",
+          "amount": 30
+        },
+        {
+          "resourceId": "planks",
+          "amount": 13
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 11
+        }
+      ],
+      "prereqs": [
+        "fabrication"
+      ],
+      "labLevel": 1,
+      "unlocks": [
+        "upgrade:jump:1"
+      ]
+    },
+    {
+      "id": "steelmaking",
+      "displayName": "Steelmaking",
+      "description": "Burn timber into carbon and fold it into iron.",
+      "branch": "Industry",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 60
+        },
+        {
+          "resourceId": "planks",
+          "amount": 300
+        },
+        {
+          "resourceId": "glass",
+          "amount": 35
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 75
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 190
+        }
+      ],
+      "prereqs": [
+        "smelting"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "recipe:smelt_steel"
+      ]
+    },
+    {
+      "id": "composites",
+      "displayName": "Composites",
+      "description": "Press plant fibre and resin into a poison-proof skin.",
+      "branch": "Industry",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 70
+        },
+        {
+          "resourceId": "planks",
+          "amount": 150
+        },
+        {
+          "resourceId": "glass",
+          "amount": 40
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 90
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 220
+        },
+        {
+          "resourceId": "biomass",
+          "amount": 170
+        }
+      ],
+      "prereqs": [
+        "fabrication",
+        "bio_cultivation"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "recipe:press_biocomposite"
+      ]
+    },
+    {
+      "id": "circuitry",
+      "displayName": "Circuitry",
+      "description": "Etched copper traces on a glass-fibre sheet.",
+      "branch": "Industry",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 75
+        },
+        {
+          "resourceId": "planks",
+          "amount": 160
+        },
+        {
+          "resourceId": "glass",
+          "amount": 45
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 95
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 230
+        },
+        {
+          "resourceId": "silica",
+          "amount": 120
+        }
+      ],
+      "prereqs": [
+        "fabrication"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "recipe:etch_circuit_board"
+      ]
+    },
+    {
+      "id": "titanium_working",
+      "displayName": "Titanium Working",
+      "description": "A furnace hot enough for the stubborn grey ore.",
+      "branch": "Industry",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 100
+        },
+        {
+          "resourceId": "planks",
+          "amount": 210
+        },
+        {
+          "resourceId": "glass",
+          "amount": 55
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 120
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 310
+        },
+        {
+          "resourceId": "titanium_ore",
+          "amount": 30
+        }
+      ],
+      "prereqs": [
+        "smelting"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "recipe:smelt_titanium_plate"
+      ]
+    },
+    {
+      "id": "gas_extraction",
+      "displayName": "Gas Extraction",
+      "description": "Pumps and turbines for the storm bands.",
+      "branch": "Harvest",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 95
+        },
+        {
+          "resourceId": "planks",
+          "amount": 200
+        },
+        {
+          "resourceId": "glass",
+          "amount": 55
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 180
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 300
+        }
+      ],
+      "prereqs": [
+        "deep_drilling"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:siphon_rig",
+        "tool:siphon:2"
+      ]
+    },
+    {
+      "id": "geo_survey",
+      "displayName": "Geo-Survey",
+      "description": "Sonar and trowel work for buried deposits.",
+      "branch": "Harvest",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 90
+        },
+        {
+          "resourceId": "planks",
+          "amount": 190
+        },
+        {
+          "resourceId": "glass",
+          "amount": 55
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 110
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 280
+        },
+        {
+          "resourceId": "silica",
+          "amount": 110
+        }
+      ],
+      "prereqs": [
+        "deep_drilling"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:excavator",
+        "tool:scanner:2"
+      ]
+    },
+    {
+      "id": "salvage_ops",
+      "displayName": "Salvage Operations",
+      "description": "A yard to sort the wreckage of the galaxy.",
+      "branch": "Harvest",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 75
+        },
+        {
+          "resourceId": "planks",
+          "amount": 160
+        },
+        {
+          "resourceId": "glass",
+          "amount": 45
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 95
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 470
+        }
+      ],
+      "prereqs": [
+        "fabrication"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:salvage_yard"
+      ]
+    },
+    {
+      "id": "fuel_logistics",
+      "displayName": "Fuel Logistics",
+      "description": "Dense racks for fuel cells.",
+      "branch": "Logistics",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 75
+        },
+        {
+          "resourceId": "planks",
+          "amount": 160
+        },
+        {
+          "resourceId": "glass",
+          "amount": 45
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 95
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 230
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 80
+        }
+      ],
+      "prereqs": [
+        "smelting"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:fuel_depot"
+      ]
+    },
+    {
+      "id": "cargo_logistics",
+      "displayName": "Cargo Logistics",
+      "description": "One pool for every warehouse on a world.",
+      "branch": "Logistics",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 90
+        },
+        {
+          "resourceId": "planks",
+          "amount": 380
+        },
+        {
+          "resourceId": "glass",
+          "amount": 50
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 110
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 280
+        }
+      ],
+      "prereqs": [
+        "steelmaking"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:cargo_depot"
+      ]
+    },
+    {
+      "id": "ballistics",
+      "displayName": "Ballistics",
+      "description": "Focused beams for long range.",
+      "branch": "Defense",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 85
+        },
+        {
+          "resourceId": "planks",
+          "amount": 180
+        },
+        {
+          "resourceId": "glass",
+          "amount": 50
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 110
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 260
+        },
+        {
+          "resourceId": "crystal",
+          "amount": 25
+        }
+      ],
+      "prereqs": [
+        "steelmaking"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:laser"
+      ]
+    },
+    {
+      "id": "shield_tech",
+      "displayName": "Shield Tech",
+      "description": "Fields that blunt incoming fire.",
+      "branch": "Defense",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 85
+        },
+        {
+          "resourceId": "planks",
+          "amount": 180
+        },
+        {
+          "resourceId": "glass",
+          "amount": 50
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 110
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 260
+        },
+        {
+          "resourceId": "crystal",
+          "amount": 25
+        }
+      ],
+      "prereqs": [
+        "circuitry"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "structure:shield_pylon"
+      ]
+    },
+    {
+      "id": "hazmat_toxic",
+      "displayName": "Hazmat: Toxic",
+      "description": "Seal the hull against toxic air.",
+      "branch": "Navigation",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 120
+        },
+        {
+          "resourceId": "planks",
+          "amount": 250
+        },
+        {
+          "resourceId": "glass",
+          "amount": 70
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 150
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 370
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 15
+        }
+      ],
+      "prereqs": [
+        "composites"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "upgrade:hull_toxic:1"
+      ]
+    },
+    {
+      "id": "jump_drive_2",
+      "displayName": "Jump Drive II",
+      "description": "More stable coils: a longer first leap.",
+      "branch": "Navigation",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 70
+        },
+        {
+          "resourceId": "planks",
+          "amount": 150
+        },
+        {
+          "resourceId": "glass",
+          "amount": 40
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 170
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 210
+        }
+      ],
+      "prereqs": [
+        "jump_drive_1"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "upgrade:jump:2",
+        "upgrade:jump:3"
+      ]
+    },
+    {
+      "id": "field_engineering",
+      "displayName": "Field Engineering",
+      "description": "A second crew works your sites.",
+      "branch": "Logistics",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 75
+        },
+        {
+          "resourceId": "planks",
+          "amount": 330
+        },
+        {
+          "resourceId": "glass",
+          "amount": 45
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 95
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 240
+        }
+      ],
+      "prereqs": [
+        "steelmaking"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "feature:builder_2"
+      ]
+    },
+    {
+      "id": "long_range_scanning_1",
+      "displayName": "Long-Range Scanning I",
+      "description": "Wider survey sweeps.",
+      "branch": "Navigation",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 60
+        },
+        {
+          "resourceId": "planks",
+          "amount": 130
+        },
+        {
+          "resourceId": "glass",
+          "amount": 70
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 75
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 190
+        }
+      ],
+      "prereqs": [
+        "survey_basics"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "upgrade:scanner_range:2",
+        "upgrade:scanner_range:3"
+      ]
+    },
+    {
+      "id": "toolsmithing_1",
+      "displayName": "Toolsmithing I",
+      "description": "Steel heads on every handle.",
+      "branch": "Harvest",
+      "tier": 2,
+      "cost": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 95
+        },
+        {
+          "resourceId": "planks",
+          "amount": 200
+        },
+        {
+          "resourceId": "glass",
+          "amount": 55
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 120
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 300
+        },
+        {
+          "resourceId": "steel",
+          "amount": 16
+        }
+      ],
+      "prereqs": [
+        "steelmaking"
+      ],
+      "labLevel": 2,
+      "unlocks": [
+        "tool:*:4"
+      ]
+    },
+    {
+      "id": "chemistry",
+      "displayName": "Chemistry",
+      "description": "Reactors for resins, cryogels and charged gas.",
+      "branch": "Industry",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 200
+        },
+        {
+          "resourceId": "planks",
+          "amount": 280
+        },
+        {
+          "resourceId": "glass",
+          "amount": 210
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 80
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 60
+        },
+        {
+          "resourceId": "methane",
+          "amount": 95
+        }
+      ],
+      "prereqs": [
+        "composites",
+        "circuitry",
+        "gas_extraction"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "structure:chem_reactor",
+        "recipe:crystal_cell"
+      ]
+    },
+    {
+      "id": "thermal_metallurgy",
+      "displayName": "Thermal Metallurgy",
+      "description": "Alloys that glow without failing.",
+      "branch": "Industry",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 200
+        },
+        {
+          "resourceId": "planks",
+          "amount": 280
+        },
+        {
+          "resourceId": "glass",
+          "amount": 210
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 80
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 60
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 40
+        }
+      ],
+      "prereqs": [
+        "titanium_working",
+        "steelmaking"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "recipe:forge_thermal_alloy"
+      ]
+    },
+    {
+      "id": "cryo_chemistry",
+      "displayName": "Cryo-Chemistry",
+      "description": "Foam-cored laminates for deep cold.",
+      "branch": "Industry",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 200
+        },
+        {
+          "resourceId": "planks",
+          "amount": 280
+        },
+        {
+          "resourceId": "glass",
+          "amount": 210
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 80
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 60
+        },
+        {
+          "resourceId": "ice",
+          "amount": 190
+        }
+      ],
+      "prereqs": [
+        "chemistry",
+        "geo_survey"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "recipe:mix_cryo_composite"
+      ]
+    },
+    {
+      "id": "robotics",
+      "displayName": "Robotics",
+      "description": "Sealed motors with precision gearheads.",
+      "branch": "Industry",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 180
+        },
+        {
+          "resourceId": "planks",
+          "amount": 250
+        },
+        {
+          "resourceId": "glass",
+          "amount": 190
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 70
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 55
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 280
+        }
+      ],
+      "prereqs": [
+        "circuitry",
+        "steelmaking"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "recipe:assemble_servo_motor"
+      ]
+    },
+    {
+      "id": "optics",
+      "displayName": "Optics",
+      "description": "Lenses ground flawless enough for lasers.",
+      "branch": "Industry",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 170
+        },
+        {
+          "resourceId": "planks",
+          "amount": 240
+        },
+        {
+          "resourceId": "glass",
+          "amount": 370
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 70
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 55
+        }
+      ],
+      "prereqs": [
+        "circuitry"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "recipe:grind_optic_lens"
+      ]
+    },
+    {
+      "id": "hazmat_heat",
+      "displayName": "Hazmat: Heat",
+      "description": "Plating for worlds where rock flows.",
+      "branch": "Navigation",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 250
+        },
+        {
+          "resourceId": "planks",
+          "amount": 340
+        },
+        {
+          "resourceId": "glass",
+          "amount": 260
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 95
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 75
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 14
+        }
+      ],
+      "prereqs": [
+        "thermal_metallurgy"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "upgrade:hull_heat:1"
+      ]
+    },
+    {
+      "id": "hazmat_cold",
+      "displayName": "Hazmat: Cold",
+      "description": "Plating for worlds where air freezes.",
+      "branch": "Navigation",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 250
+        },
+        {
+          "resourceId": "planks",
+          "amount": 340
+        },
+        {
+          "resourceId": "glass",
+          "amount": 260
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 95
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 75
+        },
+        {
+          "resourceId": "cryo_composite",
+          "amount": 15
+        }
+      ],
+      "prereqs": [
+        "cryo_chemistry"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "upgrade:hull_cold:1"
+      ]
+    },
+    {
+      "id": "missile_tech",
+      "displayName": "Missile Tech",
+      "description": "Splash missiles for the thick of a wave.",
+      "branch": "Defense",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 220
+        },
+        {
+          "resourceId": "planks",
+          "amount": 300
+        },
+        {
+          "resourceId": "glass",
+          "amount": 230
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 85
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 65
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 12
+        }
+      ],
+      "prereqs": [
+        "robotics",
+        "ballistics"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "structure:missile_silo"
+      ]
+    },
+    {
+      "id": "tesla_tech",
+      "displayName": "Tesla Tech",
+      "description": "Chain lightning between aliens.",
+      "branch": "Defense",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 210
+        },
+        {
+          "resourceId": "planks",
+          "amount": 280
+        },
+        {
+          "resourceId": "glass",
+          "amount": 220
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 80
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 65
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 310
+        }
+      ],
+      "prereqs": [
+        "robotics"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "structure:tesla_coil"
+      ]
+    },
+    {
+      "id": "field_repair",
+      "displayName": "Field Repair",
+      "description": "Repair drones for the reactor.",
+      "branch": "Defense",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 210
+        },
+        {
+          "resourceId": "planks",
+          "amount": 290
+        },
+        {
+          "resourceId": "glass",
+          "amount": 220
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 85
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 65
+        },
+        {
+          "resourceId": "servo_motor",
+          "amount": 6
+        }
+      ],
+      "prereqs": [
+        "robotics"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "structure:repair_bay"
+      ]
+    },
+    {
+      "id": "colony_charter",
+      "displayName": "Colony Charter",
+      "description": "A hub that runs the settlement.",
+      "branch": "Logistics",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 270
+        },
+        {
+          "resourceId": "planks",
+          "amount": 360
+        },
+        {
+          "resourceId": "glass",
+          "amount": 280
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 100
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 150
+        }
+      ],
+      "prereqs": [
+        "field_engineering",
+        "cargo_logistics"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "structure:colony_hub",
+        "feature:builder_3"
+      ]
+    },
+    {
+      "id": "jump_drive_3",
+      "displayName": "Jump Drive III",
+      "description": "Folded lattices for deep hops.",
+      "branch": "Navigation",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 170
+        },
+        {
+          "resourceId": "planks",
+          "amount": 240
+        },
+        {
+          "resourceId": "glass",
+          "amount": 180
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 110
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 55
+        }
+      ],
+      "prereqs": [
+        "jump_drive_2"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "upgrade:jump:4",
+        "upgrade:jump:5"
+      ]
+    },
+    {
+      "id": "nav_autopilot",
+      "displayName": "Autopilot Navigation",
+      "description": "Skip the flight at a fuel premium.",
+      "branch": "Navigation",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 160
+        },
+        {
+          "resourceId": "planks",
+          "amount": 220
+        },
+        {
+          "resourceId": "glass",
+          "amount": 170
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 110
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 50
+        }
+      ],
+      "prereqs": [
+        "jump_drive_2",
+        "circuitry"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "feature:autopilot"
+      ]
+    },
+    {
+      "id": "toolsmithing_2",
+      "displayName": "Toolsmithing II",
+      "description": "Crystal-edged tools.",
+      "branch": "Harvest",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 200
+        },
+        {
+          "resourceId": "planks",
+          "amount": 280
+        },
+        {
+          "resourceId": "glass",
+          "amount": 210
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 80
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 60
+        },
+        {
+          "resourceId": "crystal",
+          "amount": 95
+        }
+      ],
+      "prereqs": [
+        "toolsmithing_1",
+        "thermal_metallurgy"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "tool:*:5"
+      ]
+    },
+    {
+      "id": "long_range_scanning_2",
+      "displayName": "Long-Range Scanning II",
+      "description": "Parallax surveys of whole sectors.",
+      "branch": "Navigation",
+      "tier": 3,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 180
+        },
+        {
+          "resourceId": "planks",
+          "amount": 240
+        },
+        {
+          "resourceId": "glass",
+          "amount": 190
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 70
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 55
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 35
+        }
+      ],
+      "prereqs": [
+        "long_range_scanning_1",
+        "optics"
+      ],
+      "labLevel": 3,
+      "unlocks": [
+        "upgrade:scanner_range:4",
+        "upgrade:scanner_range:5"
+      ]
+    },
+    {
+      "id": "plasma_physics",
+      "displayName": "Plasma Physics",
+      "description": "Bottle a star in a flask.",
+      "branch": "Industry",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 510
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 270
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 330
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 320
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 70
+        },
+        {
+          "resourceId": "methane",
+          "amount": 300
+        }
+      ],
+      "prereqs": [
+        "chemistry",
+        "optics"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "recipe:charge_plasma_cell"
+      ]
+    },
+    {
+      "id": "radiation_shielding",
+      "displayName": "Radiation Shielding",
+      "description": "Layered alloys that drink hard radiation.",
+      "branch": "Industry",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 600
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 320
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 390
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 380
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 85
+        },
+        {
+          "resourceId": "radium",
+          "amount": 15
+        }
+      ],
+      "prereqs": [
+        "thermal_metallurgy",
+        "chemistry"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "recipe:forge_rad_shield"
+      ]
+    },
+    {
+      "id": "quantum_computing",
+      "displayName": "Quantum Computing",
+      "description": "Machines that think in more than one state.",
+      "branch": "Industry",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 640
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 330
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 420
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 400
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 90
+        },
+        {
+          "resourceId": "helium3",
+          "amount": 140
+        }
+      ],
+      "prereqs": [
+        "optics",
+        "robotics",
+        "hazmat_toxic"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "structure:quantum_lab",
+        "recipe:etch_quantum_chip"
+      ]
+    },
+    {
+      "id": "hazmat_rad",
+      "displayName": "Hazmat: Radiation",
+      "description": "Plating for worlds that glow in the dark.",
+      "branch": "Navigation",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 700
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 370
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 460
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 440
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 100
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 23
+        }
+      ],
+      "prereqs": [
+        "radiation_shielding"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "upgrade:hull_rad:1"
+      ]
+    },
+    {
+      "id": "orbital_logistics",
+      "displayName": "Orbital Logistics",
+      "description": "Withdraw from any warehouse the beam can see.",
+      "branch": "Logistics",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 660
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 350
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 430
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 410
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 90
+        },
+        {
+          "resourceId": "quantum_chip",
+          "amount": 6
+        }
+      ],
+      "prereqs": [
+        "quantum_computing",
+        "cargo_logistics"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "structure:orbital_relay"
+      ]
+    },
+    {
+      "id": "automation",
+      "displayName": "Automation",
+      "description": "Machines that gather bulk goods while you sleep.",
+      "branch": "Logistics",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 590
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 310
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 390
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 370
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 85
+        },
+        {
+          "resourceId": "servo_motor",
+          "amount": 25
+        }
+      ],
+      "prereqs": [
+        "robotics",
+        "colony_charter"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "structure:auto_harvester"
+      ]
+    },
+    {
+      "id": "hangar_ops",
+      "displayName": "Hangar Operations",
+      "description": "Ground crews that shave fuel off every launch.",
+      "branch": "Logistics",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 570
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 420
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 370
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 360
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 80
+        }
+      ],
+      "prereqs": [
+        "colony_charter",
+        "plasma_physics"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "structure:hangar"
+      ]
+    },
+    {
+      "id": "toolsmithing_3",
+      "displayName": "Toolsmithing III",
+      "description": "Plasma-edged tools.",
+      "branch": "Harvest",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 540
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 280
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 350
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 340
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 75
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 25
+        }
+      ],
+      "prereqs": [
+        "toolsmithing_2",
+        "plasma_physics"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "tool:*:6"
+      ]
+    },
+    {
+      "id": "jump_drive_4",
+      "displayName": "Jump Drive IV",
+      "description": "Anchors in the rift: long, safe jumps.",
+      "branch": "Navigation",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 490
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 260
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 320
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 310
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 70
+        },
+        {
+          "resourceId": "quantum_chip",
+          "amount": 5
+        }
+      ],
+      "prereqs": [
+        "jump_drive_3",
+        "quantum_computing"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "upgrade:jump:6",
+        "upgrade:jump:7"
+      ]
+    },
+    {
+      "id": "compression_1",
+      "displayName": "Cargo Compression I",
+      "description": "Vacuum-packed stacks.",
+      "branch": "Logistics",
+      "tier": 4,
+      "cost": [
+        {
+          "resourceId": "steel",
+          "amount": 470
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 340
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 310
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 290
+        },
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 65
+        }
+      ],
+      "prereqs": [
+        "automation"
+      ],
+      "labLevel": 4,
+      "unlocks": [
+        "upgrade:compression:1"
+      ]
+    },
+    {
+      "id": "terraforming",
+      "displayName": "Terraforming",
+      "description": "Reshape a world's climate in five stages.",
+      "branch": "Megaprojects",
+      "tier": 5,
+      "cost": [
+        {
+          "resourceId": "titanium_plate",
+          "amount": 1100
+        },
+        {
+          "resourceId": "quantum_chip",
+          "amount": 110
+        },
+        {
+          "resourceId": "servo_motor",
+          "amount": 370
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 310
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 130
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 770
+        }
+      ],
+      "prereqs": [
+        "plasma_physics",
+        "quantum_computing",
+        "colony_charter"
+      ],
+      "labLevel": 5,
+      "unlocks": [
+        "structure:terraformer"
+      ]
+    },
+    {
+      "id": "long_range_scanning_3",
+      "displayName": "Long-Range Scanning III",
+      "description": "A survey net that spans galaxies.",
+      "branch": "Navigation",
+      "tier": 5,
+      "cost": [
+        {
+          "resourceId": "titanium_plate",
+          "amount": 890
+        },
+        {
+          "resourceId": "quantum_chip",
+          "amount": 120
+        },
+        {
+          "resourceId": "servo_motor",
+          "amount": 310
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 260
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 110
+        }
+      ],
+      "prereqs": [
+        "long_range_scanning_2",
+        "quantum_computing"
+      ],
+      "labLevel": 5,
+      "unlocks": [
+        "upgrade:scanner_range:6",
+        "upgrade:scanner_range:7",
+        "upgrade:scanner_range:8"
+      ]
+    },
+    {
+      "id": "compression_2",
+      "displayName": "Cargo Compression II",
+      "description": "Dense racking.",
+      "branch": "Logistics",
+      "tier": 5,
+      "cost": [
+        {
+          "resourceId": "titanium_plate",
+          "amount": 1000
+        },
+        {
+          "resourceId": "quantum_chip",
+          "amount": 110
+        },
+        {
+          "resourceId": "servo_motor",
+          "amount": 440
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 290
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 120
+        }
+      ],
+      "prereqs": [
+        "compression_1",
+        "orbital_logistics"
+      ],
+      "labLevel": 5,
+      "unlocks": [
+        "upgrade:compression:2"
+      ]
+    },
+    {
+      "id": "void_forging",
+      "displayName": "Void Forging",
+      "description": "Grow metal around a seed of nothing.",
+      "branch": "Industry",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 450
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 1100
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 700
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2800
+        },
+        {
+          "resourceId": "dark_matter",
+          "amount": 95
+        }
+      ],
+      "prereqs": [
+        "radiation_shielding",
+        "quantum_computing"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "recipe:grow_void_alloy"
+      ]
+    },
+    {
+      "id": "warp_theory",
+      "displayName": "Warp Theory",
+      "description": "Fold space inside a coil.",
+      "branch": "Industry",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 480
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 1200
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 750
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 3000
+        },
+        {
+          "resourceId": "dark_matter",
+          "amount": 100
+        }
+      ],
+      "prereqs": [
+        "quantum_computing",
+        "hazmat_rad"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "recipe:wind_warp_coil"
+      ]
+    },
+    {
+      "id": "antimatter_synthesis",
+      "displayName": "Antimatter Synthesis",
+      "description": "Mirror-bottled energy: sixty-four cells in a pod.",
+      "branch": "Industry",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 350
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 840
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 540
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2200
+        },
+        {
+          "resourceId": "helium3",
+          "amount": 710
+        }
+      ],
+      "prereqs": [
+        "plasma_physics",
+        "quantum_computing"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "recipe:synthesize_antimatter"
+      ]
+    },
+    {
+      "id": "hazmat_void",
+      "displayName": "Hazmat: Void",
+      "description": "Plating for the places between places.",
+      "branch": "Navigation",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 520
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 1300
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 820
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 3300
+        },
+        {
+          "resourceId": "void_alloy",
+          "amount": 70
+        }
+      ],
+      "prereqs": [
+        "void_forging"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "upgrade:hull_void:1"
+      ]
+    },
+    {
+      "id": "warp_gate_engineering",
+      "displayName": "Warp Gate Engineering",
+      "description": "A ring in orbit that makes distance negotiable.",
+      "branch": "Megaprojects",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 640
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 1600
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 1000
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 3800
+        },
+        {
+          "resourceId": "warp_coil",
+          "amount": 21
+        }
+      ],
+      "prereqs": [
+        "warp_theory",
+        "terraforming"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "structure:warp_gate"
+      ]
+    },
+    {
+      "id": "jump_drive_5",
+      "displayName": "Jump Drive V",
+      "description": "Tunnel drives and gate harmonics.",
+      "branch": "Navigation",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 340
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 820
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 520
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2100
+        },
+        {
+          "resourceId": "warp_coil",
+          "amount": 8
+        }
+      ],
+      "prereqs": [
+        "jump_drive_4",
+        "warp_theory"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "upgrade:jump:8",
+        "upgrade:jump:9",
+        "upgrade:jump:10"
+      ]
+    },
+    {
+      "id": "toolsmithing_4",
+      "displayName": "Toolsmithing IV",
+      "description": "Singularity-edged tools.",
+      "branch": "Harvest",
+      "tier": 6,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 370
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 910
+        },
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 580
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2300
+        },
+        {
+          "resourceId": "void_alloy",
+          "amount": 50
+        }
+      ],
+      "prereqs": [
+        "toolsmithing_3",
+        "void_forging"
+      ],
+      "labLevel": 6,
+      "unlocks": [
+        "tool:*:7"
+      ]
+    },
+    {
+      "id": "stellar_engineering",
+      "displayName": "Stellar Engineering",
+      "description": "Harness a star.",
+      "branch": "Megaprojects",
+      "tier": 7,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 1900
+        },
+        {
+          "resourceId": "warp_coil",
+          "amount": 300
+        },
+        {
+          "resourceId": "void_alloy",
+          "amount": 1000
+        },
+        {
+          "resourceId": "antimatter",
+          "amount": 320
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 2300
+        }
+      ],
+      "prereqs": [
+        "warp_gate_engineering",
+        "antimatter_synthesis"
+      ],
+      "labLevel": 7,
+      "unlocks": [
+        "structure:dyson_collector"
+      ]
+    },
+    {
+      "id": "compression_3",
+      "displayName": "Cargo Compression III",
+      "description": "Quantum compression: a hold inside a speck.",
+      "branch": "Logistics",
+      "tier": 7,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 890
+        },
+        {
+          "resourceId": "warp_coil",
+          "amount": 160
+        },
+        {
+          "resourceId": "void_alloy",
+          "amount": 480
+        },
+        {
+          "resourceId": "antimatter",
+          "amount": 110
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 1100
+        }
+      ],
+      "prereqs": [
+        "compression_2",
+        "warp_theory"
+      ],
+      "labLevel": 7,
+      "unlocks": [
+        "upgrade:compression:3",
+        "upgrade:compression:4"
+      ]
+    },
+    {
+      "id": "ascension_protocol",
+      "displayName": "Ascension Protocol",
+      "description": "Begin again in a new seeded universe, keeping what you learned.",
+      "branch": "Megaprojects",
+      "tier": 7,
+      "cost": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 3700
+        },
+        {
+          "resourceId": "warp_coil",
+          "amount": 600
+        },
+        {
+          "resourceId": "void_alloy",
+          "amount": 2500
+        },
+        {
+          "resourceId": "antimatter",
+          "amount": 480
+        },
+        {
+          "resourceId": "plasma",
+          "amount": 4500
+        }
+      ],
+      "prereqs": [
+        "stellar_engineering"
+      ],
+      "labLevel": 7,
+      "unlocks": [
+        "feature:ascension"
+      ]
+    }
+  ]
+}

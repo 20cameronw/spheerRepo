@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "tuningSchemaVersion": 1,
+  "generator": "frontier-economy-dev",
+  "tuningKeys": 606,
+  "tuningDigest": "f7b3888e49b20760",
+  "counts": {
+    "resources": 34,
+    "recipes": 24,
+    "structures": 31,
+    "tools": 6,
+    "upgrades": 16,
+    "research": 60,
+    "habitats": 89,
+    "obstacleKinds": 8,
+    "legacyIds": 29
+  },
+  "files": [
+    "resources.json",
+    "resource_habitats.json",
+    "recipes.json",
+    "structures.json",
+    "tools.json",
+    "upgrades.json",
+    "research.json",
+    "legacy_ids.json",
+    "start.json",
+    "obstacles.json",
+    "shards.json",
+    "score_formula.json",
+    "travel.json",
+    "era_targets.json",
+    "tuning.json",
+    "remote_config.json"
+  ]
+}

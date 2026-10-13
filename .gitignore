@@ -91,3 +91,6 @@ SpheerURP/Recordings/
 /tests/**/obj/
 /tests/**/TestResults/
 /TestResults/
+
+# Console labs (tools/labs): everything they build or render goes to tools/labs/out
+/tools/labs/out/

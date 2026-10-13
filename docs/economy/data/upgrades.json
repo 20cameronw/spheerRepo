@@ -1,0 +1,3134 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "upgrades",
+  "items": [
+    {
+      "id": "pack",
+      "displayName": "Backpack",
+      "description": "+9 slots (one more row). Carry more before you turn back.",
+      "group": "Ship",
+      "effect": "BackpackSlots",
+      "maxLevel": 8,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Satchel",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 30
+            },
+            {
+              "resourceId": "stone",
+              "amount": 30
+            }
+          ],
+          "value": 18,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Rucksack",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 60
+            },
+            {
+              "resourceId": "stone",
+              "amount": 60
+            },
+            {
+              "resourceId": "planks",
+              "amount": 25
+            }
+          ],
+          "value": 27,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Field Pack",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 240
+            },
+            {
+              "resourceId": "stone",
+              "amount": 240
+            },
+            {
+              "resourceId": "planks",
+              "amount": 110
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 40
+            }
+          ],
+          "value": 36,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Expedition Pack",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 800
+            },
+            {
+              "resourceId": "stone",
+              "amount": 800
+            },
+            {
+              "resourceId": "planks",
+              "amount": 470
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 160
+            },
+            {
+              "resourceId": "steel",
+              "amount": 160
+            }
+          ],
+          "value": 45,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 5,
+          "displayName": "Cargo Harness",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1080
+            },
+            {
+              "resourceId": "stone",
+              "amount": 1080
+            },
+            {
+              "resourceId": "planks",
+              "amount": 860
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 300
+            },
+            {
+              "resourceId": "steel",
+              "amount": 300
+            }
+          ],
+          "value": 54,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 6,
+          "displayName": "Hauler Rig",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1360
+            },
+            {
+              "resourceId": "stone",
+              "amount": 1360
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1360
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 540
+            },
+            {
+              "resourceId": "steel",
+              "amount": 540
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 190
+            }
+          ],
+          "value": 63,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 7,
+          "displayName": "Titan Frame",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1600
+            },
+            {
+              "resourceId": "stone",
+              "amount": 1600
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1600
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 1200
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1200
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 400
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 590
+            }
+          ],
+          "value": 72,
+          "researchPrereq": null,
+          "requiresReachTier": 5,
+          "eraTier": 5
+        },
+        {
+          "level": 8,
+          "displayName": "Exo-Hauler",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 2200
+            },
+            {
+              "resourceId": "stone",
+              "amount": 2200
+            },
+            {
+              "resourceId": "planks",
+              "amount": 2200
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2900
+            },
+            {
+              "resourceId": "steel",
+              "amount": 2900
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 1000
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 1500
+            }
+          ],
+          "value": 81,
+          "researchPrereq": null,
+          "requiresReachTier": 7,
+          "eraTier": 7
+        }
+      ]
+    },
+    {
+      "id": "engine",
+      "displayName": "Engine Efficiency",
+      "description": "Every trip burns less fuel.",
+      "group": "Ship",
+      "effect": "FuelEfficiency",
+      "maxLevel": 10,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Tuned Injectors",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 25
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 25
+            }
+          ],
+          "value": 0.92,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Flow Manifold",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 75
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 75
+            }
+          ],
+          "value": 0.85,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Ion Nozzles",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 270
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 270
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 45
+            }
+          ],
+          "value": 0.78,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Cryo Intake",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 790
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 790
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 130
+            },
+            {
+              "resourceId": "steel",
+              "amount": 130
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 310
+            }
+          ],
+          "value": 0.72,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 5,
+          "displayName": "Plasma Lens",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1080
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 1400
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 220
+            },
+            {
+              "resourceId": "steel",
+              "amount": 220
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 550
+            }
+          ],
+          "value": 0.66,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 6,
+          "displayName": "Phase Vents",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1360
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 400
+            },
+            {
+              "resourceId": "steel",
+              "amount": 400
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 990
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 75
+            }
+          ],
+          "value": 0.61,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 7,
+          "displayName": "Zero-Point Taps",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1600
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2460
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 830
+            },
+            {
+              "resourceId": "steel",
+              "amount": 830
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 2100
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 160
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 110
+            }
+          ],
+          "value": 0.56,
+          "researchPrereq": null,
+          "requiresReachTier": 5,
+          "eraTier": 5
+        },
+        {
+          "level": 8,
+          "displayName": "Gradient Drive",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1900
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2880
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2600
+            },
+            {
+              "resourceId": "steel",
+              "amount": 2600
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 3800
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 480
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 350
+            }
+          ],
+          "value": 0.52,
+          "researchPrereq": null,
+          "requiresReachTier": 6,
+          "eraTier": 6
+        },
+        {
+          "level": 9,
+          "displayName": "Resonant Core",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 2480
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 3700
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 3700
+            },
+            {
+              "resourceId": "steel",
+              "amount": 5952
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 4960
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 1300
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 950
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 260
+            }
+          ],
+          "value": 0.48,
+          "researchPrereq": null,
+          "requiresReachTier": 8,
+          "eraTier": 8
+        },
+        {
+          "level": 10,
+          "displayName": "Quiet Singularity",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 2760
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 4100
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 4100
+            },
+            {
+              "resourceId": "steel",
+              "amount": 6600
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 5500
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 5800
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 4200
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 1100
+            }
+          ],
+          "value": 0.45,
+          "researchPrereq": null,
+          "requiresReachTier": 9,
+          "eraTier": 9
+        }
+      ]
+    },
+    {
+      "id": "jump",
+      "displayName": "Jump Range",
+      "description": "A single jump reaches farther, so depth is earned.",
+      "group": "Ship",
+      "effect": "JumpRange",
+      "maxLevel": 10,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Jump Coils",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 90
+            },
+            {
+              "resourceId": "planks",
+              "amount": 40
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 14
+            }
+          ],
+          "value": 36,
+          "researchPrereq": "jump_drive_1",
+          "requiresReachTier": 0,
+          "eraTier": 1
+        },
+        {
+          "level": 2,
+          "displayName": "Capacitor Bank",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 500
+            },
+            {
+              "resourceId": "planks",
+              "amount": 230
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 80
+            }
+          ],
+          "value": 55,
+          "researchPrereq": "jump_drive_2",
+          "requiresReachTier": 0,
+          "eraTier": 2
+        },
+        {
+          "level": 3,
+          "displayName": "Resonance Array",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 840
+            },
+            {
+              "resourceId": "planks",
+              "amount": 380
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 130
+            },
+            {
+              "resourceId": "steel",
+              "amount": 130
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 340
+            }
+          ],
+          "value": 85,
+          "researchPrereq": "jump_drive_2",
+          "requiresReachTier": 0,
+          "eraTier": 2
+        },
+        {
+          "level": 4,
+          "displayName": "Folded Lattice",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 1200
+            },
+            {
+              "resourceId": "planks",
+              "amount": 560
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 200
+            },
+            {
+              "resourceId": "steel",
+              "amount": 200
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 490
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 85
+            }
+          ],
+          "value": 130,
+          "researchPrereq": "jump_drive_3",
+          "requiresReachTier": 0,
+          "eraTier": 3
+        },
+        {
+          "level": 5,
+          "displayName": "Deep Coils",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 1600
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1080
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 610
+            },
+            {
+              "resourceId": "steel",
+              "amount": 610
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 1500
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 260
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 210
+            }
+          ],
+          "value": 200,
+          "researchPrereq": "jump_drive_3",
+          "requiresReachTier": 0,
+          "eraTier": 3
+        },
+        {
+          "level": 6,
+          "displayName": "Rift Anchors",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1360
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 1200
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1200
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 2700
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 500
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 400
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 45
+            }
+          ],
+          "value": 310,
+          "researchPrereq": "jump_drive_4",
+          "requiresReachTier": 0,
+          "eraTier": 4
+        },
+        {
+          "level": 7,
+          "displayName": "Tunnel Drive",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1360
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2000
+            },
+            {
+              "resourceId": "steel",
+              "amount": 3264
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 2700
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 2400
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 1900
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 210
+            }
+          ],
+          "value": 480,
+          "researchPrereq": "jump_drive_4",
+          "requiresReachTier": 0,
+          "eraTier": 4
+        },
+        {
+          "level": 8,
+          "displayName": "Gate Harmonics",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2880
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1900
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2880
+            },
+            {
+              "resourceId": "steel",
+              "amount": 4600
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 3800
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 3800
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 3800
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 760
+            }
+          ],
+          "value": 750,
+          "researchPrereq": "jump_drive_5",
+          "requiresReachTier": 0,
+          "eraTier": 6
+        },
+        {
+          "level": 9,
+          "displayName": "Fold Engine",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2880
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1900
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2880
+            },
+            {
+              "resourceId": "steel",
+              "amount": 4600
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 3800
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 3800
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 3800
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 3200
+            },
+            {
+              "resourceId": "warp_coil",
+              "amount": 390
+            }
+          ],
+          "value": 1200,
+          "researchPrereq": "jump_drive_5",
+          "requiresReachTier": 0,
+          "eraTier": 6
+        },
+        {
+          "level": 10,
+          "displayName": "Boundless Drive",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2880
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1900
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2880
+            },
+            {
+              "resourceId": "steel",
+              "amount": 4600
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 3800
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 3800
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 3800
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 6100
+            },
+            {
+              "resourceId": "warp_coil",
+              "amount": 1500
+            }
+          ],
+          "value": 2000,
+          "researchPrereq": "jump_drive_5",
+          "requiresReachTier": 0,
+          "eraTier": 6
+        }
+      ]
+    },
+    {
+      "id": "scanner_range",
+      "displayName": "Scanner Range",
+      "description": "Worlds within range of any world you have visited show their resources.",
+      "group": "Ship",
+      "effect": "ScannerRange",
+      "maxLevel": 8,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Long Lens",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 90
+            },
+            {
+              "resourceId": "glass",
+              "amount": 17
+            }
+          ],
+          "value": 60,
+          "researchPrereq": "survey_basics",
+          "requiresReachTier": 0,
+          "eraTier": 1
+        },
+        {
+          "level": 2,
+          "displayName": "Sweep Array",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 340
+            },
+            {
+              "resourceId": "glass",
+              "amount": 65
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 140
+            }
+          ],
+          "value": 110,
+          "researchPrereq": "long_range_scanning_1",
+          "requiresReachTier": 0,
+          "eraTier": 2
+        },
+        {
+          "level": 3,
+          "displayName": "Deep Survey",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 820
+            },
+            {
+              "resourceId": "glass",
+              "amount": 150
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 330
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 55
+            }
+          ],
+          "value": 180,
+          "researchPrereq": "long_range_scanning_1",
+          "requiresReachTier": 0,
+          "eraTier": 2
+        },
+        {
+          "level": 4,
+          "displayName": "Parallax Net",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 1200
+            },
+            {
+              "resourceId": "glass",
+              "amount": 220
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 470
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 80
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 80
+            }
+          ],
+          "value": 300,
+          "researchPrereq": "long_range_scanning_2",
+          "requiresReachTier": 0,
+          "eraTier": 3
+        },
+        {
+          "level": 5,
+          "displayName": "Galactic Atlas",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 1600
+            },
+            {
+              "resourceId": "glass",
+              "amount": 800
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 1700
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 300
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 290
+            }
+          ],
+          "value": 500,
+          "researchPrereq": "long_range_scanning_2",
+          "requiresReachTier": 0,
+          "eraTier": 3
+        },
+        {
+          "level": 6,
+          "displayName": "Dark Survey",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2460
+            },
+            {
+              "resourceId": "glass",
+              "amount": 1000
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 2200
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 390
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 370
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 35
+            }
+          ],
+          "value": 800,
+          "researchPrereq": "long_range_scanning_3",
+          "requiresReachTier": 0,
+          "eraTier": 5
+        },
+        {
+          "level": 7,
+          "displayName": "Lattice Scan",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2460
+            },
+            {
+              "resourceId": "glass",
+              "amount": 1968
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 3280
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 1700
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 1700
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 150
+            }
+          ],
+          "value": 1300,
+          "researchPrereq": "long_range_scanning_3",
+          "requiresReachTier": 0,
+          "eraTier": 5
+        },
+        {
+          "level": 8,
+          "displayName": "Cosmic Ear",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2460
+            },
+            {
+              "resourceId": "glass",
+              "amount": 1968
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 3280
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 3280
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 2600
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 1200
+            }
+          ],
+          "value": 2200,
+          "researchPrereq": "long_range_scanning_3",
+          "requiresReachTier": 0,
+          "eraTier": 5
+        }
+      ]
+    },
+    {
+      "id": "fuel_tank",
+      "displayName": "Fuel Tank",
+      "description": "Dedicated slots for fuel cells, plasma and antimatter, so fuel stops eating backpack space.",
+      "group": "Ship",
+      "effect": "FuelTankSlots",
+      "maxLevel": 6,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Auxiliary Cell",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 30
+            },
+            {
+              "resourceId": "planks",
+              "amount": 14
+            }
+          ],
+          "value": 2,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Reserve Tank",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 120
+            },
+            {
+              "resourceId": "planks",
+              "amount": 55
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 19
+            }
+          ],
+          "value": 4,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 3,
+          "displayName": "Baffled Tank",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 380
+            },
+            {
+              "resourceId": "planks",
+              "amount": 170
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 60
+            },
+            {
+              "resourceId": "steel",
+              "amount": 60
+            },
+            {
+              "resourceId": "glass",
+              "amount": 70
+            }
+          ],
+          "value": 7,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 4,
+          "displayName": "Cryo Tank",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 710
+            },
+            {
+              "resourceId": "planks",
+              "amount": 320
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 110
+            },
+            {
+              "resourceId": "steel",
+              "amount": 110
+            },
+            {
+              "resourceId": "glass",
+              "amount": 130
+            }
+          ],
+          "value": 10,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 5,
+          "displayName": "Plasma Tank",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 1300
+            },
+            {
+              "resourceId": "planks",
+              "amount": 600
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 210
+            },
+            {
+              "resourceId": "steel",
+              "amount": 210
+            },
+            {
+              "resourceId": "glass",
+              "amount": 250
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 75
+            }
+          ],
+          "value": 14,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 6,
+          "displayName": "Containment Vault",
+          "cost": [
+            {
+              "resourceId": "scrap",
+              "amount": 2880
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1300
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 460
+            },
+            {
+              "resourceId": "steel",
+              "amount": 460
+            },
+            {
+              "resourceId": "glass",
+              "amount": 540
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 160
+            }
+          ],
+          "value": 18,
+          "researchPrereq": null,
+          "requiresReachTier": 6,
+          "eraTier": 6
+        }
+      ]
+    },
+    {
+      "id": "hull_toxic",
+      "displayName": "Toxic Seal",
+      "description": "Biocomposite plating that lets the hull set down on toxic worlds.",
+      "group": "Ship",
+      "effect": "HullPlating",
+      "maxLevel": 3,
+      "hazard": "Toxic",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Biocomposite Seal",
+          "cost": [
+            {
+              "resourceId": "biocomposite",
+              "amount": 160
+            },
+            {
+              "resourceId": "steel",
+              "amount": 70
+            },
+            {
+              "resourceId": "planks",
+              "amount": 150
+            }
+          ],
+          "value": 1,
+          "researchPrereq": "hazmat_toxic",
+          "requiresReachTier": 1,
+          "eraTier": 2
+        },
+        {
+          "level": 2,
+          "displayName": "Triple Seal",
+          "cost": [
+            {
+              "resourceId": "biocomposite",
+              "amount": 1400
+            },
+            {
+              "resourceId": "steel",
+              "amount": 610
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1300
+            }
+          ],
+          "value": 2,
+          "researchPrereq": "hazmat_toxic",
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 3,
+          "displayName": "Sealed Hull",
+          "cost": [
+            {
+              "resourceId": "biocomposite",
+              "amount": 3968
+            },
+            {
+              "resourceId": "steel",
+              "amount": 5952
+            },
+            {
+              "resourceId": "planks",
+              "amount": 2480
+            }
+          ],
+          "value": 3,
+          "researchPrereq": "hazmat_toxic",
+          "requiresReachTier": 8,
+          "eraTier": 8
+        }
+      ]
+    },
+    {
+      "id": "hull_heat",
+      "displayName": "Thermal Plating",
+      "description": "Thermal alloy plating for volcanic and desert worlds.",
+      "group": "Ship",
+      "effect": "HullPlating",
+      "maxLevel": 3,
+      "hazard": "Heat",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Thermal Plating",
+          "cost": [
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 190
+            },
+            {
+              "resourceId": "steel",
+              "amount": 230
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 120
+            }
+          ],
+          "value": 1,
+          "researchPrereq": "hazmat_heat",
+          "requiresReachTier": 2,
+          "eraTier": 3
+        },
+        {
+          "level": 2,
+          "displayName": "Ceramic Shell",
+          "cost": [
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 1400
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1600
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 840
+            }
+          ],
+          "value": 2,
+          "researchPrereq": "hazmat_heat",
+          "requiresReachTier": 5,
+          "eraTier": 5
+        },
+        {
+          "level": 3,
+          "displayName": "Magma Shell",
+          "cost": [
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 6600
+            },
+            {
+              "resourceId": "steel",
+              "amount": 6600
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 5500
+            }
+          ],
+          "value": 3,
+          "researchPrereq": "hazmat_heat",
+          "requiresReachTier": 9,
+          "eraTier": 9
+        }
+      ]
+    },
+    {
+      "id": "hull_cold",
+      "displayName": "Cryo Plating",
+      "description": "Cryo composite plating for glacial worlds.",
+      "group": "Ship",
+      "effect": "HullPlating",
+      "maxLevel": 3,
+      "hazard": "Cold",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Cryo Plating",
+          "cost": [
+            {
+              "resourceId": "cryo_composite",
+              "amount": 200
+            },
+            {
+              "resourceId": "steel",
+              "amount": 230
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 180
+            }
+          ],
+          "value": 1,
+          "researchPrereq": "hazmat_cold",
+          "requiresReachTier": 2,
+          "eraTier": 3
+        },
+        {
+          "level": 2,
+          "displayName": "Thermal Break",
+          "cost": [
+            {
+              "resourceId": "cryo_composite",
+              "amount": 1400
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1600
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 1200
+            }
+          ],
+          "value": 2,
+          "researchPrereq": "hazmat_cold",
+          "requiresReachTier": 5,
+          "eraTier": 5
+        },
+        {
+          "level": 3,
+          "displayName": "Polar Shell",
+          "cost": [
+            {
+              "resourceId": "cryo_composite",
+              "amount": 6600
+            },
+            {
+              "resourceId": "steel",
+              "amount": 6600
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 4400
+            }
+          ],
+          "value": 3,
+          "researchPrereq": "hazmat_cold",
+          "requiresReachTier": 9,
+          "eraTier": 9
+        }
+      ]
+    },
+    {
+      "id": "hull_rad",
+      "displayName": "Rad-Shield Plating",
+      "description": "Rad-Shield alloy plating for irradiated worlds and hostile stars.",
+      "group": "Ship",
+      "effect": "HullPlating",
+      "maxLevel": 3,
+      "hazard": "Radiation",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Rad-Shield Plating",
+          "cost": [
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 410
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1000
+            },
+            {
+              "resourceId": "glass",
+              "amount": 1600
+            }
+          ],
+          "value": 1,
+          "researchPrereq": "hazmat_rad",
+          "requiresReachTier": 3,
+          "eraTier": 4
+        },
+        {
+          "level": 2,
+          "displayName": "Lead Lattice",
+          "cost": [
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 4500
+            },
+            {
+              "resourceId": "steel",
+              "amount": 4600
+            },
+            {
+              "resourceId": "glass",
+              "amount": 2300
+            }
+          ],
+          "value": 2,
+          "researchPrereq": "hazmat_rad",
+          "requiresReachTier": 6,
+          "eraTier": 6
+        },
+        {
+          "level": 3,
+          "displayName": "Pulsar Shell",
+          "cost": [
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 8800
+            },
+            {
+              "resourceId": "steel",
+              "amount": 6600
+            },
+            {
+              "resourceId": "glass",
+              "amount": 3300
+            }
+          ],
+          "value": 3,
+          "researchPrereq": "hazmat_rad",
+          "requiresReachTier": 9,
+          "eraTier": 9
+        }
+      ]
+    },
+    {
+      "id": "hull_void",
+      "displayName": "Void Shell",
+      "description": "Void alloy shell for worlds where space itself is thin.",
+      "group": "Ship",
+      "effect": "HullPlating",
+      "maxLevel": 3,
+      "hazard": "Void",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Void Shell",
+          "cost": [
+            {
+              "resourceId": "void_alloy",
+              "amount": 1400
+            },
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 1400
+            }
+          ],
+          "value": 1,
+          "researchPrereq": "hazmat_void",
+          "requiresReachTier": 5,
+          "eraTier": 6
+        },
+        {
+          "level": 2,
+          "displayName": "Event Shell",
+          "cost": [
+            {
+              "resourceId": "void_alloy",
+              "amount": 7000
+            },
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 7000
+            },
+            {
+              "resourceId": "warp_coil",
+              "amount": 1200
+            }
+          ],
+          "value": 2,
+          "researchPrereq": "hazmat_void",
+          "requiresReachTier": 7,
+          "eraTier": 7
+        },
+        {
+          "level": 3,
+          "displayName": "Null Shell",
+          "cost": [
+            {
+              "resourceId": "void_alloy",
+              "amount": 9700
+            },
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 9700
+            },
+            {
+              "resourceId": "warp_coil",
+              "amount": 2400
+            }
+          ],
+          "value": 3,
+          "researchPrereq": "hazmat_void",
+          "requiresReachTier": 10,
+          "eraTier": 10
+        }
+      ]
+    },
+    {
+      "id": "turret",
+      "displayName": "Turret Actuators",
+      "description": "+15% firing speed for placed turrets. Does not spawn turrets.",
+      "group": "Defense",
+      "effect": "TurretFireRate",
+      "maxLevel": 6,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Turret Actuators",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 14
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 14
+            }
+          ],
+          "value": 0.15,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Turret Actuators",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 20
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 20
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 3
+            }
+          ],
+          "value": 0.3,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Turret Actuators",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 50
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 50
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 8
+            },
+            {
+              "resourceId": "steel",
+              "amount": 8
+            }
+          ],
+          "value": 0.45,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Turret Actuators",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 110
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 110
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 18
+            },
+            {
+              "resourceId": "steel",
+              "amount": 18
+            }
+          ],
+          "value": 0.6,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 5,
+          "displayName": "Turret Actuators",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 370
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 370
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 60
+            },
+            {
+              "resourceId": "steel",
+              "amount": 60
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 7
+            }
+          ],
+          "value": 0.75,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 6,
+          "displayName": "Turret Actuators",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 800
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 810
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 130
+            },
+            {
+              "resourceId": "steel",
+              "amount": 130
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 16
+            }
+          ],
+          "value": 0.9,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        }
+      ]
+    },
+    {
+      "id": "turretdmg",
+      "displayName": "Turret Damage",
+      "description": "+35% turret damage.",
+      "group": "Defense",
+      "effect": "TurretDamage",
+      "maxLevel": 10,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 4
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 11
+            }
+          ],
+          "value": 0.35,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 8
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 24
+            }
+          ],
+          "value": 0.7,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 18
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 55
+            },
+            {
+              "resourceId": "steel",
+              "amount": 12
+            }
+          ],
+          "value": 1.05,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 30
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 90
+            },
+            {
+              "resourceId": "steel",
+              "amount": 19
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 23
+            }
+          ],
+          "value": 1.4,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 5,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 110
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 350
+            },
+            {
+              "resourceId": "steel",
+              "amount": 75
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 90
+            }
+          ],
+          "value": 1.75,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 6,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 190
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 600
+            },
+            {
+              "resourceId": "steel",
+              "amount": 130
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 150
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 35
+            }
+          ],
+          "value": 2.1,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 7,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 240
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 750
+            },
+            {
+              "resourceId": "steel",
+              "amount": 160
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 190
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 45
+            }
+          ],
+          "value": 2.45,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 8,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 430
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 1300
+            },
+            {
+              "resourceId": "steel",
+              "amount": 290
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 340
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 80
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 60
+            }
+          ],
+          "value": 2.8,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 9,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 630
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "steel",
+              "amount": 420
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 490
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 120
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 85
+            }
+          ],
+          "value": 3.15,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 10,
+          "displayName": "Turret Damage",
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 1500
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "steel",
+              "amount": 970
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 1100
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 270
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 200
+            }
+          ],
+          "value": 3.5,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        }
+      ]
+    },
+    {
+      "id": "pulse",
+      "displayName": "Ion Pulse",
+      "description": "+40% tap damage.",
+      "group": "Defense",
+      "effect": "TapDamage",
+      "maxLevel": 10,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 14
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 14
+            }
+          ],
+          "value": 0.4,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 21
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 21
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 3
+            }
+          ],
+          "value": 0.8,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 80
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 80
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 13
+            }
+          ],
+          "value": 1.2,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 130
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 130
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 21
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 17
+            }
+          ],
+          "value": 1.6,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 5,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 520
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 520
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 85
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 65
+            }
+          ],
+          "value": 2,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 6,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 800
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 950
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 150
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 120
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 65
+            }
+          ],
+          "value": 2.4,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 7,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 1080
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 1200
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 190
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 140
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 75
+            }
+          ],
+          "value": 2.8,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 8,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 1080
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 1600
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 530
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 410
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 220
+            }
+          ],
+          "value": 3.2,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 9,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 1360
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 800
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 630
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 330
+            }
+          ],
+          "value": 3.6,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 10,
+          "displayName": "Ion Pulse",
+          "cost": [
+            {
+              "resourceId": "stone",
+              "amount": 1360
+            },
+            {
+              "resourceId": "scrap",
+              "amount": 2000
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 2000
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 1500
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 820
+            }
+          ],
+          "value": 4,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        }
+      ]
+    },
+    {
+      "id": "shield",
+      "displayName": "Reactor Shield",
+      "description": "+25 reactor health.",
+      "group": "Defense",
+      "effect": "ReactorHealth",
+      "maxLevel": 10,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 14
+            },
+            {
+              "resourceId": "stone",
+              "amount": 14
+            }
+          ],
+          "value": 25,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 20
+            },
+            {
+              "resourceId": "stone",
+              "amount": 20
+            },
+            {
+              "resourceId": "planks",
+              "amount": 9
+            }
+          ],
+          "value": 50,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 50
+            },
+            {
+              "resourceId": "stone",
+              "amount": 50
+            },
+            {
+              "resourceId": "planks",
+              "amount": 24
+            },
+            {
+              "resourceId": "steel",
+              "amount": 8
+            }
+          ],
+          "value": 75,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 110
+            },
+            {
+              "resourceId": "stone",
+              "amount": 110
+            },
+            {
+              "resourceId": "planks",
+              "amount": 50
+            },
+            {
+              "resourceId": "steel",
+              "amount": 18
+            }
+          ],
+          "value": 100,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 5,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 370
+            },
+            {
+              "resourceId": "stone",
+              "amount": 370
+            },
+            {
+              "resourceId": "planks",
+              "amount": 170
+            },
+            {
+              "resourceId": "steel",
+              "amount": 60
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 30
+            }
+          ],
+          "value": 125,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 6,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 800
+            },
+            {
+              "resourceId": "stone",
+              "amount": 800
+            },
+            {
+              "resourceId": "planks",
+              "amount": 370
+            },
+            {
+              "resourceId": "steel",
+              "amount": 130
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 65
+            }
+          ],
+          "value": 150,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 7,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 850
+            },
+            {
+              "resourceId": "stone",
+              "amount": 850
+            },
+            {
+              "resourceId": "planks",
+              "amount": 390
+            },
+            {
+              "resourceId": "steel",
+              "amount": 140
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 70
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 45
+            }
+          ],
+          "value": 175,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 8,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1080
+            },
+            {
+              "resourceId": "stone",
+              "amount": 1080
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1000
+            },
+            {
+              "resourceId": "steel",
+              "amount": 350
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 180
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 120
+            }
+          ],
+          "value": 200,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 9,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1360
+            },
+            {
+              "resourceId": "stone",
+              "amount": 1360
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1360
+            },
+            {
+              "resourceId": "steel",
+              "amount": 550
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 280
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 190
+            }
+          ],
+          "value": 225,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 10,
+          "displayName": "Reactor Shield",
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 1360
+            },
+            {
+              "resourceId": "stone",
+              "amount": 1360
+            },
+            {
+              "resourceId": "planks",
+              "amount": 1360
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1500
+            },
+            {
+              "resourceId": "biocomposite",
+              "amount": 770
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 530
+            }
+          ],
+          "value": 250,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        }
+      ]
+    },
+    {
+      "id": "salvage",
+      "displayName": "Salvage Rig",
+      "description": "+10% wave rewards.",
+      "group": "Defense",
+      "effect": "RewardBonus",
+      "maxLevel": 10,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 1
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 3
+            }
+          ],
+          "value": 0.1,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 2,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 2
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 6
+            }
+          ],
+          "value": 0.2,
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "eraTier": 0
+        },
+        {
+          "level": 3,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 4
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 14
+            },
+            {
+              "resourceId": "steel",
+              "amount": 19
+            }
+          ],
+          "value": 0.3,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 4,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 9
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 30
+            },
+            {
+              "resourceId": "steel",
+              "amount": 40
+            }
+          ],
+          "value": 0.4,
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "eraTier": 1
+        },
+        {
+          "level": 5,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 35
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 120
+            },
+            {
+              "resourceId": "steel",
+              "amount": 170
+            }
+          ],
+          "value": 0.5,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 6,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 55
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 190
+            },
+            {
+              "resourceId": "steel",
+              "amount": 260
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 55
+            }
+          ],
+          "value": 0.6,
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "eraTier": 2
+        },
+        {
+          "level": 7,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 70
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 230
+            },
+            {
+              "resourceId": "steel",
+              "amount": 330
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 65
+            }
+          ],
+          "value": 0.7,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 8,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 150
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 510
+            },
+            {
+              "resourceId": "steel",
+              "amount": 720
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 150
+            }
+          ],
+          "value": 0.8,
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "eraTier": 3
+        },
+        {
+          "level": 9,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 220
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 740
+            },
+            {
+              "resourceId": "steel",
+              "amount": 1000
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 210
+            }
+          ],
+          "value": 0.9,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        },
+        {
+          "level": 10,
+          "displayName": "Salvage Rig",
+          "cost": [
+            {
+              "resourceId": "core",
+              "amount": 480
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 1600
+            },
+            {
+              "resourceId": "steel",
+              "amount": 2300
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 470
+            }
+          ],
+          "value": 1,
+          "researchPrereq": null,
+          "requiresReachTier": 4,
+          "eraTier": 4
+        }
+      ]
+    },
+    {
+      "id": "compression",
+      "displayName": "Cargo Compression",
+      "description": "Every stack in your backpack and warehouses holds more: the end-game answer to storage.",
+      "group": "Logistics",
+      "effect": "StackMultiplier",
+      "maxLevel": 4,
+      "hazard": "None",
+      "levels": [
+        {
+          "level": 1,
+          "displayName": "Vacuum Packing",
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 830
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 440
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 120
+            }
+          ],
+          "value": 1.15,
+          "researchPrereq": "compression_1",
+          "requiresReachTier": 3,
+          "eraTier": 4
+        },
+        {
+          "level": 2,
+          "displayName": "Dense Racking",
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 2700
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 1400
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 380
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 110
+            }
+          ],
+          "value": 1.3,
+          "researchPrereq": "compression_2",
+          "requiresReachTier": 5,
+          "eraTier": 5
+        },
+        {
+          "level": 3,
+          "displayName": "Pressure Stacks",
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 5280
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 4400
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 1900
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 560
+            },
+            {
+              "resourceId": "void_alloy",
+              "amount": 300
+            }
+          ],
+          "value": 1.5,
+          "researchPrereq": "compression_3",
+          "requiresReachTier": 7,
+          "eraTier": 7
+        },
+        {
+          "level": 4,
+          "displayName": "Quantum Compression",
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 6600
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 5500
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 3300
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 6300
+            },
+            {
+              "resourceId": "void_alloy",
+              "amount": 3400
+            }
+          ],
+          "value": 1.75,
+          "researchPrereq": "compression_3",
+          "requiresReachTier": 9,
+          "eraTier": 9
+        }
+      ]
+    }
+  ]
+}

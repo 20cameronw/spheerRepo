@@ -8,6 +8,7 @@ forbidden dependency (a data asset reaching into rendering, game logic reaching 
 ```mermaid
 flowchart BT
   Core["<b>Frontier.Core</b><br/>pure C#, no UnityEngine<br/>shared enums, universe generator,<br/>session services, save schema + protocol"]
+  Economy["<b>Frontier.Economy</b><br/>pure C#, no UnityEngine<br/>catalog, costs, travel model,<br/>balance simulator, shards, score"]
   Data["<b>Frontier.Data</b><br/>ScriptableObjects, GameDatabase,<br/>ModelLibrary, PlanetData, DefaultContent"]
   Game["<b>Frontier.Game</b><br/>GameState facade, UniverseService,<br/>AuthoredWorlds, SaveService"]
   Visual["<b>Frontier.Visual</b><br/>planet, backdrop, weather, world surface,<br/>Fx/Sfx, ScreenMetrics, combat"]
@@ -16,6 +17,7 @@ flowchart BT
   Editor["<b>Frontier.Editor</b> (Editor only)<br/>menus, check suites, tools"]
   TE["<b>Frontier.Tests.EditMode</b><br/>(Editor only)"]
   TP["<b>Frontier.Tests.PlayMode</b>"]
+  Economy --> Core
   Data --> Core
   Game --> Data
   Visual --> Game
@@ -29,6 +31,7 @@ flowchart BT
 | Assembly | Folder | Contents | Engine |
 |----------|--------|----------|--------|
 | `Frontier.Core` | `Scripts/Core` | `GameEnums` (`StructureKind`, `MinigameKind`, `UpgradeEffect`, `WeatherKind`, ...); `Universe/`: the infinite deterministic universe generator (namespace `Frontier.Universe`, 15 files); `Session/`: `Inventory`, `Progression`, `WorldStore` (+ `PlanetDelta`, `PlayerStats`), `WarehouseOps`, `IClock`, `HarvestMapping`; `Save/`: save schema v2, the v1 type, `SaveMigrator`, `SaveStore`, `SaveDebouncer`; `Travel/`: `TravelModel`; `Flavor/`: planet descriptions and stable visual seeds. See [RUNTIME_MODEL.md](RUNTIME_MODEL.md) | **none** (`noEngineReferences`) |
+| `Frontier.Economy` | `Scripts/Economy` | The whole game economy as pure, deterministic C# (`EconomyCatalog`: 34 resources, 24 recipes, 31 structures with per-level cost/time/effect rows, 6 tool ladders, 16 upgrades, 60 research nodes, obstacles, shard rules; `Tuning`: 606 keys; `TravelModel`, `WorldRules`, `Costs`, `JobTimes`, `ShardModel`, `ScoreFormula`; `Sim*`: the balance simulator and its era bands). Referenced by Data/Game when the content is wired in; see [economy/README.md](economy/README.md) | **none** (`noEngineReferences`) |
 | `Frontier.Data` | `Scripts/Data` | `ResourceSO`, `PlanetSO` (authoring format of the 30 Core Worlds), `PlanetData` (the runtime planet), `StructureSO`, `RecipeSO`, `UpgradeSO`, `EnemySO`, `WaveFormulaSO`, `GameDatabase`, `FrontierSettings`, `ModelLibrary`, `ItemAmount`, `PlanetGenerator`, `DefaultContent` | UnityEngine |
 | `Frontier.Game` | `Scripts/Game` | `GameState` (facade over the Core services: `GameState.I`, `PlacedStructure`), `UniverseService`, `AuthoredWorlds`, `Save/` (`SaveService`, the `JsonUtility` codec): the whole non-rendering game model | UnityEngine |
 | `Frontier.Visual` | `Scripts/Visual` | `PlanetView`, `SpaceBackdrop`, `Weather`, `WorldSurface` (structures, pads, picking), `Fx` + `Sfx`, `ScreenMetrics`; `Combat/`: `DefenseController`, `AlienActor` | UnityEngine, URP |
@@ -93,6 +96,7 @@ reference upward.
 | Folder | Contents |
 |--------|----------|
 | `Scripts/Core` | `Frontier.Core`: `GameEnums.cs`; `Universe/` (15 files): the pure, deterministic universe generator; `Session/`, `Save/`, `Travel/`, `Flavor/`: the engine-free session services, save schema and protocol, travel formula and planet descriptions |
+| `Scripts/Economy` | `Frontier.Economy`: the economy catalog, tuning, costs, travel/world rules, shards, score formula and the balance simulator (pure C#; nothing wired into gameplay yet) |
 | `Scripts/Data` | `Frontier.Data`: ScriptableObject definitions (`ResourceSO`, `PlanetSO`, `StructureSO`, `RecipeSO`, `UpgradeSO`, `EnemySO`, `WaveFormulaSO`, `GameDatabase`, `FrontierSettings`, `ModelLibrary`), `PlanetData` (runtime planet), `ItemAmount`, `PlanetGenerator`, `DefaultContent` |
 | `Scripts/Game` | `Frontier.Game`: `GameState` (facade: inventory, upgrades, structures, storage, waves, travel; `GameState.Persistence.cs` holds save/load, new game and debug helpers), `UniverseService`, `AuthoredWorlds`, `Save/` |
 | `Scripts/Visual` | `Frontier.Visual`: planet view, space backdrop, weather, world surface (structures, pads, picking), FX and procedural audio, `ScreenMetrics`; `Combat/` holds `DefenseController` and `AlienActor` |
@@ -103,8 +107,12 @@ reference upward.
 | `Editor` | `Frontier.Editor`: menu tools and validation scripts |
 | `Tests` | `EditMode/` (`Core/`, `Universe/`, `Game/`, `Fixtures/`) and `PlayMode/` NUnit tests, see [TESTING.md](TESTING.md) |
 
-`tests/` at the repository root holds the plain .NET projects that compile `Frontier.Core` (netstandard2.1) and run the engine-free
-tests without Unity; it sits outside `SpheerURP/` so Unity never imports it.
+`tests/` at the repository root holds the plain .NET projects that compile `Frontier.Core` and `Frontier.Economy` (netstandard2.1) and
+run the engine-free tests without Unity; it sits outside `SpheerURP/` so Unity never imports it.
+
+`tools/labs/` holds two console labs (universe, economy) that compile the same sources in place with the compiler and .NET runtime
+inside the Unity editor: tests, density maps, the balance simulator, charts and the JSON/Markdown exports published to
+[docs/economy](economy/README.md). See [tools/labs/README.md](../tools/labs/README.md).
 
 `FrontierBootstrap` (the only object in `Scenes/Frontier.unity` besides a camera and light) builds the camera, post-processing,
 planet, backdrop, defense, UI and world surface from the `GameDatabase` asset, then publishes a `FrontierRuntime`.

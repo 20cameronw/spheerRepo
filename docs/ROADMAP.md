@@ -557,6 +557,16 @@ The authoritative todo list with dependencies lives in the session database (`to
 
 ## Progress
 
+### Economy imported (design locked, not yet wired into gameplay)
+
+The complete economy lives in `Scripts/Economy` (`Frontier.Economy`, pure C#) with its 91 tests, the console labs in `tools/labs` and the
+reviewable snapshot in [economy/](economy/README.md) (report, Atlas text, icon brief, tuning keys, charts, JSON exports). Locked content: 34
+resources, 24 recipes, 31 structures, 6 tool ladders x 7 tiers, 16 upgrades, 60 research nodes, 8 obstacle kinds and 606 tuning keys. The
+simulator puts a regular player in Settlement after about 3.6 days, Industry after 13, Interstellar after 89 and Ascension after 212 (casual about
+3x slower, hardcore about 4x faster) with no dead zones; the first session reaches a Warehouse at 0.3 min, the first fuel at 1.1 min and the first
+hop at 2.4 min. Next: turn the catalog into ScriptableObjects, wire the mechanics (jobs and timers, research, tool tiers, hazards, obstacles,
+shards), then the new map and Atlas.
+
 ### Foundation rework: runtime planet model, session split, save v2 (done on this branch)
 
 Covers `m2-session-split`, `m2-save-v2`, `m3-planet-data-adapter` and the interim part of `m3-travel-system`; closes audit findings E1

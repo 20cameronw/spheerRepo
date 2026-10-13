@@ -1,0 +1,720 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "resource_habitats",
+  "items": [
+    {
+      "resourceId": "wood",
+      "biome": "Lush",
+      "belt": false,
+      "method": "Chop",
+      "weight": 1,
+      "minTier": 0
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Lush",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.55,
+      "minTier": 0
+    },
+    {
+      "resourceId": "biomass",
+      "biome": "Lush",
+      "belt": false,
+      "method": "Harvest",
+      "weight": 0.7,
+      "minTier": 1
+    },
+    {
+      "resourceId": "copper_ore",
+      "biome": "Lush",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.1,
+      "minTier": 1
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Lush",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.12,
+      "minTier": 2
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Lush",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 0
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.9,
+      "minTier": 1
+    },
+    {
+      "resourceId": "copper_ore",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.8,
+      "minTier": 1
+    },
+    {
+      "resourceId": "silica",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.4,
+      "minTier": 1
+    },
+    {
+      "resourceId": "titanium_ore",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.35,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.15,
+      "minTier": 2
+    },
+    {
+      "resourceId": "wood",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Chop",
+      "weight": 0.2,
+      "minTier": 0
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Mineral",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "ice",
+      "biome": "Glacial",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 1,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Glacial",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.75,
+      "minTier": 2
+    },
+    {
+      "resourceId": "wood",
+      "biome": "Glacial",
+      "belt": false,
+      "method": "Chop",
+      "weight": 0.3,
+      "minTier": 0
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Glacial",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.45,
+      "minTier": 0
+    },
+    {
+      "resourceId": "core",
+      "biome": "Glacial",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.12,
+      "minTier": 5
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Glacial",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Drill",
+      "weight": 1,
+      "minTier": 1
+    },
+    {
+      "resourceId": "copper_ore",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.5,
+      "minTier": 1
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.4,
+      "minTier": 0
+    },
+    {
+      "resourceId": "titanium_ore",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.6,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.25,
+      "minTier": 2
+    },
+    {
+      "resourceId": "core",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.3,
+      "minTier": 3
+    },
+    {
+      "resourceId": "radium",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.12,
+      "minTier": 4
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Volcanic",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "wood",
+      "biome": "Fungal",
+      "belt": false,
+      "method": "Chop",
+      "weight": 1,
+      "minTier": 0
+    },
+    {
+      "resourceId": "biomass",
+      "biome": "Fungal",
+      "belt": false,
+      "method": "Harvest",
+      "weight": 1,
+      "minTier": 1
+    },
+    {
+      "resourceId": "methane",
+      "biome": "Fungal",
+      "belt": false,
+      "method": "Siphon",
+      "weight": 0.4,
+      "minTier": 2
+    },
+    {
+      "resourceId": "core",
+      "biome": "Fungal",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.4,
+      "minTier": 3
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Fungal",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.2,
+      "minTier": 0
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Fungal",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 2
+    },
+    {
+      "resourceId": "silica",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.6,
+      "minTier": 1
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.5,
+      "minTier": 1
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.4,
+      "minTier": 0
+    },
+    {
+      "resourceId": "ice",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.2,
+      "minTier": 2
+    },
+    {
+      "resourceId": "radium",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.3,
+      "minTier": 4
+    },
+    {
+      "resourceId": "core",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.15,
+      "minTier": 4
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Crystal",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 1
+    },
+    {
+      "resourceId": "titanium_ore",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.5,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.6,
+      "minTier": 2
+    },
+    {
+      "resourceId": "core",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.55,
+      "minTier": 3
+    },
+    {
+      "resourceId": "radium",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.45,
+      "minTier": 4
+    },
+    {
+      "resourceId": "dark_matter",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.15,
+      "minTier": 6
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.3,
+      "minTier": 0
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Obsidian",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 2
+    },
+    {
+      "resourceId": "core",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.8,
+      "minTier": 3
+    },
+    {
+      "resourceId": "titanium_ore",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Drill",
+      "weight": 0.4,
+      "minTier": 2
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.25,
+      "minTier": 1
+    },
+    {
+      "resourceId": "radium",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.5,
+      "minTier": 4
+    },
+    {
+      "resourceId": "dark_matter",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.35,
+      "minTier": 6
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Shattered",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Desert",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 0
+    },
+    {
+      "resourceId": "silica",
+      "biome": "Desert",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 1
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Desert",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.6,
+      "minTier": 1
+    },
+    {
+      "resourceId": "copper_ore",
+      "biome": "Desert",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.4,
+      "minTier": 1
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Desert",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.1,
+      "minTier": 2
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Desert",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "wood",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Chop",
+      "weight": 0.8,
+      "minTier": 0
+    },
+    {
+      "resourceId": "biomass",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Harvest",
+      "weight": 0.8,
+      "minTier": 1
+    },
+    {
+      "resourceId": "methane",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Siphon",
+      "weight": 0.35,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.3,
+      "minTier": 2
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.2,
+      "minTier": 0
+    },
+    {
+      "resourceId": "ice",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.1,
+      "minTier": 2
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Oceanic",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "methane",
+      "biome": "GasGiant",
+      "belt": false,
+      "method": "Siphon",
+      "weight": 0.9,
+      "minTier": 2
+    },
+    {
+      "resourceId": "helium3",
+      "biome": "GasGiant",
+      "belt": false,
+      "method": "Siphon",
+      "weight": 0.8,
+      "minTier": 3
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "GasGiant",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.3,
+      "minTier": 2
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "GasGiant",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Mine",
+      "weight": 1,
+      "minTier": 0
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.6,
+      "minTier": 1
+    },
+    {
+      "resourceId": "copper_ore",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.3,
+      "minTier": 1
+    },
+    {
+      "resourceId": "silica",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.5,
+      "minTier": 1
+    },
+    {
+      "resourceId": "ice",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Excavate",
+      "weight": 0.3,
+      "minTier": 2
+    },
+    {
+      "resourceId": "titanium_ore",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.2,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Mine",
+      "weight": 0.15,
+      "minTier": 2
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Barren",
+      "belt": false,
+      "method": "Salvage",
+      "weight": 0.5,
+      "minTier": 0
+    },
+    {
+      "resourceId": "scrap",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Salvage",
+      "weight": 1,
+      "minTier": 0
+    },
+    {
+      "resourceId": "stone",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Mine",
+      "weight": 0.8,
+      "minTier": 0
+    },
+    {
+      "resourceId": "iron",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Mine",
+      "weight": 0.8,
+      "minTier": 1
+    },
+    {
+      "resourceId": "copper_ore",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Mine",
+      "weight": 0.5,
+      "minTier": 1
+    },
+    {
+      "resourceId": "ice",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Excavate",
+      "weight": 0.5,
+      "minTier": 2
+    },
+    {
+      "resourceId": "titanium_ore",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Mine",
+      "weight": 0.5,
+      "minTier": 2
+    },
+    {
+      "resourceId": "crystal",
+      "biome": "Barren",
+      "belt": true,
+      "method": "Mine",
+      "weight": 0.2,
+      "minTier": 2
+    }
+  ]
+}

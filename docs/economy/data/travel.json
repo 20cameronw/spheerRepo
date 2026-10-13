@@ -1,0 +1,683 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "travel",
+  "items": {
+    "fuelFormula": "legFuel = travel.base_fuel + travel.k x legLy ^ travel.p; routeFuel = (legs x base + k x routeLy ^ p) x engineFactor x (1 + cargoFactor x cargoFill) x (1 - discount) x autopilot",
+    "tierFormula": "tier = clamp(floor(1.6 x log2(1 + distanceFromHomeLy / 60)), 0, tierMax); danger = dangerBase + dangerPerTier x tier",
+    "parameters": [
+      {
+        "key": "travel.base_fuel",
+        "defaultValue": 1.5
+      },
+      {
+        "key": "travel.k",
+        "defaultValue": 0.14
+      },
+      {
+        "key": "travel.p",
+        "defaultValue": 1.1
+      },
+      {
+        "key": "travel.intra_fuel",
+        "defaultValue": 2
+      },
+      {
+        "key": "travel.intra_fuel_per_au",
+        "defaultValue": 0.25
+      },
+      {
+        "key": "travel.cargo_factor",
+        "defaultValue": 0.2
+      },
+      {
+        "key": "travel.autopilot_mult",
+        "defaultValue": 1.6
+      },
+      {
+        "key": "travel.refund_max",
+        "defaultValue": 0.4
+      },
+      {
+        "key": "travel.run_base_seconds",
+        "defaultValue": 25
+      },
+      {
+        "key": "travel.run_log_seconds",
+        "defaultValue": 12
+      },
+      {
+        "key": "travel.run_cap_seconds",
+        "defaultValue": 90
+      },
+      {
+        "key": "travel.autopilot_seconds",
+        "defaultValue": 12
+      },
+      {
+        "key": "travel.hop_fraction",
+        "defaultValue": 0.9
+      },
+      {
+        "key": "travel.detour",
+        "defaultValue": 1.15
+      },
+      {
+        "key": "travel.max_discount",
+        "defaultValue": 0.7
+      },
+      {
+        "key": "travel.plating_l2_tier",
+        "defaultValue": 5
+      },
+      {
+        "key": "travel.plating_l3_tier",
+        "defaultValue": 9
+      }
+    ],
+    "jumpRanges": [
+      {
+        "level": 1,
+        "rangeLy": 36,
+        "researchPrereq": "jump_drive_1"
+      },
+      {
+        "level": 2,
+        "rangeLy": 55,
+        "researchPrereq": "jump_drive_2"
+      },
+      {
+        "level": 3,
+        "rangeLy": 85,
+        "researchPrereq": "jump_drive_2"
+      },
+      {
+        "level": 4,
+        "rangeLy": 130,
+        "researchPrereq": "jump_drive_3"
+      },
+      {
+        "level": 5,
+        "rangeLy": 200,
+        "researchPrereq": "jump_drive_3"
+      },
+      {
+        "level": 6,
+        "rangeLy": 310,
+        "researchPrereq": "jump_drive_4"
+      },
+      {
+        "level": 7,
+        "rangeLy": 480,
+        "researchPrereq": "jump_drive_4"
+      },
+      {
+        "level": 8,
+        "rangeLy": 750,
+        "researchPrereq": "jump_drive_5"
+      },
+      {
+        "level": 9,
+        "rangeLy": 1200,
+        "researchPrereq": "jump_drive_5"
+      },
+      {
+        "level": 10,
+        "rangeLy": 2000,
+        "researchPrereq": "jump_drive_5"
+      }
+    ],
+    "engineFactors": [
+      {
+        "level": 1,
+        "fuelFactor": 0.92
+      },
+      {
+        "level": 2,
+        "fuelFactor": 0.85
+      },
+      {
+        "level": 3,
+        "fuelFactor": 0.78
+      },
+      {
+        "level": 4,
+        "fuelFactor": 0.72
+      },
+      {
+        "level": 5,
+        "fuelFactor": 0.66
+      },
+      {
+        "level": 6,
+        "fuelFactor": 0.61
+      },
+      {
+        "level": 7,
+        "fuelFactor": 0.56
+      },
+      {
+        "level": 8,
+        "fuelFactor": 0.52
+      },
+      {
+        "level": 9,
+        "fuelFactor": 0.48
+      },
+      {
+        "level": 10,
+        "fuelFactor": 0.45
+      }
+    ],
+    "tiers": [
+      {
+        "tier": 0,
+        "startsAtLy": 0,
+        "meanDanger": 0.6,
+        "platingLevelRequired": 1,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 1,
+            "legs": 1,
+            "fuelOneWay": 4,
+            "seconds": 30
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 1,
+            "legs": 1,
+            "fuelOneWay": 3,
+            "seconds": 30
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 1,
+            "legs": 1,
+            "fuelOneWay": 2,
+            "seconds": 30
+          }
+        ]
+      },
+      {
+        "tier": 1,
+        "startsAtLy": 32.5,
+        "meanDanger": 1.7,
+        "platingLevelRequired": 1,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 1,
+            "legs": 2,
+            "fuelOneWay": 12,
+            "seconds": 66
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 1,
+            "legs": 2,
+            "fuelOneWay": 8,
+            "seconds": 66
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 1,
+            "legs": 2,
+            "fuelOneWay": 6,
+            "seconds": 66
+          }
+        ]
+      },
+      {
+        "tier": 2,
+        "startsAtLy": 82.7,
+        "meanDanger": 2.8,
+        "platingLevelRequired": 1,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 3,
+            "legs": 2,
+            "fuelOneWay": 27,
+            "seconds": 80
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 3,
+            "legs": 2,
+            "fuelOneWay": 18,
+            "seconds": 80
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 3,
+            "legs": 2,
+            "fuelOneWay": 12,
+            "seconds": 80
+          }
+        ]
+      },
+      {
+        "tier": 3,
+        "startsAtLy": 160.1,
+        "meanDanger": 3.9,
+        "platingLevelRequired": 1,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 5,
+            "legs": 2,
+            "fuelOneWay": 52,
+            "seconds": 92
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 5,
+            "legs": 2,
+            "fuelOneWay": 34,
+            "seconds": 92
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 5,
+            "legs": 2,
+            "fuelOneWay": 23,
+            "seconds": 92
+          }
+        ]
+      },
+      {
+        "tier": 4,
+        "startsAtLy": 279.4,
+        "meanDanger": 5,
+        "platingLevelRequired": 1,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 6,
+            "legs": 2,
+            "fuelOneWay": 92,
+            "seconds": 102
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 6,
+            "legs": 2,
+            "fuelOneWay": 61,
+            "seconds": 102
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 6,
+            "legs": 2,
+            "fuelOneWay": 42,
+            "seconds": 102
+          }
+        ]
+      },
+      {
+        "tier": 5,
+        "startsAtLy": 463.4,
+        "meanDanger": 6.1,
+        "platingLevelRequired": 2,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 7,
+            "legs": 2,
+            "fuelOneWay": 158,
+            "seconds": 114
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 7,
+            "legs": 2,
+            "fuelOneWay": 104,
+            "seconds": 114
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 7,
+            "legs": 2,
+            "fuelOneWay": 71,
+            "seconds": 114
+          }
+        ]
+      },
+      {
+        "tier": 6,
+        "startsAtLy": 747.3,
+        "meanDanger": 7.2,
+        "platingLevelRequired": 2,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 8,
+            "legs": 2,
+            "fuelOneWay": 264,
+            "seconds": 124
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 8,
+            "legs": 2,
+            "fuelOneWay": 174,
+            "seconds": 124
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 8,
+            "legs": 2,
+            "fuelOneWay": 119,
+            "seconds": 124
+          }
+        ]
+      },
+      {
+        "tier": 7,
+        "startsAtLy": 1185,
+        "meanDanger": 8.3,
+        "platingLevelRequired": 2,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 9,
+            "legs": 2,
+            "fuelOneWay": 436,
+            "seconds": 136
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 9,
+            "legs": 2,
+            "fuelOneWay": 288,
+            "seconds": 136
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 9,
+            "legs": 2,
+            "fuelOneWay": 196,
+            "seconds": 136
+          }
+        ]
+      },
+      {
+        "tier": 8,
+        "startsAtLy": 1860,
+        "meanDanger": 9.4,
+        "platingLevelRequired": 2,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 10,
+            "legs": 2,
+            "fuelOneWay": 713,
+            "seconds": 146
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 10,
+            "legs": 2,
+            "fuelOneWay": 471,
+            "seconds": 146
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 10,
+            "legs": 2,
+            "fuelOneWay": 321,
+            "seconds": 146
+          }
+        ]
+      },
+      {
+        "tier": 9,
+        "startsAtLy": 2901,
+        "meanDanger": 10.5,
+        "platingLevelRequired": 3,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 10,
+            "legs": 2,
+            "fuelOneWay": 1160,
+            "seconds": 156
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 10,
+            "legs": 2,
+            "fuelOneWay": 766,
+            "seconds": 156
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 10,
+            "legs": 2,
+            "fuelOneWay": 522,
+            "seconds": 156
+          }
+        ]
+      },
+      {
+        "tier": 10,
+        "startsAtLy": 4506.6,
+        "meanDanger": 11.6,
+        "platingLevelRequired": 3,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 10,
+            "legs": 3,
+            "fuelOneWay": 1883,
+            "seconds": 237
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 10,
+            "legs": 3,
+            "fuelOneWay": 1243,
+            "seconds": 237
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 10,
+            "legs": 3,
+            "fuelOneWay": 847,
+            "seconds": 237
+          }
+        ]
+      },
+      {
+        "tier": 11,
+        "startsAtLy": 6982.6,
+        "meanDanger": 12.7,
+        "platingLevelRequired": 3,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 10,
+            "legs": 5,
+            "fuelOneWay": 3048,
+            "seconds": 390
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 10,
+            "legs": 5,
+            "fuelOneWay": 2012,
+            "seconds": 390
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 10,
+            "legs": 5,
+            "fuelOneWay": 1372,
+            "seconds": 390
+          }
+        ]
+      },
+      {
+        "tier": 12,
+        "startsAtLy": 10801.2,
+        "meanDanger": 13.8,
+        "platingLevelRequired": 3,
+        "fuelToReachItsStart": [
+          {
+            "engineLevel": 0,
+            "jumpLevelNeeded": 10,
+            "legs": 7,
+            "fuelOneWay": 4922,
+            "seconds": 553
+          },
+          {
+            "engineLevel": 5,
+            "jumpLevelNeeded": 10,
+            "legs": 7,
+            "fuelOneWay": 3249,
+            "seconds": 553
+          },
+          {
+            "engineLevel": 10,
+            "jumpLevelNeeded": 10,
+            "legs": 7,
+            "fuelOneWay": 2215,
+            "seconds": 553
+          }
+        ]
+      }
+    ],
+    "hullPlating": [
+      {
+        "hazard": "Heat",
+        "upgradeId": "hull_heat",
+        "levels": [
+          {
+            "level": 1,
+            "requiresReachTier": 2,
+            "researchPrereq": "hazmat_heat"
+          },
+          {
+            "level": 2,
+            "requiresReachTier": 5,
+            "researchPrereq": "hazmat_heat"
+          },
+          {
+            "level": 3,
+            "requiresReachTier": 9,
+            "researchPrereq": "hazmat_heat"
+          }
+        ]
+      },
+      {
+        "hazard": "Cold",
+        "upgradeId": "hull_cold",
+        "levels": [
+          {
+            "level": 1,
+            "requiresReachTier": 2,
+            "researchPrereq": "hazmat_cold"
+          },
+          {
+            "level": 2,
+            "requiresReachTier": 5,
+            "researchPrereq": "hazmat_cold"
+          },
+          {
+            "level": 3,
+            "requiresReachTier": 9,
+            "researchPrereq": "hazmat_cold"
+          }
+        ]
+      },
+      {
+        "hazard": "Toxic",
+        "upgradeId": "hull_toxic",
+        "levels": [
+          {
+            "level": 1,
+            "requiresReachTier": 1,
+            "researchPrereq": "hazmat_toxic"
+          },
+          {
+            "level": 2,
+            "requiresReachTier": 4,
+            "researchPrereq": "hazmat_toxic"
+          },
+          {
+            "level": 3,
+            "requiresReachTier": 8,
+            "researchPrereq": "hazmat_toxic"
+          }
+        ]
+      },
+      {
+        "hazard": "Radiation",
+        "upgradeId": "hull_rad",
+        "levels": [
+          {
+            "level": 1,
+            "requiresReachTier": 3,
+            "researchPrereq": "hazmat_rad"
+          },
+          {
+            "level": 2,
+            "requiresReachTier": 6,
+            "researchPrereq": "hazmat_rad"
+          },
+          {
+            "level": 3,
+            "requiresReachTier": 9,
+            "researchPrereq": "hazmat_rad"
+          }
+        ]
+      },
+      {
+        "hazard": "Void",
+        "upgradeId": "hull_void",
+        "levels": [
+          {
+            "level": 1,
+            "requiresReachTier": 5,
+            "researchPrereq": "hazmat_void"
+          },
+          {
+            "level": 2,
+            "requiresReachTier": 7,
+            "researchPrereq": "hazmat_void"
+          },
+          {
+            "level": 3,
+            "requiresReachTier": 10,
+            "researchPrereq": "hazmat_void"
+          }
+        ]
+      }
+    ],
+    "refundByQuality": [
+      {
+        "quality": 0,
+        "refundOf100Fuel": 0
+      },
+      {
+        "quality": 0.25,
+        "refundOf100Fuel": 10
+      },
+      {
+        "quality": 0.5,
+        "refundOf100Fuel": 20
+      },
+      {
+        "quality": 0.75,
+        "refundOf100Fuel": 30
+      },
+      {
+        "quality": 1,
+        "refundOf100Fuel": 40
+      }
+    ],
+    "landingRule": "a planet can be landed on only when the hull plating level of every hazard it has is at least RequiredPlatingLevel(planetTier)"
+  }
+}

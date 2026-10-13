@@ -156,6 +156,24 @@ To confirm a clean compile, search the log for `error CS|warning CS`. Unity only
 so to prove "zero warnings" for everything, delete `SpheerURP/Library/ScriptAssemblies` (and `Library/Bee`) and run any batch
 command once.
 
+## The economy tests, the snapshot and the labs
+
+`Tests/EditMode/Economy` (91 tests, namespace `Frontier.Economy.Tests`) cover the economy catalog and everything built on it: catalog integrity
+(ids, references, categories, tiers), recipe conservation and reachability from the starting state, cost and tuning monotonicity, the travel
+model, resource coverage of the universe with the economy's habitat table (Monte-Carlo), the balance simulator (determinism, era bands for the
+three player archetypes, the return-to-starter-planets loop), obstacles, the shard model, the Frontier Score (monotonic, anti-farm, not
+purchasable) and source hygiene (no UnityEngine, clocks, platform math or static mutable state in `Scripts/Economy`). They run in Unity's
+EditMode runner, in the plain .NET project (so also in `core-tests.yml` on Linux) and in the console lab, all from the same files.
+
+`SnapshotTests` compares the committed `docs/economy/data/manifest.json` (tuning digest and entity counts) with what the code generates, so a
+catalog or tuning change cannot land without regenerating the reviewable snapshot (`tools/labs/economy/run.ps1 export docs\economy\data`, then
+`report`, `codex`, `charts`).
+
+The labs under `tools/labs` need no Unity window: `powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\economy\run.ps1 test`
+(91 tests, ~25 s) and `...\universe\run.ps1 test` (193 tests, ~4 s). Their `crosscheck.ps1` scripts compare result digests on CoreCLR and on
+Unity's Mono, which is how the float-precision difference between the two runtimes was found for the simulator code; keep arithmetic in
+`double` and round once at stores when a result must be bit-identical across runtimes.
+
 ## Continuous integration
 
 ### `core-tests.yml` (no setup)
