@@ -28,14 +28,14 @@ namespace Frontier.Tests
             Assert.AreEqual(606, db.tuning.Build().Count);
             Assert.AreEqual("sylva", db.startPlanet.id);
             Assert.AreEqual(1, db.builders);
-            Assert.AreNotSame(GameDatabase.Load(), db, "Economy must remain staged until the save/gameplay migration");
+            Assert.AreSame(db, GameDatabase.Load().ContentSource);
         }
 
         [Test]
         public void ImportTwice_IsByteIdentical_AndPreservesLegacyDatabase()
         {
             var before = Snapshot();
-            string legacyPath = AssetDatabase.GetAssetPath(GameDatabase.Load());
+            string legacyPath = AssetDatabase.GetAssetPath(GameDatabase.LoadLegacy());
             byte[] legacy = File.ReadAllBytes(legacyPath);
             EconomyImporter.Import();
             EconomyImporter.Import();

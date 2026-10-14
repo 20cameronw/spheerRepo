@@ -38,6 +38,7 @@ namespace Frontier
         public GameState(GameDatabase db, bool loadExistingSave = true, IClock clock = null)
         {
             if (db == null) throw new ArgumentNullException("db");
+            db = GameDatabase.ForRuntime(db);
             this.db = db;
             this.clock = clock ?? new SystemClock();
             I = this;
@@ -106,9 +107,10 @@ namespace Frontier
 
         public bool Buy(UpgradeSO u)
         {
+            if (!CanBuy(u)) return false;
             int lvl = Level(u);
-            if (lvl >= u.maxLevel || !SpendQuietly(u.CostAt(lvl))) return false;
-            progression.SetUpgradeLevel(u.id, lvl + 1, u.maxLevel);
+            if (!SpendQuietly(u.CostAt(lvl))) return false;
+            progression.SetUpgradeLevel(u.id, lvl + 1, u.MaxLevel);
             Notify();
             return true;
         }
@@ -116,7 +118,7 @@ namespace Frontier
         public float EffectSum(UpgradeEffect e)
         {
             float sum = 0f;
-            foreach (var u in db.upgrades) if (u != null && u.effect == e) sum += u.valuePerLevel * Level(u);
+            foreach (var u in db.upgrades) if (u != null && u.effect == e) sum += u.ContributionAt(Level(u), db.baseBackpackSlots);
             return sum;
         }
 
@@ -257,7 +259,7 @@ namespace Frontier
         // Gather structures need a matching resource on the planet.
         public bool CanBuildHere(StructureSO def)
         {
-            return !def.kind.IsGather() || SpotsFor(planet, def.kind.Game()).Count > 0;
+            return BuildLockReason(def) == null && (!def.kind.IsGather() || SpotsFor(planet, def.kind.Game()).Count > 0);
         }
 
         public bool Place(StructureSO def, int slot)
@@ -270,12 +272,14 @@ namespace Frontier
 
         public float TurretPower(PlacedStructure s)
         {
-            return s.def.damage * (1f + s.def.bonusPerLevel * (s.level - 1)) * (1f + EffectSum(UpgradeEffect.TurretDamage));
+            float mult = s.def.HasLevelRows && s.def.effectKind == "damageMult" ? s.def.EffectAt(s.level) :
+                1f + s.def.bonusPerLevel * (s.level - 1);
+            return s.def.damage * mult * (1f + EffectSum(UpgradeEffect.TurretDamage));
         }
 
         public bool UpgradeStructure(PlacedStructure s)
         {
-            if (!IsPlaced(s) || s.level >= s.def.maxLevel || !SpendQuietly(s.def.UpgradeCost(s.level))) return false;
+            if (!CanUpgradeStructure(s) || !SpendQuietly(s.def.UpgradeCost(s.level))) return false;
             world.SetLevel(s.record, s.level + 1);
             Notify();
             return true;
@@ -286,7 +290,13 @@ namespace Frontier
             return s != null && world.StructureAt(s.planetId, s.slot) == s.record;
         }
 
-        public float StructureBonus(PlacedStructure s) { return s == null ? 0f : s.def.bonusPerLevel * (s.level - 1); }
+        public float StructureBonus(PlacedStructure s)
+        {
+            if (s == null) return 0f;
+            if (!s.def.HasLevelRows) return s.def.bonusPerLevel * (s.level - 1);
+            // Catalog stations grow batch size, not free output. Never interpret batchSize=1 as +100% yield.
+            return s.def.effectKind == "yieldBonus" || s.def.effectKind == "waveRewardBonus" ? s.def.EffectAt(s.level) : 0f;
+        }
 
         public float AlarmBonus(PlanetData p)
         {
@@ -358,6 +368,7 @@ namespace Frontier
 
         public bool Craft(RecipeSO r, float bonus = 0f)
         {
+            if (!CanCraft(r)) return false;
             var outputs = new IdAmount[r.outputs.Count];
             for (int i = 0; i < outputs.Length; i++)
                 outputs[i] = new IdAmount(r.outputs[i].resource != null ? r.outputs[i].resource.id : "", OutputAmount(r.outputs[i], bonus));

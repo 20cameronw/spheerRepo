@@ -5,8 +5,8 @@ using Frontier.Economy;
 namespace Frontier
 {
     /// <summary>
-    /// A station recipe with imported level/research gates. Those gates are staged data until the economy runtime cutover;
-    /// the legacy game's CanCraft still uses the fabricator flag.
+    /// A station recipe with level/research gates enforced by the selected economy runtime.
+    /// Legacy/custom databases still use the fabricator flag.
     /// </summary>
     [CreateAssetMenu(fileName = "New Recipe", menuName = "Frontier/Recipe")]
     public class RecipeSO : ContentSO

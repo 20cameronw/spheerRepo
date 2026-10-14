@@ -88,7 +88,7 @@ namespace Frontier.Hyperspace.View
             if (!Paused && Run.State == RunState.Running) sound.Engine(Run.Speed);
         }
 
-        ResourceSO FindResource(string id) { return game == null || id == null ? null : game.db.FindResource(id); }
+        ResourceSO FindResource(string id) { return game == null || id == null ? null : game.db.ResolveResource(id); }
 
         void Drain(bool present = true)
         {

@@ -98,6 +98,16 @@ namespace Frontier
             return valuePerLevel * level;
         }
 
+        /// <summary>Contribution in the additive units expected by legacy gameplay (catalog pack/fuel rows are absolute values).</summary>
+        public float ContributionAt(int level, int baseSlots)
+        {
+            if (level <= 0) return 0f;
+            float value = ValueAt(level);
+            if (HasLevelRows && effect == UpgradeEffect.BackpackSlots) return Mathf.Max(0f, value - baseSlots);
+            if (HasLevelRows && effect == UpgradeEffect.FuelEfficiency) return 1f - value;
+            return value;
+        }
+
         public string NameAtLevel(int level)
         {
             if (HasLevelRows)

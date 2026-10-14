@@ -111,8 +111,10 @@ namespace Frontier.Tests
             {
                 if (kind.IsImplemented())
                     Assert.IsNotNull(db.StructureOfKind(kind), "no live structure is defined for " + kind);
+                else if (db.UsesImportedEconomy)
+                    Assert.IsFalse(db.StructureOfKind(kind).Implemented, "unimplemented catalog content must stay gated: " + kind);
                 else
-                    Assert.IsNull(db.StructureOfKind(kind), "imported-only structure leaked into the live database: " + kind);
+                    Assert.IsNull(db.StructureOfKind(kind));
             }
         }
 

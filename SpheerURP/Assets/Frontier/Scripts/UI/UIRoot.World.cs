@@ -106,7 +106,7 @@ namespace Frontier
             CloseModal();
             var k = s.def.kind;
             if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
-            else if (k == StructureKind.Refinery || k == StructureKind.Fabricator) OpenRefinery(s, t);
+            else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
@@ -142,7 +142,8 @@ namespace Frontier
                 if (gs.UpgradeStructure(s)) { Sfx.Good(); Toast(s.def.displayName + " LV " + s.level, c); }
                 else Sfx.Bad();
             });
-            UiKit.SetEnabledLook(up, gs.Has(cost));
+            if (gs.StructureUpgradeLockReason(s) != null) body.Add(Note(gs.StructureUpgradeLockReason(s), UiKit.Amber));
+            UiKit.SetEnabledLook(up, gs.CanUpgradeStructure(s));
             body.Add(up);
         }
 
@@ -226,10 +227,12 @@ namespace Frontier
                 body.Add(SectionLabel("RECIPES  -  you give  >  you get"));
                 foreach (var rec in gs.db.recipes)
                 {
-                    if (rec.fabricator != fab) continue;
+                    if (!gs.RecipeAt(rec, s)) continue;
                     var r = rec;
-                    int can = MaxCrafts(r);
+                    string locked = gs.RecipeLockReason(r, s);
+                    int can = locked == null ? MaxCrafts(r) : 0;
                     var card = Card(c);
+                    if (locked != null) card.Add(Note(locked, UiKit.Amber));
                     card.AddToClassList("fr-recipe");
                     if (can <= 0) card.AddToClassList("fr-card-dim");
 

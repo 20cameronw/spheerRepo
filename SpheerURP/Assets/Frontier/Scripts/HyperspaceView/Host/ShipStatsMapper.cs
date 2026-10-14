@@ -87,7 +87,8 @@ namespace Frontier.Hyperspace.View
         public static float Strength(GameState gs, UpgradeEffect effect)
         {
             float max = 0f;
-            foreach (var u in gs.db.upgrades) if (u != null && u.effect == effect) max += u.valuePerLevel * u.maxLevel;
+            foreach (var u in gs.db.upgrades)
+                if (u != null && u.effect == effect) max += u.ContributionAt(u.MaxLevel, gs.db.baseBackpackSlots);
             return max <= 0f ? 0f : Mathf.Clamp01(gs.EffectSum(effect) / max);
         }
     }

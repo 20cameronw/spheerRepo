@@ -136,6 +136,7 @@ namespace Frontier
                 card.Add(top);
 
                 if (gs.AtLimit(gs.planet, def)) card.Add(Note("BUILT - tap it on the planet", UiKit.Lime));
+                else if (gs.BuildLockReason(def) != null) card.Add(Note(gs.BuildLockReason(def), UiKit.Amber));
                 else if (!gs.CanBuildHere(def)) card.Add(Note("Nothing to harvest on this planet", UiKit.Amber));
                 else
                 {
@@ -376,7 +377,7 @@ namespace Frontier
                         if (gs.Buy(u2)) { Sfx.Good(); Toast(u2.NameAtLevel(gs.Level(u2)) + " ready!", UiKit.Ui(u2.color)); planetView.Punch(); }
                         else Sfx.Bad();
                     });
-                    UiKit.SetEnabledLook(buy, gs.Has(cost));
+                    UiKit.SetEnabledLook(buy, gs.CanBuy(u2));
                     card.Add(buy);
                 }
                 body.Add(card);
@@ -432,7 +433,8 @@ namespace Frontier
                             if (gs.UpgradeStructure(s)) { Sfx.Good(); Toast(s.def.displayName + " LV " + s.level, c); }
                             else Sfx.Bad();
                         });
-                        UiKit.SetEnabledLook(up, gs.Has(cost));
+                        if (gs.StructureUpgradeLockReason(s) != null) card.Add(Note(gs.StructureUpgradeLockReason(s), UiKit.Amber));
+                        UiKit.SetEnabledLook(up, gs.CanUpgradeStructure(s));
                         card.Add(up);
                     }
                     else card.Add(Note("MAXED", UiKit.Lime));
@@ -468,7 +470,8 @@ namespace Frontier
                             if (gs.Buy(u)) { Sfx.Good(); Toast(u.NameAtLevel(gs.Level(u)) + " ready!", UiKit.Ui(u.color)); planetView.Punch(); }
                             else Sfx.Bad();
                         });
-                        UiKit.SetEnabledLook(buy, gs.Has(cost));
+                        if (gs.UpgradeLockReason(u) != null) card.Add(Note(gs.UpgradeLockReason(u), UiKit.Amber));
+                        UiKit.SetEnabledLook(buy, gs.CanBuy(u));
                         card.Add(buy);
                     }
                     else card.Add(Note("MAXED", UiKit.Lime));

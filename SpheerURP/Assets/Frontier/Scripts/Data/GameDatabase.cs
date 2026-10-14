@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Frontier
 {
     [CreateAssetMenu(fileName = "GameDatabase", menuName = "Frontier/Game Database")]
-    public class GameDatabase : ScriptableObject
+    public partial class GameDatabase : ScriptableObject
     {
         public ResourceSO[] resources;
         public PlanetSO[] planets;
@@ -24,7 +24,7 @@ namespace Frontier
         public int baseBackpackSlots = 9;
         public float baseReactorHealth = 100f;
 
-        [Header("Imported economy (staged in Frontier/EconomyDatabase)")]
+        [Header("Imported economy")]
         public int schemaVersion;
         public int contentVersion;
         public int builders = 1;
@@ -39,9 +39,10 @@ namespace Frontier
         public LegacyIdMapSO legacyIds;
         public EconomyTuningSO tuning;
 
-        /// <summary>Reconstructs the imported catalog for validation or a future runtime cutover; does not mutate the assets.</summary>
+        /// <summary>Reconstructs the imported catalog without compatibility-only runtime definitions.</summary>
         public EconomyCatalog ToCatalog()
         {
+            if (ContentSource != null) return ContentSource.ToCatalog();
             var catalog = new EconomyCatalog
             {
                 schemaVersion = schemaVersion, contentVersion = contentVersion,
@@ -64,13 +65,16 @@ namespace Frontier
             return catalog;
         }
 
-        /// <summary>Loads the data asset from Resources, or builds the default content in memory.</summary>
+        /// <summary>Loads the validated economy runtime view, falling back to legacy content on incomplete projects.</summary>
         public static GameDatabase Load()
         {
-            var db = Resources.Load<GameDatabase>("Frontier/GameDatabase");
-            if (db == null) db = DefaultContent.Create();
-            return db;
+            if (loaded != null) return loaded;
+            loaded = Select(Resources.Load<GameDatabase>("Frontier/EconomyDatabase"), LoadLegacy(), out var reason);
+            if (!string.IsNullOrEmpty(reason)) Debug.LogWarning("Frontier: using legacy content: " + reason);
+            return loaded;
         }
+
+        public static GameDatabase LoadLegacy() { return Resources.Load<GameDatabase>("Frontier/GameDatabase") ?? DefaultContent.Create(); }
 
         public PlanetSO FindPlanet(string id)
         {

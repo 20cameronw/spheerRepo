@@ -23,7 +23,7 @@ namespace Frontier
             var cfg = FrontierSettings.I;
             Application.targetFrameRate = cfg.targetFrameRate;
 
-            var db = database != null ? database : GameDatabase.Load();
+            var db = GameDatabase.ForRuntime(database);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HarnessRunner.PrepareFromCommandLine();
 #endif

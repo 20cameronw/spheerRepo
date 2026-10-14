@@ -89,8 +89,8 @@ namespace Frontier
         }
 
         /// <summary>
-        /// True when the kind has a behaviour in the game today. Imported-only kinds stay in the staged database until
-        /// gameplay, placement gates and save migration are integrated.
+        /// True when the kind has a behaviour in the game today. Other catalog kinds stay unpurchasable until
+        /// their gameplay is implemented.
         /// </summary>
         public static bool IsImplemented(this StructureKind k)
         {

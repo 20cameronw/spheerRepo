@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1a2b3c4d5e64f708192a3b4c5d6e7f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  database: {fileID: 11400000, guid: 097b0175d8401d84183660d2cf05e123, type: 2}
+  database: {fileID: 0}
   settings: {fileID: 11400000, guid: 8767a1d6bcae8ad42b7af9b94ce2faa0, type: 2}
   panelSettings: {fileID: 11400000, guid: 121d1cec7bac3314498f4f3c486456bb, type: 2}
   sceneCamera: {fileID: 2023913153}

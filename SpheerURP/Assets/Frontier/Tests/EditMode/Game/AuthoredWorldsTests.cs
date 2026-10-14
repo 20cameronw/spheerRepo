@@ -307,8 +307,10 @@ namespace Frontier.Tests
         {
             // Authored planets count toward the coverage guarantee of their block; the generator must still satisfy every resource there.
             var u = service.Universe;
-            foreach (string id in new[] { "wood", "stone", "scrap", "iron", "crystal", "fuel", "core" })
+            foreach (var resource in u.Resources.Defs)
             {
+                if (resource.MinTier > 3) continue; // The bounded home region need not contain late-game resources.
+                string id = resource.Id;
                 int planetsWith = 0;
                 for (int sy = -8; sy <= 8; sy++)
                     for (int sx = -8; sx <= 8; sx++)

@@ -196,6 +196,18 @@ namespace Frontier.Tests.HyperspaceView
         }
 
         [Test]
+        public void ComponentLoot_UsesCanonicalSteel_AndRetainsAlloyForLegacyFallback()
+        {
+            var selected = GameDatabase.Load();
+            var imported = HyperspaceResults.ToTravelResult(Result(true, false), selected.ResolveResource);
+            Assert.AreEqual(2, imported.loot.Count);
+            Assert.AreSame(selected.FindResource("steel"), imported.loot[1].resource);
+            var legacy = GameDatabase.LoadLegacy();
+            var old = HyperspaceResults.ToTravelResult(Result(true, false), legacy.ResolveResource);
+            Assert.AreSame(legacy.FindResource("alloy"), old.loot[1].resource);
+        }
+
+        [Test]
         public void AbandonedOrDefeatedRun_GivesNothing()
         {
             foreach (var r in new[] { Result(false, true), Result(true, true) })

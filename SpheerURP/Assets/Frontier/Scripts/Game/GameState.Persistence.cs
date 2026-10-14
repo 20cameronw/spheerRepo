@@ -73,10 +73,11 @@ namespace Frontier
                 LogLoad();
                 return;
             }
+            bool contentRemapped = RemapContentIds(result.save);
             Apply(result.save, result.report);
             LogLoad();
             // A migrated or recovered save replaces the primary file right away, so the next launch reads a clean v2 file.
-            if (result.report.migratedFrom != 0 || result.report.recovered) { saves.MarkDirty(); Flush(); }
+            if (contentRemapped || result.report.migratedFrom != 0 || result.report.recovered) { saves.MarkDirty(); Flush(); }
         }
 
         SaveV2 MigrateLegacy(SaveDataV1 legacy, List<string> warnings)
@@ -155,7 +156,7 @@ namespace Frontier
             {
                 var upgrade = db.FindUpgrade(u.id);
                 if (upgrade == null) { warnings.Add("dropped the unknown upgrade '" + u.id + "'"); continue; }
-                progression.SetUpgradeLevel(upgrade.id, u.level, upgrade.maxLevel);
+                progression.SetUpgradeLevel(upgrade.id, u.level, upgrade.MaxLevel);
             }
             foreach (var stack in save.player.inventory)
             {
@@ -218,7 +219,7 @@ namespace Frontier
         // ---------- Debug ----------
         public void DebugSetUpgrade(UpgradeSO u, int level)
         {
-            progression.SetUpgradeLevel(u.id, level, u.maxLevel);
+            progression.SetUpgradeLevel(u.id, level, u.MaxLevel);
             Notify();
         }
 

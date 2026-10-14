@@ -25,7 +25,7 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Normalize All Planet Sizes")]
         public static void NormalizeAll()
         {
-            foreach (var planet in GameDatabase.Load().planets)
+            foreach (var planet in GameDatabase.LoadLegacy().planets)
             {
                 Undo.RecordObject(planet, "Normalize planet sizes");
                 planet.surfaceRadius = PlanetView.Radius;

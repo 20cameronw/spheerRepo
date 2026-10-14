@@ -317,9 +317,11 @@ namespace Frontier
 
         string StructureEffect(StructureSO d, int level)
         {
-            int pct = Mathf.RoundToInt(d.bonusPerLevel * (level - 1) * 100f);
-            if (d.kind.IsTurret()) return "dmg " + Mathf.RoundToInt(d.damage * (1f + d.bonusPerLevel * (level - 1)));
+            float effect = d.EffectAt(level);
+            int pct = Mathf.RoundToInt(effect * 100f);
+            if (d.kind.IsTurret()) return "dmg " + Mathf.RoundToInt(d.damage * (d.HasLevelRows ? effect : 1f + effect));
             if (d.kind == StructureKind.Warehouse) return d.StorageCapacity(level) + " storage slots";
+            if (d.HasLevelRows && d.kind.IsStation()) return "Batch size " + Mathf.RoundToInt(effect) + " (batch jobs coming later)";
             if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";
             if (d.kind.IsGather()) return "+" + pct + "% yield";
             return "+" + pct + "% rewards, XP";
@@ -327,13 +329,19 @@ namespace Frontier
 
         string UpgradeEffectText(UpgradeSO u, int level)
         {
-            float v = u.valuePerLevel * level;
+            float v = u.ContributionAt(level, gs.db.baseBackpackSlots);
             switch (u.effect)
             {
                 case UpgradeEffect.ToolPower: return "x" + (1f + v).ToString("0.0") + " yield";
                 case UpgradeEffect.BackpackSlots: return "+" + Mathf.RoundToInt(v) + " slots";
                 case UpgradeEffect.TurretFireRate: return "+" + Mathf.RoundToInt(v * 100f) + "% firing speed";
                 case UpgradeEffect.ReactorHealth: return "+" + Mathf.RoundToInt(v) + " HP";
+                case UpgradeEffect.JumpRange:
+                case UpgradeEffect.ScannerRange: return u.ValueAt(level).ToString("0") + " ly";
+                case UpgradeEffect.FuelEfficiency: return "-" + Mathf.RoundToInt(v * 100f) + "% fuel use";
+                case UpgradeEffect.FuelTankSlots: return u.ValueAt(level).ToString("0") + " tank slots (coming later)";
+                case UpgradeEffect.HullPlating: return "Protection level " + level;
+                case UpgradeEffect.StackMultiplier: return "x" + u.ValueAt(level, 1f).ToString("0.00") + " stacks (coming later)";
                 default: return "+" + Mathf.RoundToInt(v * 100f) + "%";
             }
         }

@@ -72,7 +72,7 @@ namespace Frontier
 
         public bool HasLevelRows { get { return levels != null && levels.Count > 0; } }
 
-        /// <summary>Classifies existing behaviours; the staged database is not yet exposed to the build shop.</summary>
+        /// <summary>Classifies existing behaviours; catalog-only kinds cannot be bought until gameplay is implemented.</summary>
         public bool Implemented { get { return kind.IsImplemented(); } }
 
         /// <summary>The row of a level (1 based, clamped); null when the structure has no rows.</summary>

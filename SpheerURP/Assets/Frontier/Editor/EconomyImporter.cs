@@ -35,7 +35,7 @@ namespace Frontier.EditorTools
             var tuning = ReadTuning(reader);
             foreach (var s in cat.structures)
                 if (!StructureKindMap.TryGet(s.id, out _)) throw new InvalidOperationException("Unmapped structure: " + s.id);
-            var legacy = GameDatabase.Load();
+            var legacy = GameDatabase.LoadLegacy();
             var start = legacy.FindPlanet(cat.start.startPlanetId);
             if (start == null) throw new InvalidOperationException("Missing authored start planet: " + cat.start.startPlanetId);
             changed = 0;
@@ -104,7 +104,7 @@ namespace Frontier.EditorTools
             db.startingItems = ItemAmounts.FromIds(cat.start.startingItems, Find);
             db.baseBackpackSlots = cat.start.baseBackpackSlots; db.builders = cat.start.builders; db.categoryHex = cat.categoryHex;
             db.startPlanet = start; db.fuel = Find("fuel"); db.scrap = Find("scrap");
-            // Keep authored Core Worlds and combat assets available, but do not wire this database into the legacy scene yet.
+            // Runtime selection rebinds these authored references without modifying the source assets.
             db.planets = legacy.planets; db.enemies = legacy.enemies; db.formula = legacy.formula;
             if (created) AssetDatabase.CreateAsset(db, DatabasePath);
             SaveChanged(db, before, created);
@@ -116,7 +116,7 @@ namespace Frontier.EditorTools
             }
             Validate();
             Debug.Log("Frontier: economy import passed; content=" + cat.contentVersion + " tuning=" + tuning.Digest().ToString("x") +
-                " changed=" + changed + " (legacy runtime database unchanged)");
+                " changed=" + changed + " (legacy asset unchanged; runtime selection is compatibility guarded)");
         }
 
         static T Upsert<T>(string family, string id, Action<T> fill) where T : ContentSO
@@ -210,6 +210,8 @@ namespace Frontier.EditorTools
             CompareRule(expected.legacyIds, db.legacyIds.rows, db.legacyIds, "rows", errors);
             CompareRule(CatalogJson.ReadScoreFormula(Reader()), db.scoreFormula.data, db.scoreFormula, "data", errors);
             db.tuning.Build();
+            if (!GameDatabase.CanActivate(db, GameDatabase.LoadLegacy(), out var reason))
+                errors.Add("Runtime compatibility: " + reason);
             if (errors.Count > 0) throw new InvalidOperationException("Imported economy invalid:\n" + string.Join("\n", errors.Take(40)));
             Debug.Log("Frontier: economy validation passed");
         }

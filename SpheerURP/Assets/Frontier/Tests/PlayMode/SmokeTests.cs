@@ -52,6 +52,8 @@ namespace Frontier.Tests
         {
             var db = GameDatabase.Load();
             Assert.IsNotNull(db);
+            Assert.IsTrue(db.UsesImportedEconomy, "validated economy should be the live default");
+            Assert.AreSame(Resources.Load<GameDatabase>("Frontier/EconomyDatabase"), db.ContentSource);
             Assert.IsNotNull(db.startPlanet);
             Assert.Greater(db.planets.Length, 0);
             Assert.Greater(db.resources.Length, 0);
@@ -82,6 +84,7 @@ namespace Frontier.Tests
             var runtime = FrontierRuntime.Current;
             Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
             Assert.IsNotNull(runtime.Db);
+            Assert.IsTrue(runtime.Db.UsesImportedEconomy);
             Assert.IsNotNull(runtime.State);
             Assert.IsNotNull(runtime.State.planet);
             Assert.IsNotNull(runtime.Camera);
@@ -172,6 +175,7 @@ namespace Frontier.Tests
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
             for (int i = 0; i < 10; i++) yield return null;
+            rt.State.DebugSetUpgrade(rt.Db.FindUpgrade("pack"), 2);
             rt.State.backpack.Set(rt.Db.fuel.id, 200);
             var target = rt.State.universe.Get("cinder");
             var plan = rt.State.PlanRoute(target);

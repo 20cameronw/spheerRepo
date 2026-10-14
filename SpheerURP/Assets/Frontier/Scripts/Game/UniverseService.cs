@@ -52,7 +52,8 @@ namespace Frontier
         {
             if (db == null) throw new ArgumentNullException("db");
             Db = db;
-            Rules = rules ?? TravelRules.CreateDefault();
+            Rules = rules ?? (db.UsesImportedEconomy ?
+                new TravelRules(new TravelModel(db.tuning.Build(), db.ToCatalog())) : TravelRules.CreateDefault());
             var config = new UniverseConfig { Seed = seed, EnablePlannedResources = false, Resources = BuildResourceTable(db, false) };
             Authored = AuthoredWorlds.Build(db, config);
             Universe = new Uni(config, Authored.Content);
@@ -85,7 +86,7 @@ namespace Frontier
         {
             var known = new HashSet<string>(StringComparer.Ordinal);
             foreach (var r in db.resources) if (r != null && !string.IsNullOrEmpty(r.id)) known.Add(r.id);
-            var table = ResourceTable.CreateDefault(includePlanned);
+            var table = db.UsesImportedEconomy ? UniverseTables.BuildResourceTable(db.ToCatalog()) : ResourceTable.CreateDefault(includePlanned);
             foreach (var def in table.Defs)
                 if (!known.Contains(def.Id)) throw new InvalidOperationException("the universe can generate '" + def.Id + "' but the game has no such ResourceSO");
             for (int b = 0; b < table.Profiles.Length; b++)
