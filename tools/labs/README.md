@@ -1,11 +1,12 @@
 # Console labs
 
-Two small console programs that run the **same sources** as the game (no Unity editor window needed, no Unity license used). They compile the repo sources in place with the Roslyn compiler and the .NET 8 runtime that ship inside the Unity editor, so they work on any machine that has the Unity version from `ProjectSettings/ProjectVersion.txt` installed (set `UNITY_PATH` to override the editor location).
+Small console programs that run the **same sources** as the game (no Unity editor window needed, no Unity license used). They compile the repo sources in place with the Roslyn compiler and the .NET 8 runtime that ship inside the Unity editor, so they work on any machine that has the Unity version from `ProjectSettings/ProjectVersion.txt` installed (set `UNITY_PATH` to override the editor location).
 
 | Lab | Sources it compiles | What it is for |
 |-----|---------------------|----------------|
 | `tools/labs/universe` | `Scripts/Core/**` (the deterministic universe generator) | tests, density maps, galaxy gallery, generator statistics |
 | `tools/labs/economy`  | `Scripts/Core/**` + `Scripts/Economy/**` | tests, the balance simulator, JSON exports, reports, charts |
+| `tools/labs/hyperspace` | `Scripts/Core/**` + Hyperspace NUnit tests | nine golden digests on CoreCLR/Mono, all 55 simulation tests on CoreCLR |
 
 Everything the labs build or render goes to `tools/labs/out/` (git-ignored). The committed, reviewable economy snapshot lives in `docs/economy/`.
 
@@ -21,6 +22,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\universe\run.ps1 
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\universe\run.ps1 density cx cy size px file
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\universe\run.ps1 inspect [region|biomes|planned]
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\universe\crosscheck.ps1                # digests on CoreCLR vs Unity's Mono
+
+# hyperspace (no separate .NET SDK needed)
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\hyperspace\verify.ps1 -Tests          # omit -Tests for digests only
 
 # economy
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\economy\run.ps1 test [--filter Travel]

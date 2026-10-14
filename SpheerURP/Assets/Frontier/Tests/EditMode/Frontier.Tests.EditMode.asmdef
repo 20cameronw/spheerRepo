@@ -8,7 +8,10 @@
         "Frontier.Economy",
         "Frontier.Data",
         "Frontier.Game",
-        "Frontier.Editor"
+        "Frontier.Editor",
+        "Frontier.Visual",
+        "Frontier.UI",
+        "Frontier.HyperspaceView"
     ],
     "includePlatforms": [
         "Editor"

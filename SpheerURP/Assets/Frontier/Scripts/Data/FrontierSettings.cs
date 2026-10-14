@@ -20,6 +20,10 @@ namespace Frontier
         [Tooltip("Share of travel fuel refunded by a perfect travel mini-game (0-1).")]
         [Range(0f, 1f)] public float travelRefundMax = 0.4f;
 
+        [Header("Travel (Hyperspace Run)")]
+        [Tooltip("Free revives granted per Hyperspace Run while no revive offer (premium wallet, rewarded ad) is registered with TravelMinigames.ReviveOffer. Set to 0 when the premium wallet ships.")]
+        [Min(0)] public int freeRevivesPerRun = 1;
+
         [Header("Scene")]
         public Color lightColor = new Color(0.85f, 0.9f, 1f);
         public float lightIntensity = 1.6f;

@@ -19,12 +19,18 @@ namespace Frontier
         /// <summary>Zero based leg index and the number of legs of the whole route.</summary>
         public int legIndex, legCount;
         public PlanetData from, to;
+        /// <summary>Fuel spent on this leg (the refund shown by a results screen is floor(fuelCost x travelRefundMax x quality), exactly what the flow credits).</summary>
+        public int fuelCost;
+        /// <summary>A full-bleed layer above the whole UI (no safe-area inset) for games that draw edge to edge; null when the caller has none. The legacy game ignores it.</summary>
+        public VisualElement fullscreenHost;
+        /// <summary>Safe-area insets (left, top, right, bottom) in UI units for HUD placed inside <see cref="fullscreenHost"/>.</summary>
+        public Vector4 safeInsets;
     }
 
     /// <summary>What a travel mini-game reports back. The caller applies fuel refund, loot and XP.</summary>
     public struct TravelRunResult
     {
-        /// <summary>Performance 0..1. The fuel refund is travelRefundMax x quality x fuel spent on the leg.</summary>
+        /// <summary>Refund fraction 0..1 (the flow credits floor(fuel spent x travelRefundMax x quality)). Hyperspace Run reports its fuelRefundFraction here, which already includes the fuel canister bonus.</summary>
         public float quality;
         /// <summary>False when the run was abandoned or lost without reaching the end: no refund and no loot.</summary>
         public bool completed;
@@ -52,7 +58,8 @@ namespace Frontier
 
         /// <summary>
         /// Called when the player's hull is destroyed and a revive is possible. The host shows its own offer (shards, rewarded ad) and answers
-        /// through the callback; null means "no revive available" and the game ends the run at once.
+        /// through the callback (on Unity's main thread, exactly once). When null, Hyperspace Run offers only the
+        /// configured freeRevivesPerRun allowance; Finish trip is always available without a reward.
         /// </summary>
         public static Action<string, Action<bool>> ReviveOffer;
     }

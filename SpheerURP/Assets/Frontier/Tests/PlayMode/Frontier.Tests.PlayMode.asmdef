@@ -9,6 +9,7 @@
         "Frontier.Game",
         "Frontier.Visual",
         "Frontier.UI",
+        "Frontier.HyperspaceView",
         "Frontier.App"
     ],
     "includePlatforms": [],

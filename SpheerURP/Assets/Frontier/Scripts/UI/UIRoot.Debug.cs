@@ -1,4 +1,5 @@
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,6 +20,7 @@ namespace Frontier
             CloseAll();
             if (root != null) { var oldSheet = root.Q("icon-sheet"); if (oldSheet != null) oldSheet.RemoveFromHierarchy(); }
             if (overlayLayer != null) overlayLayer.Clear();
+            if (travelLayer != null) travelLayer.Clear();
             if (toastLayer != null) toastLayer.Clear();
             busy = false;
             debugToolsOverride = null;
@@ -84,6 +86,27 @@ namespace Frontier
             DebugReset();
             busy = true;
             new TravelGame().Run(overlayLayer, UiKit.Magenta, 1f, 0.5f, r => { busy = false; });
+        }
+
+        /// <summary>Starts any travel mini-game exactly as the travel flow does (full-bleed host, safe-area insets) for the harness and tests. Returns the request that was used.</summary>
+        public TravelRunRequest DebugRunTravel(ITravelMinigame game, TravelRunRequest request, Action<TravelRunResult> done)
+        {
+            DebugReset();
+            busy = true;
+            request.fullscreenHost = travelLayer;
+            request.safeInsets = inset;
+            game.Run(overlayLayer, request, r => { busy = false; if (done != null) done(r); });
+            return request;
+        }
+
+        /// <summary>A request for a leg from the current world to <paramref name="to"/> as the travel flow would build it (deterministic seed).</summary>
+        public TravelRunRequest DebugMakeTravelRequest(PlanetData to, ulong seed, double distanceLy)
+        {
+            return new TravelRunRequest
+            {
+                seed = seed, distanceLy = distanceLy, danger = to.Danger, tier = to.Tier, legIndex = 0, legCount = 1,
+                from = gs.planet, to = to, fuelCost = gs.FuelCost(to), fullscreenHost = travelLayer, safeInsets = inset
+            };
         }
 
         public void DebugTapStructure(PlacedStructure s)

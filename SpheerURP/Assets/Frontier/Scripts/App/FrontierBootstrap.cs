@@ -28,6 +28,18 @@ namespace Frontier
             HarnessRunner.PrepareFromCommandLine();
 #endif
             var gs = new GameState(db);
+            TravelMinigames.Create = () =>
+            {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (TravelPrefs.UseLegacyGame) return new LegacyTravelMinigame();
+#endif
+                return new Hyperspace.View.HyperspaceGame(gs);
+            };
+            TravelDebug.Actions.Clear();
+            TravelDebug.Register("Hyperspace determinism self-check", () =>
+            {
+                return Hyperspace.View.HyperspaceDiagnostics.Check();
+            });
             new GameObject("App").AddComponent<FrontierApp>().Init(gs);
 
             var cam = sceneCamera != null ? sceneCamera : Camera.main;
