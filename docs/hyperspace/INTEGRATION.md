@@ -1,8 +1,59 @@
 # Hyperspace Run - integration guide for the Unity agent
 
 Hyperspace Run replaces the 2D travel mini-game (`TravelGame`) with a forward-moving 3D rail shooter/dodger played during warp travel.
-This package is the **deterministic simulation core only**: pure C# (`namespace Frontier.Hyperspace`, C# 9, netstandard2.1, no `UnityEngine`, fixed step 1/60 s, zero steady-state allocations).
-You render its state and feed it input. Everything below is verified by the test suite in `src\Tests` (55 tests, run on CoreCLR and on Unity's Mono).
+The **deterministic simulation core** is pure C# (`namespace Frontier.Hyperspace`, C# 9, netstandard2.1, no `UnityEngine`, fixed step 1/60 s, zero steady-state allocations).
+The Unity adapter renders its state and feeds it input. The original core API reference below was verified by 55 tests on CoreCLR and Unity's Mono.
+
+## Unity adapter in this repository
+
+The renderer now lives in `SpheerURP\Assets\Frontier\Scripts\HyperspaceView` (`Frontier.HyperspaceView`).
+`FrontierBootstrap` registers `HyperspaceGame` with `TravelMinigames.Create`; development builds can select the legacy tap game in Settings > Debug.
+The simulation source and its golden constants are unchanged.
+
+* **Driver/input:** `HyperspaceSession` owns the fixed-step accumulator, drains every step, freezes on downed/pause/background, and resets catch-up time on resume. Relative pointer drag uses **panel units** and inverted y, retains the target on lift, and captures one pointer. Bomb taps stay latched until an actual simulation step consumes them.
+* **Presentation:** an isolated URP camera explicitly renders into a full-bleed UI Toolkit texture. One reusable vertex-colour mesh batches ships, hazards, bullets, pickups, star streaks and bounded event bursts. There are no per-entity GameObjects or per-step instantiate/destroy calls. Laser gate geometry comes directly from `Hazards.Gate`; turret and Guardian fan markers use the simulation's spread/count. Safe-area HUD shows hull, shields, bomb recharge, combo, score, route/encounter progress, overdrive and Guardian phase/health.
+* **Results/arrival:** results stay visible until Continue. The adapter returns `fuelRefundFraction` in the existing travel result's `quality` field, scales raw loot once, and leaves currency/XP crediting to `UIRoot.TravelSequence`. Abandoning still permits arrival but grants no refund, loot or XP. Removing the overlay or destroying the session abandons an unfinished run and completes the callback once.
+* **Revives:** absent a wallet/ad provider, `FrontierSettings.freeRevivesPerRun` defaults to one. Set it to zero when monetized revives ship. A non-null `TravelMinigames.ReviveOffer` replaces the free offer; it must answer on the Unity main thread. Duplicate/late callbacks cannot revive a finished or disposed session. Finish trip remains available while an offer is pending.
+* **Audio/debug:** procedural clips are synthesized at run startup, not per event. Ten reusable one-shot voices plus the engine bed and legacy UI source cap audio sources at twelve. Settings preserve assist and drag sensitivity; Debug exposes the performance overlay and an on-device comparison of all nine golden digests.
+
+### Current-schema integration assumptions
+
+Upgrade families are read by `ShipFamiliesFromGame` and interpolated between the simulation's starter/endgame stats:
+reactor health -> hull/shields, turret damage/rate -> weapons, tap damage -> pierce, reward bonus -> magnet,
+fuel efficiency -> handling, and player levels 8/16/24 -> extra bombs. Backpack capacity is deliberately excluded.
+These are the upgrades available on this branch, not dependencies on a sibling upgrade redesign.
+Loot maps Salvage -> `scrap`, Component -> `alloy`, Core -> `core`; missing resources are skipped.
+There is no premium-wallet, rewarded-ad or Remote Config implementation on this branch; hooks do not pretend those services exist.
+
+The mobile baseline uses flat neon/faceted geometry and a texture capped at 1280 pixels high, without bloom, realtime shadows,
+chromatic post-processing or native haptics. Phone GPU/audio latency, touch feel and IL2CPP/ARM64 determinism still require device validation.
+No cross-device replay sharing is enabled. The game pauses rather than simulating time spent backgrounded; it does not persist/resume an in-flight run across process termination.
+
+### Reproducible verification
+
+Run from the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-checks.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-tests.ps1 -Platform EditMode
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-tests.ps1 -Platform PlayMode
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\labs\hyperspace\verify.ps1 -Tests
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\capture-screens.ps1 -Out SpheerURP\Screens\hyperspace-final -Devices phone-1080x1920,phone-1170x2532,phone-1080x2340,tablet-1536x2048 -Only hyperspace
+```
+
+The bundled-toolchain verifier needs no installed .NET SDK: it compiles the actual Core sources with warnings as errors,
+compares nine goldens on CoreCLR/Unity Mono, and runs all 55 simulation tests (including allocation and fairness proofs) on CoreCLR.
+Unity Mono cannot report thread allocation counts on this machine, so those two EditMode tests explicitly skip; CoreCLR verifies both.
+The PlayMode adapter tests exercise pointer coordinates, render pixels without mutating state, pause, completion/abandonment,
+free revive limits, duplicate/late offers, and overlay teardown. Harness shots cover intro, combat, downed, results, pause and Guardian.
+The 24 captures in `SpheerURP\Screens\hyperspace-final` have zero small-text, undersized-touch or offscreen-panel lint findings
+on the four listed virtual devices. Screens, NUnit XML, compiler outputs and logs remain git-ignored.
+Local validation on Unity 6000.4.0f1: all five editor check suites passed; EditMode with `-IncludeSlow` passed 478 tests
+with the two allocation-probe skips noted above; all 16 PlayMode tests passed; CoreCLR passed all 55 simulation tests.
+
+The remaining reference retains paths from the original standalone core package. In this repository, `src\Hyperspace`
+is `SpheerURP\Assets\Frontier\Scripts\Core\Hyperspace`, and `src\Tests` is `SpheerURP\Assets\Frontier\Tests\EditMode\Hyperspace`.
+Standalone `run.ps1`/FloatLint commands mentioned below are not bundled here; the verifier above is the available runtime/golden/test gate.
 
 * Sources: `src\Hyperspace\*.cs` (33 files) -> add to the `Frontier.Core` asmdef (`noEngineReferences`). `Hash.cs` (`Frontier.Universe.Hash`/`Rng`) is **already in Frontier.Core** and is used unmodified.
 * Tests: `src\Tests\*.cs` (NUnit attributes, `[Category("Heavy")]` = statistical, skip on slow runners) -> `Frontier.Core.Tests` (EditMode).

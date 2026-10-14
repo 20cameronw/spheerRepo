@@ -284,6 +284,16 @@ namespace Frontier
             yield return new Shot("game-chop", () => ui.DebugGather(MinigameKind.Chop), 1.8f);
             yield return new Shot("game-mine", () => ui.DebugGather(MinigameKind.Mine), 1.8f);
             yield return new Shot("game-travel", () => ui.DebugTravelGame(), 2.5f);
+            yield return new Shot("hyperspace-intro", () => HyperspaceShot(0, 0));
+            yield return new Shot("hyperspace-combat", () => HyperspaceShot(3, 900));
+            yield return new Shot("hyperspace-downed", () => HyperspaceShot(12, 14000, false));
+            yield return new Shot("hyperspace-result", () => HyperspaceShot(0, 14000));
+            yield return new Shot("hyperspace-pause", () => { HyperspaceShot(0, 500).Pause(); });
+            yield return new Shot("hyperspace-guardian", () =>
+            {
+                var session = HyperspaceShot(6, 0);
+                session.DebugAdvance(Mathf.CeilToInt((session.Run.Route.bossStart + 5) * 60), true, true);
+            });
             yield return new Shot("game-drill", () => { GoTo("glacia"); ui.DebugGather(MinigameKind.Drill); }, 1.8f);
             yield return new Shot("glacia-hud", () => { ResetView(); }, 0.3f);
             yield return new Shot("wave-hud", () => { GoTo("sylva"); ResetView(); rt.Defense.StartWave(3); }, 4.0f);
@@ -307,6 +317,26 @@ namespace Frontier
                     GoTo(world);
                     ResetView();
                 }, 2.5f);
+            }
+
+            Hyperspace.View.HyperspaceSession HyperspaceShot(int tier, int steps, bool pilot = true)
+            {
+                ResetView();
+                var prefs = TravelPrefs.Store;
+                TravelPrefs.Store = new MemoryPrefsStore();
+                try
+                {
+                    var request = rt.Ui.DebugMakeTravelRequest(rt.State.planet, 2UL, tier == 0 ? 5 : 800);
+                    request.tier = tier; request.danger = 0.6f + tier * 1.1f;
+                    request.fuelCost = 20;
+                    var game = new Hyperspace.View.HyperspaceGame(rt.State);
+                    rt.Ui.DebugRunTravel(game, request, _ => { });
+                    var session = game.Session;
+                    session.DebugFrozen = true;
+                    session.DebugAdvance(steps, pilot, pilot);
+                    return session;
+                }
+                finally { TravelPrefs.Store = prefs; }
             }
             yield return new Shot("gen-colossal-built", () =>
             {
