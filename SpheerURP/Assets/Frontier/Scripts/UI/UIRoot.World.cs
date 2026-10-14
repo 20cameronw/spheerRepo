@@ -398,9 +398,10 @@ namespace Frontier
             {
                 StructureHeader(body, s, c, "Tool: " + gs.ToolName(game) + "  (LV " + gs.ToolLevel(game) + ", damage x" + gs.ToolDamage(game).ToString("0.0") + ")");
                 float bonus = gs.StructureBonus(s);
-                var spots = gs.SpotsFor(gs.planet, game);
+                var spots = gs.SpotsFor(gs.planet, s.def.kind);
                 body.Add(SectionLabel(spots.Count > 0 ? "GATHER ON THIS PLANET" : "NOTHING TO GATHER HERE"));
-                string verb = game == MinigameKind.Drill ? "DRILL" : game == MinigameKind.Siphon ? "SIPHON" :
+                string verb = s.def.kind == StructureKind.Biodome ? "HARVEST" :
+                    game == MinigameKind.Drill ? "DRILL" : game == MinigameKind.Siphon ? "SIPHON" :
                     game == MinigameKind.Excavate ? "EXCAVATE" : game == MinigameKind.Salvage ? "SALVAGE" :
                     game == MinigameKind.Chop ? "CHOP" : "MINE";
                 foreach (var spot in spots)

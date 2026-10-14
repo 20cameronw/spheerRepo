@@ -73,7 +73,8 @@ namespace Frontier
         public static bool IsGather(this StructureKind k)
         {
             return k == StructureKind.Lumber || k == StructureKind.Mine || k == StructureKind.Drill ||
-                k == StructureKind.SiphonRig || k == StructureKind.Excavator || k == StructureKind.SalvageYard;
+                k == StructureKind.Biodome || k == StructureKind.SiphonRig || k == StructureKind.Excavator ||
+                k == StructureKind.SalvageYard;
         }
         public static bool IsTurret(this StructureKind k)
         {
@@ -114,6 +115,7 @@ namespace Frontier
                 case StructureKind.Warehouse:
                 case StructureKind.FuelDepot:
                 case StructureKind.CargoDepot:
+                case StructureKind.Biodome:
                 case StructureKind.Hangar:
                 case StructureKind.ShieldPylon:
                 case StructureKind.RepairBay:
@@ -134,6 +136,7 @@ namespace Frontier
         public static MinigameKind Game(this StructureKind k)
         {
             return k == StructureKind.Lumber ? MinigameKind.Chop :
+                k == StructureKind.Biodome ? MinigameKind.Chop :
                 k == StructureKind.Mine ? MinigameKind.Mine :
                 k == StructureKind.SiphonRig ? MinigameKind.Siphon :
                 k == StructureKind.Excavator ? MinigameKind.Excavate :

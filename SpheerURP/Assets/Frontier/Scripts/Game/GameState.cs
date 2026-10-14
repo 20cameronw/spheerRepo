@@ -420,12 +420,30 @@ namespace Frontier
 
         public List<GatherSpot> SpotsFor(PlanetData p, MinigameKind game) { return p.SpotsFor(game); }
 
+        public List<GatherSpot> SpotsFor(PlanetData p, StructureKind kind)
+        {
+            if (p == null) return new List<GatherSpot>();
+            HarvestMethod method = kind == StructureKind.Biodome
+                ? HarvestMethod.Harvest
+                : HarvestMapping.FromMinigame(kind.Game());
+            var candidates = p.SpotsFor(HarvestMapping.ToMinigame(method));
+            if (!db.UsesImportedEconomy) return candidates;
+
+            var matching = new List<GatherSpot>();
+            foreach (var spot in candidates)
+            {
+                if (spot.resource != null && spot.resource.harvestMethods != null &&
+                    Array.IndexOf(spot.resource.harvestMethods, method) >= 0) matching.Add(spot);
+            }
+            return matching;
+        }
+
         public List<ResourceSO> ResourcesFor(PlanetData p) { return new List<ResourceSO>(p.Resources); }
 
         // Gather structures need a matching resource on the planet.
         public bool CanBuildHere(StructureSO def)
         {
-            return BuildLockReason(def) == null && (!def.kind.IsGather() || SpotsFor(planet, def.kind.Game()).Count > 0);
+            return BuildLockReason(def) == null && (!def.kind.IsGather() || SpotsFor(planet, def.kind).Count > 0);
         }
 
         public bool Place(StructureSO def, int slot)

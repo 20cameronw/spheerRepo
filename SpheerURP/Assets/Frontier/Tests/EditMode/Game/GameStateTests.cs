@@ -41,6 +41,38 @@ namespace Frontier.Tests
 
         void GiveFuel(GameState state, int amount) { state.backpack.Set(db.fuel.id, amount); }
 
+        [Test]
+        public void Biodome_OnlyOffersResourcesWithTheHarvestMethod()
+        {
+            var state = NewState();
+            var authored = ScriptableObject.CreateInstance<PlanetSO>();
+            try
+            {
+                var biomass = db.FindResource("biomass");
+                var wood = db.FindResource("wood");
+                authored.spots.Add(new GatherSpot { game = MinigameKind.Chop, resource = biomass, baseYield = 10 });
+                authored.spots.Add(new GatherSpot { game = MinigameKind.Chop, resource = wood, baseYield = 10 });
+                var mixedWorld = new PlanetData(state.planet.Descriptor, state.planet.Star, authored,
+                    state.universe.Seed, id => db.FindResource(id), db.scrap);
+
+                var biodome = db.FindStructure("biodome");
+                Assert.IsNotNull(biodome);
+                Assert.IsTrue(biodome.Implemented);
+                Assert.IsTrue(biodome.kind.IsGather());
+                var harvestSpots = state.SpotsFor(mixedWorld, StructureKind.Biodome);
+                Assert.AreEqual(1, harvestSpots.Count);
+                Assert.AreEqual("biomass", harvestSpots[0].resource.id);
+
+                var lumberSpots = state.SpotsFor(mixedWorld, StructureKind.Lumber);
+                Assert.AreEqual(1, lumberSpots.Count);
+                Assert.AreEqual("wood", lumberSpots[0].resource.id);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(authored);
+            }
+        }
+
         // ---- debounce ----------------------------------------------------------------------------------------------------
 
         [Test]
