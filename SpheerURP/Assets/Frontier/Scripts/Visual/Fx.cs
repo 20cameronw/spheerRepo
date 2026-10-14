@@ -243,13 +243,13 @@ namespace Frontier
         }
     }
 
-    public static class Sfx
+    public static partial class Sfx
     {
         static AudioSource src;
         static readonly Dictionary<string, AudioClip> cache = new Dictionary<string, AudioClip>();
 
         public static bool Muted;
-        public static void Init(GameObject host) { src = host.AddComponent<AudioSource>(); src.playOnAwake = false; }
+        public static void Init(GameObject host) { src = host.AddComponent<AudioSource>(); src.playOnAwake = false; InitVoices(host); }
 
         public static void Play(float freq, float dur = 0.12f, float vol = 0.25f, float sweep = 0f)
         {

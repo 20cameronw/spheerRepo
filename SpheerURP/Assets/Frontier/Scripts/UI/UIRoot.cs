@@ -21,7 +21,7 @@ namespace Frontier
         UIDocument doc;
         PanelSettings panelSettings;
 
-        VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
+        VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
         Label waveLabel, reactorLabel, fuelLabel, packLabel, levelLabel, planetLabel;
         VisualElement planetTag;
@@ -82,11 +82,13 @@ namespace Frontier
             popupLayer = Layer(); modalLayer = Layer(); bannerLayer = Layer(); mapLayer = Layer();
             toastLayer = UiKit.Div("fr-toasts"); toastLayer.pickingMode = PickingMode.Ignore;
             overlayLayer = Layer();
+            // Edge-to-edge layer for travel games that draw behind the status bar (no safe-area inset; the game places its own HUD with the insets it is given).
+            travelLayer = Layer();
             flash = Layer();
             flash.style.backgroundColor = new Color(0.6f, 1f, 1f, 1f);
             flash.style.opacity = 0f;
             root.Add(popupLayer); root.Add(bannerLayer); root.Add(modalLayer); root.Add(mapLayer);
-            root.Add(toastLayer); root.Add(overlayLayer); root.Add(flash);
+            root.Add(toastLayer); root.Add(overlayLayer); root.Add(travelLayer); root.Add(flash);
 
             ApplyLayout(true);
 
@@ -433,7 +435,10 @@ namespace Frontier
                 danger = target.Danger,
                 tier = target.Tier,
                 legIndex = 0, legCount = 1,
-                from = from, to = target
+                from = from, to = target,
+                fuelCost = cost,
+                fullscreenHost = travelLayer,
+                safeInsets = inset
             };
             TravelRunResult result = default;
             bool completed = false;

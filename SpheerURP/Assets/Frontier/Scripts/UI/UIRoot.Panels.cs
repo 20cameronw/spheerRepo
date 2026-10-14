@@ -301,6 +301,7 @@ namespace Frontier
                 PlayerPrefs.Save();
                 RefreshModal();
             }));
+            BuildTravelSettings(body);
 
             var reset = IconBtn(confirmReset ? "TAP AGAIN TO ERASE" : "RESET PROGRESS", "close", UiKit.Red, () =>
             {
@@ -654,6 +655,7 @@ namespace Frontier
                 Sfx.Click(); RefreshModal();
             }));
             body.Add(prog);
+            BuildTravelDebug(body);
 
             var tp = Card(UiKit.Cyan);
             tp.Add(UiKit.Text("TELEPORT (free)", "fr-h2"));
