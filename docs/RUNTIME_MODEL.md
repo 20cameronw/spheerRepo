@@ -11,7 +11,7 @@ Three ideas carry the design:
 2. **Only deltas are saved.** The save holds what the player changed (structures, warehouse contents, waves, visits) keyed by the
    canonical planet id, plus the player's own state. Everything else is regenerated.
 3. **Engine-free logic, thin Unity shell.** Inventory, progression, the per-world store, the save protocol, the migrator and the
-   travel formula live in `Frontier.Core` (no `UnityEngine`, also compiled by the plain .NET test project). `GameState` is a facade
+   map geometry live in `Frontier.Core`; travel rules live in `Frontier.Economy` (both engine-free and compiled by the plain .NET test project). `GameState` is a facade
    that composes them with the ScriptableObject data.
 
 ## 1. The pieces
@@ -27,6 +27,7 @@ Three ideas carry the design:
 | `IClock`, `SystemClock`, `FakeClock`, `UtcText` | Core | Wall clock plus a monotonic clock; the fake one drives tests. Timestamps in saves are ISO 8601 text. |
 | `HarvestMapping` | Core | The one function that maps a generator `HarvestMethod` to a `MinigameKind` (TODO for the new mini-games). |
 | `RoutePlan`, `RouteLeg`, `RouteCurve`, `MapViewport` | Core | Engine-free route results and double-precision map geometry (section 6). |
+| `MapQuery`, `MapSnapshot` | Core | Bounded density/system queries and survey filtering, safe on a worker thread. |
 | `TravelModel`, `TravelRules`, `ShipCapabilities`, `RoutePlanner` | Economy | Locked fuel/range/plating model, payment and bounded stepping-stone search. |
 | `SaveV2` (+ `PlayerSave`, `LocationSave`, `ClockSave`, `CreatedWithInfo`, reserved `WalletEntry` / `BuilderSlot` / `SettingEntry`), `SaveSchema`, `SeedText` | Core | The save file schema v2: plain `[Serializable]` classes with public fields (Unity's `JsonUtility` has no dictionaries). |
 | `SaveDataV1`, `SaveMigrator`, `IWorldIdMap`, `MigrationContext` | Core | The legacy v1 type and the pure function v1 -> v2. |
@@ -49,12 +50,14 @@ flowchart LR
   end
   subgraph Core["Frontier.Core (pure C#)"]
     UNI["Universe<br/>generator V1, frozen"]
-    TM["TravelModel"]
     INV["Inventory"]
     PRG["Progression"]
     WS["WorldStore<br/>+ PlayerStats"]
     STORE["SaveStore<br/>atomic write, backup, recovery"]
     MIG["SaveMigrator<br/>v1 to v2"]
+  end
+  subgraph Economy["Frontier.Economy (pure C#)"]
+    TM["TravelRules + RoutePlanner"]
   end
   subgraph Game["Frontier.Game"]
     AW["AuthoredWorlds"]
@@ -92,7 +95,7 @@ flowchart LR
 ```
 
 Reading it: the generator and the authored assets meet in `UniverseService`, which hands out `PlanetData`. Presentation reads
-`PlanetData` and observes `GameState.Changed`; it never touches the Core services directly. A change calls `Notify()`, which only
+`PlanetData` and observes `GameState.Changed`; map workers query the immutable universe without touching Unity objects. A change calls `Notify()`, which only
 marks the save dirty; `FrontierApp` writes after a second of quiet and immediately when the app is paused or closed.
 
 ## 3. Planets
@@ -202,6 +205,32 @@ runtime formula. `GameState.Ship` reads catalog upgrade ids, hold fill and the e
   off until hull upgrades ship, but missing plating is still reported. No simulation-core changes or catalog/snapshot retuning.
 * **Geometry.** `MapViewport` pans without a fixed canvas and rebases doubles before float projection. `RouteCurve` is one continuous
   orbital-tangent cubic with exact endpoints and a finite direction at degenerate points.
+* **Flight flow.** Takeoff/warp-away, then one `ITravelMinigame` request per actual leg (system ids, distance, index/count and planned
+  seconds), then arrival. Results accumulate until the whole route is revalidated and paid; only completed manual legs grant refunds,
+  loot and XP. The existing failure policy is preserved: a failed leg has no rewards but the trip still arrives. Intermediate stars
+  are waypoints, not landings. The legacy mini-game still controls its own duration; manual seconds are explicitly estimates.
+  Autopilot bypasses all mini-games and waits 12 real-time seconds per leg, costs x1.6 and never refunds. Arrival rewards are flushed.
+
+### 6.1 Star map and Worlds card
+
+`UIRoot.Map` owns a viewport-sized Painter2D surface, not a transformed 9000 px world. Density has a fixed 32 x 24 cell budget; system
+queries only enumerate rectangles up to 2,400 ly on either axis and retain at most 800 dots. Wider views sample density and galaxy
+labels without enumerating their sectors. Labels are pooled, culled and decluttered. System view uses schematic orbits, explicitly
+labelled as such, rather than pretending AU and ly share a pixel scale.
+
+There is at most one density/system task and one route-preview task per panel. Debounced viewport versions and selection versions
+reject stale results. Closing/reopening keeps outstanding task handles until completion so rapid input cannot fan out workers.
+Workers receive plain capability/stock/survey snapshots; ScriptableObject wrapping stays on the main thread.
+
+Search supports exact Core World names, visited world names, visible system names/designations, canonical planet/system ids and
+invariant `x,y` coordinates (currently limited to +/-10 million ly). Pan, wheel/pinch zoom, ship recenter, jump-range ring, curved
+per-leg previews and surveyed-resource filtering are available. Survey is derived from every visited system plus scanner radius;
+Core Worlds are already charted. The selected world's card shows harvest method, richness, base yield, biome/size, slots, danger,
+required/owned plating, route reasons, total energy, mode and time, plus all other worlds in its system. The card scrolls independently
+of the map, and details for unsurveyed deposits are hidden.
+
+This is a bounded Painter2D implementation, **not** a completed device-performance decision gate. Pins, persisted discovery bitsets,
+global name indexing, directed next-stop UI, resumable/abortable flights and the GPU/RT comparison remain future work.
 
 ## 7. Save v2
 
@@ -338,7 +367,7 @@ home; **Next match** cycles), and **Dump descriptor** copies `PlanetData.Dump()`
 |------|-------|
 | Inventory parity (10,000 seeded random operations against the old algorithm), progression | `Core/InventoryParityTests`, `Core/ProgressionTests` |
 | World store, warehouse conservation | `Core/WorldStoreTests`, `Game/StorageTests`, the Storage check suite |
-| Travel and map geometry | `Economy/RoutePlannerTests`, `Economy/TravelTests`, `Core/MapGeometryTests` |
+| Travel and map geometry | `Economy/RoutePlannerTests`, `Economy/TravelTests`, `Core/MapGeometryTests`, `Core/MapQueryTests` |
 | Save: v1 -> v2 migration, v2 round trip, corrupt primary -> `.bak`, leftover temp, future schema, debounce | `Core/SaveMigratorTests`, `Core/SaveStoreTests`, `Core/SaveDebouncerTests`, `Game/SaveFormatTests`, `Game/SaveRoundTripTests` (fixtures `save_v1_fresh.json`, `save_v1_midgame.json`) |
 | Authored worlds: conversion, ids, golden key table, tier consistency, determinism | `Game/AuthoredWorldsTests` |
 | Generated planets: 500 random worlds resolve, stable seeds, ground radius, every biome | `Game/UniverseServiceTests`, `Game/PlanetRuntimeTests`, `Game/PlanetBiomeTests`, `Game/PlanetDataTests`, `Universe/PlanetFlavorTests` |
@@ -347,9 +376,12 @@ home; **Next match** cycles), and **Dump descriptor** copies `PlanetData.Dump()`
 
 ## 12. Known gaps
 
-* The star map still draws the 30 authored worlds from `PlanetSO.mapPosition`; a generated current world appears as a marker only
-  (semantic zoom, fog of war and the Worlds card belong to the map work package).
+* Star-map pins, persistent discovery bitsets, global unseen-name search, directed next-stop UI and on-device renderer benchmarks are
+  not implemented. Survey visibility is recomputed from visits and scanner radius, not saved as a separate exploration history.
 * The jump/scanner floors and relaxed hull enforcement are temporary until the content package imports the real ship upgrades.
+  Autopilot is available without a research unlock for the same interim reason.
+* Manual flight uses the existing mini-game, which does not yet honor the planned per-leg duration. Flights are whole-route atomic,
+  not resumable between legs; pause/abort and failure consequences belong to the minigame framework work.
 * Authored worlds with the spiky or lens models keep their authored `surfaceRadius`, so their buildings can still float a little.
 * Siphon, Excavate, Salvage and Harvest deposits play the nearest existing mini-game (`HarvestMapping`).
 * The universe golden digests have not been run on an IL2CPP/ARM64 device (see [TESTING.md](TESTING.md)).

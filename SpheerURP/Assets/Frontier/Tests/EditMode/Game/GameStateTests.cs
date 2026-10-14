@@ -274,6 +274,23 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void Travel_DenseFuelPaysTheSameRoute_WithNoOrdinaryCells()
+        {
+            var state = NewState();
+            Assert.IsNotNull(db.FindResource(GameState.PlasmaId));
+            state.backpack.Set(db.fuel.id, 0);
+            state.backpack.Set(GameState.PlasmaId, 20);
+            var target = state.universe.Get("cinder");
+            var plan = state.PlanRoute(target);
+            Assert.IsTrue(plan.reachable);
+            var payment = state.Rules.Pay(plan.totalFuel, state.FuelOnBoard);
+            Assert.Greater(payment.plasmaCells, 0);
+            Assert.IsTrue(state.Travel(plan, target));
+            Assert.AreEqual(0, state.Count(db.fuel));
+            Assert.AreEqual(20 - payment.plasmaCells, state.backpack.Count(GameState.PlasmaId));
+        }
+
+        [Test]
         public void FuelEfficiencyUpgrades_ReduceTheTravelCost()
         {
             var state = NewState();

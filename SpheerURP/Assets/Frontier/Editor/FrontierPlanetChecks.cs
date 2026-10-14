@@ -102,27 +102,25 @@ namespace Frontier.EditorTools
                     slots += planet.BuildingSlots;
                 }
                 Debug.Log("Frontier: structure diameters and tier capacities passed (" + slots + " total planet slots).");
-                var route = typeof(UIRoot).GetMethod("RoutePoint", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-                var point = typeof(UIRoot).GetMethod("MapPoint", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
                 var universe = UniverseService.For(GameDatabase.Load());
                 var planets = new System.Collections.Generic.List<PlanetData>(universe.AuthoredPlanets);
-                // a few generated worlds are only ever shown as a marker, but routes to and from them must still be well formed
                 planets.Add(universe.FindGenerated(Frontier.Universe.Biome.Lush, null));
                 planets.Add(universe.FindGenerated(Frontier.Universe.Biome.GasGiant, Frontier.Universe.SizeClass.Colossal, 6));
                 foreach (var from in planets)
                     foreach (var to in planets)
                     {
                         if (from.Id == to.Id) continue;
-                        Vector2 start = (Vector2)route.Invoke(null, new object[] { from, to, 0f });
-                        Vector2 end = (Vector2)route.Invoke(null, new object[] { from, to, 1f });
-                        if (Vector2.Distance(start, (Vector2)point.Invoke(null, new object[] { from })) > 0.01f ||
-                            Vector2.Distance(end, (Vector2)point.Invoke(null, new object[] { to })) > 0.01f)
+                        var a = new MapPoint(from.Star.X + Math.Cos(from.Descriptor.OrbitPhase) * from.Descriptor.OrbitRadius,
+                            from.Star.Y + Math.Sin(from.Descriptor.OrbitPhase) * from.Descriptor.OrbitRadius);
+                        var b = new MapPoint(to.Star.X + Math.Cos(to.Descriptor.OrbitPhase) * to.Descriptor.OrbitRadius,
+                            to.Star.Y + Math.Sin(to.Descriptor.OrbitPhase) * to.Descriptor.OrbitRadius);
+                        var curve = new RouteCurve(a, b, new MapPoint(from.Star.X, from.Star.Y), new MapPoint(to.Star.X, to.Star.Y));
+                        if ((curve.At(0) - a).Length > 1e-9 || (curve.At(1) - b).Length > 1e-9)
                             throw new InvalidOperationException("Route endpoints do not match planet positions.");
-                        foreach (float join in new[] { 0.15f, 0.85f })
+                        foreach (double join in new[] { 0.15, 0.5, 0.85 })
                         {
-                            Vector2 before = (Vector2)route.Invoke(null, new object[] { from, to, join - 0.00001f });
-                            Vector2 after = (Vector2)route.Invoke(null, new object[] { from, to, join + 0.00001f });
-                            if (Vector2.Distance(before, after) > 1f)
+                            MapPoint before = curve.At(join - 0.00001), after = curve.At(join + 0.00001);
+                            if ((before - after).Length > Math.Max(1, (b - a).Length * 0.0002))
                                 throw new InvalidOperationException("Route discontinuity.");
                         }
                     }

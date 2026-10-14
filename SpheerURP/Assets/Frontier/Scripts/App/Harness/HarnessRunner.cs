@@ -269,10 +269,21 @@ namespace Frontier
                 string pg = page;
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
             }
-            yield return new Shot("map", () => ui.DebugMap(null, 0.7f), 0.6f);
-            yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 0.9f), 0.6f);
-            yield return new Shot("map-zoom-out", () => ui.DebugMap(gs.universe.Get("glacia"), 0.14f), 0.6f);
-            yield return new Shot("map-zoom-in", () => ui.DebugMap(gs.universe.Get("ferrum"), 1.7f), 0.6f);
+            yield return new Shot("map", () => ui.DebugMap(null, 2f), 0.8f);
+            yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 1f), 0.8f);
+            yield return new Shot("map-autopilot", () => { ui.DebugMap(gs.universe.Get("cinder"), 1f); ui.DebugMapAutopilot(); }, 0.8f);
+            yield return new Shot("map-zoom-out", () => ui.DebugMap(gs.universe.Get("glacia"), 0.08f), 0.8f);
+            yield return new Shot("map-zoom-in", () => ui.DebugMap(gs.universe.Get("ferrum"), 12f), 0.8f);
+            int savedMapFuel = gs.Count(db.fuel);
+            int savedMapPlasma = gs.backpack.Count(GameState.PlasmaId), savedMapAntimatter = gs.backpack.Count(GameState.AntimatterId);
+            yield return new Shot("map-no-fuel", () =>
+            {
+                gs.backpack.Set(db.fuel.id, 0); gs.backpack.Set(GameState.PlasmaId, 0); gs.backpack.Set(GameState.AntimatterId, 0);
+                ui.DebugMap(gs.universe.Get("cinder"), 1f);
+            }, 0.8f);
+            gs.backpack.Set(db.fuel.id, savedMapFuel);
+            gs.backpack.Set(GameState.PlasmaId, savedMapPlasma); gs.backpack.Set(GameState.AntimatterId, savedMapAntimatter);
+            yield return new Shot("map-flight-autopilot", ui.DebugAutopilotScreen);
 
             foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Gunner, StructureKind.Laser, StructureKind.Warehouse })
             {
@@ -323,7 +334,7 @@ namespace Frontier
                 ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery));
             }, 0.5f);
             yield return new Shot("gen-colossal-popup", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.Gunner)); }, 0.3f);
-            yield return new Shot("map-generated", () => ui.DebugMap(null, 0.4f), 0.6f);
+            yield return new Shot("map-generated", () => { GoTo(FindWorld(ColossalSpec)); ui.DebugMap(null, 2f); }, 0.8f);
             yield return new Shot("menu-debug-teleport", () => ui.DebugMenu("debug", true), 0.5f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.

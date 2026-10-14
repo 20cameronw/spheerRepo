@@ -118,6 +118,122 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator Map_UsesLatestSelection_RevalidatesFuel_AndSearchesFarCoordinates()
+        {
+            new GameObject("MapTestBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            for (int i = 0; i < 10; i++) yield return null;
+            rt.Ui.DebugMap(rt.State.universe.Get("nyx"), 1);
+            yield return null;
+            var target = rt.State.universe.Get("glacia");
+            rt.Ui.DebugMap(target, 12);
+            deadline = Time.realtimeSinceStartup + 15;
+            while ((rt.Ui.DebugMapPreview == null || rt.Ui.DebugMapSystemCount == 0) && Time.realtimeSinceStartup < deadline) yield return null;
+            var preview = rt.Ui.DebugMapPreview;
+            Assert.IsNotNull(preview, "the worker never delivered the latest route");
+            Assert.AreEqual(target.Id, preview.toPlanetId, "a stale Nyx result must not overwrite Glacia");
+            Assert.IsTrue(preview.intraSystem);
+            int manualPrice = preview.totalFuel;
+            rt.Ui.DebugMapAutopilot();
+            deadline = Time.realtimeSinceStartup + 10;
+            while (rt.Ui.DebugMapPreview == null && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.Greater(rt.Ui.DebugMapPreview.totalFuel, manualPrice);
+            Assert.AreEqual(12, rt.Ui.DebugMapPreview.totalSeconds);
+            rt.State.backpack.Set(rt.Db.fuel.id, 0);
+            rt.State.Notify();
+            deadline = Time.realtimeSinceStartup + 10;
+            while (rt.Ui.DebugMapPreview == null && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(rt.Ui.DebugMapPreview.Has(RouteReasons.NotEnoughFuel));
+            rt.Ui.DebugMapSearch("12000,-3000");
+            Assert.AreEqual(12000, rt.Ui.DebugMapCenterX, 0.001);
+            rt.Ui.DebugReset();
+            yield return null;
+        }
+
+        sealed class ScriptedFlight : ITravelMinigame
+        {
+            public readonly List<TravelRunRequest> requests = new List<TravelRunRequest>();
+            public void Run(UnityEngine.UIElements.VisualElement host, TravelRunRequest request, Action<TravelRunResult> done)
+            {
+                requests.Add(request);
+                done(new TravelRunResult { completed = request.legIndex == 0, quality = 1 });
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator TravelFlow_FliesEachLeg_PaysOnce_AndRefundsOnlyCompletedManualLegs()
+        {
+            new GameObject("TravelTestBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            for (int i = 0; i < 10; i++) yield return null;
+            rt.State.backpack.Set(rt.Db.fuel.id, 200);
+            var target = rt.State.universe.Get("cinder");
+            var plan = rt.State.PlanRoute(target);
+            Assert.IsTrue(plan.reachable);
+            Assert.Greater(plan.LegCount, 1);
+            var flight = new ScriptedFlight();
+            var oldFactory = TravelMinigames.Create;
+            try
+            {
+                TravelMinigames.Create = () => flight;
+                rt.Ui.DebugStartTravel(target);
+                deadline = Time.realtimeSinceStartup + 25;
+                while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+                Assert.IsFalse(rt.Ui.DebugBusy, "travel did not finish");
+                Assert.AreEqual(plan.LegCount, flight.requests.Count);
+                Assert.AreEqual(target.Id, rt.State.planet.Id);
+                for (int i = 0; i < plan.LegCount; i++)
+                {
+                    Assert.AreEqual(i, flight.requests[i].legIndex);
+                    Assert.AreEqual(plan.LegCount, flight.requests[i].legCount);
+                    Assert.AreEqual(plan.legs[i].toSystemId, flight.requests[i].toSystemId);
+                    Assert.AreEqual(plan.legs[i].lengthLy, flight.requests[i].distanceLy);
+                }
+                int refund = rt.State.Rules.Refund(plan.legs[0].fuel, 1, false);
+                Assert.AreEqual(200 - plan.totalFuel + refund, rt.State.Count(rt.Db.fuel));
+                Assert.AreEqual(1, rt.State.world.Visits(target.Id));
+                Assert.IsFalse(rt.State.saves.IsDirty, "arrival and its refund must persist together");
+            }
+            finally { TravelMinigames.Create = oldFactory; }
+        }
+
+        [UnityTest]
+        public IEnumerator TravelFlow_AutopilotSkipsTheMinigame_AndPaysWithoutRefund()
+        {
+            new GameObject("AutoTestBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            for (int i = 0; i < 10; i++) yield return null;
+            rt.State.backpack.Set(rt.Db.fuel.id, 100);
+            var target = rt.State.universe.Get("glacia");
+            var plan = rt.State.PlanRoute(target, true);
+            var flight = new ScriptedFlight();
+            var oldFactory = TravelMinigames.Create;
+            float start = Time.realtimeSinceStartup;
+            try
+            {
+                TravelMinigames.Create = () => flight;
+                rt.Ui.DebugStartTravel(target, true);
+                deadline = start + 30;
+                while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+                Assert.IsFalse(rt.Ui.DebugBusy);
+                Assert.AreEqual(target.Id, rt.State.planet.Id);
+                Assert.AreEqual(0, flight.requests.Count);
+                Assert.AreEqual(100 - plan.totalFuel, rt.State.Count(rt.Db.fuel));
+                Assert.GreaterOrEqual(Time.realtimeSinceStartup - start, plan.totalSeconds);
+            }
+            finally { TravelMinigames.Create = oldFactory; }
+        }
+
+        [UnityTest]
         public IEnumerator TheAppComponent_WritesTheDebouncedSave_AfterAQuietSecond()
         {
             var host = new GameObject("TestBootstrap");

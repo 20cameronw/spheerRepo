@@ -18,6 +18,9 @@ namespace Frontier
         public int tier;
         /// <summary>Zero based leg index and the number of legs of the whole route.</summary>
         public int legIndex, legCount;
+        /// <summary>Planned run length, and canonical stepping-stone system ids (world endpoints are the whole trip).</summary>
+        public int seconds;
+        public string fromSystemId, toSystemId;
         public PlanetData from, to;
     }
 
@@ -68,6 +71,11 @@ namespace Frontier
             {
                 if (done != null) done(new TravelRunResult { quality = r.quality, completed = true, grade = "" });
             });
+            if (host.childCount > 0)
+            {
+                var title = host[host.childCount - 1].Q<Label>();
+                if (title != null) title.text += " · LEG " + (request.legIndex + 1) + " / " + request.legCount;
+            }
         }
     }
 }
