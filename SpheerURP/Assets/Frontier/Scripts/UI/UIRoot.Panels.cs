@@ -151,7 +151,7 @@ namespace Frontier
                     card.Add(UiKit.CostRow(def.buildCost, gs, true));
                     bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
                     if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
-                    bool can = gs.Has(def.buildCost) && crewAvailable;
+                    bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
                     var place = IconBtn("PLACE", "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
                     UiKit.SetEnabledLook(place, can);
                     card.Add(place);

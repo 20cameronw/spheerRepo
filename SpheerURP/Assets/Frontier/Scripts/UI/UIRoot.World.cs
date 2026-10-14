@@ -159,6 +159,9 @@ namespace Frontier
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
             else if (k == StructureKind.RadarTower) OpenRadarTower(s, t);
             else if (k == StructureKind.ColonyHub) OpenColonyHub(s, t);
+            else if (k == StructureKind.Hangar) OpenHangar(s, t);
+            else if (k == StructureKind.ShieldPylon) OpenShieldPylon(s, t);
+            else if (k == StructureKind.RepairBay) OpenRepairBay(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
@@ -334,12 +337,54 @@ namespace Frontier
             });
         }
 
+        void OpenHangar(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("hangar" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Reduces fuel for trips leaving this planet");
+                body.Add(UiKit.Text("Departure discount: " + (gs.TravelFuelDiscount(gs.planet) * 100f).ToString("0.#") + "%", "fr-small"));
+                body.Add(UiKit.Text("This local bonus applies to manual and autopilot routes. It does not reduce travel costs from other planets.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
+        void OpenShieldPylon(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("shieldpylon" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Reinforces this planet's reactor during called waves");
+                body.Add(UiKit.Text("Reactor maximum: " + gs.ReactorMax.ToString("0.#") + "  ·  +" +
+                    (Mathf.Max(0f, s.def.EffectAt(s.level)) * 100f).ToString("0.#") + "% shield field", "fr-small"));
+                body.Add(UiKit.Text("Only the planet with this operational Pylon receives the extra reactor health.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
+        void OpenRepairBay(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("repairbay" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Repairs reactor damage during called waves");
+                body.Add(UiKit.Text("Repair rate: " + gs.ReactorRepairPerSecond(gs.planet).ToString("0.##") + " health / second", "fr-small"));
+                body.Add(UiKit.Text("Repairs stop at the reactor's maximum health and do not affect other planets.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
         void OpenTurret(PlacedStructure s, Transform t)
         {
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("turret" + s.slot, t, c, body =>
             {
-                StructureHeader(body, s, c, "Fires automatically during waves");
+                string behavior = s.def.kind == StructureKind.MissileSilo
+                    ? "Splash missiles hit clustered raiders during waves"
+                    : s.def.kind == StructureKind.TeslaCoil
+                        ? "Lightning chains between nearby raiders during waves"
+                        : "Fires automatically during waves";
+                StructureHeader(body, s, c, behavior);
                 body.Add(UiKit.Text("DAMAGE " + gs.TurretPower(s).ToString("0.#") + "     RANGE " + s.def.range.ToString("0"), "fr-small"));
                 UpgradeButton(body, s, c);
             }, true);
@@ -383,7 +428,7 @@ namespace Frontier
         {
             int n = 999;
             foreach (var i in r.inputs)
-                if (i.resource != null && i.amount > 0) n = Mathf.Min(n, gs.Count(i.resource) / i.amount);
+                if (i.resource != null && i.amount > 0) n = Mathf.Min(n, gs.PlanetCount(i.resource) / i.amount);
             return n == 999 ? 0 : n;
         }
 
@@ -404,6 +449,9 @@ namespace Frontier
                 float bonus = gs.StructureBonus(s);
                 int batchSize = gs.StationBatchSize(s);
                 body.Add(UiKit.Text("BATCH CAPACITY  ·  " + batchSize + " CRAFT" + (batchSize == 1 ? "" : "S") + " PER TAP", "fr-small"));
+                body.Add(UiKit.Text(gs.CargoDepotActive
+                    ? "Recipe inputs draw from this planet's backpack and pooled Warehouses. Outputs go to the backpack."
+                    : "Recipe inputs and outputs use the backpack.", "fr-tiny"));
                 body.Add(SectionLabel("RECIPES  -  you give  >  you get"));
                 foreach (var rec in gs.db.recipes)
                 {
@@ -423,7 +471,7 @@ namespace Frontier
                         if (i.resource != null)
                         {
                             int required = (int)Math.Min(int.MaxValue, (long)i.amount * batchSize);
-                            inputs.Add(RecipeResource(i.resource, required, gs.Count(i.resource) < required));
+                            inputs.Add(RecipeResource(i.resource, required, gs.PlanetCount(i.resource) < required));
                         }
                     line.Add(inputs);
                     var arrow = UiKit.Text(">", "fr-h2");
@@ -445,7 +493,7 @@ namespace Frontier
                     {
                         if (i.resource == null) continue;
                         if (!first) haveText.Append(",  ");
-                        haveText.Append(gs.Count(i.resource)).Append(' ').Append(i.resource.displayName);
+                        haveText.Append(gs.PlanetCount(i.resource)).Append(' ').Append(i.resource.displayName);
                         first = false;
                     }
                     have.Add(UiKit.Text(haveText.ToString(), "fr-tiny"));

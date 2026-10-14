@@ -42,8 +42,18 @@ namespace Frontier
             get
             {
                 var settings = FrontierSettings.I;
-                return ShipCapabilities.FromUpgradeLevels(ShipLevel, CargoFill, settings.interimJumpLevel, settings.interimScannerLevel, settings.enforceHazardPlating);
+                var capabilities = ShipCapabilities.FromUpgradeLevels(ShipLevel, CargoFill, settings.interimJumpLevel, settings.interimScannerLevel, settings.enforceHazardPlating);
+                capabilities.discount = TravelFuelDiscount(planet);
+                return capabilities;
             }
+        }
+
+        public float TravelFuelDiscount(PlanetData departure)
+        {
+            var hangar = departure == null ? null : StructureOfKind(departure, StructureKind.Hangar);
+            return hangar != null && hangar.def.effectKind == "travelFuelDiscount"
+                ? Mathf.Clamp01(hangar.def.EffectAt(hangar.level))
+                : 0f;
         }
 
         /// <summary>Radius around every visited system inside which worlds are discovered and surveyed.</summary>

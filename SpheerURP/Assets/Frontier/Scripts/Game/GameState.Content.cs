@@ -58,7 +58,7 @@ namespace Frontier
 
         public bool CanUpgradeStructure(PlacedStructure placed)
         {
-            return StructureUpgradeLockReason(placed) == null && Has(placed.def.UpgradeCost(placed.level));
+            return StructureUpgradeLockReason(placed) == null && HasPlanetResources(placed.def.UpgradeCost(placed.level));
         }
 
         public string StructureUpgradeLockReason(PlacedStructure placed)

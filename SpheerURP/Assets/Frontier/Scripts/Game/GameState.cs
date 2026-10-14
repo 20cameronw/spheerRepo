@@ -93,6 +93,8 @@ namespace Frontier
 
         public bool Has(List<ItemAmount> cost) { return backpack.Has(ToIds(cost)); }
 
+        public bool HasPlanetResources(List<ItemAmount> cost) { return HasPlanetResources(ToIds(cost)); }
+
         public bool Spend(List<ItemAmount> cost)
         {
             if (!SpendQuietly(cost)) return false;
@@ -104,6 +106,120 @@ namespace Frontier
         {
             if (!backpack.Spend(ToIds(cost))) return false;
             saves.MarkDirty();
+            return true;
+        }
+
+        public bool HasPlanetResources(IList<IdAmount> cost)
+        {
+            var totals = new Dictionary<string, long>(StringComparer.Ordinal);
+            foreach (var item in cost)
+            {
+                if (string.IsNullOrEmpty(item.Id) || item.Amount < 0) return false;
+                long total;
+                totals.TryGetValue(item.Id, out total);
+                totals[item.Id] = total + item.Amount;
+            }
+            var pooled = PooledWarehouseStorages();
+            foreach (var item in totals)
+            {
+                long available = backpack.Count(item.Key);
+                foreach (var storage in pooled)
+                    available += WarehouseOps.Held(storage, item.Key);
+                if (available < item.Value) return false;
+            }
+            return true;
+        }
+
+        public int PlanetCount(ResourceSO resource)
+        {
+            if (resource == null) return 0;
+            long count = backpack.Count(resource.id);
+            foreach (var storage in PooledWarehouseStorages())
+                count += WarehouseOps.Held(storage, resource.id);
+            return (int)Math.Min(int.MaxValue, count);
+        }
+
+        public bool CargoDepotActive
+        {
+            get { return planet != null && StructureOfKind(planet, StructureKind.CargoDepot) != null; }
+        }
+
+        bool SpendPlanetResourcesQuietly(IList<IdAmount> cost)
+        {
+            if (!HasPlanetResources(cost)) return false;
+            var remaining = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var item in cost)
+            {
+                int amount;
+                remaining.TryGetValue(item.Id, out amount);
+                remaining[item.Id] = checked(amount + item.Amount);
+            }
+
+            bool storedChanged = false;
+            foreach (var item in new List<string>(remaining.Keys))
+            {
+                int fromPack = Math.Min(backpack.Count(item), remaining[item]);
+                if (fromPack > 0)
+                {
+                    backpack.Remove(item, fromPack);
+                    remaining[item] -= fromPack;
+                }
+            }
+            foreach (var storage in PooledWarehouseStorages())
+            {
+                foreach (var stack in storage.slots)
+                {
+                    if (stack == null || stack.count <= 0 || string.IsNullOrEmpty(stack.resourceId)) continue;
+                    int needed;
+                    if (!remaining.TryGetValue(stack.resourceId, out needed) || needed <= 0) continue;
+                    int removed = Math.Min(needed, stack.count);
+                    stack.count -= removed;
+                    remaining[stack.resourceId] = needed - removed;
+                    if (stack.count == 0) stack.resourceId = null;
+                    storedChanged = true;
+                }
+            }
+            saves.MarkDirty();
+            if (storedChanged) world.Touch();
+            return true;
+        }
+
+        List<StorageRecord> PooledWarehouseStorages()
+        {
+            var result = new List<StorageRecord>();
+            if (planet == null || StructureOfKind(planet, StructureKind.CargoDepot) == null) return result;
+            foreach (var structure in StructuresOn(planet))
+            {
+                if (!IsOperational(structure) || !structure.def.kind.IsStorage() ||
+                    structure.def.kind == StructureKind.FuelDepot) continue;
+                result.Add(StorageFor(structure));
+            }
+            return result;
+        }
+
+        bool TryCraftWithPlanetResources(IList<IdAmount> inputs, IList<IdAmount> outputs)
+        {
+            var packSpend = new List<IdAmount>();
+            var remaining = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var input in inputs)
+            {
+                int amount;
+                remaining.TryGetValue(input.Id, out amount);
+                remaining[input.Id] = checked(amount + input.Amount);
+            }
+            foreach (var input in remaining)
+            {
+                int fromPack = Math.Min(backpack.Count(input.Key), input.Value);
+                if (fromPack > 0) packSpend.Add(new IdAmount(input.Key, fromPack));
+            }
+            if (!HasPlanetResources(inputs) || !backpack.CanFitAfterSpending(packSpend, outputs)) return false;
+            if (!SpendPlanetResourcesQuietly(inputs)) return false;
+            foreach (var output in outputs)
+            {
+                int added = backpack.Add(output.Id, output.Amount);
+                if (added != output.Amount)
+                    throw new InvalidOperationException("Craft output did not fit after its inputs were spent: " + output);
+            }
             return true;
         }
 
@@ -175,7 +291,25 @@ namespace Frontier
 
         public float TurretFireRate { get { return 1f + EffectSum(UpgradeEffect.TurretFireRate); } }
         public float TapDamage { get { return 8f * (1f + EffectSum(UpgradeEffect.TapDamage)); } }
-        public float ReactorMax { get { return db.baseReactorHealth + EffectSum(UpgradeEffect.ReactorHealth); } }
+        public float ReactorMax
+        {
+            get
+            {
+                float baseHealth = db.baseReactorHealth + EffectSum(UpgradeEffect.ReactorHealth);
+                var pylon = StructureOfKind(planet, StructureKind.ShieldPylon);
+                float bonus = pylon != null && pylon.def.effectKind == "reactorHealthBonus"
+                    ? Mathf.Max(0f, pylon.def.EffectAt(pylon.level)) : 0f;
+                return baseHealth * (1f + bonus);
+            }
+        }
+
+        public float ReactorRepairPerSecond(PlanetData p)
+        {
+            var bay = StructureOfKind(p, StructureKind.RepairBay);
+            return bay != null && bay.def.effectKind == "reactorRegenPerSecond"
+                ? Mathf.Max(0f, bay.def.EffectAt(bay.level))
+                : 0f;
+        }
         public float RewardBonus { get { return 1f + EffectSum(UpgradeEffect.RewardBonus) + 0.03f * (PlayerLevel - 1); } }
         public float FuelMultiplier { get { return Mathf.Max(0.25f, 1f - EffectSum(UpgradeEffect.FuelEfficiency)); } }
 
@@ -301,7 +435,7 @@ namespace Frontier
             if (slot < 0 || slot >= planet.BuildingSlots || AtLimit(planet, def) || !CanBuildHere(def) ||
                 StructureAt(planet, slot) != null || ObstacleAt(planet, slot).HasValue ||
                 (seconds > 0 && AvailableBuilderCount <= 0) ||
-                !SpendQuietly(def.buildCost)) return false;
+                !SpendPlanetResourcesQuietly(ToIds(def.buildCost))) return false;
             var record = world.Place(planet.Id, def.id, slot);
             if (record == null) return false;
             if (seconds > 0) StartBuilderJob(StructureAt(planet, slot), seconds, 0);
@@ -320,7 +454,7 @@ namespace Frontier
         public bool UpgradeStructure(PlacedStructure s)
         {
             if (CompleteBuilderJobs()) Notify();
-            if (!CanUpgradeStructure(s) || !SpendQuietly(s.def.UpgradeCost(s.level))) return false;
+            if (!CanUpgradeStructure(s) || !SpendPlanetResourcesQuietly(ToIds(s.def.UpgradeCost(s.level)))) return false;
             int targetLevel = s.level + 1;
             int seconds = StructureJobSeconds(s.def, targetLevel);
             if (seconds > 0) StartBuilderJob(s, seconds, targetLevel);
@@ -449,7 +583,7 @@ namespace Frontier
             var outputs = new IdAmount[r.outputs.Count];
             for (int i = 0; i < outputs.Length; i++)
                 outputs[i] = new IdAmount(r.outputs[i].resource != null ? r.outputs[i].resource.id : "", OutputAmount(r.outputs[i], bonus));
-            if (!backpack.Craft(ToIds(r.inputs), outputs)) return false;
+            if (!TryCraftWithPlanetResources(ToIds(r.inputs), outputs)) return false;
             RecordAtlasRecipeCrafted(r);
             foreach (var output in r.outputs)
                 if (output.resource != null) RecordAtlasResourceAcquired(output.resource.id);
@@ -464,7 +598,7 @@ namespace Frontier
             IdAmount[] inputs, outputs;
             if (!TryScaleAmounts(recipe.inputs, batches, 0f, false, out inputs) ||
                 !TryScaleAmounts(recipe.outputs, batches, bonus, true, out outputs) ||
-                !backpack.Craft(inputs, outputs)) return false;
+                !TryCraftWithPlanetResources(inputs, outputs)) return false;
             RecordAtlasRecipeCrafted(recipe);
             foreach (var output in recipe.outputs)
                 if (output.resource != null) RecordAtlasResourceAcquired(output.resource.id);

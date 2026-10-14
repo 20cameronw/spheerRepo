@@ -141,13 +141,55 @@ namespace Frontier
             return true;
         }
 
-        /// <summary>Spends the inputs and adds the outputs; false (and nothing changed) when <see cref="CanCraft"/> says no.</summary>
-        public bool Craft(IList<IdAmount> inputs, IList<IdAmount> outputs)
+        /// <summary>
+        /// Checks whether outputs fit after the specified portion of the cost is removed from this inventory.
+        /// This also supports costs sourced partly from external storage.
+        /// </summary>
+        public bool CanFitAfterSpending(IList<IdAmount> spending, IList<IdAmount> outputs)
         {
-            if (!CanCraft(inputs, outputs)) return false;
-            Spend(inputs);
-            for (int i = 0; i < outputs.Count; i++) Add(outputs[i].Id, outputs[i].Amount);
-            return true;
+            var spent = new Dictionary<string, long>(StringComparer.Ordinal);
+            for (int i = 0; i < spending.Count; i++)
+            {
+                var item = spending[i];
+                if (string.IsNullOrEmpty(item.Id) || item.Amount < 0) return false;
+                long amount;
+                spent.TryGetValue(item.Id, out amount);
+                spent[item.Id] = amount + item.Amount;
+            }
+
+            int usedSlots = 0;
+            foreach (var item in items)
+            {
+                long removed;
+                spent.TryGetValue(item.Key, out removed);
+                if (removed > item.Value) return false;
+                long remaining = item.Value - removed;
+                if (remaining > 0) usedSlots += SlotsFor(item.Key, (int)remaining);
+            }
+            foreach (var item in spent)
+                if (!items.ContainsKey(item.Key) && item.Value > 0) return false;
+
+            var added = new Dictionary<string, long>(StringComparer.Ordinal);
+            for (int i = 0; i < outputs.Count; i++)
+            {
+                var item = outputs[i];
+                if (!IsKnown(item.Id) || item.Amount < 0) return false;
+                long amount;
+                added.TryGetValue(item.Id, out amount);
+                added[item.Id] = amount + item.Amount;
+            }
+            foreach (var item in added)
+            {
+                long removed;
+                spent.TryGetValue(item.Key, out removed);
+                long remaining = Count(item.Key) - removed;
+                long stackSize = StackSizeOf(item.Key);
+                long before = remaining <= 0 ? 0 : (remaining + stackSize - 1) / stackSize;
+                long afterCount = remaining + item.Value;
+                long after = afterCount <= 0 ? 0 : (afterCount + stackSize - 1) / stackSize;
+                usedSlots += (int)(after - before);
+            }
+            return usedSlots <= Capacity;
         }
 
         bool CanFitAfter(IList<IdAmount> inputs, IList<IdAmount> outputs, string id)
@@ -166,6 +208,15 @@ namespace Frontier
             }
             int cap = Math.Max(0, Capacity - usedOthers) * StackSizeOf(id);
             return have - inputUse + need <= cap;
+        }
+
+        /// <summary>Spends the inputs and adds the outputs; false (and nothing changed) when <see cref="CanCraft"/> says no.</summary>
+        public bool Craft(IList<IdAmount> inputs, IList<IdAmount> outputs)
+        {
+            if (!CanCraft(inputs, outputs)) return false;
+            Spend(inputs);
+            for (int i = 0; i < outputs.Count; i++) Add(outputs[i].Id, outputs[i].Amount);
+            return true;
         }
 
         /// <summary>Sets a count directly (debug tools, loading a save). A count of zero or less removes the stack. No capacity check.</summary>

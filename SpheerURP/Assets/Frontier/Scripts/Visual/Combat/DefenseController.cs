@@ -140,6 +140,7 @@ namespace Frontier
         {
             if (!Active) return;
 
+            ReactorHp = Mathf.Min(ReactorMax, ReactorHp + gs.ReactorRepairPerSecond(gs.planet) * Time.deltaTime);
             FirePlaced();
             tapCooldown -= Time.deltaTime;
             HandleTap();
@@ -160,11 +161,62 @@ namespace Frontier
                 if (target == null) { placedCd[i] = 0.15f; continue; }
                 placedCd[i] = def.fireInterval / gs.TurretFireRate;
                 Color c = def.color;
-                Fx.Bolt(from, target.transform.position, new Color(c.r, c.g, c.b, 1f), def.beamWidth, def.kind == StructureKind.Laser ? 0.28f : 0.1f);
-                Fx.Burst(target.transform.position, c, def.kind == StructureKind.Laser ? 14 : 6, 2.5f, 0.15f);
+                if (def.kind == StructureKind.MissileSilo) FireMissile(from, target, c, gs.TurretPower(placed[i]));
+                else if (def.kind == StructureKind.TeslaCoil) FireTeslaChain(from, target, c, def.range, gs.TurretPower(placed[i]));
+                else
+                {
+                    Fx.Bolt(from, target.transform.position, new Color(c.r, c.g, c.b, 1f), def.beamWidth, def.kind == StructureKind.Laser ? 0.28f : 0.1f);
+                    Fx.Burst(target.transform.position, c, def.kind == StructureKind.Laser ? 14 : 6, 2.5f, 0.15f);
+                    target.Damage(gs.TurretPower(placed[i]));
+                }
                 Sfx.Zap();
-                target.Damage(gs.TurretPower(placed[i]));
             }
+        }
+
+        void FireMissile(Vector3 from, AlienActor target, Color color, float damage)
+        {
+            const float splashRadius = 2.4f;
+            Fx.Bolt(from, target.transform.position, new Color(color.r, color.g, color.b, 1f), 0.16f, 0.22f);
+            Fx.Burst(target.transform.position, color, 24, 4.5f, 0.32f);
+            float radiusSquared = splashRadius * splashRadius;
+            foreach (var alien in new List<AlienActor>(AlienActor.All))
+            {
+                if (alien == null || !alien.Targetable ||
+                    (alien.transform.position - target.transform.position).sqrMagnitude > radiusSquared) continue;
+                alien.Damage(alien == target ? damage : damage * 0.45f);
+            }
+        }
+
+        void FireTeslaChain(Vector3 from, AlienActor first, Color color, float range, float damage)
+        {
+            const int maxTargets = 4;
+            float chainRangeSquared = Mathf.Min(3.5f, range * 0.35f);
+            chainRangeSquared *= chainRangeSquared;
+            var hit = new HashSet<AlienActor>();
+            Vector3 source = from;
+            AlienActor current = first;
+            for (int hop = 0; hop < maxTargets && current != null; hop++)
+            {
+                Fx.Bolt(source, current.transform.position, new Color(color.r, color.g, color.b, 1f), 0.12f, 0.18f);
+                Fx.Burst(current.transform.position, color, 8, 2.5f, 0.18f);
+                current.Damage(damage * Mathf.Pow(0.72f, hop));
+                hit.Add(current);
+                source = current.transform.position;
+                current = NearestUnhit(source, chainRangeSquared, hit);
+            }
+        }
+
+        AlienActor NearestUnhit(Vector3 from, float maxDistanceSquared, HashSet<AlienActor> excluded)
+        {
+            AlienActor best = null;
+            float bestDistance = maxDistanceSquared;
+            foreach (var alien in AlienActor.All)
+            {
+                if (alien == null || !alien.Targetable || excluded.Contains(alien) || !OnScreen(alien.transform.position)) continue;
+                float distance = (alien.transform.position - from).sqrMagnitude;
+                if (distance < bestDistance) { bestDistance = distance; best = alien; }
+            }
+            return best;
         }
 
         AlienActor Nearest(Vector3 from, float maxDist)

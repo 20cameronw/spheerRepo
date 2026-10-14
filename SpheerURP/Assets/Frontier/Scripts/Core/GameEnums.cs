@@ -89,7 +89,7 @@ namespace Frontier
         /// <summary>A structure with a grid of storage slots (the warehouse popup).</summary>
         public static bool IsStorage(this StructureKind k)
         {
-            return k == StructureKind.Warehouse || k == StructureKind.FuelDepot;
+            return k == StructureKind.Warehouse || k == StructureKind.FuelDepot || k == StructureKind.CargoDepot;
         }
 
         /// <summary>
@@ -113,6 +113,12 @@ namespace Frontier
                 case StructureKind.Fabricator:
                 case StructureKind.Warehouse:
                 case StructureKind.FuelDepot:
+                case StructureKind.CargoDepot:
+                case StructureKind.Hangar:
+                case StructureKind.ShieldPylon:
+                case StructureKind.RepairBay:
+                case StructureKind.MissileSilo:
+                case StructureKind.TeslaCoil:
                 case StructureKind.ResearchLab:
                 case StructureKind.RadarTower:
                 case StructureKind.SiphonRig:

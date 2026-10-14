@@ -105,13 +105,19 @@ namespace Frontier
             int used = storage.slots.FindAll(s => s.count > 0).Count;
             body.Add(UiKit.Text(gs.planet.Name + "  -  LV " + warehouse.level + "  -  " + used + " / " + capacity + " storage slots", "fr-muted"));
             bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
+            bool cargoDepot = warehouse.def.kind == StructureKind.CargoDepot;
+            bool cargoPoolActive = gs.StructureOfKind(gs.planet, StructureKind.CargoDepot) != null;
             body.Add(UiKit.Text(fuelOnly
-                ? "Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger fuel stacks; reserves stay on this planet."
-                : "Drag a stack between the grids. Resources stay on this planet. If a stack won't fit, only the amount that fits is moved.", "fr-tiny"));
+                ? "Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger fuel stacks; reserves stay on this planet and never pay travel costs."
+                : cargoDepot
+                    ? "This shared buffer joins every operational Warehouse on this planet. Build and craft costs can draw from the pool automatically; ship travel still uses your backpack."
+                    : cargoPoolActive
+                        ? "Connected to this planet's Cargo Depot. Build and craft costs can draw from this Warehouse automatically."
+                        : "Drag a stack between the grids. Resources stay on this planet. Costs use the backpack until a Cargo Depot connects its Warehouses.", "fr-tiny"));
 
             var packSlots = new List<VisualElement>();
             var storageSlots = new List<VisualElement>();
-            body.Add(SectionLabel(fuelOnly ? "FUEL RESERVE" : "WAREHOUSE"));
+            body.Add(SectionLabel(fuelOnly ? "FUEL RESERVE" : cargoDepot ? "SHARED BUFFER" : "WAREHOUSE"));
             var storageGrid = UiKit.Div("fr-grid");
             for (int i = 0; i < capacity; i++)
             {

@@ -302,6 +302,72 @@ namespace Frontier.Tests
             Assert.GreaterOrEqual(state.FuelCost(cinder), 1);
         }
 
+        [Test]
+        public void HangarDiscount_ReducesFuelOnlyWhenDepartingItsPlanet()
+        {
+            var state = NewState();
+            var home = state.universe.Home;
+            var destination = state.universe.Get("cinder");
+            var hangar = db.StructureOfKind(StructureKind.Hangar);
+            Assert.IsNotNull(hangar);
+            Assert.IsTrue(hangar.Implemented);
+
+            int withoutHangar = state.PlanRoute(home, destination, false).totalFuel;
+            var placed = state.DebugPlace(hangar, 0);
+            Assert.IsNotNull(placed);
+            Assert.AreEqual(hangar.EffectAt(1), state.TravelFuelDiscount(home), 0.0001f);
+            int fromHome = state.PlanRoute(home, destination, false).totalFuel;
+            Assert.Less(fromHome, withoutHangar);
+
+            state.DebugTeleport(state.universe.Get("glacia"));
+            Assert.AreEqual(0f, state.TravelFuelDiscount(state.planet), 0.0001f);
+            Assert.AreEqual(0f, state.Ship.discount, 0.0001);
+        }
+
+        [Test]
+        public void ShieldPylonAndRepairBay_OnlyAffectTheirOperationalPlanet()
+        {
+            var state = NewState();
+            var pylon = db.StructureOfKind(StructureKind.ShieldPylon);
+            var repairBay = db.StructureOfKind(StructureKind.RepairBay);
+            Assert.IsNotNull(pylon);
+            Assert.IsNotNull(repairBay);
+            Assert.IsTrue(pylon.Implemented);
+            Assert.IsTrue(repairBay.Implemented);
+            float baseHealth = state.ReactorMax;
+
+            var placedPylon = state.DebugPlace(pylon, 0);
+            var placedBay = state.DebugPlace(repairBay, 1);
+            Assert.IsNotNull(placedPylon);
+            Assert.IsNotNull(placedBay);
+            Assert.AreEqual(baseHealth * (1f + pylon.EffectAt(1)), state.ReactorMax, 0.001f);
+            Assert.AreEqual(repairBay.EffectAt(1), state.ReactorRepairPerSecond(state.planet), 0.001f);
+
+            var otherPlanet = state.universe.Get("glacia");
+            Assert.AreEqual(0f, state.ReactorRepairPerSecond(otherPlanet), 0.001f);
+            state.DebugTeleport(otherPlanet);
+            Assert.AreEqual(baseHealth, state.ReactorMax, 0.001f);
+        }
+
+        [Test]
+        public void MissileSiloAndTeslaCoil_AreWaveDefenseTurrets()
+        {
+            var state = NewState();
+            foreach (var kind in new[] { StructureKind.MissileSilo, StructureKind.TeslaCoil })
+            {
+                var definition = db.StructureOfKind(kind);
+                Assert.IsNotNull(definition);
+                Assert.IsTrue(definition.Implemented);
+                Assert.IsTrue(kind.IsTurret());
+                Assert.Greater(definition.damage, 0f);
+                Assert.Greater(definition.fireInterval, 0f);
+                Assert.Greater(definition.range, 0f);
+                var placed = state.DebugPlace(definition, kind == StructureKind.MissileSilo ? 0 : 1);
+                Assert.IsNotNull(placed);
+                Assert.AreEqual(definition.damage, state.TurretPower(placed), 0.001f);
+            }
+        }
+
         // ---- structures ------------------------------------------------------------------------------------------------------
 
         [Test]

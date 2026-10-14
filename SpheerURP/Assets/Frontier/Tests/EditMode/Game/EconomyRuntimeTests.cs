@@ -167,6 +167,81 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CargoDepotPoolsOrdinaryPlanetWarehousesForCraftingAndConstruction()
+        {
+            var state = new GameState(db, false);
+            state.backpack.Clear();
+            var warehouseA = state.DebugPlace(db.FindStructure("warehouse"), 1);
+            var warehouseB = state.DebugPlace(db.FindStructure("warehouse"), 2);
+            var refinery = state.DebugPlace(db.FindStructure("refinery"), 3);
+            Assert.NotNull(warehouseA);
+            Assert.NotNull(warehouseB);
+            Assert.NotNull(refinery);
+
+            var wood = db.FindResource("wood");
+            state.backpack.Set(wood.id, 1);
+            Assert.AreEqual(1, state.Deposit(warehouseA, 0, wood, 1));
+            state.backpack.Set(wood.id, 1);
+            Assert.AreEqual(1, state.Deposit(warehouseB, 0, wood, 1));
+            var planksRecipe = db.recipes.First(recipe => recipe.id == "saw_planks");
+            Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(wood.id, 2) }),
+                "warehouse contents are not available to costs before a Cargo Depot is operational");
+            Assert.IsFalse(state.Craft(planksRecipe), "crafting remains backpack-only without an operational Cargo Depot");
+
+            var cargoDepot = state.DebugPlace(db.FindStructure("cargo_depot"), 0);
+            Assert.NotNull(cargoDepot);
+            Assert.IsTrue(state.HasPlanetResources(new[] { new IdAmount(wood.id, 2) }));
+            Assert.AreEqual(2, state.PlanetCount(wood));
+            Assert.AreEqual(0, state.Count(wood), "pooled stock is not carried fuel or backpack cargo");
+            Assert.IsFalse(state.Has(new List<ItemAmount> { new ItemAmount(wood, 2) }),
+                "research and other backpack-only purchases must not treat warehouse stock as carried resources");
+            Assert.IsTrue(state.Craft(planksRecipe), "craft inputs can be taken across two warehouses");
+            Assert.AreEqual(1, state.Count(db.FindResource("planks")));
+            Assert.AreEqual(0, WarehouseOps.Held(state.StorageFor(warehouseA), wood.id) +
+                WarehouseOps.Held(state.StorageFor(warehouseB), wood.id));
+
+            var alarm = db.FindStructure("alarm");
+            foreach (var item in alarm.buildCost)
+            {
+                state.backpack.Set(item.resource.id, item.amount);
+                Assert.AreEqual(item.amount, state.Deposit(warehouseA, 1, item.resource, item.amount));
+            }
+            int openPad = -1;
+            for (int pad = 0; pad < state.planet.BuildingSlots; pad++)
+                if (state.StructureAt(state.planet, pad) == null && !state.ObstacleAt(state.planet, pad).HasValue)
+                {
+                    openPad = pad;
+                    break;
+                }
+            Assert.GreaterOrEqual(openPad, 0);
+            Assert.IsTrue(state.Place(alarm, openPad), "construction costs can be paid from the pooled warehouses");
+            Assert.AreEqual(0, WarehouseOps.Held(state.StorageFor(warehouseA), alarm.buildCost[0].resource.id));
+        }
+
+        [Test]
+        public void CargoDepotPoolExcludesFuelDepotAndOtherPlanets()
+        {
+            var state = new GameState(db, false);
+            state.backpack.Clear();
+            state.DebugPlace(db.FindStructure("cargo_depot"), 0);
+            var warehouse = state.DebugPlace(db.FindStructure("warehouse"), 1);
+            var fuelDepot = state.DebugPlace(db.FindStructure("fuel_depot"), 2);
+            var wood = db.FindResource("wood");
+            var fuel = db.fuel;
+            state.backpack.Set(wood.id, 1);
+            Assert.AreEqual(1, state.Deposit(warehouse, 0, wood, 1));
+            state.backpack.Set(fuel.id, 1);
+            Assert.AreEqual(1, state.Deposit(fuelDepot, 0, fuel, 1));
+            Assert.IsTrue(state.HasPlanetResources(new[] { new IdAmount(wood.id, 1) }));
+            Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(fuel.id, 1) }),
+                "Fuel Depot reserves remain isolated from the Cargo Depot pool");
+
+            state.DebugTeleport(state.universe.Get("glacia"));
+            Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(wood.id, 1) }),
+                "a Cargo Depot never pools warehouses on a different planet");
+        }
+
+        [Test]
         public void Recipes_AreOfferedOnlyAtTheirExactStationAndRespectLevelResearchAndLocation()
         {
             var state = new GameState(db, false);
