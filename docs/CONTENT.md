@@ -73,3 +73,22 @@ the explicit canonical-id-to-behaviour map; imported kinds without gameplay are 
 
 The ordered design and runtime API guide remains `tools/labs/economy/INTEGRATION.template.md`; the balanced source and
 review exports are documented in `docs/economy/README.md`. This pipeline deliberately does not rebalance them.
+
+## Milestone verification (2026-10-13)
+
+* Economy lab: full 111-test suite passed, including simulator bands, reachability, snapshots and source hygiene.
+  The subsequent reader-only run passed all 21 cases, including four additional mixed/incomplete-export cases.
+* Unity EditMode including Slow: 428/429 initially passed; the sole failure was the old assertion that every enum
+  kind must exist in the live legacy database. Updated it to require implemented kinds live and imported-only
+  kinds absent. The affected database/import fixtures then passed 12/12 (including two byte-identical imports).
+  The five new import tests and all 21 JSON reader cases were exercised in the full run.
+* Unity PlayMode: 8/8 passed.
+* Editor checks: Planet, Storage, Combat, Icon and Layout all passed, with zero C# diagnostics.
+* Harness: 24 captures across phone-1080x1920 and tablet-1536x2048 (HUD, build tabs, combat HUD and all four
+  economy icon pages); zero harness errors, text-under-12dp, touch-under-48dp or overflow on either device.
+  Contact sheets and full-resolution icon pages were visually reviewed. These are targeted captures, not a
+  full four-device screen sweep.
+
+Local, ignored artifacts: `SpheerURP/TestResults`, `SpheerURP/Logs`, and
+`SpheerURP/Screens/economy-content` (including contact sheets). Batch Unity's default logs now also stay inside
+the worktree's `SpheerURP/Logs`, rather than the system temporary directory.

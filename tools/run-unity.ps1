@@ -26,7 +26,9 @@ $version = $versionLine.Matches[0].Groups[1].Value
 $unity = $env:UNITY_PATH
 if (-not $unity) { $unity = "C:\Program Files\Unity\Hub\Editor\$version\Editor\Unity.exe" }
 if (-not (Test-Path $unity)) { throw "Unity $version not found at '$unity'. Install it or set UNITY_PATH." }
-if (-not $Log) { $Log = Join-Path $env:TEMP ("frontier-unity-" + [guid]::NewGuid().ToString("N").Substring(0, 8) + ".log") }
+if (-not $Log) { $Log = Join-Path $project ("Logs\frontier-unity-" + [guid]::NewGuid().ToString("N").Substring(0, 8) + ".log") }
+$logParent = Split-Path -Parent $Log
+if ($logParent) { New-Item -ItemType Directory -Force -Path $logParent | Out-Null }
 
 $unityArgs = @("-batchmode", "-projectPath", "`"$project`"", "-logFile", "`"$Log`"")
 if (-not $NoQuit) { $unityArgs += "-quit" }

@@ -135,7 +135,8 @@ Two importer details worth knowing:
 * White only (`#FFFFFF`). Colour comes from the tint.
 * Every glyph must stay distinct at 32 px. Check it on the icon sheets (below), not in the editor preview.
 
-All 48 icons are original drawings (no third-party shapes, so no attribution file is needed).
+All 95 icons are original drawings (no third-party shapes, so no attribution file is needed). The economy content
+milestone adds 47 glyphs without replacing the existing visual family.
 
 ### Set
 
@@ -145,13 +146,15 @@ All 48 icons are original drawings (no third-party shapes, so no attribution fil
 | HUD and glyphs | `fuel`, `star`, `bolt`, `skull`, `sound`, `mute`, `gear`, `ranks`, `tutorial`, `about`, `alien`, `shield`, `tools`, `base`, `warp`, `ship` |
 | Resources | `wood` (log end), `stone` (faceted rock), `iron` (ore chunks with a shine), `crystal` (gem), `fuel` (drop), `core` (orb with slit pupil), `scrap` (broken gear), `alloy` (ingot), `plasma` (energy cell), `cube` (generic fallback) |
 | Structures | `refinery`, `fabricator` (anvil), `alarm` (beacon), `lumber` (axe), `mine` (pick), `drill`, `gunner`, `laser`, `satellite`, `warehouse` (crates) |
+| Economy resources | All 34 canonical resource ids now resolve to distinct glyphs; `alloy` remains for legacy content. Concepts: [economy/ICON_BRIEF.md](economy/ICON_BRIEF.md). |
+| Economy structures | 21 additional glyphs cover every appended `StructureKind`, from `foundry` through `dyson_collector`; imported data does not imply implemented gameplay. |
 
 ### Naming and lookups
 
 * `Icons.Make("fuel", color, size)`, `Icons.IconButton`, `Icons.Apply`: unknown names fall back to `cube`.
-* `Icons.ForResource(resource)` / `ForResourceId(id)`: exact id for the nine shipped resources, then a **keyword category fallback**
-  (`"copper_ore"` gets `iron`, `"helium"` gets `fuel`, `"relic"` gets `core`...), then `cube`. New resources get a sensible glyph for free
-  and a dedicated icon later.
+* `Icons.ForResource(resource)`: an authored `icon` override first, then the exact resource id.
+* `ForResourceId(id)`: all 34 economy resource ids have dedicated glyphs, then a **keyword category fallback**
+  (`"unknown_copper_ore"` gets `iron`, `"helium"` gets `fuel`, `"relic"` gets `core`...), then `cube`.
 * `Icons.ForStructure(kind)` and `ForTool(kind)` for structures and harvest tools (`UIRoot.StructureIcon(kind)` delegates).
 * `Icons.Groups` lists every shipped name; the contact sheets are built from it.
 
@@ -163,13 +166,14 @@ All 48 icons are original drawings (no third-party shapes, so no attribution fil
 4. Run the icon check (**Frontier > Validate Icons**, or
    `tools/run-unity.ps1 -Method Frontier.EditorTools.FrontierIconChecks.Run`): every listed icon imports as a 48x48 `VectorImage`,
    every SVG on disk is listed, every resource and structure has its own glyph, and the keyword fallback works.
-5. Run the harness (`-Only icons`) and look at `icons-ui`, `icons-items` and `icons-color`.
+5. Run the harness (`-Only icons`) and inspect the original sheets plus the four `icons-economy-*` pages.
 
 ### Contact sheets
 
-Three harness shots draw every icon at **24, 32, 48 and 64 physical px** on a dark surface with labels: `icons-ui` (controls and
-glyphs), `icons-items` (resources and structures) and `icons-color` (items in their game colours). They are the acceptance test for
-legibility and consistency.
+Harness shots draw icons at **24, 32, 48 and 64 physical px** on a dark surface with labels: `icons-ui` (controls and
+glyphs), `icons-items` (legacy resources and structures), `icons-color` (live items in their game colours), and
+`icons-economy-resources-1/2` plus `icons-economy-structures-1/2` (complete catalog coverage, paginated to avoid clipping).
+They are the acceptance test for legibility and consistency.
 
 ## 7. Debug gate
 

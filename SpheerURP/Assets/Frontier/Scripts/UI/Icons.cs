@@ -23,8 +23,14 @@ namespace Frontier
         {
             new[] { "research", "map", "pack", "build", "menu", "close", "plus", "minus", "up", "back", "check", "lock", "play" },
             new[] { "fuel", "star", "bolt", "skull", "sound", "mute", "gear", "ranks", "tutorial", "about", "alien", "shield", "tools", "base", "warp", "ship" },
-            new[] { "wood", "stone", "iron", "crystal", "fuel", "core", "scrap", "alloy", "plasma", "cube" },
-            new[] { "refinery", "fabricator", "alarm", "lumber", "mine", "drill", "gunner", "laser", "satellite", "warehouse" }
+            new[] { "wood", "stone", "iron", "crystal", "fuel", "core", "scrap", "alloy", "plasma", "cube",
+                "biomass", "copper_ore", "silica", "ice", "titanium_ore", "methane", "helium3", "radium", "dark_matter",
+                "planks", "iron_plate", "copper_wire", "glass", "titanium_plate", "steel", "biocomposite", "thermal_alloy",
+                "cryo_composite", "rad_shield_alloy", "void_alloy", "circuit_board", "servo_motor", "optic_lens", "quantum_chip", "warp_coil", "antimatter" },
+            new[] { "refinery", "fabricator", "alarm", "lumber", "mine", "drill", "gunner", "laser", "satellite", "warehouse",
+                "foundry", "chem_reactor", "quantum_lab", "fuel_depot", "cargo_depot", "biodome", "siphon_rig", "excavator",
+                "salvage_yard", "shield_pylon", "missile_silo", "tesla_coil", "repair_bay", "research_lab", "radar_tower",
+                "colony_hub", "hangar", "auto_harvester", "terraformer", "warp_gate", "dyson_collector" }
         };
 
         static VectorImage Load(string name)
@@ -63,6 +69,7 @@ namespace Frontier
         public static string ForResource(ResourceSO r)
         {
             if (r == null) return Fallback;
+            if (!string.IsNullOrEmpty(r.icon) && Has(r.icon)) return r.icon;
             return ForResourceId(r.id);
         }
 
@@ -70,6 +77,8 @@ namespace Frontier
         {
             id = (id ?? "").Trim().ToLowerInvariant();
             if (id.Length == 0) return Fallback;
+            foreach (var name in Groups[2])
+                if (id == name) return name;
             for (int i = 0; i < ResourceKinds.Length; i++)
                 if (id == ResourceKinds[i]) return ResourceKinds[i];
             for (int i = 0; i < ResourceWords.Length; i++)
@@ -92,6 +101,27 @@ namespace Frontier
                 case StructureKind.Laser: return "laser";
                 case StructureKind.Satellite: return "satellite";
                 case StructureKind.Warehouse: return "warehouse";
+                case StructureKind.Foundry: return "foundry";
+                case StructureKind.ChemReactor: return "chem_reactor";
+                case StructureKind.QuantumLab: return "quantum_lab";
+                case StructureKind.FuelDepot: return "fuel_depot";
+                case StructureKind.CargoDepot: return "cargo_depot";
+                case StructureKind.Biodome: return "biodome";
+                case StructureKind.SiphonRig: return "siphon_rig";
+                case StructureKind.Excavator: return "excavator";
+                case StructureKind.SalvageYard: return "salvage_yard";
+                case StructureKind.ShieldPylon: return "shield_pylon";
+                case StructureKind.MissileSilo: return "missile_silo";
+                case StructureKind.TeslaCoil: return "tesla_coil";
+                case StructureKind.RepairBay: return "repair_bay";
+                case StructureKind.ResearchLab: return "research_lab";
+                case StructureKind.RadarTower: return "radar_tower";
+                case StructureKind.ColonyHub: return "colony_hub";
+                case StructureKind.Hangar: return "hangar";
+                case StructureKind.AutoHarvester: return "auto_harvester";
+                case StructureKind.Terraformer: return "terraformer";
+                case StructureKind.WarpGate: return "warp_gate";
+                case StructureKind.DysonCollector: return "dyson_collector";
                 default: return Fallback;
             }
         }

@@ -113,7 +113,9 @@ namespace Frontier
             sheet.style.paddingTop = inset.y + UiKit.Space.S16; sheet.style.paddingBottom = inset.w + UiKit.Space.S16;
 
             string[] titles = { "UI ICONS  24 / 32 / 48 / 64 PX", "ITEM ICONS  24 / 32 / 48 / 64 PX", "ITEM ICONS IN GAME COLOURS" };
-            var title = UiKit.Text(titles[Mathf.Clamp(page, 0, 2)], "fr-t-label");
+            string caption = page < 3 ? titles[Mathf.Clamp(page, 0, 2)] :
+                (page < 5 ? "ECONOMY RESOURCES" : "ECONOMY STRUCTURES") + "  24 / 32 / 48 / 64 PX";
+            var title = UiKit.Text(caption, "fr-t-label");
             title.style.marginBottom = UiKit.Space.S12;
             sheet.Add(title);
 
@@ -126,6 +128,15 @@ namespace Frontier
                     if (s != null) grid.Add(IconCell(Icons.ForStructure(s.kind), s.displayName, UiKit.Ui(s.color), new[] { 32f, 48f }, scale));
                 sheet.Add(grid);
             }
+            else if (page >= 3)
+            {
+                var names = Icons.Groups[page < 5 ? 2 : 3];
+                int first = ((page - 3) % 2) * 18;
+                var grid = SheetGrid();
+                for (int i = first; i < Mathf.Min(first + 18, names.Length); i++)
+                    grid.Add(IconCell(names[i], names[i], SheetInk, SheetPx, scale));
+                sheet.Add(grid);
+            }
             else
             {
                 string[] names = { "dock, controls", "hud, glyphs", "resources", "structures" };
@@ -135,7 +146,12 @@ namespace Frontier
                     label.style.marginTop = UiKit.Space.S8; label.style.marginBottom = UiKit.Space.S4;
                     sheet.Add(label);
                     var grid = SheetGrid();
-                    foreach (var n in Icons.Groups[g]) grid.Add(IconCell(n, n, SheetInk, SheetPx, scale));
+                    int count = 0;
+                    foreach (var n in Icons.Groups[g])
+                    {
+                        if (count++ >= 10) break;
+                        grid.Add(IconCell(n, n, SheetInk, SheetPx, scale));
+                    }
                     sheet.Add(grid);
                 }
             }

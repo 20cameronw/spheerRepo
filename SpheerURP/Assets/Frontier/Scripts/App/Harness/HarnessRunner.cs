@@ -292,6 +292,10 @@ namespace Frontier
             yield return new Shot("menu-release", () => ui.DebugMenuAsRelease(), 0.2f);
             yield return new Shot("icons-ui", () => ui.DebugIconSheet(0), 0.3f);
             yield return new Shot("icons-items", () => ui.DebugIconSheet(1), 0.3f);
+            yield return new Shot("icons-economy-resources-1", () => ui.DebugIconSheet(3), 0.3f);
+            yield return new Shot("icons-economy-resources-2", () => ui.DebugIconSheet(4), 0.3f);
+            yield return new Shot("icons-economy-structures-1", () => ui.DebugIconSheet(5), 0.3f);
+            yield return new Shot("icons-economy-structures-2", () => ui.DebugIconSheet(6), 0.3f);
             yield return new Shot("icons-color", () => ui.DebugIconSheet(2), 0.3f);
 
             // ---- generated worlds (appended: shots 1-45 above keep their names and numbers) ----

@@ -56,9 +56,20 @@ namespace Frontier.EditorTools
                 Check(structureGlyphs.Add(glyph), "structures share a glyph: " + kind + " (" + glyph + ")");
             }
 
-            Check(Icons.ForResourceId("copper_ore") == "iron", "keyword fallback: copper_ore");
+            Check(Icons.ForResourceId("copper_ore") == "copper_ore", "canonical ids take precedence over keywords");
+            Check(Icons.ForResourceId("unknown_copper_ore") == "iron", "keyword fallback: unknown_copper_ore");
             Check(Icons.ForResourceId("helium") == "fuel", "keyword fallback: helium");
             Check(Icons.ForResourceId("???") == Icons.Fallback, "unknown ids use the generic glyph");
+
+            var economy = Resources.Load<GameDatabase>("Frontier/EconomyDatabase");
+            Check(economy != null, "staged economy database is missing");
+            var economyGlyphs = new HashSet<string>();
+            foreach (var resource in economy.resources)
+            {
+                string glyph = Icons.ForResource(resource);
+                Check(glyph == resource.id && Icons.Has(glyph), "economy resource without canonical glyph: " + resource.id);
+                Check(economyGlyphs.Add(glyph), "economy resources share a glyph: " + glyph);
+            }
 
             Debug.Log("Frontier: icon checks passed (" + listed.Count + " icons at 48x48, " + db.resources.Length + " resources and " +
                 structureGlyphs.Count + " structures have distinct glyphs).");
@@ -68,6 +79,7 @@ namespace Frontier.EditorTools
         {
             if (!value) throw new InvalidOperationException("Icon check failed: " + label);
         }
+
     }
 }
 #endif
