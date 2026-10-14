@@ -1,0 +1,197 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: dead_tree
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: dead_tree
+    displayName: Dead Tree
+    description: The trunk is long dead and the roots still grip the pad. Fell it,
+      split it, and the wood is yours.
+    biomes: Lush;Fungal;Desert;Oceanic
+    biomeMask: 785
+    needsVoid: 0
+    minTier: 0
+    weight: 3
+    costMult: 1
+    timeMult: 0.8
+    rewardResource: wood
+    iconConcept: A bare forked trunk with three snapped branches and a pale split
+      at the base.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: wood
+        amount: 5
+      - resourceId: scrap
+        amount: 3
+      reward:
+        resourceId: wood
+        amount: 3
+    - tier: 1
+      cost:
+      - resourceId: wood
+        amount: 11
+      - resourceId: scrap
+        amount: 5
+      reward:
+        resourceId: wood
+        amount: 6
+    - tier: 2
+      cost:
+      - resourceId: wood
+        amount: 21
+      - resourceId: scrap
+        amount: 11
+      reward:
+        resourceId: wood
+        amount: 12
+    - tier: 3
+      cost:
+      - resourceId: wood
+        amount: 25
+      - resourceId: scrap
+        amount: 13
+      - resourceId: planks
+        amount: 12
+      reward:
+        resourceId: wood
+        amount: 25
+    - tier: 4
+      cost:
+      - resourceId: wood
+        amount: 50
+      - resourceId: scrap
+        amount: 25
+      - resourceId: planks
+        amount: 23
+      reward:
+        resourceId: wood
+        amount: 51
+    - tier: 5
+      cost:
+      - resourceId: wood
+        amount: 75
+      - resourceId: scrap
+        amount: 35
+      - resourceId: planks
+        amount: 35
+      - resourceId: steel
+        amount: 8
+      reward:
+        resourceId: wood
+        amount: 102
+    - tier: 6
+      cost:
+      - resourceId: wood
+        amount: 150
+      - resourceId: scrap
+        amount: 75
+      - resourceId: planks
+        amount: 65
+      - resourceId: steel
+        amount: 16
+      reward:
+        resourceId: wood
+        amount: 120
+    - tier: 7
+      cost:
+      - resourceId: wood
+        amount: 228
+      - resourceId: scrap
+        amount: 120
+      - resourceId: planks
+        amount: 110
+      - resourceId: steel
+        amount: 25
+      - resourceId: titanium_plate
+        amount: 11
+      reward:
+        resourceId: wood
+        amount: 120
+    - tier: 8
+      cost:
+      - resourceId: wood
+        amount: 223
+      - resourceId: scrap
+        amount: 241
+      - resourceId: planks
+        amount: 223
+      - resourceId: steel
+        amount: 53
+      - resourceId: titanium_plate
+        amount: 21
+      reward:
+        resourceId: wood
+        amount: 120
+    - tier: 9
+      cost:
+      - resourceId: wood
+        amount: 209
+      - resourceId: scrap
+        amount: 311
+      - resourceId: planks
+        amount: 209
+      - resourceId: steel
+        amount: 129
+      - resourceId: titanium_plate
+        amount: 53
+      reward:
+        resourceId: wood
+        amount: 120
+    - tier: 10
+      cost:
+      - resourceId: wood
+        amount: 198
+      - resourceId: scrap
+        amount: 297
+      - resourceId: planks
+        amount: 198
+      - resourceId: steel
+        amount: 264
+      - resourceId: titanium_plate
+        amount: 112
+      reward:
+        resourceId: wood
+        amount: 120
+    - tier: 11
+      cost:
+      - resourceId: wood
+        amount: 172
+      - resourceId: scrap
+        amount: 261
+      - resourceId: planks
+        amount: 172
+      - resourceId: steel
+        amount: 418
+      - resourceId: titanium_plate
+        amount: 226
+      reward:
+        resourceId: wood
+        amount: 120
+    - tier: 12
+      cost:
+      - resourceId: wood
+        amount: 170
+      - resourceId: scrap
+        amount: 254
+      - resourceId: planks
+        amount: 170
+      - resourceId: steel
+        amount: 408
+      - resourceId: titanium_plate
+        amount: 340
+      reward:
+        resourceId: wood
+        amount: 120
+  modelKey: 

@@ -1,0 +1,648 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "recipes",
+  "items": [
+    {
+      "id": "distill_wood",
+      "displayName": "Wood Distillate",
+      "kind": "Processing",
+      "stationId": "refinery",
+      "stationLevel": 1,
+      "tier": 0,
+      "inputs": [
+        {
+          "resourceId": "wood",
+          "amount": 8
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "fuel",
+          "amount": 3
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "burn_scrap",
+      "displayName": "Scrap Burner",
+      "kind": "Processing",
+      "stationId": "refinery",
+      "stationLevel": 1,
+      "tier": 0,
+      "inputs": [
+        {
+          "resourceId": "scrap",
+          "amount": 10
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "fuel",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "saw_planks",
+      "displayName": "Saw Planks",
+      "kind": "Processing",
+      "stationId": "refinery",
+      "stationLevel": 1,
+      "tier": 0,
+      "inputs": [
+        {
+          "resourceId": "wood",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "planks",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "press_scrap",
+      "displayName": "Scrap Press",
+      "kind": "Processing",
+      "stationId": "refinery",
+      "stationLevel": 1,
+      "tier": 0,
+      "inputs": [
+        {
+          "resourceId": "scrap",
+          "amount": 8
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "stone",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "ferment_biomass",
+      "displayName": "Biomass Ferment",
+      "kind": "Processing",
+      "stationId": "refinery",
+      "stationLevel": 2,
+      "tier": 1,
+      "inputs": [
+        {
+          "resourceId": "biomass",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "fuel",
+          "amount": 5
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "crystal_cell",
+      "displayName": "Crystal Cell",
+      "kind": "Energy",
+      "stationId": "refinery",
+      "stationLevel": 2,
+      "tier": 2,
+      "inputs": [
+        {
+          "resourceId": "crystal",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "fuel",
+          "amount": 8
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "condense_methane",
+      "displayName": "Methane Condenser",
+      "kind": "Energy",
+      "stationId": "refinery",
+      "stationLevel": 3,
+      "tier": 2,
+      "inputs": [
+        {
+          "resourceId": "methane",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "fuel",
+          "amount": 9
+        }
+      ],
+      "unlockResearch": null,
+      "bonus": false
+    },
+    {
+      "id": "smelt_iron_plate",
+      "displayName": "Smelt Iron Plate",
+      "kind": "Processing",
+      "stationId": "foundry",
+      "stationLevel": 1,
+      "tier": 1,
+      "inputs": [
+        {
+          "resourceId": "iron",
+          "amount": 3
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "smelting",
+      "bonus": false
+    },
+    {
+      "id": "smelt_glass",
+      "displayName": "Smelt Glass",
+      "kind": "Processing",
+      "stationId": "foundry",
+      "stationLevel": 1,
+      "tier": 1,
+      "inputs": [
+        {
+          "resourceId": "silica",
+          "amount": 3
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "glass",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "smelting",
+      "bonus": false
+    },
+    {
+      "id": "smelt_steel",
+      "displayName": "Smelt Steel",
+      "kind": "Alloy",
+      "stationId": "foundry",
+      "stationLevel": 2,
+      "tier": 2,
+      "inputs": [
+        {
+          "resourceId": "iron_plate",
+          "amount": 2
+        },
+        {
+          "resourceId": "planks",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "steel",
+          "amount": 3
+        }
+      ],
+      "unlockResearch": "steelmaking",
+      "bonus": false
+    },
+    {
+      "id": "smelt_titanium_plate",
+      "displayName": "Press Titanium Plate",
+      "kind": "Processing",
+      "stationId": "foundry",
+      "stationLevel": 3,
+      "tier": 2,
+      "inputs": [
+        {
+          "resourceId": "titanium_ore",
+          "amount": 3
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "titanium_working",
+      "bonus": false
+    },
+    {
+      "id": "forge_thermal_alloy",
+      "displayName": "Forge Thermal Alloy",
+      "kind": "Alloy",
+      "stationId": "foundry",
+      "stationLevel": 4,
+      "tier": 3,
+      "inputs": [
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2
+        },
+        {
+          "resourceId": "glass",
+          "amount": 2
+        },
+        {
+          "resourceId": "steel",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "thermal_alloy",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "thermal_metallurgy",
+      "bonus": false
+    },
+    {
+      "id": "forge_rad_shield",
+      "displayName": "Forge Rad-Shield",
+      "kind": "Alloy",
+      "stationId": "foundry",
+      "stationLevel": 5,
+      "tier": 4,
+      "inputs": [
+        {
+          "resourceId": "steel",
+          "amount": 2
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2
+        },
+        {
+          "resourceId": "glass",
+          "amount": 2
+        },
+        {
+          "resourceId": "radium",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "radiation_shielding",
+      "bonus": false
+    },
+    {
+      "id": "draw_copper_wire",
+      "displayName": "Draw Copper Wire",
+      "kind": "Processing",
+      "stationId": "fabricator",
+      "stationLevel": 1,
+      "tier": 1,
+      "inputs": [
+        {
+          "resourceId": "copper_ore",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "copper_wire",
+          "amount": 3
+        }
+      ],
+      "unlockResearch": "fabrication",
+      "bonus": false
+    },
+    {
+      "id": "press_biocomposite",
+      "displayName": "Press Biocomposite",
+      "kind": "Alloy",
+      "stationId": "fabricator",
+      "stationLevel": 2,
+      "tier": 2,
+      "inputs": [
+        {
+          "resourceId": "biomass",
+          "amount": 4
+        },
+        {
+          "resourceId": "planks",
+          "amount": 4
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "biocomposite",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "composites",
+      "bonus": false
+    },
+    {
+      "id": "etch_circuit_board",
+      "displayName": "Etch Circuit Board",
+      "kind": "Component",
+      "stationId": "fabricator",
+      "stationLevel": 2,
+      "tier": 2,
+      "inputs": [
+        {
+          "resourceId": "copper_wire",
+          "amount": 3
+        },
+        {
+          "resourceId": "silica",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "circuit_board",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": "circuitry",
+      "bonus": false
+    },
+    {
+      "id": "assemble_servo_motor",
+      "displayName": "Assemble Servo Motor",
+      "kind": "Component",
+      "stationId": "fabricator",
+      "stationLevel": 3,
+      "tier": 3,
+      "inputs": [
+        {
+          "resourceId": "steel",
+          "amount": 2
+        },
+        {
+          "resourceId": "copper_wire",
+          "amount": 3
+        },
+        {
+          "resourceId": "circuit_board",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "servo_motor",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": "robotics",
+      "bonus": false
+    },
+    {
+      "id": "grind_optic_lens",
+      "displayName": "Grind Optic Lens",
+      "kind": "Component",
+      "stationId": "fabricator",
+      "stationLevel": 3,
+      "tier": 3,
+      "inputs": [
+        {
+          "resourceId": "glass",
+          "amount": 3
+        },
+        {
+          "resourceId": "crystal",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "optic_lens",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "optics",
+      "bonus": false
+    },
+    {
+      "id": "mix_cryo_composite",
+      "displayName": "Mix Cryo Composite",
+      "kind": "Alloy",
+      "stationId": "chem_reactor",
+      "stationLevel": 1,
+      "tier": 3,
+      "inputs": [
+        {
+          "resourceId": "ice",
+          "amount": 4
+        },
+        {
+          "resourceId": "biocomposite",
+          "amount": 2
+        },
+        {
+          "resourceId": "methane",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "cryo_composite",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "cryo_chemistry",
+      "bonus": false
+    },
+    {
+      "id": "charge_plasma_cell",
+      "displayName": "Charge Plasma Cell",
+      "kind": "Energy",
+      "stationId": "chem_reactor",
+      "stationLevel": 2,
+      "tier": 4,
+      "inputs": [
+        {
+          "resourceId": "fuel",
+          "amount": 4
+        },
+        {
+          "resourceId": "crystal",
+          "amount": 2
+        },
+        {
+          "resourceId": "methane",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "plasma",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": "plasma_physics",
+      "bonus": false
+    },
+    {
+      "id": "etch_quantum_chip",
+      "displayName": "Etch Quantum Chip",
+      "kind": "Component",
+      "stationId": "quantum_lab",
+      "stationLevel": 1,
+      "tier": 5,
+      "inputs": [
+        {
+          "resourceId": "circuit_board",
+          "amount": 2
+        },
+        {
+          "resourceId": "optic_lens",
+          "amount": 2
+        },
+        {
+          "resourceId": "helium3",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "quantum_chip",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": "quantum_computing",
+      "bonus": false
+    },
+    {
+      "id": "grow_void_alloy",
+      "displayName": "Grow Void Alloy",
+      "kind": "Alloy",
+      "stationId": "quantum_lab",
+      "stationLevel": 2,
+      "tier": 6,
+      "inputs": [
+        {
+          "resourceId": "rad_shield_alloy",
+          "amount": 2
+        },
+        {
+          "resourceId": "dark_matter",
+          "amount": 1
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "void_alloy",
+          "amount": 2
+        }
+      ],
+      "unlockResearch": "void_forging",
+      "bonus": false
+    },
+    {
+      "id": "wind_warp_coil",
+      "displayName": "Wind Warp Coil",
+      "kind": "Component",
+      "stationId": "quantum_lab",
+      "stationLevel": 3,
+      "tier": 6,
+      "inputs": [
+        {
+          "resourceId": "copper_wire",
+          "amount": 6
+        },
+        {
+          "resourceId": "quantum_chip",
+          "amount": 2
+        },
+        {
+          "resourceId": "titanium_plate",
+          "amount": 2
+        },
+        {
+          "resourceId": "dark_matter",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "warp_coil",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": "warp_theory",
+      "bonus": false
+    },
+    {
+      "id": "synthesize_antimatter",
+      "displayName": "Synthesize Antimatter",
+      "kind": "Energy",
+      "stationId": "quantum_lab",
+      "stationLevel": 4,
+      "tier": 6,
+      "inputs": [
+        {
+          "resourceId": "plasma",
+          "amount": 4
+        },
+        {
+          "resourceId": "dark_matter",
+          "amount": 2
+        },
+        {
+          "resourceId": "helium3",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "resourceId": "antimatter",
+          "amount": 1
+        }
+      ],
+      "unlockResearch": "antimatter_synthesis",
+      "bonus": false
+    }
+  ]
+}

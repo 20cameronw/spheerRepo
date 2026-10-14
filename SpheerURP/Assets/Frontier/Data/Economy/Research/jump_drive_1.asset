@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: jump_drive_1
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: jump_drive_1
+    displayName: Jump Drive I
+    description: 'The first jump coils: leave the home system.'
+    branch: Navigation
+    tier: 1
+    cost:
+    - resourceId: scrap
+      amount: 55
+    - resourceId: wood
+      amount: 40
+    - resourceId: stone
+      amount: 30
+    - resourceId: planks
+      amount: 13
+    - resourceId: copper_wire
+      amount: 11
+    prereqs:
+    - fabrication
+    labLevel: 1
+    unlocks:
+    - upgrade:jump:1
+  icon: research

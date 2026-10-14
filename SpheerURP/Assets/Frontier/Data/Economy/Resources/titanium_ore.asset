@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: titanium_ore
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: titanium_ore
+  displayName: Titanium Ore
+  color: {r: 0.5294118, g: 0.58431375, b: 0.65882355, a: 1}
+  stackSize: 40
+  description: Grey ore so dense it blunts ordinary drills. Refined, it turns light,
+    strong and unbothered by fire or vacuum.
+  category: 0
+  tier: 2
+  harvestMethods: 0201
+  baseValue: 8
+  hazardAffinity: 1
+  fuelEnergy: 0
+  colorHex: '#8795A8'
+  accentHex: '#E0E6EE'
+  baseYield: 5
+  yieldPerTier: 0.7
+  difficultyOffset: 0.08
+  atlasDescription: Grey ore so dense it blunts ordinary drills. Refined, it turns
+    light, strong and unbothered by fire or vacuum.
+  iconConcept: A squat six-sided nugget with a ridged band across its middle and
+    two bright specks.
+  icon: 

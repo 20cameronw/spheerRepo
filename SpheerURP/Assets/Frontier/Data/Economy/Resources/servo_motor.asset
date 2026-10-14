@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: servo_motor
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: servo_motor
+  displayName: Servo Motor
+  color: {r: 0.69803923, g: 0.54901963, b: 0.9607843, a: 1}
+  stackSize: 24
+  description: A sealed motor with a precision gearhead. It moves every arm, drill
+    carriage and turret in the colony.
+  category: 3
+  tier: 3
+  harvestMethods: 
+  baseValue: 50.87
+  hazardAffinity: 0
+  fuelEnergy: 0
+  colorHex: '#B28CF5'
+  accentHex: '#4A2E8A'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A sealed motor with a precision gearhead. It moves every arm,
+    drill carriage and turret in the colony.
+  iconConcept: A squat cylinder carrying a short shaft topped with a six-tooth cog.
+  icon: 

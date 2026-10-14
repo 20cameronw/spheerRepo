@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: smelt_steel
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: smelt_steel
+  displayName: Smelt Steel
+  inputs:
+  - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+    amount: 5
+  outputs:
+  - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+    amount: 3
+  fabricator: 0
+  kind: 1
+  stationId: foundry
+  stationLevel: 2
+  tier: 2
+  unlockResearch: steelmaking
+  bonus: 0

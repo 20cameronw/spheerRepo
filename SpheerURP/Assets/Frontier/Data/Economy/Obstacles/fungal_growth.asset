@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: fungal_growth
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: fungal_growth
+    displayName: Fungal Growth
+    description: A shelf of spore-heavy fungus has taken the pad. Burn it back and
+      collect what the rot left behind.
+    biomes: Fungal;Lush;Oceanic
+    biomeMask: 529
+    needsVoid: 0
+    minTier: 1
+    weight: 2
+    costMult: 1
+    timeMult: 1
+    rewardResource: biomass
+    iconConcept: A tilted stack of three mushroom shelves, each wider than the last,
+      with spotted caps.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: biomass
+        amount: 4
+      reward:
+        resourceId: biomass
+        amount: 1
+    - tier: 1
+      cost:
+      - resourceId: biomass
+        amount: 8
+      reward:
+        resourceId: biomass
+        amount: 3
+    - tier: 2
+      cost:
+      - resourceId: biomass
+        amount: 16
+      reward:
+        resourceId: biomass
+        amount: 6
+    - tier: 3
+      cost:
+      - resourceId: biomass
+        amount: 21
+      - resourceId: fuel
+        amount: 7
+      reward:
+        resourceId: biomass
+        amount: 12
+    - tier: 4
+      cost:
+      - resourceId: biomass
+        amount: 45
+      - resourceId: fuel
+        amount: 15
+      reward:
+        resourceId: biomass
+        amount: 25
+    - tier: 5
+      cost:
+      - resourceId: biomass
+        amount: 55
+      - resourceId: fuel
+        amount: 19
+      - resourceId: biocomposite
+        amount: 7
+      reward:
+        resourceId: biomass
+        amount: 51
+    - tier: 6
+      cost:
+      - resourceId: biomass
+        amount: 110
+      - resourceId: fuel
+        amount: 40
+      - resourceId: biocomposite
+        amount: 14
+      reward:
+        resourceId: biomass
+        amount: 102
+    - tier: 7
+      cost:
+      - resourceId: biomass
+        amount: 190
+      - resourceId: fuel
+        amount: 65
+      - resourceId: biocomposite
+        amount: 25
+      - resourceId: thermal_alloy
+        amount: 5
+      reward:
+        resourceId: biomass
+        amount: 120
+    - tier: 8
+      cost:
+      - resourceId: biomass
+        amount: 250
+      - resourceId: fuel
+        amount: 150
+      - resourceId: biocomposite
+        amount: 60
+      - resourceId: thermal_alloy
+        amount: 11
+      reward:
+        resourceId: biomass
+        amount: 120
+    - tier: 9
+      cost:
+      - resourceId: biomass
+        amount: 276
+      - resourceId: fuel
+        amount: 330
+      - resourceId: biocomposite
+        amount: 140
+      - resourceId: thermal_alloy
+        amount: 25
+      reward:
+        resourceId: biomass
+        amount: 120
+    - tier: 10
+      cost:
+      - resourceId: biomass
+        amount: 272
+      - resourceId: fuel
+        amount: 326
+      - resourceId: biocomposite
+        amount: 317
+      - resourceId: thermal_alloy
+        amount: 58
+      reward:
+        resourceId: biomass
+        amount: 120
+    - tier: 11
+      cost:
+      - resourceId: biomass
+        amount: 241
+      - resourceId: fuel
+        amount: 292
+      - resourceId: biocomposite
+        amount: 390
+      - resourceId: thermal_alloy
+        amount: 181
+      reward:
+        resourceId: biomass
+        amount: 120
+    - tier: 12
+      cost:
+      - resourceId: biomass
+        amount: 221
+      - resourceId: fuel
+        amount: 265
+      - resourceId: biocomposite
+        amount: 354
+      - resourceId: thermal_alloy
+        amount: 452
+      reward:
+        resourceId: biomass
+        amount: 120
+  modelKey: 

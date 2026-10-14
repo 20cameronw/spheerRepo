@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: plasma_physics
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: plasma_physics
+    displayName: Plasma Physics
+    description: Bottle a star in a flask.
+    branch: Industry
+    tier: 4
+    cost:
+    - resourceId: steel
+      amount: 510
+    - resourceId: titanium_plate
+      amount: 270
+    - resourceId: circuit_board
+      amount: 330
+    - resourceId: optic_lens
+      amount: 320
+    - resourceId: thermal_alloy
+      amount: 70
+    - resourceId: methane
+      amount: 300
+    prereqs:
+    - chemistry
+    - optics
+    labLevel: 4
+    unlocks:
+    - recipe:charge_plasma_cell
+  icon: research

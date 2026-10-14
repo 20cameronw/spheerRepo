@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f59f118b164729b4b97c95519fb9e226, type: 3}
+  m_Name: pick
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ToolLadderSO
+  lockedFields: []
+  data:
+    id: pick
+    displayName: Pickaxe
+    kind: 1
+    games: 01
+    tiers:
+    - tier: 1
+      displayName: Bare Hands
+      yieldMult: 1
+      runTimeMult: 1
+      cost: []
+      researchPrereq: 
+      requiresReachTier: 0
+      requiresLabLevel: 0
+      eraTier: 0
+    - tier: 2
+      displayName: Stone Pick
+      yieldMult: 1.6
+      runTimeMult: 0.96
+      cost:
+      - resourceId: wood
+        amount: 20
+      - resourceId: stone
+        amount: 20
+      researchPrereq: 
+      requiresReachTier: 0
+      requiresLabLevel: 0
+      eraTier: 0
+    - tier: 3
+      displayName: Iron Pick
+      yieldMult: 2.4
+      runTimeMult: 0.92
+      cost:
+      - resourceId: wood
+        amount: 95
+      - resourceId: stone
+        amount: 95
+      - resourceId: iron_plate
+        amount: 23
+      researchPrereq: 
+      requiresReachTier: 1
+      requiresLabLevel: 1
+      eraTier: 1
+    - tier: 4
+      displayName: Steel Pick
+      yieldMult: 3.6
+      runTimeMult: 0.88
+      cost:
+      - resourceId: steel
+        amount: 160
+      - resourceId: stone
+        amount: 600
+      - resourceId: planks
+        amount: 270
+      researchPrereq: toolsmithing_1
+      requiresReachTier: 2
+      requiresLabLevel: 2
+      eraTier: 2
+    - tier: 5
+      displayName: Pneumatic Pick
+      yieldMult: 5.4
+      runTimeMult: 0.84
+      cost:
+      - resourceId: steel
+        amount: 300
+      - resourceId: copper_wire
+        amount: 840
+      - resourceId: circuit_board
+        amount: 150
+      researchPrereq: toolsmithing_2
+      requiresReachTier: 3
+      requiresLabLevel: 3
+      eraTier: 3
+    - tier: 6
+      displayName: Jackhammer
+      yieldMult: 8.2
+      runTimeMult: 0.8
+      cost:
+      - resourceId: titanium_plate
+        amount: 400
+      - resourceId: servo_motor
+        amount: 140
+      - resourceId: plasma
+        amount: 75
+      - resourceId: steel
+        amount: 380
+      researchPrereq: toolsmithing_3
+      requiresReachTier: 4
+      requiresLabLevel: 4
+      eraTier: 4
+    - tier: 7
+      displayName: Plasma Jackhammer
+      yieldMult: 12.5
+      runTimeMult: 0.76
+      cost:
+      - resourceId: quantum_chip
+        amount: 130
+      - resourceId: void_alloy
+        amount: 80
+      - resourceId: plasma
+        amount: 350
+      - resourceId: titanium_plate
+        amount: 610
+      researchPrereq: toolsmithing_4
+      requiresReachTier: 6
+      requiresLabLevel: 6
+      eraTier: 6
+  icon: 
+  color: {r: 1, g: 1, b: 1, a: 1}

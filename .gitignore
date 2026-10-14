@@ -60,3 +60,37 @@ sysinfo.txt
 crashlytics-build.properties
 
 SpheerURP/UserSettings/Layouts/default-2021.dwlt
+
+# --- Frontier additions -------------------------------------------------------
+# Unity-generated project files (the .slnx is rewritten by the editor on every open)
+*.slnx
+*.sln
+*.csproj
+SpheerURP/UIElementsSchema/
+SpheerURP/UserSettings/
+SpheerURP/.vscode/
+SpheerURP/.idea/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
+
+# Harness and tool output (screenshots, test results, builds)
+SpheerURP/Screens/
+SpheerURP/TestResults/
+SpheerURP/Recordings/
+*.aab
+*.ipa
+*.apk
+
+# Plain .NET test projects for the engine-free Core code live outside the Unity project (tests/). Track their .csproj files
+# (the *.csproj rule above is for Unity-generated project files) and ignore their build and test output.
+!/tests/**/*.csproj
+/tests/**/bin/
+/tests/**/obj/
+/tests/**/TestResults/
+/TestResults/
+
+# Console labs (tools/labs): everything they build or render goes to tools/labs/out
+/tools/labs/out/

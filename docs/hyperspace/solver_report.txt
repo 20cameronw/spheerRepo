@@ -1,0 +1,68 @@
+﻿template                 tiers   declared  measured  fails  note
+drone_line              0-3     0.30      0.30      0/16   
+drone_v                 0-4     0.30      0.30      0/20   
+drone_column            0-2     0.20      0.30      0/12   
+asteroid_slalom         0-6     0.50      0.30      0/28   
+gate_slit_wide          0-4     0.40      0.30      0/20   
+reward_trail            0-12    0.40      0.30      0/52   
+crate_cache             0-12    0.40      0.30      0/52   
+drone_wedge             1-5     0.35      0.30      0/20   
+zigzag_pair             1-5     0.40      0.30      0/20   
+swooper_pair            1-6     0.45      0.30      0/24   
+pincer                  1-6     0.40      0.30      0/24   
+asteroid_field          1-8     0.55      0.30      0/32   
+zigzag_stream           2-8     0.50      0.30      0/28   
+swooper_arc             2-9     0.55      0.30      0/32   
+minefield_scatter       2-8     0.50      0.30      0/28   
+turret_single           2-7     0.45      0.30      0/24   
+gate_slit_slide         2-8     0.50      0.30      0/28   
+gate_slot               2-9     0.50      0.30      0/32   
+drone_helix             2-8     0.45      0.30      0/28   
+turret_crossfire        3-12    0.55      0.30      0/40   
+gate_ring               3-12    0.60      0.30      0/40   
+gate_sequence           3-12    0.75      0.70      0/40   
+seeker_single           3-9     0.65      0.60      0/28   
+elite_single            3-8     0.50      0.30      0/24   
+minefield_corridor      3-9     0.50      0.30      0/28   
+drone_slot_rows         3-10    0.55      0.30      0/32   
+asteroid_storm          4-12    0.60      0.30      0/36   
+gate_bar_spin           4-12    0.60      0.30      0/36   
+swooper_barrage         4-12    0.65      0.30      0/36   
+seeker_swarm            5-12    0.75      0.70      0/32   
+elite_escort            5-12    0.60      0.30      0/32   
+mine_gauntlet           5-12    0.60      0.30      0/32   
+reward_gauntlet         4-12    0.50      0.30      0/36   
+turret_wall             6-12    0.65      0.30      0/28   
+gate_slalom_turrets     6-12    0.70      0.40      0/28   
+gate_double_ring        7-12    0.70      0.50      0/24   
+seeker_elite_combo      8-12    0.70      0.70      0/20   
+asteroid_gate_mix       6-12    0.65      0.30      0/28   
+drone_tide              6-12    0.65      0.30      0/28   
+drone_rain              3-9     0.50      0.30      0/28   
+zigzag_wave_dense       5-12    0.65      0.30      0/32   
+drone_swarm             4-12    0.60      0.30      0/36   
+asteroid_wall           5-12    0.65      0.30      0/32   
+seeker_storm            7-12    0.70      0.70      0/24   
+turret_nest             6-12    0.65      0.30      0/28   
+mine_belt               6-12    0.60      0.30      0/28   
+elite_phalanx           7-12    0.65      0.30      0/24   
+swooper_swarm           6-12    0.70      0.30      0/28   
+gate_gauntlet           6-12    0.80      0.60      0/28   
+gate_ring_chain         8-12    0.80      0.70      0/20   
+laser_maze              9-12    0.85      0.70      0/16   
+crossfire_storm         8-12    0.70      0.30      0/20   
+gate_sequence+turret_crossfire3-12    0.90      0.80      0/40   
+asteroid_storm+gate_sequence4-12    0.80      0.70      0/36   
+gate_sequence+seeker_swarm5-12    0.90      0.80      0/32   
+asteroid_wall+gate_sequence5-12    0.70      0.70      0/32   
+gate_sequence+turret_nest6-12    0.90      0.80      0/28   
+gate_ring_chain+drone_swarm8-12    0.90      0.80      0/20   
+gate_ring_chain+mine_belt8-12    1.00      0.70      0/20   
+elite_phalanx+gate_ring_chain8-12    1.00      0.90      0/20   
+laser_maze+seeker_swarm 9-12    1.00      0.70      0/16   
+laser_maze+elite_escort 9-12    0.90      0.70      0/16   
+laser_maze+minefield_corridor9-12    0.90      0.80      0/16   
+boss phase 1            5-12    -         0.30      0/2    
+boss phase 2            5-12    -         0.70      0/2    
+boss phase 3            5-12    -         0.30      0/2    
+failing templates/phases: 0   time 3.7 s

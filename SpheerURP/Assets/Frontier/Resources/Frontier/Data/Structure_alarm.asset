@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a77a5014ca9c1140980f1b987ea7c97, type: 3}
+  m_Name: Structure_alarm
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.StructureSO
+  id: alarm
+  displayName: Alarm Beacon
+  description: Tap it to burn fuel and call a wave. More fuel means a longer fight
+    and bigger rewards.
+  kind: 1
+  color: {r: 2.2, g: 0.4, b: 1.8, a: 1}
+  modelKey: struct_alarm
+  buildCost:
+  - resource: {fileID: 11400000, guid: 41d60b14022c20a4b9a01f911c0acab4, type: 2}
+    amount: 12
+  maxLevel: 5
+  upgradeGrowth: 1.9
+  bonusPerLevel: 0.15
+  maxPerPlanet: 1
+  damage: 0
+  fireInterval: 0.7
+  range: 8
+  beamWidth: 0.07

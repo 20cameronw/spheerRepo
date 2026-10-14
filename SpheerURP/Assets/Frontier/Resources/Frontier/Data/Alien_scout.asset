@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e090ca2b0aae4664781bf5fd78a9152c, type: 3}
+  m_Name: Alien_scout
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.EnemySO
+  id: scout
+  displayName: Scout
+  color: {r: 0.3, g: 1.6, b: 2.2, a: 1}
+  shape: 0
+  scale: 0.45
+  health: 10
+  speed: 1.3
+  damage: 4
+  threat: 1
+  minWave: 1
+  weight: 2
+  bounty:
+  - resource: {fileID: 11400000, guid: 8567583bacf739a42a16112cc194cd22, type: 2}
+    amount: 1

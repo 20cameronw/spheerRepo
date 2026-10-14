@@ -64,6 +64,14 @@ namespace Frontier
         public static Texture2D Glow { get { if (glow == null) glow = MakeRadial(128, 2.2f, false); return glow; } }
         public static Texture2D Ring { get { if (ring == null) ring = MakeRadial(128, 1f, true); return ring; } }
 
+        /// <summary>Clamps an HDR resource/accent colour into displayable range (largest channel at most 1), keeping its hue.</summary>
+        public static Color Displayable(Color c, float alpha = 1f)
+        {
+            float m = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
+            if (m > 1f) c = new Color(c.r / m, c.g / m, c.b / m);
+            return new Color(c.r, c.g, c.b, alpha);
+        }
+
         static Texture2D MakeRadial(int size, float power, bool asRing)
         {
             var t = new Texture2D(size, size, TextureFormat.RGBA32, true) { wrapMode = TextureWrapMode.Clamp };
@@ -81,6 +89,17 @@ namespace Frontier
             t.SetPixels(px);
             t.Apply();
             return t;
+        }
+
+        public static Material AtmoMat(Color c, float power = 3.2f, float intensity = 1.3f)
+        {
+            var sh = Resources.Load<Shader>("Frontier/NeonAtmosphere");
+            if (sh == null) return AddMat(new Color(c.r, c.g, c.b, 0.08f), null, 3f);
+            var m = new Material(sh);
+            m.SetColor("_Color", c);
+            m.SetFloat("_Power", power);
+            m.SetFloat("_Intensity", intensity);
+            return m;
         }
 
         public static Material AddMat(Color c, Texture tex = null, float fresnel = 0f)
@@ -224,16 +243,17 @@ namespace Frontier
         }
     }
 
-    public static class Sfx
+    public static partial class Sfx
     {
         static AudioSource src;
         static readonly Dictionary<string, AudioClip> cache = new Dictionary<string, AudioClip>();
 
-        public static void Init(GameObject host) { src = host.AddComponent<AudioSource>(); src.playOnAwake = false; }
+        public static bool Muted;
+        public static void Init(GameObject host) { src = host.AddComponent<AudioSource>(); src.playOnAwake = false; InitVoices(host); }
 
         public static void Play(float freq, float dur = 0.12f, float vol = 0.25f, float sweep = 0f)
         {
-            if (src == null) return;
+            if (src == null || Muted) return;
             string key = freq + "_" + dur + "_" + sweep;
             AudioClip clip;
             if (!cache.TryGetValue(key, out clip))

@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: engine
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: engine
+  displayName: Engine Efficiency
+  description: Every trip burns less fuel.
+  category: 1
+  effect: 2
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 10
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 0
+  hazard: 0
+  levels:
+  - level: 1
+    displayName: Tuned Injectors
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 25
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 25
+    value: 0.92
+    researchPrereq: 
+    requiresReachTier: 0
+    eraTier: 0
+  - level: 2
+    displayName: Flow Manifold
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 75
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 75
+    value: 0.85
+    researchPrereq: 
+    requiresReachTier: 0
+    eraTier: 0
+  - level: 3
+    displayName: Ion Nozzles
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 270
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 270
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 45
+    value: 0.78
+    researchPrereq: 
+    requiresReachTier: 1
+    eraTier: 1
+  - level: 4
+    displayName: Cryo Intake
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 790
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 790
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 130
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 130
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 310
+    value: 0.72
+    researchPrereq: 
+    requiresReachTier: 2
+    eraTier: 2
+  - level: 5
+    displayName: Plasma Lens
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1080
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 1400
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 220
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 220
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 550
+    value: 0.66
+    researchPrereq: 
+    requiresReachTier: 3
+    eraTier: 3
+  - level: 6
+    displayName: Phase Vents
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1360
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2000
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 400
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 400
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 990
+    - resource: {fileID: 11400000, guid: a47d841cb917a0848876efb37362cd43, type: 2}
+      amount: 75
+    value: 0.61
+    researchPrereq: 
+    requiresReachTier: 4
+    eraTier: 4
+  - level: 7
+    displayName: Zero-Point Taps
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2460
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 830
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 830
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 2100
+    - resource: {fileID: 11400000, guid: a47d841cb917a0848876efb37362cd43, type: 2}
+      amount: 160
+    - resource: {fileID: 11400000, guid: 1c8467aec0e471441b3eb60c8022ce29, type: 2}
+      amount: 110
+    value: 0.56
+    researchPrereq: 
+    requiresReachTier: 5
+    eraTier: 5
+  - level: 8
+    displayName: Gradient Drive
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1900
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2880
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 2600
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 2600
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 3800
+    - resource: {fileID: 11400000, guid: a47d841cb917a0848876efb37362cd43, type: 2}
+      amount: 480
+    - resource: {fileID: 11400000, guid: 1c8467aec0e471441b3eb60c8022ce29, type: 2}
+      amount: 350
+    value: 0.52
+    researchPrereq: 
+    requiresReachTier: 6
+    eraTier: 6
+  - level: 9
+    displayName: Resonant Core
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 2480
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 3700
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 3700
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5952
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 4960
+    - resource: {fileID: 11400000, guid: a47d841cb917a0848876efb37362cd43, type: 2}
+      amount: 1300
+    - resource: {fileID: 11400000, guid: 1c8467aec0e471441b3eb60c8022ce29, type: 2}
+      amount: 950
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 260
+    value: 0.48
+    researchPrereq: 
+    requiresReachTier: 8
+    eraTier: 8
+  - level: 10
+    displayName: Quiet Singularity
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 2760
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 4100
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 4100
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 6600
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 5500
+    - resource: {fileID: 11400000, guid: a47d841cb917a0848876efb37362cd43, type: 2}
+      amount: 5800
+    - resource: {fileID: 11400000, guid: 1c8467aec0e471441b3eb60c8022ce29, type: 2}
+      amount: 4200
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 1100
+    value: 0.45
+    researchPrereq: 
+    requiresReachTier: 9
+    eraTier: 9
+  icon: 

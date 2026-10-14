@@ -1,0 +1,21 @@
+<Project>
+  <!--
+    Settings shared by the plain .NET projects that test the engine-free Frontier.Core sources without Unity.
+    This file lives in tests/ on purpose: a Directory.Build.props at the repository root would also be picked up by the
+    Unity-generated project files inside SpheerURP/ and by IDEs that open them.
+  -->
+  <PropertyGroup>
+    <!-- Unity 6 compiles C# 9: anything newer must fail here too. -->
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <!-- The sources are linked from the Unity project; never glob the project folders. -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <!-- Keep CI deterministic: no vulnerability-feed lookups, no first-run noise. -->
+    <NuGetAudit>false</NuGetAudit>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+</Project>

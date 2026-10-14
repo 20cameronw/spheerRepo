@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: composites
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: composites
+    displayName: Composites
+    description: Press plant fibre and resin into a poison-proof skin.
+    branch: Industry
+    tier: 2
+    cost:
+    - resourceId: iron_plate
+      amount: 70
+    - resourceId: planks
+      amount: 150
+    - resourceId: glass
+      amount: 40
+    - resourceId: copper_wire
+      amount: 90
+    - resourceId: scrap
+      amount: 220
+    - resourceId: biomass
+      amount: 170
+    prereqs:
+    - fabrication
+    - bio_cultivation
+    labLevel: 2
+    unlocks:
+    - recipe:press_biocomposite
+  icon: research

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893bb58226683b547a7dfb134592bf66, type: 3}
+  m_Name: score_formula
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ScoreFormulaSO
+  lockedFields: []
+  data:
+    reachCoefficient: 700
+    reachDivisorLy: 10
+    worldBase: 130
+    worldFullValueCount: 500
+    worldExcessShare: 0.20000000298023224
+    industryBase: 50
+    industryExponent: 1.600000023841858
+    techPerUpgradeLevel: 300
+    techPerToolTier: 800
+    defenseBase: 12
+    defenseWaveCap: 25
+    atlasPerResource: 100
+    atlasPerRecipe: 80
+    atlasPerMegaStage: 28000
+    ascensionStep: 0.10000000149011612

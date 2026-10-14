@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1175b5dce9dd134ba2ed369b5c2135b, type: 3}
+  m_Name: Planet_lotus
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.PlanetSO
+  id: lotus
+  displayName: Lotus
+  description: Oceanic world of giant bioluminescent floating flora.
+  tier: 3
+  mapPosition: {x: 0.5, y: 0.5}
+  danger: 3.9
+  primary: {r: 0.34643945, g: 0.59771526, b: 0.22, a: 1}
+  secondary: {r: 0.06, g: 0.19634078, b: 0.1, a: 1}
+  rim: {r: 0.4, g: 2, b: 1, a: 1}
+  weather: 5
+  mood: 0
+  hasRings: 0
+  style: 0
+  glowIntensity: 0.35
+  atmosphereIntensity: 0.35
+  surfaceBands: 5.408499
+  modelKey: coral
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
+  worldSize: 1.48
+  buildingSlots: 24
+  spots:
+  - label: Ancient Canopy
+    game: 0
+    resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+    baseYield: 32
+    difficulty: 0.47000003
+  - label: River Bed
+    game: 1
+    resource: {fileID: 11400000, guid: 4f4d2532363d6c94a836abcfda0b73d9, type: 2}
+    baseYield: 17
+    difficulty: 0.47000003
+  - label: Amber Bore
+    game: 2
+    resource: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+    baseYield: 12
+    difficulty: 0.52000004
+  systemId: verdance

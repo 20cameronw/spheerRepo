@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: thermal_alloy
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: thermal_alloy
+  displayName: Thermal Alloy
+  color: {r: 1, g: 0.5411765, b: 0.2901961, a: 1}
+  stackSize: 48
+  description: Titanium and glass fused into a ceramic-bright metal that glows without
+    failing. Hulls plated with it can land where rock still flows.
+  category: 2
+  tier: 3
+  harvestMethods: 
+  baseValue: 33.58
+  hazardAffinity: 1
+  fuelEnergy: 0
+  colorHex: '#FF8A4A'
+  accentHex: '#7A2A10'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: Titanium and glass fused into a ceramic-bright metal that glows
+    without failing. Hulls plated with it can land where rock still flows.
+  iconConcept: A trapezoid ingot with three wavy heat-shimmer lines rising above
+    it.
+  icon: 

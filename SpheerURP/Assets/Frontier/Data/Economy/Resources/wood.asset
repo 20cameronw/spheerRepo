@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: wood
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: wood
+  displayName: Wood
+  color: {r: 0.8784314, g: 0.63529414, b: 0.22745098, a: 1}
+  stackSize: 20
+  description: Timber from the lush worlds, cut green and stacked by the cartload.
+    Every settlement begins with it, and every great project comes back to it.
+  category: 0
+  tier: 0
+  harvestMethods: 00
+  baseValue: 1
+  hazardAffinity: 0
+  fuelEnergy: 0
+  colorHex: '#E0A23A'
+  accentHex: '#7A4A18'
+  baseYield: 10
+  yieldPerTier: 0
+  difficultyOffset: -0.02
+  atlasDescription: Timber from the lush worlds, cut green and stacked by the cartload.
+    Every settlement begins with it, and every great project comes back to it.
+  iconConcept: A stout log lying on a diagonal with one round cut face showing three
+    growth rings.
+  icon: 

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: compression_3
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: compression_3
+    displayName: Cargo Compression III
+    description: 'Quantum compression: a hold inside a speck.'
+    branch: Logistics
+    tier: 7
+    cost:
+    - resourceId: quantum_chip
+      amount: 890
+    - resourceId: warp_coil
+      amount: 160
+    - resourceId: void_alloy
+      amount: 480
+    - resourceId: antimatter
+      amount: 110
+    - resourceId: plasma
+      amount: 1100
+    prereqs:
+    - compression_2
+    - warp_theory
+    labLevel: 7
+    unlocks:
+    - upgrade:compression:3
+    - upgrade:compression:4
+  icon: research

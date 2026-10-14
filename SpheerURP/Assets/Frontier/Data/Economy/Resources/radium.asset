@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: radium
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: radium
+  displayName: Radium
+  color: {r: 0.9490196, g: 0.9490196, b: 0.22745098, a: 1}
+  stackSize: 64
+  description: A faintly glowing salt that ticks in the dark. Dangerous to carry,
+    essential for shielding, and priceless to anyone who knows how to contain it.
+  category: 0
+  tier: 4
+  harvestMethods: 04
+  baseValue: 55
+  hazardAffinity: 8
+  fuelEnergy: 0
+  colorHex: '#F2F23A'
+  accentHex: '#5E6A12'
+  baseYield: 3
+  yieldPerTier: 0.4
+  difficultyOffset: 0.15
+  atlasDescription: A faintly glowing salt that ticks in the dark. Dangerous to carry,
+    essential for shielding, and priceless to anyone who knows how to contain it.
+  iconConcept: A round hazard disc with three fan blades around a centre dot (the
+    trefoil).
+  icon: 

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: antimatter
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: antimatter
+  displayName: Antimatter Pod
+  color: {r: 1, g: 0.3529412, b: 0.47843137, a: 1}
+  stackSize: 99
+  description: A pod of trapped antiparticles in a mirrored field. Sixty-four cells
+    of energy in a package you can hold, and a carelessness you cannot survive.
+  category: 4
+  tier: 6
+  harvestMethods: 
+  baseValue: 661.18
+  hazardAffinity: 16
+  fuelEnergy: 64
+  colorHex: '#FF5A7A'
+  accentHex: '#FFE0E8'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A pod of trapped antiparticles in a mirrored field. Sixty-four
+    cells of energy in a package you can hold, and a carelessness you cannot survive.
+  iconConcept: A pill-shaped capsule with a bright centre band, a zigzag seam and
+    a pin at each end.
+  icon: 

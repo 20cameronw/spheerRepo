@@ -8,6 +8,10 @@ Shader "Frontier/NeonPlanet"
         _Bands ("Bands", Float) = 6
         _RimPower ("Rim Power", Float) = 2.5
         _Seed ("Seed", Float) = 0
+        _Center ("Center (object space)", Vector) = (0,0,0,0)
+        _Style ("Style", Float) = 0
+        _Lines ("Latitude lines", Float) = 1
+        _CraterSoft ("Terrain between craters (style 2)", Range(0,1)) = 0
     }
     SubShader
     {
@@ -28,6 +32,10 @@ Shader "Frontier/NeonPlanet"
                 float _Bands;
                 float _RimPower;
                 float _Seed;
+                float4 _Center;
+                float _Style;
+                float _Lines;
+                float _CraterSoft;
             CBUFFER_END
 
             struct Attributes
@@ -51,7 +59,7 @@ Shader "Frontier/NeonPlanet"
                 o.positionCS = vp.positionCS;
                 o.normalWS = TransformObjectToWorldNormal(i.normalOS);
                 o.viewWS = GetWorldSpaceViewDir(vp.positionWS);
-                o.posOS = i.positionOS.xyz;
+                o.posOS = normalize(i.positionOS.xyz - _Center.xyz + float3(0, 1e-4, 0)) * 0.5;
                 return o;
             }
 
@@ -64,13 +72,45 @@ Shader "Frontier/NeonPlanet"
                 float ndl = saturate(dot(n, L) * 0.5 + 0.5);
 
                 float p = i.posOS.y * _Bands + sin(i.posOS.x * 4.0 + _Seed) * 0.9 + sin(i.posOS.z * 5.0 + _Seed * 1.7) * 0.7;
-                float band = sin(p) * 0.5 + 0.5;
+                float3 q = i.posOS * 2.0;
+                float pat;
+                if (_Style < 0.5)
+                    pat = sin(p) * 0.5 + 0.5;
+                else if (_Style < 1.5)
+                {
+                    float sw = atan2(q.z, q.x) * 2.0 + q.y * _Bands * 1.6 + sin(q.y * 7.0 + _Seed) * 1.6;
+                    pat = sin(sw + sin(q.x * 6.0 + _Seed) * 1.8) * 0.5 + 0.5;
+                }
+                else if (_Style < 2.5)
+                {
+                    float3 c = q * (3.0 + _Bands * 0.5) + _Seed;
+                    float3 f = frac(c) - 0.5;
+                    float d = length(f);
+                    float h = frac(sin(dot(floor(c), float3(12.9898, 78.233, 37.719))) * 43758.5453);
+                    float disc = smoothstep(0.38, 0.30, d);
+                    float ground = sin(p) * 0.15 + 0.5;
+                    // _CraterSoft 0: a cell with a crater falls to the alt colour around its disc (the original look); 1: the terrain shows between the discs.
+                    pat = (h > 0.45) ? lerp(disc * 0.9, lerp(ground, 0.9, disc), _CraterSoft) : ground;
+                }
+                else if (_Style < 3.5)
+                {
+                    float v = sin(q.x * 9.0 + sin(q.y * 8.0 + _Seed) * 2.0) * sin(q.z * 9.0 + sin(q.x * 7.0) * 2.0);
+                    pat = 1.0 - smoothstep(0.0, 0.18, abs(v));
+                }
+                else
+                {
+                    float3 c = floor(q * (4.0 + _Bands * 0.4) + _Seed);
+                    pat = frac(sin(dot(c, float3(12.9898, 78.233, 37.719))) * 43758.5453);
+                }
+                float band = pat;
                 float3 col = lerp(_AltColor.rgb, _BaseColor.rgb, band);
                 col *= 0.25 + 0.9 * ndl * ndl;
+                if (_Style > 2.5 && _Style < 3.5) col += _RimColor.rgb * pat * 0.6;
+                if (_Style > 3.5) col += _RimColor.rgb * band * 0.12;
 
                 float lat = abs(frac(i.posOS.y * 5.0) - 0.5);
                 float latLine = smoothstep(0.46, 0.5, lat);
-                col += _RimColor.rgb * (fres + latLine * 0.35);
+                col += _RimColor.rgb * (fres + latLine * 0.35 * _Lines);
                 return half4(col, 1);
             }
             ENDHLSL

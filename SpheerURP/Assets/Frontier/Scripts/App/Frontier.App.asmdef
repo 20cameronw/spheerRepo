@@ -1,0 +1,24 @@
+{
+    "name": "Frontier.App",
+    "rootNamespace": "Frontier",
+    "references": [
+        "Frontier.Core",
+        "Frontier.Economy",
+        "Frontier.Data",
+        "Frontier.Game",
+        "Frontier.Visual",
+        "Frontier.UI",
+        "Frontier.HyperspaceView",
+        "Frontier.Services",
+        "Frontier.Services.Unity"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

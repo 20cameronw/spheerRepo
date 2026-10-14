@@ -1,0 +1,4860 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "tuning",
+  "items": {
+    "schemaVersion": 1,
+    "digest": "f7b3888e49b20760",
+    "keys": [
+      {
+        "key": "value.premium.refinery",
+        "group": "value",
+        "description": "Value added by a Refinery recipe (output price = input price x (1 + premium)).",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.foundry",
+        "group": "value",
+        "description": "Value added by a Foundry recipe.",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.fabricator",
+        "group": "value",
+        "description": "Value added by a Fabricator recipe.",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.chem_reactor",
+        "group": "value",
+        "description": "Value added by a Chem Reactor recipe.",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.quantum_lab",
+        "group": "value",
+        "description": "Value added by a Quantum Lab recipe.",
+        "defaultValue": 0.35,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.max_ratio.base",
+        "group": "value",
+        "description": "Conservation limit for tier 0 recipes: value out / value in (bonus recipes are exempt).",
+        "defaultValue": 1.25,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "key": "value.max_ratio.per_tier",
+        "group": "value",
+        "description": "Conservation limit grows by this per recipe tier.",
+        "defaultValue": 0.03,
+        "min": 0,
+        "max": 0.2
+      },
+      {
+        "key": "value.min_ratio",
+        "group": "value",
+        "description": "Lowest allowed value out / value in (lossy recipes such as the scrap burner stay above this).",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "time.anchor.0",
+        "group": "time",
+        "description": "Seconds of a job at level index 0 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.1",
+        "group": "time",
+        "description": "Seconds of a job at level index 1 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.2",
+        "group": "time",
+        "description": "Seconds of a job at level index 2 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 20,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.3",
+        "group": "time",
+        "description": "Seconds of a job at level index 3 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.4",
+        "group": "time",
+        "description": "Seconds of a job at level index 4 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 180,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.5",
+        "group": "time",
+        "description": "Seconds of a job at level index 5 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.6",
+        "group": "time",
+        "description": "Seconds of a job at level index 6 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 1800,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.7",
+        "group": "time",
+        "description": "Seconds of a job at level index 7 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 3600,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.8",
+        "group": "time",
+        "description": "Seconds of a job at level index 8 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 10800,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.9",
+        "group": "time",
+        "description": "Seconds of a job at level index 9 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 28800,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.10",
+        "group": "time",
+        "description": "Seconds of a job at level index 10 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 57600,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.11",
+        "group": "time",
+        "description": "Seconds of a job at level index 11 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
+        "defaultValue": 86400,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.cap_seconds",
+        "group": "time",
+        "description": "Hard cap for ordinary build/upgrade jobs (about one day).",
+        "defaultValue": 86400,
+        "min": 3600,
+        "max": 604800
+      },
+      {
+        "key": "time.mega.stage1",
+        "group": "time",
+        "description": "Seconds of megaproject stage 1 (before the per-project multiplier).",
+        "defaultValue": 172800,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage2",
+        "group": "time",
+        "description": "Seconds of megaproject stage 2 (before the per-project multiplier).",
+        "defaultValue": 259200,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage3",
+        "group": "time",
+        "description": "Seconds of megaproject stage 3 (before the per-project multiplier).",
+        "defaultValue": 345600,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage4",
+        "group": "time",
+        "description": "Seconds of megaproject stage 4 (before the per-project multiplier).",
+        "defaultValue": 432000,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage5",
+        "group": "time",
+        "description": "Seconds of megaproject stage 5 (before the per-project multiplier).",
+        "defaultValue": 604800,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega_cap_seconds",
+        "group": "time",
+        "description": "Hard cap for a megaproject stage.",
+        "defaultValue": 864000,
+        "min": 86400,
+        "max": 2592000
+      },
+      {
+        "key": "time.scale",
+        "group": "time",
+        "description": "Global multiplier on every structure job time (1 = as designed).",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "value.raw.wood",
+        "group": "value",
+        "description": "Anchor price of Wood in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.wood",
+        "group": "yield",
+        "description": "Deposit base yield of Wood at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 10,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.wood",
+        "group": "yield",
+        "description": "Extra base yield of Wood per planet tier.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.stone",
+        "group": "value",
+        "description": "Anchor price of Stone in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.stone",
+        "group": "yield",
+        "description": "Deposit base yield of Stone at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.stone",
+        "group": "yield",
+        "description": "Extra base yield of Stone per planet tier.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.scrap",
+        "group": "value",
+        "description": "Anchor price of Scrap in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.scrap",
+        "group": "yield",
+        "description": "Deposit base yield of Scrap at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 10,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.scrap",
+        "group": "yield",
+        "description": "Extra base yield of Scrap per planet tier.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.biomass",
+        "group": "value",
+        "description": "Anchor price of Biomass in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 2,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.biomass",
+        "group": "yield",
+        "description": "Deposit base yield of Biomass at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 9,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.biomass",
+        "group": "yield",
+        "description": "Extra base yield of Biomass per planet tier.",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.iron",
+        "group": "value",
+        "description": "Anchor price of Iron Ore in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 2.5,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.iron",
+        "group": "yield",
+        "description": "Deposit base yield of Iron Ore at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 7,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.iron",
+        "group": "yield",
+        "description": "Extra base yield of Iron Ore per planet tier.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.copper_ore",
+        "group": "value",
+        "description": "Anchor price of Copper Ore in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 3,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.copper_ore",
+        "group": "yield",
+        "description": "Deposit base yield of Copper Ore at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 6,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.copper_ore",
+        "group": "yield",
+        "description": "Extra base yield of Copper Ore per planet tier.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.silica",
+        "group": "value",
+        "description": "Anchor price of Silica in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 2,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.silica",
+        "group": "yield",
+        "description": "Deposit base yield of Silica at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.silica",
+        "group": "yield",
+        "description": "Extra base yield of Silica per planet tier.",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.ice",
+        "group": "value",
+        "description": "Anchor price of Ice in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 4,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.ice",
+        "group": "yield",
+        "description": "Deposit base yield of Ice at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.ice",
+        "group": "yield",
+        "description": "Extra base yield of Ice per planet tier.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.titanium_ore",
+        "group": "value",
+        "description": "Anchor price of Titanium Ore in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 8,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.titanium_ore",
+        "group": "yield",
+        "description": "Deposit base yield of Titanium Ore at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 5,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.titanium_ore",
+        "group": "yield",
+        "description": "Extra base yield of Titanium Ore per planet tier.",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.crystal",
+        "group": "value",
+        "description": "Anchor price of Crystal in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 8,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.crystal",
+        "group": "yield",
+        "description": "Deposit base yield of Crystal at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 5,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.crystal",
+        "group": "yield",
+        "description": "Extra base yield of Crystal per planet tier.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.methane",
+        "group": "value",
+        "description": "Anchor price of Methane in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 8,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.methane",
+        "group": "yield",
+        "description": "Deposit base yield of Methane at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.methane",
+        "group": "yield",
+        "description": "Extra base yield of Methane per planet tier.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.helium3",
+        "group": "value",
+        "description": "Anchor price of Helium-3 in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 22,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.helium3",
+        "group": "yield",
+        "description": "Deposit base yield of Helium-3 at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 4,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.helium3",
+        "group": "yield",
+        "description": "Extra base yield of Helium-3 per planet tier.",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.core",
+        "group": "value",
+        "description": "Anchor price of Xeno Core in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 45,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.core",
+        "group": "yield",
+        "description": "Deposit base yield of Xeno Core at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 2,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.core",
+        "group": "yield",
+        "description": "Extra base yield of Xeno Core per planet tier.",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.radium",
+        "group": "value",
+        "description": "Anchor price of Radium in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 55,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.radium",
+        "group": "yield",
+        "description": "Deposit base yield of Radium at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 3,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.radium",
+        "group": "yield",
+        "description": "Extra base yield of Radium per planet tier.",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.dark_matter",
+        "group": "value",
+        "description": "Anchor price of Dark Matter in scrap-equivalents (crafted prices derive from recipes).",
+        "defaultValue": 130,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.dark_matter",
+        "group": "yield",
+        "description": "Deposit base yield of Dark Matter at tier 0 (before richness, tool and structure bonuses).",
+        "defaultValue": 2,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.dark_matter",
+        "group": "yield",
+        "description": "Extra base yield of Dark Matter per planet tier.",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "cost.scale.structure",
+        "group": "cost",
+        "description": "Global multiplier on every structure value budget.",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.tool",
+        "group": "cost",
+        "description": "Global multiplier on tool ladder value budgets.",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.ship",
+        "group": "cost",
+        "description": "Global multiplier on ship and logistics upgrade value budgets.",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.defense",
+        "group": "cost",
+        "description": "Global multiplier on defense upgrade value budgets.",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.research",
+        "group": "cost",
+        "description": "Global multiplier on research value budgets.",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.mega",
+        "group": "cost",
+        "description": "Global multiplier on megaproject stage budgets (tuned by the simulator: late stages are weeks of play, not months).",
+        "defaultValue": 0.7,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.0",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 0 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.1",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 1 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 1.8,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.2",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 2 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 3.2,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.3",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 3 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 1.8,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.4",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 4 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 1.2,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.5",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 5 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 0.9,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.6",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 6 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 0.8,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.7",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 7 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 0.7,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.8",
+        "group": "cost",
+        "description": "Multiplier on every value budget whose item belongs to tier 8 (the era pacing knob; tuned by the simulator against the era bands).",
+        "defaultValue": 0.7,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "level.reach_step",
+        "group": "cost",
+        "description": "A structure level needs reach tier = unlock tier + floor((level - 1) x step): upgrades reward going outward.",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 2
+      },
+      {
+        "key": "cost.cap.base_slots",
+        "group": "cost",
+        "description": "No single line of a non-megaproject cost may exceed this many slots of its resource at tier 0 (so a base can hold what a purchase asks).",
+        "defaultValue": 12,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "cost.cap.slots_per_tier",
+        "group": "cost",
+        "description": "Extra slots allowed per line for every tier of the purchase's reach requirement.",
+        "defaultValue": 14,
+        "min": 0,
+        "max": 200
+      },
+      {
+        "key": "tool.mult.1",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 1 (all ladders).",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.1",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 1 (faster swings).",
+        "defaultValue": 1,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.2",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 2 (all ladders).",
+        "defaultValue": 1.6,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.2",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 2 (faster swings).",
+        "defaultValue": 0.96,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.3",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 3 (all ladders).",
+        "defaultValue": 2.4,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.3",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 3 (faster swings).",
+        "defaultValue": 0.92,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.4",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 4 (all ladders).",
+        "defaultValue": 3.6,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.4",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 4 (faster swings).",
+        "defaultValue": 0.88,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.5",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 5 (all ladders).",
+        "defaultValue": 5.4,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.5",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 5 (faster swings).",
+        "defaultValue": 0.84,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.6",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 6 (all ladders).",
+        "defaultValue": 8.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.6",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 6 (faster swings).",
+        "defaultValue": 0.8,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.7",
+        "group": "tool",
+        "description": "Yield multiplier of tool tier 7 (all ladders).",
+        "defaultValue": 12.5,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.7",
+        "group": "tool",
+        "description": "Harvest run time multiplier at tool tier 7 (faster swings).",
+        "defaultValue": 0.76,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "cost.v.lumber",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Lumber Camp level 1.",
+        "defaultValue": 6,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.lumber",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Lumber Camp.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.lumber",
+        "group": "time",
+        "description": "Level index of Lumber Camp level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.lumber",
+        "group": "time",
+        "description": "Level index added per level for Lumber Camp.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.mine",
+        "group": "cost",
+        "description": "Mining Rig level 1 is free (set above 0 to charge for it).",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v2.mine",
+        "group": "cost",
+        "description": "Value budget of Mining Rig level 2 (the first paid level).",
+        "defaultValue": 8,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.mine",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Mining Rig.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.mine",
+        "group": "time",
+        "description": "Level index of Mining Rig level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.mine",
+        "group": "time",
+        "description": "Level index added per level for Mining Rig.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.driller",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Deep Driller level 1.",
+        "defaultValue": 33,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.driller",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Deep Driller.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.driller",
+        "group": "time",
+        "description": "Level index of Deep Driller level 1 on the shared time curve.",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.driller",
+        "group": "time",
+        "description": "Level index added per level for Deep Driller.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.biodome",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Biodome Harvester level 1.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.biodome",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Biodome Harvester.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.biodome",
+        "group": "time",
+        "description": "Level index of Biodome Harvester level 1 on the shared time curve.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.biodome",
+        "group": "time",
+        "description": "Level index added per level for Biodome Harvester.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.siphon_rig",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Gas Siphon Rig level 1.",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.siphon_rig",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Gas Siphon Rig.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.siphon_rig",
+        "group": "time",
+        "description": "Level index of Gas Siphon Rig level 1 on the shared time curve.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.siphon_rig",
+        "group": "time",
+        "description": "Level index added per level for Gas Siphon Rig.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.excavator",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Excavation Rig level 1.",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.excavator",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Excavation Rig.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.excavator",
+        "group": "time",
+        "description": "Level index of Excavation Rig level 1 on the shared time curve.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.excavator",
+        "group": "time",
+        "description": "Level index added per level for Excavation Rig.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.salvage_yard",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Salvage Yard level 1.",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.salvage_yard",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Salvage Yard.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.salvage_yard",
+        "group": "time",
+        "description": "Level index of Salvage Yard level 1 on the shared time curve.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.salvage_yard",
+        "group": "time",
+        "description": "Level index added per level for Salvage Yard.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.refinery",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Refinery level 1.",
+        "defaultValue": 15,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.refinery",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Refinery.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.refinery",
+        "group": "time",
+        "description": "Level index of Refinery level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.refinery",
+        "group": "time",
+        "description": "Level index added per level for Refinery.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.fabricator",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Fabricator level 1.",
+        "defaultValue": 70,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.fabricator",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Fabricator.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.fabricator",
+        "group": "time",
+        "description": "Level index of Fabricator level 1 on the shared time curve.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.fabricator",
+        "group": "time",
+        "description": "Level index added per level for Fabricator.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.foundry",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Foundry level 1.",
+        "defaultValue": 90,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.foundry",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Foundry.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.foundry",
+        "group": "time",
+        "description": "Level index of Foundry level 1 on the shared time curve.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.foundry",
+        "group": "time",
+        "description": "Level index added per level for Foundry.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.chem_reactor",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Chem Reactor level 1.",
+        "defaultValue": 4500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.chem_reactor",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Chem Reactor.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.chem_reactor",
+        "group": "time",
+        "description": "Level index of Chem Reactor level 1 on the shared time curve.",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.chem_reactor",
+        "group": "time",
+        "description": "Level index added per level for Chem Reactor.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.quantum_lab",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Quantum Lab level 1.",
+        "defaultValue": 30000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.quantum_lab",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Quantum Lab.",
+        "defaultValue": 1.68,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.quantum_lab",
+        "group": "time",
+        "description": "Level index of Quantum Lab level 1 on the shared time curve.",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.quantum_lab",
+        "group": "time",
+        "description": "Level index added per level for Quantum Lab.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.warehouse",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Warehouse level 1.",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.warehouse",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Warehouse.",
+        "defaultValue": 1.6,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.warehouse",
+        "group": "time",
+        "description": "Level index of Warehouse level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.warehouse",
+        "group": "time",
+        "description": "Level index added per level for Warehouse.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.fuel_depot",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Fuel Depot level 1.",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.fuel_depot",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Fuel Depot.",
+        "defaultValue": 1.65,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.fuel_depot",
+        "group": "time",
+        "description": "Level index of Fuel Depot level 1 on the shared time curve.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.fuel_depot",
+        "group": "time",
+        "description": "Level index added per level for Fuel Depot.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.cargo_depot",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Cargo Depot level 1.",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.cargo_depot",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Cargo Depot.",
+        "defaultValue": 1.65,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.cargo_depot",
+        "group": "time",
+        "description": "Level index of Cargo Depot level 1 on the shared time curve.",
+        "defaultValue": 2.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.cargo_depot",
+        "group": "time",
+        "description": "Level index added per level for Cargo Depot.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.orbital_relay",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Orbital Relay level 1.",
+        "defaultValue": 25000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.orbital_relay",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Orbital Relay.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.orbital_relay",
+        "group": "time",
+        "description": "Level index of Orbital Relay level 1 on the shared time curve.",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.orbital_relay",
+        "group": "time",
+        "description": "Level index added per level for Orbital Relay.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.gunner",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Gunner Turret level 1.",
+        "defaultValue": 29,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.gunner",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Gunner Turret.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.gunner",
+        "group": "time",
+        "description": "Level index of Gunner Turret level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.gunner",
+        "group": "time",
+        "description": "Level index added per level for Gunner Turret.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.laser",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Laser Turret level 1.",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.laser",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Laser Turret.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.laser",
+        "group": "time",
+        "description": "Level index of Laser Turret level 1 on the shared time curve.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.laser",
+        "group": "time",
+        "description": "Level index added per level for Laser Turret.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.shield_pylon",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Shield Pylon level 1.",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.shield_pylon",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Shield Pylon.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.shield_pylon",
+        "group": "time",
+        "description": "Level index of Shield Pylon level 1 on the shared time curve.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.shield_pylon",
+        "group": "time",
+        "description": "Level index added per level for Shield Pylon.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.missile_silo",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Missile Silo level 1.",
+        "defaultValue": 4200,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.missile_silo",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Missile Silo.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.missile_silo",
+        "group": "time",
+        "description": "Level index of Missile Silo level 1 on the shared time curve.",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.missile_silo",
+        "group": "time",
+        "description": "Level index added per level for Missile Silo.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.tesla_coil",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Tesla Coil level 1.",
+        "defaultValue": 4000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.tesla_coil",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Tesla Coil.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.tesla_coil",
+        "group": "time",
+        "description": "Level index of Tesla Coil level 1 on the shared time curve.",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.tesla_coil",
+        "group": "time",
+        "description": "Level index added per level for Tesla Coil.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.repair_bay",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Repair Bay level 1.",
+        "defaultValue": 3800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.repair_bay",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Repair Bay.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.repair_bay",
+        "group": "time",
+        "description": "Level index of Repair Bay level 1 on the shared time curve.",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.repair_bay",
+        "group": "time",
+        "description": "Level index added per level for Repair Bay.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.alarm",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Alarm Beacon level 1.",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.alarm",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Alarm Beacon.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.alarm",
+        "group": "time",
+        "description": "Level index of Alarm Beacon level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.alarm",
+        "group": "time",
+        "description": "Level index added per level for Alarm Beacon.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.research_lab",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Research Lab level 1.",
+        "defaultValue": 80,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.research_lab",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Research Lab.",
+        "defaultValue": 1.8,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.research_lab",
+        "group": "time",
+        "description": "Level index of Research Lab level 1 on the shared time curve.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.research_lab",
+        "group": "time",
+        "description": "Level index added per level for Research Lab.",
+        "defaultValue": 0.95,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.radar_tower",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Radar Tower level 1.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.radar_tower",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Radar Tower.",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.radar_tower",
+        "group": "time",
+        "description": "Level index of Radar Tower level 1 on the shared time curve.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.radar_tower",
+        "group": "time",
+        "description": "Level index added per level for Radar Tower.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.colony_hub",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Colony Hub level 1.",
+        "defaultValue": 6000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.colony_hub",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Colony Hub.",
+        "defaultValue": 1.8,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.colony_hub",
+        "group": "time",
+        "description": "Level index of Colony Hub level 1 on the shared time curve.",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.colony_hub",
+        "group": "time",
+        "description": "Level index added per level for Colony Hub.",
+        "defaultValue": 0.95,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.hangar",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Hangar level 1.",
+        "defaultValue": 35000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hangar",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Hangar.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.hangar",
+        "group": "time",
+        "description": "Level index of Hangar level 1 on the shared time curve.",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.hangar",
+        "group": "time",
+        "description": "Level index added per level for Hangar.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.auto_harvester",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Auto-Harvester level 1.",
+        "defaultValue": 28000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.auto_harvester",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Auto-Harvester.",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.auto_harvester",
+        "group": "time",
+        "description": "Level index of Auto-Harvester level 1 on the shared time curve.",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.auto_harvester",
+        "group": "time",
+        "description": "Level index added per level for Auto-Harvester.",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.terraformer",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Terraformer level 1 (stage 1).",
+        "defaultValue": 600000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.terraformer",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Terraformer.",
+        "defaultValue": 1.9,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.terraformer",
+        "group": "time",
+        "description": "Level index of Terraformer level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.terraformer",
+        "group": "time",
+        "description": "Level index added per level for Terraformer.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.warp_gate",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Warp Gate level 1 (stage 1).",
+        "defaultValue": 1500000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.warp_gate",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Warp Gate.",
+        "defaultValue": 1.9,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.warp_gate",
+        "group": "time",
+        "description": "Level index of Warp Gate level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.warp_gate",
+        "group": "time",
+        "description": "Level index added per level for Warp Gate.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.dyson_collector",
+        "group": "cost",
+        "description": "Value budget (scrap-equivalents) of Dyson Collector level 1 (stage 1).",
+        "defaultValue": 4000000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.dyson_collector",
+        "group": "cost",
+        "description": "Geometric cost growth per level of Dyson Collector.",
+        "defaultValue": 1.9,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.dyson_collector",
+        "group": "time",
+        "description": "Level index of Dyson Collector level 1 on the shared time curve.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.dyson_collector",
+        "group": "time",
+        "description": "Level index added per level for Dyson Collector.",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.axe",
+        "group": "cost",
+        "description": "Value budget of the first purchasable tier (tier 2) of the Axe ladder.",
+        "defaultValue": 40,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.axe",
+        "group": "cost",
+        "description": "Value growth per tool tier of the Axe ladder.",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.pick",
+        "group": "cost",
+        "description": "Value budget of the first purchasable tier (tier 2) of the Pickaxe ladder.",
+        "defaultValue": 40,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.pick",
+        "group": "cost",
+        "description": "Value growth per tool tier of the Pickaxe ladder.",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.claw",
+        "group": "cost",
+        "description": "Value budget of the first purchasable tier (tier 2) of the Salvage Claw ladder.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.claw",
+        "group": "cost",
+        "description": "Value growth per tool tier of the Salvage Claw ladder.",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.drill",
+        "group": "cost",
+        "description": "Value budget of the first purchasable tier (tier 2) of the Drill ladder.",
+        "defaultValue": 80,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.drill",
+        "group": "cost",
+        "description": "Value growth per tool tier of the Drill ladder.",
+        "defaultValue": 4.7,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.siphon",
+        "group": "cost",
+        "description": "Value budget of the first purchasable tier (tier 2) of the Siphon ladder.",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.siphon",
+        "group": "cost",
+        "description": "Value growth per tool tier of the Siphon ladder.",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.scanner",
+        "group": "cost",
+        "description": "Value budget of the first purchasable tier (tier 2) of the Excavator ladder.",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.scanner",
+        "group": "cost",
+        "description": "Value growth per tool tier of the Excavator ladder.",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.pack",
+        "group": "cost",
+        "description": "Value budget of Backpack level 1.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.pack",
+        "group": "cost",
+        "description": "Value growth per level of Backpack.",
+        "defaultValue": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.pack.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 1 (BackpackSlots).",
+        "defaultValue": 18,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 2 (BackpackSlots).",
+        "defaultValue": 27,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 3 (BackpackSlots).",
+        "defaultValue": 36,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 4 (BackpackSlots).",
+        "defaultValue": 45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 5 (BackpackSlots).",
+        "defaultValue": 54,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 6 (BackpackSlots).",
+        "defaultValue": 63,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 7 (BackpackSlots).",
+        "defaultValue": 72,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Backpack at level 8 (BackpackSlots).",
+        "defaultValue": 81,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.engine",
+        "group": "cost",
+        "description": "Value budget of Engine Efficiency level 1.",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.engine",
+        "group": "cost",
+        "description": "Value growth per level of Engine Efficiency.",
+        "defaultValue": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.engine.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 1 (FuelEfficiency).",
+        "defaultValue": 0.92,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 2 (FuelEfficiency).",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 3 (FuelEfficiency).",
+        "defaultValue": 0.78,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 4 (FuelEfficiency).",
+        "defaultValue": 0.72,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 5 (FuelEfficiency).",
+        "defaultValue": 0.66,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 6 (FuelEfficiency).",
+        "defaultValue": 0.61,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 7 (FuelEfficiency).",
+        "defaultValue": 0.56,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 8 (FuelEfficiency).",
+        "defaultValue": 0.52,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.9",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 9 (FuelEfficiency).",
+        "defaultValue": 0.48,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.10",
+        "group": "upgrade",
+        "description": "Cumulative effect of Engine Efficiency at level 10 (FuelEfficiency).",
+        "defaultValue": 0.45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.jump",
+        "group": "cost",
+        "description": "Value budget of Jump Range level 1.",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.jump",
+        "group": "cost",
+        "description": "Value growth per level of Jump Range.",
+        "defaultValue": 3.1,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.jump.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 1 (JumpRange).",
+        "defaultValue": 36,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 2 (JumpRange).",
+        "defaultValue": 55,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 3 (JumpRange).",
+        "defaultValue": 85,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 4 (JumpRange).",
+        "defaultValue": 130,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 5 (JumpRange).",
+        "defaultValue": 200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 6 (JumpRange).",
+        "defaultValue": 310,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 7 (JumpRange).",
+        "defaultValue": 480,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 8 (JumpRange).",
+        "defaultValue": 750,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.9",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 9 (JumpRange).",
+        "defaultValue": 1200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.10",
+        "group": "upgrade",
+        "description": "Cumulative effect of Jump Range at level 10 (JumpRange).",
+        "defaultValue": 2000,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.scanner_range",
+        "group": "cost",
+        "description": "Value budget of Scanner Range level 1.",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.scanner_range",
+        "group": "cost",
+        "description": "Value growth per level of Scanner Range.",
+        "defaultValue": 3.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.scanner_range.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 1 (ScannerRange).",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 2 (ScannerRange).",
+        "defaultValue": 110,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 3 (ScannerRange).",
+        "defaultValue": 180,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 4 (ScannerRange).",
+        "defaultValue": 300,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 5 (ScannerRange).",
+        "defaultValue": 500,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 6 (ScannerRange).",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 7 (ScannerRange).",
+        "defaultValue": 1300,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Scanner Range at level 8 (ScannerRange).",
+        "defaultValue": 2200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.fuel_tank",
+        "group": "cost",
+        "description": "Value budget of Fuel Tank level 1.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.fuel_tank",
+        "group": "cost",
+        "description": "Value growth per level of Fuel Tank.",
+        "defaultValue": 3.3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.fuel_tank.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Fuel Tank at level 1 (FuelTankSlots).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Fuel Tank at level 2 (FuelTankSlots).",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Fuel Tank at level 3 (FuelTankSlots).",
+        "defaultValue": 7,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Fuel Tank at level 4 (FuelTankSlots).",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Fuel Tank at level 5 (FuelTankSlots).",
+        "defaultValue": 14,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Fuel Tank at level 6 (FuelTankSlots).",
+        "defaultValue": 18,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_toxic",
+        "group": "cost",
+        "description": "Value budget of Toxic Seal level 1.",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_toxic",
+        "group": "cost",
+        "description": "Value growth per level of Toxic Seal.",
+        "defaultValue": 24,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_toxic.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Toxic Seal at level 1 (HullPlating).",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_toxic.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Toxic Seal at level 2 (HullPlating).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_toxic.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Toxic Seal at level 3 (HullPlating).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_heat",
+        "group": "cost",
+        "description": "Value budget of Thermal Plating level 1.",
+        "defaultValue": 6000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_heat",
+        "group": "cost",
+        "description": "Value growth per level of Thermal Plating.",
+        "defaultValue": 14,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_heat.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Thermal Plating at level 1 (HullPlating).",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_heat.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Thermal Plating at level 2 (HullPlating).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_heat.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Thermal Plating at level 3 (HullPlating).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_cold",
+        "group": "cost",
+        "description": "Value budget of Cryo Plating level 1.",
+        "defaultValue": 6000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_cold",
+        "group": "cost",
+        "description": "Value growth per level of Cryo Plating.",
+        "defaultValue": 14,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_cold.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cryo Plating at level 1 (HullPlating).",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_cold.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cryo Plating at level 2 (HullPlating).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_cold.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cryo Plating at level 3 (HullPlating).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_rad",
+        "group": "cost",
+        "description": "Value budget of Rad-Shield Plating level 1.",
+        "defaultValue": 40000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_rad",
+        "group": "cost",
+        "description": "Value growth per level of Rad-Shield Plating.",
+        "defaultValue": 12,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_rad.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Rad-Shield Plating at level 1 (HullPlating).",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_rad.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Rad-Shield Plating at level 2 (HullPlating).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_rad.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Rad-Shield Plating at level 3 (HullPlating).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_void",
+        "group": "cost",
+        "description": "Value budget of Void Shell level 1.",
+        "defaultValue": 500000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_void",
+        "group": "cost",
+        "description": "Value growth per level of Void Shell.",
+        "defaultValue": 8,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_void.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Void Shell at level 1 (HullPlating).",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_void.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Void Shell at level 2 (HullPlating).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_void.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Void Shell at level 3 (HullPlating).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.turret",
+        "group": "cost",
+        "description": "Value budget of Turret Actuators level 1.",
+        "defaultValue": 27,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.turret",
+        "group": "cost",
+        "description": "Value growth per level of Turret Actuators.",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.turret.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Actuators at level 1 (TurretFireRate).",
+        "defaultValue": 0.15,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Actuators at level 2 (TurretFireRate).",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Actuators at level 3 (TurretFireRate).",
+        "defaultValue": 0.45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Actuators at level 4 (TurretFireRate).",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Actuators at level 5 (TurretFireRate).",
+        "defaultValue": 0.75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Actuators at level 6 (TurretFireRate).",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.turretdmg",
+        "group": "cost",
+        "description": "Value budget of Turret Damage level 1.",
+        "defaultValue": 33,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.turretdmg",
+        "group": "cost",
+        "description": "Value growth per level of Turret Damage.",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.turretdmg.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 1 (TurretDamage).",
+        "defaultValue": 0.35,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 2 (TurretDamage).",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 3 (TurretDamage).",
+        "defaultValue": 1.05,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 4 (TurretDamage).",
+        "defaultValue": 1.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 5 (TurretDamage).",
+        "defaultValue": 1.75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 6 (TurretDamage).",
+        "defaultValue": 2.1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 7 (TurretDamage).",
+        "defaultValue": 2.45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 8 (TurretDamage).",
+        "defaultValue": 2.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.9",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 9 (TurretDamage).",
+        "defaultValue": 3.15,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.10",
+        "group": "upgrade",
+        "description": "Cumulative effect of Turret Damage at level 10 (TurretDamage).",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.pulse",
+        "group": "cost",
+        "description": "Value budget of Ion Pulse level 1.",
+        "defaultValue": 28,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.pulse",
+        "group": "cost",
+        "description": "Value growth per level of Ion Pulse.",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.pulse.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 1 (TapDamage).",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 2 (TapDamage).",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 3 (TapDamage).",
+        "defaultValue": 1.2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 4 (TapDamage).",
+        "defaultValue": 1.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 5 (TapDamage).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 6 (TapDamage).",
+        "defaultValue": 2.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 7 (TapDamage).",
+        "defaultValue": 2.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 8 (TapDamage).",
+        "defaultValue": 3.2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.9",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 9 (TapDamage).",
+        "defaultValue": 3.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.10",
+        "group": "upgrade",
+        "description": "Cumulative effect of Ion Pulse at level 10 (TapDamage).",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.shield",
+        "group": "cost",
+        "description": "Value budget of Reactor Shield level 1.",
+        "defaultValue": 27,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.shield",
+        "group": "cost",
+        "description": "Value growth per level of Reactor Shield.",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.shield.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 1 (ReactorHealth).",
+        "defaultValue": 25,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 2 (ReactorHealth).",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 3 (ReactorHealth).",
+        "defaultValue": 75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 4 (ReactorHealth).",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 5 (ReactorHealth).",
+        "defaultValue": 125,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 6 (ReactorHealth).",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 7 (ReactorHealth).",
+        "defaultValue": 175,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 8 (ReactorHealth).",
+        "defaultValue": 200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.9",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 9 (ReactorHealth).",
+        "defaultValue": 225,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.10",
+        "group": "upgrade",
+        "description": "Cumulative effect of Reactor Shield at level 10 (ReactorHealth).",
+        "defaultValue": 250,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.salvage",
+        "group": "cost",
+        "description": "Value budget of Salvage Rig level 1.",
+        "defaultValue": 54,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.salvage",
+        "group": "cost",
+        "description": "Value growth per level of Salvage Rig.",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.salvage.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 1 (RewardBonus).",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 2 (RewardBonus).",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 3 (RewardBonus).",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 4 (RewardBonus).",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.5",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 5 (RewardBonus).",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.6",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 6 (RewardBonus).",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.7",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 7 (RewardBonus).",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.8",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 8 (RewardBonus).",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.9",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 9 (RewardBonus).",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.10",
+        "group": "upgrade",
+        "description": "Cumulative effect of Salvage Rig at level 10 (RewardBonus).",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.compression",
+        "group": "cost",
+        "description": "Value budget of Cargo Compression level 1.",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.compression",
+        "group": "cost",
+        "description": "Value growth per level of Cargo Compression.",
+        "defaultValue": 5.5,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.compression.1",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cargo Compression at level 1 (StackMultiplier).",
+        "defaultValue": 1.15,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.compression.2",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cargo Compression at level 2 (StackMultiplier).",
+        "defaultValue": 1.3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.compression.3",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cargo Compression at level 3 (StackMultiplier).",
+        "defaultValue": 1.5,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.compression.4",
+        "group": "upgrade",
+        "description": "Cumulative effect of Cargo Compression at level 4 (StackMultiplier).",
+        "defaultValue": 1.75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.survey_basics",
+        "group": "cost",
+        "description": "Value budget of research node Survey Basics.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.smelting",
+        "group": "cost",
+        "description": "Value budget of research node Smelting.",
+        "defaultValue": 90,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.fabrication",
+        "group": "cost",
+        "description": "Value budget of research node Fabrication.",
+        "defaultValue": 90,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.deep_drilling",
+        "group": "cost",
+        "description": "Value budget of research node Deep Drilling.",
+        "defaultValue": 70,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.bio_cultivation",
+        "group": "cost",
+        "description": "Value budget of research node Bio-Cultivation.",
+        "defaultValue": 70,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_1",
+        "group": "cost",
+        "description": "Value budget of research node Jump Drive I.",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.steelmaking",
+        "group": "cost",
+        "description": "Value budget of research node Steelmaking.",
+        "defaultValue": 500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.composites",
+        "group": "cost",
+        "description": "Value budget of research node Composites.",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.circuitry",
+        "group": "cost",
+        "description": "Value budget of research node Circuitry.",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.titanium_working",
+        "group": "cost",
+        "description": "Value budget of research node Titanium Working.",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.gas_extraction",
+        "group": "cost",
+        "description": "Value budget of research node Gas Extraction.",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.geo_survey",
+        "group": "cost",
+        "description": "Value budget of research node Geo-Survey.",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.salvage_ops",
+        "group": "cost",
+        "description": "Value budget of research node Salvage Operations.",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.fuel_logistics",
+        "group": "cost",
+        "description": "Value budget of research node Fuel Logistics.",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.cargo_logistics",
+        "group": "cost",
+        "description": "Value budget of research node Cargo Logistics.",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.ballistics",
+        "group": "cost",
+        "description": "Value budget of research node Ballistics.",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.shield_tech",
+        "group": "cost",
+        "description": "Value budget of research node Shield Tech.",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_toxic",
+        "group": "cost",
+        "description": "Value budget of research node Hazmat: Toxic.",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_2",
+        "group": "cost",
+        "description": "Value budget of research node Jump Drive II.",
+        "defaultValue": 500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.field_engineering",
+        "group": "cost",
+        "description": "Value budget of research node Field Engineering.",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.long_range_scanning_1",
+        "group": "cost",
+        "description": "Value budget of research node Long-Range Scanning I.",
+        "defaultValue": 450,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_1",
+        "group": "cost",
+        "description": "Value budget of research node Toolsmithing I.",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.chemistry",
+        "group": "cost",
+        "description": "Value budget of research node Chemistry.",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.thermal_metallurgy",
+        "group": "cost",
+        "description": "Value budget of research node Thermal Metallurgy.",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.cryo_chemistry",
+        "group": "cost",
+        "description": "Value budget of research node Cryo-Chemistry.",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.robotics",
+        "group": "cost",
+        "description": "Value budget of research node Robotics.",
+        "defaultValue": 3200,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.optics",
+        "group": "cost",
+        "description": "Value budget of research node Optics.",
+        "defaultValue": 3200,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_heat",
+        "group": "cost",
+        "description": "Value budget of research node Hazmat: Heat.",
+        "defaultValue": 4000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_cold",
+        "group": "cost",
+        "description": "Value budget of research node Hazmat: Cold.",
+        "defaultValue": 4000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.missile_tech",
+        "group": "cost",
+        "description": "Value budget of research node Missile Tech.",
+        "defaultValue": 3600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.tesla_tech",
+        "group": "cost",
+        "description": "Value budget of research node Tesla Tech.",
+        "defaultValue": 3600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.field_repair",
+        "group": "cost",
+        "description": "Value budget of research node Field Repair.",
+        "defaultValue": 3400,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.colony_charter",
+        "group": "cost",
+        "description": "Value budget of research node Colony Charter.",
+        "defaultValue": 4500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_3",
+        "group": "cost",
+        "description": "Value budget of research node Jump Drive III.",
+        "defaultValue": 3000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.nav_autopilot",
+        "group": "cost",
+        "description": "Value budget of research node Autopilot Navigation.",
+        "defaultValue": 2800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_2",
+        "group": "cost",
+        "description": "Value budget of research node Toolsmithing II.",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.long_range_scanning_2",
+        "group": "cost",
+        "description": "Value budget of research node Long-Range Scanning II.",
+        "defaultValue": 3000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.plasma_physics",
+        "group": "cost",
+        "description": "Value budget of research node Plasma Physics.",
+        "defaultValue": 20000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.radiation_shielding",
+        "group": "cost",
+        "description": "Value budget of research node Radiation Shielding.",
+        "defaultValue": 22000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.quantum_computing",
+        "group": "cost",
+        "description": "Value budget of research node Quantum Computing.",
+        "defaultValue": 25000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_rad",
+        "group": "cost",
+        "description": "Value budget of research node Hazmat: Radiation.",
+        "defaultValue": 26000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.orbital_logistics",
+        "group": "cost",
+        "description": "Value budget of research node Orbital Logistics.",
+        "defaultValue": 24000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.automation",
+        "group": "cost",
+        "description": "Value budget of research node Automation.",
+        "defaultValue": 22000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hangar_ops",
+        "group": "cost",
+        "description": "Value budget of research node Hangar Operations.",
+        "defaultValue": 22000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_3",
+        "group": "cost",
+        "description": "Value budget of research node Toolsmithing III.",
+        "defaultValue": 20000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_4",
+        "group": "cost",
+        "description": "Value budget of research node Jump Drive IV.",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.compression_1",
+        "group": "cost",
+        "description": "Value budget of research node Cargo Compression I.",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.terraforming",
+        "group": "cost",
+        "description": "Value budget of research node Terraforming.",
+        "defaultValue": 100000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.long_range_scanning_3",
+        "group": "cost",
+        "description": "Value budget of research node Long-Range Scanning III.",
+        "defaultValue": 80000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.compression_2",
+        "group": "cost",
+        "description": "Value budget of research node Cargo Compression II.",
+        "defaultValue": 90000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.void_forging",
+        "group": "cost",
+        "description": "Value budget of research node Void Forging.",
+        "defaultValue": 300000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.warp_theory",
+        "group": "cost",
+        "description": "Value budget of research node Warp Theory.",
+        "defaultValue": 320000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.antimatter_synthesis",
+        "group": "cost",
+        "description": "Value budget of research node Antimatter Synthesis.",
+        "defaultValue": 240000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_void",
+        "group": "cost",
+        "description": "Value budget of research node Hazmat: Void.",
+        "defaultValue": 350000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.warp_gate_engineering",
+        "group": "cost",
+        "description": "Value budget of research node Warp Gate Engineering.",
+        "defaultValue": 420000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_5",
+        "group": "cost",
+        "description": "Value budget of research node Jump Drive V.",
+        "defaultValue": 220000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_4",
+        "group": "cost",
+        "description": "Value budget of research node Toolsmithing IV.",
+        "defaultValue": 250000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.stellar_engineering",
+        "group": "cost",
+        "description": "Value budget of research node Stellar Engineering.",
+        "defaultValue": 1500000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.compression_3",
+        "group": "cost",
+        "description": "Value budget of research node Cargo Compression III.",
+        "defaultValue": 700000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.ascension_protocol",
+        "group": "cost",
+        "description": "Value budget of research node Ascension Protocol.",
+        "defaultValue": 3000000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "start.wood",
+        "group": "start",
+        "description": "Starting wood.",
+        "defaultValue": 24,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "start.scrap",
+        "group": "start",
+        "description": "Starting scrap.",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "start.fuel",
+        "group": "start",
+        "description": "Starting fuel cells.",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "start.backpack_slots",
+        "group": "start",
+        "description": "Starting backpack slots (small on purpose: it forces a Warehouse in the first session).",
+        "defaultValue": 9,
+        "min": 3,
+        "max": 60
+      },
+      {
+        "key": "start.builders",
+        "group": "start",
+        "description": "Builders at the start.",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 8
+      },
+      {
+        "key": "travel.base_fuel",
+        "group": "travel",
+        "description": "Fixed fuel per jump leg (energy units).",
+        "defaultValue": 1.5,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "travel.k",
+        "group": "travel",
+        "description": "Fuel per ly^p of route length.",
+        "defaultValue": 0.14,
+        "min": 0.01,
+        "max": 2
+      },
+      {
+        "key": "travel.p",
+        "group": "travel",
+        "description": "Route-length exponent: above 1 so long trips cost more per light year.",
+        "defaultValue": 1.1,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "key": "travel.intra_fuel",
+        "group": "travel",
+        "description": "Fuel of a hop between two worlds of the same system.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "travel.intra_fuel_per_au",
+        "group": "travel",
+        "description": "Extra fuel per AU of orbit difference inside a system.",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "travel.cargo_factor",
+        "group": "travel",
+        "description": "Fuel penalty at a full hold: x(1 + factor x fill).",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "travel.autopilot_mult",
+        "group": "travel",
+        "description": "Fuel multiplier of an autopilot jump (no mini-game, no refund).",
+        "defaultValue": 1.6,
+        "min": 1,
+        "max": 4
+      },
+      {
+        "key": "travel.refund_max",
+        "group": "travel",
+        "description": "Share of the fuel refunded by a perfect Hyperspace Run (legacy 0.4).",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "travel.run_base_seconds",
+        "group": "travel",
+        "description": "Seconds of the shortest Hyperspace Run leg.",
+        "defaultValue": 25,
+        "min": 5,
+        "max": 120
+      },
+      {
+        "key": "travel.run_log_seconds",
+        "group": "travel",
+        "description": "Added seconds per ln(1 + legLy/20).",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 60
+      },
+      {
+        "key": "travel.run_cap_seconds",
+        "group": "travel",
+        "description": "Longest Hyperspace Run leg.",
+        "defaultValue": 90,
+        "min": 20,
+        "max": 300
+      },
+      {
+        "key": "travel.autopilot_seconds",
+        "group": "travel",
+        "description": "Seconds of an autopilot leg.",
+        "defaultValue": 12,
+        "min": 1,
+        "max": 60
+      },
+      {
+        "key": "travel.hop_fraction",
+        "group": "travel",
+        "description": "The route planner keeps each leg below this share of the jump range.",
+        "defaultValue": 0.9,
+        "min": 0.5,
+        "max": 1
+      },
+      {
+        "key": "travel.detour",
+        "group": "travel",
+        "description": "Route length over straight-line distance (stepping-stone systems are not on the line).",
+        "defaultValue": 1.15,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "key": "travel.max_discount",
+        "group": "travel",
+        "description": "Largest combined fuel discount of Hangar and Warp Gate.",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 0.95
+      },
+      {
+        "key": "travel.plating_l2_tier",
+        "group": "travel",
+        "description": "From this planet tier a hazard needs plating level 2.",
+        "defaultValue": 5,
+        "min": 1,
+        "max": 40
+      },
+      {
+        "key": "travel.plating_l3_tier",
+        "group": "travel",
+        "description": "From this planet tier a hazard needs plating level 3.",
+        "defaultValue": 9,
+        "min": 1,
+        "max": 40
+      },
+      {
+        "key": "wave.base_budget",
+        "group": "wave",
+        "description": "Threat budget of wave 1 at danger 0 (legacy 5).",
+        "defaultValue": 5,
+        "min": 0.5,
+        "max": 100
+      },
+      {
+        "key": "wave.linear_per_wave",
+        "group": "wave",
+        "description": "Budget added per wave number (legacy 2).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "wave.growth_per_wave",
+        "group": "wave",
+        "description": "Budget growth per wave number (legacy 1.12).",
+        "defaultValue": 1.12,
+        "min": 1,
+        "max": 1.5
+      },
+      {
+        "key": "wave.danger_weight",
+        "group": "wave",
+        "description": "Budget x (1 + danger x weight) (legacy 0.5).",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "wave.fuel_budget_base",
+        "group": "wave",
+        "description": "Budget x (base + per x energy burned) (legacy 0.5).",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "wave.fuel_budget_per",
+        "group": "wave",
+        "description": "Budget growth per energy unit burned (legacy 0.25).",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "wave.base_eff",
+        "group": "wave",
+        "description": "Value returned per value of fuel burned at wave 1.",
+        "defaultValue": 1.3,
+        "min": 0.5,
+        "max": 5
+      },
+      {
+        "key": "wave.eff_per_wave",
+        "group": "wave",
+        "description": "Efficiency gained per wave cleared on the world.",
+        "defaultValue": 0.03,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "wave.eff_cap_waves",
+        "group": "wave",
+        "description": "Waves after which the per-wave gain stops.",
+        "defaultValue": 20,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "wave.eff_per_tier",
+        "group": "wave",
+        "description": "Efficiency gained per planet tier.",
+        "defaultValue": 0.04,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "wave.bonus_cap",
+        "group": "wave",
+        "description": "Largest total bonus from Alarm Beacon, Salvage Rig and player level.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "wave.core_share",
+        "group": "wave",
+        "description": "Share of the returned value paid in Xeno Cores.",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "wave.refund_share",
+        "group": "wave",
+        "description": "Share of the returned value paid back as fuel.",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "wave.seconds_base",
+        "group": "wave",
+        "description": "Seconds of the shortest wave.",
+        "defaultValue": 40,
+        "min": 5,
+        "max": 600
+      },
+      {
+        "key": "wave.seconds_per_energy",
+        "group": "wave",
+        "description": "Extra seconds per energy unit burned.",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 10
+      },
+      {
+        "key": "wave.seconds_max",
+        "group": "wave",
+        "description": "Longest wave.",
+        "defaultValue": 150,
+        "min": 20,
+        "max": 900
+      },
+      {
+        "key": "wave.xp_per_threat",
+        "group": "wave",
+        "description": "XP per threat unit (legacy 6).",
+        "defaultValue": 6,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "wave.max_energy",
+        "group": "wave",
+        "description": "Most energy units one wave may burn.",
+        "defaultValue": 400,
+        "min": 1,
+        "max": 100000
+      },
+      {
+        "key": "wave.defense_k",
+        "group": "wave",
+        "description": "A wave is winnable when its threat budget is at most defense rating x k.",
+        "defaultValue": 2,
+        "min": 0.1,
+        "max": 100
+      },
+      {
+        "key": "score.reach_coefficient",
+        "group": "score",
+        "description": "Reach = floor(coefficient x sqrt(maxDistanceLy / divisor)).",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.reach_divisor_ly",
+        "group": "score",
+        "description": "Reach distance divisor in light years.",
+        "defaultValue": 10,
+        "min": 0.1,
+        "max": 1000
+      },
+      {
+        "key": "score.world_base",
+        "group": "score",
+        "description": "Worlds: each landed world is worth base x (1 + tier).",
+        "defaultValue": 130,
+        "min": 0,
+        "max": 10000
+      },
+      {
+        "key": "score.world_full_count",
+        "group": "score",
+        "description": "Worlds counted at full value (best tiers first); the rest count at the excess share.",
+        "defaultValue": 500,
+        "min": 1,
+        "max": 100000
+      },
+      {
+        "key": "score.world_excess_share",
+        "group": "score",
+        "description": "Share of value for landed worlds beyond the full count.",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "score.industry_base",
+        "group": "score",
+        "description": "Industry: each structure is worth base x level^exponent x (1 + structure tier).",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 10000
+      },
+      {
+        "key": "score.industry_exponent",
+        "group": "score",
+        "description": "Industry level exponent.",
+        "defaultValue": 1.6,
+        "min": 0.5,
+        "max": 3
+      },
+      {
+        "key": "score.tech_per_upgrade_level",
+        "group": "score",
+        "description": "Tech: points per ship/defense/logistics upgrade level.",
+        "defaultValue": 300,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.tech_per_tool_tier",
+        "group": "score",
+        "description": "Tech: points per tool tier purchased.",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.defense_base",
+        "group": "score",
+        "description": "Defense: base x sqrt(danger) per cleared wave.",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "score.defense_wave_cap",
+        "group": "score",
+        "description": "Anti-farm: waves beyond this count on one world add nothing.",
+        "defaultValue": 25,
+        "min": 1,
+        "max": 10000
+      },
+      {
+        "key": "score.atlas_per_resource",
+        "group": "score",
+        "description": "Atlas: points per resource discovered.",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.atlas_per_recipe",
+        "group": "score",
+        "description": "Atlas: points per recipe crafted.",
+        "defaultValue": 80,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.atlas_per_mega_stage",
+        "group": "score",
+        "description": "Atlas: points per megaproject stage completed.",
+        "defaultValue": 28000,
+        "min": 0,
+        "max": 1000000
+      },
+      {
+        "key": "score.ascension_step",
+        "group": "score",
+        "description": "Final multiplier = 1 + step x ascension rank.",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "obstacle.density",
+        "group": "obstacle",
+        "description": "Share of the building pads blocked on an ordinary world.",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 0.8
+      },
+      {
+        "key": "obstacle.density_jitter",
+        "group": "obstacle",
+        "description": "Per-planet random swing of the density (plus or minus).",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 0.3
+      },
+      {
+        "key": "obstacle.home_density",
+        "group": "obstacle",
+        "description": "Share of pads blocked on the home world (it starts mostly clear).",
+        "defaultValue": 0.08,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "obstacle.free_pads",
+        "group": "obstacle",
+        "description": "The first pads of every world never carry an obstacle.",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 12
+      },
+      {
+        "key": "obstacle.pod_chance",
+        "group": "obstacle",
+        "description": "Chance that an obstacle is a shard pod.",
+        "defaultValue": 0.05,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "obstacle.value_base",
+        "group": "obstacle",
+        "description": "Clearing cost in scrap-equivalents on a tier 0 world (size multiplier 1).",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "obstacle.value_growth",
+        "group": "obstacle",
+        "description": "Clearing cost growth per world tier.",
+        "defaultValue": 2,
+        "min": 1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.cap_base_slots",
+        "group": "obstacle",
+        "description": "No cost line of a clearing may exceed this many slots on a tier 0 world (the value the cap cuts moves to denser lines).",
+        "defaultValue": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "obstacle.cap_slots_per_tier",
+        "group": "obstacle",
+        "description": "Extra slots a clearing cost line may take for every world tier.",
+        "defaultValue": 1.2,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "obstacle.cap_total_base_slots",
+        "group": "obstacle",
+        "description": "Most slots of items a whole clearing may ask for on a tier 0 world.",
+        "defaultValue": 14,
+        "min": 2,
+        "max": 200
+      },
+      {
+        "key": "obstacle.cap_total_slots_per_tier",
+        "group": "obstacle",
+        "description": "Extra slots of items a whole clearing may ask for per world tier.",
+        "defaultValue": 2.5,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "obstacle.reward_share",
+        "group": "obstacle",
+        "description": "Share of the clearing cost that comes back as salvage (must stay below 1).",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 0.9
+      },
+      {
+        "key": "obstacle.xp_per_value",
+        "group": "obstacle",
+        "description": "XP per scrap-equivalent of clearing cost.",
+        "defaultValue": 0.05,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "obstacle.time_cap_seconds",
+        "group": "obstacle",
+        "description": "No obstacle takes a builder longer than this.",
+        "defaultValue": 18000,
+        "min": 60,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.pads.0",
+        "group": "obstacle",
+        "description": "Building pads of size class 0 (Dwarf, Small, Medium, Large, Giant, Colossal).",
+        "defaultValue": 12,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.0",
+        "group": "obstacle",
+        "description": "Clearing cost multiplier of size class 0.",
+        "defaultValue": 0.7,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.1",
+        "group": "obstacle",
+        "description": "Building pads of size class 1 (Dwarf, Small, Medium, Large, Giant, Colossal).",
+        "defaultValue": 16,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.1",
+        "group": "obstacle",
+        "description": "Clearing cost multiplier of size class 1.",
+        "defaultValue": 0.85,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.2",
+        "group": "obstacle",
+        "description": "Building pads of size class 2 (Dwarf, Small, Medium, Large, Giant, Colossal).",
+        "defaultValue": 24,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.2",
+        "group": "obstacle",
+        "description": "Clearing cost multiplier of size class 2.",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.3",
+        "group": "obstacle",
+        "description": "Building pads of size class 3 (Dwarf, Small, Medium, Large, Giant, Colossal).",
+        "defaultValue": 36,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.3",
+        "group": "obstacle",
+        "description": "Clearing cost multiplier of size class 3.",
+        "defaultValue": 1.25,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.4",
+        "group": "obstacle",
+        "description": "Building pads of size class 4 (Dwarf, Small, Medium, Large, Giant, Colossal).",
+        "defaultValue": 48,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.4",
+        "group": "obstacle",
+        "description": "Clearing cost multiplier of size class 4.",
+        "defaultValue": 1.5,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.5",
+        "group": "obstacle",
+        "description": "Building pads of size class 5 (Dwarf, Small, Medium, Large, Giant, Colossal).",
+        "defaultValue": 64,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.5",
+        "group": "obstacle",
+        "description": "Clearing cost multiplier of size class 5.",
+        "defaultValue": 1.8,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.time.t0",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 0 world.",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t1",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 1 world.",
+        "defaultValue": 6,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t2",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 2 world.",
+        "defaultValue": 20,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t3",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 3 world.",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t4",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 4 world.",
+        "defaultValue": 180,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t5",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 5 world.",
+        "defaultValue": 480,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t6",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 6 world.",
+        "defaultValue": 1200,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t7",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 7 world.",
+        "defaultValue": 2400,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t8",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 8 world.",
+        "defaultValue": 4200,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t9",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 9 world.",
+        "defaultValue": 6300,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t10",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 10 world.",
+        "defaultValue": 9000,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t11",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 11 world.",
+        "defaultValue": 12600,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t12",
+        "group": "obstacle",
+        "description": "Builder seconds to clear an obstacle on a tier 12 world.",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "shard.skip.multiplier",
+        "group": "shard",
+        "description": "Skip price = ceil(multiplier x minutes ^ exponent) shards.",
+        "defaultValue": 1.2,
+        "min": 0.1,
+        "max": 20
+      },
+      {
+        "key": "shard.skip.exponent",
+        "group": "shard",
+        "description": "Exponent of the skip price curve (below 1: long waits cost less per minute, so one big skip never costs more than its parts).",
+        "defaultValue": 0.75,
+        "min": 0.3,
+        "max": 1
+      },
+      {
+        "key": "shard.skip.min_cost",
+        "group": "shard",
+        "description": "No paid skip is cheaper than this many shards.",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 50
+      },
+      {
+        "key": "shard.skip.free_finish_seconds",
+        "group": "shard",
+        "description": "A job with at most this long left finishes for free.",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 600
+      },
+      {
+        "key": "shard.builder.max",
+        "group": "shard",
+        "description": "Most builders a player can have, earned or bought.",
+        "defaultValue": 4,
+        "min": 2,
+        "max": 8
+      },
+      {
+        "key": "shard.builder.third_price",
+        "group": "shard",
+        "description": "Shards for the third builder (the Colony Hub gives it for free at level 3).",
+        "defaultValue": 250,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "key": "shard.builder.fourth_price",
+        "group": "shard",
+        "description": "Shards for the fourth builder (the Colony Hub gives it for free at level 7).",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 10000
+      },
+      {
+        "key": "shard.revive.run",
+        "group": "shard",
+        "description": "Shards to revive in a Hyperspace Run.",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.revive.wave",
+        "group": "shard",
+        "description": "Shards to revive the reactor in a called wave.",
+        "defaultValue": 8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.cosmetic.min",
+        "group": "shard",
+        "description": "Cheapest cosmetic in shards.",
+        "defaultValue": 120,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "key": "shard.cosmetic.max",
+        "group": "shard",
+        "description": "Priciest regular cosmetic in shards.",
+        "defaultValue": 1200,
+        "min": 0,
+        "max": 50000
+      },
+      {
+        "key": "shard.earn.levelup_base",
+        "group": "shard",
+        "description": "Shards for a level-up (plus one per full block of levels).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.earn.levelup_block",
+        "group": "shard",
+        "description": "Levels per block of the level-up bonus.",
+        "defaultValue": 15,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.earn.atlas_resource",
+        "group": "shard",
+        "description": "First discovery of a resource.",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.atlas_recipe",
+        "group": "shard",
+        "description": "First craft of a recipe.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.atlas_structure",
+        "group": "shard",
+        "description": "First build of a structure kind.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.achievement_small",
+        "group": "shard",
+        "description": "Small achievement.",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.achievement_medium",
+        "group": "shard",
+        "description": "Medium achievement (new reach tier).",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.achievement_large",
+        "group": "shard",
+        "description": "Large achievement (era entry).",
+        "defaultValue": 25,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.streak_day1",
+        "group": "shard",
+        "description": "Daily login streak reward on day 1 of the week.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day2",
+        "group": "shard",
+        "description": "Daily login streak reward on day 2 of the week.",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day3",
+        "group": "shard",
+        "description": "Daily login streak reward on day 3 of the week.",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day4",
+        "group": "shard",
+        "description": "Daily login streak reward on day 4 of the week.",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day5",
+        "group": "shard",
+        "description": "Daily login streak reward on day 5 of the week.",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day6",
+        "group": "shard",
+        "description": "Daily login streak reward on day 6 of the week.",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day7",
+        "group": "shard",
+        "description": "Daily login streak reward on day 7 of the week.",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.ad_reward",
+        "group": "shard",
+        "description": "Shards for one opt-in rewarded ad (Free Shards placement).",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.earn.ads_per_day",
+        "group": "shard",
+        "description": "Daily cap of shard ads.",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "shard.earn.board_participation",
+        "group": "shard",
+        "description": "Weekly board reward for an active week (the weekly Sector Challenge).",
+        "defaultValue": 20,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.board_top10",
+        "group": "shard",
+        "description": "Weekly board reward for the top 10 percent (instead of the participation reward).",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "shard.earn.board_top1",
+        "group": "shard",
+        "description": "Weekly board reward for the top 1 percent (instead of the participation reward).",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "key": "shard.earn.weekly_objectives",
+        "group": "shard",
+        "description": "Weekly objectives per week (recurring achievements).",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10
+      },
+      {
+        "key": "shard.earn.weekly_objective_reward",
+        "group": "shard",
+        "description": "Shards per completed weekly objective.",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.pod_base",
+        "group": "shard",
+        "description": "Shards in an obstacle pod on a tier 0 world.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.earn.pod_per_3_tiers",
+        "group": "shard",
+        "description": "Extra shards in a pod for every 3 tiers of the world.",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.pack.1.shards",
+        "group": "shard",
+        "description": "Shards in consumable pack 1.",
+        "defaultValue": 80,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.1.price_tier",
+        "group": "shard",
+        "description": "Store price tier (dollars) of pack 1, a guide only.",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.2.shards",
+        "group": "shard",
+        "description": "Shards in consumable pack 2.",
+        "defaultValue": 500,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.2.price_tier",
+        "group": "shard",
+        "description": "Store price tier (dollars) of pack 2, a guide only.",
+        "defaultValue": 5,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.3.shards",
+        "group": "shard",
+        "description": "Shards in consumable pack 3.",
+        "defaultValue": 1100,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.3.price_tier",
+        "group": "shard",
+        "description": "Store price tier (dollars) of pack 3, a guide only.",
+        "defaultValue": 10,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.4.shards",
+        "group": "shard",
+        "description": "Shards in consumable pack 4.",
+        "defaultValue": 2400,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.4.price_tier",
+        "group": "shard",
+        "description": "Store price tier (dollars) of pack 4, a guide only.",
+        "defaultValue": 20,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.5.shards",
+        "group": "shard",
+        "description": "Shards in consumable pack 5.",
+        "defaultValue": 6500,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.5.price_tier",
+        "group": "shard",
+        "description": "Store price tier (dollars) of pack 5, a guide only.",
+        "defaultValue": 50,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "sim.growth_payback_hours",
+        "group": "sim",
+        "description": "A player buys an income upgrade that pays itself back within this many hours of play (0 turns the habit off).",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "sim.growth_urgent_hours",
+        "group": "sim",
+        "description": "An upgrade that pays back within this many hours of play is worked toward at once, like a headline goal.",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "sim.growth_check_seconds",
+        "group": "sim",
+        "description": "Seconds of play between two looks at the growth options.",
+        "defaultValue": 60,
+        "min": 5,
+        "max": 3600
+      },
+      {
+        "key": "sim.harvest_seconds",
+        "group": "sim",
+        "description": "Seconds of one harvest mini-game run including its cooldown (design: 25 to 40).",
+        "defaultValue": 30,
+        "min": 10,
+        "max": 90
+      },
+      {
+        "key": "sim.harvest_overhead",
+        "group": "sim",
+        "description": "Seconds of menu and walking time added to every harvest run.",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "key": "sim.craft_tap_seconds",
+        "group": "sim",
+        "description": "Seconds of one craft tap (crafting itself has no timer).",
+        "defaultValue": 2.5,
+        "min": 0.5,
+        "max": 20
+      },
+      {
+        "key": "sim.deposit_seconds",
+        "group": "sim",
+        "description": "Seconds to drag the backpack into a warehouse.",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "key": "sim.buy_seconds",
+        "group": "sim",
+        "description": "Seconds to place, upgrade or purchase one thing.",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "key": "sim.land_seconds",
+        "group": "sim",
+        "description": "Seconds of takeoff and landing around every flight.",
+        "defaultValue": 8,
+        "min": 0,
+        "max": 60
+      },
+      {
+        "key": "sim.intra_hop_seconds",
+        "group": "sim",
+        "description": "Seconds of a Hyperspace Run between two worlds of the same system.",
+        "defaultValue": 22,
+        "min": 5,
+        "max": 120
+      },
+      {
+        "key": "sim.base_scanner_ly",
+        "group": "sim",
+        "description": "Survey radius around visited systems before any Scanner Range upgrade.",
+        "defaultValue": 40,
+        "min": 5,
+        "max": 500
+      },
+      {
+        "key": "sim.max_runs_per_step",
+        "group": "sim",
+        "description": "Harvest runs a player does before re-planning.",
+        "defaultValue": 6,
+        "min": 1,
+        "max": 50
+      },
+      {
+        "key": "sim.instant_below_seconds",
+        "group": "sim",
+        "description": "Build jobs shorter than this finish at once and need no builder.",
+        "defaultValue": 15,
+        "min": 0,
+        "max": 120
+      },
+      {
+        "key": "sim.fuel_reserve",
+        "group": "sim",
+        "description": "Energy a player keeps above the cost of a trip.",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "sim.auto_quality",
+        "group": "sim",
+        "description": "Mini-game quality assumed for Auto-Harvester output.",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "sim.storage_trigger",
+        "group": "sim",
+        "description": "A purchase needing more than this share of all slots makes the player build storage first.",
+        "defaultValue": 0.9,
+        "min": 0.3,
+        "max": 1
+      },
+      {
+        "key": "sim.mega_chunk_share",
+        "group": "sim",
+        "description": "Share of all slots a single megaproject installment may fill.",
+        "defaultValue": 0.15,
+        "min": 0.02,
+        "max": 1
+      },
+      {
+        "key": "sim.session_jitter_hours",
+        "group": "sim",
+        "description": "Random shift of each session start (deterministic per seed).",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "sim.pack_deposit_share",
+        "group": "sim",
+        "description": "The player empties the backpack into storage once it is this full.",
+        "defaultValue": 0.6,
+        "min": 0.1,
+        "max": 1
+      },
+      {
+        "key": "sim.intermediate_share",
+        "group": "sim",
+        "description": "An intermediate product may fill at most this share of all bag slots; beyond it the player waits for the other ingredients.",
+        "defaultValue": 0.12,
+        "min": 0.02,
+        "max": 1
+      },
+      {
+        "key": "sim.max_warehouses",
+        "group": "sim",
+        "description": "Most warehouses the player builds on the home world.",
+        "defaultValue": 6,
+        "min": 1,
+        "max": 12
+      },
+      {
+        "key": "sim.max_wait_seconds",
+        "group": "sim",
+        "description": "A player waits for a job that finishes within this time instead of leaving.",
+        "defaultValue": 120,
+        "min": 0,
+        "max": 3600
+      },
+      {
+        "key": "sim.wave_energy_base",
+        "group": "sim",
+        "description": "Energy burned in the first called wave.",
+        "defaultValue": 6,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "sim.wave_energy_per_wave",
+        "group": "sim",
+        "description": "Extra energy burned per wave already called.",
+        "defaultValue": 1.5,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "sim.wave_energy_cap",
+        "group": "sim",
+        "description": "Most energy a player burns in one called wave.",
+        "defaultValue": 60,
+        "min": 1,
+        "max": 1000
+      }
+    ]
+  }
+}

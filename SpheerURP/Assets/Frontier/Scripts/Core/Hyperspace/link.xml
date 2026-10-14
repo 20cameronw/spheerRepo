@@ -1,0 +1,6 @@
+<linker>
+  <!-- HyperspaceTuning resolves its tuning keys by reflection (AllKeys/TryGet/TrySet, Remote Config overrides); keep its fields in IL2CPP builds. -->
+  <assembly fullname="Frontier.Core">
+    <type fullname="Frontier.Hyperspace.HyperspaceTuning" preserve="all" />
+  </assembly>
+</linker>

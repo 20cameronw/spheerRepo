@@ -1,0 +1,21 @@
+{
+    "name": "Frontier.Services.Unity.Recovery.Apple",
+    "rootNamespace": "Frontier.Services.Unity.Recovery.Apple",
+    "references": [
+        "Frontier.Services",
+        "Frontier.Services.Unity",
+        "AppleAuth"
+    ],
+    "includePlatforms": [
+        "Editor",
+        "iOS"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

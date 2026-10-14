@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: draw_copper_wire
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: draw_copper_wire
+  displayName: Draw Copper Wire
+  inputs:
+  - resource: {fileID: 11400000, guid: d245a69f6c4876e47a160dd6b1339d85, type: 2}
+    amount: 2
+  outputs:
+  - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+    amount: 3
+  fabricator: 1
+  kind: 0
+  stationId: fabricator
+  stationLevel: 1
+  tier: 1
+  unlockResearch: fabrication
+  bonus: 0

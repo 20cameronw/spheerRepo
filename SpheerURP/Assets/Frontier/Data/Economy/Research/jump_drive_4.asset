@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: jump_drive_4
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: jump_drive_4
+    displayName: Jump Drive IV
+    description: 'Anchors in the rift: long, safe jumps.'
+    branch: Navigation
+    tier: 4
+    cost:
+    - resourceId: steel
+      amount: 490
+    - resourceId: titanium_plate
+      amount: 260
+    - resourceId: circuit_board
+      amount: 320
+    - resourceId: optic_lens
+      amount: 310
+    - resourceId: thermal_alloy
+      amount: 70
+    - resourceId: quantum_chip
+      amount: 5
+    prereqs:
+    - jump_drive_3
+    - quantum_computing
+    labLevel: 4
+    unlocks:
+    - upgrade:jump:6
+    - upgrade:jump:7
+  icon: research
