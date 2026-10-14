@@ -14,6 +14,9 @@ namespace Frontier
         Color popupColor;
         ScrollView popupScroll;
         bool popupCompact;
+        PlacedStructure jobPopupStructure;
+        Label jobStatusLabel;
+        float nextJobStatusRefresh;
 
         StructureSO buildDef;
         VisualElement banner;
@@ -58,8 +61,17 @@ namespace Frontier
             if (popup != null) popup.RemoveFromHierarchy();
             popup = null; popupAnchor = null; popupBuild = null; popupKey = null;
             popupScroll = null;
+            jobPopupStructure = null; jobStatusLabel = null;
             if (planetView != null) planetView.Frozen = false;
             if (world != null) world.Selected = null;
+        }
+
+        void RefreshBuilderStatus()
+        {
+            if (jobStatusLabel == null || jobPopupStructure == null || Time.unscaledTime < nextJobStatusRefresh) return;
+            nextJobStatusRefresh = Time.unscaledTime + 1f;
+            jobStatusLabel.text = gs.BuilderJobStatus(jobPopupStructure);
+            if (string.IsNullOrEmpty(jobStatusLabel.text)) jobStatusLabel.text = "READY";
         }
 
         void RefreshPopup()
@@ -104,6 +116,19 @@ namespace Frontier
             // Tapping the selected structure again releases it.
             if (popup != null && popupAnchor == t) { ClosePopup(); return; }
             CloseModal();
+            if (gs.IsUnderConstruction(s) || gs.IsUpgradeInProgress(s))
+            {
+                Color jobColor = UiKit.Ui(s.def.color);
+                OpenPopup("builder" + s.slot, t, jobColor, body =>
+                {
+                    StructureHeader(body, s, jobColor, "Builder crew assigned");
+                    jobStatusLabel = UiKit.Text(gs.BuilderJobStatus(s), "fr-small", UiKit.Cyan);
+                    body.Add(jobStatusLabel);
+                    body.Add(UiKit.Text("Jobs use local device time in this offline build.", "fr-tiny"));
+                });
+                jobPopupStructure = s;
+                return;
+            }
             var k = s.def.kind;
             if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
@@ -133,13 +158,28 @@ namespace Frontier
 
         void UpgradeButton(VisualElement body, PlacedStructure s, Color c)
         {
+            if (gs.IsUpgradeInProgress(s))
+            {
+                body.Add(Note(gs.BuilderJobStatus(s), UiKit.Cyan));
+                return;
+            }
+            if (gs.IsUnderConstruction(s))
+            {
+                body.Add(Note(gs.BuilderJobStatus(s), UiKit.Amber));
+                return;
+            }
             if (s.level >= s.def.maxLevel) { body.Add(Note("MAX LEVEL", UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
             body.Add(SectionLabel("UPGRADE TO LV " + (s.level + 1) + "  (" + StructureEffect(s.def, s.level + 1) + ")"));
             body.Add(UiKit.CostRow(cost, gs, true));
             var up = IconBtn("UPGRADE", "up", c, () =>
             {
-                if (gs.UpgradeStructure(s)) { Sfx.Good(); Toast(s.def.displayName + " LV " + s.level, c); }
+                if (gs.UpgradeStructure(s))
+                {
+                    Sfx.Good();
+                    Toast(gs.IsUpgradeInProgress(s) ? "Upgrade started · " + gs.BuilderJobStatus(s) :
+                        s.def.displayName + " LV " + s.level, c);
+                }
                 else Sfx.Bad();
             });
             if (gs.StructureUpgradeLockReason(s) != null) body.Add(Note(gs.StructureUpgradeLockReason(s), UiKit.Amber));
@@ -390,15 +430,18 @@ namespace Frontier
             if (!gs.Place(def, slot)) { }
             else
             {
+                var placed = gs.StructureAt(gs.planet, slot);
                 Sfx.Good();
                 Fx.Burst(t.position, def.color, 50, 5f, 0.25f);
                 planetView.Punch();
-                Toast(def.displayName + " built!", UiKit.Ui(def.color));
+                Toast(gs.IsUnderConstruction(placed) ? def.displayName + " construction started" :
+                    def.displayName + " built!", UiKit.Ui(def.color));
                 ExitBuild();
                 return;
             }
             Sfx.Bad();
-            Toast("Not enough resources", UiKit.Red);
+            Toast(gs.AvailableBuilderCount <= 0 && gs.StructureJobSeconds(def, 1) > 0
+                ? gs.BuilderAvailabilityReason() : "Not enough resources", UiKit.Red);
         }
     }
 }

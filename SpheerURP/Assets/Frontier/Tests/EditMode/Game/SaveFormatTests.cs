@@ -133,7 +133,7 @@ namespace Frontier.Tests
             s.player.inventory.Add(new StackRecord { resourceId = "fuel", count = 9 });
             s.location.currentPlanetId = "p:3:0:1001:2";
             var d = new PlanetDelta { planetId = "p:0:0:1000:0", wavesCleared = 4, visits = 3, discovered = true, firstVisitUtc = "2026-10-13T12:00:00.0000000Z", lastVisitUtc = "2026-10-13T14:30:15.5000000Z" };
-            d.structures.Add(new StructureRecord { defId = "lumber", slot = 0, level = 2, buildEndUtc = "2026-10-13T15:00:00.0000000Z" });
+            d.structures.Add(new StructureRecord { defId = "lumber", slot = 0, level = 2, buildEndUtc = "2026-10-13T15:00:00.0000000Z", pendingUpgradeLevel = 3 });
             d.structures.Add(new StructureRecord { defId = "warehouse", slot = 5, level = 5 });
             var storage = new StorageRecord { structureSlot = 5 };
             for (int i = 0; i < 54; i++) storage.slots.Add(new StackRecord());
@@ -176,6 +176,7 @@ namespace Frontier.Tests
             Assert.AreEqual("2026-10-13T14:30:15.5000000Z", d.lastVisitUtc);
             Assert.AreEqual(2, d.structures[0].level);
             Assert.AreEqual("2026-10-13T15:00:00.0000000Z", d.structures[0].buildEndUtc);
+            Assert.AreEqual(3, d.structures[0].pendingUpgradeLevel);
             Assert.AreEqual(54, d.storages[0].slots.Count);
             Assert.AreEqual("stone", d.storages[0].slots[7].resourceId);
             Assert.AreEqual(64, d.storages[0].slots[7].count);

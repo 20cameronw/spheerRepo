@@ -64,11 +64,15 @@ namespace Frontier
         public string StructureUpgradeLockReason(PlacedStructure placed)
         {
             if (!IsPlaced(placed)) return "Unknown structure";
+            if (!IsOperational(placed)) return "Structure is still under construction";
+            if (IsUpgradeInProgress(placed)) return "Upgrade already in progress";
             if (placed.level >= placed.def.maxLevel) return "Max level";
             if (!db.UsesImportedEconomy) return null;
             if (!placed.def.Implemented) return "Structure gameplay coming later";
             var row = placed.def.Row(placed.level + 1);
-            return GateReason(placed.def.unlockResearch, row.requiresReachTier, row.requiresLabLevel);
+            string gate = GateReason(placed.def.unlockResearch, row.requiresReachTier, row.requiresLabLevel);
+            if (gate != null) return gate;
+            return StructureJobSeconds(placed.def, placed.level + 1) > 0 ? BuilderAvailabilityReason() : null;
         }
 
         public bool RecipeAt(RecipeSO recipe, PlacedStructure station)
@@ -81,7 +85,7 @@ namespace Frontier
         public string RecipeLockReason(RecipeSO recipe, PlacedStructure station)
         {
             if (recipe == null || Array.IndexOf(db.recipes, recipe) < 0) return "Unknown recipe";
-            if (!IsPlaced(station) || station.planetId != planet.Id || !RecipeAt(recipe, station)) return "Requires its crafting station";
+            if (!IsOperational(station) || station.planetId != planet.Id || !RecipeAt(recipe, station)) return "Requires its crafting station";
             if (!db.UsesImportedEconomy) return null;
             if (station.level < recipe.stationLevel) return "Requires station level " + recipe.stationLevel;
             return GateReason(recipe.unlockResearch, recipe.tier);

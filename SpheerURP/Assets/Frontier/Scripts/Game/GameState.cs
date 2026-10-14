@@ -252,7 +252,7 @@ namespace Frontier
 
         public PlacedStructure StructureOfKind(PlanetData p, StructureKind k)
         {
-            foreach (var s in structures) if (s.planetId == p.Id && s.def.kind == k) return s;
+            foreach (var s in structures) if (s.planetId == p.Id && s.def.kind == k && IsOperational(s)) return s;
             return null;
         }
 
@@ -263,7 +263,12 @@ namespace Frontier
             return n;
         }
 
-        public bool HasStructure(PlanetData p, StructureSO def) { return CountOnPlanet(p, def) > 0; }
+        public bool HasStructure(PlanetData p, StructureSO def)
+        {
+            foreach (var structure in structures)
+                if (structure.planetId == p.Id && structure.def == def && IsOperational(structure)) return true;
+            return false;
+        }
 
         public bool AtLimit(PlanetData p, StructureSO def) { return def.maxPerPlanet > 0 && CountOnPlanet(p, def) >= def.maxPerPlanet; }
 
@@ -286,8 +291,14 @@ namespace Frontier
 
         public bool Place(StructureSO def, int slot)
         {
-            if (slot < 0 || slot >= planet.BuildingSlots || AtLimit(planet, def) || !CanBuildHere(def) || StructureAt(planet, slot) != null || !SpendQuietly(def.buildCost)) return false;
-            world.Place(planet.Id, def.id, slot);
+            if (CompleteBuilderJobs()) Notify();
+            int seconds = StructureJobSeconds(def, 1);
+            if (slot < 0 || slot >= planet.BuildingSlots || AtLimit(planet, def) || !CanBuildHere(def) ||
+                StructureAt(planet, slot) != null || (seconds > 0 && AvailableBuilderCount <= 0) ||
+                !SpendQuietly(def.buildCost)) return false;
+            var record = world.Place(planet.Id, def.id, slot);
+            if (record == null) return false;
+            if (seconds > 0) StartBuilderJob(StructureAt(planet, slot), seconds, 0);
             Notify();
             return true;
         }
@@ -301,8 +312,12 @@ namespace Frontier
 
         public bool UpgradeStructure(PlacedStructure s)
         {
+            if (CompleteBuilderJobs()) Notify();
             if (!CanUpgradeStructure(s) || !SpendQuietly(s.def.UpgradeCost(s.level))) return false;
-            world.SetLevel(s.record, s.level + 1);
+            int targetLevel = s.level + 1;
+            int seconds = StructureJobSeconds(s.def, targetLevel);
+            if (seconds > 0) StartBuilderJob(s, seconds, targetLevel);
+            else world.SetLevel(s.record, targetLevel);
             Notify();
             return true;
         }
@@ -314,7 +329,7 @@ namespace Frontier
 
         public float StructureBonus(PlacedStructure s)
         {
-            if (s == null) return 0f;
+            if (s == null || !IsOperational(s)) return 0f;
             if (!s.def.HasLevelRows) return s.def.bonusPerLevel * (s.level - 1);
             // Catalog stations grow batch size, not free output. Never interpret batchSize=1 as +100% yield.
             return s.def.effectKind == "yieldBonus" || s.def.effectKind == "waveRewardBonus" ? s.def.EffectAt(s.level) : 0f;

@@ -23,16 +23,19 @@ namespace Frontier
         public List<StackRecord> slots = new List<StackRecord>();
     }
 
-    /// <summary>A structure the player built: definition id, pad slot and level, plus reserved timer fields.</summary>
+    /// <summary>A placed structure with optional construction and upgrade jobs.</summary>
     [Serializable]
     public class StructureRecord
     {
         public string defId;
         public int slot;
         public int level = 1;
-        /// <summary>Reserved for the builder timers (UTC, ISO 8601). Empty while no job runs.</summary>
+        /// <summary>Local timer end in UTC ISO 8601. Empty while no construction runs.</summary>
         public string buildEndUtc = "";
+        /// <summary>Local timer end in UTC ISO 8601. Empty while no upgrade runs.</summary>
         public string upgradeEndUtc = "";
+        /// <summary>Level to apply when upgradeEndUtc is reached; 0 while idle.</summary>
+        public int pendingUpgradeLevel;
     }
 
     /// <summary>
@@ -300,6 +303,7 @@ namespace Frontier
                 if (s.level < 1) s.level = 1;
                 if (s.buildEndUtc == null) s.buildEndUtc = "";
                 if (s.upgradeEndUtc == null) s.upgradeEndUtc = "";
+                if (s.pendingUpgradeLevel < 0) s.pendingUpgradeLevel = 0;
             }
             d.storages.RemoveAll(s => s == null);
             foreach (var storage in d.storages)

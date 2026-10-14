@@ -49,6 +49,7 @@ namespace Frontier
             double dt = now - lastTickAt;
             lastTickAt = now;
             if (dt > 0.0 && dt <= MaxCountedFrameSeconds) stats.AddPlaySeconds(dt);
+            if (CompleteBuilderJobs()) Notify();
             if (now - playTimeMarkedAt >= PlayTimeSaveSeconds)
             {
                 playTimeMarkedAt = now;
@@ -176,6 +177,7 @@ namespace Frontier
                 });
             }
             world.Import(save.worlds);
+            RecoverBuilderJobs(warnings);
             stats = save.stats ?? new PlayerStats();
 
             planet = universe.Get(save.location.currentPlanetId);

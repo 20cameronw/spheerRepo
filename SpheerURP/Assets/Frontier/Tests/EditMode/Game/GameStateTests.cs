@@ -317,7 +317,13 @@ namespace Frontier.Tests
             Assert.AreEqual(2, state.structures.Count);
             Assert.AreSame(placed, state.StructureAt(state.planet, 2), "the same object after the list was rebuilt");
             GiveAllResources(state);
+            int upgradeSeconds = state.StructureJobSeconds(placed.def, placed.level + 1);
             Assert.IsTrue(state.UpgradeStructure(placed));
+            if (upgradeSeconds > 0)
+            {
+                clock.Advance(upgradeSeconds);
+                state.Tick();
+            }
             Assert.AreEqual(2, placed.level);
             Assert.AreEqual(2, state.world.StructureAt(state.planet.Id, 2).level, "the wrapper reads the saved record");
             Assert.AreSame(placed, state.StructureAt(state.planet, 2));

@@ -100,7 +100,8 @@ namespace Frontier
             tabs.Add(TabButton("shield", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
             tabs.Add(TabButton("satellite", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
             body.Add(tabs);
-            var note = UiKit.Text("Build on " + gs.planet.Name + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots + " free slots. Tap a structure on the planet to use it.", "fr-muted");
+            var note = UiKit.Text("Build on " + gs.planet.Name + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots +
+                " free slots  ·  CREWS " + gs.BusyBuilderCount + "/" + gs.BuilderCount + " busy. Tap a structure on the planet to use it.", "fr-muted");
             note.style.marginBottom = UiKit.Space.S12;
             body.Add(note);
             switch (shopTab)
@@ -135,13 +136,19 @@ namespace Frontier
                 top.Add(count);
                 card.Add(top);
 
-                if (gs.AtLimit(gs.planet, def)) card.Add(Note("BUILT - tap it on the planet", UiKit.Lime));
+                PlacedStructure activeJob = null;
+                foreach (var structure in gs.StructuresOn(gs.planet))
+                    if (structure.def == def && gs.IsBuilderBusy(structure)) { activeJob = structure; break; }
+                if (activeJob != null) card.Add(Note(gs.BuilderJobStatus(activeJob), UiKit.Cyan));
+                else if (gs.AtLimit(gs.planet, def)) card.Add(Note("BUILT - tap it on the planet", UiKit.Lime));
                 else if (gs.BuildLockReason(def) != null) card.Add(Note(gs.BuildLockReason(def), UiKit.Amber));
                 else if (!gs.CanBuildHere(def)) card.Add(Note("Nothing to harvest on this planet", UiKit.Amber));
                 else
                 {
                     card.Add(UiKit.CostRow(def.buildCost, gs, true));
-                    bool can = gs.Has(def.buildCost);
+                    bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
+                    if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
+                    bool can = gs.Has(def.buildCost) && crewAvailable;
                     var place = IconBtn("PLACE", "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
                     UiKit.SetEnabledLook(place, can);
                     card.Add(place);
@@ -425,13 +432,19 @@ namespace Frontier
                     col.Add(UiKit.Text(StructureEffect(s.def, s.level) + (max ? "" : "  >  " + StructureEffect(s.def, s.level + 1)), "fr-tiny"));
                     top.Add(col);
                     card.Add(top);
-                    if (!max)
+                    if (gs.IsBuilderBusy(s)) card.Add(Note(gs.BuilderJobStatus(s), UiKit.Cyan));
+                    if (!max && !gs.IsBuilderBusy(s))
                     {
                         var cost = s.def.UpgradeCost(s.level);
                         card.Add(UiKit.CostRow(cost, gs, true));
                         var up = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
                         {
-                            if (gs.UpgradeStructure(s)) { Sfx.Good(); Toast(s.def.displayName + " LV " + s.level, c); }
+                            if (gs.UpgradeStructure(s))
+                            {
+                                Sfx.Good();
+                                Toast(gs.IsUpgradeInProgress(s) ? "Upgrade started · " + gs.BuilderJobStatus(s) :
+                                    s.def.displayName + " LV " + s.level, c);
+                            }
                             else Sfx.Bad();
                         });
                         if (gs.StructureUpgradeLockReason(s) != null) card.Add(Note(gs.StructureUpgradeLockReason(s), UiKit.Amber));

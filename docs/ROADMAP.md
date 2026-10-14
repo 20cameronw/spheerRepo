@@ -591,7 +591,7 @@ the save model does not track those discoveries yet.
 its authored prerequisites, reach tier, current-world Research Lab level and catalog resource costs; successful purchases
 unlock dependent content and survive save/load. Axe, Pick and Drill tiers can be bought and affect yield and tool feedback. Other tool ladders
 remain unavailable until their harvest games exist. The save schema remains v2 and older v2 saves default to no new purchases.
-The full EditMode suite (including Slow) passes 539 tests, with two runtime-specific allocation probes skipped; PlayMode passes 19,
+The full EditMode suite (including Slow) passes 543 tests, with two runtime-specific allocation probes skipped; PlayMode passes 19,
 and all five editor checks pass. Progression coverage includes save/reload, invalid catalog entries and preserving progression data
 while the database temporarily falls back to legacy content.
 
@@ -599,13 +599,14 @@ while the database temporarily falls back to legacy content.
 
 The research and supported-tool progression slice is complete. Continue in small, independently verifiable gameplay slices, in this order:
 
-1. **Builder jobs and timers (`m7-timers-builders-obstacles`, builder/timer foundation):** define a persisted job lifecycle and builder-slot rules; use the injected clock rather than wall-clock reads; expose job state and remaining time in the UI; cover save/reload, completion, reset and clock edge cases with EditMode tests. Start with the already-supported build actions and do not imply offline/server authority that does not exist.
-2. **Structure behaviours and economy gates:** implement only effects with an existing runtime contract, and keep catalog-only structures visibly unavailable until their behavior is real.
-3. **Harvest expansion:** establish the shared minigame lifecycle before adding Siphon, Excavate and Salvage; each new game must use its matching tool ladder and resource method.
-4. **World hazards, obstacles and shards:** wire their existing catalog data into travel, removal and reward loops, with deterministic tests and clear player-facing costs.
-5. **Atlas discovery and rewards:** persist discoveries and grant capped first-discovery rewards; keep visited/surveyed information distinct from discovery.
+1. **Structure behaviours and economy gates:** implement only effects with an existing runtime contract, and keep catalog-only structures visibly unavailable until their behavior is real.
+2. **Harvest expansion:** establish the shared minigame lifecycle before adding Siphon, Excavate and Salvage; each new game must use its matching tool ladder and resource method.
+3. **World hazards, obstacles and shards:** wire their existing catalog data into travel, removal and reward loops, with deterministic tests and clear player-facing costs.
+4. **Atlas discovery and rewards:** persist discoveries and grant capped first-discovery rewards; keep visited/surveyed information distinct.
 
 Defer ads, premium purchases, online services and cross-device time validation until their service interfaces, consent and compliance work are ready. This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
+
+**Builder jobs and timers (foundation complete):** persisted construction and upgrade jobs now use the injected UTC clock, derive crew capacity from the catalog/research/operational Colony Hub, and recover or complete jobs across save/load. Construction occupies its pad but stays offline; upgrades retain the active level until completion. The UI shows crew availability, job status and countdowns, and explicitly identifies local-device time. Unknown reserved builder entries are preserved. Validation: EditMode 543 passed / 2 runtime-specific allocation probes skipped; PlayMode 19 passed; all five editor checks passed. The phone screenshot harness captured HUD, build mode and refinery popup with zero lint overflow findings. This is an offline timer foundation, not trusted cross-device timing; obstacle-clearing jobs and timer skips are not implemented.
 
 **Runtime cutover validation (2026-10-13):** full EditMode including Slow 535 passed / 2 platform-specific allocation probes
 skipped; PlayMode 19 passed; economy lab 127 passed; all five editor checks passed with zero compile diagnostics. Original

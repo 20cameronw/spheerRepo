@@ -76,7 +76,7 @@ namespace Frontier
         {
             var list = new List<KeyValuePair<PlacedStructure, Transform>>();
             foreach (var it in items)
-                if (it.structure != null && it.structure.def.kind.IsTurret() && it.t != null)
+                if (it.structure != null && gs.IsOperational(it.structure) && it.structure.def.kind.IsTurret() && it.t != null)
                     list.Add(new KeyValuePair<PlacedStructure, Transform>(it.structure, it.t));
             return list;
         }
@@ -152,7 +152,11 @@ namespace Frontier
         void RebuildStructures()
         {
             var sb = new StringBuilder(gs.planet.Id);
-            foreach (var s in gs.structures) if (s.planetId == gs.planet.Id) sb.Append('|').Append(s.def.id).Append(s.slot).Append(':').Append(s.level);
+            foreach (var s in gs.structures)
+                if (s.planetId == gs.planet.Id)
+                    sb.Append('|').Append(s.def.id).Append(s.slot).Append(':').Append(s.level)
+                        .Append(':').Append(s.record.buildEndUtc).Append(':').Append(s.record.upgradeEndUtc)
+                        .Append(':').Append(s.record.pendingUpgradeLevel);
             string sig = sb.ToString();
             if (sig == signature) return;
             signature = sig;
@@ -230,7 +234,10 @@ namespace Frontier
             }
             PrepareStructure(it, c);
             if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
-            it.label = MakeLabel(it.t, s.def.displayName.ToUpper() + "  LV" + s.level, Fx.Displayable(c), 1.0f, 0.34f, out it.labelRenderer);
+            string label = gs.IsUnderConstruction(s) ? s.def.displayName.ToUpper() + "  BUILDING"
+                : gs.IsUpgradeInProgress(s) ? s.def.displayName.ToUpper() + "  UPGRADING"
+                : s.def.displayName.ToUpper() + "  LV" + s.level;
+            it.label = MakeLabel(it.t, label, Fx.Displayable(c), 1.0f, 0.34f, out it.labelRenderer);
             it.phase = s.slot * 0.4f;
             it.orbit = s.def.kind == StructureKind.Satellite;
             return it;

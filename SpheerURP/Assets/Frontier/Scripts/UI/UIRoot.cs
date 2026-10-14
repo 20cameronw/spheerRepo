@@ -281,6 +281,7 @@ namespace Frontier
             if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
 
             UpdatePopupPosition();
+            RefreshBuilderStatus();
             UpdateMapInput();
         }
 
