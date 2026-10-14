@@ -119,7 +119,7 @@ namespace Frontier
                 totals.TryGetValue(item.Id, out total);
                 totals[item.Id] = total + item.Amount;
             }
-            var pooled = PooledWarehouseStorages();
+            var pooled = PooledWarehouseStorages(planet);
             foreach (var item in totals)
             {
                 long available = backpack.Count(item.Key);
@@ -134,7 +134,7 @@ namespace Frontier
         {
             if (resource == null) return 0;
             long count = backpack.Count(resource.id);
-            foreach (var storage in PooledWarehouseStorages())
+            foreach (var storage in PooledWarehouseStorages(planet))
                 count += WarehouseOps.Held(storage, resource.id);
             return (int)Math.Min(int.MaxValue, count);
         }
@@ -165,7 +165,7 @@ namespace Frontier
                     remaining[item] -= fromPack;
                 }
             }
-            foreach (var storage in PooledWarehouseStorages())
+            foreach (var storage in PooledWarehouseStorages(planet))
             {
                 foreach (var stack in storage.slots)
                 {
@@ -184,11 +184,11 @@ namespace Frontier
             return true;
         }
 
-        List<StorageRecord> PooledWarehouseStorages()
+        List<StorageRecord> PooledWarehouseStorages(PlanetData p)
         {
             var result = new List<StorageRecord>();
-            if (planet == null || StructureOfKind(planet, StructureKind.CargoDepot) == null) return result;
-            foreach (var structure in StructuresOn(planet))
+            if (p == null || StructureOfKind(p, StructureKind.CargoDepot) == null) return result;
+            foreach (var structure in StructuresOn(p))
             {
                 if (!IsOperational(structure) || !structure.def.kind.IsStorage() ||
                     structure.def.kind == StructureKind.FuelDepot) continue;
@@ -443,7 +443,9 @@ namespace Frontier
         // Gather structures need a matching resource on the planet.
         public bool CanBuildHere(StructureSO def)
         {
-            return BuildLockReason(def) == null && (!def.kind.IsGather() || SpotsFor(planet, def.kind).Count > 0);
+            return BuildLockReason(def) == null &&
+                (!def.kind.IsGather() || SpotsFor(planet, def.kind).Count > 0) &&
+                (def.kind != StructureKind.AutoHarvester || AutoHarvestSpots(planet).Count > 0);
         }
 
         public bool Place(StructureSO def, int slot)

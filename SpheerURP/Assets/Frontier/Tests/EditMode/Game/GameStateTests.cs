@@ -73,6 +73,54 @@ namespace Frontier.Tests
             }
         }
 
+        [Test]
+        public void AutoHarvester_AccruesCappedOfflineOutputIntoItsPersistentHopper()
+        {
+            var state = NewState();
+            var definition = db.FindStructure("auto_harvester");
+            Assert.IsNotNull(definition);
+            Assert.IsTrue(definition.Implemented);
+            Assert.AreEqual(8, definition.CapacityAt(1), "level one caps a single offline interval at eight hours");
+            Assert.AreEqual(18, definition.StorageCapacity(1), "offline-hour capacity is not the storage-slot capacity");
+            Assert.IsNotNull(state.DebugPlace(definition, 0));
+            state.Save();
+
+            clock.Advance(12 * 60 * 60);
+            var loaded = NewState(true);
+            var harvester = loaded.StructureAt(loaded.planet, 0);
+            Assert.IsNotNull(harvester);
+            var hopper = loaded.StorageFor(harvester);
+            int stored = 0;
+            foreach (var stack in hopper.slots) stored += stack.count;
+            Assert.Greater(stored, 0, "the stored save gap produces offline raw materials");
+            Assert.LessOrEqual(WarehouseOps.UsedSlots(hopper), definition.StorageCapacity(1));
+
+            var reloaded = NewState(true);
+            var reloadedHopper = reloaded.StorageFor(reloaded.StructureAt(reloaded.planet, 0));
+            int storedAgain = 0;
+            foreach (var stack in reloadedHopper.slots) storedAgain += stack.count;
+            Assert.AreEqual(stored, storedAgain, "the launch-time accrual is flushed and is not replayed");
+        }
+
+        [Test]
+        public void AutoHarvester_CarriesFractionalRunsAcrossShortOfflineIntervals()
+        {
+            var state = NewState();
+            Assert.IsNotNull(state.DebugPlace(db.FindStructure("auto_harvester"), 0));
+            state.Save();
+
+            clock.Advance(60);
+            var firstLoad = NewState(true);
+            var firstRecord = firstLoad.StructureAt(firstLoad.planet, 0).record;
+            Assert.AreEqual(0.1, firstRecord.offlineRunRemainder, 0.0001);
+
+            clock.Advance(11 * 60);
+            var secondLoad = NewState(true);
+            var hopper = secondLoad.StorageFor(secondLoad.StructureAt(secondLoad.planet, 0));
+            Assert.Greater(WarehouseOps.UsedSlots(hopper), 0,
+                "the fractional run from the previous visit combines with the next interval");
+        }
+
         // ---- debounce ----------------------------------------------------------------------------------------------------
 
         [Test]

@@ -226,19 +226,27 @@ namespace Frontier.Tests
             state.DebugPlace(db.FindStructure("cargo_depot"), 0);
             var warehouse = state.DebugPlace(db.FindStructure("warehouse"), 1);
             var fuelDepot = state.DebugPlace(db.FindStructure("fuel_depot"), 2);
+            var autoHarvester = state.DebugPlace(db.FindStructure("auto_harvester"), 3);
             var wood = db.FindResource("wood");
+            var stone = db.FindResource("stone");
             var fuel = db.fuel;
             state.backpack.Set(wood.id, 1);
             Assert.AreEqual(1, state.Deposit(warehouse, 0, wood, 1));
+            state.backpack.Set(stone.id, 1);
+            Assert.AreEqual(1, state.Deposit(autoHarvester, 0, stone, 1));
             state.backpack.Set(fuel.id, 1);
             Assert.AreEqual(1, state.Deposit(fuelDepot, 0, fuel, 1));
             Assert.IsTrue(state.HasPlanetResources(new[] { new IdAmount(wood.id, 1) }));
+            Assert.IsTrue(state.HasPlanetResources(new[] { new IdAmount(stone.id, 1) }),
+                "the Cargo Depot pool includes an Auto-Harvester's output hopper");
             Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(fuel.id, 1) }),
                 "Fuel Depot reserves remain isolated from the Cargo Depot pool");
 
             state.DebugTeleport(state.universe.Get("glacia"));
             Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(wood.id, 1) }),
                 "a Cargo Depot never pools warehouses on a different planet");
+            Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(stone.id, 1) }),
+                "Auto-Harvester output remains local to its planet");
         }
 
         [Test]

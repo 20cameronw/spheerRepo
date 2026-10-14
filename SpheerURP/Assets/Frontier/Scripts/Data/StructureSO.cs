@@ -104,7 +104,8 @@ namespace Frontier
 
         public int StorageCapacity(int level)
         {
-            if (HasLevelRows && Row(level).capacity > 0) return Row(level).capacity;
+            if (HasLevelRows && (capacityKind == "storageSlots" || capacityKind == "energySlots") && Row(level).capacity > 0)
+                return Row(level).capacity;
             return Mathf.Max(1, storageSlots + Mathf.Max(0, level - 1) * storageSlotsPerLevel);
         }
 

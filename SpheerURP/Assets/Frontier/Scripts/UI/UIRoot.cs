@@ -327,6 +327,9 @@ namespace Frontier
             if (d.kind == StructureKind.Warehouse) return d.StorageCapacity(level) + " storage slots";
             if (d.kind == StructureKind.FuelDepot)
                 return d.StorageCapacity(level) + " fuel slots" + (pct > 0 ? " · +" + pct + "% fuel stack" : "");
+            if (d.kind == StructureKind.AutoHarvester)
+                return effect.ToString("0.#") + " runs/hr · " + d.CapacityAt(level) + "h offline · " +
+                    d.StorageCapacity(level) + " output slots";
             if (d.kind == StructureKind.ResearchLab) return "Research Lab level " + Mathf.RoundToInt(effect);
             if (d.kind == StructureKind.RadarTower) return "+" + Mathf.RoundToInt(effect) + " ly local survey";
             if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";

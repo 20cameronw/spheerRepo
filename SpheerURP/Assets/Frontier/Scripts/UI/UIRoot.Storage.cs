@@ -106,18 +106,25 @@ namespace Frontier
             body.Add(UiKit.Text(gs.planet.Name + "  -  LV " + warehouse.level + "  -  " + used + " / " + capacity + " storage slots", "fr-muted"));
             bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
             bool cargoDepot = warehouse.def.kind == StructureKind.CargoDepot;
+            bool autoHarvester = warehouse.def.kind == StructureKind.AutoHarvester;
             bool cargoPoolActive = gs.StructureOfKind(gs.planet, StructureKind.CargoDepot) != null;
             body.Add(UiKit.Text(fuelOnly
                 ? "Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger fuel stacks; reserves stay on this planet and never pay travel costs."
-                : cargoDepot
-                    ? "This shared buffer joins every operational Warehouse on this planet. Build and craft costs can draw from the pool automatically; ship travel still uses your backpack."
+                : autoHarvester
+                    ? "This hopper stores the Auto-Harvester's offline output. A local Cargo Depot connects its materials to this planet's shared build and craft pool."
+                    : cargoDepot
+                    ? "This shared buffer joins operational Warehouses and Auto-Harvester hoppers on this planet. Build and craft costs draw from the pool automatically; travel still uses your backpack."
                     : cargoPoolActive
-                        ? "Connected to this planet's Cargo Depot. Build and craft costs can draw from this Warehouse automatically."
-                        : "Drag a stack between the grids. Resources stay on this planet. Costs use the backpack until a Cargo Depot connects its Warehouses.", "fr-tiny"));
+                        ? "Connected to this planet's Cargo Depot. Build and craft costs can draw from this storage automatically."
+                        : "Drag a stack between the grids. Resources stay on this planet. Costs use the backpack until a Cargo Depot connects its storage.", "fr-tiny"));
+            if (autoHarvester)
+                body.Add(UiKit.Text("OFFLINE " + warehouse.def.EffectAt(warehouse.level).ToString("0.#") +
+                    " run-eq/hr  ·  " + warehouse.def.CapacityAt(warehouse.level) + "h cap", "fr-small"));
 
             var packSlots = new List<VisualElement>();
             var storageSlots = new List<VisualElement>();
-            body.Add(SectionLabel(fuelOnly ? "FUEL RESERVE" : cargoDepot ? "SHARED BUFFER" : "WAREHOUSE"));
+            body.Add(SectionLabel(fuelOnly ? "FUEL RESERVE" : autoHarvester ? "HARVESTER HOPPER" :
+                cargoDepot ? "SHARED BUFFER" : "WAREHOUSE"));
             var storageGrid = UiKit.Div("fr-grid");
             for (int i = 0; i < capacity; i++)
             {

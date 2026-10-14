@@ -36,6 +36,8 @@ namespace Frontier
         public string upgradeEndUtc = "";
         /// <summary>Level to apply when upgradeEndUtc is reached; 0 while idle.</summary>
         public int pendingUpgradeLevel;
+        /// <summary>Fractional offline Auto-Harvester runs carried across saves (always in [0, 1)).</summary>
+        public double offlineRunRemainder;
     }
 
     /// <summary>A paid obstacle removal job. Its generated cost and reward are derived from the planet seed and pad.</summary>
@@ -329,6 +331,8 @@ namespace Frontier
                 if (s.buildEndUtc == null) s.buildEndUtc = "";
                 if (s.upgradeEndUtc == null) s.upgradeEndUtc = "";
                 if (s.pendingUpgradeLevel < 0) s.pendingUpgradeLevel = 0;
+                if (double.IsNaN(s.offlineRunRemainder) || double.IsInfinity(s.offlineRunRemainder) ||
+                    s.offlineRunRemainder < 0.0 || s.offlineRunRemainder >= 1.0) s.offlineRunRemainder = 0.0;
             }
             d.storages.RemoveAll(s => s == null);
             foreach (var storage in d.storages)

@@ -75,10 +75,14 @@ namespace Frontier
                 return;
             }
             bool contentRemapped = RemapContentIds(result.save);
-            Apply(result.save, result.report);
+            bool offlineChanged = Apply(result.save, result.report);
             LogLoad();
             // A migrated or recovered save replaces the primary file right away, so the next launch reads a clean v2 file.
-            if (contentRemapped || result.report.migratedFrom != 0 || result.report.recovered) { saves.MarkDirty(); Flush(); }
+            if (contentRemapped || result.report.migratedFrom != 0 || result.report.recovered || offlineChanged)
+            {
+                saves.MarkDirty();
+                Flush();
+            }
         }
 
         SaveV2 MigrateLegacy(SaveDataV1 legacy, List<string> warnings)
@@ -138,7 +142,7 @@ namespace Frontier
             saves.MarkDirty();
         }
 
-        void Apply(SaveV2 save, SaveLoadReport report)
+        bool Apply(SaveV2 save, SaveLoadReport report)
         {
             var warnings = report.warnings;
             ClearState();
@@ -182,6 +186,7 @@ namespace Frontier
                 });
             }
             world.Import(save.worlds);
+            bool offlineChanged = AccrueOfflineHarvesters(save.clock.lastSavedUtc);
             RecoverBuilderJobs(warnings);
             SeedAtlasFromExistingProgress();
             stats = save.stats ?? new PlayerStats();
@@ -192,6 +197,7 @@ namespace Frontier
                 if (!string.IsNullOrEmpty(save.location.currentPlanetId)) warnings.Add("the world '" + save.location.currentPlanetId + "' does not exist; returning home");
                 planet = universe.Home;
             }
+            return offlineChanged;
         }
 
         SaveV2 BuildSave()
