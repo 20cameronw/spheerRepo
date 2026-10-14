@@ -591,7 +591,7 @@ the save model does not track those discoveries yet.
 its authored prerequisites, reach tier, current-world Research Lab level and catalog resource costs; successful purchases
 unlock dependent content and survive save/load. Axe, Pick and Drill tiers can be bought and affect yield and tool feedback. Other tool ladders
 remain unavailable until their harvest games exist. The save schema remains v2 and older v2 saves default to no new purchases.
-The full EditMode suite (including Slow) passes 543 tests, with two runtime-specific allocation probes skipped; PlayMode passes 19,
+The full EditMode suite (including Slow) passes 544 tests, with two runtime-specific allocation probes skipped; PlayMode passes 19,
 and all five editor checks pass. Progression coverage includes save/reload, invalid catalog entries and preserving progression data
 while the database temporarily falls back to legacy content.
 
@@ -607,6 +607,8 @@ The research and supported-tool progression slice is complete. Continue in small
 Defer ads, premium purchases, online services and cross-device time validation until their service interfaces, consent and compliance work are ready. This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
 
 **Builder jobs and timers (foundation complete):** persisted construction and upgrade jobs now use the injected UTC clock, derive crew capacity from the catalog/research/operational Colony Hub, and recover or complete jobs across save/load. Construction occupies its pad but stays offline; upgrades retain the active level until completion. The UI shows crew availability, job status and countdowns, and explicitly identifies local-device time. Unknown reserved builder entries are preserved. Validation: EditMode 543 passed / 2 runtime-specific allocation probes skipped; PlayMode 19 passed; all five editor checks passed. The phone screenshot harness captured HUD, build mode and refinery popup with zero lint overflow findings. This is an offline timer foundation, not trusted cross-device timing; obstacle-clearing jobs and timer skips are not implemented.
+
+**Structure behavior follow-up:** the tier-one Research Lab is now a supported structure: it appears in BUILD ▸ UTILITY, is gated by reach tier, opens a research-specific panel, and its operational level gates lab-required research as intended. Research Lab construction still uses the builder timer. Validation: full EditMode 544 passed / 2 runtime-specific skips, PlayMode 19 passed, all five editor checks passed, and utility/Command phone captures reported zero overflow findings. Other catalog-only structures remain blocked until their runtime behavior is implemented; this does not complete the structure expansion.
 
 **Runtime cutover validation (2026-10-13):** full EditMode including Slow 535 passed / 2 platform-specific allocation probes
 skipped; PlayMode 19 passed; economy lab 127 passed; all five editor checks passed with zero compile diagnostics. Original

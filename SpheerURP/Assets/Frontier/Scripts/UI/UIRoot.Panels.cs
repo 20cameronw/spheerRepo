@@ -98,7 +98,7 @@ namespace Frontier
             tabs.Add(TabButton("refinery", "ECON", shopTab == 0, UiKit.Lime, () => shopTab = 0));
             tabs.Add(TabButton("mine", "GATHER", shopTab == 1, UiKit.Lime, () => shopTab = 1));
             tabs.Add(TabButton("shield", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
-            tabs.Add(TabButton("satellite", "ORBIT", shopTab == 3, UiKit.Lime, () => shopTab = 3));
+            tabs.Add(TabButton("research", "UTILITY", shopTab == 3, UiKit.Lime, () => shopTab = 3));
             body.Add(tabs);
             var note = UiKit.Text("Build on " + gs.planet.Name + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots +
                 " free slots  ·  CREWS " + gs.BusyBuilderCount + "/" + gs.BuilderCount + " busy. Tap a structure on the planet to use it.", "fr-muted");
@@ -109,7 +109,7 @@ namespace Frontier
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Warehouse); break;
                 case 1: ShopSection(body, StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill); break;
                 case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;
-                default: ShopSection(body, StructureKind.Satellite); break;
+                default: ShopSection(body, StructureKind.ResearchLab, StructureKind.Satellite); break;
             }
         }
 

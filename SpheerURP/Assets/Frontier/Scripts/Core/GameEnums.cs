@@ -106,6 +106,7 @@ namespace Frontier
                 case StructureKind.Satellite:
                 case StructureKind.Fabricator:
                 case StructureKind.Warehouse:
+                case StructureKind.ResearchLab:
                     return true;
                 default:
                     return false;

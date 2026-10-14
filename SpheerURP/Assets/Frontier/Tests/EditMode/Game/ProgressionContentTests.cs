@@ -11,12 +11,14 @@ namespace Frontier.Tests
     {
         SaveSandbox sandbox;
         GameDatabase db;
+        FakeClock clock;
 
         [SetUp]
         public void SetUp()
         {
             sandbox = new SaveSandbox();
             db = GameDatabase.Load();
+            clock = new FakeClock();
         }
 
         [TearDown]
@@ -54,6 +56,38 @@ namespace Frontier.Tests
             Assert.IsTrue(loaded.LoadReport.warnings.Count == 0, string.Join("; ", loaded.LoadReport.warnings));
             loaded.ResetProgress();
             Assert.IsFalse(loaded.IsResearched(node.data.id), "reset must clear purchased research");
+        }
+
+        [Test]
+        public void ResearchLab_IsBuildableAtTierOneAndEnablesLabGatedResearch()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported structure catalog is unavailable");
+            var state = new GameState(db, false, clock);
+            var labDef = db.StructureOfKind(StructureKind.ResearchLab);
+            Assert.IsNotNull(labDef);
+            Assert.IsTrue(labDef.Implemented, "research lab is now a supported structure behavior");
+            Assert.AreEqual("Reach planet tier 1", state.BuildLockReason(labDef));
+
+            var tierOneWorld = state.universe.FindGenerated(planet => planet.Tier >= 1, 1, 0, 10000);
+            Assert.IsNotNull(tierOneWorld);
+            state.DebugTeleport(tierOneWorld);
+            GiveMaterials(state);
+            Assert.IsNull(state.BuildLockReason(labDef));
+
+            var research = db.research.FirstOrDefault(node => node != null && node.data != null &&
+                node.data.tier <= state.ReachTier && node.data.labLevel == 1 &&
+                (node.data.prereqs == null || node.data.prereqs.Length == 0));
+            Assert.IsNotNull(research, "catalog contains tier-one research gated by a level-one lab");
+            StringAssert.StartsWith("Requires Research Lab level 1", state.ResearchLockReason(research));
+
+            Assert.IsTrue(state.Place(labDef, 0));
+            var placed = state.StructureAt(state.planet, 0);
+            int seconds = state.StructureJobSeconds(labDef, 1);
+            if (seconds > 0) clock.Advance(seconds);
+            state.Tick();
+            Assert.IsTrue(state.IsOperational(placed));
+            Assert.AreSame(placed, state.StructureOfKind(state.planet, StructureKind.ResearchLab));
+            Assert.IsNull(state.ResearchLockReason(research), state.ResearchLockReason(research));
         }
 
         [Test]

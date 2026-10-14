@@ -132,6 +132,7 @@ namespace Frontier
             var k = s.def.kind;
             if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
+            else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
@@ -194,6 +195,17 @@ namespace Frontier
             {
                 StructureHeader(body, s, c, title);
                 body.Add(UiKit.Text(text, "fr-tiny"));
+            });
+        }
+
+        void OpenResearchLab(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("researchlab" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Research and tool upgrades");
+                body.Add(UiKit.Text("Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced research.", "fr-tiny"));
+                UpgradeButton(body, s, c);
             });
         }
 

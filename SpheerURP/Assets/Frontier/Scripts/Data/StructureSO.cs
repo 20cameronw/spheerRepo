@@ -6,7 +6,7 @@ using Frontier.Universe;
 
 namespace Frontier
 {
-    /// <summary>One level of a structure: the cost to build or upgrade into it, the (stored, not yet enforced) build time, requirements and effect.</summary>
+    /// <summary>One level of a structure: the cost and duration to build or upgrade into it, its requirements and effect.</summary>
     [Serializable]
     public class StructureLevel
     {
