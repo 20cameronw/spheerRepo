@@ -64,11 +64,11 @@ namespace Frontier.Economy
                 .G("V").C(650, 1.70, "scrap:1.5@1,steel:2.5@1,planks:1@1,circuit_board:1@4,servo_motor:1@7").T(2.0, 0.90).E("yieldBonus", 0, 0.20).U(2, "salvage_ops"),
 
             // ------------------------------------------------------------ Process (5)
-            S("refinery", "Refinery", Prc, 0, "Converts raw materials into fuel and planks. Higher levels craft bigger batches per tap and unlock better recipes.")
+            S("refinery", "Refinery", Prc, 0, "Converts raw materials into fuel and planks. Higher levels unlock better recipes; level-based batch bonuses are planned.")
                 .Legacy("Refinery").C(15, 1.75, "scrap:1@1,wood:0.4@2,planks:0.5@3,iron_plate:0.5@5,steel:0.6@8").T(0, 0.85).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150),
-            S("fabricator", "Fabricator", Prc, 1, "Draws wire and assembles components. Higher levels craft bigger batches per tap and unlock better recipes.")
+            S("fabricator", "Fabricator", Prc, 1, "Draws wire and assembles components. Higher levels unlock better recipes; level-based batch bonuses are planned.")
                 .Legacy("Fabricator").C(70, 1.75, "scrap:2@1,planks:1.5@1,iron_plate:1@2,copper_wire:0.8@4,steel:1@6").T(0.8, 0.90).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150).U(1, "fabrication"),
-            S("foundry", "Foundry", Prc, 1, "Smelts ore into plates and alloys. Higher levels craft bigger batches per tap and unlock tougher alloys.")
+            S("foundry", "Foundry", Prc, 1, "Smelts ore into plates and alloys. Higher levels unlock tougher alloys; level-based batch bonuses are planned.")
                 .C(90, 1.75, "scrap:2@1,planks:1.5@1,stone:1@1,iron_plate:1@3,steel:1.2@6").T(0.8, 0.90).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150).U(1, "smelting"),
             S("chem_reactor", "Chem Reactor", Prc, 3, "Mixes composites and charges plasma cells.")
                 .Footprint(2).C(4500, 1.75, "steel:3@1,planks:0.8@1,biocomposite:2@1,glass:1.5@1,circuit_board:2@3,titanium_plate:2@5").T(3.5, 0.90).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150).U(3, "chemistry"),
@@ -82,7 +82,7 @@ namespace Frontier.Economy
                 .C(600, 1.65, "steel:3@1,planks:1@1,fuel:1@1,glass:1@2,titanium_plate:1@5").T(2.0, 0.85).E("energyStackBonus", 0, 0.15).Cap("energySlots", 6, 3).U(2, "fuel_logistics").Levels(8),
             S("cargo_depot", "Cargo Depot", Sto, 2, "Pools every warehouse on this planet, so crafting and building draw from all of them at once.")
                 .Footprint(2).C(900, 1.65, "steel:3@1,planks:1.5@1,iron_plate:1.5@1,circuit_board:1@3,biocomposite:1@5").T(2.5, 0.90).E("none", 0, 0).Cap("storageSlots", 6, 6).U(2, "cargo_logistics").Levels(8),
-            S("orbital_relay", "Orbital Relay", Sto, 4, "Links your warehouses by a tight beam: withdraw remotely across the system, then across the galaxy, for a little energy. Replaces the old Satellite.")
+            S("orbital_relay", "Orbital Relay", Sto, 4, "Planned logistics structure: remotely links warehouses across a system and later the galaxy. Replaces the old Satellite.")
                 .Legacy("Satellite").C(25000, 1.70, "steel:2@1,planks:0.4@1,titanium_plate:2.5@1,circuit_board:2@1,quantum_chip:2@4,servo_motor:1.5@5").T(4.5, 0.90)
                 .E("transferEnergyFactor", 1.0, -0.07).CapT("linkRadiusLy", 0, 0, 60, 150, 400, 1000, 3000, 10000, 30000, 100000).U(4, "orbital_logistics"),
 

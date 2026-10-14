@@ -144,6 +144,10 @@ namespace Frontier.Tests
         {
             var state = new GameState(db, false);
             foreach (var resource in db.resources) state.backpack.Set(resource.id, 100000);
+            var orbitalRelay = db.StructureOfKind(StructureKind.Satellite);
+            Assert.IsNotNull(orbitalRelay);
+            Assert.IsFalse(orbitalRelay.Implemented, "orbital warehouse links are not implemented yet");
+            Assert.AreEqual("Structure gameplay coming later", state.BuildLockReason(orbitalRelay));
             foreach (var structure in db.structures)
                 if (!structure.Implemented || !string.IsNullOrEmpty(structure.unlockResearch))
                 {
@@ -184,6 +188,26 @@ namespace Frontier.Tests
             Assert.IsTrue(state.CanCraft(first));
             state.DebugTeleport(state.universe.Get("glacia"));
             Assert.IsFalse(state.CanCraft(first), "a station on another world does not count");
+        }
+
+        [Test]
+        public void CatalogCraftingStations_AreImplementedAndServeOnlyTheirRecipes()
+        {
+            var state = new GameState(db, false);
+            string[] stationIds = { "refinery", "fabricator", "foundry", "chem_reactor", "quantum_lab" };
+            int slot = 0;
+            foreach (string id in stationIds)
+            {
+                var definition = db.FindStructure(id);
+                Assert.IsNotNull(definition, id);
+                Assert.IsTrue(definition.Implemented, id + " uses the existing recipe-station behavior");
+                Assert.IsTrue(definition.kind.IsStation(), id);
+                var placed = state.DebugPlace(definition, slot++);
+                var matchingRecipes = db.recipes.Where(recipe => recipe.stationId == id).ToList();
+                Assert.IsNotEmpty(matchingRecipes, id + " has catalog recipes");
+                foreach (var recipe in db.recipes)
+                    Assert.AreEqual(recipe.stationId == id, state.RecipeAt(recipe, placed), id + "/" + recipe.id);
+            }
         }
 
         [Test]

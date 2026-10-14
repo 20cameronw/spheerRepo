@@ -137,7 +137,7 @@ namespace Frontier
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
-            else OpenSimple(s, t, "UPLINK COMING SOON", "Satellites will unlock orbital abilities in a future update.");
+            else OpenSimple(s, t, "STRUCTURE OFFLINE", s.def.displayName + " gameplay is planned for a future update.");
         }
 
         void StructureHeader(VisualElement body, PlacedStructure s, Color c, string subtitle = null)
@@ -288,8 +288,7 @@ namespace Frontier
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("station" + s.slot, t, c, body =>
             {
-                bool fab = s.def.kind == StructureKind.Fabricator;
-                StructureHeader(body, s, c, fab ? "Combine materials into advanced parts" : "Convert resources into fuel and other materials");
+                StructureHeader(body, s, c, s.def.description);
                 float bonus = gs.StructureBonus(s);
                 body.Add(SectionLabel("RECIPES  -  you give  >  you get"));
                 foreach (var rec in gs.db.recipes)

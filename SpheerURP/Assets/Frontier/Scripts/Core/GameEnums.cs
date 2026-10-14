@@ -103,7 +103,9 @@ namespace Frontier
                 case StructureKind.Drill:
                 case StructureKind.Gunner:
                 case StructureKind.Laser:
-                case StructureKind.Satellite:
+                case StructureKind.Foundry:
+                case StructureKind.ChemReactor:
+                case StructureKind.QuantumLab:
                 case StructureKind.Fabricator:
                 case StructureKind.Warehouse:
                 case StructureKind.ResearchLab:

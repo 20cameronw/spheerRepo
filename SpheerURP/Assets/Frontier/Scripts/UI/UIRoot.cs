@@ -324,7 +324,7 @@ namespace Frontier
             if (d.kind == StructureKind.Warehouse) return d.StorageCapacity(level) + " storage slots";
             if (d.kind == StructureKind.ResearchLab) return "Research Lab level " + Mathf.RoundToInt(effect);
             if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";
-            if (d.HasLevelRows && d.kind.IsStation()) return "Batch size " + Mathf.RoundToInt(effect) + " (batch jobs coming later)";
+            if (d.HasLevelRows && d.kind.IsStation()) return "Batch size " + Mathf.RoundToInt(effect) + " (level bonus planned)";
             if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";
             if (d.kind.IsGather()) return "+" + pct + "% yield";
             return "+" + pct + "% rewards, XP";
