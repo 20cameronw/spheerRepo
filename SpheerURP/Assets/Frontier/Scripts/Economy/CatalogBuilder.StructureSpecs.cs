@@ -82,7 +82,7 @@ namespace Frontier.Economy
                 .C(600, 1.65, "steel:3@1,planks:1@1,fuel:1@1,glass:1@2,titanium_plate:1@5").T(2.0, 0.85).E("energyStackBonus", 0, 0.15).Cap("energySlots", 6, 3).U(2, "fuel_logistics").Levels(8),
             S("cargo_depot", "Cargo Depot", Sto, 2, "Pools every warehouse on this planet, so crafting and building draw from all of them at once.")
                 .Footprint(2).C(900, 1.65, "steel:3@1,planks:1.5@1,iron_plate:1.5@1,circuit_board:1@3,biocomposite:1@5").T(2.5, 0.90).E("none", 0, 0).Cap("storageSlots", 6, 6).U(2, "cargo_logistics").Levels(8),
-            S("orbital_relay", "Orbital Relay", Sto, 4, "Planned logistics structure: remotely links warehouses across a system and later the galaxy. Replaces the old Satellite.")
+            S("orbital_relay", "Orbital Relay", Sto, 4, "Withdraw from operational warehouses on visited worlds in this system; upgrades extend its beam and reduce transfer energy.")
                 .Legacy("Satellite").C(25000, 1.70, "steel:2@1,planks:0.4@1,titanium_plate:2.5@1,circuit_board:2@1,quantum_chip:2@4,servo_motor:1.5@5").T(4.5, 0.90)
                 .E("transferEnergyFactor", 1.0, -0.07).CapT("linkRadiusLy", 0, 0, 60, 150, 400, 1000, 3000, 10000, 30000, 100000).U(4, "orbital_logistics"),
 

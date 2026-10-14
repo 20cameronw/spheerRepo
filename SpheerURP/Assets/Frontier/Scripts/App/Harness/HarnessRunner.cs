@@ -149,7 +149,7 @@ namespace Frontier
             var pack = db.FindUpgrade("pack");
             if (pack != null) gs.DebugSetUpgrade(pack, 4);
             foreach (var r in db.resources) gs.Add(r, r == db.fuel ? 30 : 18 + (r.id.Length * 7) % 40, false);
-            string[] order = { "lumber", "mine", "refinery", "fabricator", "alarm", "gunner", "warehouse", "fuel_depot", "cargo_depot", "hangar", "shield_pylon", "auto_harvester" };
+            string[] order = { "lumber", "mine", "refinery", "fabricator", "orbital_relay", "gunner", "warehouse", "fuel_depot", "cargo_depot", "hangar", "shield_pylon", "auto_harvester" };
             int slot = 0;
             foreach (var id in order)
             {
@@ -162,6 +162,18 @@ namespace Frontier
                     if (wood != null) gs.Deposit(placed, 0, wood, 8);
                 }
                 slot++;
+            }
+            var localPlanet = gs.planet;
+            PlanetData relayTarget = null;
+            foreach (var candidate in gs.universe.PlanetsOf(localPlanet.Star))
+                if (candidate.Id != localPlanet.Id) { relayTarget = candidate; break; }
+            if (relayTarget != null)
+            {
+                gs.DebugTeleport(relayTarget);
+                var remoteWarehouse = gs.DebugPlace(db.FindStructure("warehouse"), 0);
+                var wood = db.FindResource("wood");
+                if (remoteWarehouse != null && wood != null) gs.Deposit(remoteWarehouse, 0, wood, 8);
+                gs.DebugTeleport(localPlanet);
             }
             foreach (var u in db.upgrades) if (u != null && u.category == UpgradeCategory.Tools) gs.DebugSetUpgrade(u, 2);
             gs.DebugSetLevel(7);
@@ -299,7 +311,7 @@ namespace Frontier
             gs.backpack.Set(GameState.PlasmaId, savedMapPlasma); gs.backpack.Set(GameState.AntimatterId, savedMapAntimatter);
             yield return new Shot("map-flight-autopilot", ui.DebugAutopilotScreen);
 
-            foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Gunner, StructureKind.Warehouse, StructureKind.FuelDepot, StructureKind.CargoDepot, StructureKind.Hangar, StructureKind.ShieldPylon, StructureKind.AutoHarvester })
+            foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Satellite, StructureKind.Gunner, StructureKind.Warehouse, StructureKind.FuelDepot, StructureKind.CargoDepot, StructureKind.Hangar, StructureKind.ShieldPylon, StructureKind.AutoHarvester })
             {
                 var k = kind;
                 yield return new Shot("popup-" + k.ToString().ToLower(), () => { ResetView(); ui.DebugTapStructure(At(k)); });

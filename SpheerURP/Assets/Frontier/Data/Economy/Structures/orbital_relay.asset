@@ -15,8 +15,8 @@ MonoBehaviour:
   lockedFields: []
   id: orbital_relay
   displayName: Orbital Relay
-  description: 'Planned logistics structure: remotely links warehouses across a system
-    and later the galaxy. Replaces the old Satellite.'
+  description: Withdraw from operational warehouses on visited worlds in this system;
+    upgrades extend its beam and reduce transfer energy.
   kind: 7
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
   modelKey: 

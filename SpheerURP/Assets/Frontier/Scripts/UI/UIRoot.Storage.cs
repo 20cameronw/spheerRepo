@@ -97,6 +97,66 @@ namespace Frontier
             world.Selected = anchor;
         }
 
+        void OpenRelay(PlacedStructure relay, Transform anchor)
+        {
+            OpenModal("orbital-relay", "satellite", relay.def.displayName.ToUpper(), UiKit.Cyan,
+                body => BuildRelay(body, relay), true);
+            planetView.Frozen = true;
+            world.Selected = anchor;
+        }
+
+        void BuildRelay(VisualElement body, PlacedStructure relay)
+        {
+            int radius = relay.def.CapacityAt(relay.level);
+            body.Add(UiKit.Text(gs.planet.Name + " · LV " + relay.level + " · " +
+                (radius > 0 ? radius + " LY beam" : "system beam"), "fr-muted"));
+            body.Add(UiKit.Text("Pull stacks from operational storage on other visited worlds. Each pull costs energy based on stack size and distance; only fuel in your backpack can pay. Fuel Depot reserves stay isolated.", "fr-tiny"));
+            var sources = gs.RelayWarehouses(relay);
+            if (sources.Count == 0)
+            {
+                body.Add(UiKit.Text("No remote warehouses are in range. Build storage on another visited world, or upgrade the relay to extend its beam.", "fr-small"));
+                return;
+            }
+
+            foreach (var source in sources)
+            {
+                var sourcePlanet = gs.universe.Get(source.planetId);
+                if (sourcePlanet == null) continue;
+                double distance = gs.RelayDistanceLy(relay, source);
+                string range = distance <= 0.0 ? "SAME SYSTEM" : distance.ToString("0.#") + " LY";
+                var card = Card(UiKit.Cyan);
+                card.Add(UiKit.Text(sourcePlanet.Name + " · " + source.def.displayName.ToUpperInvariant(), "fr-h2"));
+                card.Add(UiKit.Text(sourcePlanet.SystemName + " · " + range, "fr-tiny"));
+                var storage = gs.StorageFor(source);
+                bool hasStacks = false;
+                for (int i = 0; i < storage.slots.Count; i++)
+                {
+                    var stack = storage.slots[i];
+                    var resource = stack == null ? null : gs.db.FindResource(stack.resourceId);
+                    if (resource == null || stack.count <= 0) continue;
+                    hasStacks = true;
+                    int slotIndex = i;
+                    int amount = Math.Min(stack.count, gs.FreeSpace(resource));
+                    int energy = amount > 0 ? gs.RelayTransferEnergyCost(relay, source, amount) : 0;
+                    var row = UiKit.Div("fr-row-wrap");
+                    row.Add(ResourceIconChip(resource, resource.displayName + " ×" + stack.count));
+                    string action = amount > 0 ? "PULL " + amount + " · " + energy + " ENERGY" : "BACKPACK FULL";
+                    var pull = IconBtn(action, "pack", UiKit.Cyan, () =>
+                    {
+                        int moved = gs.WithdrawThroughRelay(relay, source, slotIndex, amount);
+                        if (moved > 0) { Sfx.Good(); Toast("Relayed " + moved + " " + resource.displayName, UiKit.Cyan); }
+                        else Toast("Transfer blocked: check backpack space and carried fuel.", UiKit.Amber);
+                        RefreshModal();
+                    });
+                    UiKit.SetEnabledLook(pull, amount > 0 && energy <= gs.FuelOnBoard.Energy);
+                    row.Add(pull);
+                    card.Add(row);
+                }
+                if (!hasStacks) card.Add(UiKit.Text("No stored resources", "fr-tiny"));
+                body.Add(card);
+            }
+        }
+
         void BuildWarehouse(VisualElement body, PlacedStructure warehouse)
         {
             SyncPack();

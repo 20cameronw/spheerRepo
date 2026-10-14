@@ -146,8 +146,8 @@ namespace Frontier.Tests
             foreach (var resource in db.resources) state.backpack.Set(resource.id, 100000);
             var orbitalRelay = db.StructureOfKind(StructureKind.Satellite);
             Assert.IsNotNull(orbitalRelay);
-            Assert.IsFalse(orbitalRelay.Implemented, "orbital warehouse links are not implemented yet");
-            Assert.AreEqual("Structure gameplay coming later", state.BuildLockReason(orbitalRelay));
+            Assert.IsTrue(orbitalRelay.Implemented);
+            Assert.AreEqual("Requires research: orbital logistics", state.BuildLockReason(orbitalRelay));
             foreach (var structure in db.structures)
                 if (!structure.Implemented || !string.IsNullOrEmpty(structure.unlockResearch))
                 {
@@ -247,6 +247,62 @@ namespace Frontier.Tests
                 "a Cargo Depot never pools warehouses on a different planet");
             Assert.IsFalse(state.HasPlanetResources(new[] { new IdAmount(stone.id, 1) }),
                 "Auto-Harvester output remains local to its planet");
+        }
+
+        [Test]
+        public void OrbitalRelay_WithdrawsFromVisitedSameSystemStorageForCarriedEnergy()
+        {
+            var state = new GameState(db, false);
+            var home = state.planet;
+            var relay = state.DebugPlace(db.FindStructure("orbital_relay"), 0);
+            Assert.IsNotNull(relay);
+            Assert.IsTrue(relay.def.Implemented);
+
+            var sameSystemWorlds = state.universe.PlanetsOf(home.Star);
+            var remote = sameSystemWorlds.FirstOrDefault(p => p.Id != home.Id);
+            Assert.IsNotNull(remote, "the home system has another world for a same-system logistics fixture");
+            state.DebugTeleport(remote);
+            var warehouse = state.DebugPlace(db.FindStructure("warehouse"), 0);
+            Assert.IsNotNull(warehouse);
+            var wood = db.FindResource("wood");
+            state.backpack.Set(wood.id, 20);
+            Assert.AreEqual(20, state.Deposit(warehouse, 0, wood, 20));
+            state.DebugTeleport(home);
+            state.backpack.Set(db.fuel.id, 10);
+
+            Assert.Contains(warehouse, state.RelayWarehouses(relay));
+            Assert.AreEqual(2, state.RelayTransferEnergyCost(relay, warehouse, 20),
+                "same-system pulls cost one energy per ten items at relay level one");
+            Assert.AreEqual(20, state.WithdrawThroughRelay(relay, warehouse, 0, 20));
+            Assert.AreEqual(20, state.Count(wood));
+            Assert.AreEqual(8, state.Count(db.fuel), "relay energy is paid from carried fuel");
+            Assert.AreEqual(0, WarehouseOps.Held(state.StorageFor(warehouse), wood.id));
+        }
+
+        [Test]
+        public void OrbitalRelay_UpgradesExtendBeamButFuelDepotReservesStayPrivate()
+        {
+            var state = new GameState(db, false);
+            var relay = state.DebugPlace(db.FindStructure("orbital_relay"), 0);
+            var remote = state.universe.FindGenerated(_ => true);
+            Assert.IsNotNull(remote);
+            Assert.AreNotEqual(state.planet.Star.Id, remote.Star.Id);
+
+            state.DebugTeleport(remote);
+            var warehouse = state.DebugPlace(db.FindStructure("warehouse"), 0);
+            var fuelDepot = state.DebugPlace(db.FindStructure("fuel_depot"), 1);
+            Assert.IsNotNull(warehouse);
+            Assert.IsNotNull(fuelDepot);
+            state.DebugTeleport(state.universe.Home);
+            Assert.IsFalse(state.RelayWarehouses(relay).Contains(warehouse),
+                "level one only links storage within the same system");
+
+            state.DebugSetStructureLevel(relay, 10);
+            Assert.Contains(warehouse, state.RelayWarehouses(relay),
+                "the authored level-ten beam reaches the visited generated system");
+            Assert.IsFalse(state.RelayWarehouses(relay).Contains(fuelDepot),
+                "Fuel Depot reserves are never exposed to remote pulls");
+            Assert.AreEqual(0.37f, relay.def.EffectAt(relay.level));
         }
 
         [Test]

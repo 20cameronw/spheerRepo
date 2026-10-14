@@ -4247,7 +4247,7 @@
       "displayName": "Orbital Relay",
       "role": "Storage",
       "tier": 4,
-      "description": "Planned logistics structure: remotely links warehouses across a system and later the galaxy. Replaces the old Satellite.",
+      "description": "Withdraw from operational warehouses on visited worlds in this system; upgrades extend its beam and reduce transfer energy.",
       "footprint": 1,
       "maxPerPlanet": 1,
       "maxLevel": 10,

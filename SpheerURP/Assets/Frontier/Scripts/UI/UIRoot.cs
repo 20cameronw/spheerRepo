@@ -330,6 +330,9 @@ namespace Frontier
             if (d.kind == StructureKind.AutoHarvester)
                 return effect.ToString("0.#") + " runs/hr · " + d.CapacityAt(level) + "h offline · " +
                     d.StorageCapacity(level) + " output slots";
+            if (d.kind == StructureKind.Satellite)
+                return (d.CapacityAt(level) > 0 ? d.CapacityAt(level) + " ly beam" : "system beam") +
+                    " · " + Mathf.RoundToInt(effect * 100f) + "% energy";
             if (d.kind == StructureKind.ResearchLab) return "Research Lab level " + Mathf.RoundToInt(effect);
             if (d.kind == StructureKind.RadarTower) return "+" + Mathf.RoundToInt(effect) + " ly local survey";
             if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";

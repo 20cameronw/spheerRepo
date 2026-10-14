@@ -155,6 +155,7 @@ namespace Frontier
             }
             var k = s.def.kind;
             if (k.IsStorage()) OpenWarehouse(s, t);
+            else if (k == StructureKind.Satellite) OpenRelay(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
             else if (k == StructureKind.RadarTower) OpenRadarTower(s, t);
