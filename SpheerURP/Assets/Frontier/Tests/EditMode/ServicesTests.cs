@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Frontier.Services;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Frontier.Tests
 {
@@ -129,6 +130,63 @@ namespace Frontier.Tests
             Assert.IsFalse(consent.Current.analyticsAllowed);
             Assert.IsFalse(consent.Current.adsAllowed);
             Assert.IsFalse(consent.Current.onlineServicesAllowed);
+        }
+
+        [Test]
+        public void PlayerPrefsConsentStore_RoundTripsOnlineServicesChoice()
+        {
+            const string policyKey = "fr_consent_policy";
+            const string decisionKey = "fr_consent_decided";
+            const string analyticsKey = "fr_consent_analytics";
+            const string adsKey = "fr_consent_ads";
+            const string onlineKey = "fr_consent_online_services";
+            const string ticksKey = "fr_consent_utc_ticks";
+
+            string[] keys = { policyKey, decisionKey, analyticsKey, adsKey, onlineKey, ticksKey };
+            var existed = new bool[keys.Length];
+            var ints = new int[keys.Length];
+            var strings = new string[keys.Length];
+            for (int i = 0; i < keys.Length; i++)
+            {
+                existed[i] = PlayerPrefs.HasKey(keys[i]);
+                ints[i] = PlayerPrefs.GetInt(keys[i]);
+                strings[i] = PlayerPrefs.GetString(keys[i]);
+            }
+
+            try
+            {
+                var expected = new ConsentPreferences(ConsentService.CurrentPolicyVersion, true,
+                    analyticsAllowed: true, adsAllowed: false, onlineServicesAllowed: true, decisionUtcTicks: 638960000000000000L);
+                var store = new PlayerPrefsConsentStore();
+                store.Save(expected);
+                var actual = store.Load();
+
+                Assert.IsTrue(actual.hasDecision);
+                Assert.IsTrue(actual.analyticsAllowed);
+                Assert.IsFalse(actual.adsAllowed);
+                Assert.IsTrue(actual.onlineServicesAllowed);
+                Assert.AreEqual(expected.policyVersion, actual.policyVersion);
+                Assert.AreEqual(expected.decisionUtcTicks, actual.decisionUtcTicks);
+            }
+            finally
+            {
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    if (!existed[i])
+                    {
+                        PlayerPrefs.DeleteKey(keys[i]);
+                    }
+                    else if (i == keys.Length - 1)
+                    {
+                        PlayerPrefs.SetString(keys[i], strings[i]);
+                    }
+                    else
+                    {
+                        PlayerPrefs.SetInt(keys[i], ints[i]);
+                    }
+                }
+                PlayerPrefs.Save();
+            }
         }
 
         [Test]

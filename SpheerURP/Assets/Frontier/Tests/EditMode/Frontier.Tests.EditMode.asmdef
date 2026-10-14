@@ -12,6 +12,7 @@
         "Frontier.Visual",
         "Frontier.UI",
         "Frontier.Services",
+        "Frontier.App",
         "Frontier.HyperspaceView"
     ],
     "includePlatforms": [
