@@ -20,11 +20,30 @@ public class Player : MonoBehaviour
     [Space(10)]
     [Header("Modifiable Data")]
     [SerializeField] private bool RWFileData;
-    [SerializeField] private float dollars;
-    [SerializeField] private float passive;
+    [SerializeField] private float dollars;     // Nebulite stock
+    [SerializeField] private float passive;     // Nebulite income/s
     [SerializeField] private int cores;
     [SerializeField] private List<int> buildingCount;
     [SerializeField] private List<int> researchCount;
+
+    // Phase 2 — Multi-resource pools
+    [Header("Resource Pools (Phase 2)")]
+    [SerializeField] private float plasma = 0f;              // Plasma stock
+    [SerializeField] private float plasmaPassive = 0f;       // Plasma income/s
+    [SerializeField] private float electricity = 0f;         // Electricity stock (accumulated, future use)
+    [SerializeField] private float electricityCapacity = 0f; // Total Electricity output from Windmills
+    [SerializeField] private float voidCrystal = 0f;         // Void Crystal stock (late-game)
+
+    // Storage caps — base values give early-game headroom; storage buildings increase these.
+    private const float BASE_NEBULITE_CAP = 10000f;
+    private const float BASE_PLASMA_CAP   = 500f;
+    [SerializeField] private float nebuliteCapacity = BASE_NEBULITE_CAP;
+    [SerializeField] private float plasmaCapacity   = BASE_PLASMA_CAP;
+
+    // Phase 3 — Town Hall & Electricity gating
+    [Header("Gating (Phase 3)")]
+    [SerializeField] private int   townHallLevel    = 0;    // Number of Town Hall buildings placed
+    [SerializeField] private float electricityUsed  = 0f;  // Sum of electricityRequired for all placed buildings
 
     [SerializeField] private int currentWorld;
     [SerializeField] private float maxHealth;
@@ -103,30 +122,15 @@ public class Player : MonoBehaviour
         return completedMissionIndices.Contains(missionIndex);
     }
 
-    public Transform target;
-
+    // ── Legacy targeting API ────────────────────────────────────────────────────
+    // Kept for source-compatibility with enemy scripts that are still in the project
+    // but will be removed when Phase 1 scene/prefab cleanup is completed in Unity.
+    private Transform _legacyTarget;
     public static event System.Action<Transform> OnTargetChanged;
-
-    public void targetThis(Transform target)
-    {
-        this.target = target;
-        OnTargetChanged?.Invoke(target);
-    }
-
-    public Transform GetTarget()
-    {
-        return target;
-    }
-
-    public void ClearTarget()
-    {
-        target = null;
-        OnTargetChanged?.Invoke(null);
-    }
-
-    public bool getGunnerAutoTargeting()   { return gunnerAutoTargeting; }
-    public bool getLazerAutoTargeting()    { return lazerAutoTargeting; }
-    public bool getMissileAutoTargeting()  { return missileAutoTargeting; }
+    public void targetThis(Transform t) { _legacyTarget = t; OnTargetChanged?.Invoke(t); }
+    public Transform GetTarget() => _legacyTarget;
+    public void ClearTarget() { _legacyTarget = null; OnTargetChanged?.Invoke(null); }
+    // ──────────────────────────────────────────────────────────────────────────
 
     public float getTurretRangeMultiplier()
     {
@@ -200,6 +204,80 @@ public class Player : MonoBehaviour
         return dollarsGainedThisSecond;
     }
 
+    // ── Phase 2: Multi-resource getters ──────────────────────────────────────────
+
+    public float getPlasma()                  => plasma;
+    public float getPlasmaPassive()           => plasmaPassive;
+    public float getElectricity()             => electricity;
+    public float getElectricityCapacity()     => electricityCapacity;
+    public float getVoidCrystal()             => voidCrystal;
+    public float getNebuliteCapacity()        => nebuliteCapacity;
+    public float getPlasmaCapacity()          => plasmaCapacity;
+
+    // ── Phase 3: Gating getters ───────────────────────────────────────────────────
+
+    public int   getTownHallLevel()           => townHallLevel;
+    public float getElectricityUsed()         => electricityUsed;
+    /// <summary>Electricity still available for new buildings.</summary>
+    public float getElectricityFree()         => electricityCapacity - electricityUsed;
+
+    public void AddPlasma(float amount)       { plasma += amount; }
+    public void AddElectricity(float amount)  { electricity += amount; }
+    public void AddVoidCrystal(float amount)  { voidCrystal += amount; }
+
+    public void AddPlasmaPassive(float bonus)
+    {
+        plasmaPassive += bonus;
+    }
+
+    public void AddElectricityCapacity(float bonus)
+    {
+        electricityCapacity += bonus;
+    }
+
+    // ── Phase 3: gating mutators ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// Called whenever a building is confirmed as placed (surface or orbit).
+    /// Increments electricity demand and, for Town Hall buildings, the town-hall level.
+    /// </summary>
+    public void OnBuildingPlaced(Upgrade item)
+    {
+        electricityUsed += item.electricityRequired;
+        if (item.isTownHall) townHallLevel++;
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Routes a building's passive income bonus to the correct resource pool based on its <see cref="ResourceType"/>.
+    /// Call this whenever a building is placed or sold (with a negative value).
+    /// Storage types (NebuliteStorage, PlasmaStorage) add to capacity rather than per-second income.
+    /// </summary>
+    public void RoutePassiveIncome(ResourceType resourceType, float bonus)
+    {
+        switch (resourceType)
+        {
+            case ResourceType.Plasma:
+                plasmaPassive += bonus;
+                break;
+            case ResourceType.Electricity:
+                electricityCapacity += bonus;
+                break;
+            case ResourceType.NebuliteStorage:
+                nebuliteCapacity += bonus;
+                break;
+            case ResourceType.PlasmaStorage:
+                plasmaCapacity += bonus;
+                break;
+            default: // Nebulite (and VoidCrystal if added later)
+                passive += bonus;
+                break;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+
     public float getPassive()
     {
         return passive;
@@ -265,10 +343,6 @@ public class Player : MonoBehaviour
         return researchDiscount;
     }
 
-    private bool gunnerAutoTargeting = false;
-    private bool lazerAutoTargeting  = false;
-    private bool missileAutoTargeting = false;
-
     private float junkMultiplier = 1;
 
 
@@ -328,9 +402,6 @@ public class Player : MonoBehaviour
                     researchDiscount = 1f - 0.05f * researchCount[index];
                 else
                     researchDiscount -= 0.05f;
-                break;
-            case 8: //gunner auto targeting
-                if (researchCount[index] > 0) gunnerAutoTargeting = true;
                 break;
             case 9: //hold to buy
             case 10: //hold to click
@@ -437,12 +508,6 @@ public class Player : MonoBehaviour
                 if (!init)
                     addCores(5);
                 break;
-            case 30: //laser auto targeting
-                if (researchCount[index] > 0) lazerAutoTargeting = true;
-                break;
-            case 31: //missile auto targeting
-                if (researchCount[index] > 0) missileAutoTargeting = true;
-                break;
             default:
                 Debug.Log("No effect coded in for this research with index " + index);
                 break;
@@ -456,7 +521,24 @@ public class Player : MonoBehaviour
         {
             buildingCount[i] = 0;
         }
+        ResetDerivedBuildingStats();
+    }
+
+    /// <summary>
+    /// Resets all stats derived from placed buildings back to their base values.
+    /// Call before any loop that rebuilds these totals from scratch.
+    /// </summary>
+    private void ResetDerivedBuildingStats()
+    {
         passive = 0;
+        plasmaPassive = 0;
+        electricityCapacity = 0;
+        // Reset storage caps to their base values — building loop will re-add vault bonuses.
+        nebuliteCapacity = BASE_NEBULITE_CAP;
+        plasmaCapacity   = BASE_PLASMA_CAP;
+        // Reset Phase 3 gating state.
+        townHallLevel   = 0;
+        electricityUsed = 0;
     }
 
     private void EnsureResearchCountSize()
@@ -521,18 +603,10 @@ public class Player : MonoBehaviour
         LoadPlayerData();
 
         InvokeRepeating("SaveAndAddPassive", 1f, 1f);
-
-        EnemySpawner.OnWaveCompleted += OnWaveCompleted;
     }
 
     private void OnDestroy()
     {
-        EnemySpawner.OnWaveCompleted -= OnWaveCompleted;
-    }
-
-    private void OnWaveCompleted(int wave)
-    {
-        recordWaveCompleted(wave);
     }
 
 
@@ -596,7 +670,6 @@ public class Player : MonoBehaviour
             currentWorld = data.currentWorld;
             darkMatter = data.darkMatter;
             worldSpawner.SetCurrentWorld(currentWorld);
-            EnemySpawner.Instance.currentWave = data.currentWave;
             for (int i = 0; i < buildingCount.Count; i++)
             {
                 worldSpawner.LoadObjects(buildingCount[i], i);
@@ -609,13 +682,26 @@ public class Player : MonoBehaviour
             currentXP = data.currentXP;
             currentXPLevel = data.currentXPLevel;
 
+            // Reset derived passive/capacity/gating totals before rebuilding from building counts.
+            ResetDerivedBuildingStats();
+
             for (int i = 0; i < buildingCount.Count; i++)
             {
-                passive += shopItemsList.shopItemsSO[i].bonus * buildingCount[i];
+                Upgrade item = shopItemsList.shopItemsSO[i];
+                RoutePassiveIncome(item.resourceProduced, item.bonus * buildingCount[i]);
+                // Phase 3: rebuild electricity demand and Town Hall level from saved counts.
+                electricityUsed += item.electricityRequired * buildingCount[i];
+                if (item.isTownHall) townHallLevel += buildingCount[i];
             }
 
+            // Restore Phase 2 resource stocks
+            plasma    = data.plasma;
+            electricity = data.electricity;
+            voidCrystal = data.voidCrystal;
+
             offlineEarnings = CalculateOfflineEarnings(data.saveTime);
-            dollars += offlineEarnings;
+            // dollars was saved capped, so adding offline earnings and re-clamping is safe.
+            dollars = Mathf.Min(dollars + offlineEarnings, nebuliteCapacity);
 
             // Restore lifetime stats
             lifetimeTotalEnemiesKilled   = data.lifetimeTotalEnemiesKilled;
@@ -643,14 +729,26 @@ public class Player : MonoBehaviour
         float baseIncome = passive * productionRateMultiplier;
         float earned = baseIncome * (1 + (getDMEarningsBonus()/100));
         dollars += earned;
+        // Phase 2: clamp Nebulite to storage cap (increased by NebuliteVault buildings).
+        dollars = Mathf.Min(dollars, nebuliteCapacity);
         recordMoneyEarned(earned);
         updateRecordPassive(baseIncome);
+
+        // Phase 2: tick Plasma (capped by plasmaCapacity from PlasmaTank buildings) and
+        // Electricity each second.  Electricity accumulates without a cap for now; Phase 3
+        // uses electricityCapacity to gate buildings, not the stock value.
+        plasma = Mathf.Min(plasma + plasmaPassive * productionRateMultiplier, plasmaCapacity);
+        electricity += electricityCapacity * productionRateMultiplier;
     }
 
     public void removeUpgrade(int index)
     {
         buildingCount[index]--;
-        passive -= shopItemsList.shopItemsSO[index].bonus;
+        Upgrade item = shopItemsList.shopItemsSO[index];
+        RoutePassiveIncome(item.resourceProduced, -item.bonus);
+        // Phase 3: free up electricity and Town Hall level when a building is sold.
+        electricityUsed = Mathf.Max(0f, electricityUsed - item.electricityRequired);
+        if (item.isTownHall) townHallLevel = Mathf.Max(0, townHallLevel - 1);
     }
 
     public void resetData()
@@ -660,7 +758,6 @@ public class Player : MonoBehaviour
         dollars = 0;
         currentWorld = 0;
         worldSpawner.SetCurrentWorld(currentWorld);
-        EnemySpawner.Instance.prestige();
         resetResearchCount();
         resetBuildingCount();
         FindObjectOfType<XPBar>()?.refreshXPLevel();
@@ -705,8 +802,6 @@ public class Player : MonoBehaviour
         darkMatter += earnedDarkMatter;
 
         resetData();
-
-        ClearTarget();
 
         uIManager.ClosePanel();
 

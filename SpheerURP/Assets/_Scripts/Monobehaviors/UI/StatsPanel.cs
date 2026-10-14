@@ -49,7 +49,7 @@ public class StatsPanel : MenuPanel
         if (highestXPLevelText)
             highestXPLevelText.text  = "Best XP Level: " + p.getLifetimeRecordHighestXPLevel().ToString("N0");
         if (currentWaveText)
-            currentWaveText.text     = "Current Wave: " + (EnemySpawner.Instance != null ? EnemySpawner.Instance.currentWave.ToString("N0") : "0");
+            currentWaveText.text     = "Current Wave: —";
         if (currentXPLevelText)
             currentXPLevelText.text  = "Current XP Level: " + p.getCurrentXPLevel().ToString("N0");
         if (darkMatterText)

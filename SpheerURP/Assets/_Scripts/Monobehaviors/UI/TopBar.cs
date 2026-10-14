@@ -11,12 +11,15 @@ public class TopBar : MonoBehaviour
 
     [SerializeField] private TMP_Text coresText;
 
+    // Phase 2 — additional resource displays (assign in Inspector; safe to leave null)
+    [SerializeField] private TMP_Text plasmaText;
+    [SerializeField] private TMP_Text electricityText;
+    [SerializeField] private TMP_Text nebuliteCapText;  // Optional: shows Nebulite cap
+
     [SerializeField] private float dollarsUpdateTime;
 
     [SerializeField] private Image EnergyBar;
     [SerializeField] private float HealthResetTime;
-
-    [SerializeField] private TMP_Text aliensRemainingText;
 
     private float previousDollars;
     private float currentDollars;
@@ -29,16 +32,33 @@ public class TopBar : MonoBehaviour
     private void UpdateDollars()
     {
         float dollars = Player.Instance.getDollars();
-        // DollarsText.text = Mathf.Round(dollars).ToString("N0");
         if (dollars > 999999999)
-        {
             DollarsText.text = dollars.ToString("0.##E0");
-        }
         else
-        {
             DollarsText.text = Mathf.Round(dollars).ToString("N0");
+
+        // Phase 2: update Plasma and Electricity displays if wired
+        if (plasmaText != null)
+        {
+            float p = Player.Instance.getPlasma();
+            plasmaText.text = p > 999999 ? p.ToString("0.##E0") : Mathf.Round(p).ToString("N0");
         }
 
+        if (electricityText != null)
+        {
+            // Shows free / total electricity (Phase 3 gate).
+            float free  = Player.Instance.getElectricityFree();
+            float total = Player.Instance.getElectricityCapacity();
+            string freeStr  = free  > 999999 ? free.ToString("0.##E0")  : free.ToString("F0");
+            string totalStr = total > 999999 ? total.ToString("0.##E0") : total.ToString("F0");
+            electricityText.text = freeStr + "/" + totalStr + " ⚡";
+        }
+
+        if (nebuliteCapText != null)
+        {
+            float cap  = Player.Instance.getNebuliteCapacity();
+            nebuliteCapText.text = "Cap: " + (cap > 999999 ? cap.ToString("0.##E0") : Mathf.Round(cap).ToString("N0"));
+        }
     }
 
     private IEnumerator UpdatePassive()
@@ -47,26 +67,10 @@ public class TopBar : MonoBehaviour
         {
             UpdateCores();
             previousDollars = Player.Instance.getDollars();
-            // Debug.Log(previousDollars);
             yield return new WaitForSeconds(1f);
             currentDollars = Player.Instance.getDollars();
-            // Debug.Log(currentDollars);
             float passive = (currentDollars - previousDollars);
-            // Debug.Log(passive);
-            // if (passive <= 0) continue;
             PassiveText.text = passive.ToString("N0") + "/s";
-
-            aliensRemainingText.text = EnemySpawner.Instance.getEnemiesRemaining().ToString();
-            // if (passive > 99999)
-            // {
-            //     // PassiveText.text = passive.ToString("0.##E0") + "/s";
-            //     PassiveText.text = $"{passive:0.##E0}/s";
-            // }
-            // else
-            // {
-                
-            // }
-
         }
     }
 

@@ -29,10 +29,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject textPrefab; 
     [SerializeField] private Transform canvasTransform;
 
-    void Awake() {
-        EnemySpawner.OnWaveStarted += handleWaveStarted;
-        EnemySpawner.OnWaveCompleted += handleWaveCompleted;
-    }
+    [Header("XP Gain Text")]
+    [SerializeField] private Color xpGainTextColor = Color.cyan;
 
     public IEnumerator waitAndOpenPanel(string panelName) {
             yield return new WaitForSeconds(openPanelDelay);
@@ -63,6 +61,10 @@ public class UIManager : MonoBehaviour
             currentPanel.ClosePanel();
             currentPanel = null;
         }
+    }
+
+    public bool IsAnyPanelOpen() {
+        return currentPanel != null;
     }
 
     private MenuPanel getPanelFromName(string name) {
@@ -110,7 +112,7 @@ public class UIManager : MonoBehaviour
         GameObject textObject = Instantiate(textPrefab, canvasTransform);
         TMP_Text textComponent = textObject.GetComponent<TMP_Text>();
         textComponent.text = message;
-        textComponent.color = color;
+        textComponent.color = new Color(color.r, color.g, color.b, 1f);
         textComponent.fontSize = Mathf.RoundToInt(30 * size);
 
         if (isWaveMessage)
@@ -171,26 +173,15 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void handleWaveCompleted(int wave) {
-        string message = "Wave " + wave + " ended";
-        Debug.Log(message);
-        CreateAnimatedText(message, Color.white, 1f, true);
+    public void ShowXPGain(int amount, Vector3 worldPosition)
+    {
+        CreateAnimatedText("+" + amount + " XP", xpGainTextColor, 0.7f);
     }
 
-    public void handleWaveStarted(int wave) {
-        string message = "Wave " + wave + " started";
-        Debug.Log(message);
-        CreateAnimatedText(message, Color.white, 1f, true);
-    }
 
     public void MineResource() {
         float reward = Player.Instance.getPower();
         string message = "+" + reward;
         CreateAnimatedText(message, Color.yellow, 0.6f);
-    }
-
-    void OnDisable() {
-        EnemySpawner.OnWaveStarted -= handleWaveStarted;
-        EnemySpawner.OnWaveCompleted -= handleWaveCompleted;
     }
 }

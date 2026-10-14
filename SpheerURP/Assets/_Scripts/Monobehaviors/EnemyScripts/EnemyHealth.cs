@@ -17,6 +17,8 @@ public class EnemyHealth : MonoBehaviour
 
     private bool isDying = false;
 
+    private UIManager uiManager;
+
     public void SetCurrentHealth(float value)
     {
         currentHealth = value;
@@ -25,6 +27,8 @@ public class EnemyHealth : MonoBehaviour
 
     void Start()
     {
+        uiManager = FindObjectOfType<UIManager>();
+
         int   level = Player.Instance.getCurrentXPLevel();
         int   wave  = EnemySpawner.Instance.currentWave;
 
@@ -57,6 +61,11 @@ public class EnemyHealth : MonoBehaviour
         // Clear the player's target if this enemy was being targeted
         if (Player.Instance.GetTarget() == transform)
             Player.Instance.ClearTarget();
+
+        // Lazy lookup in case Start() ran before UIManager was ready
+        if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
+        if (uiManager != null)
+            uiManager.ShowXPGain(xpWorth, transform.position);
 
         Player.Instance.addXpPoints(xpWorth);
         Player.Instance.recordEnemyKilled();
