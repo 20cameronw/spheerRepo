@@ -339,6 +339,8 @@ namespace Frontier
             if (d.kind == StructureKind.RadarTower) return "+" + Mathf.RoundToInt(effect) + " ly local survey";
             if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";
             if (d.kind == StructureKind.WarpGate) return "-" + pct + "% fuel · +" + pct + "% jump range";
+            if (d.kind == StructureKind.DysonCollector)
+                return effect.ToString("0") + " energy/hr · " + d.CapacityAt(level) + "h reserve";
             if (d.kind == StructureKind.Terraformer) return "+" + pct + "% global harvest";
             if (d.HasLevelRows && d.kind.IsStation()) return "Batch size " + Mathf.RoundToInt(effect) + " (level bonus planned)";
             if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";

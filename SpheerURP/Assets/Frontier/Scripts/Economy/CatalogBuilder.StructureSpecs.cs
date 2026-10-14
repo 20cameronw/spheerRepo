@@ -121,8 +121,8 @@ namespace Frontier.Economy
                 .Footprint(4).C(600000, 1.90, "wood:0.8@1,stone:0.5@1,planks:1.1@1,steel:4@1,biocomposite:5@1,titanium_plate:8@1,thermal_alloy:11@1,servo_motor:12@1,plasma:15@1,quantum_chip:30@1,void_alloy:12@3").E("globalYieldBonus", 0, 0.06).U(5, "terraforming").Mega(1.0),
             S("warp_gate", "Warp Gate", Meg, 6, "Megaproject. A ring gate in orbit: each stage cuts fuel costs and extends jump range.")
                 .Footprint(3).C(1500000, 1.90, "wood:0.6@1,stone:0.4@1,planks:0.9@1,steel:3@1,titanium_plate:8@1,rad_shield_alloy:12@1,plasma:14@1,quantum_chip:30@1,warp_coil:20@2,void_alloy:12@3").E("gateFuelDiscount", 0, 0.08).U(6, "warp_gate_engineering").Mega(1.15),
-            S("dyson_collector", "Dyson Collector", Meg, 7, "Megaproject. A swarm of collectors around the star feeds your ships fuel while you sleep.")
-                .Footprint(4).C(4000000, 1.90, "wood:0.4@1,stone:0.4@1,planks:0.7@1,steel:2.5@1,titanium_plate:6@1,rad_shield_alloy:10@1,plasma:12@1,quantum_chip:25@1,warp_coil:20@1,antimatter:18@2,void_alloy:15@1").E("passiveEnergyPerHour", 0, 400).U(7, "stellar_engineering").Mega(1.3),
+            S("dyson_collector", "Dyson Collector", Meg, 7, "Megaproject. Produces fuel while you are away. Each collector stores up to eight hours of output; a full reserve pauses production.")
+                .Footprint(4).C(4000000, 1.90, "wood:0.4@1,stone:0.4@1,planks:0.7@1,steel:2.5@1,titanium_plate:6@1,rad_shield_alloy:10@1,plasma:12@1,quantum_chip:25@1,warp_coil:20@1,antimatter:18@2,void_alloy:15@1").E("passiveEnergyPerHour", 0, 400).Cap("offlineCapHours", 8, 0).U(7, "stellar_engineering").Mega(1.3),
         };
     }
 }

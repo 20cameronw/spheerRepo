@@ -8718,12 +8718,12 @@
       "displayName": "Dyson Collector",
       "role": "Megaproject",
       "tier": 7,
-      "description": "Megaproject. A swarm of collectors around the star feeds your ships fuel while you sleep.",
+      "description": "Megaproject. Produces fuel while you are away. Each collector stores up to eight hours of output; a full reserve pauses production.",
       "footprint": 4,
       "maxPerPlanet": 1,
       "maxLevel": 5,
       "effectKind": "passiveEnergyPerHour",
-      "capacityKind": "",
+      "capacityKind": "offlineCapHours",
       "gathers": [],
       "unlockResearch": "stellar_engineering",
       "unlockTier": 7,
@@ -8780,7 +8780,7 @@
           "requiresReachTier": 7,
           "requiresLabLevel": 0,
           "effect": 400,
-          "capacity": 0
+          "capacity": 8
         },
         {
           "level": 2,
@@ -8834,7 +8834,7 @@
           "requiresReachTier": 7,
           "requiresLabLevel": 0,
           "effect": 800,
-          "capacity": 0
+          "capacity": 8
         },
         {
           "level": 3,
@@ -8888,7 +8888,7 @@
           "requiresReachTier": 8,
           "requiresLabLevel": 0,
           "effect": 1200,
-          "capacity": 0
+          "capacity": 8
         },
         {
           "level": 4,
@@ -8942,7 +8942,7 @@
           "requiresReachTier": 8,
           "requiresLabLevel": 0,
           "effect": 1600,
-          "capacity": 0
+          "capacity": 8
         },
         {
           "level": 5,
@@ -8996,7 +8996,7 @@
           "requiresReachTier": 9,
           "requiresLabLevel": 0,
           "effect": 2000,
-          "capacity": 0
+          "capacity": 8
         }
       ]
     }

@@ -38,6 +38,8 @@ namespace Frontier
         public int pendingUpgradeLevel;
         /// <summary>Fractional offline Auto-Harvester runs carried across saves (always in [0, 1)).</summary>
         public double offlineRunRemainder;
+        /// <summary>Unclaimed Dyson Collector output, in energy units.</summary>
+        public double offlineFuelEnergy;
     }
 
     /// <summary>A paid obstacle removal job. Its generated cost and reward are derived from the planet seed and pad.</summary>
@@ -337,6 +339,8 @@ namespace Frontier
                 if (s.pendingUpgradeLevel < 0) s.pendingUpgradeLevel = 0;
                 if (double.IsNaN(s.offlineRunRemainder) || double.IsInfinity(s.offlineRunRemainder) ||
                     s.offlineRunRemainder < 0.0 || s.offlineRunRemainder >= 1.0) s.offlineRunRemainder = 0.0;
+                if (double.IsNaN(s.offlineFuelEnergy) || double.IsInfinity(s.offlineFuelEnergy) ||
+                    s.offlineFuelEnergy < 0.0) s.offlineFuelEnergy = 0.0;
             }
             d.storages.RemoveAll(s => s == null);
             foreach (var storage in d.storages)

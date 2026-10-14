@@ -53,6 +53,91 @@ namespace Frontier
             return changed;
         }
 
+        bool AccrueOfflineDysonCollectors(string lastSavedUtc)
+        {
+            if (SaveIsReadOnly || !UtcText.TryParse(lastSavedUtc, out var lastSaved)) return false;
+            double gapHours = (clock.UtcNow - lastSaved).TotalHours;
+            if (gapHours <= 0.0) return false;
+
+            bool changed = false;
+            foreach (var delta in world.All)
+            {
+                foreach (var record in delta.structures)
+                {
+                    if (record.defId != "dyson_collector" || !string.IsNullOrEmpty(record.buildEndUtc)) continue;
+                    var definition = db.FindStructure(record.defId);
+                    if (definition == null || definition.kind != StructureKind.DysonCollector) continue;
+
+                    double rate = Math.Max(0.0, definition.EffectAt(record.level));
+                    double capHours = Math.Max(0.0, definition.CapacityAt(record.level));
+                    if (rate <= 0.0 || capHours <= 0.0) continue;
+
+                    double capacity = rate * capHours;
+                    double reserve = double.IsNaN(record.offlineFuelEnergy) || double.IsInfinity(record.offlineFuelEnergy)
+                        ? 0.0 : Math.Min(capacity, Math.Max(0.0, record.offlineFuelEnergy));
+                    double accrued = rate * Math.Min(gapHours, capHours);
+                    double nextReserve = Math.Min(capacity, reserve + accrued);
+                    if (nextReserve == record.offlineFuelEnergy) continue;
+
+                    record.offlineFuelEnergy = nextReserve;
+                    changed = true;
+                }
+            }
+
+            if (changed) world.Touch();
+            return changed;
+        }
+
+        public double DysonFuelBufferCapacity(PlacedStructure collector)
+        {
+            if (!IsDysonCollector(collector)) return 0.0;
+            return Math.Max(0.0, collector.def.EffectAt(collector.level)) *
+                Math.Max(0.0, collector.def.CapacityAt(collector.level));
+        }
+
+        public double DysonFuelReserveEnergy(PlacedStructure collector)
+        {
+            double capacity = DysonFuelBufferCapacity(collector);
+            if (capacity <= 0.0) return 0.0;
+            double stored = collector.record.offlineFuelEnergy;
+            if (double.IsNaN(stored) || double.IsInfinity(stored)) return 0.0;
+            return Math.Min(capacity, Math.Max(0.0, stored));
+        }
+
+        public int DysonFuelReady(PlacedStructure collector)
+        {
+            if (!IsDysonCollector(collector) || db.fuel == null) return 0;
+            double energyPerCell = Math.Max(0.0, db.fuel.fuelEnergy);
+            if (energyPerCell <= 0.0) return 0;
+            double available = Math.Floor(DysonFuelReserveEnergy(collector) / energyPerCell);
+            int ready = (int)Math.Min(int.MaxValue, available);
+            return Math.Min(ready, backpack.FreeSpace(db.fuel.id));
+        }
+
+        public int ClaimDysonFuel(PlacedStructure collector)
+        {
+            int ready = DysonFuelReady(collector);
+            if (ready <= 0) return 0;
+            double energyPerCell = db.fuel.fuelEnergy;
+            int accepted = backpack.Add(db.fuel.id, ready);
+            if (accepted <= 0) return 0;
+
+            collector.record.offlineFuelEnergy = Math.Max(0.0,
+                DysonFuelReserveEnergy(collector) - accepted * energyPerCell);
+            world.Touch();
+            saves.MarkDirty();
+            RecordAtlasResourceAcquired(db.fuel.id);
+            Notify();
+            return accepted;
+        }
+
+        bool IsDysonCollector(PlacedStructure collector)
+        {
+            return collector != null && collector.def != null && collector.record != null &&
+                collector.def.kind == StructureKind.DysonCollector && collector.def.effectKind == "passiveEnergyPerHour" &&
+                collector.planetId == planet.Id && IsPlaced(collector) && IsOperational(collector);
+        }
+
         List<GatherSpot> AutoHarvestSpots(PlanetData p)
         {
             var byResource = new Dictionary<string, GatherSpot>(StringComparer.Ordinal);

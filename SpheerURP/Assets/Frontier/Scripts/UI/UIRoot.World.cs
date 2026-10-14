@@ -154,6 +154,14 @@ namespace Frontier
                         body.Add(SectionLabel("STAGE " + stage + " / " + s.def.maxLevel + "  ·  " + StructureEffect(s.def, stage)));
                         body.Add(UiKit.Text("The global harvest bonus activates when this timer completes.", "fr-tiny"));
                     }
+                    else if (s.def.kind == StructureKind.WarpGate || s.def.kind == StructureKind.DysonCollector)
+                    {
+                        int stage = s.record.pendingUpgradeLevel > s.level ? s.record.pendingUpgradeLevel : s.level;
+                        body.Add(SectionLabel("STAGE " + stage + " / " + s.def.maxLevel + "  ·  " + StructureEffect(s.def, stage)));
+                        body.Add(UiKit.Text(s.def.kind == StructureKind.WarpGate
+                            ? "Range and fuel effects activate when complete and apply only to trips leaving this world."
+                            : "Fuel production starts when complete; collected fuel stays in this world's reserve.", "fr-tiny"));
+                    }
                     body.Add(UiKit.Text("Jobs use local device time in this offline build.", "fr-tiny"));
                 });
                 jobPopupStructure = s;
@@ -162,6 +170,7 @@ namespace Frontier
             var k = s.def.kind;
             if (k.IsStorage()) OpenWarehouse(s, t);
             else if (k == StructureKind.Satellite) OpenRelay(s, t);
+            else if (k == StructureKind.DysonCollector) OpenDysonCollector(s, t);
             else if (k == StructureKind.WarpGate) OpenWarpGate(s, t);
             else if (k == StructureKind.Terraformer) OpenTerraformer(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
@@ -338,6 +347,43 @@ namespace Frontier
                 body.Add(UiKit.Text("Combined departure fuel discount: " +
                     (gs.TravelFuelDiscount(gs.planet) * 100f).ToString("0.#") +
                     "% (local Hangar + Warp Gate). Applies only when leaving this world.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
+        void OpenDysonCollector(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("dyson" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Offline fuel generation");
+                double rate = Math.Max(0.0, s.def.EffectAt(s.level));
+                double capHours = Math.Max(0.0, s.def.CapacityAt(s.level));
+                double capacity = gs.DysonFuelBufferCapacity(s);
+                double stored = gs.DysonFuelReserveEnergy(s);
+                int ready = gs.DysonFuelReady(s);
+                body.Add(UiKit.Text("Production: " + rate.ToString("0") + " energy / hour  ·  " +
+                    capHours.ToString("0") + "h reserve", "fr-small", UiKit.Cyan));
+                body.Add(UiKit.Text("Stored reserve: " + stored.ToString("0") + " / " + capacity.ToString("0") +
+                    " energy", "fr-small"));
+                body.Add(UiKit.Text("Unclaimed energy stays here if your backpack is full. A full reserve pauses production.",
+                    "fr-tiny"));
+                double fuelPerCell = gs.db.fuel == null ? 1.0 : Math.Max(0.0, gs.db.fuel.fuelEnergy);
+                string action = ready > 0 ? "COLLECT " + ready + " FUEL" :
+                    stored >= fuelPerCell ? "BACKPACK FULL" : "NO FUEL READY";
+                var collect = IconBtn(action, "pack", UiKit.Cyan, () =>
+                {
+                    int amount = gs.ClaimDysonFuel(s);
+                    if (amount > 0)
+                    {
+                        Sfx.Good();
+                        Toast("Collected " + amount + " fuel", UiKit.Cyan);
+                        RefreshModal();
+                    }
+                    else Sfx.Bad();
+                });
+                UiKit.SetEnabledLook(collect, ready > 0);
+                body.Add(collect);
                 UpgradeButton(body, s, c);
             });
         }

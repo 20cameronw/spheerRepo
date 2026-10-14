@@ -490,6 +490,27 @@ namespace Frontier
                 }
                 ui.DebugTapStructure(gate);
             }, 0.3f);
+            yield return new Shot("popup-dysoncollector", () =>
+            {
+                var world = FindWorld(ColossalSpec);
+                if (world == null) throw new InvalidOperationException("no colossal Dyson Collector showcase world");
+                GoTo(world);
+                showcaseWorld = world.Id;
+                ResetView();
+                var collector = gs.StructureOfKind(world, StructureKind.DysonCollector);
+                if (collector == null)
+                {
+                    int slot = world.BuildingSlots - 1;
+                    while (slot >= 0 && gs.StructureAt(world, slot) != null) slot--;
+                    if (slot < 0) throw new InvalidOperationException("no free colossal pad for the Dyson Collector showcase");
+                    collector = gs.DebugPlace(db.StructureOfKind(StructureKind.DysonCollector), slot, 3);
+                    if (collector == null) throw new InvalidOperationException("Dyson Collector showcase could not be placed");
+                }
+                collector.record.offlineFuelEnergy = collector.def.EffectAt(collector.level) * 3.25;
+                gs.world.Touch();
+                gs.Notify();
+                ui.DebugTapStructure(collector);
+            }, 0.3f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.
             if (showcaseWorld != null)

@@ -113,7 +113,7 @@ namespace Frontier.Tests
                 Assert.IsTrue(seen.Add(kind), "Kind must have one canonical id: " + kind);
             }
             Assert.AreEqual(Enum.GetValues(typeof(StructureKind)).Length, seen.Count);
-            Assert.IsFalse(StructureKind.DysonCollector.IsImplemented());
+            Assert.IsTrue(StructureKind.DysonCollector.IsImplemented());
         }
     }
 }

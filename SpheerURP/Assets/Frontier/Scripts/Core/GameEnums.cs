@@ -130,6 +130,7 @@ namespace Frontier
                 case StructureKind.Excavator:
                 case StructureKind.Terraformer:
                 case StructureKind.WarpGate:
+                case StructureKind.DysonCollector:
                 case StructureKind.SalvageYard:
                 case StructureKind.ColonyHub:
                     return true;

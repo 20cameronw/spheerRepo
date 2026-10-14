@@ -188,6 +188,7 @@ namespace Frontier
             world.Import(save.worlds);
             stats = save.stats ?? new PlayerStats();
             bool offlineChanged = AccrueOfflineHarvesters(save.clock.lastSavedUtc);
+            offlineChanged |= AccrueOfflineDysonCollectors(save.clock.lastSavedUtc);
             bool builderJobsChanged = RecoverBuilderJobs(warnings);
             SeedAtlasFromExistingProgress();
 

@@ -121,6 +121,61 @@ namespace Frontier.Tests
                 "the fractional run from the previous visit combines with the next interval");
         }
 
+        [Test]
+        public void DysonCollector_AccruesCappedOfflineFuelAndDoesNotReplayIt()
+        {
+            var state = NewState();
+            var definition = db.StructureOfKind(StructureKind.DysonCollector);
+            Assert.IsNotNull(definition);
+            Assert.IsTrue(definition.Implemented);
+            Assert.AreEqual(400f, definition.EffectAt(1), 0.001f);
+            Assert.AreEqual(8, definition.CapacityAt(1));
+            Assert.IsNotNull(state.DebugPlace(definition, 0));
+            state.Save();
+
+            clock.Advance(12 * 60 * 60);
+            var loaded = NewState(true);
+            var collector = loaded.StructureAt(loaded.planet, 0);
+            Assert.AreEqual(3200.0, collector.record.offlineFuelEnergy, 0.001,
+                "one offline interval is capped to eight hours of output");
+
+            var reloaded = NewState(true);
+            Assert.AreEqual(3200.0, reloaded.StructureAt(reloaded.planet, 0).record.offlineFuelEnergy, 0.001,
+                "reloading does not replay already-accrued output");
+        }
+
+        [Test]
+        public void DysonCollector_ClaimIsPlanetLocalAndRetainsBackpackOverflow()
+        {
+            var state = NewState();
+            var collector = state.DebugPlace(db.StructureOfKind(StructureKind.DysonCollector), 0);
+            Assert.IsNotNull(collector);
+            collector.record.offlineFuelEnergy = 2500.0;
+            state.backpack.Clear();
+            int filledSlots = 0;
+            ResourceSO freedResource = null;
+            foreach (var resource in db.resources)
+            {
+                if (resource == null || resource == db.fuel || filledSlots >= state.Slots) continue;
+                state.backpack.Set(resource.id, resource.stackSize);
+                if (freedResource == null) freedResource = resource;
+                filledSlots++;
+            }
+            Assert.AreEqual(state.Slots, state.SlotsUsed);
+            Assert.AreEqual(0, state.DysonFuelReady(collector));
+            Assert.AreEqual(0, state.ClaimDysonFuel(collector));
+            Assert.AreEqual(2500.0, collector.record.offlineFuelEnergy, 0.001,
+                "full backpack does not discard the stored reserve");
+
+            state.DebugTeleport(state.universe.Get("glacia"));
+            Assert.AreEqual(0, state.ClaimDysonFuel(collector), "fuel must be collected on the collector's planet");
+            state.DebugTeleport(state.universe.Home);
+            state.backpack.Remove(freedResource.id, state.backpack.Count(freedResource.id));
+            int claimed = state.ClaimDysonFuel(collector);
+            Assert.Greater(claimed, 0);
+            Assert.AreEqual(2500.0 - claimed * db.fuel.fuelEnergy, collector.record.offlineFuelEnergy, 0.001);
+        }
+
         // ---- debounce ----------------------------------------------------------------------------------------------------
 
         [Test]

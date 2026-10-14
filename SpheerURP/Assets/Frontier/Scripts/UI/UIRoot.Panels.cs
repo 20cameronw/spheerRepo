@@ -113,7 +113,7 @@ namespace Frontier
                     StructureKind.SiphonRig, StructureKind.Excavator, StructureKind.SalvageYard); break;
                 case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;
                 default: ShopSection(body, StructureKind.ResearchLab, StructureKind.RadarTower, StructureKind.ColonyHub,
-                    StructureKind.Satellite, StructureKind.Terraformer, StructureKind.WarpGate); break;
+                    StructureKind.Satellite, StructureKind.Terraformer, StructureKind.WarpGate, StructureKind.DysonCollector); break;
             }
         }
 
