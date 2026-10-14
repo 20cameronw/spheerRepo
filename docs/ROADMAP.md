@@ -595,8 +595,17 @@ The full EditMode suite (including Slow) passes 539 tests, with two runtime-spec
 and all five editor checks pass. Progression coverage includes save/reload, invalid catalog entries and preserving progression data
 while the database temporarily falls back to legacy content.
 
-Next: builders/jobs/timers, remaining structure behaviours, hazards, obstacles, shards, persisted Atlas discovery and rewards,
-and the remaining harvest games. This is not yet the full balanced progression loop.
+### Next implementation sequence
+
+The research and supported-tool progression slice is complete. Continue in small, independently verifiable gameplay slices, in this order:
+
+1. **Builder jobs and timers (`m7-timers-builders-obstacles`, builder/timer foundation):** define a persisted job lifecycle and builder-slot rules; use the injected clock rather than wall-clock reads; expose job state and remaining time in the UI; cover save/reload, completion, reset and clock edge cases with EditMode tests. Start with the already-supported build actions and do not imply offline/server authority that does not exist.
+2. **Structure behaviours and economy gates:** implement only effects with an existing runtime contract, and keep catalog-only structures visibly unavailable until their behavior is real.
+3. **Harvest expansion:** establish the shared minigame lifecycle before adding Siphon, Excavate and Salvage; each new game must use its matching tool ladder and resource method.
+4. **World hazards, obstacles and shards:** wire their existing catalog data into travel, removal and reward loops, with deterministic tests and clear player-facing costs.
+5. **Atlas discovery and rewards:** persist discoveries and grant capped first-discovery rewards; keep visited/surveyed information distinct from discovery.
+
+Defer ads, premium purchases, online services and cross-device time validation until their service interfaces, consent and compliance work are ready. This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
 
 **Runtime cutover validation (2026-10-13):** full EditMode including Slow 535 passed / 2 platform-specific allocation probes
 skipped; PlayMode 19 passed; economy lab 127 passed; all five editor checks passed with zero compile diagnostics. Original
@@ -619,7 +628,7 @@ structure scale, ground radii and route geometry.
 economy lab 127 passed; all five editor checks passed. Seven integrated phone captures (map plus six Hyperspace states) reported zero errors,
 zero text/touch-target/overflow lint findings.
 
-Still open: complete economy progression (research/tools/builders/timers and remaining behaviours); pins and persisted discovery history; global name indexing and directed next-stop controls;
+Still open: builder jobs/timers and remaining economy behaviours; pins and persisted discovery history; global name indexing and directed next-stop controls;
 device/GPU map budget and IL2CPP/ARM64 determinism; binding the mini-game duration to route time; resumable/abortable multi-leg flights and
 real jump/scanner/plating unlocks; Atlas discovery/persistence/rewards, harvest expansion, monetization and live services.
 
