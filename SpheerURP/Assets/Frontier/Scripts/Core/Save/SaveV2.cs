@@ -97,6 +97,8 @@ namespace Frontier
     {
         public int schemaVersion = SaveSchema.Current;
         public string saveId = "";
+        /// <summary>Monotonic local-save write sequence used to identify divergent snapshots across devices.</summary>
+        public long revision;
         public CreatedWithInfo createdWith = new CreatedWithInfo();
         public PlayerSave player = new PlayerSave();
         public LocationSave location = new LocationSave();
@@ -112,6 +114,7 @@ namespace Frontier
         public SaveV2 Normalize()
         {
             if (saveId == null) saveId = "";
+            if (revision < 0) revision = 0;
             if (createdWith == null) createdWith = new CreatedWithInfo();
             if (createdWith.appVersion == null) createdWith.appVersion = "";
             if (createdWith.universeSeed == null) createdWith.universeSeed = "";

@@ -20,9 +20,20 @@ namespace Frontier.Tests
 
             public string Serialize(SaveV2 s)
             {
-                string text = "{\"schemaVersion\":" + s.schemaVersion + ",\"saveId\":\"" + (CorruptOnWrite ? "garbled" : s.saveId) + "\",\"xp\":" + s.player.xp +
+                string text = "{\"schemaVersion\":" + s.schemaVersion + ",\"saveId\":\"" + (CorruptOnWrite ? "garbled" : s.saveId) + "\",\"revision\":" + s.revision + ",\"xp\":" + s.player.xp +
                               ",\"worlds\":" + s.worlds.Count + ",\"inventory\":" + s.player.inventory.Count + ",\"planetId\":\"" + s.location.currentPlanetId + "\"}";
                 return text;
+            }
+
+            static bool TryLong(string text, string key, out long value)
+            {
+                value = 0;
+                int i = text.IndexOf("\"" + key + "\":", StringComparison.Ordinal);
+                if (i < 0) return false;
+                i += key.Length + 3;
+                int j = i;
+                while (j < text.Length && (char.IsDigit(text[j]) || text[j] == '-')) j++;
+                return long.TryParse(text.Substring(i, j - i), out value);
             }
 
             static bool TryNumber(string text, string key, out int value)
@@ -48,11 +59,13 @@ namespace Frontier.Tests
             public SaveV2 DeserializeV2(string text)
             {
                 int version, xp, worlds, inventory;
+                long revision;
                 if (!TryNumber(text, "schemaVersion", out version)) throw new FormatException("no schemaVersion");
+                TryLong(text, "revision", out revision);
                 TryNumber(text, "xp", out xp);
                 TryNumber(text, "worlds", out worlds);
                 TryNumber(text, "inventory", out inventory);
-                var s = new SaveV2 { schemaVersion = version, saveId = Text(text, "saveId") };
+                var s = new SaveV2 { schemaVersion = version, saveId = Text(text, "saveId"), revision = revision };
                 s.player.xp = xp;
                 s.location.currentPlanetId = Text(text, "planetId");
                 for (int i = 0; i < worlds; i++) s.worlds.Add(new PlanetDelta { planetId = "p:" + i });
@@ -110,9 +123,9 @@ namespace Frontier.Tests
             }
         }
 
-        static SaveV2 Save(int xp, string id = "save-1", int worlds = 0)
+        static SaveV2 Save(int xp, string id = "save-1", int worlds = 0, long revision = 0)
         {
-            var s = new SaveV2 { saveId = id };
+            var s = new SaveV2 { saveId = id, revision = revision };
             s.player.xp = xp;
             for (int i = 0; i < worlds; i++) s.worlds.Add(new PlanetDelta { planetId = "p:" + i });
             return s;
@@ -144,6 +157,17 @@ namespace Frontier.Tests
             Assert.AreEqual(0, r.report.migratedFrom);
             Assert.AreEqual(SaveSchema.Current, r.report.schemaVersion);
             Assert.AreEqual(0, migrated);
+        }
+
+        [Test]
+        public void Revision_RoundTripsAndOlderV2DefaultsToZero()
+        {
+            Assert.IsTrue(store.Write(Save(77, revision: 42)));
+            Assert.AreEqual(42L, store.Load(Migrate).save.revision);
+
+            File.WriteAllText(store.PrimaryPath,
+                "{\"schemaVersion\":" + SaveSchema.Current + ",\"saveId\":\"older-v2\",\"xp\":1,\"worlds\":0,\"inventory\":0}");
+            Assert.AreEqual(0L, store.Load(Migrate).save.revision);
         }
 
         [Test]

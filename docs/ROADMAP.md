@@ -2,7 +2,7 @@
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
 Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
-Latest validated milestone: **UGS Cloud Save now has a consent-gated provider with write-lock handling, but it is disabled by default and is not connected to local save synchronization.** Its focused EditMode service tests passed 14/14. Frontier Score remains a local, save-derived value; leaderboard writes remain disabled because local saves and client-supplied score inputs are not authoritative. UGS reads also remain behind consent and an explicit off-by-default configuration gate. Next, define and test non-destructive local/cloud restore and conflict handling without automatic uploads; do not enable competitive writes until progression has server-verifiable evidence and direct client leaderboard writes are blocked.
+Latest validated milestone: **UGS Cloud Save has a consent-gated provider with write-lock handling, and local saves now carry a monotonic revision; cloud sync remains disabled and is not connected to local saves.** Full EditMode passed 594 tests with 2 runtime-specific skips. Existing v2 saves without a revision load as revision 0. Frontier Score remains a local, save-derived value; leaderboard writes remain disabled because local saves and client-supplied score inputs are not authoritative. UGS reads also remain behind consent and an explicit off-by-default configuration gate. Next, add non-destructive local/cloud restore and conflict handling only after account recovery is supported; do not enable competitive writes until progression has server-verifiable evidence and direct client leaderboard writes are blocked.
 
 ---
 
@@ -159,7 +159,7 @@ Dependency rule: Core ← Data ← Game ← UI; Services depends on Core only an
 
 - Versioned JSON (`schemaVersion`), atomic write (`.tmp` → replace), rolling `.bak`, debounce (~1.5 s) with forced flush on pause/quit/travel.
 - `SaveMigrator` v1 → v2 with a fixture test built from a real v1 save.
-- Local store + `ICloudSave` (UGS Cloud Save, write locks for conflict detection). The provider is implemented but disabled by default and is not yet wired to local save sync. Before enabling it, define and test non-destructive restore/conflict UX; never silently upload or overwrite local progress. The proposed conflict rule (higher `revision`, then ask the player when diverged) still needs implementation and validation.
+- Local store + `ICloudSave` (UGS Cloud Save, write locks for conflict detection). The provider is implemented but disabled by default and is not yet wired to local save sync. `SaveV2.revision` increments with each local snapshot; older v2 saves default to 0. Revision can order snapshots but cannot prove which divergent save is correct, so any differing local/cloud payload must be shown to the player and never silently uploaded or overwritten. Before enabling sync, add account recovery plus tested restore/conflict UX.
 - Stores deltas only (see §4.6).
 
 ### 2.4 Content pipeline

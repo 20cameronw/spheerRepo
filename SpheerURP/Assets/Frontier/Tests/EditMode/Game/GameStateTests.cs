@@ -344,7 +344,9 @@ namespace Frontier.Tests
         {
             var state = NewState();
             Assert.IsTrue(state.Save());
+            Assert.AreEqual(1L, ReadSave(PrimaryPath).revision);
             Assert.IsTrue(state.Save());
+            Assert.AreEqual(2L, ReadSave(PrimaryPath).revision);
             Assert.AreEqual(2, state.saves.WriteCount);
         }
 

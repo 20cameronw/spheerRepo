@@ -13,6 +13,7 @@ namespace Frontier
         public const double PlayTimeSaveSeconds = 60.0;
 
         string saveId = "";
+        long saveRevision;
         CreatedWithInfo createdWith = new CreatedWithInfo();
         // Reserved save sections: this build does not interpret them but writes back what it loaded.
         List<WalletEntry> wallet = new List<WalletEntry>();
@@ -114,6 +115,7 @@ namespace Frontier
             progression.Clear();
             world.Clear();
             ClearProgressionContent();
+            saveRevision = 0;
             stats = new PlayerStats();
             wallet = new List<WalletEntry>();
             builders = new List<BuilderSlot>();
@@ -147,6 +149,7 @@ namespace Frontier
             var warnings = report.warnings;
             ClearState();
             saveId = !string.IsNullOrEmpty(save.saveId) ? save.saveId : NewSaveId();
+            saveRevision = save.revision;
             createdWith = save.createdWith;
             wallet = save.wallet; builders = save.builders; atlas = save.atlas; settings = save.settings;
 
@@ -203,9 +206,11 @@ namespace Frontier
 
         SaveV2 BuildSave()
         {
+            if (saveRevision < long.MaxValue) saveRevision++;
             var save = new SaveV2
             {
                 saveId = saveId,
+                revision = saveRevision,
                 createdWith = createdWith,
                 wallet = wallet,
                 builders = builders,

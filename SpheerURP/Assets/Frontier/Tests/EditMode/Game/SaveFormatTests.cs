@@ -101,6 +101,20 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void SaveRevision_RoundTripsAndOlderV2DefaultsToZero()
+        {
+            var save = new SaveV2 { saveId = "revisioned", revision = 9007199254740991L };
+            string json = Codec.Serialize(save);
+            Assert.AreEqual(save.revision, Codec.DeserializeV2(json).Normalize().revision);
+
+            var older = Codec.DeserializeV2("{\"schemaVersion\":" + SaveSchema.Current + ",\"saveId\":\"older-v2\"}").Normalize();
+            Assert.AreEqual(0L, older.revision);
+
+            older.revision = -1;
+            Assert.AreEqual(0L, older.Normalize().revision);
+        }
+
+        [Test]
         public void RealV1FreshFile_MigratesToTheHomeWorld()
         {
             var v1 = Codec.DeserializeV1(Fixture("save_v1_fresh.json"));

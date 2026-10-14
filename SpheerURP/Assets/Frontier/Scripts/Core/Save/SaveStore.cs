@@ -242,6 +242,7 @@ namespace Frontier
             if (!JsonShape.IsCompleteObject(text)) throw new IOException("verification failed: the written file is not a complete JSON object");
             var back = codec.DeserializeV2(text);
             if (back == null || back.schemaVersion != written.schemaVersion || back.saveId != written.saveId ||
+                back.revision != written.revision ||
                 back.player == null || back.player.xp != written.player.xp ||
                 back.worlds == null || back.worlds.Count != written.worlds.Count ||
                 back.player.inventory == null || back.player.inventory.Count != written.player.inventory.Count)
