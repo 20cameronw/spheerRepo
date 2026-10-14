@@ -17,6 +17,7 @@ namespace Frontier
         VisualElement mapView, mapWorld, mapCard, mapTools;
         Label mapReadout, mapNotice;
         TextField mapSearch;
+        DropdownField mapFilter;
         readonly MapViewport viewport = new MapViewport();
         float mapZoom = 2f;
         int dragPointer = -1;
@@ -82,12 +83,25 @@ namespace Frontier
             ApplyMapTransform();
         }
 
+        void OpenMapForResource(string resourceId)
+        {
+            OpenMap();
+            if (!mapOpen || mapFilter == null) return;
+            int index = mapResourceIds.IndexOf(resourceId);
+            if (index < 1) return;
+            mapFilter.index = index;
+            mapResource = resourceId;
+            mapVersion++;
+            mapQueryAt = 0;
+        }
+
         void CloseMap()
         {
             ResetMapPointer();
             if (mapView != null) mapView.RemoveFromHierarchy();
             mapView = null; mapWorld = null; mapCard = null; mapTools = null;
             mapOpen = false; lastPinch = 0f; mapSnapshot = null;
+            mapFilter = null;
             mapVersion++; previewVersion++;
             mapLabels.Clear(); mapPlanets.Clear();
             // Workers never touch UI/GameObjects. Keep their handles until completion so reopening cannot fan out new workers.
@@ -385,6 +399,7 @@ namespace Frontier
             bar.Add(mapSearch); bar.Add(UiKit.Btn("FIND", UiKit.Cyan, SearchMap));
             mapView.Add(bar);
             var filter = new DropdownField();
+            mapFilter = filter;
             filter.AddToClassList("fr-map-filter");
             filter.tooltip = "Filter systems by surveyed deposits";
             filter.choices = new List<string> { "All deposits" }; mapResourceIds.Clear(); mapResourceIds.Add("");

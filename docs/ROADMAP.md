@@ -577,8 +577,17 @@ simulator puts a regular player in Settlement after about 3.6 days, Industry aft
 hop at 2.4 min. The validated export reader and idempotent importer now create 186 designer-editable ScriptableObject assets and 47 distinct
 content icons; see [CONTENT.md](CONTENT.md). The live default now uses a validated transient view of these assets with legacy fallback,
 canonical v1/v2 content-id remapping, rebound authored/combat references, exact station gates and cumulative effects. Legacy tool ownership
-is retained; unfinished research/structure/effect purchases stay locked. Next: persistent research/tool tiers/builders, jobs/timers,
-the remaining behaviours, hazards, obstacles, shards and the Atlas. This is not yet the full balanced progression loop.
+is retained; unfinished research/structure/effect purchases stay locked.
+
+**Atlas UI vertical slice:** the Menu now opens a catalogue backed by the selected economy database. Resource entries show category, tier,
+stack size, catalog description, harvest method and habitat/minimum-tier rows, plus recipes that make or consume the item. Raw resources
+can hand off to the map's surveyed-deposit filter. Recipe entries show input → output, station and progression gates. The Worlds tab is
+limited to the current and visited worlds and links their resource entries; the Field Guide lists structure definitions (clearly marking
+catalogue-only behavior) and configured aliens. Discovery silhouettes/rewards and persisted Atlas completion are intentionally not claimed:
+the save model does not track those discoveries yet.
+
+Next: persistent research/tool tiers/builders, jobs/timers, remaining structure behaviours, hazards, obstacles, shards, persisted Atlas
+discovery and rewards, and the remaining harvest games. This is not yet the full balanced progression loop.
 
 **Runtime cutover validation (2026-10-13):** full EditMode including Slow 535 passed / 2 platform-specific allocation probes
 skipped; PlayMode 19 passed; economy lab 127 passed; all five editor checks passed with zero compile diagnostics. Original
@@ -603,7 +612,7 @@ zero text/touch-target/overflow lint findings.
 
 Still open: complete economy progression (research/tools/builders/timers and remaining behaviours); pins and persisted discovery history; global name indexing and directed next-stop controls;
 device/GPU map budget and IL2CPP/ARM64 determinism; binding the mini-game duration to route time; resumable/abortable multi-leg flights and
-real jump/scanner/plating unlocks; Atlas, harvest expansion, monetization and live services.
+real jump/scanner/plating unlocks; Atlas discovery/persistence/rewards, harvest expansion, monetization and live services.
 
 ### Foundation rework: runtime planet model, session split, save v2 (done on this branch)
 

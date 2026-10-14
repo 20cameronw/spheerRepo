@@ -194,12 +194,14 @@ namespace Frontier
                     case "ranks": BuildLeaderboard(body); break;
                     case "tutorial": BuildTutorial(body); break;
                     case "about": BuildAbout(body); break;
+                    case "atlas": BuildAtlas(body); break;
                     default: BuildSettings(body); break;
                 }
                 return;
             }
             var grid = UiKit.Div("fr-menu-grid");
             grid.Add(MenuTile("ranks", "RANKS", UiKit.Lime, "ranks"));
+            grid.Add(MenuTile("map", "ATLAS", UiKit.Cyan, "atlas"));
             grid.Add(MenuTile("tutorial", "HOW TO PLAY", UiKit.Cyan, "tutorial"));
             grid.Add(MenuTile("about", "ABOUT", UiKit.Magenta, "about"));
             grid.Add(MenuTile("gear", "SETTINGS", UiKit.Cyan, "settings"));
