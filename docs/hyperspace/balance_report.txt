@@ -1,0 +1,199 @@
+== A. Expected ship for the tier (power = 1 + 0.75 x tier), 96 runs each
+novice  5 ly     tier 0   surv 100%  hits  0.1  kills  97%  grades S/A/B/C  86/ 11/  2/  0  q 0.97  t 26s
+novice  5 ly     tier 1   surv 100%  hits  0.5  kills  90%  grades S/A/B/C  63/  9/ 28/  0  q 0.90  t 26s
+novice  5 ly     tier 2   surv 100%  hits  0.4  kills  90%  grades S/A/B/C  70/ 15/ 16/  0  q 0.92  t 26s
+novice  5 ly     tier 3   surv 100%  hits  0.4  kills  88%  grades S/A/B/C  65/ 17/ 19/  0  q 0.91  t 26s
+novice  5 ly     tier 4   surv 100%  hits  0.7  kills  85%  grades S/A/B/C  51/ 22/ 27/  0  q 0.88  t 26s
+novice  5 ly     tier 5   surv 100%  hits  0.5  kills  78%  grades S/A/B/C  66/  6/ 28/  0  q 0.90  t 26s
+novice  5 ly     tier 6   surv 100%  hits  1.1  kills  72%  grades S/A/B/C  38/  9/ 53/  0  q 0.83  t 42s  boss 96/96
+novice  5 ly     tier 8   surv 100%  hits  1.4  kills  63%  grades S/A/B/C  31/  6/ 63/  0  q 0.80  t 44s  boss 96/96
+novice  5 ly     tier 10  surv 100%  hits  2.1  kills  73%  grades S/A/B/C  18/  4/ 75/  3  q 0.73  t 45s  boss 96/96
+novice  5 ly     tier 12  surv 100%  hits  2.5  kills  63%  grades S/A/B/C   7/  8/ 73/ 11  q 0.68  t 45s  boss 96/96
+novice  50 ly    tier 0   surv 100%  hits  0.4  kills  95%  grades S/A/B/C  68/ 26/  6/  0  q 0.93  t 35s
+novice  50 ly    tier 1   surv 100%  hits  0.7  kills  82%  grades S/A/B/C  48/ 30/ 22/  0  q 0.88  t 35s
+novice  50 ly    tier 2   surv 100%  hits  0.5  kills  88%  grades S/A/B/C  60/ 22/ 18/  0  q 0.91  t 35s
+novice  50 ly    tier 3   surv 100%  hits  1.3  kills  87%  grades S/A/B/C  31/ 23/ 46/  0  q 0.83  t 35s
+novice  50 ly    tier 4   surv 100%  hits  1.4  kills  83%  grades S/A/B/C  31/ 16/ 53/  0  q 0.82  t 35s
+novice  50 ly    tier 5   surv 100%  hits  1.0  kills  76%  grades S/A/B/C  43/ 24/ 32/  1  q 0.86  t 35s
+novice  50 ly    tier 6   surv 100%  hits  2.1  kills  70%  grades S/A/B/C  11/ 15/ 73/  1  q 0.75  t 52s  boss 96/96
+novice  50 ly    tier 8   surv 100%  hits  2.3  kills  58%  grades S/A/B/C  13/ 14/ 74/  0  q 0.74  t 53s  boss 96/96
+novice  50 ly    tier 10  surv 100%  hits  3.5  kills  61%  grades S/A/B/C   6/  3/ 74/ 17  q 0.66  t 54s  boss 96/96
+novice  50 ly    tier 12  surv 100%  hits  3.9  kills  58%  grades S/A/B/C   5/  1/ 71/ 23  q 0.63  t 55s  boss 96/96
+novice  200 ly   tier 0   surv 100%  hits  0.6  kills  95%  grades S/A/B/C  54/ 34/ 11/  0  q 0.90  t 46s
+novice  200 ly   tier 1   surv 100%  hits  0.5  kills  85%  grades S/A/B/C  63/ 26/ 11/  0  q 0.92  t 46s
+novice  200 ly   tier 2   surv 100%  hits  1.0  kills  87%  grades S/A/B/C  35/ 36/ 28/  0  q 0.85  t 46s
+novice  200 ly   tier 3   surv 100%  hits  1.7  kills  84%  grades S/A/B/C  21/ 27/ 52/  0  q 0.80  t 46s
+novice  200 ly   tier 4   surv 100%  hits  1.7  kills  80%  grades S/A/B/C  23/ 25/ 51/  1  q 0.81  t 46s
+novice  200 ly   tier 5   surv 100%  hits  1.8  kills  70%  grades S/A/B/C  21/ 22/ 57/  0  q 0.80  t 46s
+novice  200 ly   tier 6   surv 100%  hits  2.4  kills  67%  grades S/A/B/C  16/  9/ 70/  5  q 0.75  t 63s  boss 96/96
+novice  200 ly   tier 8   surv 100%  hits  3.9  kills  57%  grades S/A/B/C   4/  6/ 78/ 11  q 0.67  t 65s  boss 96/96
+novice  200 ly   tier 10  surv 100%  hits  5.0  kills  56%  grades S/A/B/C   2/  1/ 73/ 24  q 0.61  t 65s  boss 96/96
+novice  200 ly   tier 12  surv  97%  hits  6.2  kills  51%  grades S/A/B/C   0/  3/ 43/ 54  q 0.53  t 65s  boss 93/96
+novice  800 ly   tier 0   surv 100%  hits  1.6  kills  94%  grades S/A/B/C  20/ 27/ 53/  0  q 0.79  t 77s  boss 96/96
+novice  800 ly   tier 1   surv 100%  hits  1.4  kills  83%  grades S/A/B/C  23/ 39/ 39/  0  q 0.82  t 78s  boss 96/96
+novice  800 ly   tier 2   surv 100%  hits  1.7  kills  85%  grades S/A/B/C  17/ 24/ 59/  0  q 0.80  t 78s  boss 96/96
+novice  800 ly   tier 3   surv 100%  hits  2.7  kills  82%  grades S/A/B/C   8/ 20/ 67/  5  q 0.74  t 78s  boss 96/96
+novice  800 ly   tier 4   surv 100%  hits  3.3  kills  78%  grades S/A/B/C   3/ 11/ 81/  4  q 0.72  t 78s  boss 96/96
+novice  800 ly   tier 5   surv 100%  hits  3.4  kills  67%  grades S/A/B/C   4/ 10/ 82/  3  q 0.72  t 78s  boss 96/96
+novice  800 ly   tier 6   surv  99%  hits  4.1  kills  62%  grades S/A/B/C   3/  3/ 79/ 15  q 0.67  t 79s  boss 95/96
+novice  800 ly   tier 8   surv 100%  hits  5.4  kills  56%  grades S/A/B/C   1/  0/ 78/ 21  q 0.62  t 81s  boss 96/96
+novice  800 ly   tier 10  surv  98%  hits  8.0  kills  54%  grades S/A/B/C   0/  0/ 43/ 57  q 0.50  t 80s  boss 94/96
+novice  800 ly   tier 12  surv  83%  hits 10.0  kills  53%  grades S/A/B/C   0/  0/ 18/ 82  q 0.38  t 77s  boss 80/96
+novice  3000 ly  tier 0   surv 100%  hits  1.5  kills  94%  grades S/A/B/C  22/ 33/ 45/  0  q 0.80  t 77s  boss 96/96
+novice  3000 ly  tier 1   surv 100%  hits  1.2  kills  83%  grades S/A/B/C  29/ 39/ 32/  0  q 0.84  t 78s  boss 96/96
+novice  3000 ly  tier 2   surv 100%  hits  1.6  kills  86%  grades S/A/B/C  16/ 34/ 50/  0  q 0.80  t 78s  boss 96/96
+novice  3000 ly  tier 3   surv 100%  hits  3.1  kills  81%  grades S/A/B/C   6/ 15/ 75/  4  q 0.72  t 78s  boss 96/96
+novice  3000 ly  tier 4   surv 100%  hits  3.6  kills  78%  grades S/A/B/C   3/ 14/ 78/  5  q 0.71  t 78s  boss 96/96
+novice  3000 ly  tier 5   surv 100%  hits  3.4  kills  67%  grades S/A/B/C   5/ 14/ 74/  7  q 0.71  t 78s  boss 96/96
+novice  3000 ly  tier 6   surv 100%  hits  4.7  kills  58%  grades S/A/B/C   0/  3/ 78/ 19  q 0.63  t 79s  boss 96/96
+novice  3000 ly  tier 8   surv  99%  hits  5.8  kills  51%  grades S/A/B/C   0/  3/ 64/ 33  q 0.58  t 80s  boss 95/96
+novice  3000 ly  tier 10  surv  98%  hits  8.2  kills  53%  grades S/A/B/C   1/  1/ 33/ 65  q 0.49  t 80s  boss 94/96
+novice  3000 ly  tier 12  surv  65%  hits 10.3  kills  46%  grades S/A/B/C   0/  0/ 13/ 88  q 0.34  t 71s  boss 62/96
+average 5 ly     tier 0   surv 100%  hits  0.0  kills  96%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 26s
+average 5 ly     tier 1   surv 100%  hits  0.0  kills  90%  grades S/A/B/C 100/  0/  0/  0  q 0.99  t 26s
+average 5 ly     tier 2   surv 100%  hits  0.0  kills  87%  grades S/A/B/C 100/  0/  0/  0  q 0.98  t 26s
+average 5 ly     tier 3   surv 100%  hits  0.0  kills  86%  grades S/A/B/C  96/  1/  3/  0  q 0.98  t 26s
+average 5 ly     tier 4   surv 100%  hits  0.1  kills  84%  grades S/A/B/C  88/  5/  7/  0  q 0.96  t 26s
+average 5 ly     tier 5   surv 100%  hits  0.2  kills  77%  grades S/A/B/C  82/  5/ 13/  0  q 0.94  t 26s
+average 5 ly     tier 6   surv 100%  hits  0.3  kills  71%  grades S/A/B/C  73/  6/ 21/  0  q 0.92  t 42s  boss 96/96
+average 5 ly     tier 8   surv 100%  hits  0.4  kills  62%  grades S/A/B/C  61/  8/ 30/  0  q 0.88  t 44s  boss 96/96
+average 5 ly     tier 10  surv 100%  hits  1.0  kills  73%  grades S/A/B/C  36/  8/ 55/  0  q 0.81  t 45s  boss 96/96
+average 5 ly     tier 12  surv 100%  hits  1.1  kills  61%  grades S/A/B/C  18/ 16/ 67/  0  q 0.76  t 45s  boss 96/96
+average 50 ly    tier 0   surv 100%  hits  0.0  kills  94%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+average 50 ly    tier 1   surv 100%  hits  0.0  kills  81%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+average 50 ly    tier 2   surv 100%  hits  0.0  kills  87%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+average 50 ly    tier 3   surv 100%  hits  0.3  kills  87%  grades S/A/B/C  75/ 14/ 11/  0  q 0.94  t 35s
+average 50 ly    tier 4   surv 100%  hits  0.6  kills  84%  grades S/A/B/C  57/ 23/ 20/  0  q 0.90  t 35s
+average 50 ly    tier 5   surv 100%  hits  0.2  kills  75%  grades S/A/B/C  79/ 13/  8/  0  q 0.95  t 35s
+average 50 ly    tier 6   surv 100%  hits  0.5  kills  67%  grades S/A/B/C  55/ 24/ 21/  0  q 0.89  t 52s  boss 96/96
+average 50 ly    tier 8   surv 100%  hits  0.8  kills  58%  grades S/A/B/C  44/ 13/ 44/  0  q 0.85  t 54s  boss 96/96
+average 50 ly    tier 10  surv 100%  hits  1.6  kills  60%  grades S/A/B/C  21/  6/ 72/  1  q 0.77  t 54s  boss 96/96
+average 50 ly    tier 12  surv 100%  hits  1.8  kills  58%  grades S/A/B/C  13/ 10/ 74/  3  q 0.73  t 55s  boss 96/96
+average 200 ly   tier 0   surv 100%  hits  0.0  kills  94%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 46s
+average 200 ly   tier 1   surv 100%  hits  0.0  kills  85%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 46s
+average 200 ly   tier 2   surv 100%  hits  0.0  kills  86%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 46s
+average 200 ly   tier 3   surv 100%  hits  0.4  kills  84%  grades S/A/B/C  67/ 23/ 10/  0  q 0.92  t 46s
+average 200 ly   tier 4   surv 100%  hits  0.5  kills  79%  grades S/A/B/C  64/ 25/ 11/  0  q 0.92  t 46s
+average 200 ly   tier 5   surv 100%  hits  0.4  kills  71%  grades S/A/B/C  65/ 25/ 10/  0  q 0.92  t 46s
+average 200 ly   tier 6   surv 100%  hits  0.6  kills  67%  grades S/A/B/C  54/ 19/ 27/  0  q 0.88  t 63s  boss 96/96
+average 200 ly   tier 8   surv 100%  hits  1.7  kills  57%  grades S/A/B/C  29/ 10/ 59/  1  q 0.79  t 65s  boss 96/96
+average 200 ly   tier 10  surv 100%  hits  2.3  kills  56%  grades S/A/B/C   8/ 10/ 80/  1  q 0.73  t 65s  boss 96/96
+average 200 ly   tier 12  surv 100%  hits  3.2  kills  50%  grades S/A/B/C   7/  3/ 79/ 10  q 0.66  t 66s  boss 96/96
+average 800 ly   tier 0   surv 100%  hits  0.0  kills  94%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 77s  boss 96/96
+average 800 ly   tier 1   surv 100%  hits  0.0  kills  83%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 78s  boss 96/96
+average 800 ly   tier 2   surv 100%  hits  0.0  kills  85%  grades S/A/B/C  97/  3/  0/  0  q 0.99  t 78s  boss 96/96
+average 800 ly   tier 3   surv 100%  hits  0.6  kills  82%  grades S/A/B/C  52/ 33/ 15/  0  q 0.89  t 78s  boss 96/96
+average 800 ly   tier 4   surv 100%  hits  1.0  kills  76%  grades S/A/B/C  36/ 32/ 31/  0  q 0.85  t 78s  boss 96/96
+average 800 ly   tier 5   surv 100%  hits  0.8  kills  66%  grades S/A/B/C  46/ 29/ 25/  0  q 0.87  t 78s  boss 96/96
+average 800 ly   tier 6   surv 100%  hits  1.5  kills  60%  grades S/A/B/C  24/ 22/ 54/  0  q 0.80  t 79s  boss 96/96
+average 800 ly   tier 8   surv 100%  hits  2.1  kills  55%  grades S/A/B/C  18/ 10/ 72/  0  q 0.76  t 81s  boss 96/96
+average 800 ly   tier 10  surv 100%  hits  3.8  kills  54%  grades S/A/B/C   3/  4/ 88/  5  q 0.67  t 81s  boss 96/96
+average 800 ly   tier 12  surv 100%  hits  5.3  kills  52%  grades S/A/B/C   1/  1/ 66/ 32  q 0.59  t 82s  boss 96/96
+average 3000 ly  tier 0   surv 100%  hits  0.0  kills  94%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 77s  boss 96/96
+average 3000 ly  tier 1   surv 100%  hits  0.0  kills  82%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 78s  boss 96/96
+average 3000 ly  tier 2   surv 100%  hits  0.0  kills  85%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 78s  boss 96/96
+average 3000 ly  tier 3   surv 100%  hits  0.7  kills  81%  grades S/A/B/C  44/ 38/ 19/  0  q 0.88  t 78s  boss 96/96
+average 3000 ly  tier 4   surv 100%  hits  1.2  kills  78%  grades S/A/B/C  33/ 32/ 34/  0  q 0.85  t 78s  boss 96/96
+average 3000 ly  tier 5   surv 100%  hits  0.9  kills  67%  grades S/A/B/C  39/ 33/ 28/  0  q 0.85  t 78s  boss 96/96
+average 3000 ly  tier 6   surv 100%  hits  1.5  kills  58%  grades S/A/B/C  22/ 16/ 63/  0  q 0.79  t 79s  boss 96/96
+average 3000 ly  tier 8   surv 100%  hits  2.4  kills  52%  grades S/A/B/C  16/  7/ 74/  3  q 0.74  t 81s  boss 96/96
+average 3000 ly  tier 10  surv 100%  hits  4.2  kills  52%  grades S/A/B/C   5/  2/ 78/ 15  q 0.65  t 81s  boss 96/96
+average 3000 ly  tier 12  surv  99%  hits  6.1  kills  46%  grades S/A/B/C   0/  0/ 52/ 48  q 0.54  t 82s  boss 95/96
+expert  5 ly     tier 0   surv 100%  hits  0.0  kills  96%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 26s
+expert  5 ly     tier 1   surv 100%  hits  0.0  kills  89%  grades S/A/B/C 100/  0/  0/  0  q 0.98  t 26s
+expert  5 ly     tier 2   surv 100%  hits  0.0  kills  88%  grades S/A/B/C 100/  0/  0/  0  q 0.98  t 26s
+expert  5 ly     tier 3   surv 100%  hits  0.0  kills  87%  grades S/A/B/C  99/  0/  1/  0  q 0.98  t 26s
+expert  5 ly     tier 4   surv 100%  hits  0.0  kills  83%  grades S/A/B/C  96/  3/  1/  0  q 0.97  t 26s
+expert  5 ly     tier 5   surv 100%  hits  0.0  kills  77%  grades S/A/B/C  92/  4/  4/  0  q 0.96  t 26s
+expert  5 ly     tier 6   surv 100%  hits  0.0  kills  70%  grades S/A/B/C  95/  5/  0/  0  q 0.97  t 42s  boss 96/96
+expert  5 ly     tier 8   surv 100%  hits  0.1  kills  63%  grades S/A/B/C  84/  9/  6/  0  q 0.94  t 44s  boss 96/96
+expert  5 ly     tier 10  surv 100%  hits  0.2  kills  73%  grades S/A/B/C  67/ 18/ 16/  0  q 0.90  t 45s  boss 96/96
+expert  5 ly     tier 12  surv 100%  hits  0.3  kills  62%  grades S/A/B/C  50/ 24/ 26/  0  q 0.86  t 45s  boss 96/96
+expert  50 ly    tier 0   surv 100%  hits  0.0  kills  95%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+expert  50 ly    tier 1   surv 100%  hits  0.0  kills  83%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 35s
+expert  50 ly    tier 2   surv 100%  hits  0.0  kills  86%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+expert  50 ly    tier 3   surv 100%  hits  0.1  kills  84%  grades S/A/B/C  94/  4/  2/  0  q 0.98  t 35s
+expert  50 ly    tier 4   surv 100%  hits  0.1  kills  83%  grades S/A/B/C  88/  5/  7/  0  q 0.96  t 35s
+expert  50 ly    tier 5   surv 100%  hits  0.1  kills  71%  grades S/A/B/C  91/  5/  4/  0  q 0.97  t 35s
+expert  50 ly    tier 6   surv 100%  hits  0.1  kills  65%  grades S/A/B/C  91/  5/  4/  0  q 0.96  t 52s  boss 96/96
+expert  50 ly    tier 8   surv 100%  hits  0.2  kills  58%  grades S/A/B/C  74/ 14/ 13/  0  q 0.93  t 54s  boss 96/96
+expert  50 ly    tier 10  surv 100%  hits  0.4  kills  60%  grades S/A/B/C  54/ 13/ 33/  0  q 0.87  t 54s  boss 96/96
+expert  50 ly    tier 12  surv 100%  hits  0.6  kills  58%  grades S/A/B/C  43/ 16/ 42/  0  q 0.83  t 55s  boss 96/96
+expert  200 ly   tier 0   surv 100%  hits  0.0  kills  94%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 46s
+expert  200 ly   tier 1   surv 100%  hits  0.0  kills  86%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 46s
+expert  200 ly   tier 2   surv 100%  hits  0.0  kills  86%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 46s
+expert  200 ly   tier 3   surv 100%  hits  0.1  kills  83%  grades S/A/B/C  86/  6/  7/  0  q 0.96  t 46s
+expert  200 ly   tier 4   surv 100%  hits  0.1  kills  78%  grades S/A/B/C  88/ 10/  2/  0  q 0.97  t 46s
+expert  200 ly   tier 5   surv 100%  hits  0.1  kills  68%  grades S/A/B/C  86/  8/  5/  0  q 0.96  t 46s
+expert  200 ly   tier 6   surv 100%  hits  0.1  kills  66%  grades S/A/B/C  91/  6/  3/  0  q 0.96  t 63s  boss 96/96
+expert  200 ly   tier 8   surv 100%  hits  0.4  kills  57%  grades S/A/B/C  66/ 11/ 23/  0  q 0.90  t 65s  boss 96/96
+expert  200 ly   tier 10  surv 100%  hits  0.8  kills  56%  grades S/A/B/C  41/ 16/ 44/  0  q 0.84  t 65s  boss 96/96
+expert  200 ly   tier 12  surv 100%  hits  1.2  kills  50%  grades S/A/B/C  26/ 11/ 63/  0  q 0.77  t 66s  boss 96/96
+expert  800 ly   tier 0   surv 100%  hits  0.0  kills  95%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 77s  boss 96/96
+expert  800 ly   tier 1   surv 100%  hits  0.0  kills  84%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 78s  boss 96/96
+expert  800 ly   tier 2   surv 100%  hits  0.0  kills  84%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 78s  boss 96/96
+expert  800 ly   tier 3   surv 100%  hits  0.2  kills  82%  grades S/A/B/C  80/ 19/  1/  0  q 0.96  t 78s  boss 96/96
+expert  800 ly   tier 4   surv 100%  hits  0.4  kills  76%  grades S/A/B/C  64/ 33/  3/  0  q 0.92  t 78s  boss 96/96
+expert  800 ly   tier 5   surv 100%  hits  0.3  kills  64%  grades S/A/B/C  70/ 21/  9/  0  q 0.93  t 78s  boss 96/96
+expert  800 ly   tier 6   surv 100%  hits  0.2  kills  60%  grades S/A/B/C  78/ 14/  8/  0  q 0.94  t 79s  boss 96/96
+expert  800 ly   tier 8   surv 100%  hits  0.5  kills  57%  grades S/A/B/C  65/  8/ 27/  0  q 0.90  t 81s  boss 96/96
+expert  800 ly   tier 10  surv 100%  hits  1.2  kills  54%  grades S/A/B/C  22/ 11/ 67/  0  q 0.79  t 81s  boss 96/96
+expert  800 ly   tier 12  surv 100%  hits  2.1  kills  52%  grades S/A/B/C  13/  5/ 80/  2  q 0.73  t 82s  boss 96/96
+expert  3000 ly  tier 0   surv 100%  hits  0.0  kills  95%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 77s  boss 96/96
+expert  3000 ly  tier 1   surv 100%  hits  0.0  kills  83%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 78s  boss 96/96
+expert  3000 ly  tier 2   surv 100%  hits  0.0  kills  85%  grades S/A/B/C  99/  1/  0/  0  q 1.00  t 78s  boss 96/96
+expert  3000 ly  tier 3   surv 100%  hits  0.2  kills  81%  grades S/A/B/C  83/ 17/  0/  0  q 0.96  t 78s  boss 96/96
+expert  3000 ly  tier 4   surv 100%  hits  0.4  kills  77%  grades S/A/B/C  66/ 29/  5/  0  q 0.93  t 78s  boss 96/96
+expert  3000 ly  tier 5   surv 100%  hits  0.2  kills  66%  grades S/A/B/C  82/ 15/  3/  0  q 0.95  t 78s  boss 96/96
+expert  3000 ly  tier 6   surv 100%  hits  0.2  kills  58%  grades S/A/B/C  76/ 10/ 14/  0  q 0.93  t 79s  boss 96/96
+expert  3000 ly  tier 8   surv 100%  hits  0.7  kills  52%  grades S/A/B/C  52/  8/ 40/  0  q 0.86  t 81s  boss 96/96
+expert  3000 ly  tier 10  surv 100%  hits  1.6  kills  52%  grades S/A/B/C  19/ 17/ 64/  1  q 0.77  t 81s  boss 96/96
+expert  3000 ly  tier 12  surv 100%  hits  2.4  kills  45%  grades S/A/B/C   5/  3/ 88/  4  q 0.68  t 82s  boss 96/96
+
+== B. Ship power sweep (starter / mid / endgame), 50 ly
+novice  power 1.0  tier 0   surv 100%  hits  0.5  kills  95%  grades S/A/B/C  53/ 36/ 10/  0  q 0.89  t 35s
+novice  power 1.0  tier 3   surv  86%  hits  2.5  kills  30%  grades S/A/B/C   0/  6/ 32/ 61  q 0.51  t 34s
+novice  power 1.0  tier 6   surv  45%  hits  3.0  kills   3%  grades S/A/B/C   0/  0/  4/ 96  q 0.38  t 37s  boss 43/96
+novice  power 1.0  tier 9   surv  27%  hits  3.0  kills   1%  grades S/A/B/C   0/  0/  0/100  q 0.37  t 31s  boss 26/96
+novice  power 1.0  tier 12  surv   9%  hits  3.1  kills   0%  grades S/A/B/C   0/  0/  0/100  q 0.35  t 25s  boss 9/96
+novice  power 5.0  tier 0   surv 100%  hits  0.3  kills 100%  grades S/A/B/C  67/ 31/  2/  0  q 0.93  t 35s
+novice  power 5.0  tier 3   surv 100%  hits  1.4  kills  96%  grades S/A/B/C  29/ 34/ 36/  0  q 0.83  t 35s
+novice  power 5.0  tier 6   surv 100%  hits  1.8  kills  63%  grades S/A/B/C  23/ 11/ 65/  1  q 0.77  t 52s  boss 96/96
+novice  power 5.0  tier 9   surv 100%  hits  3.5  kills  48%  grades S/A/B/C   3/  3/ 65/ 29  q 0.60  t 54s  boss 96/96
+novice  power 5.0  tier 12  surv  79%  hits  5.5  kills  29%  grades S/A/B/C   0/  0/ 16/ 84  q 0.40  t 49s  boss 76/96
+novice  power 12.0 tier 0   surv 100%  hits  0.3  kills 100%  grades S/A/B/C  74/ 22/  4/  0  q 0.94  t 35s
+novice  power 12.0 tier 3   surv 100%  hits  1.5  kills  99%  grades S/A/B/C  28/ 27/ 45/  0  q 0.82  t 35s
+novice  power 12.0 tier 6   surv 100%  hits  1.9  kills  90%  grades S/A/B/C  24/ 24/ 51/  1  q 0.81  t 54s  boss 96/96
+novice  power 12.0 tier 9   surv 100%  hits  2.9  kills  83%  grades S/A/B/C   9/  9/ 79/  2  q 0.74  t 54s  boss 96/96
+novice  power 12.0 tier 12  surv 100%  hits  4.1  kills  62%  grades S/A/B/C   5/  1/ 71/ 23  q 0.64  t 55s  boss 96/96
+average power 1.0  tier 0   surv 100%  hits  0.0  kills  95%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+average power 1.0  tier 3   surv 100%  hits  0.1  kills  31%  grades S/A/B/C   8/ 61/ 29/  1  q 0.80  t 35s
+average power 1.0  tier 6   surv  98%  hits  0.5  kills   6%  grades S/A/B/C   0/  0/ 61/ 39  q 0.64  t 50s  boss 94/96
+average power 1.0  tier 9   surv  91%  hits  0.9  kills   5%  grades S/A/B/C   0/  0/ 51/ 49  q 0.60  t 49s  boss 87/96
+average power 1.0  tier 12  surv  71%  hits  1.6  kills   3%  grades S/A/B/C   0/  0/ 25/ 75  q 0.50  t 44s  boss 68/96
+average power 5.0  tier 0   surv 100%  hits  0.0  kills 100%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+average power 5.0  tier 3   surv 100%  hits  0.4  kills  95%  grades S/A/B/C  68/ 23/  9/  0  q 0.93  t 35s
+average power 5.0  tier 6   surv 100%  hits  0.5  kills  59%  grades S/A/B/C  58/ 14/ 28/  0  q 0.88  t 52s  boss 96/96
+average power 5.0  tier 9   surv 100%  hits  1.1  kills  48%  grades S/A/B/C  17/ 30/ 49/  4  q 0.76  t 54s  boss 96/96
+average power 5.0  tier 12  surv 100%  hits  2.4  kills  31%  grades S/A/B/C   1/  7/ 49/ 43  q 0.59  t 54s  boss 96/96
+average power 12.0 tier 0   surv 100%  hits  0.0  kills 100%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+average power 12.0 tier 3   surv 100%  hits  0.4  kills  99%  grades S/A/B/C  59/ 33/  7/  0  q 0.91  t 35s
+average power 12.0 tier 6   surv 100%  hits  0.6  kills  91%  grades S/A/B/C  55/ 32/ 13/  0  q 0.90  t 54s  boss 96/96
+average power 12.0 tier 9   surv 100%  hits  1.2  kills  81%  grades S/A/B/C  40/ 19/ 42/  0  q 0.85  t 54s  boss 96/96
+average power 12.0 tier 12  surv 100%  hits  2.0  kills  61%  grades S/A/B/C  17/  3/ 80/  0  q 0.74  t 55s  boss 96/96
+expert  power 1.0  tier 0   surv 100%  hits  0.0  kills  95%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+expert  power 1.0  tier 3   surv 100%  hits  0.1  kills  31%  grades S/A/B/C   9/ 66/ 25/  0  q 0.81  t 35s
+expert  power 1.0  tier 6   surv 100%  hits  0.1  kills   6%  grades S/A/B/C   0/  1/ 89/ 10  q 0.70  t 51s  boss 96/96
+expert  power 1.0  tier 9   surv 100%  hits  0.3  kills   5%  grades S/A/B/C   0/  0/ 76/ 24  q 0.67  t 51s  boss 96/96
+expert  power 1.0  tier 12  surv  98%  hits  0.6  kills   5%  grades S/A/B/C   0/  0/ 51/ 49  q 0.61  t 51s  boss 94/96
+expert  power 5.0  tier 0   surv 100%  hits  0.0  kills 100%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+expert  power 5.0  tier 3   surv 100%  hits  0.0  kills  94%  grades S/A/B/C  96/  3/  1/  0  q 0.99  t 35s
+expert  power 5.0  tier 6   surv 100%  hits  0.0  kills  60%  grades S/A/B/C  80/ 17/  3/  0  q 0.95  t 52s  boss 96/96
+expert  power 5.0  tier 9   surv 100%  hits  0.2  kills  48%  grades S/A/B/C  41/ 43/ 17/  0  q 0.86  t 54s  boss 96/96
+expert  power 5.0  tier 12  surv 100%  hits  0.8  kills  31%  grades S/A/B/C   5/ 29/ 56/  9  q 0.71  t 54s  boss 96/96
+expert  power 12.0 tier 0   surv 100%  hits  0.0  kills 100%  grades S/A/B/C 100/  0/  0/  0  q 1.00  t 35s
+expert  power 12.0 tier 3   surv 100%  hits  0.1  kills  99%  grades S/A/B/C  90/  7/  3/  0  q 0.97  t 35s
+expert  power 12.0 tier 6   surv 100%  hits  0.1  kills  91%  grades S/A/B/C  86/ 13/  1/  0  q 0.97  t 54s  boss 96/96
+expert  power 12.0 tier 9   surv 100%  hits  0.5  kills  83%  grades S/A/B/C  60/ 20/ 20/  0  q 0.91  t 54s  boss 96/96
+expert  power 12.0 tier 12  surv 100%  hits  0.7  kills  60%  grades S/A/B/C  43/ 11/ 46/  0  q 0.83  t 55s  boss 96/96
+time 9.1 s
