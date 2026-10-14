@@ -384,6 +384,30 @@ namespace Frontier
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Siphon)) throw new InvalidOperationException("world has no siphon gather spot");
             }, 1.8f);
+            yield return new Shot("game-excavate", () =>
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    foreach (var deposit in d.Deposits)
+                        if (deposit.Method == Frontier.Universe.HarvestMethod.Excavate) return true;
+                    return false;
+                }, 2, 0, 10000);
+                if (world == null) throw new InvalidOperationException("no generated world with excavation deposits");
+                GoTo(world);
+                if (!ui.DebugGather(MinigameKind.Excavate)) throw new InvalidOperationException("world has no excavation gather spot");
+            }, 1.8f);
+            yield return new Shot("game-salvage", () =>
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    foreach (var deposit in d.Deposits)
+                        if (deposit.Method == Frontier.Universe.HarvestMethod.Salvage) return true;
+                    return false;
+                }, 2, 0, 10000);
+                if (world == null) throw new InvalidOperationException("no generated world with salvage deposits");
+                GoTo(world);
+                if (!ui.DebugGather(MinigameKind.Salvage)) throw new InvalidOperationException("world has no salvage gather spot");
+            }, 1.8f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.
             if (showcaseWorld != null)

@@ -55,6 +55,11 @@ namespace Frontier.Tests
             Assert.AreEqual(MinigameKind.Chop, StructureKind.Lumber.Game());
             Assert.AreEqual(MinigameKind.Mine, StructureKind.Mine.Game());
             Assert.AreEqual(MinigameKind.Drill, StructureKind.Drill.Game());
+            Assert.AreEqual(MinigameKind.Siphon, StructureKind.SiphonRig.Game());
+            Assert.AreEqual(MinigameKind.Excavate, StructureKind.Excavator.Game());
+            Assert.AreEqual(MinigameKind.Salvage, StructureKind.SalvageYard.Game());
+            Assert.IsTrue(StructureKind.Excavator.IsGather());
+            Assert.IsTrue(StructureKind.SalvageYard.IsGather());
         }
     }
 }

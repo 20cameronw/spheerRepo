@@ -2,7 +2,7 @@ namespace Frontier
 {
     // Plain data enums shared by every layer. They live in Frontier.Core (no engine references), so ScriptableObjects,
     // game logic, rendering and the pure universe/economy code can all use them. Serialized values are the integers: never reorder.
-    public enum MinigameKind { Chop, Mine, Drill, Siphon }
+    public enum MinigameKind { Chop, Mine, Drill, Siphon, Excavate, Salvage }
 
     public enum UpgradeCategory { Tools, Ship, Defense, Logistics }
 
@@ -72,7 +72,8 @@ namespace Frontier
         /// <summary>Gather structures with an implemented harvest minigame.</summary>
         public static bool IsGather(this StructureKind k)
         {
-            return k == StructureKind.Lumber || k == StructureKind.Mine || k == StructureKind.Drill || k == StructureKind.SiphonRig;
+            return k == StructureKind.Lumber || k == StructureKind.Mine || k == StructureKind.Drill ||
+                k == StructureKind.SiphonRig || k == StructureKind.Excavator || k == StructureKind.SalvageYard;
         }
         public static bool IsTurret(this StructureKind k)
         {
@@ -114,6 +115,8 @@ namespace Frontier
                 case StructureKind.ResearchLab:
                 case StructureKind.RadarTower:
                 case StructureKind.SiphonRig:
+                case StructureKind.Excavator:
+                case StructureKind.SalvageYard:
                 case StructureKind.ColonyHub:
                     return true;
                 default:
@@ -125,7 +128,9 @@ namespace Frontier
         {
             return k == StructureKind.Lumber ? MinigameKind.Chop :
                 k == StructureKind.Mine ? MinigameKind.Mine :
-                k == StructureKind.SiphonRig ? MinigameKind.Siphon : MinigameKind.Drill;
+                k == StructureKind.SiphonRig ? MinigameKind.Siphon :
+                k == StructureKind.Excavator ? MinigameKind.Excavate :
+                k == StructureKind.SalvageYard ? MinigameKind.Salvage : MinigameKind.Drill;
         }
     }
 }

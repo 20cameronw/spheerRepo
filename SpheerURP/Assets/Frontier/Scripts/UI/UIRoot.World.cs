@@ -261,6 +261,7 @@ namespace Frontier
                 var spots = gs.SpotsFor(gs.planet, game);
                 body.Add(SectionLabel(spots.Count > 0 ? "GATHER ON THIS PLANET" : "NOTHING TO GATHER HERE"));
                 string verb = game == MinigameKind.Drill ? "DRILL" : game == MinigameKind.Siphon ? "SIPHON" :
+                    game == MinigameKind.Excavate ? "EXCAVATE" : game == MinigameKind.Salvage ? "SALVAGE" :
                     game == MinigameKind.Chop ? "CHOP" : "MINE";
                 foreach (var spot in spots)
                 {

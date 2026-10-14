@@ -120,7 +120,7 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void SiphonHarvestUsesItsDedicatedGameToolAndStructure()
+        public void DedicatedHarvestGamesUseTheirMatchingToolsAndStructures()
         {
             if (!db.UsesImportedEconomy) Assert.Ignore("Imported progression catalog is unavailable");
             var state = new GameState(db, false, clock);
@@ -135,6 +135,24 @@ namespace Frontier.Tests
             Assert.IsTrue(rig.Implemented);
             Assert.AreEqual("Hand Pump", state.ToolName(MinigameKind.Siphon));
             Assert.AreNotEqual("This tool's harvest game is not implemented", state.ToolTierLockReason(ladder));
+
+            AssertHarvestTool(state, Frontier.Universe.HarvestMethod.Excavate, MinigameKind.Excavate, "scanner", StructureKind.Excavator);
+            AssertHarvestTool(state, Frontier.Universe.HarvestMethod.Salvage, MinigameKind.Salvage, "claw", StructureKind.SalvageYard);
+        }
+
+        void AssertHarvestTool(GameState state, Frontier.Universe.HarvestMethod method, MinigameKind game, string ladderId, StructureKind structureKind)
+        {
+            var ladder = db.toolLadders.FirstOrDefault(candidate => candidate != null && candidate.data != null && candidate.data.id == ladderId);
+            var structure = db.StructureOfKind(structureKind);
+            Assert.IsNotNull(ladder, ladderId + " tool ladder");
+            Assert.IsNotNull(structure, structureKind + " structure");
+            Assert.AreEqual(game, HarvestMapping.ToMinigame(method));
+            Assert.AreEqual(method, HarvestMapping.FromMinigame(game));
+            Assert.AreEqual(game, structureKind.Game());
+            Assert.IsTrue(structureKind.IsGather());
+            Assert.IsTrue(structure.Implemented);
+            Assert.AreNotEqual("This tool's harvest game is not implemented", state.ToolTierLockReason(ladder), ladderId);
+            Assert.AreEqual(ladder.data.tiers.First(row => row.tier == 1).displayName, state.ToolName(game));
         }
 
         [Test]
@@ -152,7 +170,9 @@ namespace Frontier.Tests
             {
                 if (ladder == null || ladder.data == null ||
                     (ladder.data.kind != Economy.ToolKind.Axe && ladder.data.kind != Economy.ToolKind.Pick &&
-                     ladder.data.kind != Economy.ToolKind.Drill)) continue;
+                     ladder.data.kind != Economy.ToolKind.Drill && ladder.data.kind != Economy.ToolKind.Siphon &&
+                     ladder.data.kind != Economy.ToolKind.Scanner && ladder.data.kind != Economy.ToolKind.Claw) ||
+                    ladder.data.games == null || ladder.data.games.Length == 0) continue;
                 var next = ladder.data.tiers.FirstOrDefault(row => row != null && row.tier == state.ToolTier(ladder) + 1);
                 if (next == null || next.requiresReachTier > state.ReachTier ||
                     next.requiresLabLevel > 20 || !string.IsNullOrEmpty(next.researchPrereq)) continue;
@@ -163,8 +183,7 @@ namespace Frontier.Tests
             Assert.IsTrue(state.BuyToolTier(selected));
             Assert.AreEqual(2, state.ToolTier(selected));
 
-            MinigameKind game = selected.data.kind == Economy.ToolKind.Axe ? MinigameKind.Chop :
-                selected.data.kind == Economy.ToolKind.Pick ? MinigameKind.Mine : MinigameKind.Drill;
+            MinigameKind game = HarvestMapping.ToMinigame(selected.data.games[0]);
             Assert.AreEqual(purchased.yieldMult, state.CatalogToolYieldMultiplier(game), 0.001f);
             Assert.AreEqual(1, state.ToolLevel(game), "the purchased tier should be reflected in the active tool level");
 

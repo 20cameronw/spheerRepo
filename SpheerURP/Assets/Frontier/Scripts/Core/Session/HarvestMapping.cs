@@ -15,8 +15,8 @@ namespace Frontier
                 case HarvestMethod.Mine: return MinigameKind.Mine;
                 case HarvestMethod.Drill: return MinigameKind.Drill;
                 case HarvestMethod.Siphon: return MinigameKind.Siphon;
-                case HarvestMethod.Excavate: return MinigameKind.Mine;
-                case HarvestMethod.Salvage: return MinigameKind.Mine;
+                case HarvestMethod.Excavate: return MinigameKind.Excavate;
+                case HarvestMethod.Salvage: return MinigameKind.Salvage;
                 case HarvestMethod.Harvest: return MinigameKind.Chop;
                 default: return MinigameKind.Mine;
             }
@@ -30,6 +30,8 @@ namespace Frontier
                 case MinigameKind.Chop: return HarvestMethod.Chop;
                 case MinigameKind.Drill: return HarvestMethod.Drill;
                 case MinigameKind.Siphon: return HarvestMethod.Siphon;
+                case MinigameKind.Excavate: return HarvestMethod.Excavate;
+                case MinigameKind.Salvage: return HarvestMethod.Salvage;
                 default: return HarvestMethod.Mine;
             }
         }

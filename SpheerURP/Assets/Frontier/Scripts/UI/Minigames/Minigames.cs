@@ -907,6 +907,290 @@ namespace Frontier
         }
     }
 
+    /// <summary>Use sonar echoes to locate buried seams without wasting the scanner's limited pulses.</summary>
+    public class ExcavationGame : Minigame
+    {
+        const int GridSide = 3;
+        const int Seams = 3;
+        const int MaxPings = 18;
+        readonly Button[] cells = new Button[GridSide * GridSide];
+        readonly bool[] revealed = new bool[GridSide * GridSide];
+        int target, pings, seamsFound;
+        float elapsed;
+        Transform scanner, echo, pulseRing, ground;
+        readonly Vector3[] echoPositions = { new Vector3(-0.75f, -0.28f, -0.15f), new Vector3(0.5f, 0.05f, -0.15f), new Vector3(0.15f, 0.4f, -0.15f) };
+        const float frameW = 6.2f, frameH = 7.3f;
+
+        protected override string Title { get { return "SONAR EXCAVATION"; } }
+        protected override string Hint { get { return "Ping the grid to read echoes. Brighter returns mark the buried seam"; } }
+        protected override Color StageBg { get { return new Color(0.008f, 0.025f, 0.045f); } }
+
+        protected override void Build()
+        {
+            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Trowel" : toolName, color));
+            arena.style.flexGrow = 0f;
+            arena.style.flexBasis = Length.Percent(38f);
+            arena.style.minHeight = 220f;
+            status.style.display = DisplayStyle.Flex;
+            controls.style.flexDirection = FlexDirection.Column;
+            controls.style.alignItems = Align.Stretch;
+            controls.style.flexShrink = 0f;
+            overlay.Remove(status);
+            controls.Add(status);
+            status.style.marginBottom = 8f;
+            target = UnityEngine.Random.Range(0, cells.Length);
+            var grid = UiKit.Div();
+            grid.style.flexDirection = FlexDirection.Row;
+            grid.style.flexWrap = Wrap.Wrap;
+            grid.style.justifyContent = Justify.Center;
+            grid.style.alignSelf = Align.Center;
+            grid.style.width = Length.Percent(84f);
+            for (int i = 0; i < cells.Length; i++)
+            {
+                int cell = i;
+                var button = UiKit.Btn("PING", color, () => Ping(cell), false);
+                button.name = "excavate-cell-" + i;
+                button.style.width = Length.Percent(30f);
+                button.style.height = 58;
+                button.style.marginLeft = 3;
+                button.style.marginRight = 3;
+                button.style.marginTop = 3;
+                button.style.marginBottom = 3;
+                cells[i] = button;
+                grid.Add(button);
+            }
+            controls.Add(grid);
+            UpdateStatus("SEAM 0/3  ·  18 SCANS");
+        }
+
+        protected override void BuildScene()
+        {
+            var st = stage;
+            Color rim = new Color(rawColor.r, rawColor.g, rawColor.b) * 1.7f;
+            var basalt = st.Lit(new Color(0.06f, 0.12f, 0.18f), new Color(0.08f, 0.35f, 0.5f), 1f, 6f, 0f);
+            var stratum = st.Lit(new Color(0.12f, 0.2f, 0.27f), rim * 0.8f, 1f, 8f, 0f);
+            var crystal = st.Lit(new Color(0.08f, 0.35f, 0.45f), new Color(color.r, color.g, color.b) * 2.8f, 0f, 3f, 0f);
+            ground = st.AddMesh(MeshKit.Cyl(2.6f, 2.3f, 0.7f, 24), basalt, st.root, new Vector3(0f, -1.35f, 0f)).transform;
+            st.AddMesh(MeshKit.Cyl(2.25f, 2.2f, 0.1f, 24), stratum, st.root, new Vector3(0f, -0.63f, 0f));
+            st.AddMesh(MeshKit.Cyl(1.85f, 1.8f, 0.1f, 24), basalt, st.root, new Vector3(0f, -0.52f, 0f));
+            echo = st.AddMesh(MeshKit.Ico(1, d => 0.42f * (0.84f + 0.12f * Mathf.PerlinNoise(d.x * 3f, d.y * 3f + d.z))),
+                crystal, st.root, echoPositions[0]).transform;
+            echo.gameObject.SetActive(false);
+
+            scanner = new GameObject("SonarScanner").transform;
+            scanner.SetParent(st.root, false);
+            st.Prim(PrimitiveType.Cylinder, scanner, new Vector3(0f, 0.55f, 0f), new Vector3(0.15f, 0.7f, 0.15f), Vector3.zero, stratum);
+            st.Prim(PrimitiveType.Cylinder, scanner, new Vector3(0f, 1.0f, 0f), new Vector3(0.62f, 0.08f, 0.62f), Vector3.zero, crystal);
+            st.Prim(PrimitiveType.Sphere, scanner, new Vector3(0f, 1.12f, 0f), new Vector3(0.2f, 0.2f, 0.2f), Vector3.zero, crystal);
+            scanner.localPosition = new Vector3(0f, 1.2f, 0.1f);
+            pulseRing = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.8f), 1.7f,
+                new Vector3(0f, -0.48f, -0.1f), true);
+            pulseRing.localScale = Vector3.zero;
+            st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.2f), 11f, new Vector3(0f, 0.6f, 5f));
+        }
+
+        protected override void Frame(float aspect) { FramePose(frameW, frameH, 0.1f, aspect, 1.1f); }
+
+        void Ping(int cell)
+        {
+            if (finished || revealed[cell] || pings >= MaxPings) return;
+            revealed[cell] = true;
+            cells[cell].SetEnabled(false);
+            pings++;
+            int row = cell / GridSide, col = cell % GridSide;
+            int targetRow = target / GridSide, targetCol = target % GridSide;
+            int distance = Mathf.Abs(row - targetRow) + Mathf.Abs(col - targetCol);
+            if (distance == 0)
+            {
+                seamsFound++;
+                echo.localPosition = echoPositions[(seamsFound - 1) % echoPositions.Length];
+                echo.gameObject.SetActive(true);
+                Fx.Burst(stage.root.TransformPoint(echo.localPosition), color * 1.8f, 22, 4f, 0.18f);
+                stage.Shake(0.34f);
+                Sfx.Good();
+                if (seamsFound >= Seams || pings >= MaxPings) { Complete(); return; }
+                target = UnityEngine.Random.Range(0, cells.Length);
+                Array.Clear(revealed, 0, revealed.Length);
+                foreach (var button in cells) button.SetEnabled(true);
+                UpdateStatus("SEAM " + seamsFound + "/3  ·  " + (MaxPings - pings) + " SCANS");
+                return;
+            }
+
+            Color echoColor = distance == 1 ? new Color(0.9f, 0.92f, 0.32f) :
+                distance == 2 ? new Color(0.95f, 0.55f, 0.2f) : new Color(0.18f, 0.38f, 0.5f);
+            cells[cell].text = distance == 1 ? "NEAR" : distance == 2 ? "WARM" : "FAINT";
+            cells[cell].style.backgroundColor = new Color(echoColor.r * 0.22f, echoColor.g * 0.22f, echoColor.b * 0.22f);
+            cells[cell].style.color = echoColor;
+            pulseRing.localScale = Vector3.one * 1.1f;
+            Sfx.Play(distance == 1 ? 560f : 310f, 0.1f, 0.22f, -80f);
+            UpdateStatus((distance == 1 ? "STRONG ECHO" : distance == 2 ? "WARM RETURN" : "WEAK RETURN") +
+                "  ·  SEAM " + seamsFound + "/3  ·  " + (MaxPings - pings) + " SCANS");
+            if (pings >= MaxPings) Complete();
+        }
+
+        void Complete()
+        {
+            float q = seamsFound == 0 ? 0f : 0.2f + 0.8f * seamsFound / Seams;
+            UpdateStatus("SEAMS LOCATED " + seamsFound + "/3");
+            Finish(new MinigameResult { quality = q, perfects = seamsFound, total = Seams });
+        }
+
+        void UpdateStatus(string message) { status.text = message; }
+
+        protected override void Tick(float dt)
+        {
+            elapsed += dt;
+            float ping = Mathf.PingPong(elapsed * 0.9f, 1.8f);
+            pulseRing.localScale = Vector3.one * (0.35f + ping);
+            scanner.localRotation = Quaternion.Euler(0f, elapsed * (25f + difficulty * 20f), 0f);
+            ground.localScale = Vector3.one * (1f + Mathf.Sin(elapsed * 1.5f) * 0.012f);
+            if (echo.gameObject.activeSelf)
+                echo.localScale = Vector3.one * (0.88f + Mathf.Sin(elapsed * 5f) * 0.12f);
+        }
+    }
+
+    /// <summary>Cast a magnetic claw to collect drifting wreckage before it escapes the salvage field.</summary>
+    public class SalvageGame : Minigame
+    {
+        const int Targets = 6;
+        const int MaxCasts = 10;
+        readonly Transform[] debris = new Transform[Targets];
+        readonly float[] radii = new float[Targets];
+        readonly float[] phases = new float[Targets];
+        int casts, captured;
+        float elapsed;
+        Transform claw, tether;
+        const float frameW = 8f, frameH = 7.2f;
+
+        protected override string Title { get { return "WRECKAGE SALVAGE"; } }
+        protected override string Hint { get { return "Tap tumbling wreckage to catch it with your claw. Misses cost a cast"; } }
+        protected override Color StageBg { get { return new Color(0.018f, 0.015f, 0.04f); } }
+
+        protected override void Build()
+        {
+            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Grabber" : toolName, color));
+            status.style.display = DisplayStyle.Flex;
+            arena.RegisterCallback<PointerDownEvent>(OnCast);
+            UpdateStatus("RECOVER 6 FRAGMENTS  ·  TAP A TARGET");
+        }
+
+        protected override void BuildScene()
+        {
+            var st = stage;
+            Color accent = new Color(rawColor.r, rawColor.g, rawColor.b);
+            st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.25f), 16f, new Vector3(0f, 0f, 8f));
+            var field = st.Lit(new Color(0.08f, 0.08f, 0.17f), accent * 0.6f, 1f, 5f, 0f);
+            var alloy = st.Lit(new Color(0.32f, 0.38f, 0.48f), accent * 1.3f, 0f, 9f, 0f);
+            var glowing = st.Lit(new Color(0.12f, 0.35f, 0.42f), accent * 2f, 0f, 4f, 0f);
+            st.AddMesh(MeshKit.Cyl(4.6f, 4.6f, 0.06f, 32), field, st.root, new Vector3(0f, -2.45f, 1.3f));
+            tether = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.72f), 0.18f, new Vector3(0f, -1.8f, -0.7f));
+            tether.localScale = new Vector3(0.06f, 0f, 0.06f);
+
+            for (int i = 0; i < Targets; i++)
+            {
+                var root = new GameObject("SalvageTarget" + i).transform;
+                root.SetParent(st.root, false);
+                root.localPosition = new Vector3(-3.4f + (i % 3) * 3.4f, -0.8f + (i / 3) * 1.7f, (i % 2) * 0.45f);
+                phases[i] = i * 0.93f;
+                radii[i] = 0.48f + (i % 3) * 0.08f;
+                Color targetColor = i % 2 == 0 ? new Color(0.65f, 0.88f, 1.1f) : accent * 1.5f;
+                var material = i % 2 == 0 ? alloy : glowing;
+                if (i % 3 == 0)
+                {
+                    st.Prim(PrimitiveType.Cube, root, Vector3.zero, new Vector3(0.8f, 0.58f, 0.52f), new Vector3(0f, 0f, 18f), material);
+                    st.Prim(PrimitiveType.Cube, root, Vector3.zero, new Vector3(0.92f, 0.08f, 0.08f), Vector3.zero, alloy);
+                }
+                else if (i % 3 == 1)
+                {
+                    st.AddMesh(MeshKit.Ico(1, d => 0.47f * (0.8f + 0.25f * Mathf.PerlinNoise(d.x * 3f + i, d.y * 3f + d.z))),
+                        material, root, Vector3.zero);
+                    st.Prim(PrimitiveType.Cylinder, root, new Vector3(0f, 0.42f, 0f), new Vector3(0.3f, 0.12f, 0.3f), new Vector3(0f, 0f, 90f), alloy);
+                }
+                else
+                {
+                    st.Prim(PrimitiveType.Cube, root, Vector3.zero, new Vector3(0.65f, 0.65f, 0.65f), new Vector3(20f, 30f, 15f), material);
+                    st.Prim(PrimitiveType.Cube, root, new Vector3(0.35f, 0f, 0f), new Vector3(0.1f, 0.8f, 0.1f), Vector3.zero, alloy);
+                }
+                st.GlowQuad(root, new Color(targetColor.r, targetColor.g, targetColor.b, 0.45f), 1.5f, new Vector3(0f, 0f, -0.5f));
+                debris[i] = root;
+            }
+
+            claw = new GameObject("MagnetClaw").transform;
+            claw.SetParent(st.root, false);
+            st.Prim(PrimitiveType.Cylinder, claw, new Vector3(0f, 0.48f, 0f), new Vector3(0.1f, 0.48f, 0.1f), Vector3.zero, alloy);
+            st.Prim(PrimitiveType.Sphere, claw, new Vector3(0f, 0.95f, 0f), new Vector3(0.4f, 0.3f, 0.4f), Vector3.zero, glowing);
+            st.GlowQuad(claw, new Color(color.r, color.g, color.b, 0.8f), 1.2f, new Vector3(0f, 0.95f, -0.3f));
+            claw.localPosition = new Vector3(0f, -1.55f, -0.65f);
+        }
+
+        protected override void Frame(float aspect) { FramePose(frameW, frameH, -0.15f, aspect, 0.75f); }
+
+        void OnCast(PointerDownEvent e)
+        {
+            if (finished || casts >= MaxCasts) return;
+            casts++;
+            Ray ray = PointerRay(e);
+            int hit = -1;
+            float nearest = float.MaxValue;
+            for (int i = 0; i < debris.Length; i++)
+            {
+                if (!debris[i].gameObject.activeSelf) continue;
+                Vector3 delta = debris[i].position - ray.origin;
+                float along = Vector3.Dot(delta, ray.direction);
+                if (along < 0f) continue;
+                Vector3 closest = ray.origin + ray.direction * along;
+                float r = radii[i] * 0.72f;
+                if ((debris[i].position - closest).sqrMagnitude > r * r) continue;
+                float distance = along - Mathf.Sqrt(Mathf.Max(0f, r * r - (debris[i].position - closest).sqrMagnitude));
+                if (distance < nearest) { nearest = distance; hit = i; }
+            }
+
+            if (hit >= 0)
+            {
+                Vector3 point = debris[hit].position;
+                debris[hit].gameObject.SetActive(false);
+                captured++;
+                claw.localPosition = new Vector3(point.x, -1.55f, -0.65f);
+                tether.localPosition = (point + claw.position) * 0.5f - stage.root.position;
+                tether.localScale = new Vector3(0.08f, Vector3.Distance(point, claw.position) * 0.5f, 0.08f);
+                Fx.Burst(point, color * 1.8f, 20, 4f, 0.18f);
+                stage.Shake(0.22f);
+                Sfx.Good();
+                UpdateStatus("FRAGMENT LOCKED  ·  " + captured + "/6  ·  " + (MaxCasts - casts) + " CASTS");
+            }
+            else
+            {
+                Sfx.Bad();
+                UpdateStatus("CLAW MISSED  ·  " + captured + "/6  ·  " + (MaxCasts - casts) + " CASTS");
+            }
+
+            if (captured >= Targets || casts >= MaxCasts) Complete();
+        }
+
+        void Complete()
+        {
+            float q = captured == 0 ? 0f : 0.2f + 0.8f * (captured / (float)Targets);
+            UpdateStatus("RECOVERED " + captured + "/6 FRAGMENTS");
+            Finish(new MinigameResult { quality = q, perfects = captured, total = Targets });
+        }
+
+        void UpdateStatus(string message) { status.text = "CASTS " + casts + "/" + MaxCasts + "  ·  " + message; }
+
+        protected override void Tick(float dt)
+        {
+            elapsed += dt;
+            for (int i = 0; i < debris.Length; i++)
+            {
+                if (!debris[i].gameObject.activeSelf) continue;
+                float phase = elapsed * (0.28f + difficulty * 0.08f) + phases[i];
+                debris[i].localPosition = new Vector3(Mathf.Sin(phase) * 3.15f, -0.85f + Mathf.Sin(phase * 1.7f + i) * 0.85f,
+                    (i % 2) * 0.45f + Mathf.Cos(phase * 1.3f) * 0.18f);
+                debris[i].localRotation = Quaternion.Euler(phase * 37f, phase * 63f, Mathf.Sin(phase) * 25f);
+            }
+            claw.localRotation = Quaternion.Euler(0f, Mathf.Sin(elapsed * 1.4f) * 18f, Mathf.Sin(elapsed * 1.8f) * 7f);
+        }
+    }
+
     /// <summary>3D asteroid-field flight during warp. Quality (fewer hits) refunds part of the fuel.</summary>
     public class TravelGame : Minigame
     {
