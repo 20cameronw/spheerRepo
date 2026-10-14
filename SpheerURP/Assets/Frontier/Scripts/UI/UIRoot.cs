@@ -252,6 +252,7 @@ namespace Frontier
             UiKit.SetFill(xpFill, gs.LevelProgress);
             RefreshModal();
             RefreshPopup();
+            if (mapOpen) { InvalidateMapPreview(); BuildMapCard(); }
         }
 
         // ------------------------------------------------------------ frame
@@ -411,60 +412,7 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ travel
-        void StartTravel(PlanetData target)
-        {
-            if (busy || defense.Active || backdrop.Warping) return;
-            int cost = gs.FuelCost(target);
-            if (gs.Count(gs.db.fuel) < cost) { Sfx.Bad(); return; }
-            busy = true;
-            CloseAll();
-            StartCoroutine(TravelSequence(target, cost));
-        }
-
-        IEnumerator TravelSequence(PlanetData target, int cost)
-        {
-            StartCoroutine(backdrop.DoWarp(null));
-            yield return planetView.Depart();
-            while (backdrop.Warping) yield return null;
-            var from = gs.planet;
-            double dx = target.Star.X - from.Star.X, dy = target.Star.Y - from.Star.Y;
-            var request = new TravelRunRequest
-            {
-                seed = Frontier.Universe.Hash.Fnv1a64(from.Id + ">" + target.Id) ^ (ulong)(uint)UnityEngine.Random.Range(int.MinValue, int.MaxValue),
-                distanceLy = Math.Sqrt(dx * dx + dy * dy),
-                danger = target.Danger,
-                tier = target.Tier,
-                legIndex = 0, legCount = 1,
-                from = from, to = target,
-                fuelCost = cost,
-                fullscreenHost = travelLayer,
-                safeInsets = inset
-            };
-            TravelRunResult result = default;
-            bool completed = false;
-            TravelMinigames.Create().Run(overlayLayer, request, r =>
-            {
-                result = r; completed = true;
-            });
-            while (!completed) yield return null;
-            if (!gs.Travel(target))
-            {
-                yield return planetView.Approach(gs.planet);
-                busy = false;
-                Toast("Travel failed: not enough fuel.", UiKit.Red);
-                yield break;
-            }
-            backdrop.Apply(target);
-            int refund = result.completed ? Mathf.FloorToInt(cost * FrontierSettings.I.travelRefundMax * result.quality) : 0;
-            if (refund > 0) gs.Add(gs.db.fuel, refund);
-            if (result.completed && result.loot != null)
-                foreach (var item in result.loot) if (item.resource != null && item.amount > 0) gs.Add(item.resource, item.amount);
-            if (result.completed && result.xp > 0) gs.AddXp(result.xp);
-            selected = target;
-            yield return planetView.Approach(target);
-            busy = false;
-            Toast("Arrived at " + target.Name + (refund > 0 ? "  -  +" + refund + " fuel back" : ""), UiKit.Cyan);
-        }
+        // Multi-leg travel is hosted in UIRoot.Travel.cs.
 
         // ------------------------------------------------------------ toast
         void Toast(string text, Color color)

@@ -24,6 +24,14 @@ namespace Frontier
         [Tooltip("Free revives granted per Hyperspace Run while no revive offer (premium wallet, rewarded ad) is registered with TravelMinigames.ReviveOffer. Set to 0 when the premium wallet ships.")]
         [Min(0)] public int freeRevivesPerRun = 1;
 
+        [Header("Travel (interim)")]
+        [Tooltip("Jump drive level the ship has for free until the content package ships the 'jump' upgrade (5 = 200 ly per jump; 0 would mean the home system only). The content package removes this floor.")]
+        [Range(0, 10)] public int interimJumpLevel = 5;
+        [Tooltip("Scanner level the ship has for free until the 'scanner_range' upgrade ships (0 = the base survey radius around visited systems). The content package removes this floor.")]
+        [Range(0, 8)] public int interimScannerLevel = 0;
+        [Tooltip("When true a world can only be landed on with hull plating for every hazard it has (the 'hull_*' upgrades). Off until the plating upgrades ship; the map and the Worlds card still show what each hazard would need.")]
+        public bool enforceHazardPlating = false;
+
         [Header("Scene")]
         public Color lightColor = new Color(0.85f, 0.9f, 1f);
         public float lightIntensity = 1.6f;

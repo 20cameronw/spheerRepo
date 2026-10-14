@@ -195,10 +195,11 @@ namespace Frontier.Tests
             var state = NewState();
             GiveFuel(state, 100);
             var glacia = state.universe.Get("glacia");
-            Assert.AreEqual(5, state.FuelCost(glacia), "the closest neighbour keeps the old price");
+            int hopFuel = state.FuelCost(glacia);
+            Assert.AreEqual(state.Rules.Model.IntraSystemFuelCost(Math.Abs(state.planet.Descriptor.OrbitRadius - glacia.Descriptor.OrbitRadius), 0, 0, false), hopFuel);
             Assert.AreEqual(0, state.FuelCost(state.planet), "no cost to stay");
             Assert.IsTrue(state.Travel(glacia));
-            Assert.AreEqual(95, state.Count(db.fuel));
+            Assert.AreEqual(100 - hopFuel, state.Count(db.fuel));
             Assert.AreEqual(glacia.Id, state.planet.Id);
             Assert.AreEqual(1, state.world.Visits(glacia.Id));
             Assert.AreEqual(2, state.stats.worldsLanded);
@@ -208,7 +209,7 @@ namespace Frontier.Tests
             int cost = state.FuelCost(cinder);
             Assert.Greater(cost, 5, "another system costs more than a hop inside one");
             Assert.IsTrue(state.Travel(cinder));
-            Assert.AreEqual(95 - cost, state.Count(db.fuel));
+            Assert.AreEqual(100 - hopFuel - cost, state.Count(db.fuel));
             Assert.AreEqual(3, state.stats.worldsLanded);
             Assert.AreEqual(state.universe.DistanceFromHomeLy(cinder), state.stats.maxDistanceFromHomeLy, 1e-9);
             Assert.AreEqual(213.3, state.stats.maxDistanceFromHomeLy, 0.1, "Emberfall lies at tier 3 distance");
@@ -233,9 +234,9 @@ namespace Frontier.Tests
         public void Travel_IsRefused_WithoutEnoughFuel_OrToTheSameWorld()
         {
             var state = NewState();
-            state.backpack.Set(db.fuel.id, 2);
-            Assert.IsFalse(state.Travel(state.universe.Get("glacia")), "5 fuel needed, 2 owned");
-            Assert.AreEqual(2, state.Count(db.fuel));
+            state.backpack.Set(db.fuel.id, 0);
+            Assert.IsFalse(state.Travel(state.universe.Get("glacia")), "no fuel owned");
+            Assert.AreEqual(0, state.Count(db.fuel));
             Assert.AreEqual(state.universe.Home.Id, state.planet.Id);
             Assert.IsFalse(state.Travel(state.planet));
             Assert.IsFalse(state.Travel(null));
@@ -252,6 +253,41 @@ namespace Frontier.Tests
             Assert.AreEqual(writes + 1, state.saves.WriteCount, "travel flushes without waiting for the quiet period");
             Assert.IsFalse(state.saves.IsDirty);
             Assert.AreEqual(state.planet.Id, ReadSave(PrimaryPath).location.currentPlanetId);
+        }
+
+        [Test]
+        public void Travel_RejectsWrongDestination_ModifiedPrice_AndStaleOrigin()
+        {
+            var state = NewState();
+            GiveFuel(state, 100);
+            var glacia = state.universe.Get("glacia");
+            var route = state.PlanRoute(glacia);
+            Assert.IsFalse(state.Travel(route, state.universe.Get("cinder")));
+            int price = route.totalFuel;
+            route.totalFuel = 0;
+            Assert.IsFalse(state.Travel(route, glacia));
+            Assert.AreEqual(100, state.Count(db.fuel));
+            route.totalFuel = price;
+            Assert.IsTrue(state.Travel(state.universe.Get("ferrum")));
+            Assert.IsFalse(state.Travel(route, glacia));
+            Assert.AreEqual(0, state.world.Visits(glacia.Id));
+        }
+
+        [Test]
+        public void Travel_DenseFuelPaysTheSameRoute_WithNoOrdinaryCells()
+        {
+            var state = NewState();
+            Assert.IsNotNull(db.FindResource(GameState.PlasmaId));
+            state.backpack.Set(db.fuel.id, 0);
+            state.backpack.Set(GameState.PlasmaId, 20);
+            var target = state.universe.Get("cinder");
+            var plan = state.PlanRoute(target);
+            Assert.IsTrue(plan.reachable);
+            var payment = state.Rules.Pay(plan.totalFuel, state.FuelOnBoard);
+            Assert.Greater(payment.plasmaCells, 0);
+            Assert.IsTrue(state.Travel(plan, target));
+            Assert.AreEqual(0, state.Count(db.fuel));
+            Assert.AreEqual(20 - payment.plasmaCells, state.backpack.Count(GameState.PlasmaId));
         }
 
         [Test]

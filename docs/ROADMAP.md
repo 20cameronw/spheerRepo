@@ -249,6 +249,16 @@ The 30 current planets become **Core Worlds** placed in the landmark galaxies. `
 
 Three levels of detail: galaxy (density tiles + galaxy labels), sector (system dots, colours, discovered state), system (orbits and planets). Chunked, pooled rendering so nothing is ever 9000 px wide. **Spike first** (decision gate): (A) pooled UI Toolkit `Painter2D` chunks vs (B) a GPU-instanced map stage rendered to a RenderTexture with UI Toolkit overlays; pick by on-device vertex/frame budget. Features: search by name or coordinates, pins, resource filter ("show worlds with Titanium"), range ring, route preview with the existing curved orbital path, recenter, fog of war.
 
+**Working milestone (2026-10-13, `feature/star-map`).** The locked economy route planner now supplies real stepping-stone legs,
+energy payment (1/8/64), plating/fuel diagnostics and guarded arrival. Manual flight runs once per leg; autopilot skips the mini-game
+and takes 12 s per leg at x1.6 fuel. The viewport-sized Painter2D map has bounded background queries, double-precision pan/zoom,
+galaxy/sector/system views, known-name/id/coordinate search, recenter/range ring, survey-based deposit filtering and a detailed Worlds
+card. See [RUNTIME_MODEL.md §6](RUNTIME_MODEL.md#6-travel) for budgets, interim settings and execution semantics.
+
+Still open for `m3-*`: pins and persisted discovery history; global name indexing; directed next-stop controls; on-device A/B
+Painter2D-versus-GPU/RT performance gate; real jump/scanner/plating content and autopilot unlock. Manual timing is an estimate until the
+new flight mini-game consumes `TravelRunRequest.seconds`; flight resume/abort and new failure consequences remain in `m5-*`.
+
 ### 4.6 What gets saved
 
 `UniverseSeed`, `GeneratorVersion`, `discovered` (compact bitsets by sector), `visited` planet ids, and `PlanetDelta` per touched planet: structures (slot, kind, level, build timer), cleared obstacles, warehouse contents, wave counters, notes/rename. Everything else is regenerated. Save size stays small even after thousands of worlds.

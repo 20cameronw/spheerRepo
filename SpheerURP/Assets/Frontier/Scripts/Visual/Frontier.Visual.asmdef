@@ -3,6 +3,7 @@
     "rootNamespace": "Frontier",
     "references": [
         "Frontier.Core",
+        "Frontier.Economy",
         "Frontier.Data",
         "Frontier.Game",
         "Unity.RenderPipelines.Core.Runtime",

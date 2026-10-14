@@ -63,9 +63,24 @@ namespace Frontier
             mapZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
             if (mapView == null) return;
             BuildMapNodes();
+            InvalidateMapPreview();
             BuildMapCard();
             CenterOn(pick != null ? pick : gs.planet);
             mapWorld.MarkDirtyRepaint();
+        }
+
+        public RoutePlan DebugMapPreview { get { return mapPreview; } }
+        public int DebugMapSystemCount { get { return mapSnapshot == null ? 0 : mapSnapshot.systems.Length; } }
+        public double DebugMapCenterX { get { return viewport.CenterX; } }
+        public void DebugMapSearch(string text) { mapSearch.value = text; SearchMap(); }
+        public void DebugMapAutopilot() { mapAutopilot = true; InvalidateMapPreview(); BuildMapCard(); }
+        public void DebugStartTravel(PlanetData target, bool autopilot = false) { StartTravel(target, autopilot); }
+        public void DebugAutopilotScreen()
+        {
+            DebugReset();
+            Label progress;
+            CreateAutopilotOverlay(out progress);
+            progress.text = "Leg 1 / 3 · 12s";
         }
 
         public void DebugBuild(StructureSO def) { DebugReset(); EnterBuild(def); }
