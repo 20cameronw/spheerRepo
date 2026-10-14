@@ -62,8 +62,15 @@ namespace Frontier
             {
                 scroll.Add(UiKit.Text("Hazards: " + planet.Hazards + " · hull level " + gs.Rules.RequiredPlatingLevel(planet.Tier) + " per hazard", "fr-tiny", UiKit.Amber));
                 var gaps = gs.Rules.LandingGaps(gs.Ship, planet.Hazards, planet.Tier);
-                foreach (var gap in gaps) scroll.Add(UiKit.Text(gap.hazard + " plating " + gap.have + " / " + gap.need, "fr-tiny", UiKit.Amber));
-                if (gaps.Length > 0 && !gs.Ship.enforceHazardPlating) scroll.Add(UiKit.Text("Plating advisory only until ship upgrades arrive", "fr-tiny", UiKit.Muted));
+                if (gaps.Length == 0)
+                    scroll.Add(UiKit.Text("HULL READY · SAFE TO LAND", "fr-tiny", UiKit.Lime));
+                else
+                {
+                    foreach (var gap in gaps)
+                        scroll.Add(UiKit.Text(gap.hazard + " plating " + gap.have + " / " + gap.need, "fr-tiny", UiKit.Amber));
+                    if (!gs.Ship.enforceHazardPlating)
+                        scroll.Add(UiKit.Text("Landing protection is disabled in development settings", "fr-tiny", UiKit.Muted));
+                }
             }
             scroll.Add(SectionLabel(surveyed ? "RESOURCES · HOW TO HARVEST" : "UNSURVEYED"));
             if (!surveyed) scroll.Add(UiKit.Text("Fly within " + gs.ScannerRangeLy.ToString("0") + " ly of this system to reveal its deposits.", "fr-small", UiKit.Muted));

@@ -113,7 +113,8 @@ namespace Frontier.Tests
                 Assert.IsTrue(seen.Add(kind), "Kind must have one canonical id: " + kind);
             }
             Assert.AreEqual(Enum.GetValues(typeof(StructureKind)).Length, seen.Count);
-            Assert.IsTrue(StructureKind.DysonCollector.IsImplemented());
+            foreach (var structure in GameDatabase.Load().structures)
+                Assert.IsTrue(structure.Implemented, "Catalog structure has no implemented behavior: " + structure.id);
         }
     }
 }

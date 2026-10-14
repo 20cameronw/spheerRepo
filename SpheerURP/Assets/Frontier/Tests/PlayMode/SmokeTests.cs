@@ -166,6 +166,12 @@ namespace Frontier.Tests
             }
         }
 
+        static void GiveFullHazardPlating(GameState state)
+        {
+            foreach (string upgrade in new[] { "hull_heat", "hull_cold", "hull_toxic", "hull_rad", "hull_void" })
+                state.DebugSetShipLevel(upgrade, 3);
+        }
+
         [UnityTest]
         public IEnumerator TravelFlow_FliesEachLeg_PaysOnce_AndRefundsOnlyCompletedManualLegs()
         {
@@ -175,6 +181,7 @@ namespace Frontier.Tests
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
             for (int i = 0; i < 10; i++) yield return null;
+            GiveFullHazardPlating(rt.State);
             rt.State.DebugSetUpgrade(rt.Db.FindUpgrade("pack"), 2);
             rt.State.backpack.Set(rt.Db.fuel.id, 200);
             var target = rt.State.universe.Get("cinder");
@@ -216,6 +223,7 @@ namespace Frontier.Tests
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
             for (int i = 0; i < 10; i++) yield return null;
+            GiveFullHazardPlating(rt.State);
             rt.State.backpack.Set(rt.Db.fuel.id, 100);
             var target = rt.State.universe.Get("glacia");
             var plan = rt.State.PlanRoute(target, true);

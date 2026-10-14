@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Frontier.Universe;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -40,6 +41,22 @@ namespace Frontier.Tests
         static SaveV2 ReadSave(string path) { return SaveSerializer.Instance.DeserializeV2(File.ReadAllText(path)).Normalize(); }
 
         void GiveFuel(GameState state, int amount) { state.backpack.Set(db.fuel.id, amount); }
+
+        static void GiveFullHazardPlating(GameState state)
+        {
+            foreach (string upgrade in new[] { "hull_heat", "hull_cold", "hull_toxic", "hull_rad", "hull_void" })
+                state.DebugSetShipLevel(upgrade, 3);
+        }
+
+        [Test]
+        public void DefaultShipSettings_RequireHazardPlatingBeforeLanding()
+        {
+            var state = NewState();
+
+            Assert.IsTrue(state.Ship.enforceHazardPlating);
+            Assert.IsFalse(state.Rules.CanLand(state.Ship, Hazards.Heat, 0));
+            Assert.IsTrue(state.Rules.CanLand(state.Ship, Hazards.None, 0));
+        }
 
         [Test]
         public void Biodome_OnlyOffersResourcesWithTheHarvestMethod()
@@ -328,6 +345,7 @@ namespace Frontier.Tests
         public void Travel_SpendsTheFuelOfTheTravelModel_AndRecordsTheLanding()
         {
             var state = NewState();
+            GiveFullHazardPlating(state);
             GiveFuel(state, 100);
             var glacia = state.universe.Get("glacia");
             int hopFuel = state.FuelCost(glacia);
@@ -354,6 +372,7 @@ namespace Frontier.Tests
         public void ARepeatedVisit_CountsTheVisitButNotANewWorld()
         {
             var state = NewState();
+            GiveFullHazardPlating(state);
             GiveFuel(state, 100);
             var glacia = state.universe.Get("glacia");
             state.Travel(glacia);
@@ -381,6 +400,7 @@ namespace Frontier.Tests
         public void Travel_WritesTheSaveImmediately()
         {
             var state = NewState();
+            GiveFullHazardPlating(state);
             GiveFuel(state, 50);
             state.Save();
             int writes = state.saves.WriteCount;
@@ -412,6 +432,7 @@ namespace Frontier.Tests
         public void Travel_DenseFuelPaysTheSameRoute_WithNoOrdinaryCells()
         {
             var state = NewState();
+            GiveFullHazardPlating(state);
             Assert.IsNotNull(db.FindResource(GameState.PlasmaId));
             state.backpack.Set(db.fuel.id, 0);
             state.backpack.Set(GameState.PlasmaId, 20);
@@ -822,6 +843,7 @@ namespace Frontier.Tests
         public void OnlyChangedWorlds_AreSaved()
         {
             var state = NewState();
+            GiveFullHazardPlating(state);
             state.Save();
             Assert.AreEqual(1, ReadSave(PrimaryPath).worlds.Count, "just the home world the player landed on");
             GiveFuel(state, 100);
