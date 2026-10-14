@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using Frontier.Services;
 
 namespace Frontier
 {
@@ -20,6 +21,7 @@ namespace Frontier
         public WorldSurface Surface;
         public UIRoot Ui;
         public UIDocument Document;
+        public FrontierServices Services;
 
         public static void Publish(FrontierRuntime runtime) { Current = runtime; }
         public static void Clear() { Current = null; }

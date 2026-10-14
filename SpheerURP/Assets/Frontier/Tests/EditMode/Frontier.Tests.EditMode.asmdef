@@ -11,6 +11,7 @@
         "Frontier.Editor",
         "Frontier.Visual",
         "Frontier.UI",
+        "Frontier.Services",
         "Frontier.HyperspaceView"
     ],
     "includePlatforms": [

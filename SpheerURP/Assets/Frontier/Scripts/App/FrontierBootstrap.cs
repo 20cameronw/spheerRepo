@@ -1,4 +1,5 @@
 using System.Collections;
+using Frontier.Services;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,6 +25,7 @@ namespace Frontier
             Application.targetFrameRate = cfg.targetFrameRate;
 
             var db = GameDatabase.ForRuntime(database);
+            var services = FrontierServices.CreateOffline(new ConsentService(new PlayerPrefsConsentStore()));
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HarnessRunner.PrepareFromCommandLine();
 #endif
@@ -102,12 +104,12 @@ namespace Frontier
             surface.IsOverUi = ui.IsOverUi;
             defense.IsOverUi = ui.IsOverUi;
             defense.World = surface;
-            ui.Init(doc, gs, defense, planet, backdrop, surface, cam);
+            ui.Init(doc, gs, defense, planet, backdrop, surface, cam, services);
 
             FrontierRuntime.Publish(new FrontierRuntime
             {
                 Db = db, State = gs, Camera = cam, Backdrop = backdrop, Planet = planet,
-                Defense = defense, Surface = surface, Ui = ui, Document = doc
+                Defense = defense, Surface = surface, Ui = ui, Document = doc, Services = services
             });
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (HarnessRunner.Requested) new GameObject("Harness").AddComponent<HarnessRunner>().Begin(FrontierRuntime.Current);

@@ -348,6 +348,8 @@
 .fr-map-card Toggle { margin-top: 8px; margin-bottom: 8px; color: var(--fr-text-hi); font-size: var(--fr-fs-caption); flex-shrink: 0; }
 .fr-map-card .unity-toggle__input { min-height: 56px; }
 .fr-map-card .unity-toggle__checkmark { width: 44px; height: 44px; margin-right: 12px; background-color: var(--fr-surface-2); }
+.fr-consent-toggle { margin-top: 4px; margin-bottom: 4px; color: var(--fr-text-hi); font-size: var(--fr-fs-caption); flex-shrink: 0; }
+.fr-consent-toggle .unity-toggle__checkmark { width: 44px; height: 44px; margin-right: 12px; background-color: var(--fr-surface-2); }
 .fr-map-filter { height: 64px; font-size: var(--fr-fs-caption); }
 .fr-map-filter .unity-base-popup-field__input { background-color: var(--fr-surface-1); color: var(--fr-text-hi); border-color: var(--fr-outline-strong); }
 .fr-map-node { position: absolute; width: 110px; height: 110px; margin-left: -55px; margin-top: -55px; border-radius: 55px; }

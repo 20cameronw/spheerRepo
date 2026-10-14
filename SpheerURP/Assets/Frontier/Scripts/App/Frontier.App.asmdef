@@ -8,7 +8,8 @@
         "Frontier.Game",
         "Frontier.Visual",
         "Frontier.UI",
-        "Frontier.HyperspaceView"
+        "Frontier.HyperspaceView",
+        "Frontier.Services"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

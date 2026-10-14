@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Frontier.Services;
 
 namespace Frontier
 {
@@ -20,6 +21,7 @@ namespace Frontier
         Camera cam;
         UIDocument doc;
         PanelSettings panelSettings;
+        FrontierServices services;
 
         VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
@@ -53,9 +55,10 @@ namespace Frontier
             return root.panel.Pick(p) != null;
         }
 
-        public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd, WorldSurface ws, Camera camera)
+        public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd, WorldSurface ws, Camera camera, FrontierServices serviceSet)
         {
             doc = document; gs = state; defense = def; planetView = pv; backdrop = bd; world = ws; cam = camera;
+            services = serviceSet;
             LoadPrefs();
             panelSettings = doc.panelSettings;
             selected = gs.planet;

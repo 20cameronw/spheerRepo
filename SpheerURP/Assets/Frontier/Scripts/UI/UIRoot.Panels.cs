@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Frontier.Services;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UBiome = Frontier.Universe.Biome;
@@ -316,6 +317,7 @@ namespace Frontier
                 RefreshModal();
             }));
             BuildTravelSettings(body);
+            BuildConsentSettings(body);
 
             var reset = IconBtn(confirmReset ? "TAP AGAIN TO ERASE" : "RESET PROGRESS", "close", UiKit.Red, () =>
             {
@@ -328,6 +330,40 @@ namespace Frontier
             });
             reset.style.marginTop = UiKit.Space.S24;
             body.Add(reset);
+        }
+
+        void BuildConsentSettings(VisualElement body)
+        {
+            if (services == null || services.Consent == null) return;
+            ConsentPreferences saved = services.Consent.Current;
+            bool analyticsAllowed = saved.hasDecision && saved.analyticsAllowed;
+            bool adsAllowed = saved.hasDecision && saved.adsAllowed;
+
+            body.Add(SectionLabel("PRIVACY"));
+            body.Add(UiKit.Text(
+                services.Analytics.IsConfigured || services.Ads.IsConfigured
+                    ? "Analytics and rewarded ads are optional. Changes save immediately and can be withdrawn at any time."
+                    : "Optional data services are not configured in this build. Changes save locally and gate future initialization.",
+                "fr-muted"));
+
+            var analytics = new Toggle("Allow gameplay analytics") { value = analyticsAllowed };
+            analytics.AddToClassList("fr-consent-toggle");
+            analytics.style.minHeight = UiKit.Size.Touch;
+            body.Add(analytics);
+            var ads = new Toggle("Allow rewarded ads") { value = adsAllowed };
+            ads.AddToClassList("fr-consent-toggle");
+            ads.style.minHeight = UiKit.Size.Touch;
+            body.Add(ads);
+
+            analytics.RegisterValueChangedCallback(e => SaveConsentPreferences(e.newValue, ads.value));
+            ads.RegisterValueChangedCallback(e => SaveConsentPreferences(analytics.value, e.newValue));
+        }
+
+        void SaveConsentPreferences(bool analyticsAllowed, bool adsAllowed)
+        {
+            services.Consent.SavePreferences(analyticsAllowed, adsAllowed);
+            Sfx.Good();
+            Toast("Privacy choice saved on this device", UiKit.Cyan);
         }
 
         // ------------------------------------------------------------ command (bases + research)
