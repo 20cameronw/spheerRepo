@@ -5,7 +5,7 @@ Everything that can run without Unity does. Five layers, fastest first:
 | Layer | Covers | Needs | Run it | CI |
 |-------|--------|-------|--------|----|
 | **Core tests** (plain .NET) | `Frontier.Core`: universe generator, flavour text and golden hashes, plus inventory, progression, world store, save schema/migrator/store/debounce, map queries, route geometry and frozen shared enums (188) | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
-| **EditMode** (Unity) | Core tests under Unity Mono, plus Data/Game/Economy/Hyperspace tests: authored worlds, universe service, model scales, saves, route planning, content import/runtime selection, simulation, and catalog/balance checks (535 passed in the cutover run; 2 Mono-only allocation probes skip) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode -IncludeSlow` | `unity-tests.yml` (needs a licence) |
+| **EditMode** (Unity) | Core tests under Unity Mono, plus Data/Game/Economy/Hyperspace tests: authored worlds, universe service, model scales, saves, route planning, content import/runtime selection, simulation, and catalog/balance checks (539 passed in the progression slice; 2 Mono-only allocation probes skip) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode -IncludeSlow` | `unity-tests.yml` (needs a licence) |
 | **PlayMode** (Unity) | Runtime smoke/travel and Hyperspace lifecycle tests: authored database/bootstrap, saves, generated-world rendering and surface sizing, minigame lifecycle, pause/revive/results, and render setup (19) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
 | **Check suites** (Unity editor) | the five `Frontier > Validate ...` checks: the pass/fail **gate** for every change | Unity | `tools/run-checks.ps1` | local only |
 | **Screenshot harness** (Unity, GPU) | Current screens across four virtual devices + UI lint; includes generated-world maps and Hyperspace states | Unity + GPU | `tools/capture-screens.ps1` | local only |
@@ -66,9 +66,9 @@ Focused command (use the full suites before landing):
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-tests.ps1 -Platform EditMode -TestFilter Frontier.Tests.EconomyRuntimeTests
 ```
 
-The runtime coverage check now follows raw resource definitions instead of requiring harvestable fuel. Economy lab
-reachability/balance tests validate the complete designed progression, **not** the currently gated runtime progression:
-research, new tools, builder/timer jobs and Atlas still need their separate wiring.
+The runtime coverage check now follows raw resource definitions instead of requiring harvestable fuel. `ProgressionContentTests`
+verify research spending/save-load, supported tool-tier yield/level/save-load, invalid-entry handling, and preservation through a
+legacy-content fallback. Builder/timer jobs, Atlas discovery/rewards and unsupported tool minigames still need their separate wiring.
 
 **Cutover validation (2026-10-13):** final full EditMode including Slow: 535 passed / 2 Mono-only allocation probes skipped;
 PlayMode: 19 passed; all five editor suites (Planet, Storage, Combat, Icon, Layout) passed with zero compile diagnostics;

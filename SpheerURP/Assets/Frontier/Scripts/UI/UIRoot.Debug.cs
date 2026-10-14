@@ -29,7 +29,15 @@ namespace Frontier
         }
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
-        public void DebugResearch(int tab, int tool = 0) { DebugReset(); researchTab = tab; toolTab = tool; OpenResearch(); }
+        public void DebugResearch(int tab, int tool = 0, int progression = 0)
+        {
+            DebugReset();
+            researchTab = tab;
+            toolTab = tool;
+            progressionTab = progression;
+            researchBranch = "";
+            OpenResearch();
+        }
         public void DebugPack(int select) { DebugReset(); packSel = select; OpenPack(); }
 
         public void DebugMenu(string page, bool scrollToEnd = false)

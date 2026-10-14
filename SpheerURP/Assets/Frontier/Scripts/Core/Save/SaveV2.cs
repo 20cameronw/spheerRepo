@@ -38,6 +38,10 @@ namespace Frontier
     {
         public int xp;
         public List<IdLevel> upgrades = new List<IdLevel>();
+        /// <summary>Purchased economy research node ids (absent from earlier v2 saves).</summary>
+        public List<string> researched = new List<string>();
+        /// <summary>Purchased catalog tool tiers keyed by tool ladder id (absent from earlier v2 saves).</summary>
+        public List<IdLevel> toolTiers = new List<IdLevel>();
         /// <summary>The backpack as stacks per resource (a count, not slot positions).</summary>
         public List<StackRecord> inventory = new List<StackRecord>();
     }
@@ -113,6 +117,8 @@ namespace Frontier
             if (createdWith.universeSeed == null) createdWith.universeSeed = "";
             if (player == null) player = new PlayerSave();
             if (player.upgrades == null) player.upgrades = new List<IdLevel>();
+            if (player.researched == null) player.researched = new List<string>();
+            if (player.toolTiers == null) player.toolTiers = new List<IdLevel>();
             if (player.inventory == null) player.inventory = new List<StackRecord>();
             if (location == null) location = new LocationSave();
             if (location.currentPlanetId == null) location.currentPlanetId = "";
@@ -125,6 +131,8 @@ namespace Frontier
             if (atlas == null) atlas = new List<string>();
             if (settings == null) settings = new List<SettingEntry>();
             player.upgrades.RemoveAll(u => u == null || string.IsNullOrEmpty(u.id));
+            player.researched.RemoveAll(id => string.IsNullOrEmpty(id));
+            player.toolTiers.RemoveAll(t => t == null || string.IsNullOrEmpty(t.id) || t.level <= 0);
             player.inventory.RemoveAll(s => s == null || string.IsNullOrEmpty(s.resourceId) || s.count <= 0);
             if (player.xp < 0) player.xp = 0;
             return this;

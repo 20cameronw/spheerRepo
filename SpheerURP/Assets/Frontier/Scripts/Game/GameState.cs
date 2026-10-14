@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Frontier.Universe;
 using UnityEngine;
 
 namespace Frontier
@@ -126,6 +127,14 @@ namespace Frontier
         {
             int best = 0;
             foreach (var u in db.upgrades) if (u != null && u.effect == UpgradeEffect.ToolPower && u.tool == k) best += Level(u);
+            if (db.UsesImportedEconomy && db.toolLadders != null)
+            {
+                HarvestMethod method = HarvestMapping.FromMinigame(k);
+                foreach (var ladder in db.toolLadders)
+                    if (IsSupportedTool(ladder) && ladder.data.games != null &&
+                        Array.IndexOf(ladder.data.games, method) >= 0)
+                        best = Math.Max(best, ToolTier(ladder) - 1);
+            }
             return best;
         }
 
@@ -134,7 +143,7 @@ namespace Frontier
             float m = 1f;
             foreach (var u in db.upgrades)
                 if (u != null && u.effect == UpgradeEffect.ToolPower && u.tool == k) m += u.valuePerLevel * Level(u);
-            return m;
+            return m * CatalogToolYieldMultiplier(k);
         }
 
         public float ToolTolerance(MinigameKind k) { return Mathf.Min(1.6f, 1f + 0.08f * ToolLevel(k)); }
@@ -142,6 +151,19 @@ namespace Frontier
 
         public string ToolName(MinigameKind k)
         {
+            if (db.toolLadders != null)
+            {
+                HarvestMethod method = HarvestMapping.FromMinigame(k);
+                foreach (var ladder in db.toolLadders)
+                {
+                    if (ladder == null || ladder.data == null || ladder.data.games == null ||
+                        Array.IndexOf(ladder.data.games, method) < 0) continue;
+                    int tier = ToolTier(ladder);
+                    if (ladder.data.tiers == null) break;
+                    foreach (var row in ladder.data.tiers)
+                        if (row != null && row.tier == tier) return row.displayName;
+                }
+            }
             foreach (var u in db.upgrades)
                 if (u != null && u.effect == UpgradeEffect.ToolPower && u.tool == k) return u.NameAtLevel(Level(u));
             return k.ToString();

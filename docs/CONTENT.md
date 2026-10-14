@@ -33,14 +33,17 @@ stay stable; generated deposit contents now follow economy content v1 rather tha
 Both v1 migration and existing v2 saves resolve missing resource/structure/upgrade ids through `LegacyIdMapSO`.
 Existing stable ids take precedence, so reloads never migrate them twice. `alloy` becomes `steel`, `satellite` becomes
 `orbital_relay`; warehouse slots stay in place and colliding inventory aliases sum, while upgrade aliases take the maximum
-owned level. Legacy `axe`/`pick`/`drill` purchases and levels remain legacy upgrades until tool-tier persistence exists.
-The save schema stays v2, v1 originals are backed up, and newer read-only saves are never overwritten.
+owned level. Legacy `axe`/`pick`/`drill` purchases and levels remain legacy upgrades; catalog tiers for supported Axe/Pick/Drill ladders
+are persisted alongside them in v2. The save schema stays v2, v1 originals are backed up, and newer read-only saves are never overwritten.
 
 Imported recipes are filtered by exact station id, station level, reach and research, including the authoritative craft
-action. Unsupported structures/effects cannot be purchased. Research requirements currently stay locked (Atlas entries
-are not research grants); existing saved ownership survives without retroactive gating. Supported legacy actions remain
-synchronous: batch size is not treated as free output, and upgrade rows use their cumulative values and correct units.
-This is a safe content cutover, **not** the complete economy progression loop.
+action. Purchased research now passes authored research gates; node prerequisites, current-world lab level, reach tier,
+catalog identity and resource costs are checked by the runtime. The Command panel exposes research and tool ladders.
+Only Axe/Pick/Drill tiers can be purchased; their yield and active tool level are reflected in harvest rewards and tool feedback.
+Other ladder game types remain visibly unavailable until their minigames exist.
+Unsupported structures/effects cannot be purchased. Supported legacy actions remain synchronous: batch size is not treated
+as free output, and upgrade rows use their cumulative values and correct units. This is a bounded progression slice,
+**not** the complete economy progression loop.
 
 ## Import and validation
 
@@ -83,10 +86,10 @@ the explicit canonical-id-to-behaviour map; imported kinds without gameplay are 
 
 ## Remaining integration
 
-1. Add persistent research completion, tool tiers and builder jobs; replace the temporary fail-closed research gates.
+1. Add builder jobs and timer execution; research completion, supported tool tiers and research gates are now persistent.
 2. Wire timers/batch jobs and the remaining structure behaviours, tank/compression effects, full travel/hull progression,
    obstacles, megaprojects, shards and score. The current interim travel settings are unchanged.
-3. Expose Atlas/research/tool screens and full presentation coverage. Merely importing a structure is not gameplay.
+3. Add full presentation coverage for Atlas/research/tools. Merely importing a structure is not gameplay.
 4. Add safe live tuning/Remote Config overrides later; current travel reads the validated imported tuning and catalog.
 
 The ordered design and runtime API guide remains `tools/labs/economy/INTEGRATION.template.md`; the balanced source and
@@ -122,3 +125,10 @@ guarded selection/fallback, every selected catalog item reference, real v1 migra
 warehouse slots, cumulative effects, station/reach/research gates, crafted-only fuel and canonical Hyperspace loot.
 No economy export/balance values were changed, and no new screenshot/device sweep was claimed. The existing generated
 font SDF changes were excluded from the cutover commits.
+
+## Persistent progression verification
+
+Full EditMode including Slow: **539 passed, 2 skipped** (Mono allocation API unavailable); PlayMode: **19 passed**; all five
+editor checks passed with zero compile diagnostics. Coverage includes research and supported-tool purchases, their effects and
+save/load, reset behavior, invalid catalog entries, and round-tripping progression through a legacy-content fallback. Only
+Axe/Pick/Drill ladders are enabled; builder timers, Atlas discovery/rewards and unsupported harvest minigames remain unimplemented.

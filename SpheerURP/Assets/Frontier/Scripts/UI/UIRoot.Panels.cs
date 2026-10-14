@@ -325,15 +325,13 @@ namespace Frontier
             var tabs = UiKit.Div("fr-tabs");
             tabs.Add(TabButton("base", "BASES", researchTab == 0, UiKit.Magenta, () => researchTab = 0));
             tabs.Add(TabButton("tools", "TOOLS", researchTab == 1, UiKit.Magenta, () => researchTab = 1));
-            tabs.Add(TabButton("ship", "SHIP", researchTab == 2, UiKit.Magenta, () => researchTab = 2));
-            tabs.Add(TabButton("shield", "DEFENSE", researchTab == 3, UiKit.Magenta, () => researchTab = 3));
+            tabs.Add(TabButton("research", "UPGRADES", researchTab == 2, UiKit.Magenta, () => researchTab = 2));
             body.Add(tabs);
             switch (researchTab)
             {
                 case 0: BuildBases(body); break;
                 case 1: BuildTools(body); break;
-                case 2: BuildUpgrades(body, UpgradeCategory.Ship); break;
-                default: BuildUpgrades(body, UpgradeCategory.Defense); break;
+                default: BuildProgression(body); break;
             }
         }
 
@@ -355,7 +353,7 @@ namespace Frontier
             var u2 = tools[toolTab];
             int lvl = gs.Level(u2);
             body.Add(UiKit.Text(u2.description, "fr-muted"));
-            var equipped = UiKit.Text("Equipped: " + u2.NameAtLevel(lvl) + "   DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * lvl).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * lvl).ToString("0.0"), "fr-small");
+            var equipped = UiKit.Text("Equipped: " + gs.ToolName(u2.tool) + "   DMG x" + gs.ToolDamage(u2.tool).ToString("0.0") + "   Yield x" + gs.ToolMultiplier(u2.tool).ToString("0.0"), "fr-small");
             equipped.style.marginTop = UiKit.Space.S8; equipped.style.marginBottom = UiKit.Space.S12;
             body.Add(equipped);
             for (int l = 0; l <= u2.maxLevel; l++)
@@ -369,7 +367,7 @@ namespace Frontier
                 top.Add(UiKit.Div("fr-spacer"));
                 top.Add(UiKit.Text(owned ? (l == lvl ? "EQUIPPED" : "OWNED") : next ? "NEXT" : "LOCKED", "fr-tiny", l == lvl ? UiKit.Lime : (Color?)null));
                 card.Add(top);
-                card.Add(UiKit.Text("DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * l).ToString("0.0") + "   Yield x" + (1f + u2.valuePerLevel * l).ToString("0.0") + "   Faster swing", "fr-tiny"));
+                card.Add(UiKit.Text("DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * l).ToString("0.0") + "   Yield x" + ((1f + u2.valuePerLevel * l) * gs.CatalogToolYieldMultiplier(u2.tool)).ToString("0.0") + "   Faster swing", "fr-tiny"));
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);
@@ -384,6 +382,7 @@ namespace Frontier
                 }
                 body.Add(card);
             }
+            BuildCatalogTools(body);
         }
 
         void BuildBases(VisualElement body)

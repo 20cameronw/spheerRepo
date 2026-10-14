@@ -259,8 +259,9 @@ namespace Frontier
             yield return new Shot("command-tools-axe", () => ui.DebugResearch(1, 0));
             yield return new Shot("command-tools-pick", () => ui.DebugResearch(1, 1));
             yield return new Shot("command-tools-drill", () => ui.DebugResearch(1, 2));
-            yield return new Shot("command-ship", () => ui.DebugResearch(2));
-            yield return new Shot("command-defense", () => ui.DebugResearch(3));
+            yield return new Shot("command-tech", () => ui.DebugResearch(2));
+            yield return new Shot("command-ship", () => ui.DebugResearch(2, 0, 1));
+            yield return new Shot("command-defense", () => ui.DebugResearch(2, 0, 2));
             yield return new Shot("pack", () => ui.DebugPack(-1));
             yield return new Shot("pack-selected", () => ui.DebugPack(0));
             yield return new Shot("menu", () => ui.DebugMenu(""));

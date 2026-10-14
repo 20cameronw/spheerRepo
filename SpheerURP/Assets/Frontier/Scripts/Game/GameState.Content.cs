@@ -20,10 +20,10 @@ namespace Frontier
             }
         }
 
-        // Research has no completion service yet. Atlas/discovery entries are NOT research grants.
         string GateReason(string research, int reach, int lab = 0)
         {
-            if (!string.IsNullOrEmpty(research)) return "Requires research: " + research.Replace('_', ' ');
+            if (!string.IsNullOrEmpty(research) && !IsResearched(research))
+                return "Requires research: " + research.Replace('_', ' ');
             if (reach > ReachTier) return "Reach planet tier " + reach;
             if (lab > 0)
             {

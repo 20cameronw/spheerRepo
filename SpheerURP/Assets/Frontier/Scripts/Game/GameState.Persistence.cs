@@ -108,6 +108,7 @@ namespace Frontier
             backpack.Clear();
             progression.Clear();
             world.Clear();
+            ClearProgressionContent();
             stats = new PlayerStats();
             wallet = new List<WalletEntry>();
             builders = new List<BuilderSlot>();
@@ -158,6 +159,7 @@ namespace Frontier
                 if (upgrade == null) { warnings.Add("dropped the unknown upgrade '" + u.id + "'"); continue; }
                 progression.SetUpgradeLevel(upgrade.id, u.level, upgrade.MaxLevel);
             }
+            LoadProgressionContent(save.player, warnings);
             foreach (var stack in save.player.inventory)
             {
                 if (!backpack.IsKnown(stack.resourceId)) { warnings.Add("dropped " + stack.count + " of the unknown resource '" + stack.resourceId + "'"); continue; }
@@ -199,6 +201,10 @@ namespace Frontier
             save.player.xp = progression.Xp;
             foreach (var kv in progression.Upgrades) save.player.upgrades.Add(new IdLevel { id = kv.Key, level = kv.Value });
             save.player.upgrades.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
+            save.player.researched.AddRange(new List<string>(ResearchedIds));
+            save.player.researched.Sort(StringComparer.Ordinal);
+            foreach (var kv in ToolTiers) save.player.toolTiers.Add(new IdLevel { id = kv.Key, level = kv.Value });
+            save.player.toolTiers.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
             foreach (var kv in backpack.Stacks) save.player.inventory.Add(new StackRecord { resourceId = kv.Key, count = kv.Value });
             save.player.inventory.Sort((a, b) => string.CompareOrdinal(a.resourceId, b.resourceId));
             save.location.currentPlanetId = planet.Id;

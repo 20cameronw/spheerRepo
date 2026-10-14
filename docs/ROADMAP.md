@@ -576,8 +576,9 @@ simulator puts a regular player in Settlement after about 3.6 days, Industry aft
 3x slower, hardcore about 4x faster) with no dead zones; the first session reaches a Warehouse at 0.3 min, the first fuel at 1.1 min and the first
 hop at 2.4 min. The validated export reader and idempotent importer now create 186 designer-editable ScriptableObject assets and 47 distinct
 content icons; see [CONTENT.md](CONTENT.md). The live default now uses a validated transient view of these assets with legacy fallback,
-canonical v1/v2 content-id remapping, rebound authored/combat references, exact station gates and cumulative effects. Legacy tool ownership
-is retained; unfinished research/structure/effect purchases stay locked.
+canonical v1/v2 content-id remapping, rebound authored/combat references, exact station gates and cumulative effects. Legacy tool ownership is retained; purchased research and supported Axe/Pick/Drill tool tiers now persist in v2 saves.
+Tool tiers apply their catalog yield multipliers to harvesting; research/reach/lab/resource gates are enforced at purchase
+and on dependent content. Unsupported tool minigames and unfinished structure/effect purchases stay locked.
 
 **Atlas UI vertical slice:** the Menu now opens a catalogue backed by the selected economy database. Resource entries show category, tier,
 stack size, catalog description, harvest method and habitat/minimum-tier rows, plus recipes that make or consume the item. Raw resources
@@ -586,8 +587,16 @@ limited to the current and visited worlds and links their resource entries; the 
 catalogue-only behavior) and configured aliens. Discovery silhouettes/rewards and persisted Atlas completion are intentionally not claimed:
 the save model does not track those discoveries yet.
 
-Next: persistent research/tool tiers/builders, jobs/timers, remaining structure behaviours, hazards, obstacles, shards, persisted Atlas
-discovery and rewards, and the remaining harvest games. This is not yet the full balanced progression loop.
+**Persistent progression slice:** Command now exposes branch-filtered research and catalog tool ladders. Research requires
+its authored prerequisites, reach tier, current-world Research Lab level and catalog resource costs; successful purchases
+unlock dependent content and survive save/load. Axe, Pick and Drill tiers can be bought and affect yield and tool feedback. Other tool ladders
+remain unavailable until their harvest games exist. The save schema remains v2 and older v2 saves default to no new purchases.
+The full EditMode suite (including Slow) passes 539 tests, with two runtime-specific allocation probes skipped; PlayMode passes 19,
+and all five editor checks pass. Progression coverage includes save/reload, invalid catalog entries and preserving progression data
+while the database temporarily falls back to legacy content.
+
+Next: builders/jobs/timers, remaining structure behaviours, hazards, obstacles, shards, persisted Atlas discovery and rewards,
+and the remaining harvest games. This is not yet the full balanced progression loop.
 
 **Runtime cutover validation (2026-10-13):** full EditMode including Slow 535 passed / 2 platform-specific allocation probes
 skipped; PlayMode 19 passed; economy lab 127 passed; all five editor checks passed with zero compile diagnostics. Original
