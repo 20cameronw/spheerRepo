@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 
@@ -130,6 +131,29 @@ namespace Frontier.Tests
             var placed = state.StructureAt(state.planet, 0);
             Assert.IsTrue(state.IsOperational(placed));
             Assert.AreEqual(0, state.BusyBuilderCount);
+        }
+
+        [Test]
+        public void ColonyHubAddsBuildersAtCatalogMilestonesAndStaysResearchGated()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported builder content is unavailable");
+            var state = new GameState(db, false, clock);
+            var hub = db.StructureOfKind(StructureKind.ColonyHub);
+            Assert.IsNotNull(hub);
+            Assert.IsTrue(hub.Implemented);
+
+            var tierThreeWorld = state.universe.FindGenerated(planet => planet.Tier >= 3, 1, 0, 10000);
+            Assert.IsNotNull(tierThreeWorld);
+            state.DebugTeleport(tierThreeWorld);
+            Assert.AreEqual("Requires research: colony charter", state.BuildLockReason(hub));
+
+            var placed = state.DebugPlace(hub, 0);
+            Assert.IsNotNull(placed);
+            int baseline = state.BuilderCount;
+            state.DebugSetStructureLevel(placed, 3);
+            Assert.AreEqual(Math.Min(db.shardRules.data.maxBuilders, baseline + 1), state.BuilderCount);
+            state.DebugSetStructureLevel(placed, 7);
+            Assert.AreEqual(Math.Min(db.shardRules.data.maxBuilders, baseline + 2), state.BuilderCount);
         }
 
         static void GiveAllResources(GameState state)

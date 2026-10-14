@@ -15,8 +15,7 @@ MonoBehaviour:
   lockedFields: []
   id: colony_hub
   displayName: Colony Hub
-  description: 'Grows the colony: extra builders at levels 3 and 7, and cheaper obstacle
-    clearing.'
+  description: Adds builder crews at levels 3 and 7. Obstacle clearing is planned for a later update.
   kind: 25
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
   modelKey: 

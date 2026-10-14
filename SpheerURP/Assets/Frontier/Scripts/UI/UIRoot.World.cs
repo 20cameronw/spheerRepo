@@ -133,6 +133,7 @@ namespace Frontier
             if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
+            else if (k == StructureKind.ColonyHub) OpenColonyHub(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
@@ -205,6 +206,20 @@ namespace Frontier
             {
                 StructureHeader(body, s, c, "Research and tool upgrades");
                 body.Add(UiKit.Text("Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced research.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
+        void OpenColonyHub(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("colonyhub" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Builder crew capacity");
+                int bonus = Mathf.Max(0, Mathf.RoundToInt(s.def.EffectAt(s.level)));
+                body.Add(UiKit.Text("Hub bonus: +" + bonus + " crew  ·  Colony total: " + gs.BuilderCount + "/" +
+                    gs.db.shardRules.data.maxBuilders, "fr-small"));
+                body.Add(UiKit.Text("Hub upgrades add crews at levels 3 and 7. Obstacle-clearing discounts are not active yet.", "fr-tiny"));
                 UpgradeButton(body, s, c);
             });
         }
