@@ -371,6 +371,7 @@ namespace Frontier
             yield return new Shot("gen-colossal-popup", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.Gunner)); }, 0.3f);
             yield return new Shot("map-generated", () => { GoTo(FindWorld(ColossalSpec)); ui.DebugMap(null, 2f); }, 0.8f);
             yield return new Shot("menu-debug-teleport", () => ui.DebugMenu("debug", true), 0.5f);
+            yield return new Shot("popup-radartower", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.RadarTower)); }, 0.3f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.
             if (showcaseWorld != null)
@@ -425,9 +426,9 @@ namespace Frontier
             {
                 StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm,
                 StructureKind.Gunner, StructureKind.Laser, StructureKind.Warehouse, StructureKind.Gunner, StructureKind.Laser, StructureKind.Satellite,
-                StructureKind.Gunner, StructureKind.Warehouse, StructureKind.Laser, StructureKind.Gunner
+                StructureKind.Gunner, StructureKind.Warehouse, StructureKind.Laser, StructureKind.Gunner, StructureKind.RadarTower
             };
-            int[] slots = { 0, 4, 9, 13, 18, 22, 27, 31, 36, 40, 45, 49, 54, 58, 61, 63 };
+            int[] slots = { 0, 4, 9, 13, 18, 22, 27, 31, 36, 40, 45, 49, 54, 58, 61, 63, 62 };
             for (int i = 0; i < kinds.Length; i++)
             {
                 var def = db.StructureOfKind(kinds[i]);

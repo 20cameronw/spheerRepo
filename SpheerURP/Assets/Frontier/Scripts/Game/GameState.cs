@@ -335,6 +335,13 @@ namespace Frontier
             return s.def.effectKind == "yieldBonus" || s.def.effectKind == "waveRewardBonus" ? s.def.EffectAt(s.level) : 0f;
         }
 
+        public float RadarRangeBonus(PlanetData p)
+        {
+            var radar = p == null ? null : StructureOfKind(p, StructureKind.RadarTower);
+            return radar != null && radar.def.effectKind == "surveyRadiusBonusLy" ?
+                Mathf.Max(0f, radar.def.EffectAt(radar.level)) : 0f;
+        }
+
         public float AlarmBonus(PlanetData p)
         {
             return 1f + StructureBonus(StructureOfKind(p, StructureKind.Alarm));

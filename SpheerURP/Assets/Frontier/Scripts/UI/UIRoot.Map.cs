@@ -30,11 +30,12 @@ namespace Frontier
         Task<RoutePlan> mapPreviewTask;
         RoutePlan mapPreview;
         readonly List<StarSystem> surveyCenters = new List<StarSystem>();
+        readonly List<double> surveyRadii = new List<double>();
         readonly List<PlanetData> mapPlanets = new List<PlanetData>();
         readonly List<Label> mapLabels = new List<Label>();
         readonly List<Rect> mapLabelBounds = new List<Rect>();
         string mapResource = "";
-        double mapSurveyRadius, mapJumpRange;
+        double mapJumpRange;
         readonly List<string> mapResourceIds = new List<string>();
 
         void OpenMap()
@@ -44,15 +45,32 @@ namespace Frontier
             ClosePopup(); CloseModal(); ExitBuild();
             mapOpen = true; selected = gs.planet; mapAutopilot = false; mapResource = ""; mapZoom = 2f;
             surveyCenters.Clear();
-            var seen = new HashSet<SystemKey>();
+            surveyRadii.Clear();
+            var centerIndices = new Dictionary<SystemKey, int>();
             foreach (var record in gs.world.All)
             {
                 PlanetKey key;
                 StarSystem star;
-                if (record.visits > 0 && PlanetKey.TryParse(record.planetId, out key) && seen.Add(key.System) && gs.universe.Universe.TryGetSystem(key.System, out star))
+                if (record.visits <= 0 || !PlanetKey.TryParse(record.planetId, out key) ||
+                    !gs.universe.Universe.TryGetSystem(key.System, out star)) continue;
+                PlanetData visited = gs.universe.Get(record.planetId);
+                double radius = gs.ScannerRangeLy + gs.RadarRangeBonus(visited);
+                int index;
+                if (!centerIndices.TryGetValue(key.System, out index))
+                {
+                    centerIndices.Add(key.System, surveyCenters.Count);
                     surveyCenters.Add(star);
+                    surveyRadii.Add(radius);
+                }
+                else surveyRadii[index] = Math.Max(surveyRadii[index], radius);
             }
-            if (seen.Add(gs.planet.Star.Key)) surveyCenters.Add(gs.planet.Star);
+            int currentIndex;
+            if (!centerIndices.TryGetValue(gs.planet.Star.Key, out currentIndex))
+            {
+                surveyCenters.Add(gs.planet.Star);
+                surveyRadii.Add(gs.ScannerRangeLy + gs.RadarRangeBonus(gs.planet));
+            }
+            else surveyRadii[currentIndex] = Math.Max(surveyRadii[currentIndex], gs.ScannerRangeLy + gs.RadarRangeBonus(gs.planet));
             mapView = UiKit.Div("fr-map");
             mapLayer.Add(mapView);
             mapWorld = UiKit.Div("fr-map-viewport");
@@ -203,11 +221,11 @@ namespace Frontier
         bool Surveyed(StarSystem star)
         {
             if (star.IsAuthored) return true;
-            double radius = mapSurveyRadius;
-            foreach (var center in surveyCenters)
+            for (int i = 0; i < surveyCenters.Count; i++)
             {
+                var center = surveyCenters[i];
                 double dx = star.X - center.X, dy = star.Y - center.Y;
-                if (dx * dx + dy * dy <= radius * radius) return true;
+                if (dx * dx + dy * dy <= surveyRadii[i] * surveyRadii[i]) return true;
             }
             return false;
         }
@@ -243,7 +261,6 @@ namespace Frontier
         {
             mapPreview = null; previewVersion++;
             var caps = gs.Ship;
-            mapSurveyRadius = gs.Rules.ScannerRangeLy(caps);
             mapJumpRange = gs.Rules.JumpRangeLy(caps);
         }
 

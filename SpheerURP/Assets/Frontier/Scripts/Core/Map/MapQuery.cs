@@ -13,6 +13,17 @@ namespace Frontier
         { this.x = x; this.y = y; this.width = width; this.height = height; this.density = density; }
     }
 
+    public readonly struct MapSurveyPoint
+    {
+        public readonly double x, y, radius;
+        public MapSurveyPoint(double x, double y, double radius)
+        {
+            this.x = x;
+            this.y = y;
+            this.radius = Math.Max(0, radius);
+        }
+    }
+
     public sealed class MapSnapshot
     {
         public MapDensityCell[] density;
@@ -38,7 +49,25 @@ namespace Frontier
             return false;
         }
 
+        public static bool Surveyed(StarSystem star, MapSurveyPoint[] centers)
+        {
+            if (star.IsAuthored) return true;
+            foreach (var center in centers)
+            {
+                double dx = star.X - center.x, dy = star.Y - center.y;
+                if (dx * dx + dy * dy <= center.radius * center.radius) return true;
+            }
+            return false;
+        }
+
         public static MapSnapshot Build(Uni universe, double x0, double y0, double x1, double y1, string resource, MapPoint[] centers, double surveyRadius)
+        {
+            var points = new MapSurveyPoint[centers.Length];
+            for (int i = 0; i < points.Length; i++) points[i] = new MapSurveyPoint(centers[i].x, centers[i].y, surveyRadius);
+            return Build(universe, x0, y0, x1, y1, resource, points);
+        }
+
+        public static MapSnapshot Build(Uni universe, double x0, double y0, double x1, double y1, string resource, MapSurveyPoint[] centers)
         {
             double width = x1 - x0, height = y1 - y0;
             var result = new MapSnapshot { density = new MapDensityCell[Columns * Rows] };
@@ -61,7 +90,7 @@ namespace Frontier
             if (!string.IsNullOrEmpty(resource))
                 systems.RemoveAll(star =>
                 {
-                    if (!Surveyed(star, centers, surveyRadius)) return true;
+                    if (!Surveyed(star, centers)) return true;
                     foreach (var world in universe.PlanetsOf(star)) if (world.HasResource(resource)) return false;
                     return true;
                 });

@@ -109,6 +109,7 @@ namespace Frontier
                 case StructureKind.Fabricator:
                 case StructureKind.Warehouse:
                 case StructureKind.ResearchLab:
+                case StructureKind.RadarTower:
                 case StructureKind.ColonyHub:
                     return true;
                 default:

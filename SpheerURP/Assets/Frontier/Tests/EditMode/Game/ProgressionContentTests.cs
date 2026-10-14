@@ -91,6 +91,35 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void RadarTower_ExtendsSurveyRangeAfterConstructionCompletes()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported structure catalog is unavailable");
+            var state = new GameState(db, false, clock);
+            var towerDef = db.StructureOfKind(StructureKind.RadarTower);
+            Assert.IsNotNull(towerDef);
+            Assert.IsTrue(towerDef.Implemented, "radar tower is a supported structure behavior");
+
+            var tierOneWorld = state.universe.FindGenerated(planet => planet.Tier >= 1, 1, 0, 10000);
+            Assert.IsNotNull(tierOneWorld);
+            state.DebugTeleport(tierOneWorld);
+            GiveMaterials(state);
+            PlaceResearchLab(state);
+
+            var surveyBasics = db.research.FirstOrDefault(node => node != null && node.data != null && node.data.id == "survey_basics");
+            Assert.IsNotNull(surveyBasics);
+            Assert.IsTrue(state.Research(surveyBasics), state.ResearchLockReason(surveyBasics));
+            Assert.IsNull(state.BuildLockReason(towerDef), state.BuildLockReason(towerDef));
+            Assert.IsTrue(state.Place(towerDef, 1));
+            var tower = state.StructureAt(state.planet, 1);
+            Assert.AreEqual(0, state.RadarRangeBonus(state.planet), "construction should not grant scan range early");
+
+            clock.Advance(state.StructureJobSeconds(towerDef, 1));
+            state.Tick();
+            Assert.IsTrue(state.IsOperational(tower));
+            Assert.AreEqual(towerDef.EffectAt(1), state.RadarRangeBonus(state.planet), 0.001f);
+        }
+
+        [Test]
         public void SupportedToolTierPurchase_ChangesHarvestYieldAndSurvivesSaveLoad()
         {
             var state = new GameState(db, false);

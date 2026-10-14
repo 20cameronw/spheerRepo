@@ -50,5 +50,15 @@ namespace Frontier.Tests
             Assert.IsTrue(MapQuery.Surveyed(star, new[] { new MapPoint(star.X, star.Y) }, 40));
             Assert.IsFalse(MapQuery.Surveyed(star, new[] { new MapPoint(star.X + 41, star.Y) }, 40));
         }
+
+        [Test]
+        public void SurveyRadius_UsesTowerCoverageAtItsVisitedSystem()
+        {
+            var star = universe.SystemsInRect(-200, -200, 200, 200)[0];
+            var center = new[] { new MapSurveyPoint(star.X - 50, star.Y, 60) };
+            Assert.IsTrue(MapQuery.Surveyed(star, center));
+            center[0] = new MapSurveyPoint(star.X - 50, star.Y, 49);
+            Assert.IsFalse(MapQuery.Surveyed(star, center));
+        }
     }
 }

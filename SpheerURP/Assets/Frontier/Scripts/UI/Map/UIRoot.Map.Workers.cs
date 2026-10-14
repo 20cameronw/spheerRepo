@@ -6,10 +6,11 @@ namespace Frontier
 {
     public partial class UIRoot
     {
-        MapPoint[] SurveyPoints()
+        MapSurveyPoint[] SurveyPoints()
         {
-            var points = new MapPoint[surveyCenters.Count];
-            for (int i = 0; i < points.Length; i++) points[i] = new MapPoint(surveyCenters[i].X, surveyCenters[i].Y);
+            var points = new MapSurveyPoint[surveyCenters.Count];
+            for (int i = 0; i < points.Length; i++)
+                points[i] = new MapSurveyPoint(surveyCenters[i].X, surveyCenters[i].Y, surveyRadii[i]);
             return points;
         }
 
@@ -34,9 +35,8 @@ namespace Frontier
                 MapPoint a = viewport.Unproject(0, viewport.Height), b = viewport.Unproject(viewport.Width, 0);
                 var universe = gs.universe.Universe;
                 var points = SurveyPoints();
-                double radius = gs.ScannerRangeLy;
                 string resource = mapResource;
-                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, radius));
+                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points));
             }
             if (mapPreviewTask != null && mapPreviewTask.IsCompleted)
             {

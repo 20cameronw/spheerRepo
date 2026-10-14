@@ -133,6 +133,7 @@ namespace Frontier
             if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
+            else if (k == StructureKind.RadarTower) OpenRadarTower(s, t);
             else if (k == StructureKind.ColonyHub) OpenColonyHub(s, t);
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
@@ -220,6 +221,20 @@ namespace Frontier
                 body.Add(UiKit.Text("Hub bonus: +" + bonus + " crew  ·  Colony total: " + gs.BuilderCount + "/" +
                     gs.db.shardRules.data.maxBuilders, "fr-small"));
                 body.Add(UiKit.Text("Hub upgrades add crews at levels 3 and 7. Obstacle-clearing discounts are not active yet.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
+        void OpenRadarTower(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("radartower" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Expands local survey coverage");
+                float bonus = gs.RadarRangeBonus(gs.planet);
+                body.Add(UiKit.Text("Coverage around this system: " + (gs.ScannerRangeLy + bonus).ToString("0") + " ly  (+" +
+                    bonus.ToString("0") + " ly from tower)", "fr-small"));
+                body.Add(UiKit.Text("Reveals additional systems and their resource deposits on the star map.", "fr-tiny"));
                 UpgradeButton(body, s, c);
             });
         }
