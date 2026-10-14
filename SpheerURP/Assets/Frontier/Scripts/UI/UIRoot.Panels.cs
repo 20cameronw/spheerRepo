@@ -542,6 +542,40 @@ namespace Frontier
             }
             else detail.Add(UiKit.Text("Tap an item to see its details.", "fr-muted"));
             body.Add(detail);
+            var salvage = gs.ObstacleRewardsOn(gs.planet);
+            if (salvage.Count > 0)
+            {
+                body.Add(SectionLabel("RECOVERED SURFACE SALVAGE"));
+                foreach (var reward in salvage)
+                {
+                    ResourceSO resource = gs.db.FindResource(reward.resourceId);
+                    if (resource == null) continue;
+                    var row = UiKit.Div("fr-row");
+                    row.AddToClassList("fr-popup-line");
+                    row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconLg));
+                    var text = UiKit.Div("fr-card-text");
+                    text.Add(UiKit.Text(resource.displayName, "fr-small"));
+                    text.Add(UiKit.Text(reward.amount + " waiting on " + gs.planet.Name, "fr-tiny"));
+                    row.Add(text);
+                    int pad = reward.pad;
+                    var claim = IconBtn("CLAIM", "pack", UiKit.Amber, () =>
+                    {
+                        if (gs.ClaimObstacleReward(gs.planet, pad))
+                        {
+                            Sfx.Good();
+                            Toast("Surface salvage added to backpack", UiKit.Lime);
+                        }
+                        else
+                        {
+                            Sfx.Bad();
+                            Toast("Make room in your backpack to claim salvage", UiKit.Red);
+                        }
+                    });
+                    UiKit.SetEnabledLook(claim, gs.FreeSpace(resource) > 0);
+                    row.Add(claim);
+                    body.Add(row);
+                }
+            }
             body.Add(UiKit.Text("Upgrade the backpack in Command > Research for more slots.", "fr-tiny"));
         }
 

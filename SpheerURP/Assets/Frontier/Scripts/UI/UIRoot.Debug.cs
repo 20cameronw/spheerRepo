@@ -138,6 +138,12 @@ namespace Frontier
             world.SimulateTap(s);
         }
 
+        public bool DebugTapObstacle(int pad)
+        {
+            DebugReset();
+            return world.SimulateObstacleTap(pad);
+        }
+
         // ------------------------------------------------------------ icon contact sheets
         static readonly Color SheetInk = new Color(0.92f, 0.96f, 1f);
         static readonly float[] SheetPx = { 24f, 32f, 48f, 64f };

@@ -96,6 +96,7 @@ namespace Frontier
             defense.WaveEnded += OnWaveEnded;
             world.StructureTapped += OnStructureTapped;
             world.SlotTapped += OnSlotTapped;
+            world.ObstacleTapped += OnObstacleTapped;
             OnStateChanged();
         }
 
@@ -114,6 +115,7 @@ namespace Frontier
             {
                 world.StructureTapped -= OnStructureTapped;
                 world.SlotTapped -= OnSlotTapped;
+                world.ObstacleTapped -= OnObstacleTapped;
             }
         }
 
@@ -282,6 +284,7 @@ namespace Frontier
 
             UpdatePopupPosition();
             RefreshBuilderStatus();
+            RefreshObstacleStatus();
             UpdateMapInput();
         }
 

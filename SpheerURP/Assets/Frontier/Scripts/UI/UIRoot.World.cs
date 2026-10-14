@@ -17,6 +17,10 @@ namespace Frontier
         PlacedStructure jobPopupStructure;
         Label jobStatusLabel;
         float nextJobStatusRefresh;
+        int obstaclePopupPad = -1;
+        Label obstacleStatusLabel, obstacleSkipButtonText;
+        Button obstacleSkipButton;
+        float nextObstacleStatusRefresh;
 
         StructureSO buildDef;
         VisualElement banner;
@@ -62,6 +66,7 @@ namespace Frontier
             popup = null; popupAnchor = null; popupBuild = null; popupKey = null;
             popupScroll = null;
             jobPopupStructure = null; jobStatusLabel = null;
+            obstaclePopupPad = -1; obstacleStatusLabel = null; obstacleSkipButtonText = null; obstacleSkipButton = null;
             if (planetView != null) planetView.Frozen = false;
             if (world != null) world.Selected = null;
         }
@@ -72,6 +77,25 @@ namespace Frontier
             nextJobStatusRefresh = Time.unscaledTime + 1f;
             jobStatusLabel.text = gs.BuilderJobStatus(jobPopupStructure);
             if (string.IsNullOrEmpty(jobStatusLabel.text)) jobStatusLabel.text = "READY";
+        }
+
+        void RefreshObstacleStatus()
+        {
+            if (obstaclePopupPad < 0 || obstacleStatusLabel == null || Time.unscaledTime < nextObstacleStatusRefresh) return;
+            nextObstacleStatusRefresh = Time.unscaledTime + 1f;
+            int remaining = gs.ObstacleClearSecondsRemaining(obstaclePopupPad);
+            obstacleStatusLabel.text = remaining > 0 ? "CLEARING  ·  " + FormatJobDuration(remaining) : "CLEARANCE COMPLETING";
+            if (obstacleSkipButton == null) return;
+            int cost = gs.ObstacleSkipCost(obstaclePopupPad);
+            if (obstacleSkipButtonText != null) obstacleSkipButtonText.text = "SKIP  ·  " + cost + " SHARDS";
+            UiKit.SetEnabledLook(obstacleSkipButton, gs.ShardBalance >= cost);
+        }
+
+        static string FormatJobDuration(int seconds)
+        {
+            if (seconds >= 3600) return (seconds / 3600) + "h " + (seconds % 3600 / 60).ToString("00") + "m";
+            if (seconds >= 60) return (seconds / 60) + "m " + (seconds % 60).ToString("00") + "s";
+            return seconds + "s";
         }
 
         void RefreshPopup()
@@ -139,6 +163,77 @@ namespace Frontier
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
             else OpenSimple(s, t, "STRUCTURE OFFLINE", s.def.displayName + " gameplay is planned for a future update.");
+        }
+
+        void OnObstacleTapped(int pad, Transform t)
+        {
+            if (busy || defense.Active) return;
+            if (buildDef != null) ExitBuild();
+            var obstacle = gs.ObstacleAt(gs.planet, pad);
+            if (!obstacle.HasValue) return;
+            CloseModal();
+            var kind = gs.ObstacleKind(obstacle.Value);
+            Color accent = UiKit.Amber;
+            OpenPopup("obstacle-" + gs.planet.Id + "-" + pad, t, accent, body =>
+            {
+                body.Add(UiKit.Text(kind != null ? kind.displayName.ToUpperInvariant() : "SURFACE OBSTRUCTION", "fr-h2"));
+                if (kind != null && !string.IsNullOrEmpty(kind.description))
+                    body.Add(UiKit.Text(kind.description, "fr-tiny"));
+                body.Add(SectionLabel("CLEARANCE COST"));
+                var cost = gs.ObstacleClearCost(gs.planet, pad);
+                body.Add(cost.Count == 0 ? UiKit.Text("No materials required", "fr-small") : UiKit.CostRow(cost, gs, true));
+
+                body.Add(SectionLabel("RECOVERABLE SALVAGE"));
+                ResourceSO salvage = gs.db.FindResource(obstacle.Value.reward.resourceId);
+                var rewards = UiKit.Div("fr-row-wrap");
+                if (salvage != null) rewards.Add(ResourceIconChip(salvage, obstacle.Value.reward.amount + " " + salvage.displayName));
+                rewards.Add(UiKit.Chip("star", UiKit.Magenta, obstacle.Value.xp + " XP"));
+                if (obstacle.Value.podShards > 0)
+                    rewards.Add(UiKit.Chip("star", UiKit.Magenta, "+" + obstacle.Value.podShards + " shards"));
+                body.Add(rewards);
+
+                int remaining = gs.ObstacleClearSecondsRemaining(pad);
+                if (remaining > 0)
+                {
+                    obstacleStatusLabel = UiKit.Text("CLEARING  ·  " + FormatJobDuration(remaining), "fr-small", UiKit.Cyan);
+                    body.Add(obstacleStatusLabel);
+                    body.Add(UiKit.Text("Clearance continues while you explore. Timers use local device time.", "fr-tiny"));
+                    int skipCost = gs.ObstacleSkipCost(pad);
+                    obstacleSkipButton = IconBtn("SKIP  ·  " + skipCost + " SHARDS", "bolt", UiKit.Magenta, () =>
+                    {
+                        if (gs.SkipObstacleClear(pad)) { Sfx.Good(); Toast("Obstruction cleared", UiKit.Lime); }
+                        else { Sfx.Bad(); Toast("Not enough shards to finish clearance", UiKit.Red); }
+                    });
+                    obstacleSkipButtonText = obstacleSkipButton.Q<Label>(className: "fr-btn-label");
+                    UiKit.SetEnabledLook(obstacleSkipButton, gs.ShardBalance >= skipCost);
+                    body.Add(obstacleSkipButton);
+                }
+                else
+                {
+                    string locked = gs.ObstacleClearLockReason(pad);
+                    if (!string.IsNullOrEmpty(locked))
+                        body.Add(Note(locked, UiKit.Amber));
+                    var clear = IconBtn(obstacle.Value.seconds <= 0 ? "CLEAR NOW" : "ASSIGN CLEARANCE",
+                        "build", UiKit.Amber, () =>
+                        {
+                            if (gs.StartObstacleClear(pad))
+                            {
+                                if (gs.ObstacleClearSecondsRemaining(pad) == 0)
+                                    Toast("Obstruction cleared", UiKit.Lime);
+                                else Toast("Clearance crew assigned", UiKit.Cyan);
+                                Sfx.Good();
+                            }
+                            else
+                            {
+                                Sfx.Bad();
+                                Toast(gs.ObstacleClearLockReason(pad) ?? "Clearance could not start", UiKit.Red);
+                            }
+                        }, true, gs.ObstacleClearLockReason(pad) == null);
+                    UiKit.SetEnabledLook(clear, gs.ObstacleClearLockReason(pad) == null);
+                    body.Add(clear);
+                }
+            });
+            obstaclePopupPad = pad;
         }
 
         void StructureHeader(VisualElement body, PlacedStructure s, Color c, string subtitle = null)

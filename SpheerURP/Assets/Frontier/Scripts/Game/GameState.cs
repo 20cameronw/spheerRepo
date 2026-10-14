@@ -276,7 +276,8 @@ namespace Frontier
         {
             int used = 0;
             foreach (var s in structures) if (s.planetId == p.Id && s.slot >= 0 && s.slot < p.BuildingSlots) used++;
-            return Mathf.Max(0, p.BuildingSlots - used);
+            int blocked = ObstaclesOn(p).Count;
+            return Mathf.Max(0, p.BuildingSlots - used - blocked);
         }
 
         public List<GatherSpot> SpotsFor(PlanetData p, MinigameKind game) { return p.SpotsFor(game); }
@@ -294,7 +295,8 @@ namespace Frontier
             if (CompleteBuilderJobs()) Notify();
             int seconds = StructureJobSeconds(def, 1);
             if (slot < 0 || slot >= planet.BuildingSlots || AtLimit(planet, def) || !CanBuildHere(def) ||
-                StructureAt(planet, slot) != null || (seconds > 0 && AvailableBuilderCount <= 0) ||
+                StructureAt(planet, slot) != null || ObstacleAt(planet, slot).HasValue ||
+                (seconds > 0 && AvailableBuilderCount <= 0) ||
                 !SpendQuietly(def.buildCost)) return false;
             var record = world.Place(planet.Id, def.id, slot);
             if (record == null) return false;

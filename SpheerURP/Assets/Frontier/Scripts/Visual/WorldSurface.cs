@@ -17,6 +17,7 @@ namespace Frontier
 
         public event Action<PlacedStructure, Transform> StructureTapped;
         public event Action<int, Transform> SlotTapped;
+        public event Action<int, Transform> ObstacleTapped;
 
         public Func<Vector2, bool> IsOverUi;
         public bool Locked;
@@ -32,7 +33,9 @@ namespace Frontier
         Vector3[] dirs;
         readonly List<Item> items = new List<Item>();
         readonly List<Item> pads = new List<Item>();
+        readonly List<Item> obstacles = new List<Item>();
         string signature = "";
+        string obstacleSignature = "";
         static Font font;
         static Shader litShader;
         Material outlineMaterial;
@@ -42,6 +45,7 @@ namespace Frontier
             public Transform t;
             public Transform label;
             public PlacedStructure structure;
+            public bool obstacle;
             public int slot;
             public float phase;
             public Transform glow;
@@ -94,8 +98,10 @@ namespace Frontier
                 if (structure.planetId == p.Id) count = Mathf.Max(count, structure.slot + 1);
             dirs = SlotDirections(count);
             signature = null;
+            obstacleSignature = null;
             ClearAll();
             RebuildStructures();
+            RebuildObstacles();
             RebuildPads();
         }
 
@@ -133,6 +139,7 @@ namespace Frontier
             // and the new world may have buildings on pads that layout does not have.
             if (view.Current == null || view.Current.Id != gs.planet.Id) return;
             RebuildStructures();
+            RebuildObstacles();
             if (buildMode) RebuildPads();
         }
 
@@ -140,7 +147,9 @@ namespace Frontier
         {
             foreach (var i in items) DestroyItem(i);
             foreach (var i in pads) if (i.t != null) Destroy(i.t.gameObject);
-            items.Clear(); pads.Clear();
+            foreach (var i in obstacles) DestroyItem(i);
+            items.Clear(); pads.Clear(); obstacles.Clear();
+            obstacleSignature = null;
         }
 
         void DestroyItem(Item item)
@@ -175,9 +184,11 @@ namespace Frontier
             foreach (var p in pads) if (p.t != null) Destroy(p.t.gameObject);
             pads.Clear();
             if (!buildMode || view == null || view.Spin == null) return;
+            var blocked = new HashSet<int>();
+            foreach (var obstacle in gs.ObstaclesOn(gs.planet)) blocked.Add(obstacle.pad);
             for (int i = 0; i < SlotCount; i++)
             {
-                if (SlotOccupied(i)) continue;
+                if (SlotOccupied(i) || blocked.Contains(i)) continue;
                 var it = NewItem(i, "Pad");
                 it.phase = i;
                 var ring = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -191,6 +202,21 @@ namespace Frontier
                 it.label = MakeLabel(it.t, "+", new Color(0.4f, 1f, 1f), 0.6f, 0.55f, out it.labelRenderer);
                 pads.Add(it);
             }
+        }
+
+        void RebuildObstacles()
+        {
+            if (view == null || view.Spin == null || gs == null) return;
+            var generated = gs.ObstaclesOn(gs.planet);
+            var sb = new StringBuilder(gs.planet.Id);
+            foreach (var obstacle in generated) sb.Append('|').Append(obstacle.pad).Append(':').Append(obstacle.kind);
+            string sig = sb.ToString();
+            if (sig == obstacleSignature) return;
+            obstacleSignature = sig;
+            foreach (var item in obstacles) DestroyItem(item);
+            obstacles.Clear();
+            foreach (var obstacle in generated)
+                obstacles.Add(MakeObstacle(obstacle));
         }
 
         Item NewItem(int slot, string name)
@@ -241,6 +267,51 @@ namespace Frontier
             it.phase = s.slot * 0.4f;
             it.orbit = s.def.kind == StructureKind.Satellite;
             return it;
+        }
+
+        Item MakeObstacle(Frontier.Economy.ObstacleInstance obstacle)
+        {
+            var it = NewItem(obstacle.pad, "Obstacle_" + obstacle.pad);
+            it.obstacle = true;
+            var kind = gs.ObstacleKind(obstacle);
+            Transform model = kind != null ? SpawnModel(gs.db.obstacleKinds[obstacle.kind].modelKey, it.t, 0.72f) : null;
+            if (model == null) BuildFallbackObstacle(it.t, obstacle.kind, it.materials);
+            var ring = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(ring.GetComponent<Collider>());
+            ring.transform.SetParent(it.t, false);
+            ring.transform.localPosition = new Vector3(0f, 0.16f, 0f);
+            ring.transform.localScale = Vector3.one * 0.86f;
+            ring.GetComponent<MeshRenderer>().sharedMaterial = Fx.AddMat(new Color(2.2f, 0.72f, 0.12f, 1f), Fx.Ring);
+            ring.AddComponent<Billboard>();
+            it.glow = Fx.GlowQuad(it.t, new Color(1f, 0.32f, 0.04f, 0.36f), 1.15f, new Vector3(0f, 0.16f, 0f)).transform;
+            it.phase = obstacle.pad * 0.31f;
+            return it;
+        }
+
+        static void BuildFallbackObstacle(Transform parent, int kind, List<Material> materials)
+        {
+            Color[] palettes =
+            {
+                new Color(0.38f, 0.42f, 0.5f), new Color(0.31f, 0.2f, 0.13f),
+                new Color(0.25f, 0.58f, 0.52f), new Color(0.48f, 0.35f, 0.57f),
+                new Color(0.6f, 0.3f, 0.2f), new Color(0.45f, 0.52f, 0.56f)
+            };
+            Color baseColor = palettes[Mathf.Abs(kind) % palettes.Length];
+            var body = Lit(baseColor);
+            var trim = Lit(Color.Lerp(baseColor, new Color(0.8f, 0.72f, 0.55f), 0.3f));
+            materials.Add(body);
+            materials.Add(trim);
+            for (int i = 0; i < 4; i++)
+            {
+                float angle = i * 90f + (kind % 5) * 13f;
+                float x = Mathf.Cos(angle * Mathf.Deg2Rad) * (0.16f + (i % 2) * 0.08f);
+                float z = Mathf.Sin(angle * Mathf.Deg2Rad) * (0.12f + (i % 2) * 0.08f);
+                Transform shard = Prim(parent, i % 2 == 0 ? PrimitiveType.Sphere : PrimitiveType.Cube,
+                    new Vector3(x, 0.14f + (i % 3) * 0.06f, z),
+                    new Vector3(0.25f + (i % 2) * 0.08f, 0.22f + (i % 3) * 0.05f, 0.24f), i % 2 == 0 ? body : trim,
+                    new Vector3(i * 17f, angle, i * 29f));
+                shard.name = "Debris";
+            }
         }
 
         void PrepareStructure(Item item, Color color)
@@ -475,6 +546,7 @@ namespace Frontier
             }
             AnimateItems(items);
             AnimateItems(pads);
+            AnimateItems(obstacles);
             HandleInput();
         }
 
@@ -547,6 +619,7 @@ namespace Frontier
             Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
             foreach (var h in hits)
             {
+                foreach (var it in obstacles) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
                 foreach (var it in pads) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
                 foreach (var it in items) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
             }
@@ -554,7 +627,7 @@ namespace Frontier
             // Generous screen-space fallback: anything visible near the tap counts.
             float best = 95f * Mathf.Max(0.6f, ScreenMetrics.Height / 1080f);
             Item pick = null;
-            foreach (var list in new[] { items, pads })
+            foreach (var list in new[] { items, pads, obstacles })
                 foreach (var it in list)
                 {
                     if (it.t == null) continue;
@@ -571,6 +644,7 @@ namespace Frontier
         {
             Sfx.Click();
             if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
+            else if (it.obstacle) { if (ObstacleTapped != null) ObstacleTapped(it.slot, it.t); }
             else if (SlotTapped != null) SlotTapped(it.slot, it.t);
         }
 
@@ -579,6 +653,14 @@ namespace Frontier
         {
             foreach (var it in items)
                 if (it.structure == structure && it.t != null) { Tap(it); return true; }
+            return false;
+        }
+
+        /// <summary>Taps a visible obstruction exactly as a finger would (harness and tests).</summary>
+        public bool SimulateObstacleTap(int pad)
+        {
+            foreach (var it in obstacles)
+                if (it.slot == pad && it.t != null) { Tap(it); return true; }
             return false;
         }
     }

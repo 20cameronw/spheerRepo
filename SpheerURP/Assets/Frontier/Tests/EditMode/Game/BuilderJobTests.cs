@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
@@ -154,6 +155,76 @@ namespace Frontier.Tests
             Assert.AreEqual(Math.Min(db.shardRules.data.maxBuilders, baseline + 1), state.BuilderCount);
             state.DebugSetStructureLevel(placed, 7);
             Assert.AreEqual(Math.Min(db.shardRules.data.maxBuilders, baseline + 2), state.BuilderCount);
+        }
+
+        [Test]
+        public void ObstacleClearJobsRecoverAndPayXpOnce_OverflowSalvageCanBeClaimed()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported obstacle content is unavailable");
+            var state = new GameState(db, false, clock);
+            GiveAllResources(state);
+            PlanetData target = state.universe.FindGenerated(p => p.Tier > 0 &&
+                state.ObstaclesOn(state.universe.Get(p)).Any(o => o.seconds > 0), 1, 0, 10000);
+            Assert.IsNotNull(target, "the generated universe contains timed surface obstructions");
+            state.DebugTeleport(target);
+            var obstacle = state.ObstaclesOn(target).First(o => o.seconds > 0);
+            int duration = obstacle.seconds;
+            int originalXp = state.xp;
+            Assert.IsTrue(state.StartObstacleClear(obstacle.pad));
+            Assert.AreEqual(1, state.BusyBuilderCount);
+            Assert.AreEqual(0, state.AvailableBuilderCount);
+            Assert.IsFalse(state.Place(db.StructureOfKind(StructureKind.Refinery), obstacle.pad),
+                "a structure cannot be placed on a pad until its obstruction is removed");
+            Assert.IsTrue(state.Save());
+
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(1, loaded.BusyBuilderCount, "the crew is restored with the paid job");
+            clock.Advance(duration);
+            loaded.Tick();
+            Assert.IsNull(loaded.ObstacleAt(target, obstacle.pad));
+            Assert.AreEqual(originalXp + obstacle.xp, loaded.xp);
+            Assert.AreEqual(0, loaded.BusyBuilderCount);
+            Assert.AreEqual(1, loaded.ObstacleRewardsOn(target).Count,
+                "backpack overflow is retained as a claimable planet reward");
+            int shards = loaded.ShardBalance;
+            loaded.Tick();
+            Assert.AreEqual(originalXp + obstacle.xp, loaded.xp, "repeated ticks never pay the same obstacle twice");
+            Assert.AreEqual(shards, loaded.ShardBalance, "pod shards are paid at most once");
+            Assert.IsTrue(loaded.Save());
+
+            var restored = new GameState(db, true, clock);
+            Assert.AreEqual(1, restored.ObstacleRewardsOn(target).Count, "overflow survives save/load");
+            restored.backpack.Clear();
+            Assert.IsTrue(restored.ClaimObstacleReward(target, obstacle.pad));
+            Assert.AreEqual(obstacle.reward.amount, restored.Count(db.FindResource(obstacle.reward.resourceId)));
+            Assert.AreEqual(0, restored.ObstacleRewardsOn(target).Count);
+        }
+
+        [Test]
+        public void ObstacleTimerCanBeSkippedWithPersistedShards()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported obstacle content is unavailable");
+            var state = new GameState(db, false, clock);
+            GiveAllResources(state);
+            PlanetData target = state.universe.FindGenerated(p => p.Tier >= 4 &&
+                state.ObstaclesOn(state.universe.Get(p)).Any(o => o.seconds > 60), 1, 0, 10000);
+            Assert.IsNotNull(target, "the generated universe contains a skippable clearance timer");
+            state.DebugTeleport(target);
+            Assert.IsTrue(state.Save());
+
+            SaveV2 save = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(sandbox.SaveFile)).Normalize();
+            save.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+            File.WriteAllText(sandbox.SaveFile, SaveSerializer.Instance.Serialize(save));
+            var loaded = new GameState(db, true, clock);
+            var obstacle = loaded.ObstaclesOn(target).First(o => o.seconds > 60);
+            Assert.IsTrue(loaded.StartObstacleClear(obstacle.pad));
+            int before = loaded.ShardBalance;
+            int price = loaded.ObstacleSkipCost(obstacle.pad);
+            Assert.Greater(price, 0);
+            Assert.IsTrue(loaded.SkipObstacleClear(obstacle.pad));
+            Assert.AreEqual(before - price, loaded.ShardBalance);
+            Assert.IsNull(loaded.ObstacleAt(target, obstacle.pad));
+            Assert.AreEqual(0, loaded.BusyBuilderCount);
         }
 
         static void GiveAllResources(GameState state)

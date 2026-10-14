@@ -31,9 +31,7 @@ namespace Frontier
                 int busy = 0;
                 foreach (var slot in builders)
                 {
-                    var record = slot == null ? null : FindBuilderTarget(slot.target);
-                    if (record != null && IsMatchingBuilderJob(slot, record) &&
-                        UtcText.TryParse(slot.busyUntilUtc, out var end) && end > clock.UtcNow) busy++;
+                    if (IsActiveBuilderSlot(slot)) busy++;
                 }
                 return busy;
             }
@@ -128,9 +126,7 @@ namespace Frontier
                 bool inUse = false;
                 foreach (var slot in builders)
                 {
-                    var record = slot == null ? null : FindBuilderTarget(slot.target);
-                    if (slot != null && slot.slotId == id && record != null && IsMatchingBuilderJob(slot, record) &&
-                        UtcText.TryParse(slot.busyUntilUtc, out var end) && end > clock.UtcNow) { inUse = true; break; }
+                    if (slot != null && slot.slotId == id && IsActiveBuilderSlot(slot)) { inUse = true; break; }
                 }
                 if (!inUse) return id;
             }
@@ -139,12 +135,12 @@ namespace Frontier
 
         bool CompleteBuilderJobs()
         {
-            if (builders == null || builders.Count == 0) return false;
             bool changed = false;
-            for (int i = builders.Count - 1; i >= 0; i--)
+            for (int i = builders == null ? -1 : builders.Count - 1; i >= 0; i--)
             {
                 var slot = builders[i];
                 if (slot == null) continue;
+                if (IsObstacleBuilderTarget(slot.target)) continue;
                 StructureRecord record = FindBuilderTarget(slot.target);
                 if (record == null) continue;
                 bool isBuild = record.buildEndUtc == slot.busyUntilUtc && !string.IsNullOrEmpty(record.buildEndUtc);
@@ -182,6 +178,7 @@ namespace Frontier
                 builders.RemoveAt(i);
                 changed = true;
             }
+            if (CompleteObstacleJobs()) changed = true;
             return changed;
         }
 
@@ -246,6 +243,26 @@ namespace Frontier
                         busyUntilUtc = timestamp
                     });
                 }
+                for (int i = delta.obstacleJobs.Count - 1; i >= 0; i--)
+                {
+                    ObstacleJobRecord job = delta.obstacleJobs[i];
+                    string target = ObstacleBuilderTarget(delta.planetId, job.pad);
+                    matched.Add(target);
+                    if (!UtcText.TryParse(job.endUtc, out var end))
+                    {
+                        warnings.Add("cleared an invalid obstacle timer for pad " + job.pad + " on " + delta.planetId);
+                        delta.obstacleJobs.RemoveAt(i);
+                        changed = true;
+                        continue;
+                    }
+                    if (end <= now) continue;
+                    recovered.Add(new BuilderSlot
+                    {
+                        slotId = "builder-" + (recovered.Count + 1).ToString(CultureInfo.InvariantCulture),
+                        target = target,
+                        busyUntilUtc = job.endUtc
+                    });
+                }
             }
 
             foreach (var saved in savedSlots)
@@ -260,6 +277,28 @@ namespace Frontier
             return planetId + "#" + slot.ToString(CultureInfo.InvariantCulture);
         }
 
+        static string ObstacleBuilderTarget(string planetId, int pad)
+        {
+            return planetId + "#obstacle#" + pad.ToString(CultureInfo.InvariantCulture);
+        }
+
+        static bool IsObstacleBuilderTarget(string target)
+        {
+            return !string.IsNullOrEmpty(target) && target.LastIndexOf("#obstacle#", StringComparison.Ordinal) > 0;
+        }
+
+        bool IsActiveBuilderSlot(BuilderSlot slot)
+        {
+            if (slot == null || !UtcText.TryParse(slot.busyUntilUtc, out var end) || end <= clock.UtcNow) return false;
+            if (IsObstacleBuilderTarget(slot.target))
+            {
+                var job = FindObstacleBuilderTarget(slot.target);
+                return job != null && job.endUtc == slot.busyUntilUtc;
+            }
+            var record = FindBuilderTarget(slot.target);
+            return record != null && IsMatchingBuilderJob(slot, record);
+        }
+
         StructureRecord FindBuilderTarget(string target)
         {
             if (string.IsNullOrEmpty(target)) return null;
@@ -268,6 +307,17 @@ namespace Frontier
                     CultureInfo.InvariantCulture, out int slot)) return null;
             string planetId = target.Substring(0, separator);
             return world.StructureAt(planetId, slot);
+        }
+
+        ObstacleJobRecord FindObstacleBuilderTarget(string target)
+        {
+            if (!IsObstacleBuilderTarget(target)) return null;
+            int separator = target.LastIndexOf("#obstacle#", StringComparison.Ordinal);
+            if (!int.TryParse(target.Substring(separator + 10), NumberStyles.None, CultureInfo.InvariantCulture, out int pad)) return null;
+            string planetId = target.Substring(0, separator);
+            if (!world.TryGet(planetId, out var delta)) return null;
+            foreach (var job in delta.obstacleJobs) if (job.pad == pad) return job;
+            return null;
         }
 
         static bool IsMatchingBuilderJob(BuilderSlot slot, StructureRecord record)

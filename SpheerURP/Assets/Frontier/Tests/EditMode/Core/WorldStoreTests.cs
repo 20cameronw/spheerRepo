@@ -151,6 +151,53 @@ namespace Frontier.Tests
             Assert.IsFalse(store.Remove(Home, s));
             Assert.AreEqual(0, store.TotalStructures);
         }
+
+        [Test]
+        public void ObstacleJobsAndSalvage_AreNormalizedPersistedAndMergedByPad()
+        {
+            var store = new WorldStore();
+            store.Import(new[]
+            {
+                new PlanetDelta
+                {
+                    planetId = Home,
+                    obstacleJobs = new List<ObstacleJobRecord>
+                    {
+                        new ObstacleJobRecord { pad = 7, endUtc = "2026-10-13T21:00:00.0000000Z" },
+                        new ObstacleJobRecord { pad = 7, endUtc = "duplicate" },
+                        new ObstacleJobRecord { pad = -1, endUtc = "invalid" }
+                    },
+                    obstacleRewards = new List<ObstacleRewardRecord>
+                    {
+                        new ObstacleRewardRecord { pad = 7, resourceId = "wood", amount = 3 },
+                        new ObstacleRewardRecord { pad = 7, resourceId = "wood", amount = 9 },
+                        new ObstacleRewardRecord { pad = 8, resourceId = "wood", amount = 0 }
+                    }
+                },
+                new PlanetDelta
+                {
+                    planetId = Home,
+                    clearedObstacles = new List<int> { 9 },
+                    obstacleJobs = new List<ObstacleJobRecord>
+                    {
+                        new ObstacleJobRecord { pad = 7, endUtc = "later" },
+                        new ObstacleJobRecord { pad = 9, endUtc = "stale" }
+                    },
+                    obstacleRewards = new List<ObstacleRewardRecord> { new ObstacleRewardRecord { pad = 7, resourceId = "stone", amount = 4 } }
+                }
+            });
+
+            var delta = store.Get(Home);
+            Assert.AreEqual(1, delta.obstacleJobs.Count);
+            Assert.AreEqual(7, delta.obstacleJobs[0].pad, "a cleared pad cannot regain a stale timer during duplicate-delta merge");
+            Assert.AreEqual("2026-10-13T21:00:00.0000000Z", delta.obstacleJobs[0].endUtc);
+            Assert.AreEqual(1, delta.obstacleRewards.Count);
+            Assert.AreEqual("wood", delta.obstacleRewards[0].resourceId);
+            var exported = store.Export();
+            Assert.AreEqual(1, exported.Count);
+            Assert.AreEqual(1, exported[0].obstacleJobs.Count);
+            Assert.AreEqual(1, exported[0].obstacleRewards.Count);
+        }
     }
 
     /// <summary>Warehouse drag rules (the semantics FrontierStorageChecks and StorageTests assert on the live game), engine free.</summary>

@@ -353,7 +353,8 @@ namespace Frontier.Tests
             Assert.IsFalse(state.Place(db.StructureOfKind(StructureKind.Alarm), -1));
             Assert.IsFalse(state.Place(db.StructureOfKind(StructureKind.Alarm), state.planet.BuildingSlots), "out of range");
             Assert.AreEqual(1, state.CountOnPlanet(state.planet, refinery));
-            Assert.AreEqual(state.planet.BuildingSlots - 1, state.FreePads(state.planet));
+            Assert.AreEqual(state.planet.BuildingSlots - 1 - state.ObstaclesOn(state.planet).Count, state.FreePads(state.planet),
+                "generated obstructions are not advertised as available build pads");
         }
 
         [Test]

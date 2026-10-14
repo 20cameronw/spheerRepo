@@ -38,6 +38,23 @@ namespace Frontier
         public int pendingUpgradeLevel;
     }
 
+    /// <summary>A paid obstacle removal job. Its generated cost and reward are derived from the planet seed and pad.</summary>
+    [Serializable]
+    public class ObstacleJobRecord
+    {
+        public int pad;
+        public string endUtc = "";
+    }
+
+    /// <summary>Salvage overflow that did not fit in the backpack when an obstacle was cleared.</summary>
+    [Serializable]
+    public class ObstacleRewardRecord
+    {
+        public int pad;
+        public string resourceId;
+        public int amount;
+    }
+
     /// <summary>
     /// Everything the player changed on one planet. A planet is identified by its canonical universe id ("p:X:Y:I:P"). Planets the
     /// player never touched have no delta at all: the world itself is regenerated from the universe seed.
@@ -53,12 +70,18 @@ namespace Frontier
         public string firstVisitUtc = "";
         public string lastVisitUtc = "";
         public bool discovered;
-        /// <summary>Reserved: indices of obstacles the player has cleared on this planet.</summary>
+        /// <summary>Indices of deterministic obstacles the player has cleared on this planet.</summary>
         public List<int> clearedObstacles = new List<int>();
+        public List<ObstacleJobRecord> obstacleJobs = new List<ObstacleJobRecord>();
+        public List<ObstacleRewardRecord> obstacleRewards = new List<ObstacleRewardRecord>();
 
         public bool HasContent
         {
-            get { return structures.Count > 0 || storages.Count > 0 || wavesCleared > 0 || visits > 0 || discovered || clearedObstacles.Count > 0; }
+            get
+            {
+                return structures.Count > 0 || storages.Count > 0 || wavesCleared > 0 || visits > 0 || discovered ||
+                    clearedObstacles.Count > 0 || obstacleJobs.Count > 0 || obstacleRewards.Count > 0;
+            }
         }
     }
 
@@ -292,6 +315,8 @@ namespace Frontier
             if (d.structures == null) d.structures = new List<StructureRecord>();
             if (d.storages == null) d.storages = new List<StorageRecord>();
             if (d.clearedObstacles == null) d.clearedObstacles = new List<int>();
+            if (d.obstacleJobs == null) d.obstacleJobs = new List<ObstacleJobRecord>();
+            if (d.obstacleRewards == null) d.obstacleRewards = new List<ObstacleRewardRecord>();
             if (d.firstVisitUtc == null) d.firstVisitUtc = "";
             if (d.lastVisitUtc == null) d.lastVisitUtc = "";
             d.structures.RemoveAll(s => s == null || string.IsNullOrEmpty(s.defId) || s.slot < 0);
@@ -312,6 +337,17 @@ namespace Frontier
                 for (int i = 0; i < storage.slots.Count; i++)
                     if (storage.slots[i] == null) storage.slots[i] = new StackRecord();
             }
+            d.clearedObstacles.RemoveAll(pad => pad < 0);
+            var seenCleared = new HashSet<int>();
+            d.clearedObstacles.RemoveAll(pad => !seenCleared.Add(pad));
+            d.obstacleJobs.RemoveAll(job => job == null || job.pad < 0);
+            var seenJobs = new HashSet<int>();
+            d.obstacleJobs.RemoveAll(job => d.clearedObstacles.Contains(job.pad) || !seenJobs.Add(job.pad));
+            foreach (var job in d.obstacleJobs) if (job.endUtc == null) job.endUtc = "";
+            d.obstacleRewards.RemoveAll(reward => reward == null || reward.pad < 0 ||
+                string.IsNullOrEmpty(reward.resourceId) || reward.amount <= 0);
+            var seenRewards = new HashSet<int>();
+            d.obstacleRewards.RemoveAll(reward => !seenRewards.Add(reward.pad));
             if (d.visits < 0) d.visits = 0;
             if (d.wavesCleared < 0) d.wavesCleared = 0;
         }
@@ -336,6 +372,20 @@ namespace Frontier
             if (string.IsNullOrEmpty(into.firstVisitUtc)) into.firstVisitUtc = other.firstVisitUtc;
             if (string.IsNullOrEmpty(into.lastVisitUtc)) into.lastVisitUtc = other.lastVisitUtc;
             foreach (int o in other.clearedObstacles) if (!into.clearedObstacles.Contains(o)) into.clearedObstacles.Add(o);
+            into.obstacleJobs.RemoveAll(job => into.clearedObstacles.Contains(job.pad));
+            foreach (var job in other.obstacleJobs)
+            {
+                if (into.clearedObstacles.Contains(job.pad)) continue;
+                bool exists = false;
+                foreach (var current in into.obstacleJobs) if (current.pad == job.pad) { exists = true; break; }
+                if (!exists) into.obstacleJobs.Add(job);
+            }
+            foreach (var reward in other.obstacleRewards)
+            {
+                bool exists = false;
+                foreach (var current in into.obstacleRewards) if (current.pad == reward.pad) { exists = true; break; }
+                if (!exists) into.obstacleRewards.Add(reward);
+            }
         }
     }
 }
