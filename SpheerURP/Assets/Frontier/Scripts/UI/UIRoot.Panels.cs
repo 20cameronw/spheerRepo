@@ -338,30 +338,52 @@ namespace Frontier
             ConsentPreferences saved = services.Consent.Current;
             bool analyticsAllowed = saved.hasDecision && saved.analyticsAllowed;
             bool adsAllowed = saved.hasDecision && saved.adsAllowed;
+            bool onlineServicesAllowed = saved.hasDecision && saved.onlineServicesAllowed;
 
             body.Add(SectionLabel("PRIVACY"));
             body.Add(UiKit.Text(
-                services.Analytics.IsConfigured || services.Ads.IsConfigured
-                    ? "Analytics and rewarded ads are optional. Changes save immediately and can be withdrawn at any time."
-                    : "Optional data services are not configured in this build. Changes save locally and gate future initialization.",
+                "Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. These services are not configured in this build. Changes save locally and gate initialization.",
                 "fr-muted"));
 
-            var analytics = new Toggle("Allow gameplay analytics") { value = analyticsAllowed };
-            analytics.AddToClassList("fr-consent-toggle");
-            analytics.style.minHeight = UiKit.Size.Touch;
-            body.Add(analytics);
-            var ads = new Toggle("Allow rewarded ads") { value = adsAllowed };
-            ads.AddToClassList("fr-consent-toggle");
-            ads.style.minHeight = UiKit.Size.Touch;
-            body.Add(ads);
-
-            analytics.RegisterValueChangedCallback(e => SaveConsentPreferences(e.newValue, ads.value));
-            ads.RegisterValueChangedCallback(e => SaveConsentPreferences(analytics.value, e.newValue));
+            ConsentChoice(body, "Gameplay analytics", analyticsAllowed, value =>
+            {
+                analyticsAllowed = value;
+                SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
+            });
+            ConsentChoice(body, "Rewarded ads", adsAllowed, value =>
+            {
+                adsAllowed = value;
+                SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
+            });
+            ConsentChoice(body, "Online account, leaderboard and cloud features", onlineServicesAllowed, value =>
+            {
+                onlineServicesAllowed = value;
+                SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
+            });
         }
 
-        void SaveConsentPreferences(bool analyticsAllowed, bool adsAllowed)
+        static void ConsentChoice(VisualElement body, string label, bool initialValue, Action<bool> onChanged)
         {
-            services.Consent.SavePreferences(analyticsAllowed, adsAllowed);
+            bool value = initialValue;
+            var button = new Button();
+            button.AddToClassList("fr-consent-choice");
+            button.Add(UiKit.Text(label, "fr-small"));
+            var state = UiKit.Text(value ? "ON" : "OFF", "fr-consent-choice-state");
+            state.style.color = value ? UiKit.Lime : UiKit.Muted;
+            button.Add(state);
+            button.clicked += () =>
+            {
+                value = !value;
+                state.text = value ? "ON" : "OFF";
+                state.style.color = value ? UiKit.Lime : UiKit.Muted;
+                onChanged(value);
+            };
+            body.Add(button);
+        }
+
+        void SaveConsentPreferences(bool analyticsAllowed, bool adsAllowed, bool onlineServicesAllowed)
+        {
+            services.Consent.SavePreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
             Sfx.Good();
             Toast("Privacy choice saved on this device", UiKit.Cyan);
         }

@@ -212,14 +212,17 @@ namespace Frontier.Services
         public readonly bool hasDecision;
         public readonly bool analyticsAllowed;
         public readonly bool adsAllowed;
+        public readonly bool onlineServicesAllowed;
         public readonly long decisionUtcTicks;
 
-        public ConsentPreferences(int policyVersion, bool hasDecision, bool analyticsAllowed, bool adsAllowed, long decisionUtcTicks)
+        public ConsentPreferences(int policyVersion, bool hasDecision, bool analyticsAllowed, bool adsAllowed,
+            bool onlineServicesAllowed, long decisionUtcTicks)
         {
             this.policyVersion = Math.Max(0, policyVersion);
             this.hasDecision = hasDecision;
             this.analyticsAllowed = hasDecision && analyticsAllowed;
             this.adsAllowed = hasDecision && adsAllowed;
+            this.onlineServicesAllowed = hasDecision && onlineServicesAllowed;
             this.decisionUtcTicks = Math.Max(0, decisionUtcTicks);
         }
     }
@@ -233,13 +236,13 @@ namespace Frontier.Services
     public interface IConsentService
     {
         ConsentPreferences Current { get; }
-        void SavePreferences(bool analyticsAllowed, bool adsAllowed);
+        void SavePreferences(bool analyticsAllowed, bool adsAllowed, bool onlineServicesAllowed);
         void Reset();
     }
 
     public sealed class ConsentService : IConsentService
     {
-        public const int CurrentPolicyVersion = 1;
+        public const int CurrentPolicyVersion = 2;
 
         readonly IConsentStore store;
         readonly Func<DateTimeOffset> utcNow;
@@ -253,21 +256,21 @@ namespace Frontier.Services
             var saved = store.Load();
             current = saved.hasDecision && saved.policyVersion == CurrentPolicyVersion
                 ? saved
-                : new ConsentPreferences(CurrentPolicyVersion, false, false, false, 0);
+                : new ConsentPreferences(CurrentPolicyVersion, false, false, false, false, 0);
         }
 
         public ConsentPreferences Current { get { return current; } }
 
-        public void SavePreferences(bool analyticsAllowed, bool adsAllowed)
+        public void SavePreferences(bool analyticsAllowed, bool adsAllowed, bool onlineServicesAllowed)
         {
-            current = new ConsentPreferences(CurrentPolicyVersion, true, analyticsAllowed, adsAllowed,
+            current = new ConsentPreferences(CurrentPolicyVersion, true, analyticsAllowed, adsAllowed, onlineServicesAllowed,
                 utcNow().UtcDateTime.Ticks);
             store.Save(current);
         }
 
         public void Reset()
         {
-            current = new ConsentPreferences(CurrentPolicyVersion, false, false, false, 0);
+            current = new ConsentPreferences(CurrentPolicyVersion, false, false, false, false, 0);
             store.Save(current);
         }
     }
@@ -332,6 +335,118 @@ namespace Frontier.Services
         }
     }
 
+    sealed class ConsentGatedAuthenticationService : IAuthService
+    {
+        readonly IAuthService inner;
+        readonly IConsentService consent;
+
+        public ConsentGatedAuthenticationService(IAuthService inner, IConsentService consent)
+        {
+            this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            this.consent = consent ?? throw new ArgumentNullException(nameof(consent));
+        }
+
+        public bool IsConfigured { get { return inner.IsConfigured; } }
+
+        public Task<ServiceResult> InitializeAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.InitializeAsync()
+                : Task.FromResult(ServiceResult.ConsentRequired("online account services"));
+        }
+
+        public Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.SignInAnonymouslyAsync()
+                : Task.FromResult(ServiceResult<AuthIdentity>.ConsentRequired("online account services"));
+        }
+
+        public Task<ServiceResult> DeleteAccountAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.DeleteAccountAsync()
+                : Task.FromResult(ServiceResult.ConsentRequired("online account services"));
+        }
+    }
+
+    sealed class ConsentGatedLeaderboardService : ILeaderboardService
+    {
+        readonly ILeaderboardService inner;
+        readonly IConsentService consent;
+
+        public ConsentGatedLeaderboardService(ILeaderboardService inner, IConsentService consent)
+        {
+            this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            this.consent = consent ?? throw new ArgumentNullException(nameof(consent));
+        }
+
+        public bool IsConfigured { get { return inner.IsConfigured; } }
+
+        public Task<ServiceResult> InitializeAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.InitializeAsync()
+                : Task.FromResult(ServiceResult.ConsentRequired("online leaderboards"));
+        }
+
+        public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
+        {
+            if (!consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
+                return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.ConsentRequired("online leaderboards"));
+            if (string.IsNullOrWhiteSpace(boardId) || limit < 1)
+                return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.InvalidRequest(
+                    "A leaderboard ID and positive result limit are required."));
+            return inner.GetScoresAsync(boardId, limit);
+        }
+
+        public Task<ServiceResult> SubmitScoreAsync(string boardId, long score)
+        {
+            if (!consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
+                return Task.FromResult(ServiceResult.ConsentRequired("online leaderboards"));
+            if (string.IsNullOrWhiteSpace(boardId) || score < 0)
+                return Task.FromResult(ServiceResult.InvalidRequest("A leaderboard ID and non-negative score are required."));
+            return inner.SubmitScoreAsync(boardId, score);
+        }
+    }
+
+    sealed class ConsentGatedCloudSaveService : ICloudSaveService
+    {
+        readonly ICloudSaveService inner;
+        readonly IConsentService consent;
+
+        public ConsentGatedCloudSaveService(ICloudSaveService inner, IConsentService consent)
+        {
+            this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            this.consent = consent ?? throw new ArgumentNullException(nameof(consent));
+        }
+
+        public bool IsConfigured { get { return inner.IsConfigured; } }
+
+        public Task<ServiceResult> InitializeAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.InitializeAsync()
+                : Task.FromResult(ServiceResult.ConsentRequired("cloud saves"));
+        }
+
+        public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.ReadAsync()
+                : Task.FromResult(ServiceResult<CloudSaveRecord>.ConsentRequired("cloud saves"));
+        }
+
+        public Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
+        {
+            if (!consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.ConsentRequired("cloud saves"));
+            if (payload == null)
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.InvalidRequest("A cloud-save payload is required."));
+            return inner.WriteAsync(payload, writeLock);
+        }
+    }
+
     public sealed class UnavailableFrontierProvider : IAdsService, IPurchaseService, IAuthService,
         ILeaderboardService, ICloudSaveService, IAnalyticsService, IRemoteConfigService, INotificationService
     {
@@ -393,9 +508,9 @@ namespace Frontier.Services
             Consent = consent ?? throw new ArgumentNullException(nameof(consent));
             Ads = new ConsentGatedAdsService(ads, consent);
             Purchases = purchases ?? throw new ArgumentNullException(nameof(purchases));
-            Authentication = authentication ?? throw new ArgumentNullException(nameof(authentication));
-            Leaderboards = leaderboards ?? throw new ArgumentNullException(nameof(leaderboards));
-            CloudSave = cloudSave ?? throw new ArgumentNullException(nameof(cloudSave));
+            Authentication = new ConsentGatedAuthenticationService(authentication, consent);
+            Leaderboards = new ConsentGatedLeaderboardService(leaderboards, consent);
+            CloudSave = new ConsentGatedCloudSaveService(cloudSave, consent);
             Analytics = new ConsentGatedAnalyticsService(analytics, consent);
             RemoteConfig = remoteConfig ?? throw new ArgumentNullException(nameof(remoteConfig));
             Time = time ?? throw new ArgumentNullException(nameof(time));

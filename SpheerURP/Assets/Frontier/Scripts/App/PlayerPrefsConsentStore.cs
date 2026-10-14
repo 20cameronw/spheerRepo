@@ -10,6 +10,7 @@ namespace Frontier
         const string HasDecisionKey = "fr_consent_decided";
         const string AnalyticsKey = "fr_consent_analytics";
         const string AdsKey = "fr_consent_ads";
+        const string OnlineServicesKey = "fr_consent_online_services";
         const string DecisionUtcTicksKey = "fr_consent_utc_ticks";
 
         public ConsentPreferences Load()
@@ -23,6 +24,7 @@ namespace Frontier
                 PlayerPrefs.GetInt(HasDecisionKey, 0) == 1,
                 PlayerPrefs.GetInt(AnalyticsKey, 0) == 1,
                 PlayerPrefs.GetInt(AdsKey, 0) == 1,
+                PlayerPrefs.GetInt(OnlineServicesKey, 0) == 1,
                 ticks);
         }
 
@@ -32,6 +34,7 @@ namespace Frontier
             PlayerPrefs.SetInt(HasDecisionKey, preferences.hasDecision ? 1 : 0);
             PlayerPrefs.SetInt(AnalyticsKey, preferences.analyticsAllowed ? 1 : 0);
             PlayerPrefs.SetInt(AdsKey, preferences.adsAllowed ? 1 : 0);
+            PlayerPrefs.SetInt(OnlineServicesKey, preferences.onlineServicesAllowed ? 1 : 0);
             PlayerPrefs.SetString(DecisionUtcTicksKey, preferences.decisionUtcTicks.ToString(CultureInfo.InvariantCulture));
             PlayerPrefs.Save();
         }
