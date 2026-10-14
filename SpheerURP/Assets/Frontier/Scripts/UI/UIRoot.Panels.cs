@@ -453,39 +453,53 @@ namespace Frontier
 
         bool accountRecoveryBusy;
         string accountRecoveryStatus;
+        bool cloudSaveBusy;
+        bool cloudSaveChecked;
+        bool cloudBackupConfirm;
+        bool cloudRestoreConfirm;
+        bool localRestoreConfirm;
+        bool cloudSaveStatusIsError;
+        string cloudSaveStatus;
+        CloudSaveRecord cloudRecord;
+        SaveV2 localCloudSnapshot;
+        SaveV2 cloudSnapshot;
 
         void BuildAccountRecoverySettings(VisualElement body, bool onlineServicesAllowed)
         {
             body.Add(SectionLabel("SAVE RECOVERY"));
             body.Add(UiKit.Text(
-                "Protect this device's save with Apple Sign-In on iPhone or Google Play Games on Android. Signing in on another device never replaces its local save; cloud restore remains a separate, explicit step.",
+                "Protect this device's save with Apple Sign-In on iPhone or Google Play Games on Android. Signing in never replaces local progress; cloud copies are compared and moved only when you choose.",
                 "fr-muted"));
 
             if (!onlineServicesAllowed)
             {
                 body.Add(UiKit.Text("Enable online account features above to manage save recovery.", "fr-small"));
+                if (!string.IsNullOrEmpty(cloudSaveStatus))
+                    body.Add(UiKit.Text(cloudSaveStatus, "fr-small",
+                        cloudSaveStatusIsError ? UiKit.Amber : UiKit.Cyan));
+                BuildLocalRestoreBackupSettings(body);
                 return;
             }
 
-            if (!services.Authentication.CanRecoverAccount)
+            if (services.Authentication.CanRecoverAccount)
             {
-                body.Add(UiKit.Text("Save recovery is not enabled or configured for this build.", "fr-small"));
-                return;
+                body.Add(UiKit.Text("Provider: " + services.Authentication.RecoveryProviderName, "fr-small"));
+                if (!string.IsNullOrEmpty(accountRecoveryStatus))
+                    body.Add(UiKit.Text(accountRecoveryStatus, "fr-small"));
+
+                var protect = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "PROTECT THIS SAVE",
+                    "about", UiKit.Cyan, ProtectCurrentSave);
+                UiKit.SetEnabledLook(protect, !accountRecoveryBusy);
+                body.Add(protect);
+
+                var recover = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "SIGN IN TO RECOVER",
+                    "about", UiKit.Magenta, SignInToRecoverSave);
+                UiKit.SetEnabledLook(recover, !accountRecoveryBusy);
+                body.Add(recover);
             }
+            else body.Add(UiKit.Text("Account recovery is not enabled for this build.", "fr-small"));
 
-            body.Add(UiKit.Text("Provider: " + services.Authentication.RecoveryProviderName, "fr-small"));
-            if (!string.IsNullOrEmpty(accountRecoveryStatus))
-                body.Add(UiKit.Text(accountRecoveryStatus, "fr-small"));
-
-            var protect = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "PROTECT THIS SAVE",
-                "about", UiKit.Cyan, ProtectCurrentSave);
-            UiKit.SetEnabledLook(protect, !accountRecoveryBusy);
-            body.Add(protect);
-
-            var recover = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "SIGN IN TO RECOVER",
-                "about", UiKit.Magenta, SignInToRecoverSave);
-            UiKit.SetEnabledLook(recover, !accountRecoveryBusy);
-            body.Add(recover);
+            BuildCloudSaveSettings(body);
         }
 
         async void ProtectCurrentSave()
@@ -538,6 +552,341 @@ namespace Frontier
         {
             accountRecoveryBusy = false;
             accountRecoveryStatus = message;
+            cloudSaveChecked = false;
+            cloudBackupConfirm = false;
+            cloudRestoreConfirm = false;
+            RefreshModal();
+        }
+
+        void BuildCloudSaveSettings(VisualElement body)
+        {
+            body.Add(SectionLabel("CLOUD SAVE"));
+            body.Add(UiKit.Text(
+                "No automatic upload or restore. Compare both snapshots, then choose which direction to move data. Replacing a save requires a second confirmation; the local snapshot replaced by a restore stays on this device for undo.",
+                "fr-muted"));
+
+            if (!string.IsNullOrEmpty(cloudSaveStatus))
+                body.Add(UiKit.Text(cloudSaveStatus, "fr-small",
+                    cloudSaveStatusIsError ? UiKit.Amber : UiKit.Cyan));
+
+            if (!services.CloudSave.IsConfigured)
+            {
+                body.Add(UiKit.Text("Cloud Save is disabled or not configured for this build.", "fr-small"));
+                BuildLocalRestoreBackupSettings(body);
+                return;
+            }
+
+            var compare = IconBtn(cloudSaveBusy ? "CHECKING..." : "COMPARE DEVICE AND CLOUD",
+                "map", UiKit.Cyan, CompareCloudSave);
+            UiKit.SetEnabledLook(compare, !cloudSaveBusy);
+            body.Add(compare);
+
+            if (cloudSaveChecked)
+            {
+                if (localCloudSnapshot != null)
+                    body.Add(UiKit.Text("THIS DEVICE  ·  " + CloudSaveSummary(localCloudSnapshot), "fr-small"));
+
+                if (!cloudRecord.hasValue)
+                {
+                    body.Add(UiKit.Text("CLOUD  ·  No save exists for this account yet.", "fr-small"));
+                    if (localCloudSnapshot != null)
+                    {
+                        var create = IconBtn(cloudSaveBusy ? "SAVING..." :
+                                cloudBackupConfirm ? "TAP AGAIN TO CREATE CLOUD COPY" : "CREATE CLOUD COPY",
+                            "about", cloudBackupConfirm ? UiKit.Amber : UiKit.Cyan, RequestCloudBackup);
+                        UiKit.SetEnabledLook(create, !cloudSaveBusy);
+                        body.Add(create);
+                    }
+                }
+                else if (cloudSnapshot == null)
+                {
+                    body.Add(UiKit.Text("CLOUD  ·  The stored copy could not be validated and was not changed.", "fr-small", UiKit.Amber));
+                }
+                else
+                {
+                    body.Add(UiKit.Text("CLOUD  ·  " + CloudSaveSummary(cloudSnapshot), "fr-small"));
+                    string relation = localCloudSnapshot != null &&
+                        localCloudSnapshot.saveId == cloudSnapshot.saveId &&
+                        localCloudSnapshot.revision == cloudSnapshot.revision
+                        ? "These snapshots have the same save ID and revision."
+                        : "These are different snapshots. Revision alone cannot determine which has the right progress.";
+                    body.Add(UiKit.Text(relation, "fr-small", UiKit.Amber));
+
+                    bool safeCloudVersion = gs.CanRestoreCloudSaveSnapshot(cloudSnapshot, out string compatibilityMessage);
+                    if (localCloudSnapshot != null && safeCloudVersion)
+                    {
+                        var backup = IconBtn(cloudBackupConfirm
+                                ? "TAP AGAIN TO REPLACE CLOUD SAVE"
+                                : "BACK UP THIS DEVICE TO CLOUD",
+                            "about", cloudBackupConfirm ? UiKit.Amber : UiKit.Cyan, RequestCloudBackup);
+                        UiKit.SetEnabledLook(backup, !cloudSaveBusy);
+                        body.Add(backup);
+                    }
+                    else if (!safeCloudVersion)
+                        body.Add(UiKit.Text(compatibilityMessage, "fr-small", UiKit.Amber));
+
+                    if (safeCloudVersion)
+                    {
+                        var restore = IconBtn(cloudRestoreConfirm
+                                ? "TAP AGAIN TO RESTORE CLOUD SAVE"
+                                : "RESTORE CLOUD SAVE TO THIS DEVICE",
+                            "back", cloudRestoreConfirm ? UiKit.Red : UiKit.Magenta, RequestCloudRestore);
+                        UiKit.SetEnabledLook(restore, !cloudSaveBusy);
+                        body.Add(restore);
+                    }
+                }
+            }
+
+            BuildLocalRestoreBackupSettings(body);
+        }
+
+        void BuildLocalRestoreBackupSettings(VisualElement body)
+        {
+            if (!gs.HasCloudRestoreBackup) return;
+            body.Add(UiKit.Text("A previous device save is retained locally after a cloud restore.", "fr-small"));
+            var undo = IconBtn(localRestoreConfirm
+                    ? "TAP AGAIN TO RESTORE PREVIOUS DEVICE SAVE"
+                    : "UNDO CLOUD RESTORE",
+                "back", localRestoreConfirm ? UiKit.Red : UiKit.Muted, RequestLocalRestore);
+            UiKit.SetEnabledLook(undo, !cloudSaveBusy);
+            body.Add(undo);
+        }
+
+        static string CloudSaveSummary(SaveV2 save)
+        {
+            return "XP " + save.player.xp + "  ·  " + save.worlds.Count + " worlds  ·  revision " +
+                save.revision + "  ·  current world " +
+                (string.IsNullOrEmpty(save.location.currentPlanetId) ? "unknown" : save.location.currentPlanetId);
+        }
+
+        async void CompareCloudSave()
+        {
+            if (cloudSaveBusy || services == null) return;
+            cloudSaveBusy = true;
+            cloudSaveStatus = "Writing the latest device snapshot, then reading the cloud copy...";
+            cloudSaveStatusIsError = false;
+            cloudBackupConfirm = false;
+            cloudRestoreConfirm = false;
+            cloudSaveChecked = false;
+            RefreshModal();
+
+            try
+            {
+                if (!gs.TryCreateCloudSaveSnapshot(out localCloudSnapshot, out string localError))
+                {
+                    FinishCloudSaveAction(localError, true);
+                    return;
+                }
+
+                ServiceResult<CloudSaveRecord> result = await services.CloudSave.ReadAsync();
+                if (this == null) return;
+                if (!result.succeeded)
+                {
+                    FinishCloudSaveAction(result.message, true);
+                    return;
+                }
+
+                cloudRecord = result.value;
+                cloudSaveChecked = true;
+                cloudSnapshot = null;
+                if (cloudRecord.hasValue && !TryParseCloudSave(cloudRecord.payload, out cloudSnapshot, out string parseError))
+                {
+                    FinishCloudSaveAction(parseError, true);
+                    return;
+                }
+
+                FinishCloudSaveAction(cloudRecord.hasValue
+                    ? "Both saves are ready to compare. No copy was changed."
+                    : "No cloud copy exists. The device save is unchanged.", false);
+            }
+            catch (Exception exception)
+            {
+                FinishCloudSaveAction("Cloud save comparison failed: " + exception.Message, true);
+            }
+        }
+
+        static bool TryParseCloudSave(string payload, out SaveV2 save, out string message)
+        {
+            save = null;
+            message = "";
+            try
+            {
+                if (!JsonShape.IsCompleteObject(payload))
+                {
+                    message = "The cloud save is incomplete and was not changed.";
+                    return false;
+                }
+                int schema = SaveSerializer.Instance.ReadSchemaVersion(payload);
+                if (schema != SaveSchema.Current)
+                {
+                    message = "The cloud save uses schema " + schema +
+                        "; this build can compare only schema " + SaveSchema.Current + ".";
+                    return false;
+                }
+                save = SaveSerializer.Instance.DeserializeV2(payload).Normalize();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                message = "The cloud save could not be validated: " + exception.Message;
+                return false;
+            }
+        }
+
+        void RequestCloudBackup()
+        {
+            if (cloudSaveBusy || !cloudSaveChecked || localCloudSnapshot == null) return;
+            if (!cloudBackupConfirm)
+            {
+                cloudBackupConfirm = true;
+                cloudSaveStatus = cloudRecord.hasValue
+                    ? "This will replace the current cloud copy with this device's save. Tap again to confirm."
+                    : "This will create a cloud copy of this device's save. Tap again to confirm.";
+                cloudSaveStatusIsError = false;
+                RefreshModal();
+                return;
+            }
+            cloudBackupConfirm = false;
+            BackupCurrentSaveToCloud();
+        }
+
+        async void BackupCurrentSaveToCloud()
+        {
+            if (cloudSaveBusy || services == null) return;
+            cloudSaveBusy = true;
+            cloudSaveStatus = "Securing the device save and checking the cloud write lock...";
+            cloudSaveStatusIsError = false;
+            RefreshModal();
+
+            try
+            {
+                if (!gs.TryCreateCloudSaveSnapshot(out localCloudSnapshot, out string localError))
+                {
+                    FinishCloudSaveAction(localError, true);
+                    return;
+                }
+                ServiceResult<CloudSaveRecord> current = await services.CloudSave.ReadAsync();
+                if (this == null) return;
+                if (!current.succeeded)
+                {
+                    FinishCloudSaveAction(current.message, true);
+                    return;
+                }
+                if (!SameCloudRecord(cloudRecord, current.value))
+                {
+                    cloudRecord = current.value;
+                    cloudSaveChecked = false;
+                    cloudSnapshot = null;
+                    FinishCloudSaveAction("The cloud copy changed since comparison. Compare again before choosing an action.", true);
+                    return;
+                }
+
+                string writeLock = current.value.hasValue ? current.value.writeLock : "";
+                ServiceResult<CloudSaveRecord> written = await services.CloudSave.WriteAsync(
+                    SaveSerializer.Instance.Serialize(localCloudSnapshot), writeLock);
+                if (this == null) return;
+                if (!written.succeeded)
+                {
+                    FinishCloudSaveAction(written.message, true);
+                    return;
+                }
+
+                cloudRecord = written.value;
+                cloudSnapshot = localCloudSnapshot;
+                cloudSaveChecked = true;
+                FinishCloudSaveAction("This device's save was backed up to the cloud. No local progress was replaced.", false);
+            }
+            catch (Exception exception)
+            {
+                FinishCloudSaveAction("Cloud backup failed: " + exception.Message, true);
+            }
+        }
+
+        void RequestCloudRestore()
+        {
+            if (cloudSaveBusy || !cloudSaveChecked || !cloudRecord.hasValue || cloudSnapshot == null) return;
+            if (!cloudRestoreConfirm)
+            {
+                cloudRestoreConfirm = true;
+                cloudSaveStatus = "This replaces device progress with the shown cloud save. The current device save will be retained for undo. Tap again to confirm.";
+                cloudSaveStatusIsError = false;
+                RefreshModal();
+                return;
+            }
+            cloudRestoreConfirm = false;
+            RestoreCloudToDevice();
+        }
+
+        async void RestoreCloudToDevice()
+        {
+            if (cloudSaveBusy || services == null) return;
+            cloudSaveBusy = true;
+            cloudSaveStatus = "Verifying the cloud copy has not changed...";
+            cloudSaveStatusIsError = false;
+            RefreshModal();
+
+            try
+            {
+                ServiceResult<CloudSaveRecord> current = await services.CloudSave.ReadAsync();
+                if (this == null) return;
+                if (!current.succeeded)
+                {
+                    FinishCloudSaveAction(current.message, true);
+                    return;
+                }
+                if (!SameCloudRecord(cloudRecord, current.value))
+                {
+                    cloudRecord = current.value;
+                    cloudSaveChecked = false;
+                    cloudSnapshot = null;
+                    FinishCloudSaveAction("The cloud copy changed since comparison. Compare again before restoring.", true);
+                    return;
+                }
+
+                if (!gs.TryRestoreCloudSave(cloudSnapshot, out string message))
+                {
+                    FinishCloudSaveAction(message, true);
+                    return;
+                }
+                cloudSaveChecked = false;
+                localRestoreConfirm = false;
+                FinishCloudSaveAction(message, false);
+            }
+            catch (Exception exception)
+            {
+                FinishCloudSaveAction("Cloud restore failed: " + exception.Message, true);
+            }
+        }
+
+        void RequestLocalRestore()
+        {
+            if (cloudSaveBusy) return;
+            if (!localRestoreConfirm)
+            {
+                localRestoreConfirm = true;
+                cloudSaveStatus = "This swaps the current save with the retained device save. Tap again to confirm.";
+                cloudSaveStatusIsError = false;
+                RefreshModal();
+                return;
+            }
+            localRestoreConfirm = false;
+            bool restored = gs.TryRestorePreviousLocalSave(out string message);
+            cloudSaveChecked = false;
+            FinishCloudSaveAction(message, !restored);
+        }
+
+        static bool SameCloudRecord(CloudSaveRecord first, CloudSaveRecord second)
+        {
+            return first.hasValue == second.hasValue &&
+                string.Equals(first.payload, second.payload, StringComparison.Ordinal) &&
+                string.Equals(first.writeLock, second.writeLock, StringComparison.Ordinal);
+        }
+
+        void FinishCloudSaveAction(string message, bool isError)
+        {
+            cloudSaveBusy = false;
+            cloudSaveStatus = message;
+            cloudSaveStatusIsError = isError;
             RefreshModal();
         }
 

@@ -48,6 +48,9 @@ namespace Frontier
         /// <summary>Number of successful writes since this service was created.</summary>
         public int WriteCount { get; private set; }
 
+        /// <summary>The last snapshot successfully written to the primary save.</summary>
+        public SaveV2 LastWrittenSnapshot { get; private set; }
+
         /// <summary>The error of the last failed write, or the reason the save is read-only; null when all is well.</summary>
         public string LastError { get { return store.ReadOnly ? store.ReadOnlyReason : store.LastWriteError; } }
 
@@ -86,8 +89,26 @@ namespace Frontier
                 debouncer.Flushed();
                 return false;
             }
+            SaveV2 next;
+            try { next = snapshot(); }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Frontier save failed: " + e.Message);
+                retryAt = clock.MonotonicSeconds + RetrySeconds;
+                return false;
+            }
+            return Write(next);
+        }
+
+        bool Write(SaveV2 next)
+        {
+            if (store.ReadOnly)
+            {
+                debouncer.Flushed();
+                return false;
+            }
             bool ok;
-            try { ok = store.Write(snapshot()); }
+            try { ok = store.Write(next); }
             catch (Exception e)
             {
                 Debug.LogWarning("Frontier save failed: " + e.Message);
@@ -98,6 +119,7 @@ namespace Frontier
             {
                 debouncer.Flushed();
                 WriteCount++;
+                LastWrittenSnapshot = next;
                 retryAt = double.NegativeInfinity;
                 return true;
             }

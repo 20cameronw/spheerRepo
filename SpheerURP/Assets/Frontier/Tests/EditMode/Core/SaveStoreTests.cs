@@ -186,6 +186,50 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void ExplicitRestore_PreservesOneDeepBackupAcrossOrdinaryWrites()
+        {
+            Assert.IsTrue(store.Write(Save(10)));
+            Assert.IsTrue(store.WriteWithRestoreBackup(Save(20)));
+            Assert.AreEqual(10, store.ReadCloudRestoreBackup(out string readError).player.xp, readError);
+
+            Assert.IsTrue(store.Write(Save(30)));
+            Assert.AreEqual(10, store.ReadCloudRestoreBackup(out readError).player.xp,
+                "ordinary saves must not rotate the explicit restore point");
+
+            Assert.IsTrue(store.WriteWithRestoreBackup(store.ReadCloudRestoreBackup(out readError)));
+            Assert.AreEqual(10, store.Load(Migrate).save.player.xp);
+            Assert.AreEqual(30, store.ReadCloudRestoreBackup(out readError).player.xp,
+                "undo swaps the replaced save into the same one-deep restore point");
+        }
+
+        [Test]
+        public void ExplicitRestore_RefusesToReplaceAnUnreadableLocalSave()
+        {
+            File.WriteAllText(store.PrimaryPath, "{\"schemaVersion\":2,\"saveId\":\"truncated");
+            string original = File.ReadAllText(store.PrimaryPath);
+
+            Assert.IsFalse(store.WriteWithRestoreBackup(Save(20)));
+            StringAssert.Contains("safely preserved", store.LastWriteError);
+            Assert.AreEqual(original, File.ReadAllText(store.PrimaryPath));
+            Assert.IsFalse(File.Exists(store.CloudRestoreBackupPath));
+        }
+
+        [Test]
+        public void DeleteAll_RemovesExplicitRestorePointAndItsTemporaryFile()
+        {
+            Assert.IsTrue(store.Write(Save(10)));
+            Assert.IsTrue(store.WriteWithRestoreBackup(Save(20)));
+            File.WriteAllText(store.CloudRestoreBackupPath + ".tmp", codec.Serialize(Save(30)));
+
+            store.DeleteAll();
+
+            Assert.IsFalse(File.Exists(store.PrimaryPath));
+            Assert.IsFalse(File.Exists(store.BackupPath));
+            Assert.IsFalse(File.Exists(store.CloudRestoreBackupPath));
+            Assert.IsFalse(File.Exists(store.CloudRestoreBackupPath + ".tmp"));
+        }
+
+        [Test]
         public void CorruptPrimary_RecoversFromTheBackup()
         {
             store.Write(Save(10));

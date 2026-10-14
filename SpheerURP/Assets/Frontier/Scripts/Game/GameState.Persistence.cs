@@ -27,6 +27,7 @@ namespace Frontier
 
         /// <summary>True when the save on disk was written by a newer build: this session plays on, but nothing is written back.</summary>
         public bool SaveIsReadOnly { get { return saves.Store.ReadOnly; } }
+        public bool HasCloudRestoreBackup { get { return saves.Store.HasCloudRestoreBackup; } }
 
         static string SaveDirectory()
         {
@@ -64,6 +65,115 @@ namespace Frontier
 
         /// <summary>Writes now whether or not anything changed (tests, the harness).</summary>
         public bool Save() { return saves.Save(); }
+
+        /// <summary>Writes the latest local state and returns exactly the snapshot that was persisted.</summary>
+        public bool TryCreateCloudSaveSnapshot(out SaveV2 snapshot, out string message)
+        {
+            snapshot = null;
+            message = "";
+            if (SaveIsReadOnly)
+            {
+                message = saves.LastError;
+                return false;
+            }
+            if (!saves.Save())
+            {
+                message = string.IsNullOrEmpty(saves.LastError)
+                    ? "The local save could not be written."
+                    : "The local save could not be written: " + saves.LastError;
+                return false;
+            }
+            snapshot = saves.LastWrittenSnapshot;
+            if (snapshot == null)
+            {
+                message = "The local save completed without a readable snapshot.";
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>Restores a player-selected cloud snapshot and retains the previous local snapshot for an explicit undo.</summary>
+        public bool TryRestoreCloudSave(SaveV2 cloudSnapshot, out string message)
+        {
+            return TryRestoreSnapshot(cloudSnapshot, "cloud", out message);
+        }
+
+        /// <summary>Swaps the current save with the retained pre-restore local snapshot.</summary>
+        public bool TryRestorePreviousLocalSave(out string message)
+        {
+            string readError;
+            SaveV2 previous = saves.Store.ReadCloudRestoreBackup(out readError);
+            if (previous == null)
+            {
+                message = readError;
+                return false;
+            }
+            return TryRestoreSnapshot(previous, "previous local", out message);
+        }
+
+        public bool CanRestoreCloudSaveSnapshot(SaveV2 snapshot, out string message)
+        {
+            message = "";
+            if (snapshot == null)
+            {
+                message = "The selected save is empty.";
+                return false;
+            }
+            if (SaveIsReadOnly)
+            {
+                message = saves.LastError;
+                return false;
+            }
+
+            snapshot.Normalize();
+            if (snapshot.schemaVersion != SaveSchema.Current)
+            {
+                message = "This save uses schema " + snapshot.schemaVersion +
+                    "; this build can restore only schema " + SaveSchema.Current + ".";
+                return false;
+            }
+            if (snapshot.createdWith.generatorVersion > universe.Universe.GeneratorVersion)
+            {
+                message = "This save was created with a newer universe generator and cannot be restored by this build.";
+                return false;
+            }
+            return true;
+        }
+
+        bool TryRestoreSnapshot(SaveV2 snapshot, string source, out string message)
+        {
+            if (!CanRestoreCloudSaveSnapshot(snapshot, out message)) return false;
+            if (!saves.Save())
+            {
+                message = string.IsNullOrEmpty(saves.LastError)
+                    ? "The current local save could not be secured before restore."
+                    : "The current local save could not be secured before restore: " + saves.LastError;
+                return false;
+            }
+            if (!saves.Store.WriteWithRestoreBackup(snapshot))
+            {
+                message = "The selected save was not restored: " + saves.Store.LastWriteError;
+                return false;
+            }
+
+            var report = new SaveLoadReport
+            {
+                source = SaveSource.Primary,
+                schemaVersion = snapshot.schemaVersion
+            };
+            Apply(snapshot, report);
+            LoadReport = report;
+            Notify();
+            if (!saves.Save())
+            {
+                message = "The " + source + " save was restored, but its updated local snapshot could not be written: " +
+                    saves.LastError + ". The previous save is still retained.";
+                return true;
+            }
+
+            message = "The " + source + " save was restored. The save it replaced is retained on this device for undo.";
+            return true;
+        }
 
         void LoadOrStart()
         {
@@ -183,6 +293,11 @@ namespace Frontier
                 if (delta == null || delta.structures == null) continue;
                 delta.structures.RemoveAll(record =>
                 {
+                    if (record == null || string.IsNullOrEmpty(record.defId))
+                    {
+                        warnings.Add("dropped an empty structure record on " + delta.planetId);
+                        return true;
+                    }
                     if (db.FindStructure(record.defId) != null) return false;
                     warnings.Add("dropped the unknown structure '" + record.defId + "' on " + delta.planetId);
                     return true;

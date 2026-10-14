@@ -60,6 +60,59 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CloudRestore_PreservesAndCanUndoThePreviousDeviceSave()
+        {
+            var state = new GameState(db, false);
+            state.AddXp(20);
+            Assert.IsTrue(state.Save());
+            Assert.IsTrue(state.TryCreateCloudSaveSnapshot(out SaveV2 cloud, out string snapshotError), snapshotError);
+            cloud.player.xp = 7;
+            cloud.worlds.Add(new PlanetDelta
+            {
+                planetId = state.planet.Id,
+                structures = new System.Collections.Generic.List<StructureRecord> { null }
+            });
+
+            Assert.IsTrue(state.TryRestoreCloudSave(cloud, out string restoreMessage), restoreMessage);
+            Assert.AreEqual(7, state.xp);
+            Assert.IsTrue(state.HasCloudRestoreBackup);
+            CollectionAssert.Contains(state.LoadReport.warnings,
+                "dropped an empty structure record on " + state.planet.Id);
+
+            string backupPath = sandbox.SaveFile + ".restore.bak";
+            SaveV2 retained = SaveSerializer.Instance.DeserializeV2(
+                System.IO.File.ReadAllText(backupPath)).Normalize();
+            Assert.AreEqual(20, retained.player.xp);
+
+            state.AddXp(1);
+            Assert.IsTrue(state.Save());
+            retained = SaveSerializer.Instance.DeserializeV2(
+                System.IO.File.ReadAllText(backupPath)).Normalize();
+            Assert.AreEqual(20, retained.player.xp, "ordinary writes must keep the explicit pre-restore backup");
+
+            Assert.IsTrue(state.TryRestorePreviousLocalSave(out string undoMessage), undoMessage);
+            Assert.AreEqual(20, state.xp);
+            retained = SaveSerializer.Instance.DeserializeV2(
+                System.IO.File.ReadAllText(backupPath)).Normalize();
+            Assert.AreEqual(8, retained.player.xp, "undo retains the save it replaced as the next one-deep restore point");
+        }
+
+        [Test]
+        public void CloudRestore_RejectsFutureSchemaWithoutChangingTheDeviceSave()
+        {
+            var state = new GameState(db, false);
+            state.AddXp(31);
+            Assert.IsTrue(state.Save());
+            string before = System.IO.File.ReadAllText(sandbox.SaveFile);
+            var future = new SaveV2 { schemaVersion = SaveSchema.Current + 1 };
+
+            Assert.IsFalse(state.TryRestoreCloudSave(future, out string message));
+            StringAssert.Contains("schema", message);
+            Assert.AreEqual(before, System.IO.File.ReadAllText(sandbox.SaveFile));
+            Assert.IsFalse(state.HasCloudRestoreBackup);
+        }
+
+        [Test]
         public void StartingANewStateWithoutASave_UsesTheStartingContent()
         {
             var state = new GameState(db, true);

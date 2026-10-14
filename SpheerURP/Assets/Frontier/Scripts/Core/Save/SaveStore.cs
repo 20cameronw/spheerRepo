@@ -80,6 +80,8 @@ namespace Frontier
         public string DirectoryPath { get; private set; }
         public string PrimaryPath { get { return Path.Combine(DirectoryPath, SaveSchema.FileName); } }
         public string BackupPath { get { return PrimaryPath + SaveSchema.BackupSuffix; } }
+        public string CloudRestoreBackupPath { get { return PrimaryPath + ".restore.bak"; } }
+        public bool HasCloudRestoreBackup { get { return File.Exists(CloudRestoreBackupPath); } }
         public string TempPath { get { return PrimaryPath + SaveSchema.TempSuffix; } }
         public string LegacyBackupPath { get { return Path.Combine(DirectoryPath, SaveSchema.LegacyBackupName); } }
 
@@ -227,6 +229,103 @@ namespace Frontier
             }
         }
 
+        /// <summary>
+        /// Explicitly replaces the primary save while retaining the current primary as a separate, one-deep restore point.
+        /// Ordinary writes never rotate or delete this player-selected recovery snapshot.
+        /// </summary>
+        public bool WriteWithRestoreBackup(SaveV2 save)
+        {
+            LastWriteError = null;
+            if (ReadOnly)
+            {
+                LastWriteError = ReadOnlyReason;
+                return false;
+            }
+
+            if (File.Exists(PrimaryPath))
+            {
+                if (!IsReadable(PrimaryPath))
+                {
+                    LastWriteError = "the current local save cannot be safely preserved before replacement";
+                    return false;
+                }
+
+                string temporaryBackup = CloudRestoreBackupPath + ".tmp";
+                try
+                {
+                    Directory.CreateDirectory(DirectoryPath);
+                    File.Copy(PrimaryPath, temporaryBackup, true);
+                    if (!IsReadable(temporaryBackup))
+                        throw new IOException("the preserved local save did not pass verification");
+
+                    if (File.Exists(CloudRestoreBackupPath))
+                    {
+                        try { File.Replace(temporaryBackup, CloudRestoreBackupPath, null); }
+                        catch (Exception)
+                        {
+                            File.Copy(temporaryBackup, CloudRestoreBackupPath, true);
+                            File.Delete(temporaryBackup);
+                        }
+                    }
+                    else File.Move(temporaryBackup, CloudRestoreBackupPath);
+                }
+                catch (Exception e)
+                {
+                    LastWriteError = e.Message;
+                    try { if (File.Exists(temporaryBackup)) File.Delete(temporaryBackup); }
+                    catch (Exception cleanupError)
+                    {
+                        LastWriteError += " The temporary restore backup could not be removed: " + cleanupError.Message;
+                    }
+                    return false;
+                }
+            }
+
+            return Write(save);
+        }
+
+        /// <summary>Reads the one-deep player recovery snapshot without changing the active save or its read-only state.</summary>
+        public SaveV2 ReadCloudRestoreBackup(out string problem)
+        {
+            problem = null;
+            try
+            {
+                if (!File.Exists(CloudRestoreBackupPath))
+                {
+                    problem = "No previous local save is available to restore.";
+                    return null;
+                }
+
+                string text = File.ReadAllText(CloudRestoreBackupPath, Utf8);
+                if (!JsonShape.IsCompleteObject(text))
+                {
+                    problem = "The retained local save is incomplete and cannot be restored.";
+                    return null;
+                }
+
+                int version = codec.ReadSchemaVersion(text);
+                if (version != SaveSchema.Current)
+                {
+                    problem = "The retained local save uses schema " + version +
+                        "; this build can restore only schema " + SaveSchema.Current + ".";
+                    return null;
+                }
+
+                var save = codec.DeserializeV2(text);
+                if (save == null)
+                {
+                    problem = "The retained local save could not be decoded.";
+                    return null;
+                }
+                return save.Normalize();
+            }
+            catch (Exception e)
+            {
+                problem = "The retained local save could not be read: " + e.Message;
+                return null;
+            }
+        }
+
         static void WriteDurable(string path, string text)
         {
             byte[] bytes = Utf8.GetBytes(text);
@@ -261,10 +360,14 @@ namespace Frontier
             catch (Exception) { return false; }
         }
 
-        /// <summary>Deletes the save, its backup, a leftover temp file and the legacy backup (a player-requested reset).</summary>
+        /// <summary>Deletes the active save and every recovery copy (a player-requested reset).</summary>
         public void DeleteAll()
         {
-            foreach (string path in new[] { PrimaryPath, BackupPath, TempPath, LegacyBackupPath })
+            foreach (string path in new[]
+            {
+                PrimaryPath, BackupPath, TempPath, LegacyBackupPath,
+                CloudRestoreBackupPath, CloudRestoreBackupPath + ".tmp"
+            })
             {
                 try { if (File.Exists(path)) File.Delete(path); }
                 catch (Exception) { /* best effort */ }
