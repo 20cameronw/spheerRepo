@@ -5,6 +5,7 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Frontier.Core",
+        "Frontier.Economy",
         "Frontier.Data",
         "Frontier.Game",
         "Frontier.Visual",

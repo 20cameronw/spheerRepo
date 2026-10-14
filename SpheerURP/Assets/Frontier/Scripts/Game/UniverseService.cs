@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Frontier.Economy;
 using Frontier.Universe;
 using Uni = Frontier.Universe.Universe;
 
@@ -8,10 +9,10 @@ namespace Frontier
 {
     /// <summary>
     /// The game's door to the universe: owns the deterministic <see cref="Universe"/> (built from <see cref="UniverseConfig"/> with the
-    /// game's resource set and the authored Core Worlds), turns descriptors into <see cref="PlanetData"/>, caches a few of them and prices
-    /// travel through <see cref="ITravelCostModel"/>. It also implements <see cref="IWorldIdMap"/> so saves can be migrated from legacy ids.
+    /// game's resource set and the authored Core Worlds), turns descriptors into <see cref="PlanetData"/>, caches a few of them and owns the
+    /// travel rules and the route planner (the locked economy model). It also implements <see cref="IWorldIdMap"/> so saves can be migrated from legacy ids.
     /// The generator itself is pure and thread safe, but this service touches ScriptableObjects: use it from the main thread, and give a
-    /// background worker the raw <see cref="Universe"/> instead.
+    /// background worker the raw <see cref="Universe"/> (and <see cref="NewPlanner"/>) instead.
     /// </summary>
     public sealed class UniverseService : IWorldIdMap
     {
@@ -25,7 +26,10 @@ namespace Frontier
         public readonly GameDatabase Db;
         public readonly Uni Universe;
         public readonly AuthoredWorlds Authored;
-        public readonly ITravelCostModel Travel;
+        /// <summary>The locked travel numbers (jump range, fuel, plating, autopilot).</summary>
+        public readonly TravelRules Rules;
+        /// <summary>The route planner of the main thread. Planners are not thread safe: a worker builds its own with <see cref="NewPlanner"/>.</summary>
+        public readonly RoutePlanner Planner;
 
         readonly Dictionary<PlanetKey, PlanetData> authoredCache = new Dictionary<PlanetKey, PlanetData>();
         readonly Dictionary<PlanetKey, PlanetData> generatedCache = new Dictionary<PlanetKey, PlanetData>();
@@ -44,14 +48,15 @@ namespace Frontier
             return service;
         }
 
-        public UniverseService(GameDatabase db, ITravelCostModel travel = null, ulong seed = DefaultSeed)
+        public UniverseService(GameDatabase db, TravelRules rules = null, ulong seed = DefaultSeed)
         {
             if (db == null) throw new ArgumentNullException("db");
             Db = db;
-            Travel = travel ?? new TravelModel();
+            Rules = rules ?? TravelRules.CreateDefault();
             var config = new UniverseConfig { Seed = seed, EnablePlannedResources = false, Resources = BuildResourceTable(db, false) };
             Authored = AuthoredWorlds.Build(db, config);
             Universe = new Uni(config, Authored.Content);
+            Planner = new RoutePlanner(Universe, Rules);
             foreach (var so in db.planets)
             {
                 if (so == null) continue;
@@ -143,20 +148,17 @@ namespace Frontier
 
         // ---- distances and travel --------------------------------------------------------------------------------------
 
-        public TravelNode NodeOf(PlanetData p)
+        /// <summary>Where a world is for the route planner: its system, position, orbit, tier and hazards.</summary>
+        public RouteEndpoint EndpointOf(PlanetData p)
         {
-            return new TravelNode(p.Star.Id, p.Star.X, p.Star.Y, p.Descriptor.OrbitRadius, p.Descriptor.OrbitPhase);
+            return new RouteEndpoint(p.Id, p.Star.Key, p.Star.X, p.Star.Y, p.Descriptor.OrbitRadius, p.Tier, p.Hazards);
         }
+
+        /// <summary>A planner for another thread (the map worker): same universe and rules, its own scratch state.</summary>
+        public RoutePlanner NewPlanner() { return new RoutePlanner(Universe, Rules); }
 
         /// <summary>Distance of the planet's system from the home system, in light-years.</summary>
         public double DistanceFromHomeLy(PlanetData p) { return Universe.DistanceFromHome(p.Star.X, p.Star.Y); }
-
-        /// <summary>Fuel for a trip from one world to another (0 for the same world).</summary>
-        public int FuelCost(PlanetData from, PlanetData to, float efficiency)
-        {
-            if (from == null || to == null || from.Id == to.Id) return 0;
-            return Travel.FuelCost(NodeOf(from), NodeOf(to), efficiency);
-        }
 
         // ---- IWorldIdMap (save migration) ------------------------------------------------------------------------------
 

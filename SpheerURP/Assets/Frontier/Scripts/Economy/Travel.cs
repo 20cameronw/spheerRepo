@@ -71,10 +71,11 @@ namespace Frontier.Economy
         public static readonly string[] HullIds = { "hull_heat", "hull_cold", "hull_toxic", "hull_rad", "hull_void" };
         public static readonly Hazards[] HazardOrder = { Hazards.Heat, Hazards.Cold, Hazards.Toxic, Hazards.Radiation, Hazards.Void };
 
-        readonly double _base, _k, _p, _intra, _intraPerAu, _cargo, _autopilot, _refundMax, _runBase, _runLog, _runCap, _autoRun, _hopFraction, _detour, _maxDiscount;
+        readonly double _base, _k, _p, _intra, _intraPerAu, _cargo, _autopilot, _refundMax, _runBase, _runLog, _runCap, _autoRun, _hopFraction, _detour, _maxDiscount, _baseScanner;
         readonly int _l2, _l3;
         readonly double[] _jump;
         readonly double[] _engine;
+        readonly double[] _scanner;
 
         public TravelModel(Tuning t, EconomyCatalog cat)
         {
@@ -101,6 +102,11 @@ namespace Frontier.Economy
             _engine = new double[engine.levels.Length + 1];
             _engine[0] = 1.0;
             for (int i = 0; i < engine.levels.Length; i++) _engine[i + 1] = engine.levels[i].value;
+            _baseScanner = t.D("sim.base_scanner_ly");
+            UpgradeDef scanner = cat.Upgrade("scanner_range");
+            _scanner = new double[scanner.levels.Length + 1];
+            _scanner[0] = _baseScanner;
+            for (int i = 0; i < scanner.levels.Length; i++) _scanner[i + 1] = Math.Max(_baseScanner, scanner.levels[i].value);
         }
 
         public static void RegisterKeys(Tuning t)
@@ -137,6 +143,36 @@ namespace Frontier.Economy
             if (level <= 0) return 1.0;
             return _engine[Math.Min(level, _engine.Length - 1)];
         }
+
+        /// <summary>Survey radius in ly around every visited system at a scanner level (the base radius at level 0, 2,200 ly at the top).</summary>
+        public double ScannerRangeLy(int level)
+        {
+            if (level <= 0) return _scanner[0];
+            return _scanner[Math.Min(level, _scanner.Length - 1)];
+        }
+
+        public int MaxJumpLevel { get { return _jump.Length - 1; } }
+        public int MaxEngineLevel { get { return _engine.Length - 1; } }
+        public int MaxScannerLevel { get { return _scanner.Length - 1; } }
+
+        /// <summary>The fixed fuel share of one leg (before modifiers).</summary>
+        public double BaseFuelPerLeg { get { return _base; } }
+
+        /// <summary>Share of the jump range a leg may use (the planner leaves some slack for stepping stones); the closed-form estimate uses it.</summary>
+        public double HopFraction { get { return _hopFraction; } }
+
+        /// <summary>Unmodified energy of a whole route of <paramref name="legs"/> legs and <paramref name="routeLy"/> total length: legs x base + k x length^p.</summary>
+        public double RouteBaseFuel(int legs, double routeLy)
+        {
+            double distancePart = routeLy > 0.0 ? _k * DetMath.Pow(routeLy, _p) : 0.0;
+            return Math.Max(0, legs) * _base + distancePart;
+        }
+
+        /// <summary>Autopilot fuel multiplier (1.6).</summary>
+        public double AutopilotFuelMultiplier { get { return _autopilot; } }
+
+        /// <summary>The largest combined discount the model honours.</summary>
+        public double MaxDiscount { get { return _maxDiscount; } }
 
         double LegFuel(double legLy)
         {

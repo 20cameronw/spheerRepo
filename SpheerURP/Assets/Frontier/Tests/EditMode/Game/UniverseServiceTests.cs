@@ -184,26 +184,33 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void FuelCost_KeepsTheOldAnchors_AndGrowsWithDistance()
+        public void Planner_UsesTheLockedEconomyRules_ForAuthoredWorlds()
         {
             var sylva = service.Get("sylva");
             var glacia = service.Get("glacia");
             var ferrum = service.Get("ferrum");
-            Assert.AreEqual(5, service.FuelCost(sylva, glacia, 1f));
-            Assert.AreEqual(5, service.FuelCost(glacia, sylva, 1f), "symmetric");
-            Assert.AreEqual(5, service.FuelCost(sylva, ferrum, 1f));
-            Assert.AreEqual(0, service.FuelCost(sylva, sylva, 1f));
-            Assert.AreEqual(0, service.FuelCost(null, sylva, 1f));
+            var ship = new Frontier.Economy.ShipCapabilities { jumpLevel = 5, enforceHazardPlating = false };
+            Func<PlanetData, PlanetData, RoutePlan> plan = (a, b) => service.Planner.Plan(service.EndpointOf(a), service.EndpointOf(b), ship, false, null);
+            RoutePlan hop = plan(sylva, glacia);
+            Assert.IsTrue(hop.reachable);
+            Assert.IsTrue(hop.intraSystem);
+            Assert.AreEqual(hop.totalFuel, plan(glacia, sylva).totalFuel, "symmetric");
+            Assert.IsTrue(plan(sylva, ferrum).reachable);
+            Assert.IsTrue(plan(sylva, sylva).Has(RouteReasons.AlreadyHere));
             int previous = 0;
             foreach (string system in new[] { "cinder", "arbor", "nyx", "prism" })
             {
-                int cost = service.FuelCost(sylva, service.Get(system), 1f);
-                Assert.Greater(cost, 5, system + " is another star system");
+                RoutePlan route = plan(sylva, service.Get(system));
+                Assert.IsTrue(route.reachable, system);
+                int cost = route.totalFuel;
+                Assert.Greater(cost, hop.totalFuel, system + " is another star system");
                 Assert.GreaterOrEqual(cost, previous, "deeper systems are further away");
                 previous = cost;
             }
-            Assert.Less(service.FuelCost(sylva, service.Get("nyx"), 0.5f), service.FuelCost(sylva, service.Get("nyx"), 1f), "efficiency upgrades pay off");
-            Assert.GreaterOrEqual(service.FuelCost(sylva, glacia, 0.25f), 1, "never free");
+            int baseline = plan(sylva, service.Get("nyx")).totalFuel;
+            ship.engineLevel = 5;
+            Assert.Less(plan(sylva, service.Get("nyx")).totalFuel, baseline, "efficiency upgrades pay off");
+            Assert.GreaterOrEqual(plan(sylva, glacia).totalFuel, 1, "never free");
         }
 
         [Test]

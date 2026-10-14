@@ -334,21 +334,7 @@ namespace Frontier
         }
 
         // ---------- Travel ----------
-        /// <summary>Fuel for a trip from the current world to another (0 for the world the player is on). See <see cref="ITravelCostModel"/>.</summary>
-        public int FuelCost(PlanetData to) { return universe.FuelCost(planet, to, FuelMultiplier); }
-
-        public bool Travel(PlanetData to)
-        {
-            if (to == null || to.Id == planet.Id) return false;
-            int cost = FuelCost(to);
-            if (Count(db.fuel) < cost) return false;
-            SpendQuietly(new List<ItemAmount> { new ItemAmount(db.fuel, cost) });
-            planet = to;
-            RecordArrival(to);
-            Notify();
-            Flush();
-            return true;
-        }
+        // Route planning, fuel payment and the ship's capabilities live in GameState.Ship.cs.
 
         /// <summary>Visit bookkeeping for a landing: the world's first/last visit and the stats that feed the Frontier Score.</summary>
         void RecordArrival(PlanetData p)
