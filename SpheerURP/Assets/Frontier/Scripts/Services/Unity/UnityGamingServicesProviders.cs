@@ -62,14 +62,29 @@ namespace Frontier.Services.Unity
     {
         readonly FrontierUnityServicesConfig config;
         readonly UnityServicesInitializer initializer;
+        readonly IRecoveryCredentialProvider recoveryCredentials;
 
-        public UnityAuthenticationProvider(FrontierUnityServicesConfig config, UnityServicesInitializer initializer)
+        public UnityAuthenticationProvider(FrontierUnityServicesConfig config, UnityServicesInitializer initializer,
+            IRecoveryCredentialProvider recoveryCredentials)
         {
             this.config = config;
             this.initializer = initializer;
+            this.recoveryCredentials = recoveryCredentials;
         }
 
         public bool IsConfigured { get { return config != null && config.CanUseAuthentication; } }
+        public bool CanRecoverAccount
+        {
+            get
+            {
+                return config != null && config.CanUseAccountRecovery &&
+                    recoveryCredentials != null && recoveryCredentials.IsConfigured;
+            }
+        }
+        public string RecoveryProviderName
+        {
+            get { return CanRecoverAccount ? recoveryCredentials.ProviderName : string.Empty; }
+        }
 
         public Task<ServiceResult> InitializeAsync()
         {
@@ -99,6 +114,77 @@ namespace Frontier.Services.Unity
             catch (RequestFailedException exception)
             {
                 Debug.LogWarning("Unity Authentication sign-in failed: " + exception.Message);
+                return ServiceResult<AuthIdentity>.Failed(exception.Message);
+            }
+        }
+
+        public Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync()
+        {
+            return RecoverAsync(linkCurrentAccount: true);
+        }
+
+        public Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync()
+        {
+            return RecoverAsync(linkCurrentAccount: false);
+        }
+
+        async Task<ServiceResult<AuthIdentity>> RecoverAsync(bool linkCurrentAccount)
+        {
+            if (!CanRecoverAccount)
+                return ServiceResult<AuthIdentity>.NotConfigured("Account recovery");
+
+            ServiceResult initialized = await InitializeAsync();
+            if (!initialized.succeeded)
+                return ServiceResult<AuthIdentity>.Failed(initialized.message);
+
+            var authentication = AuthenticationService.Instance;
+            if (linkCurrentAccount && !authentication.IsSignedIn)
+                return ServiceResult<AuthIdentity>.InvalidRequest(
+                    "Sign in to the current save before linking an account.");
+
+            ServiceResult<RecoveryCredential> credentialResult =
+                await recoveryCredentials.AcquireAsync();
+            if (!credentialResult.succeeded)
+                return ServiceResult<AuthIdentity>.Failed(credentialResult.message);
+            if (string.IsNullOrWhiteSpace(credentialResult.value.token))
+                return ServiceResult<AuthIdentity>.Failed(
+                    "The recovery provider returned an empty credential.");
+
+            try
+            {
+                RecoveryCredential credential = credentialResult.value;
+                switch (credential.provider)
+                {
+                    case RecoveryProvider.Apple:
+                        if (linkCurrentAccount)
+                            await authentication.LinkWithAppleAsync(credential.token);
+                        else
+                            await authentication.SignInWithAppleAsync(credential.token);
+                        break;
+                    case RecoveryProvider.GooglePlayGames:
+                        if (linkCurrentAccount)
+                            await authentication.LinkWithGooglePlayGamesAsync(credential.token);
+                        else
+                            await authentication.SignInWithGooglePlayGamesAsync(credential.token);
+                        break;
+                    default:
+                        return ServiceResult<AuthIdentity>.InvalidRequest(
+                            "The configured recovery provider is not supported.");
+                }
+
+                bool anonymous = authentication.PlayerInfo != null &&
+                    authentication.PlayerInfo.Identities.Count == 0;
+                return ServiceResult<AuthIdentity>.Success(
+                    new AuthIdentity(authentication.PlayerId, anonymous));
+            }
+            catch (AuthenticationException exception)
+            {
+                Debug.LogWarning("Unity Authentication account recovery failed: " + exception.Message);
+                return ServiceResult<AuthIdentity>.Failed(exception.Message);
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.LogWarning("Unity Authentication account recovery failed: " + exception.Message);
                 return ServiceResult<AuthIdentity>.Failed(exception.Message);
             }
         }
@@ -332,7 +418,10 @@ namespace Frontier.Services.Unity
         {
             var unavailable = new UnavailableFrontierProvider();
             var initializer = new UnityServicesInitializer(config);
-            var authentication = new UnityAuthenticationProvider(config, initializer);
+            IRecoveryCredentialProvider recoveryCredentials = config != null && config.CanUseAccountRecovery
+                ? UnityRecoveryCredentialProviderRegistry.GetOrCreate()
+                : null;
+            var authentication = new UnityAuthenticationProvider(config, initializer, recoveryCredentials);
             var leaderboards = new UnityLeaderboardProvider(config, initializer);
             var cloudSave = new UnityCloudSaveProvider(config, initializer);
             return new FrontierServices(consent, unavailable, unavailable, authentication, leaderboards,

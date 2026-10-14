@@ -169,7 +169,11 @@ namespace Frontier.Services
 
     public interface IAuthService : IServiceEndpoint
     {
+        bool CanRecoverAccount { get; }
+        string RecoveryProviderName { get; }
         Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync();
+        Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync();
+        Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync();
         Task<ServiceResult> DeleteAccountAsync();
     }
 
@@ -348,6 +352,8 @@ namespace Frontier.Services
         }
 
         public bool IsConfigured { get { return inner.IsConfigured; } }
+        public bool CanRecoverAccount { get { return inner.CanRecoverAccount; } }
+        public string RecoveryProviderName { get { return inner.RecoveryProviderName; } }
 
         public Task<ServiceResult> InitializeAsync()
         {
@@ -360,6 +366,20 @@ namespace Frontier.Services
         {
             return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
                 ? inner.SignInAnonymouslyAsync()
+                : Task.FromResult(ServiceResult<AuthIdentity>.ConsentRequired("online account services"));
+        }
+
+        public Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.LinkRecoveryAccountAsync()
+                : Task.FromResult(ServiceResult<AuthIdentity>.ConsentRequired("online account services"));
+        }
+
+        public Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.SignInWithRecoveryAccountAsync()
                 : Task.FromResult(ServiceResult<AuthIdentity>.ConsentRequired("online account services"));
         }
 
@@ -456,6 +476,12 @@ namespace Frontier.Services
         { return Task.FromResult(ServiceResult<IReadOnlyList<PurchaseReceipt>>.NotConfigured("Purchases")); }
         public Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync()
         { return Task.FromResult(ServiceResult<AuthIdentity>.NotConfigured("Authentication")); }
+        public bool CanRecoverAccount { get { return false; } }
+        public string RecoveryProviderName { get { return string.Empty; } }
+        public Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync()
+        { return Task.FromResult(ServiceResult<AuthIdentity>.NotConfigured("Account recovery")); }
+        public Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync()
+        { return Task.FromResult(ServiceResult<AuthIdentity>.NotConfigured("Account recovery")); }
         public Task<ServiceResult> DeleteAccountAsync() { return Task.FromResult(ServiceResult.NotConfigured("Authentication")); }
         public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
         { return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.NotConfigured("Leaderboards")); }

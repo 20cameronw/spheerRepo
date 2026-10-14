@@ -12,6 +12,9 @@ namespace Frontier.Services.Unity
         [Tooltip("Enable Cloud Save only after local/cloud conflict handling and account recovery UX are ready.")]
         public bool enableCloudSave;
 
+        [Tooltip("Enable Apple Sign-In or Google Play Games recovery after native provider and dashboard setup are complete.")]
+        public bool enableAccountRecovery;
+
         [Tooltip("UGS leaderboard ID created in the Unity Dashboard.")]
         public string leaderboardId;
 
@@ -45,6 +48,11 @@ namespace Frontier.Services.Unity
         public bool CanUseCloudSave
         {
             get { return CanUseAuthentication && enableCloudSave; }
+        }
+
+        public bool CanUseAccountRecovery
+        {
+            get { return CanUseAuthentication && enableAccountRecovery; }
         }
     }
 }

@@ -1,0 +1,20 @@
+{
+    "name": "Frontier.Services.Unity.Recovery.GooglePlayGames",
+    "rootNamespace": "Frontier.Services.Unity.Recovery.GooglePlayGames",
+    "references": [
+        "Frontier.Services",
+        "Frontier.Services.Unity",
+        "Google.Play.Games"
+    ],
+    "includePlatforms": [
+        "Android"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

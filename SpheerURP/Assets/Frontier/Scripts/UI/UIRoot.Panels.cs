@@ -447,6 +447,98 @@ namespace Frontier
                 onlineServicesAllowed = value;
                 SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
             });
+
+            BuildAccountRecoverySettings(body, onlineServicesAllowed);
+        }
+
+        bool accountRecoveryBusy;
+        string accountRecoveryStatus;
+
+        void BuildAccountRecoverySettings(VisualElement body, bool onlineServicesAllowed)
+        {
+            body.Add(SectionLabel("SAVE RECOVERY"));
+            body.Add(UiKit.Text(
+                "Protect this device's save with Apple Sign-In on iPhone or Google Play Games on Android. Signing in on another device never replaces its local save; cloud restore remains a separate, explicit step.",
+                "fr-muted"));
+
+            if (!onlineServicesAllowed)
+            {
+                body.Add(UiKit.Text("Enable online account features above to manage save recovery.", "fr-small"));
+                return;
+            }
+
+            if (!services.Authentication.CanRecoverAccount)
+            {
+                body.Add(UiKit.Text("Save recovery is not enabled or configured for this build.", "fr-small"));
+                return;
+            }
+
+            body.Add(UiKit.Text("Provider: " + services.Authentication.RecoveryProviderName, "fr-small"));
+            if (!string.IsNullOrEmpty(accountRecoveryStatus))
+                body.Add(UiKit.Text(accountRecoveryStatus, "fr-small"));
+
+            var protect = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "PROTECT THIS SAVE",
+                "about", UiKit.Cyan, ProtectCurrentSave);
+            UiKit.SetEnabledLook(protect, !accountRecoveryBusy);
+            body.Add(protect);
+
+            var recover = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "SIGN IN TO RECOVER",
+                "about", UiKit.Magenta, SignInToRecoverSave);
+            UiKit.SetEnabledLook(recover, !accountRecoveryBusy);
+            body.Add(recover);
+        }
+
+        async void ProtectCurrentSave()
+        {
+            if (accountRecoveryBusy || services == null) return;
+            accountRecoveryBusy = true;
+            accountRecoveryStatus = "Preparing the current save for account linking...";
+            RefreshModal();
+
+            ServiceResult<AuthIdentity> current = await services.Authentication.SignInAnonymouslyAsync();
+            if (this == null) return;
+            if (!current.succeeded)
+            {
+                FinishAccountRecovery(current.message);
+                return;
+            }
+            if (!current.value.isAnonymous)
+            {
+                FinishAccountRecovery("This save is already linked to a recovery account.");
+                return;
+            }
+
+            accountRecoveryStatus = "Complete the sign-in prompt to link this save...";
+            RefreshModal();
+            ServiceResult<AuthIdentity> linked = await services.Authentication.LinkRecoveryAccountAsync();
+            if (this == null) return;
+            FinishAccountRecovery(linked.succeeded
+                ? "Save protected with " + services.Authentication.RecoveryProviderName +
+                    ". Local progress remains on this device; cloud sync is still off."
+                : linked.message);
+        }
+
+        async void SignInToRecoverSave()
+        {
+            if (accountRecoveryBusy || services == null) return;
+            accountRecoveryBusy = true;
+            accountRecoveryStatus = "Complete the sign-in prompt for your recovery account...";
+            RefreshModal();
+
+            ServiceResult<AuthIdentity> recovered =
+                await services.Authentication.SignInWithRecoveryAccountAsync();
+            if (this == null) return;
+            FinishAccountRecovery(recovered.succeeded
+                ? "Signed in with " + services.Authentication.RecoveryProviderName +
+                    ". This device's local save was not replaced; cloud restore remains a separate step."
+                : recovered.message);
+        }
+
+        void FinishAccountRecovery(string message)
+        {
+            accountRecoveryBusy = false;
+            accountRecoveryStatus = message;
+            RefreshModal();
         }
 
         static void ConsentChoice(VisualElement body, string label, bool initialValue, Action<bool> onChanged)

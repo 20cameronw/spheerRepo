@@ -54,12 +54,26 @@ namespace Frontier.Tests
         sealed class TestAuthService : IAuthService
         {
             public bool IsConfigured { get { return true; } }
+            public bool CanRecoverAccount { get { return true; } }
+            public string RecoveryProviderName { get { return "Test"; } }
             public int signInCount;
+            public int linkRecoveryCount;
+            public int recoverySignInCount;
             public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
             public Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync()
             {
                 signInCount++;
                 return Task.FromResult(ServiceResult<AuthIdentity>.Success(new AuthIdentity("player", true)));
+            }
+            public Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync()
+            {
+                linkRecoveryCount++;
+                return Task.FromResult(ServiceResult<AuthIdentity>.Success(new AuthIdentity("player", false)));
+            }
+            public Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync()
+            {
+                recoverySignInCount++;
+                return Task.FromResult(ServiceResult<AuthIdentity>.Success(new AuthIdentity("player", false)));
             }
             public Task<ServiceResult> DeleteAccountAsync() { return Task.FromResult(ServiceResult.Success()); }
         }
@@ -289,6 +303,41 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void AccountRecovery_RequiresOnlineConsentForLinkAndRestoreSignIn()
+        {
+            var consent = new ConsentService(new MemoryConsentStore());
+            var authentication = new TestAuthService();
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(consent, unavailable, unavailable, authentication,
+                unavailable, unavailable, unavailable, unavailable, new LocalTimeService(), unavailable);
+
+            Assert.IsTrue(services.Authentication.CanRecoverAccount);
+            Assert.AreEqual("Test", services.Authentication.RecoveryProviderName);
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                services.Authentication.LinkRecoveryAccountAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                services.Authentication.SignInWithRecoveryAccountAsync().Result.status);
+            Assert.AreEqual(0, authentication.linkRecoveryCount);
+            Assert.AreEqual(0, authentication.recoverySignInCount);
+
+            consent.SavePreferences(false, false, true);
+            Assert.AreEqual(ServiceStatus.Success,
+                services.Authentication.LinkRecoveryAccountAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.Success,
+                services.Authentication.SignInWithRecoveryAccountAsync().Result.status);
+            Assert.AreEqual(1, authentication.linkRecoveryCount);
+            Assert.AreEqual(1, authentication.recoverySignInCount);
+
+            consent.SavePreferences(false, false, false);
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                services.Authentication.LinkRecoveryAccountAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                services.Authentication.SignInWithRecoveryAccountAsync().Result.status);
+            Assert.AreEqual(1, authentication.linkRecoveryCount);
+            Assert.AreEqual(1, authentication.recoverySignInCount);
+        }
+
+        [Test]
         public void LeaderboardRequests_RejectInvalidBoundsBeforeProviderCalls()
         {
             var consent = new ConsentService(new MemoryConsentStore());
@@ -348,6 +397,29 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void UnityServicesConfig_AccountRecoveryRequiresExplicitConfiguration()
+        {
+            var config = ScriptableObject.CreateInstance<FrontierUnityServicesConfig>();
+            try
+            {
+                config.enableOnlineServices = true;
+                config.enableAccountRecovery = true;
+                config.privacyPolicyUrl = "https://example.com/privacy";
+                Assert.IsTrue(config.CanUseAccountRecovery);
+
+                config.enableAccountRecovery = false;
+                Assert.IsFalse(config.CanUseAccountRecovery);
+                config.enableAccountRecovery = true;
+                config.enableOnlineServices = false;
+                Assert.IsFalse(config.CanUseAccountRecovery);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(config);
+            }
+        }
+
+        [Test]
         public void UnityServicesFactory_LeavesProvidersUnavailableUntilConfigured()
         {
             var config = ScriptableObject.CreateInstance<FrontierUnityServicesConfig>();
@@ -362,6 +434,7 @@ namespace Frontier.Tests
                     consent, config);
 
                 Assert.IsFalse(services.Authentication.IsConfigured);
+                Assert.IsFalse(services.Authentication.CanRecoverAccount);
                 Assert.IsFalse(services.Leaderboards.IsConfigured);
                 Assert.IsFalse(services.CloudSave.IsConfigured);
                 Assert.AreEqual(ServiceStatus.NotConfigured, services.Authentication.InitializeAsync().Result.status);
@@ -384,6 +457,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(config);
             Assert.IsFalse(config.enableOnlineServices);
             Assert.IsFalse(config.enableCloudSave);
+            Assert.IsFalse(config.enableAccountRecovery);
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.leaderboardId));
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.privacyPolicyUrl));
         }
