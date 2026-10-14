@@ -33,7 +33,8 @@ if (-not $NoQuit) { $unityArgs += "-quit" }
 if ($Method) { $unityArgs += @("-executeMethod", $Method) }
 $unityArgs += $ExtraArgs
 
-$mutex = New-Object System.Threading.Mutex($false, "Global\FrontierUnityBatch")
+$projectKey = [System.BitConverter]::ToString([System.Security.Cryptography.MD5]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($project.ToLowerInvariant()))).Replace("-", "").Substring(0, 12)
+$mutex = New-Object System.Threading.Mutex($false, "Global\FrontierUnityBatch-$projectKey")
 if (-not $mutex.WaitOne([TimeSpan]::FromMinutes(30))) { throw "Another Unity batch run held the lock for 30 minutes." }
 try {
     $proc = Start-Process -FilePath $unity -ArgumentList $unityArgs -PassThru
