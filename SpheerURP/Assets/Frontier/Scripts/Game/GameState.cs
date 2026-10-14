@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Frontier.Economy;
 using Frontier.Universe;
 using UnityEngine;
 
@@ -394,6 +395,33 @@ namespace Frontier
             return null;
         }
 
+        public float TerraformerHarvestBonus
+        {
+            get
+            {
+                float bonus = 0f;
+                foreach (var structure in structures)
+                {
+                    if (structure.def.kind != StructureKind.Terraformer || !IsOperational(structure) ||
+                        structure.def.effectKind != "globalYieldBonus") continue;
+                    bonus += Mathf.Max(0f, structure.def.EffectAt(structure.level));
+                }
+                return bonus;
+            }
+        }
+
+        public int TerraformerStageOn(PlanetData p)
+        {
+            var terraformer = p == null ? null : StructureOfKind(p, StructureKind.Terraformer);
+            return terraformer == null ? 0 : terraformer.level;
+        }
+
+        void RecordMegaprojectStage(StructureSO definition)
+        {
+            if (definition != null && definition.role == StructureRole.Megaproject)
+                stats.RecordMegaprojectStage();
+        }
+
         public int CountOnPlanet(PlanetData p, StructureSO def)
         {
             int n = 0;
@@ -459,7 +487,11 @@ namespace Frontier
             var record = world.Place(planet.Id, def.id, slot);
             if (record == null) return false;
             if (seconds > 0) StartBuilderJob(StructureAt(planet, slot), seconds, 0);
-            else RecordAtlasStructureBuilt(def);
+            else
+            {
+                RecordAtlasStructureBuilt(def);
+                RecordMegaprojectStage(def);
+            }
             Notify();
             return true;
         }
@@ -478,7 +510,11 @@ namespace Frontier
             int targetLevel = s.level + 1;
             int seconds = StructureJobSeconds(s.def, targetLevel);
             if (seconds > 0) StartBuilderJob(s, seconds, targetLevel);
-            else world.SetLevel(s.record, targetLevel);
+            else
+            {
+                world.SetLevel(s.record, targetLevel);
+                RecordMegaprojectStage(s.def);
+            }
             Notify();
             return true;
         }

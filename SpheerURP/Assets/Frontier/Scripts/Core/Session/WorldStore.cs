@@ -94,6 +94,7 @@ namespace Frontier
         public double maxDistanceFromHomeLy;
         public int worldsLanded;
         public int totalWavesCleared;
+        public int megaprojectStages;
         public double playSeconds;
 
         /// <summary>A landing on a world: the farthest distance only ever grows, <see cref="worldsLanded"/> counts distinct worlds.</summary>
@@ -105,6 +106,8 @@ namespace Frontier
 
         public void RecordWaveCleared() { totalWavesCleared++; }
 
+        public void RecordMegaprojectStage() { megaprojectStages++; }
+
         public void AddPlaySeconds(double seconds)
         {
             if (seconds > 0.0) playSeconds += seconds;
@@ -115,6 +118,7 @@ namespace Frontier
             maxDistanceFromHomeLy = 0.0;
             worldsLanded = 0;
             totalWavesCleared = 0;
+            megaprojectStages = 0;
             playSeconds = 0.0;
         }
 

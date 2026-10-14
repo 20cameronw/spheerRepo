@@ -68,7 +68,7 @@ namespace Frontier
 
             var planet = new GameObject("Planet").AddComponent<PlanetView>();
             planet.Rebuilt += backdrop.Apply;
-            planet.Show(gs.planet, true);
+            planet.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet));
 
             var defense = new GameObject("Defense").AddComponent<DefenseController>();
             defense.Init(planet, cam, gs);

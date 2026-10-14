@@ -112,7 +112,8 @@ namespace Frontier
                 case 1: ShopSection(body, StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill,
                     StructureKind.SiphonRig, StructureKind.Excavator, StructureKind.SalvageYard); break;
                 case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;
-                default: ShopSection(body, StructureKind.ResearchLab, StructureKind.RadarTower, StructureKind.ColonyHub, StructureKind.Satellite); break;
+                default: ShopSection(body, StructureKind.ResearchLab, StructureKind.RadarTower, StructureKind.ColonyHub,
+                    StructureKind.Satellite, StructureKind.Terraformer); break;
             }
         }
 
@@ -322,7 +323,7 @@ namespace Frontier
                 confirmReset = false;
                 CloseModal();
                 gs.ResetProgress();
-                planetView.Show(gs.planet, true);
+                planetView.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet));
                 selected = gs.planet;
             });
             reset.style.marginTop = UiKit.Space.S24;
@@ -812,7 +813,7 @@ namespace Frontier
         {
             CloseModal();
             gs.DebugTeleport(target);
-            planetView.Show(target, true);
+            planetView.Show(target, true, gs.TerraformerStageOn(target));
             selected = target;
         }
 

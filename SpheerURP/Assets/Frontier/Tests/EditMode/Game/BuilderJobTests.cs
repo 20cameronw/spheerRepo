@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Frontier.Tests
 {
@@ -101,6 +102,38 @@ namespace Frontier.Tests
             {
                 refinery.Row(1).buildSeconds = originalDuration;
             }
+        }
+
+        [Test]
+        public void MegaprojectStages_AreCountedOnRecoveryAndNotCountedTwice()
+        {
+            var state = new GameState(db, false, clock);
+            StructureSO terraformer = db.StructureOfKind(StructureKind.Terraformer);
+            Assert.IsNotNull(terraformer);
+            var placed = state.DebugPlace(terraformer, 0);
+            placed.record.buildEndUtc = UtcText.Format(clock.UtcNow.AddSeconds(-1));
+            Assert.IsTrue(state.Save());
+
+            var built = new GameState(db, true, clock);
+            Assert.AreEqual(1, built.stats.megaprojectStages);
+            var recoveredSave = JsonUtility.FromJson<SaveV2>(File.ReadAllText(sandbox.SaveFile));
+            Assert.AreEqual(1, recoveredSave.stats.megaprojectStages,
+                "offline completion and its score are persisted immediately");
+            placed = built.StructureAt(built.planet, 0);
+            Assert.IsFalse(built.IsUnderConstruction(placed));
+
+            placed.record.upgradeEndUtc = UtcText.Format(clock.UtcNow.AddSeconds(-1));
+            placed.record.pendingUpgradeLevel = 2;
+            Assert.IsTrue(built.Save());
+
+            var upgraded = new GameState(db, true, clock);
+            Assert.AreEqual(2, upgraded.stats.megaprojectStages);
+            Assert.AreEqual(2, upgraded.StructureAt(upgraded.planet, 0).level);
+            Assert.IsTrue(upgraded.Save());
+
+            var reloaded = new GameState(db, true, clock);
+            Assert.AreEqual(2, reloaded.stats.megaprojectStages,
+                "a completed construction or upgrade is counted only once");
         }
 
         [Test]

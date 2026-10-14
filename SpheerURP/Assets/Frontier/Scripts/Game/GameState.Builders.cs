@@ -163,7 +163,9 @@ namespace Frontier
                 {
                     record.buildEndUtc = "";
                     world.Touch();
-                    RecordAtlasStructureBuilt(db.FindStructure(record.defId));
+                    var definition = db.FindStructure(record.defId);
+                    RecordAtlasStructureBuilt(definition);
+                    RecordMegaprojectStage(definition);
                 }
                 else
                 {
@@ -174,6 +176,7 @@ namespace Frontier
                     record.upgradeEndUtc = "";
                     record.pendingUpgradeLevel = 0;
                     world.SetLevel(record, level);
+                    RecordMegaprojectStage(definition);
                 }
 
                 builders.RemoveAt(i);
@@ -183,7 +186,7 @@ namespace Frontier
             return changed;
         }
 
-        void RecoverBuilderJobs(List<string> warnings)
+        bool RecoverBuilderJobs(List<string> warnings)
         {
             var savedSlots = builders ?? new List<BuilderSlot>();
             var recovered = new List<BuilderSlot>();
@@ -226,7 +229,9 @@ namespace Frontier
                         if (isBuild)
                         {
                             record.buildEndUtc = "";
-                            RecordAtlasStructureBuilt(db.FindStructure(record.defId));
+                            var definition = db.FindStructure(record.defId);
+                            RecordAtlasStructureBuilt(definition);
+                            RecordMegaprojectStage(definition);
                         }
                         else
                         {
@@ -236,6 +241,7 @@ namespace Frontier
                             record.upgradeEndUtc = "";
                             record.pendingUpgradeLevel = 0;
                             world.SetLevel(record, level);
+                            RecordMegaprojectStage(definition);
                         }
                         changed = true;
                         continue;
@@ -275,6 +281,7 @@ namespace Frontier
                     recovered.Add(saved);
             builders = recovered;
             if (changed) world.Touch();
+            return changed;
         }
 
         static string BuilderTarget(string planetId, int slot)

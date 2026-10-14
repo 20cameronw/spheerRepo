@@ -23,7 +23,10 @@ namespace Frontier
         public bool Frozen;
         float appear = 1f;
         GameObject glow;
+        Material atmosphereMat;
+        Material glowMat;
         Color baseRim;
+        int terraformingStage;
         bool punchWas;
         bool usesModel;
         List<Material> modelMats;
@@ -46,7 +49,15 @@ namespace Frontier
 
         static float CraterSoftness(PlanetData p) { return p.IsAuthored ? 0f : 1f; }
 
-        void StyleModel(Transform model, PlanetData p, System.Random rng)
+        static void TerraformPalette(PlanetData p, int level, out Color primary, out Color secondary, out Color rim)
+        {
+            float terraforming = Mathf.Clamp01(level / 5f);
+            primary = Color.Lerp(p.Primary, new Color(0.13f, 0.72f, 0.45f), terraforming * 0.35f);
+            secondary = Color.Lerp(p.Secondary, new Color(0.10f, 0.42f, 0.30f), terraforming * 0.35f);
+            rim = Color.Lerp(p.Rim, new Color(0.18f, 1f, 0.58f), terraforming * 0.4f);
+        }
+
+        void StyleModel(Transform model, PlanetData p, System.Random rng, Color primary, Color secondary)
         {
             float bands = 4f + (float)rng.NextDouble() * 6f, seed = (float)rng.NextDouble() * 10f;
             if (p.SurfaceBands > 0f) bands = p.SurfaceBands;
@@ -58,8 +69,8 @@ namespace Frontier
                 // Stacked layers (land/ocean) alternate the palette so they read as different terrain.
                 bool alt = (layer++ % 2) == 1;
                 var mat = new Material(Fx.PlanetShader);
-                mat.SetColor("_BaseColor", alt ? Color.Lerp(p.Secondary, p.Primary, 0.35f) : p.Primary);
-                mat.SetColor("_AltColor", alt ? p.Secondary * 0.6f : p.Secondary);
+                mat.SetColor("_BaseColor", alt ? Color.Lerp(secondary, primary, 0.35f) : primary);
+                mat.SetColor("_AltColor", alt ? secondary * 0.6f : secondary);
                 mat.SetColor("_RimColor", baseRim);
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
@@ -75,7 +86,7 @@ namespace Frontier
             modelMats = mats;
         }
 
-        public void Show(PlanetData p, bool animate)
+        public void Show(PlanetData p, bool animate, int terraformingLevel = 0)
         {
             if (root != null) Destroy(root.gameObject);
             orbiters.Clear(); orbiterSpeed.Clear();
@@ -88,11 +99,14 @@ namespace Frontier
             Spin.SetParent(root, false);
             // The stable visual seed (never string.GetHashCode): for the 30 Core Worlds it equals the legacy id hash, so their look is unchanged.
             var rng = new System.Random(unchecked((int)p.Seed));
+            terraformingStage = Mathf.Clamp(terraformingLevel, 0, 5);
 
             var sphere = new GameObject("Core");
             sphere.transform.SetParent(Spin, false);
             core = sphere.transform;
-            baseRim = p.Rim * p.GlowIntensity;
+            Color primary, secondary, rim;
+            TerraformPalette(p, terraformingStage, out primary, out secondary, out rim);
+            baseRim = rim * p.GlowIntensity;
             coreMat = null; modelMats = null;
             float ground = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
             // The model is fitted to its own radius (the standard 1.5 for generated worlds, whatever their ground radius), so every planet is the same size on screen.
@@ -104,7 +118,7 @@ namespace Frontier
             {
                 solids.Clear();
                 solids.AddRange(model.GetComponentsInChildren<MeshRenderer>());
-                StyleModel(model, p, rng);
+                StyleModel(model, p, rng, primary, secondary);
             }
             if (model == null)
             {
@@ -115,8 +129,8 @@ namespace Frontier
                 sphere.transform.localScale = Vector3.one * Radius * 2f;
                 core = sphere.transform;
                 coreMat = new Material(Fx.PlanetShader);
-                coreMat.SetColor("_BaseColor", p.Primary);
-                coreMat.SetColor("_AltColor", p.Secondary);
+                coreMat.SetColor("_BaseColor", primary);
+                coreMat.SetColor("_AltColor", secondary);
                 coreMat.SetColor("_RimColor", baseRim);
                 coreMat.SetFloat("_Bands", EffectiveBands(p, p.SurfaceBands > 0f ? p.SurfaceBands : 4f + (float)rng.NextDouble() * 6f));
                 coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
@@ -137,14 +151,16 @@ namespace Frontier
             atmo.transform.SetParent(root, false);
             atmosphere = atmo.transform;
             atmo.transform.localScale = Vector3.one * p.AtmosphereScale;
-            Color atmosphereColor = p.Rim * (1.2f * p.AtmosphereIntensity);
-            atmo.GetComponent<MeshRenderer>().sharedMaterial = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
+            Color atmosphereColor = rim * (1.2f * p.AtmosphereIntensity);
+            atmosphereMat = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
+            atmo.GetComponent<MeshRenderer>().sharedMaterial = atmosphereMat;
 
             glow = Fx.GlowQuad(root, new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
+            glowMat = glow.GetComponent<MeshRenderer>().sharedMaterial;
 
             if (p.HasRings)
                 for (int i = 0; i < 2; i++)
-                    BuildRing(Radius * (1.7f + i * 0.35f), p.Rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
+                    BuildRing(Radius * (1.7f + i * 0.35f), rim, (float)rng.NextDouble() * 70f - 35f, (float)rng.NextDouble() * 360f);
 
             // Moons: angle and speed come from the same stream as before (authored worlds keep their layout); the orbit tilt has its own seeded stream.
             // More than four moons share the same outer limit instead of drifting off screen.
@@ -152,7 +168,7 @@ namespace Frontier
             float moonStep = Mathf.Min(0.45f, 1.5f / Mathf.Max(1, moons - 1));
             var tiltRng = new System.Random(unchecked((int)p.Seed ^ (int)(p.Seed >> 32) ^ 0x4D4F4F4E));
             for (int i = 0; i < moons; i++)
-                BuildMoon(Radius * (2.1f + i * moonStep), p.Rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f,
+                BuildMoon(Radius * (2.1f + i * moonStep), rim, (float)rng.NextDouble() * 6.28f, 0.6f + (float)rng.NextDouble() * 0.6f,
                     Mathf.Lerp(-25f, 25f, (float)tiltRng.NextDouble()), Mathf.Lerp(-15f, 15f, (float)tiltRng.NextDouble()));
 
             Weather.Build(root, p);
@@ -160,6 +176,40 @@ namespace Frontier
             appear = animate ? 0f : 1f;
             root.localScale = Vector3.one * appear;
             if (Rebuilt != null) Rebuilt(p);
+        }
+
+        public void SetTerraformingStage(int level)
+        {
+            if (Current == null) return;
+            int stage = Mathf.Clamp(level, 0, 5);
+            if (stage == terraformingStage) return;
+            terraformingStage = stage;
+
+            Color primary, secondary, rim;
+            TerraformPalette(Current, terraformingStage, out primary, out secondary, out rim);
+            baseRim = rim * Current.GlowIntensity;
+            if (coreMat != null)
+            {
+                coreMat.SetColor("_BaseColor", primary);
+                coreMat.SetColor("_AltColor", secondary);
+                coreMat.SetColor("_RimColor", baseRim);
+            }
+            if (modelMats != null)
+            {
+                foreach (var material in modelMats)
+                {
+                    if (material == null) continue;
+                    material.SetColor("_BaseColor", primary);
+                    material.SetColor("_AltColor", secondary);
+                    material.SetColor("_RimColor", baseRim);
+                }
+            }
+
+            Color atmosphereColor = rim * (1.2f * Current.AtmosphereIntensity);
+            if (atmosphereMat != null)
+                atmosphereMat.SetColor("_Color", new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
+            if (glowMat != null)
+                glowMat.SetColor("_Color", new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f));
         }
 
         // Free trackball control: drags rotate about the camera's up/right axes, so any direction works.
@@ -245,9 +295,9 @@ namespace Frontier
             root.gameObject.SetActive(false);
         }
 
-        public IEnumerator Approach(PlanetData planet)
+        public IEnumerator Approach(PlanetData planet, int terraformingLevel = 0)
         {
-            Show(planet, false);
+            Show(planet, false, terraformingLevel);
             Frozen = true;
             float time = 0f;
             while (time < 1.1f)

@@ -148,6 +148,12 @@ namespace Frontier
                     StructureHeader(body, s, jobColor, "Builder crew assigned");
                     jobStatusLabel = UiKit.Text(gs.BuilderJobStatus(s), "fr-small", UiKit.Cyan);
                     body.Add(jobStatusLabel);
+                    if (s.def.kind == StructureKind.Terraformer)
+                    {
+                        int stage = s.record.pendingUpgradeLevel > s.level ? s.record.pendingUpgradeLevel : s.level;
+                        body.Add(SectionLabel("STAGE " + stage + " / " + s.def.maxLevel + "  ·  " + StructureEffect(s.def, stage)));
+                        body.Add(UiKit.Text("The global harvest bonus activates when this timer completes.", "fr-tiny"));
+                    }
                     body.Add(UiKit.Text("Jobs use local device time in this offline build.", "fr-tiny"));
                 });
                 jobPopupStructure = s;
@@ -156,6 +162,7 @@ namespace Frontier
             var k = s.def.kind;
             if (k.IsStorage()) OpenWarehouse(s, t);
             else if (k == StructureKind.Satellite) OpenRelay(s, t);
+            else if (k == StructureKind.Terraformer) OpenTerraformer(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
             else if (k == StructureKind.RadarTower) OpenRadarTower(s, t);
@@ -299,6 +306,21 @@ namespace Frontier
             });
         }
 
+        void OpenTerraformer(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("terraformer" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Planet-wide harvest program");
+                body.Add(UiKit.Text(s.def.description, "fr-tiny"));
+                body.Add(SectionLabel("GLOBAL HARVEST BONUS"));
+                body.Add(UiKit.Text("+" + Mathf.RoundToInt(gs.TerraformerHarvestBonus * 100f) +
+                    "% harvest yield on all worlds", "fr-small", UiKit.Lime));
+                body.Add(UiKit.Text("Megaproject stages completed: " + gs.stats.megaprojectStages, "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
         void OpenResearchLab(PlacedStructure s, Transform t)
         {
             Color c = UiKit.Ui(s.def.color);
@@ -411,7 +433,8 @@ namespace Frontier
                     Color rc = UiKit.Ui(sp.resource.color);
                     var row = UiKit.Div("fr-row");
                     row.AddToClassList("fr-popup-line");
-                    int est = Mathf.Max(1, Mathf.RoundToInt(sp.baseYield * gs.ToolMultiplier(game) * (1f + bonus)));
+                    int est = Mathf.Max(1, Mathf.RoundToInt(sp.baseYield * gs.ToolMultiplier(game) *
+                        (1f + bonus + gs.TerraformerHarvestBonus)));
                     row.Add(Icons.Make(Icons.ForResource(sp.resource), rc, UiKit.Size.IconLg));
                     var txt = UiKit.Div("fr-card-text");
                     txt.Add(UiKit.Text(sp.resource.displayName, "fr-small"));

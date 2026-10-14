@@ -140,6 +140,33 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void Terraformer_AppliesGlobalHarvestBonusOnlyWhileOperational()
+        {
+            var state = new GameState(db, false);
+            var terraformer = db.StructureOfKind(StructureKind.Terraformer);
+            Assert.IsNotNull(terraformer);
+            Assert.IsTrue(terraformer.Implemented);
+
+            var first = state.DebugPlace(terraformer, 0, 3);
+            Assert.AreEqual(3, state.TerraformerStageOn(state.planet));
+            Assert.AreEqual(0.18f, state.TerraformerHarvestBonus, 0.00001f);
+
+            var remoteDefinition = db.planets.First(p => p != null && p.id != state.planet.AuthoredId);
+            PlanetData remote = state.universe.Get(remoteDefinition.id);
+            state.DebugTeleport(remote);
+            var second = state.DebugPlace(terraformer, 0, 2);
+            Assert.AreEqual(2, state.TerraformerStageOn(remote));
+            Assert.AreEqual(0.30f, state.TerraformerHarvestBonus, 0.00001f,
+                "terraforming effects stack across worlds");
+
+            second.record.buildEndUtc = UtcText.Format(state.clock.UtcNow.AddHours(1));
+            Assert.AreEqual(0, state.TerraformerStageOn(remote));
+            Assert.AreEqual(0.18f, state.TerraformerHarvestBonus, 0.00001f,
+                "a project under construction has no stage effect");
+            Assert.NotNull(first);
+        }
+
+        [Test]
         public void UnimplementedAndResearchContent_CannotBePurchasedWithFreeMaterials()
         {
             var state = new GameState(db, false);

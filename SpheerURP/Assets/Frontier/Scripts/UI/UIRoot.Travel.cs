@@ -63,7 +63,7 @@ namespace Frontier
             if (autoOverlay != null) autoOverlay.RemoveFromHierarchy();
             if (!gs.Travel(plan, target))
             {
-                yield return planetView.Approach(gs.planet);
+                yield return planetView.Approach(gs.planet, gs.TerraformerStageOn(gs.planet));
                 busy = false;
                 Toast("Travel changed. Check your route and fuel, then try again.", UiKit.Red);
                 yield break;
@@ -81,7 +81,7 @@ namespace Frontier
             gs.Flush();
             backdrop.Apply(target);
             selected = target;
-            yield return planetView.Approach(target);
+            yield return planetView.Approach(target, gs.TerraformerStageOn(target));
             busy = false;
             Toast("Arrived at " + target.Name + (refund > 0 ? " · +" + refund + " fuel back" : ""), UiKit.Cyan);
         }

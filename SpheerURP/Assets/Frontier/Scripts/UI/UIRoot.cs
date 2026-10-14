@@ -245,6 +245,8 @@ namespace Frontier
         void OnStateChanged()
         {
             if (batching) return;
+            if (planetView.Current != null && planetView.Current.Id == gs.planet.Id)
+                planetView.SetTerraformingStage(gs.TerraformerStageOn(gs.planet));
             fuelLabel.text = gs.Count(gs.db.fuel).ToString();
             packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
             levelLabel.text = "LV " + gs.PlayerLevel;
@@ -336,6 +338,7 @@ namespace Frontier
             if (d.kind == StructureKind.ResearchLab) return "Research Lab level " + Mathf.RoundToInt(effect);
             if (d.kind == StructureKind.RadarTower) return "+" + Mathf.RoundToInt(effect) + " ly local survey";
             if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";
+            if (d.kind == StructureKind.Terraformer) return "+" + pct + "% global harvest";
             if (d.HasLevelRows && d.kind.IsStation()) return "Batch size " + Mathf.RoundToInt(effect) + " (level bonus planned)";
             if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";
             if (d.kind.IsGather()) return "+" + pct + "% yield";
@@ -387,7 +390,8 @@ namespace Frontier
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;
-                float amount = spot.baseYield * gs.ToolMultiplier(spot.game) * (1f + bonus) * (0.4f + 1.1f * r.quality);
+                float amount = spot.baseYield * gs.ToolMultiplier(spot.game) *
+                    (1f + bonus + gs.TerraformerHarvestBonus) * (0.4f + 1.1f * r.quality);
                 int n = r.quality > 0.05f ? Mathf.Max(1, Mathf.RoundToInt(amount)) : 0;
                 int got = gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);

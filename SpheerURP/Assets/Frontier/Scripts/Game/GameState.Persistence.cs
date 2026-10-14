@@ -186,10 +186,10 @@ namespace Frontier
                 });
             }
             world.Import(save.worlds);
-            bool offlineChanged = AccrueOfflineHarvesters(save.clock.lastSavedUtc);
-            RecoverBuilderJobs(warnings);
-            SeedAtlasFromExistingProgress();
             stats = save.stats ?? new PlayerStats();
+            bool offlineChanged = AccrueOfflineHarvesters(save.clock.lastSavedUtc);
+            bool builderJobsChanged = RecoverBuilderJobs(warnings);
+            SeedAtlasFromExistingProgress();
 
             planet = universe.Get(save.location.currentPlanetId);
             if (planet == null)
@@ -197,7 +197,7 @@ namespace Frontier
                 if (!string.IsNullOrEmpty(save.location.currentPlanetId)) warnings.Add("the world '" + save.location.currentPlanetId + "' does not exist; returning home");
                 planet = universe.Home;
             }
-            return offlineChanged;
+            return offlineChanged || builderJobsChanged;
         }
 
         SaveV2 BuildSave()

@@ -254,7 +254,7 @@ namespace Frontier
         {
             if (p == null) return;
             rt.State.DebugTeleport(p);
-            rt.Planet.Show(p, false);
+            rt.Planet.Show(p, false, rt.State.TerraformerStageOn(p));
         }
 
         void ResetView()
@@ -451,6 +451,26 @@ namespace Frontier
                 GoTo(obstacleShowcase);
                 if (!ui.DebugTapObstacle(obstacleShowcasePad))
                     throw new InvalidOperationException("surface obstruction could not be selected");
+            }, 0.3f);
+            yield return new Shot("popup-terraformer", () =>
+            {
+                var world = FindWorld(ColossalSpec);
+                if (world == null) throw new InvalidOperationException("no colossal Terraformer showcase world");
+                GoTo(world);
+                showcaseWorld = world.Id;
+                ResetView();
+                var terraformer = gs.StructureOfKind(world, StructureKind.Terraformer);
+                if (terraformer == null)
+                {
+                    int slot = world.BuildingSlots - 1;
+                    while (slot >= 0 && gs.StructureAt(world, slot) != null) slot--;
+                    if (slot < 0) throw new InvalidOperationException("no free colossal pad for the Terraformer showcase");
+                    terraformer = gs.DebugPlace(db.StructureOfKind(StructureKind.Terraformer), slot, 3);
+                    if (terraformer == null) throw new InvalidOperationException("Terraformer showcase could not be placed");
+                    gs.stats.megaprojectStages = Math.Max(gs.stats.megaprojectStages, terraformer.level);
+                    gs.Notify();
+                }
+                ui.DebugTapStructure(terraformer);
             }, 0.3f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.

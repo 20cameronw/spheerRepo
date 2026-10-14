@@ -37,7 +37,8 @@ namespace Frontier
                 changed = true;
 
                 float gatherBonus = AutoHarvestStructureBonus(universe.Get(structure.planetId), spot);
-                double perRun = spot.baseYield * (1.0 + gatherBonus) * (0.4 + 1.1 * AutoHarvesterAverageQuality);
+                double perRun = spot.baseYield * (1.0 + gatherBonus + TerraformerHarvestBonus) *
+                    (0.4 + 1.1 * AutoHarvesterAverageQuality);
                 long amount = (long)Math.Floor(wholeRuns * perRun);
                 int requested = (int)Math.Min(int.MaxValue, Math.Max(0L, amount));
                 int stored = AddToHarvesterHopper(structure, spot.resource, requested);
