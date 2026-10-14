@@ -1,0 +1,19 @@
+{
+    "name": "Frontier.Services.Unity",
+    "rootNamespace": "Frontier.Services.Unity",
+    "references": [
+        "Frontier.Services",
+        "Unity.Services.Core",
+        "Unity.Services.Authentication",
+        "Unity.Services.Leaderboards"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,5 +1,6 @@
 using System.Collections;
 using Frontier.Services;
+using Frontier.Services.Unity;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -25,7 +26,9 @@ namespace Frontier
             Application.targetFrameRate = cfg.targetFrameRate;
 
             var db = GameDatabase.ForRuntime(database);
-            var services = FrontierServices.CreateOffline(new ConsentService(new PlayerPrefsConsentStore()));
+            var consent = new ConsentService(new PlayerPrefsConsentStore());
+            var serviceConfig = Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
+            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HarnessRunner.PrepareFromCommandLine();
 #endif

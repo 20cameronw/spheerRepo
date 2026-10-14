@@ -499,11 +499,13 @@ namespace Frontier.Services
         public readonly IRemoteConfigService RemoteConfig;
         public readonly ITimeService Time;
         public readonly INotificationService Notifications;
+        public readonly string LeaderboardId;
+        public readonly string PrivacyPolicyUrl;
 
         public FrontierServices(IConsentService consent, IAdsService ads, IPurchaseService purchases,
             IAuthService authentication, ILeaderboardService leaderboards, ICloudSaveService cloudSave,
             IAnalyticsService analytics, IRemoteConfigService remoteConfig, ITimeService time,
-            INotificationService notifications)
+            INotificationService notifications, string leaderboardId = null, string privacyPolicyUrl = null)
         {
             Consent = consent ?? throw new ArgumentNullException(nameof(consent));
             Ads = new ConsentGatedAdsService(ads, consent);
@@ -515,6 +517,8 @@ namespace Frontier.Services
             RemoteConfig = remoteConfig ?? throw new ArgumentNullException(nameof(remoteConfig));
             Time = time ?? throw new ArgumentNullException(nameof(time));
             Notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+            LeaderboardId = leaderboardId ?? string.Empty;
+            PrivacyPolicyUrl = privacyPolicyUrl ?? string.Empty;
         }
 
         public static FrontierServices CreateOffline(IConsentService consent)

@@ -12,6 +12,7 @@
         "Frontier.Visual",
         "Frontier.UI",
         "Frontier.Services",
+        "Frontier.Services.Unity",
         "Frontier.App",
         "Frontier.HyperspaceView"
     ],

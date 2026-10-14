@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Frontier.Services;
+using Frontier.Services.Unity;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -298,6 +299,63 @@ namespace Frontier.Tests
             Assert.AreEqual(ServiceStatus.NotConfigured, services.RemoteConfig.InitializeAsync().Result.status);
             Assert.AreEqual(ServiceStatus.NotConfigured, services.Notifications.InitializeAsync().Result.status);
             Assert.IsFalse(services.Time.IsServerTrusted);
+        }
+
+        [TestCase("https://example.com/privacy", true)]
+        [TestCase("http://example.com/privacy", false)]
+        [TestCase("javascript:alert(1)", false)]
+        [TestCase("", false)]
+        public void UnityServicesConfig_OnlyAcceptsHttpsPrivacyPolicy(string url, bool expected)
+        {
+            var config = ScriptableObject.CreateInstance<FrontierUnityServicesConfig>();
+            try
+            {
+                config.enableOnlineServices = false;
+                config.privacyPolicyUrl = url;
+                Assert.AreEqual(expected, config.HasValidPrivacyPolicy);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(config);
+            }
+        }
+
+        [Test]
+        public void UnityServicesFactory_LeavesProvidersUnavailableUntilConfigured()
+        {
+            var config = ScriptableObject.CreateInstance<FrontierUnityServicesConfig>();
+            try
+            {
+                config.enableOnlineServices = false;
+                config.leaderboardId = string.Empty;
+                config.privacyPolicyUrl = string.Empty;
+                var consent = new ConsentService(new MemoryConsentStore());
+                consent.SavePreferences(false, false, true);
+                var services = FrontierUnityServicesFactory.Create(
+                    consent, config);
+
+                Assert.IsFalse(services.Authentication.IsConfigured);
+                Assert.IsFalse(services.Leaderboards.IsConfigured);
+                Assert.AreEqual(ServiceStatus.NotConfigured, services.Authentication.InitializeAsync().Result.status);
+                Assert.AreEqual(ServiceStatus.NotConfigured, services.Leaderboards.InitializeAsync().Result.status);
+                Assert.AreEqual(string.Empty, services.PrivacyPolicyUrl);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(config);
+            }
+        }
+
+        [Test]
+        public void ResourcesUnityServicesConfig_RemainsDisabledAndUncredentialed()
+        {
+            FrontierUnityServicesConfig config =
+                Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
+
+            Assert.IsNotNull(config);
+            Assert.IsFalse(config.enableOnlineServices);
+            Assert.IsTrue(string.IsNullOrWhiteSpace(config.leaderboardId));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(config.privacyPolicyUrl));
         }
     }
 }

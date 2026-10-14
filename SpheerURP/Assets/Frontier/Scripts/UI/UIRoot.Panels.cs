@@ -256,7 +256,76 @@ namespace Frontier
             foreach (var s in gs.structures) planets.Add(s.planetId);
             StatRow(card, "map", UiKit.Amber, "Bases", planets.Count.ToString());
             body.Add(card);
-            body.Add(UiKit.Text("Online leaderboards aren't connected yet - this shows your local progress.", "fr-muted"));
+            if (services == null || !services.Leaderboards.IsConfigured)
+            {
+                body.Add(UiKit.Text("Online ranks are unavailable until Unity services, a leaderboard and an HTTPS privacy policy are configured and approved. Your local record remains available above.", "fr-muted"));
+                return;
+            }
+            if (!services.Consent.Current.hasDecision || !services.Consent.Current.onlineServicesAllowed)
+            {
+                body.Add(UiKit.Text("Enable online account and leaderboard access in Settings to load online ranks. Nothing is sent before you opt in and request the list.", "fr-muted"));
+                return;
+            }
+
+            body.Add(UiKit.Text("Online ranks load only when requested. Scores are not submitted until Frontier Score is connected to live progression.", "fr-muted"));
+            if (!string.IsNullOrEmpty(leaderboardStatus))
+                body.Add(UiKit.Text(leaderboardStatus, "fr-small"));
+
+            if (onlineLeaderboardEntries != null)
+            {
+                foreach (LeaderboardEntry entry in onlineLeaderboardEntries)
+                {
+                    var row = UiKit.Div("fr-stat-row");
+                    row.Add(UiKit.Text("#" + entry.rank + "  " + entry.displayName, "fr-small"));
+                    row.Add(UiKit.Div("fr-spacer"));
+                    row.Add(UiKit.Text(entry.score.ToString("N0"), "fr-small"));
+                    body.Add(row);
+                }
+                if (onlineLeaderboardEntries.Count == 0)
+                    body.Add(UiKit.Text("No scores have been posted to this board yet.", "fr-muted"));
+            }
+
+            var load = IconBtn(leaderboardLoading ? "LOADING RANKS" : "CONNECT AND LOAD RANKS",
+                "ranks", UiKit.Cyan, LoadOnlineLeaderboard);
+            UiKit.SetEnabledLook(load, !leaderboardLoading);
+            body.Add(load);
+        }
+
+        IReadOnlyList<LeaderboardEntry> onlineLeaderboardEntries;
+        string leaderboardStatus;
+        bool leaderboardLoading;
+
+        async void LoadOnlineLeaderboard()
+        {
+            if (leaderboardLoading || services == null) return;
+            leaderboardLoading = true;
+            leaderboardStatus = "Connecting to online services...";
+            RefreshModal();
+
+            ServiceResult<AuthIdentity> signIn = await services.Authentication.SignInAnonymouslyAsync();
+            if (this == null) return;
+            if (!signIn.succeeded)
+            {
+                leaderboardStatus = signIn.message;
+                leaderboardLoading = false;
+                RefreshModal();
+                return;
+            }
+
+            ServiceResult<IReadOnlyList<LeaderboardEntry>> scores =
+                await services.Leaderboards.GetScoresAsync(services.LeaderboardId, 20);
+            if (this == null) return;
+            leaderboardLoading = false;
+            if (!scores.succeeded)
+            {
+                leaderboardStatus = scores.message;
+                RefreshModal();
+                return;
+            }
+
+            onlineLeaderboardEntries = scores.value;
+            leaderboardStatus = "Online leaderboard connected.";
+            RefreshModal();
         }
 
         void BuildTutorial(VisualElement body)
@@ -342,8 +411,11 @@ namespace Frontier
 
             body.Add(SectionLabel("PRIVACY"));
             body.Add(UiKit.Text(
-                "Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. These services are not configured in this build. Changes save locally and gate initialization.",
+                "Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. Choices save locally and online services stay opt-in. Online services also require legal, audience and account-deletion setup; ads, purchases, cloud saves and analytics are not configured.",
                 "fr-muted"));
+            if (!string.IsNullOrEmpty(services.PrivacyPolicyUrl))
+                body.Add(IconBtn("VIEW PRIVACY POLICY", "about", UiKit.Cyan,
+                    () => Application.OpenURL(services.PrivacyPolicyUrl)));
 
             ConsentChoice(body, "Gameplay analytics", analyticsAllowed, value =>
             {

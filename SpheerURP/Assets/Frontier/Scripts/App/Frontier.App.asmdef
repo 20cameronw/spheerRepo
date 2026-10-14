@@ -9,7 +9,8 @@
         "Frontier.Visual",
         "Frontier.UI",
         "Frontier.HyperspaceView",
-        "Frontier.Services"
+        "Frontier.Services",
+        "Frontier.Services.Unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
