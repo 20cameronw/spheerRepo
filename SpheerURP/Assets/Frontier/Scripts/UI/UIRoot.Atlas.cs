@@ -17,15 +17,22 @@ namespace Frontier
 
         void BuildAtlas(VisualElement body)
         {
-            var tabs = UiKit.Div("fr-tabs");
-            tabs.Add(TabButton("core", "RESOURCES", atlasTab == 0, UiKit.Cyan, () => atlasTab = 0));
-            tabs.Add(TabButton("refinery", "RECIPES", atlasTab == 1, UiKit.Cyan, () => atlasTab = 1));
-            tabs.Add(TabButton("map", "WORLDS", atlasTab == 2, UiKit.Cyan, () => atlasTab = 2));
-            tabs.Add(TabButton("alien", "FIELD GUIDE", atlasTab == 3, UiKit.Cyan, () => atlasTab = 3));
+            var tabs = UiKit.Div();
+            var firstTabRow = UiKit.Div("fr-tabs");
+            firstTabRow.Add(TabButton("core", "RESOURCES", atlasTab == 0, UiKit.Cyan, () => atlasTab = 0));
+            firstTabRow.Add(TabButton("refinery", "RECIPES", atlasTab == 1, UiKit.Cyan, () => atlasTab = 1));
+            tabs.Add(firstTabRow);
+            var secondTabRow = UiKit.Div("fr-tabs");
+            secondTabRow.Add(TabButton("map", "WORLDS", atlasTab == 2, UiKit.Cyan, () => atlasTab = 2));
+            secondTabRow.Add(TabButton("alien", "FIELD GUIDE", atlasTab == 3, UiKit.Cyan, () => atlasTab = 3));
+            tabs.Add(secondTabRow);
             body.Add(tabs);
 
             body.Add(UiKit.Text("FIELD NOTES  /  CATALOG DATA", "fr-tiny", UiKit.Muted));
-            body.Add(UiKit.Text("Entries describe known content. Discovery tracking is not enabled yet.", "fr-muted"));
+            body.Add(UiKit.Text("RESOURCES  " + gs.AtlasDiscoveredCount("resource") + "/" + gs.AtlasCatalogCount("resource") +
+                "  ·  RECIPES  " + gs.AtlasDiscoveredCount("recipe") + "/" + gs.AtlasCatalogCount("recipe"), "fr-small"));
+            body.Add(UiKit.Text("STRUCTURES  " + gs.AtlasDiscoveredCount("structure") + "/" + gs.AtlasCatalogCount("structure"), "fr-small"));
+            body.Add(UiKit.Text("Find resources, craft recipes and complete builds to discover entries and earn one-time Nova Shards. World visits are tracked separately.", "fr-muted"));
             switch (atlasTab)
             {
                 case 0: BuildAtlasResources(body); break;
@@ -101,6 +108,12 @@ namespace Frontier
             heading.Add(UiKit.Text(resource.category + "  /  TIER " + resource.tier + "  /  STACK " + resource.stackSize, "fr-tiny"));
             header.Add(heading);
             card.Add(header);
+            card.Add(UiKit.Text(
+                gs.IsAtlasDiscovered("resource", resource.id)
+                    ? "DISCOVERED"
+                    : "NOT DISCOVERED  ·  FIRST FIND EARNS SHARDS",
+                "fr-tiny",
+                gs.IsAtlasDiscovered("resource", resource.id) ? UiKit.Lime : UiKit.Muted));
             if (!string.IsNullOrEmpty(resource.DetailText)) card.Add(UiKit.Text(resource.DetailText, "fr-muted"));
 
             card.Add(SectionLabel("WHERE TO FIND IT"));
@@ -203,6 +216,11 @@ namespace Frontier
                 PrettyName(recipe.stationId) + " LV " + recipe.stationLevel;
             if (!string.IsNullOrEmpty(recipe.unlockResearch)) gate += "  ·  RESEARCH: " + PrettyName(recipe.unlockResearch);
             card.Add(UiKit.Text(gate, "fr-tiny"));
+            bool discovered = gs.IsAtlasDiscovered("recipe", recipe.id);
+            card.Add(UiKit.Text(
+                discovered ? "CRAFTED" : "NOT CRAFTED  ·  FIRST CRAFT EARNS SHARDS",
+                "fr-tiny",
+                discovered ? UiKit.Lime : UiKit.Muted));
 
             var flow = UiKit.Div("fr-recipe-flow");
             var inputs = UiKit.Div("fr-recipe-side");
@@ -245,7 +263,7 @@ namespace Frontier
                 atlasWorldId = planets[index].Id;
                 RefreshModal();
             });
-            body.Add(UiKit.Text("VISITED WORLDS", "fr-tiny"));
+            body.Add(UiKit.Text("VISITED WORLDS  ·  TRACKED SEPARATELY FROM CATALOG DISCOVERIES", "fr-tiny"));
             body.Add(picker);
             BuildAtlasWorldDetails(body, planets[selectedIndex]);
         }
@@ -315,6 +333,14 @@ namespace Frontier
                     text.Add(UiKit.Text(structure.role + "  ·  TIER " + structure.tier + "  ·  " + (structure.Implemented ? "GAMEPLAY ACTIVE" : "CATALOGUE ONLY"), "fr-tiny"));
                     header.Add(text);
                     card.Add(header);
+                    if (structure.Implemented)
+                    {
+                        bool discovered = gs.IsAtlasDiscovered("structure", structure.kind.ToString());
+                        card.Add(UiKit.Text(
+                            discovered ? "BUILT" : "NOT BUILT  ·  FIRST COMPLETED BUILD EARNS SHARDS",
+                            "fr-tiny",
+                            discovered ? UiKit.Lime : UiKit.Muted));
+                    }
                     card.Add(UiKit.Text(structure.description, "fr-muted"));
                     if (!structure.Implemented)
                         card.Add(Note("This definition is in the content catalog; its gameplay behavior is not implemented.", UiKit.Amber));

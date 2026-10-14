@@ -75,7 +75,11 @@ namespace Frontier
         public int Add(ResourceSO r, int amount, bool notify = true)
         {
             int accepted = r == null ? 0 : backpack.Add(r.id, amount);
-            if (accepted > 0) saves.MarkDirty();
+            if (accepted > 0)
+            {
+                saves.MarkDirty();
+                RecordAtlasResourceAcquired(r.id);
+            }
             if (notify) Notify();
             return accepted;
         }
@@ -301,6 +305,7 @@ namespace Frontier
             var record = world.Place(planet.Id, def.id, slot);
             if (record == null) return false;
             if (seconds > 0) StartBuilderJob(StructureAt(planet, slot), seconds, 0);
+            else RecordAtlasStructureBuilt(def);
             Notify();
             return true;
         }
@@ -445,6 +450,9 @@ namespace Frontier
             for (int i = 0; i < outputs.Length; i++)
                 outputs[i] = new IdAmount(r.outputs[i].resource != null ? r.outputs[i].resource.id : "", OutputAmount(r.outputs[i], bonus));
             if (!backpack.Craft(ToIds(r.inputs), outputs)) return false;
+            RecordAtlasRecipeCrafted(r);
+            foreach (var output in r.outputs)
+                if (output.resource != null) RecordAtlasResourceAcquired(output.resource.id);
             Notify();
             return true;
         }
@@ -457,6 +465,9 @@ namespace Frontier
             if (!TryScaleAmounts(recipe.inputs, batches, 0f, false, out inputs) ||
                 !TryScaleAmounts(recipe.outputs, batches, bonus, true, out outputs) ||
                 !backpack.Craft(inputs, outputs)) return false;
+            RecordAtlasRecipeCrafted(recipe);
+            foreach (var output in recipe.outputs)
+                if (output.resource != null) RecordAtlasResourceAcquired(output.resource.id);
             Notify();
             return true;
         }

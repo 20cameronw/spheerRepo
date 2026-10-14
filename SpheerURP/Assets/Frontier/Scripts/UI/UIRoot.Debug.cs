@@ -29,6 +29,14 @@ namespace Frontier
         }
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
+        public void DebugAtlas(int tab)
+        {
+            DebugReset();
+            atlasTab = Mathf.Clamp(tab, 0, 3);
+            OpenMenu();
+            menuPage = "atlas";
+            RefreshModal();
+        }
         public void DebugResearch(int tab, int tool = 0, int progression = 0)
         {
             DebugReset();

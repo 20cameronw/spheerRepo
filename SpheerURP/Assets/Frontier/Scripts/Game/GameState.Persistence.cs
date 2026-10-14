@@ -127,7 +127,12 @@ namespace Frontier
                 generatorVersion = universe.Universe.GeneratorVersion,
                 universeSeed = SeedText.Format(universe.Seed)
             };
-            foreach (var s in db.startingItems) if (s.resource != null) backpack.Set(s.resource.id, s.amount);
+            foreach (var s in db.startingItems)
+            {
+                if (s.resource == null) continue;
+                backpack.Set(s.resource.id, s.amount);
+                if (s.amount > 0) RecordAtlasResourceAcquired(s.resource.id);
+            }
             planet = universe.Home;
             RecordArrival(planet);
             saves.MarkDirty();
@@ -178,6 +183,7 @@ namespace Frontier
             }
             world.Import(save.worlds);
             RecoverBuilderJobs(warnings);
+            SeedAtlasFromExistingProgress();
             stats = save.stats ?? new PlayerStats();
 
             planet = universe.Get(save.location.currentPlanetId);

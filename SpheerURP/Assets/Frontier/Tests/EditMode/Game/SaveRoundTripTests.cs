@@ -71,6 +71,45 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void AtlasResourceDiscovery_AwardsOnceAndSurvivesSaveReload()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported shard rules are unavailable");
+            var state = new GameState(db, false);
+            var resource = db.FindResource("steel");
+            Assert.IsNotNull(resource);
+            int before = state.ShardBalance;
+
+            Assert.AreEqual(1, state.Add(resource, 1, false));
+            Assert.IsTrue(state.IsAtlasDiscovered("resource", resource.id));
+            Assert.AreEqual(before + db.shardRules.data.atlasResourceShards, state.ShardBalance);
+            Assert.IsFalse(state.IsAtlasDiscovered("world", state.planet.Id), "visiting a world is not a catalog discovery");
+            Assert.IsTrue(state.Save());
+
+            var loaded = new GameState(db, true);
+            Assert.IsTrue(loaded.IsAtlasDiscovered("resource", resource.id));
+            Assert.AreEqual(state.ShardBalance, loaded.ShardBalance);
+            Assert.AreEqual(1, loaded.Add(resource, 1, false));
+            Assert.AreEqual(state.ShardBalance, loaded.ShardBalance, "reacquiring a discovered resource does not pay twice");
+        }
+
+        [Test]
+        public void AtlasBackfill_MarksPreviouslyOwnedResourcesWithoutRetroactiveReward()
+        {
+            var state = new GameState(db, false);
+            var resource = db.FindResource("steel");
+            Assert.IsNotNull(resource);
+            state.backpack.Set(resource.id, 2);
+            int balance = state.ShardBalance;
+            Assert.IsTrue(state.Save());
+
+            var loaded = new GameState(db, true);
+            Assert.IsTrue(loaded.IsAtlasDiscovered("resource", resource.id));
+            Assert.AreEqual(balance, loaded.ShardBalance);
+            loaded.Add(resource, 1, false);
+            Assert.AreEqual(balance, loaded.ShardBalance, "an existing save's known inventory is not paid retroactively");
+        }
+
+        [Test]
         public void ResetProgress_RestoresTheStartingContent()
         {
             var state = new GameState(db, false);

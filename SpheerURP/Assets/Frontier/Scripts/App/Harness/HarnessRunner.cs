@@ -272,6 +272,12 @@ namespace Frontier
                 string pg = page;
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
             }
+            string[] atlasShots = { "resources", "recipes", "worlds", "structures" };
+            for (int tab = 0; tab < atlasShots.Length; tab++)
+            {
+                int t = tab;
+                yield return new Shot("menu-atlas-" + atlasShots[tab], () => ui.DebugAtlas(t));
+            }
             yield return new Shot("map", () => ui.DebugMap(null, 2f), 0.8f);
             yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 1f), 0.8f);
             yield return new Shot("map-autopilot", () => { ui.DebugMap(gs.universe.Get("cinder"), 1f); ui.DebugMapAutopilot(); }, 0.8f);

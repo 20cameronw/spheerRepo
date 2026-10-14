@@ -2,6 +2,7 @@
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
 Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
+Latest validated milestone: **Atlas discovery and first-discovery rewards**; remaining structure expansion, hazards, services and release work are still open.
 
 ---
 
@@ -316,7 +317,7 @@ Tool ladders (6–7 tiers) for Axe, Pick, Drill, **Siphon, Scanner/Excavator, Cl
 
 ### 5.6 Atlas (Astroneer-style codex)
 
-Tabs: **Resources · Alloys & Recipes · Worlds · Bestiary · Structures**. Each resource entry: icon, category/tier, description, **how to obtain** (harvest method + biomes + sample surveyed worlds with distance), **used in** (recipes, structures, upgrades), **made from**. Entries show a silhouette until discovered; first discovery grants a small shard bounty (capped, a premium faucet). Deep links: "Find on map" applies the resource filter; a missing ingredient on any cost row has a **Find** chip.
+Tabs: **Resources · Alloys & Recipes · Worlds · Bestiary · Structures**. Each resource entry: icon, category/tier, description, **how to obtain** (harvest method + biomes + sample surveyed worlds with distance), **used in** (recipes, structures, upgrades), **made from**. Catalog references stay visible with clear discovered/undiscovered states. The first actual resource acquisition, successful recipe craft and completed implemented structure-kind build each grant their configured shard bounty once; the total is bounded by catalog entries. World visits remain separate from catalog discoveries. Deep links: "Find on map" applies the resource filter; a missing ingredient on any cost row has a **Find** chip.
 
 ### 5.7 Logistics model
 
@@ -584,8 +585,16 @@ and on dependent content. Unsupported tool minigames and unfinished structure/ef
 stack size, catalog description, harvest method and habitat/minimum-tier rows, plus recipes that make or consume the item. Raw resources
 can hand off to the map's surveyed-deposit filter. Recipe entries show input → output, station and progression gates. The Worlds tab is
 limited to the current and visited worlds and links their resource entries; the Field Guide lists structure definitions (clearly marking
-catalogue-only behavior) and configured aliens. Discovery silhouettes/rewards and persisted Atlas completion are intentionally not claimed:
-the save model does not track those discoveries yet.
+catalogue-only behavior) and configured aliens.
+
+**Atlas discovery and rewards completed:** namespaced resource, recipe and implemented structure-kind discoveries use the reserved v2
+`atlas` save list; duplicate and empty entries are normalized without discarding legacy/unknown values. Successful resource additions
+(including obstacle salvage), single/batch crafts and completed builds award the configured first-discovery shards once. Timed builds pay
+only on completion, including offline completion recovery. Existing saves seed discoveries from resources and structures already owned
+without retroactive rewards; starting resources are discovered normally. Atlas progress and entry badges show discovery/craft/build state,
+while the visited-world list stays independent. All four Atlas tabs are covered by the screenshot harness. Validation: EditMode including
+Slow 560 passed / 2 runtime-specific allocation skips; PlayMode 19 passed; all five editor checks passed. Twelve Atlas captures across standard
+phone, narrow phone and tablet reported zero errors, overflow, undersized text or undersized touch targets.
 
 **Persistent progression slice:** Command now exposes branch-filtered research and catalog tool ladders. Research requires
 its authored prerequisites, reach tier, current-world Research Lab level and catalog resource costs; successful purchases
@@ -597,11 +606,10 @@ while the database temporarily falls back to legacy content.
 
 ### Next implementation sequence
 
-The research/tool progression, harvest expansion, obstacle-clear loop and processing-station batches are complete. Continue in small, independently verifiable gameplay slices, in this order:
+The research/tool progression, harvest expansion, obstacle-clear loop, processing-station batches and Atlas discovery/rewards are complete. Continue in small, independently verifiable gameplay slices, in this order:
 
 1. **Remaining supported structure behaviours:** continue with catalog-backed runtime contracts; keep Cargo Depot unavailable until planet-wide warehouse pooling is real.
-2. **Atlas discovery rewards:** persist discoveries and grant capped first-discovery rewards while keeping visited/surveyed information distinct.
-3. **World hazards and release services:** wire remaining hazards into travel, then continue through consent, ads, purchases, online services and compliance.
+2. **World hazards and release services:** wire remaining hazards into travel, then continue through consent, ads, purchases, online services and compliance.
 
 Defer ads, premium purchases, online services and cross-device time validation until their service interfaces, consent and compliance work are ready. This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
 
@@ -638,9 +646,9 @@ structure scale, ground radii and route geometry.
 economy lab 127 passed; all five editor checks passed. Seven integrated phone captures (map plus six Hyperspace states) reported zero errors,
 zero text/touch-target/overflow lint findings.
 
-Still open: remaining economy and structure behaviours; pins and persisted discovery history; global name indexing and directed next-stop controls;
+Still open: remaining economy and structure behaviours; pins; global name indexing and directed next-stop controls;
 device/GPU map budget and IL2CPP/ARM64 determinism; binding the mini-game duration to route time; resumable/abortable multi-leg flights and
-real jump/scanner/plating unlocks; Atlas discovery/persistence/rewards, monetization and live services.
+real jump/scanner/plating unlocks; monetization and live services.
 
 ### Foundation rework: runtime planet model, session split, save v2 (done on this branch)
 

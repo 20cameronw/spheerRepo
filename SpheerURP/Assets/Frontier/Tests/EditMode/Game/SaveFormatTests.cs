@@ -88,6 +88,19 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void SaveNormalization_DeduplicatesAtlasEntriesAndPreservesLegacyValues()
+        {
+            var save = new SaveV2();
+            save.atlas.Add("wood");
+            save.atlas.Add("resource:wood");
+            save.atlas.Add("resource:wood");
+            save.atlas.Add(null);
+            save.Normalize();
+
+            CollectionAssert.AreEqual(new[] { "wood", "resource:wood" }, save.atlas);
+        }
+
+        [Test]
         public void RealV1FreshFile_MigratesToTheHomeWorld()
         {
             var v1 = Codec.DeserializeV1(Fixture("save_v1_fresh.json"));

@@ -400,5 +400,29 @@ namespace Frontier.Tests
             Assert.IsTrue(state.Craft(next));
             Assert.AreEqual(before + 8, state.Count(db.fuel));
         }
+
+        [Test]
+        public void AtlasRecipeDiscovery_AwardsOnlyAfterTheFirstSuccessfulCraft()
+        {
+            var state = new GameState(db, false);
+            var recipe = db.recipes.Single(r => r.id == "distill_wood");
+            state.DebugPlace(db.FindStructure("refinery"), 0);
+            state.backpack.Set("wood", 0);
+            int before = state.ShardBalance;
+
+            Assert.IsFalse(state.Craft(recipe));
+            Assert.IsFalse(state.IsAtlasDiscovered("recipe", recipe.id));
+            Assert.AreEqual(before, state.ShardBalance, "a failed craft is not a discovery");
+
+            state.backpack.Set("wood", 8);
+            Assert.IsTrue(state.Craft(recipe));
+            Assert.IsTrue(state.IsAtlasDiscovered("recipe", recipe.id));
+            Assert.AreEqual(before + db.shardRules.data.atlasRecipeShards, state.ShardBalance);
+
+            state.backpack.Set("wood", 8);
+            Assert.IsTrue(state.Craft(recipe));
+            Assert.AreEqual(before + db.shardRules.data.atlasRecipeShards, state.ShardBalance);
+            Assert.AreEqual(1, state.AtlasDiscoveredCount("recipe"));
+        }
     }
 }

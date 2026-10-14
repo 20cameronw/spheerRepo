@@ -75,6 +75,35 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void AtlasStructureDiscovery_IsRewardedOnlyWhenConstructionCompletes()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported build-time content is unavailable");
+            var state = new GameState(db, false, clock);
+            GiveAllResources(state);
+            StructureSO refinery = db.FindStructure("refinery");
+            int originalDuration = refinery.Row(1).buildSeconds;
+            refinery.Row(1).buildSeconds = 5;
+            try
+            {
+                int before = state.ShardBalance;
+                Assert.IsTrue(state.Place(refinery, 0));
+                Assert.IsFalse(state.IsAtlasDiscovered("structure", refinery.kind.ToString()));
+                Assert.AreEqual(before, state.ShardBalance, "an unfinished structure is not a discovery");
+
+                Assert.IsTrue(state.Save());
+                clock.Advance(5);
+                var loaded = new GameState(db, true, clock);
+                Assert.IsTrue(loaded.IsAtlasDiscovered("structure", refinery.kind.ToString()));
+                Assert.AreEqual(before + db.shardRules.data.atlasStructureShards, loaded.ShardBalance,
+                    "an offline construction completion is rewarded once when the save recovers it");
+            }
+            finally
+            {
+                refinery.Row(1).buildSeconds = originalDuration;
+            }
+        }
+
+        [Test]
         public void UpgradeKeepsCurrentLevelUntilTimerCompletes()
         {
             if (!db.UsesImportedEconomy) Assert.Ignore("Imported upgrade-time content is unavailable");

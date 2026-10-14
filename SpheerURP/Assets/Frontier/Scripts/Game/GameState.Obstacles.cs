@@ -146,6 +146,7 @@ namespace Frontier
                 if (resource == null) throw new InvalidOperationException("Pending obstacle salvage references unknown resource '" + reward.resourceId + "'.");
                 int accepted = backpack.Add(reward.resourceId, reward.amount);
                 if (accepted <= 0) return false;
+                RecordAtlasResourceAcquired(resource.id);
                 reward.amount -= accepted;
                 if (reward.amount <= 0) delta.obstacleRewards.RemoveAt(i);
                 world.Touch();
@@ -187,6 +188,7 @@ namespace Frontier
             ResourceSO salvage = db.FindResource(obstacle.reward.resourceId);
             if (salvage == null) throw new InvalidOperationException("Obstacle reward references unknown resource '" + obstacle.reward.resourceId + "'.");
             int accepted = backpack.Add(salvage.id, obstacle.reward.amount);
+            if (accepted > 0) RecordAtlasResourceAcquired(salvage.id);
             int overflow = obstacle.reward.amount - accepted;
             if (overflow > 0)
                 delta.obstacleRewards.Add(new ObstacleRewardRecord

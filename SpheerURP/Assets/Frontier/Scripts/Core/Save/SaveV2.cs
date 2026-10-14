@@ -130,6 +130,8 @@ namespace Frontier
             if (builders == null) builders = new List<BuilderSlot>();
             if (atlas == null) atlas = new List<string>();
             if (settings == null) settings = new List<SettingEntry>();
+            var atlasEntries = new HashSet<string>(StringComparer.Ordinal);
+            atlas.RemoveAll(id => string.IsNullOrEmpty(id) || !atlasEntries.Add(id));
             player.upgrades.RemoveAll(u => u == null || string.IsNullOrEmpty(u.id));
             player.researched.RemoveAll(id => string.IsNullOrEmpty(id));
             player.toolTiers.RemoveAll(t => t == null || string.IsNullOrEmpty(t.id) || t.level <= 0);

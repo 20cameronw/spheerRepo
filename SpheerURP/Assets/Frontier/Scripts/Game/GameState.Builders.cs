@@ -163,6 +163,7 @@ namespace Frontier
                 {
                     record.buildEndUtc = "";
                     world.Touch();
+                    RecordAtlasStructureBuilt(db.FindStructure(record.defId));
                 }
                 else
                 {
@@ -222,7 +223,11 @@ namespace Frontier
 
                     if (end <= now)
                     {
-                        if (isBuild) record.buildEndUtc = "";
+                        if (isBuild)
+                        {
+                            record.buildEndUtc = "";
+                            RecordAtlasStructureBuilt(db.FindStructure(record.defId));
+                        }
                         else
                         {
                             var definition = db.FindStructure(record.defId);
