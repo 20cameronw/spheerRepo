@@ -472,6 +472,24 @@ namespace Frontier
                 }
                 ui.DebugTapStructure(terraformer);
             }, 0.3f);
+            yield return new Shot("popup-warpgate", () =>
+            {
+                var world = FindWorld(ColossalSpec);
+                if (world == null) throw new InvalidOperationException("no colossal Warp Gate showcase world");
+                GoTo(world);
+                showcaseWorld = world.Id;
+                ResetView();
+                var gate = gs.StructureOfKind(world, StructureKind.WarpGate);
+                if (gate == null)
+                {
+                    int slot = world.BuildingSlots - 1;
+                    while (slot >= 0 && gs.StructureAt(world, slot) != null) slot--;
+                    if (slot < 0) throw new InvalidOperationException("no free colossal pad for the Warp Gate showcase");
+                    gate = gs.DebugPlace(db.StructureOfKind(StructureKind.WarpGate), slot, 3);
+                    if (gate == null) throw new InvalidOperationException("Warp Gate showcase could not be placed");
+                }
+                ui.DebugTapStructure(gate);
+            }, 0.3f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.
             if (showcaseWorld != null)

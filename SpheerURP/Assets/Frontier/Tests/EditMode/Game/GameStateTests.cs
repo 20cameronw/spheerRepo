@@ -405,6 +405,43 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void WarpGate_ExtendsJumpRangeAndDiscountsOnlyItsDepartureWorld()
+        {
+            var state = NewState();
+            var home = state.universe.Home;
+            var destination = state.universe.Get("cinder");
+            var gate = db.StructureOfKind(StructureKind.WarpGate);
+            Assert.IsNotNull(gate);
+            Assert.IsTrue(gate.Implemented);
+
+            double baseRange = state.Rules.JumpRangeLy(state.Ship);
+            int baseFuel = state.PlanRoute(home, destination, false).totalFuel;
+            var placed = state.DebugPlace(gate, 0, 3);
+            Assert.IsNotNull(placed);
+            float stageEffect = gate.EffectAt(3);
+            Assert.AreEqual(stageEffect, state.WarpGateEffect(home), 0.0001f);
+            Assert.AreEqual(baseRange * (1.0 + stageEffect), state.Rules.JumpRangeLy(state.Ship), 0.001);
+            int gatedFuel = state.PlanRoute(home, destination, false).totalFuel;
+            Assert.Less(gatedFuel, baseFuel, "the route planner applies the gate's fuel discount");
+
+            var hangar = db.StructureOfKind(StructureKind.Hangar);
+            Assert.IsNotNull(state.DebugPlace(hangar, 1));
+            float combinedDiscount = Mathf.Min((float)state.Rules.Model.MaxDiscount,
+                stageEffect + hangar.EffectAt(1));
+            Assert.AreEqual(combinedDiscount, state.TravelFuelDiscount(home), 0.0001f,
+                "Hangar and Warp Gate discounts stack within the configured model cap");
+            int combinedFuel = state.PlanRoute(home, destination, false).totalFuel;
+            Assert.LessOrEqual(combinedFuel, gatedFuel);
+
+            state.DebugTeleport(state.universe.Get("glacia"));
+            Assert.AreEqual(0f, state.WarpGateEffect(state.planet), 0.0001f);
+            Assert.AreEqual(baseRange, state.Rules.JumpRangeLy(state.Ship), 0.001,
+                "the gate does not extend jump range away from its planet");
+            Assert.AreEqual(combinedFuel, state.PlanRoute(home, destination, false).totalFuel,
+                "an explicitly planned trip still uses the actual departure planet's gate");
+        }
+
+        [Test]
         public void ShieldPylonAndRepairBay_OnlyAffectTheirOperationalPlanet()
         {
             var state = NewState();

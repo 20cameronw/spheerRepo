@@ -39,21 +39,35 @@ namespace Frontier
         /// <summary>The ship's capabilities right now, computed from the upgrade levels, the hold and the interim settings.</summary>
         public ShipCapabilities Ship
         {
-            get
-            {
-                var settings = FrontierSettings.I;
-                var capabilities = ShipCapabilities.FromUpgradeLevels(ShipLevel, CargoFill, settings.interimJumpLevel, settings.interimScannerLevel, settings.enforceHazardPlating);
-                capabilities.discount = TravelFuelDiscount(planet);
-                return capabilities;
-            }
+            get { return ShipFor(planet); }
+        }
+
+        ShipCapabilities ShipFor(PlanetData departure)
+        {
+            var settings = FrontierSettings.I;
+            var capabilities = ShipCapabilities.FromUpgradeLevels(ShipLevel, CargoFill, settings.interimJumpLevel,
+                settings.interimScannerLevel, settings.enforceHazardPlating);
+            double baseRange = Rules.Model.JumpRangeLy(capabilities.jumpLevel);
+            capabilities.jumpRangeBonusLy = baseRange * WarpGateEffect(departure);
+            capabilities.discount = TravelFuelDiscount(departure);
+            return capabilities;
+        }
+
+        public float WarpGateEffect(PlanetData departure)
+        {
+            var gate = departure == null ? null : StructureOfKind(departure, StructureKind.WarpGate);
+            return gate != null && gate.def.effectKind == "gateFuelDiscount"
+                ? Mathf.Max(0f, gate.def.EffectAt(gate.level))
+                : 0f;
         }
 
         public float TravelFuelDiscount(PlanetData departure)
         {
             var hangar = departure == null ? null : StructureOfKind(departure, StructureKind.Hangar);
-            return hangar != null && hangar.def.effectKind == "travelFuelDiscount"
-                ? Mathf.Clamp01(hangar.def.EffectAt(hangar.level))
+            float hangarDiscount = hangar != null && hangar.def.effectKind == "travelFuelDiscount"
+                ? Mathf.Max(0f, hangar.def.EffectAt(hangar.level))
                 : 0f;
+            return Mathf.Min((float)Rules.Model.MaxDiscount, hangarDiscount + WarpGateEffect(departure));
         }
 
         /// <summary>Radius around every visited system inside which worlds are discovered and surveyed.</summary>
@@ -83,7 +97,7 @@ namespace Frontier
         public RoutePlan PlanRoute(PlanetData from, PlanetData to, bool autopilot)
         {
             if (from == null || to == null) return RoutePlan.Blocked(RouteReasons.Unknown);
-            return Planner.Plan(universe.EndpointOf(from), universe.EndpointOf(to), Ship, autopilot, FuelOnBoard);
+            return Planner.Plan(universe.EndpointOf(from), universe.EndpointOf(to), ShipFor(from), autopilot, FuelOnBoard);
         }
 
         /// <summary>Energy units a trip from the current world costs (0 for the world the player is on, or when there is no way there).</summary>

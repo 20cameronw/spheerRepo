@@ -81,7 +81,10 @@ namespace Frontier.Economy
             return new TravelRules(new TravelModel(tuning, CatalogBuilder.Build(tuning)));
         }
 
-        public double JumpRangeLy(ShipCapabilities caps) { return Model.JumpRangeLy(caps.jumpLevel); }
+        public double JumpRangeLy(ShipCapabilities caps)
+        {
+            return Model.JumpRangeLy(caps.jumpLevel) + Math.Max(0.0, caps.jumpRangeBonusLy);
+        }
 
         /// <summary>Survey radius around every visited system.</summary>
         public double ScannerRangeLy(ShipCapabilities caps) { return Model.ScannerRangeLy(caps.scannerLevel); }

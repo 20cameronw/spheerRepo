@@ -265,7 +265,7 @@ namespace Frontier
                 : s.def.displayName.ToUpper() + "  LV" + s.level;
             it.label = MakeLabel(it.t, label, Fx.Displayable(c), 1.0f, 0.34f, out it.labelRenderer);
             it.phase = s.slot * 0.4f;
-            it.orbit = s.def.kind == StructureKind.Satellite;
+            it.orbit = s.def.kind == StructureKind.Satellite || s.def.kind == StructureKind.WarpGate;
             return it;
         }
 

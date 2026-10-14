@@ -15,6 +15,8 @@ namespace Frontier.Economy
 
         /// <summary>Jump drive level, 0 = no drive (home system only), up to 10 (2,000 ly per jump).</summary>
         public int jumpLevel;
+        /// <summary>Additional jump range granted by an operational local Warp Gate, in light-years.</summary>
+        public double jumpRangeBonusLy;
         /// <summary>Engine efficiency level, 0 = stock engine, up to 10 (0.45 fuel factor).</summary>
         public int engineLevel;
         /// <summary>Scanner level, 0 = the base survey radius, up to 8.</summary>
@@ -30,7 +32,16 @@ namespace Frontier.Economy
 
         public ShipCapabilities Clone()
         {
-            var c = new ShipCapabilities { jumpLevel = jumpLevel, engineLevel = engineLevel, scannerLevel = scannerLevel, cargoFill = cargoFill, discount = discount, enforceHazardPlating = enforceHazardPlating };
+            var c = new ShipCapabilities
+            {
+                jumpLevel = jumpLevel,
+                jumpRangeBonusLy = jumpRangeBonusLy,
+                engineLevel = engineLevel,
+                scannerLevel = scannerLevel,
+                cargoFill = cargoFill,
+                discount = discount,
+                enforceHazardPlating = enforceHazardPlating
+            };
             Array.Copy(platingLevels, c.platingLevels, platingLevels.Length);
             return c;
         }

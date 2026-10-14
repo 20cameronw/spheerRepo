@@ -162,6 +162,7 @@ namespace Frontier
             var k = s.def.kind;
             if (k.IsStorage()) OpenWarehouse(s, t);
             else if (k == StructureKind.Satellite) OpenRelay(s, t);
+            else if (k == StructureKind.WarpGate) OpenWarpGate(s, t);
             else if (k == StructureKind.Terraformer) OpenTerraformer(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
@@ -321,6 +322,26 @@ namespace Frontier
             });
         }
 
+        void OpenWarpGate(PlacedStructure s, Transform t)
+        {
+            Color c = UiKit.Ui(s.def.color);
+            OpenPopup("warpgate" + s.slot, t, c, body =>
+            {
+                StructureHeader(body, s, c, "Extends outbound reach and lowers fuel use");
+                int pct = Mathf.RoundToInt(gs.WarpGateEffect(gs.planet) * 100f);
+                body.Add(UiKit.Text("Local bonus: -" + pct + "% fuel, +" + pct + "% jump range.",
+                    "fr-small", UiKit.Cyan));
+                var ship = gs.Ship;
+                double baseRange = gs.Rules.Model.JumpRangeLy(ship.jumpLevel);
+                body.Add(UiKit.Text("Jump range from this world: " + baseRange.ToString("0") + " ly  ->  " +
+                    gs.Rules.JumpRangeLy(ship).ToString("0") + " ly", "fr-small"));
+                body.Add(UiKit.Text("Combined departure fuel discount: " +
+                    (gs.TravelFuelDiscount(gs.planet) * 100f).ToString("0.#") +
+                    "% (local Hangar + Warp Gate). Applies only when leaving this world.", "fr-tiny"));
+                UpgradeButton(body, s, c);
+            });
+        }
+
         void OpenResearchLab(PlacedStructure s, Transform t)
         {
             Color c = UiKit.Ui(s.def.color);
@@ -367,7 +388,7 @@ namespace Frontier
             {
                 StructureHeader(body, s, c, "Reduces fuel for trips leaving this planet");
                 body.Add(UiKit.Text("Departure discount: " + (gs.TravelFuelDiscount(gs.planet) * 100f).ToString("0.#") + "%", "fr-small"));
-                body.Add(UiKit.Text("This local bonus applies to manual and autopilot routes. It does not reduce travel costs from other planets.", "fr-tiny"));
+                body.Add(UiKit.Text("This combines local Hangar and Warp Gate discounts for manual and autopilot routes. Other planets use their own structures.", "fr-tiny"));
                 UpgradeButton(body, s, c);
             });
         }

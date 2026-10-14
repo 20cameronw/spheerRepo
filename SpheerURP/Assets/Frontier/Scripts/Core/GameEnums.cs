@@ -129,6 +129,7 @@ namespace Frontier
                 case StructureKind.SiphonRig:
                 case StructureKind.Excavator:
                 case StructureKind.Terraformer:
+                case StructureKind.WarpGate:
                 case StructureKind.SalvageYard:
                 case StructureKind.ColonyHub:
                     return true;
