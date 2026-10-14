@@ -120,6 +120,24 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void SiphonHarvestUsesItsDedicatedGameToolAndStructure()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported progression catalog is unavailable");
+            var state = new GameState(db, false, clock);
+            var ladder = db.toolLadders.FirstOrDefault(candidate => candidate != null && candidate.data != null && candidate.data.id == "siphon");
+            var rig = db.StructureOfKind(StructureKind.SiphonRig);
+            Assert.IsNotNull(ladder);
+            Assert.IsNotNull(rig);
+            Assert.AreEqual(MinigameKind.Siphon, HarvestMapping.ToMinigame(Frontier.Universe.HarvestMethod.Siphon));
+            Assert.AreEqual(Frontier.Universe.HarvestMethod.Siphon, HarvestMapping.FromMinigame(MinigameKind.Siphon));
+            Assert.AreEqual(MinigameKind.Siphon, StructureKind.SiphonRig.Game());
+            Assert.IsTrue(StructureKind.SiphonRig.IsGather());
+            Assert.IsTrue(rig.Implemented);
+            Assert.AreEqual("Hand Pump", state.ToolName(MinigameKind.Siphon));
+            Assert.AreNotEqual("This tool's harvest game is not implemented", state.ToolTierLockReason(ladder));
+        }
+
+        [Test]
         public void SupportedToolTierPurchase_ChangesHarvestYieldAndSurvivesSaveLoad()
         {
             var state = new GameState(db, false);

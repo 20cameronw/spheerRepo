@@ -2,7 +2,7 @@ namespace Frontier
 {
     // Plain data enums shared by every layer. They live in Frontier.Core (no engine references), so ScriptableObjects,
     // game logic, rendering and the pure universe/economy code can all use them. Serialized values are the integers: never reorder.
-    public enum MinigameKind { Chop, Mine, Drill }
+    public enum MinigameKind { Chop, Mine, Drill, Siphon }
 
     public enum UpgradeCategory { Tools, Ship, Defense, Logistics }
 
@@ -69,8 +69,11 @@ namespace Frontier
 
     public static class StructureKinds
     {
-        /// <summary>The three gather structures that run one of the existing mini-games (the new gather rigs wait for their own games).</summary>
-        public static bool IsGather(this StructureKind k) { return k == StructureKind.Lumber || k == StructureKind.Mine || k == StructureKind.Drill; }
+        /// <summary>Gather structures with an implemented harvest minigame.</summary>
+        public static bool IsGather(this StructureKind k)
+        {
+            return k == StructureKind.Lumber || k == StructureKind.Mine || k == StructureKind.Drill || k == StructureKind.SiphonRig;
+        }
         public static bool IsTurret(this StructureKind k)
         {
             return k == StructureKind.Gunner || k == StructureKind.Laser || k == StructureKind.MissileSilo || k == StructureKind.TeslaCoil;
@@ -110,6 +113,7 @@ namespace Frontier
                 case StructureKind.Warehouse:
                 case StructureKind.ResearchLab:
                 case StructureKind.RadarTower:
+                case StructureKind.SiphonRig:
                 case StructureKind.ColonyHub:
                     return true;
                 default:
@@ -119,7 +123,9 @@ namespace Frontier
 
         public static MinigameKind Game(this StructureKind k)
         {
-            return k == StructureKind.Lumber ? MinigameKind.Chop : k == StructureKind.Mine ? MinigameKind.Mine : MinigameKind.Drill;
+            return k == StructureKind.Lumber ? MinigameKind.Chop :
+                k == StructureKind.Mine ? MinigameKind.Mine :
+                k == StructureKind.SiphonRig ? MinigameKind.Siphon : MinigameKind.Drill;
         }
     }
 }

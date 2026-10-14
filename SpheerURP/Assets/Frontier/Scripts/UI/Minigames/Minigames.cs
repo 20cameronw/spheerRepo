@@ -776,6 +776,137 @@ namespace Frontier
         }
     }
 
+    /// <summary>Time each pump to the moving pressure window and draw gas from a glowing planetary vent.</summary>
+    public class SiphonGame : Minigame
+    {
+        const int Pulses = 7;
+        VisualElement track, catchBand, needle;
+        float elapsed, bandWidth, cooldown, quality;
+        float needlePosition, targetPosition;
+        int pulses, perfect;
+        Transform reservoir, vent, stream;
+        readonly Transform[] bubbles = new Transform[9];
+        float frameW = 6.4f, frameH = 7.6f;
+
+        protected override string Title { get { return "ATMOSPHERIC SIPHON"; } }
+        protected override string Hint { get { return "Tap PUMP when the needle crosses the capture window. Clean pulses keep the gas flowing"; } }
+        protected override Color StageBg { get { return new Color(color.r * 0.04f + 0.005f, color.g * 0.04f + 0.01f, color.b * 0.05f + 0.03f); } }
+
+        protected override void Build()
+        {
+            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Hand Pump" : toolName, color));
+            status.style.display = DisplayStyle.Flex;
+            track = UiKit.Div();
+            track.pickingMode = PickingMode.Ignore;
+            track.style.position = Position.Absolute;
+            track.style.left = 76; track.style.right = 76; track.style.top = Length.Percent(69);
+            track.style.height = 36;
+            track.style.backgroundColor = new Color(0f, 0f, 0f, 0.62f);
+            UiKit.Radius(track, 18f);
+            UiKit.Border(track, new Color(1f, 1f, 1f, 0.35f), 2f);
+
+            catchBand = UiKit.Div();
+            catchBand.pickingMode = PickingMode.Ignore;
+            catchBand.style.position = Position.Absolute;
+            catchBand.style.top = 0; catchBand.style.bottom = 0;
+            catchBand.style.backgroundColor = new Color(UiKit.Lime.r, UiKit.Lime.g, UiKit.Lime.b, 0.52f);
+            UiKit.Radius(catchBand, 16f);
+            UiKit.Halo(catchBand, UiKit.Lime, 22f, 0.4f);
+            track.Add(catchBand);
+
+            needle = UiKit.Div();
+            needle.pickingMode = PickingMode.Ignore;
+            needle.style.position = Position.Absolute;
+            needle.style.top = -5; needle.style.bottom = -5; needle.style.width = 8;
+            needle.style.backgroundColor = Color.white;
+            UiKit.Radius(needle, 4f);
+            UiKit.Halo(needle, color, 18f, 0.8f);
+            track.Add(needle);
+            arena.Add(track);
+
+            var pump = UiKit.Btn("PUMP", color, null, true);
+            pump.clicked += Pump;
+            controls.Add(pump);
+            UpdateStatus("Watch the flow window");
+        }
+
+        protected override void BuildScene()
+        {
+            var st = stage;
+            Color rim = new Color(rawColor.r, rawColor.g, rawColor.b) * 2f;
+            var metal = st.Lit(new Color(0.18f, 0.24f, 0.34f), rim * 0.6f, 1f, 8f, 0f);
+            var gas = st.Lit(new Color(color.r * 0.2f, color.g * 0.2f, color.b * 0.24f), rim * 2.5f, 0f, 3f, 0f);
+            st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.28f), 13f, new Vector3(0f, 1f, 5f));
+            st.Prim(PrimitiveType.Cube, st.root, new Vector3(-1.9f, 0.9f, 0f), new Vector3(0.16f, 2.3f, 0.16f), Vector3.zero, metal);
+            st.Prim(PrimitiveType.Cube, st.root, new Vector3(1.9f, 0.9f, 0f), new Vector3(0.16f, 2.3f, 0.16f), Vector3.zero, metal);
+            st.Prim(PrimitiveType.Cube, st.root, new Vector3(0f, 2.05f, 0f), new Vector3(4f, 0.16f, 0.16f), Vector3.zero, metal);
+            st.Prim(PrimitiveType.Cylinder, st.root, new Vector3(0f, -0.55f, 0f), new Vector3(0.85f, 1.55f, 0.85f), Vector3.zero, metal);
+            st.Prim(PrimitiveType.Cylinder, st.root, new Vector3(0f, 0.3f, -0.02f), new Vector3(0.43f, 0.55f, 0.43f), Vector3.zero, gas);
+            reservoir = st.AddMesh(MeshKit.Ico(2, d => 0.95f * (0.84f + 0.18f * Mathf.PerlinNoise(d.x * 2f, d.y * 2f + d.z))),
+                gas, st.root, new Vector3(0f, 1.05f, 0.02f)).transform;
+            vent = st.AddMesh(MeshKit.Cyl(0.3f, 0.18f, 1.0f, 12), metal, st.root, new Vector3(0f, 1.9f, 0f)).transform;
+            stream = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.8f), 1.5f, new Vector3(0f, 2.8f, -0.25f));
+            var bubbleMat = st.Additive(new Color(1f, 1.5f, 2f, 0.7f));
+            for (int i = 0; i < bubbles.Length; i++)
+            {
+                bubbles[i] = st.AddMesh(MeshKit.Ico(1, d => 0.15f), bubbleMat, st.root,
+                    new Vector3(UnityEngine.Random.Range(-0.8f, 0.8f), 0f, UnityEngine.Random.Range(-0.2f, 0.2f))).transform;
+            }
+        }
+
+        protected override void Frame(float aspect) { FramePose(frameW, frameH, 0.85f, aspect, 0.9f); }
+
+        protected override void Tick(float dt)
+        {
+            elapsed += dt;
+            cooldown = Mathf.Max(0f, cooldown - dt);
+            float rate = 1.2f + difficulty * 1.5f;
+            needlePosition = 0.5f + 0.43f * Mathf.Sin(elapsed * rate);
+            targetPosition = 0.5f + 0.31f * Mathf.Sin(elapsed * (0.68f + difficulty * 0.3f) + 1.1f);
+            bandWidth = Mathf.Clamp(0.15f * tolerance - difficulty * 0.035f, 0.065f, 0.23f);
+            catchBand.style.left = Length.Percent(Mathf.Clamp01(targetPosition - bandWidth) * 100f);
+            catchBand.style.width = Length.Percent(bandWidth * 200f);
+            needle.style.left = Length.Percent(needlePosition * 100f);
+
+            float pulse = 1f + 0.08f * Mathf.Sin(elapsed * 5f);
+            reservoir.localScale = Vector3.one * pulse;
+            vent.localRotation = Quaternion.Euler(0f, elapsed * 28f, 0f);
+            stream.localScale = Vector3.one * (0.75f + 0.22f * pulse);
+            for (int i = 0; i < bubbles.Length; i++)
+            {
+                float phase = elapsed * (0.65f + difficulty * 0.3f) + i * 0.73f;
+                bubbles[i].localPosition = new Vector3(Mathf.Sin(phase * 1.7f) * 0.62f, -0.2f + Mathf.PingPong(phase, 2.4f), Mathf.Cos(phase) * 0.22f);
+            }
+        }
+
+        void Pump()
+        {
+            if (pulses >= Pulses || cooldown > 0f) return;
+            cooldown = 0.22f;
+            float error = Mathf.Abs(needlePosition - targetPosition);
+            float hit = Mathf.Clamp01(1f - error / Mathf.Max(0.01f, bandWidth * 2.2f));
+            quality += hit;
+            if (hit >= 0.78f) perfect++;
+            pulses++;
+            UpdateStatus(hit >= 0.78f ? "Clean pressure lock" : hit > 0.05f ? "Partial capture" : "Pressure lost");
+            if (hit > 0.05f)
+            {
+                Vector3 point = stage.root.TransformPoint(reservoir.localPosition);
+                Fx.Burst(point, color * (hit >= 0.78f ? 2f : 1.1f), hit >= 0.78f ? 18 : 8, 3.5f, 0.18f);
+                stage.Shake(hit >= 0.78f ? 0.28f : 0.12f);
+                if (hit >= 0.78f) Sfx.Good(); else Sfx.Play(135f, 0.07f, 0.25f, -80f);
+            }
+            else Sfx.Bad();
+            if (pulses >= Pulses)
+                Finish(new MinigameResult { quality = quality / Pulses, perfects = perfect, total = Pulses });
+        }
+
+        void UpdateStatus(string message)
+        {
+            status.text = "PULSES " + pulses + "/" + Pulses + "   ·   " + message;
+        }
+    }
+
     /// <summary>3D asteroid-field flight during warp. Quality (fewer hits) refunds part of the fuel.</summary>
     public class TravelGame : Minigame
     {

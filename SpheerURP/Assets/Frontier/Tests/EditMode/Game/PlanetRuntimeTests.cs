@@ -243,7 +243,7 @@ namespace Frontier.Tests
             };
             var d = new PlanetDescriptor(new PlanetSpec { Key = new PlanetKey(new SystemKey(0, 0, 5), 0), Name = "T", Deposits = deposits, Biome = Biome.Lush });
             var p = new PlanetData(d, star, null, 1UL, db.FindResource, db.scrap);
-            var games = new[] { MinigameKind.Chop, MinigameKind.Mine, MinigameKind.Drill, MinigameKind.Drill, MinigameKind.Mine, MinigameKind.Mine, MinigameKind.Chop };
+            var games = new[] { MinigameKind.Chop, MinigameKind.Mine, MinigameKind.Drill, MinigameKind.Siphon, MinigameKind.Mine, MinigameKind.Mine, MinigameKind.Chop };
             Assert.AreEqual(deposits.Length, p.Spots.Count);
             for (int i = 0; i < games.Length; i++) Assert.AreEqual(games[i], p.Spots[i].game, deposits[i].Method.ToString());
             Assert.AreEqual(15, p.Spots[1].baseYield, "yield is base yield x richness");

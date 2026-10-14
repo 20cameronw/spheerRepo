@@ -372,6 +372,18 @@ namespace Frontier
             yield return new Shot("map-generated", () => { GoTo(FindWorld(ColossalSpec)); ui.DebugMap(null, 2f); }, 0.8f);
             yield return new Shot("menu-debug-teleport", () => ui.DebugMenu("debug", true), 0.5f);
             yield return new Shot("popup-radartower", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.RadarTower)); }, 0.3f);
+            yield return new Shot("game-siphon", () =>
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    foreach (var deposit in d.Deposits)
+                        if (deposit.Method == Frontier.Universe.HarvestMethod.Siphon) return true;
+                    return false;
+                }, 2, 0, 10000);
+                if (world == null) throw new InvalidOperationException("no generated world with siphon deposits");
+                GoTo(world);
+                if (!ui.DebugGather(MinigameKind.Siphon)) throw new InvalidOperationException("world has no siphon gather spot");
+            }, 1.8f);
 
             // Leave the session as the first shots found it (home world, nothing built on the showcase world), so the next device starts from the same state.
             if (showcaseWorld != null)

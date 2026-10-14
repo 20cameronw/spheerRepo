@@ -260,7 +260,8 @@ namespace Frontier
                 float bonus = gs.StructureBonus(s);
                 var spots = gs.SpotsFor(gs.planet, game);
                 body.Add(SectionLabel(spots.Count > 0 ? "GATHER ON THIS PLANET" : "NOTHING TO GATHER HERE"));
-                string verb = game == MinigameKind.Drill ? "DRILL" : game == MinigameKind.Chop ? "CHOP" : "MINE";
+                string verb = game == MinigameKind.Drill ? "DRILL" : game == MinigameKind.Siphon ? "SIPHON" :
+                    game == MinigameKind.Chop ? "CHOP" : "MINE";
                 foreach (var spot in spots)
                 {
                     var sp = spot;

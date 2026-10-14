@@ -366,7 +366,8 @@ namespace Frontier
             busy = true;
             Vector3 fxPos = at != null ? at.position : Vector3.zero;
             Minigame g = spot.game == MinigameKind.Chop ? (Minigame)new NodeGame(true)
-                       : spot.game == MinigameKind.Mine ? (Minigame)new NodeGame(false) : new DrillGame();
+                       : spot.game == MinigameKind.Mine ? (Minigame)new NodeGame(false)
+                       : spot.game == MinigameKind.Siphon ? (Minigame)new SiphonGame() : new DrillGame();
             g.toolDamage = gs.ToolDamage(spot.game);
             g.toolLevel = gs.ToolLevel(spot.game);
             g.toolName = gs.ToolName(spot.game);

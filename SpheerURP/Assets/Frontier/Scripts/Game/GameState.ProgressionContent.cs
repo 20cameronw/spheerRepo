@@ -155,7 +155,8 @@ namespace Frontier
             if (!db.UsesImportedEconomy || ladder == null || ladder.data == null ||
                 db.toolLadders == null || Array.IndexOf(db.toolLadders, ladder) < 0 ||
                 ladder.data.tiers == null || ladder.data.tiers.Length == 0) return false;
-            return ladder.data.kind == ToolKind.Axe || ladder.data.kind == ToolKind.Pick || ladder.data.kind == ToolKind.Drill;
+            return ladder.data.kind == ToolKind.Axe || ladder.data.kind == ToolKind.Pick ||
+                ladder.data.kind == ToolKind.Drill || ladder.data.kind == ToolKind.Siphon;
         }
 
         static ToolTierDef FindToolTier(ToolLadderSO ladder, int tier)
