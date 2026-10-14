@@ -9,6 +9,9 @@ namespace Frontier.Services.Unity
         [Tooltip("Enable only after legal/audience review, account-deletion UX, leaderboard policy and Unity Dashboard setup are complete.")]
         public bool enableOnlineServices;
 
+        [Tooltip("Enable Cloud Save only after local/cloud conflict handling and account recovery UX are ready.")]
+        public bool enableCloudSave;
+
         [Tooltip("UGS leaderboard ID created in the Unity Dashboard.")]
         public string leaderboardId;
 
@@ -37,6 +40,11 @@ namespace Frontier.Services.Unity
         public bool CanUseLeaderboard
         {
             get { return CanUseAuthentication && !string.IsNullOrWhiteSpace(leaderboardId); }
+        }
+
+        public bool CanUseCloudSave
+        {
+            get { return CanUseAuthentication && enableCloudSave; }
         }
     }
 }

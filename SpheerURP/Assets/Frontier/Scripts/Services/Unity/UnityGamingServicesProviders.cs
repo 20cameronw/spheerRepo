@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using Frontier.Services;
 using Unity.Services.Authentication;
+using Unity.Services.CloudSave;
+using Unity.Services.CloudSave.Models;
 using Unity.Services.Core;
 using Unity.Services.Leaderboards;
 using Unity.Services.Leaderboards.Models;
@@ -206,6 +209,123 @@ namespace Frontier.Services.Unity
 
     }
 
+    sealed class UnityCloudSaveProvider : ICloudSaveService
+    {
+        const string SaveKey = "frontier_save_v2";
+        const int MaximumPayloadBytes = 5 * 1024 * 1024;
+
+        readonly FrontierUnityServicesConfig config;
+        readonly UnityServicesInitializer initializer;
+
+        public UnityCloudSaveProvider(FrontierUnityServicesConfig config, UnityServicesInitializer initializer)
+        {
+            this.config = config;
+            this.initializer = initializer;
+        }
+
+        public bool IsConfigured { get { return config != null && config.CanUseCloudSave; } }
+
+        public Task<ServiceResult> InitializeAsync()
+        {
+            return IsConfigured
+                ? initializer.InitializeAsync()
+                : Task.FromResult(ServiceResult.NotConfigured("Unity Cloud Save"));
+        }
+
+        public async Task<ServiceResult<CloudSaveRecord>> ReadAsync()
+        {
+            if (!IsConfigured)
+                return ServiceResult<CloudSaveRecord>.NotConfigured("Unity Cloud Save");
+
+            ServiceResult initialized = await initializer.InitializeAsync();
+            if (!initialized.succeeded)
+                return ServiceResult<CloudSaveRecord>.Failed(initialized.message);
+
+            if (!AuthenticationService.Instance.IsSignedIn)
+                return ServiceResult<CloudSaveRecord>.InvalidRequest(
+                    "Sign in before loading a cloud save.");
+
+            try
+            {
+                var items = await CloudSaveService.Instance.Data.Player.LoadAsync(
+                    new HashSet<string> { SaveKey });
+                if (!items.TryGetValue(SaveKey, out var item))
+                    return ServiceResult<CloudSaveRecord>.Success(
+                        new CloudSaveRecord(false, string.Empty, string.Empty));
+
+                string payload = item.Value.GetAs<string>();
+                if (string.IsNullOrWhiteSpace(payload))
+                    return ServiceResult<CloudSaveRecord>.Failed(
+                        "The stored cloud save is empty and cannot be restored.");
+
+                return ServiceResult<CloudSaveRecord>.Success(
+                    new CloudSaveRecord(true, payload, item.WriteLock));
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.LogWarning("Unity Cloud Save read failed: " + exception.Message);
+                return ServiceResult<CloudSaveRecord>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
+        {
+            if (!IsConfigured)
+                return ServiceResult<CloudSaveRecord>.NotConfigured("Unity Cloud Save");
+            if (string.IsNullOrWhiteSpace(payload))
+                return ServiceResult<CloudSaveRecord>.InvalidRequest(
+                    "A non-empty cloud-save payload is required.");
+            if (Encoding.UTF8.GetByteCount(payload) > MaximumPayloadBytes)
+                return ServiceResult<CloudSaveRecord>.InvalidRequest(
+                    "The cloud-save payload exceeds the 5 MiB limit.");
+
+            ServiceResult initialized = await initializer.InitializeAsync();
+            if (!initialized.succeeded)
+                return ServiceResult<CloudSaveRecord>.Failed(initialized.message);
+
+            if (!AuthenticationService.Instance.IsSignedIn)
+                return ServiceResult<CloudSaveRecord>.InvalidRequest(
+                    "Sign in before writing a cloud save.");
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(writeLock))
+                {
+                    var existing = await CloudSaveService.Instance.Data.Player.LoadAsync(
+                        new HashSet<string> { SaveKey });
+                    if (existing.ContainsKey(SaveKey))
+                        return ServiceResult<CloudSaveRecord>.InvalidRequest(
+                            "A write lock is required to replace an existing cloud save. Reload it before retrying.");
+                }
+
+                var data = new Dictionary<string, SaveItem>
+                {
+                    { SaveKey, new SaveItem(payload, string.IsNullOrWhiteSpace(writeLock) ? null : writeLock) }
+                };
+                Dictionary<string, string> writeLocks =
+                    await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+                if (writeLocks == null || !writeLocks.TryGetValue(SaveKey, out string updatedWriteLock) ||
+                    string.IsNullOrWhiteSpace(updatedWriteLock))
+                    return ServiceResult<CloudSaveRecord>.Failed(
+                        "Unity Cloud Save did not return a write lock. Reload the save before retrying.");
+
+                return ServiceResult<CloudSaveRecord>.Success(
+                    new CloudSaveRecord(true, payload, updatedWriteLock));
+            }
+            catch (CloudSaveConflictException exception)
+            {
+                Debug.LogWarning("Unity Cloud Save write conflict: " + exception.Message);
+                return ServiceResult<CloudSaveRecord>.Failed(
+                    "The cloud save changed on another device. Reload it before retrying.");
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.LogWarning("Unity Cloud Save write failed: " + exception.Message);
+                return ServiceResult<CloudSaveRecord>.Failed(exception.Message);
+            }
+        }
+    }
+
     public static class FrontierUnityServicesFactory
     {
         public static FrontierServices Create(IConsentService consent, FrontierUnityServicesConfig config)
@@ -214,8 +334,9 @@ namespace Frontier.Services.Unity
             var initializer = new UnityServicesInitializer(config);
             var authentication = new UnityAuthenticationProvider(config, initializer);
             var leaderboards = new UnityLeaderboardProvider(config, initializer);
+            var cloudSave = new UnityCloudSaveProvider(config, initializer);
             return new FrontierServices(consent, unavailable, unavailable, authentication, leaderboards,
-                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable,
+                cloudSave, unavailable, unavailable, new LocalTimeService(), unavailable,
                 config == null ? null : config.leaderboardId,
                 config != null && config.HasValidPrivacyPolicy ? config.privacyPolicyUrl : null);
         }

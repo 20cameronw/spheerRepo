@@ -77,6 +77,26 @@ namespace Frontier.Tests
             }
         }
 
+        sealed class TestCloudSaveService : ICloudSaveService
+        {
+            public bool IsConfigured { get { return true; } }
+            public int readCount;
+            public int writeCount;
+            public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
+            {
+                readCount++;
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.Success(
+                    new CloudSaveRecord(true, "{}", "read-lock")));
+            }
+            public Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
+            {
+                writeCount++;
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.Success(
+                    new CloudSaveRecord(true, payload, "next-lock")));
+            }
+        }
+
         static FrontierServices Services(IConsentService consent, IAdsService ads, IAnalyticsService analytics)
         {
             var unavailable = new UnavailableFrontierProvider();
@@ -230,27 +250,42 @@ namespace Frontier.Tests
             var consent = new ConsentService(new MemoryConsentStore());
             var auth = new TestAuthService();
             var leaderboards = new TestLeaderboardService();
+            var cloudSave = new TestCloudSaveService();
             var unavailable = new UnavailableFrontierProvider();
             var services = new FrontierServices(consent, unavailable, unavailable, auth, leaderboards,
-                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable);
+                cloudSave, unavailable, unavailable, new LocalTimeService(), unavailable);
 
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Authentication.InitializeAsync().Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Authentication.SignInAnonymouslyAsync().Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Leaderboards.InitializeAsync().Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Leaderboards.GetScoresAsync("weekly", 10).Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.ReadAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.WriteAsync("{}", string.Empty).Result.status);
+            Assert.IsFalse(new CloudSaveRecord(false, string.Empty, string.Empty).hasValue);
             Assert.AreEqual(0, auth.signInCount);
             Assert.AreEqual(0, leaderboards.readCount);
+            Assert.AreEqual(0, cloudSave.readCount);
+            Assert.AreEqual(0, cloudSave.writeCount);
 
             consent.SavePreferences(false, false, true);
             Assert.AreEqual(ServiceStatus.Success, services.Authentication.SignInAnonymouslyAsync().Result.status);
             Assert.AreEqual(ServiceStatus.Success, services.Leaderboards.GetScoresAsync("weekly", 10).Result.status);
+            Assert.AreEqual(ServiceStatus.Success, services.CloudSave.ReadAsync().Result.status);
+            ServiceResult<CloudSaveRecord> cloudWrite = services.CloudSave.WriteAsync("{}", "read-lock").Result;
+            Assert.AreEqual(ServiceStatus.Success, cloudWrite.status);
+            Assert.AreEqual("next-lock", cloudWrite.value.writeLock);
             Assert.AreEqual(1, auth.signInCount);
             Assert.AreEqual(1, leaderboards.readCount);
+            Assert.AreEqual(1, cloudSave.readCount);
+            Assert.AreEqual(1, cloudSave.writeCount);
 
             consent.SavePreferences(false, false, false);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Authentication.SignInAnonymouslyAsync().Result.status);
             Assert.AreEqual(1, auth.signInCount);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.ReadAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.WriteAsync("{}", "read-lock").Result.status);
+            Assert.AreEqual(1, cloudSave.readCount);
+            Assert.AreEqual(1, cloudSave.writeCount);
         }
 
         [Test]
@@ -328,8 +363,10 @@ namespace Frontier.Tests
 
                 Assert.IsFalse(services.Authentication.IsConfigured);
                 Assert.IsFalse(services.Leaderboards.IsConfigured);
+                Assert.IsFalse(services.CloudSave.IsConfigured);
                 Assert.AreEqual(ServiceStatus.NotConfigured, services.Authentication.InitializeAsync().Result.status);
                 Assert.AreEqual(ServiceStatus.NotConfigured, services.Leaderboards.InitializeAsync().Result.status);
+                Assert.AreEqual(ServiceStatus.NotConfigured, services.CloudSave.InitializeAsync().Result.status);
                 Assert.AreEqual(string.Empty, services.PrivacyPolicyUrl);
             }
             finally
@@ -346,6 +383,7 @@ namespace Frontier.Tests
 
             Assert.IsNotNull(config);
             Assert.IsFalse(config.enableOnlineServices);
+            Assert.IsFalse(config.enableCloudSave);
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.leaderboardId));
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.privacyPolicyUrl));
         }

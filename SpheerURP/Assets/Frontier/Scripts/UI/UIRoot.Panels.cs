@@ -426,7 +426,7 @@ namespace Frontier
 
             body.Add(SectionLabel("PRIVACY"));
             body.Add(UiKit.Text(
-                "Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. Choices save locally and online services stay opt-in. Online services also require legal, audience and account-deletion setup; ads, purchases, cloud saves and analytics are not configured.",
+                "Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. Choices save locally and online services stay opt-in. Online services require legal, audience and account-deletion setup. Cloud Save is not yet connected to local save syncing; no progress is uploaded automatically.",
                 "fr-muted"));
             if (!string.IsNullOrEmpty(services.PrivacyPolicyUrl))
                 body.Add(IconBtn("VIEW PRIVACY POLICY", "about", UiKit.Cyan,

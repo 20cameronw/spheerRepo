@@ -127,11 +127,13 @@ namespace Frontier.Services
 
     public readonly struct CloudSaveRecord
     {
+        public readonly bool hasValue;
         public readonly string payload;
         public readonly string writeLock;
 
-        public CloudSaveRecord(string payload, string writeLock)
+        public CloudSaveRecord(bool hasValue, string payload, string writeLock)
         {
+            this.hasValue = hasValue;
             this.payload = payload ?? string.Empty;
             this.writeLock = writeLock ?? string.Empty;
         }

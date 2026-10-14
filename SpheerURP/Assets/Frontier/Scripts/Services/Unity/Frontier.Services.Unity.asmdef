@@ -5,6 +5,7 @@
         "Frontier.Services",
         "Unity.Services.Core",
         "Unity.Services.Authentication",
+        "Unity.Services.CloudSave",
         "Unity.Services.Leaderboards"
     ],
     "includePlatforms": [],

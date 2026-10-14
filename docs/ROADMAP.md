@@ -2,7 +2,7 @@
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
 Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
-Latest validated milestone: **Frontier Score is connected to save-backed game progression and shown with a local breakdown on Ranks.** Full EditMode passed 592 tests (2 runtime-specific allocation skips), PlayMode passed 19, and standard/narrow Ranks captures had zero errors, overflow, undersized text or touch targets. The client leaderboard contract is read-only: score writes remain disabled until a server-validated Cloud Code path is available. UGS reads remain behind consent and an explicit off-by-default configuration gate; legal/audience/account-deletion setup, LevelPlay, purchases, cloud saves and release work remain open.
+Latest validated milestone: **UGS Cloud Save now has a consent-gated provider with write-lock handling, but it is disabled by default and is not connected to local save synchronization.** Its focused EditMode service tests passed 14/14. Frontier Score remains a local, save-derived value; leaderboard writes remain disabled because local saves and client-supplied score inputs are not authoritative. UGS reads also remain behind consent and an explicit off-by-default configuration gate. Next, define and test non-destructive local/cloud restore and conflict handling without automatic uploads; do not enable competitive writes until progression has server-verifiable evidence and direct client leaderboard writes are blocked.
 
 ---
 
@@ -159,7 +159,7 @@ Dependency rule: Core ← Data ← Game ← UI; Services depends on Core only an
 
 - Versioned JSON (`schemaVersion`), atomic write (`.tmp` → replace), rolling `.bak`, debounce (~1.5 s) with forced flush on pause/quit/travel.
 - `SaveMigrator` v1 → v2 with a fixture test built from a real v1 save.
-- Local store + `ICloudSave` (UGS Cloud Save, write locks for conflict detection). Conflict rule: higher `revision`; if diverged, prefer higher Frontier Score and ask the player.
+- Local store + `ICloudSave` (UGS Cloud Save, write locks for conflict detection). The provider is implemented but disabled by default and is not yet wired to local save sync. Before enabling it, define and test non-destructive restore/conflict UX; never silently upload or overwrite local progress. The proposed conflict rule (higher `revision`, then ask the player when diverged) still needs implementation and validation.
 - Stores deltas only (see §4.6).
 
 ### 2.4 Content pipeline
@@ -463,8 +463,8 @@ Daily login streak, objectives/quests, achievements, weekly Sector Challenge on 
 | IAP | **Unity IAP v5** (`com.unity.purchasing` 5.4.x): `UnityIAPServices.StoreController()`, `Connect`, `FetchProducts`, `OnPurchasePending`, `ConfirmPurchase` | Codeless IAP is closed to new projects. iOS uses StoreKit 2 local validation; Google via `CrossPlatformValidator`. **No Unity-hosted remote validation**, so v1 = local validation + idempotent grants tracked by the game; server validation is a hardening step. Consumables are not auto-restored. Products must be created by hand in App Store Connect and Play Console |
 | Identity | UGS Authentication ≥ 3.8 (project has 3.6.1): anonymous sign-in, later `LinkWithAppleAsync` / `LinkWithGooglePlayGamesAsync` | Free |
 | Leaderboards | UGS Leaderboards 2.3: Dashboard config (`UpdateType` keepBest/cumulative, cron `ResetConfig`, tiers); `AddPlayerScoreAsync`, `GetScoresAsync`, `GetPlayerRangeAsync` | Rate limits unpublished; pricing becomes MAU-based after the free period, so check before launch |
-| Anti-cheat | **Cloud Code** (C# modules or JS) with Access Control so clients cannot write boards directly; server validates plausibility and submits via the Leaderboards API | 600 req/min/player; free tier 1M invocations/month |
-| Cloud save | UGS Cloud Save 3.4 with **write locks** for conflict detection | 5 MiB/2,000 keys per access class; free tier generous |
+| Anti-cheat | **Cloud Code** (C# modules or JS) with Access Control so clients cannot write boards directly; server validates progression from server-verifiable evidence and submits via the Leaderboards API. Recomputing a score from client-supplied components is not sufficient | 600 req/min/player; free tier 1M invocations/month |
+| Cloud save | UGS Cloud Save 3.4.2 provider with **write locks** for conflict detection; `enableCloudSave` is off by default and the adapter is not yet wired to local save restore/sync | 5 MiB/2,000 keys per access class; validate current limits before release |
 | Live tuning | UGS Remote Config 4.2 + Game Overrides | Free |
 | Analytics | UGS Analytics 6.3 custom events | Free up to 50 k MAU |
 | Timers | **Cloud Code server-time pattern** (official "Simple server time anti-cheat" + Idle Clicker sample): server recomputes elapsed time from a stored timestamp, client clock never trusted; offline fallback uses monotonic session time + rewind detection (HTTP Date header trick is unverified, not relied on) | |
@@ -472,7 +472,7 @@ Daily login streak, objectives/quests, achievements, weekly Sector Challenge on 
 | Cinematics | Cinemachine + Timeline (free) | |
 | Localization | Unity Localization (free) | |
 
-Package updates: Phase A removes `com.unity.ads`; later phases add LevelPlay, IAP 5.4, Authentication 3.8, Cloud Save, Cloud Code client, Remote Config, Analytics, Notifications, Cinemachine, Localization.
+Package updates: Phase A removes `com.unity.ads`; Cloud Save 3.4.2 is now installed as a disabled provider foundation. Remaining planned additions include LevelPlay, IAP 5.4, Authentication 3.8, Cloud Code client, Remote Config, Analytics, Notifications, Cinemachine and Localization.
 
 ### 8.8 Compliance
 
