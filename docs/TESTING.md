@@ -5,7 +5,7 @@ Everything that can run without Unity does. Five layers, fastest first:
 | Layer | Covers | Needs | Run it | CI |
 |-------|--------|-------|--------|----|
 | **Core tests** (plain .NET) | `Frontier.Core`: universe generator, flavour text and golden hashes, plus inventory, progression, world store, save schema/migrator/store/debounce, map queries, route geometry and frozen shared enums (188) | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
-| **EditMode** (Unity) | Core tests under Unity Mono, plus Data/Game/Economy/Hyperspace tests: authored worlds, universe service, model scales, saves, route planning, content import, simulation, and catalog/balance checks (513 passed in the integrated run; 2 Mono-only allocation probes skip) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode -IncludeSlow` | `unity-tests.yml` (needs a licence) |
+| **EditMode** (Unity) | Core tests under Unity Mono, plus Data/Game/Economy/Hyperspace tests: authored worlds, universe service, model scales, saves, route planning, content import/runtime selection, simulation, and catalog/balance checks (535 passed in the cutover run; 2 Mono-only allocation probes skip) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode -IncludeSlow` | `unity-tests.yml` (needs a licence) |
 | **PlayMode** (Unity) | Runtime smoke/travel and Hyperspace lifecycle tests: authored database/bootstrap, saves, generated-world rendering and surface sizing, minigame lifecycle, pause/revive/results, and render setup (19) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
 | **Check suites** (Unity editor) | the five `Frontier > Validate ...` checks: the pass/fail **gate** for every change | Unity | `tools/run-checks.ps1` | local only |
 | **Screenshot harness** (Unity, GPU) | Current screens across four virtual devices + UI lint; includes generated-world maps and Hyperspace states | Unity + GPU | `tools/capture-screens.ps1` | local only |
@@ -49,6 +49,32 @@ Never let tests or tools touch the real save: set `GameState.SaveDirectoryOverri
 `SaveSandbox` (`Tests/EditMode/Game/SaveSandbox.cs`), the PlayMode tests in their `SetUp`, the editor checks with
 `CheckSupport.IsolateSaves()`. Changes are saved *debounced*, so a test that looks at the file calls `GameState.Flush()` or `Save()`
 first; tests of the debounce itself drive a `FakeClock` instead of waiting (`GameState(db, loadSave, clock)`).
+
+### Economy runtime cutover regressions
+
+`EconomyRuntimeTests` covers active/cached selection, guarded Inspector imports, missing/unsupported/incomplete imports,
+missing world/combat/rule links and aliases, `DefaultContent` fallback, rebound resource references, cumulative effects,
+crafted-only fuel, exact station/level/reach/research gates, legacy tools, the real v1 fixture, mixed-id v2 inventories and
+warehouse slots, upgrade-alias merging, idempotent reloads, legacy fallback roundtrips and newer-save read-only protection.
+`ContentImportTests` still imports twice byte-for-byte while preserving the **legacy** database asset. The PlayMode
+bootstrap smoke test also asserts that the imported content is the live default.
+Hyperspace component loot resolves the legacy `alloy` id to selected `steel`, while a legacy fallback still awards `alloy`.
+
+Focused command (use the full suites before landing):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-tests.ps1 -Platform EditMode -TestFilter Frontier.Tests.EconomyRuntimeTests
+```
+
+The runtime coverage check now follows raw resource definitions instead of requiring harvestable fuel. Economy lab
+reachability/balance tests validate the complete designed progression, **not** the currently gated runtime progression:
+research, new tools, builder/timer jobs and Atlas still need their separate wiring.
+
+**Cutover validation (2026-10-13):** final full EditMode including Slow: 535 passed / 2 Mono-only allocation probes skipped;
+PlayMode: 19 passed; all five editor suites (Planet, Storage, Combat, Icon, Layout) passed with zero compile diagnostics;
+economy console lab: 127 passed. The transition exposed old harvestable-fuel coverage and over-capacity travel-test
+assumptions; the tests now follow the selected raw table and provision enough backpack capacity for an exact refund.
+No new screenshot sweep or on-device/IL2CPP run was performed for this bounded milestone.
 
 ## Screenshot harness acceptance
 

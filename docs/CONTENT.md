@@ -6,7 +6,7 @@ The reviewed economy is now importable as editable Unity ScriptableObjects. No e
 `docs/economy/data` remains the single committed JSON source (regenerate it with the economy lab, never hand-edit it).
 The engine-free JSON reader is also compiled and tested by the lab and the plain .NET CI project.
 
-**The imported database is staged, not the live game's database.** `Resources/Frontier/EconomyDatabase.asset` references
+**The imported database is now the compatibility-guarded runtime default.** `Resources/Frontier/EconomyDatabase.asset` references
 34 resources, 24 recipes, 31 structures, 6 tool ladders, 16 upgrades, 60 research nodes, 8 obstacle kinds, and the
 habitat, obstacle, shard, score, legacy-id and tuning assets. It includes the exact level tables, costs, timers,
 requirements, 606 tuning values, category colours and starting inventory from the export.
@@ -17,11 +17,30 @@ icon overrides take precedence over canonical ids, which take precedence over ke
 verifies VectorImage import, 48×48 bounds and full distinct coverage; four paginated economy icon harness shots
 show every glyph at 24/32/48/64 physical pixels.
 
-`GameDatabase.Load()` and the scene still use `Frontier/GameDatabase`. Its assets, GUIDs, save semantics and current
-gameplay stay unchanged. Staging avoids exposing research-gated recipes or new costs before research, tool tiers,
-builders and economy save migration exist. Core Worlds and combat assets in the staged database are references to
-the original authored assets; **their legacy deposit resource references are not migrated yet**. Do not point the
-scene at the staged database as a substitute for the remaining gameplay integration.
+`GameDatabase.Load()` validates the supported v1 catalog, tuning, required families, starting capacity, typed adapters,
+legacy aliases, and the complete authored-world/combat links before selecting it. A missing, old, incomplete or
+incompatible import falls back to `Frontier/GameDatabase`, then `DefaultContent` when that asset is absent.
+The shipped scene leaves its database override empty; explicit legacy/custom overrides still work. An explicit
+imported override goes through the same guard.
+
+Selection creates a cached, transient runtime view (`ContentSource` points to the imported asset). It keeps the imported
+resources, recipes, structures, upgrade rows and rules, but copies authored planets/enemies and the three legacy tool
+upgrades to rebind their item references. No authored asset, GUID, legacy database or imported catalog is rewritten.
+Legacy fuel deposits are omitted from the runtime view because fuel is now crafted-only; source deposits remain intact.
+Procedural deposits use the imported raw-resource/habitat tables. Planet ids, authored placement, models and visual seeds
+stay stable; generated deposit contents now follow economy content v1 rather than the former seven-resource table.
+
+Both v1 migration and existing v2 saves resolve missing resource/structure/upgrade ids through `LegacyIdMapSO`.
+Existing stable ids take precedence, so reloads never migrate them twice. `alloy` becomes `steel`, `satellite` becomes
+`orbital_relay`; warehouse slots stay in place and colliding inventory aliases sum, while upgrade aliases take the maximum
+owned level. Legacy `axe`/`pick`/`drill` purchases and levels remain legacy upgrades until tool-tier persistence exists.
+The save schema stays v2, v1 originals are backed up, and newer read-only saves are never overwritten.
+
+Imported recipes are filtered by exact station id, station level, reach and research, including the authoritative craft
+action. Unsupported structures/effects cannot be purchased. Research requirements currently stay locked (Atlas entries
+are not research grants); existing saved ownership survives without retroactive gating. Supported legacy actions remain
+synchronous: batch size is not treated as free output, and upgrade rows use their cumulative values and correct units.
+This is a safe content cutover, **not** the complete economy progression loop.
 
 ## Import and validation
 
@@ -41,7 +60,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-tests.ps1 -Platfor
 
 Assets live at `Assets/Frontier/Data/Economy/<Family>/<id>.asset`. Reimport updates existing objects in place,
 preserving GUIDs and references. Removed ids are reported and retained, never deleted. Unchanged imports do not dirty
-assets; the tests import twice and compare every generated asset and meta file byte-for-byte, including the live
+assets; the tests import twice and compare every generated asset and meta file byte-for-byte, including the legacy
 database's bytes. Paths are identity: don't rename generated asset files.
 
 ### Ownership and overrides
@@ -64,12 +83,11 @@ the explicit canonical-id-to-behaviour map; imported kinds without gameplay are 
 
 ## Remaining integration
 
-1. Build an economy runtime service from `Tuning`/`CatalogBuilder`, including safe Remote Config overrides.
-2. Migrate saved legacy resource/structure ids and tool upgrades; add persistent research, tool tiers and builders.
-3. Migrate authored deposit references and wire the economy resource table into universe generation.
-4. Wire inventory/warehouse tables, station/research gates and batch crafting, structure builders/timers, tools,
-   upgrade effects, research, travel/hull gates, waves, obstacle clearing, megaprojects, shards and score.
-5. Expose Atlas/research/tool screens and full presentation coverage. Merely importing a structure is not gameplay.
+1. Add persistent research completion, tool tiers and builder jobs; replace the temporary fail-closed research gates.
+2. Wire timers/batch jobs and the remaining structure behaviours, tank/compression effects, full travel/hull progression,
+   obstacles, megaprojects, shards and score. The current interim travel settings are unchanged.
+3. Expose Atlas/research/tool screens and full presentation coverage. Merely importing a structure is not gameplay.
+4. Add safe live tuning/Remote Config overrides later; current travel reads the validated imported tuning and catalog.
 
 The ordered design and runtime API guide remains `tools/labs/economy/INTEGRATION.template.md`; the balanced source and
 review exports are documented in `docs/economy/README.md`. This pipeline deliberately does not rebalance them.
@@ -95,3 +113,12 @@ the worktree's `SpheerURP/Logs`, rather than the system temporary directory.
 
 The harness also added six pair-adjustment records to `Barlow-Medium-SDF.asset` while rendering the new labels.
 Those additive font-feature changes are retained; no existing font data or interrupted work was discarded.
+
+## Runtime cutover verification (2026-10-13)
+
+Final full EditMode including Slow: **535 passed, 2 skipped** (Mono allocation API unavailable); PlayMode: **19 passed**;
+all five editor check suites passed with **zero compile diagnostics**; economy lab: **127 passed**. Coverage includes
+guarded selection/fallback, every selected catalog item reference, real v1 migration, mixed-id v2 roundtrips, legacy tools,
+warehouse slots, cumulative effects, station/reach/research gates, crafted-only fuel and canonical Hyperspace loot.
+No economy export/balance values were changed, and no new screenshot/device sweep was claimed. The existing generated
+font SDF changes were excluded from the cutover commits.

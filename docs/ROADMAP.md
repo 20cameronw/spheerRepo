@@ -575,8 +575,15 @@ resources, 24 recipes, 31 structures, 6 tool ladders x 7 tiers, 16 upgrades, 60 
 simulator puts a regular player in Settlement after about 3.6 days, Industry after 13, Interstellar after 89 and Ascension after 212 (casual about
 3x slower, hardcore about 4x faster) with no dead zones; the first session reaches a Warehouse at 0.3 min, the first fuel at 1.1 min and the first
 hop at 2.4 min. The validated export reader and idempotent importer now create 186 designer-editable ScriptableObject assets and 47 distinct
-content icons; see [CONTENT.md](CONTENT.md). The live database and save model have not yet cut over to these assets. Next: migrate runtime
-content and saves, then wire jobs/timers, research, tool tiers, hazards, obstacles, shards and the Atlas.
+content icons; see [CONTENT.md](CONTENT.md). The live default now uses a validated transient view of these assets with legacy fallback,
+canonical v1/v2 content-id remapping, rebound authored/combat references, exact station gates and cumulative effects. Legacy tool ownership
+is retained; unfinished research/structure/effect purchases stay locked. Next: persistent research/tool tiers/builders, jobs/timers,
+the remaining behaviours, hazards, obstacles, shards and the Atlas. This is not yet the full balanced progression loop.
+
+**Runtime cutover validation (2026-10-13):** full EditMode including Slow 535 passed / 2 platform-specific allocation probes
+skipped; PlayMode 19 passed; economy lab 127 passed; all five editor checks passed with zero compile diagnostics. Original
+authored assets and legacy database bytes remain intact; the existing font SDF changes are not part of the cutover commits.
+No new screenshot sweep or on-device/IL2CPP validation was performed.
 
 ### Map, travel and Hyperspace Run (integrated milestone)
 
@@ -594,7 +601,7 @@ structure scale, ground radii and route geometry.
 economy lab 127 passed; all five editor checks passed. Seven integrated phone captures (map plus six Hyperspace states) reported zero errors,
 zero text/touch-target/overflow lint findings.
 
-Still open: live economy/runtime and save migration; pins and persisted discovery history; global name indexing and directed next-stop controls;
+Still open: complete economy progression (research/tools/builders/timers and remaining behaviours); pins and persisted discovery history; global name indexing and directed next-stop controls;
 device/GPU map budget and IL2CPP/ARM64 determinism; binding the mini-game duration to route time; resumable/abortable multi-leg flights and
 real jump/scanner/plating unlocks; Atlas, harvest expansion, monetization and live services.
 

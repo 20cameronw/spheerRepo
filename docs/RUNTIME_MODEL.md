@@ -46,6 +46,31 @@ to those values. See [CONTENT.md](CONTENT.md) for import ownership, reimport gua
 
 ## 2. Data flow
 
+### Economy database cutover
+
+`GameDatabase.Load()` prefers `Frontier/EconomyDatabase` only after `CanActivate` accepts its supported schema/content
+version, complete catalog, tuning digest, starting inventory, runtime enum adapters, legacy aliases and authored-world/combat
+references. Selection falls back to the legacy Resources database (or `DefaultContent`) without editing either source.
+The scene has no pinned database; `ForRuntime` also guards imported Inspector overrides and direct `GameState` inputs.
+
+The selected database is a cached transient view of imported ScriptableObjects. Its `ContentSource` remains the authoring asset;
+`ToCatalog()` excludes the compatibility-only upgrades. Planet/enemy copies bind deposits and bounties to selected resources.
+Crafted fuel is no longer a harvest deposit in that view. Generated worlds use the imported raw-resource/habitat tables;
+this changes deposit content, not planet keys, authored orbit ordering or visual seeds. Source assets remain untouched.
+The legacy tool upgrades are retained with canonical costs until separate tool-tier persistence is implemented.
+
+The v1-to-v2 migrator still owns world-id/schema migration. Before applying **either** save version, `GameState.ContentIds`
+resolves missing content ids using the selected `LegacyIdMapSO`: stable ids are kept, inventory alias collisions sum,
+upgrade levels merge by maximum, and warehouse slot positions/counts and structure levels remain intact. Renamed content
+is flushed once to canonical v2; subsequent loads do not trigger another content-migration write. Existing backup/recovery
+and newer-save read-only protections still apply.
+
+Supported gameplay consumes imported cumulative upgrade/structure rows, with absolute backpack/fuel values translated to
+legacy additive units. Station batch sizes do not become yield bonuses. Recipe actions require a local station of the exact
+id and sufficient level/reach; research-gated recipes, purchases and structures fail closed until a research service exists.
+Unknown/unsupported behaviours cannot be bought; previously owned objects remain loadable. Timers, builders, research,
+new tool tiers, tank/compression, obstacles, shards, score and Atlas gameplay remain separate milestones.
+
 ```mermaid
 flowchart LR
   subgraph Data["Frontier.Data"]
