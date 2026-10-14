@@ -402,6 +402,8 @@ namespace Frontier
             {
                 StructureHeader(body, s, c, s.def.description);
                 float bonus = gs.StructureBonus(s);
+                int batchSize = gs.StationBatchSize(s);
+                body.Add(UiKit.Text("BATCH CAPACITY  ·  " + batchSize + " CRAFT" + (batchSize == 1 ? "" : "S") + " PER TAP", "fr-small"));
                 body.Add(SectionLabel("RECIPES  -  you give  >  you get"));
                 foreach (var rec in gs.db.recipes)
                 {
@@ -416,17 +418,22 @@ namespace Frontier
 
                     var line = UiKit.Div("fr-recipe-flow");
                     var inputs = UiKit.Div("fr-recipe-side");
-                    inputs.Add(UiKit.Text("INPUT", "fr-tiny"));
+                    inputs.Add(UiKit.Text("INPUT · BATCH x" + batchSize, "fr-tiny"));
                     foreach (var i in r.inputs)
-                        if (i.resource != null) inputs.Add(RecipeResource(i.resource, i.amount, gs.Count(i.resource) < i.amount));
+                        if (i.resource != null)
+                        {
+                            int required = (int)Math.Min(int.MaxValue, (long)i.amount * batchSize);
+                            inputs.Add(RecipeResource(i.resource, required, gs.Count(i.resource) < required));
+                        }
                     line.Add(inputs);
                     var arrow = UiKit.Text(">", "fr-h2");
                     arrow.AddToClassList("fr-recipe-arrow");
                     line.Add(arrow);
                     var outputs = UiKit.Div("fr-recipe-side");
-                    outputs.Add(UiKit.Text("OUTPUT", "fr-tiny"));
+                    outputs.Add(UiKit.Text("OUTPUT · BATCH x" + batchSize, "fr-tiny"));
                     foreach (var o in r.outputs)
-                        if (o.resource != null) outputs.Add(RecipeResource(o.resource, gs.OutputAmount(o, bonus)));
+                        if (o.resource != null)
+                            outputs.Add(RecipeResource(o.resource, (int)Math.Min(int.MaxValue, (long)gs.OutputAmount(o, bonus) * batchSize)));
                     line.Add(outputs);
                     card.Add(line);
 
@@ -447,28 +454,49 @@ namespace Frontier
                     var btns = UiKit.Div("fr-row");
                     btns.style.justifyContent = Justify.FlexEnd;
                     btns.style.marginTop = UiKit.Space.S4;
-                    var one = UiKit.Btn("MAKE 1", c, () => Craft(r, bonus, 1));
-                    UiKit.SetEnabledLook(one, can > 0);
-                    var max = UiKit.Btn(can > 1 ? "MAKE ALL (" + can + ")" : "MAKE ALL", c, () => Craft(r, bonus, 100));
-                    max.style.marginLeft = UiKit.Space.S12;
-                    UiKit.SetEnabledLook(max, can > 1);
-                    btns.Add(one); btns.Add(max);
+                    int batchCount = Math.Min(batchSize, can);
+                    var batch = UiKit.Btn("MAKE BATCH x" + batchCount, c, () => Craft(r, s, bonus, batchCount));
+                    UiKit.SetEnabledLook(batch, can > 0);
+                    btns.Add(batch);
+                    if (can > batchCount)
+                    {
+                        var max = UiKit.Btn("MAKE ALL (" + can + ")", c, () => Craft(r, s, bonus, can, true));
+                        max.style.marginLeft = UiKit.Space.S12;
+                        UiKit.SetEnabledLook(max, true);
+                        btns.Add(max);
+                    }
                     card.Add(btns);
                     body.Add(card);
                 }
             });
         }
 
-        void Craft(RecipeSO r, float bonus, int times)
+        void Craft(RecipeSO r, PlacedStructure station, float bonus, int times, bool all = false)
         {
             int made = 0;
             batching = true;
-            for (int i = 0; i < times; i++)
+            try
             {
-                if (!gs.Craft(r, bonus)) break;
-                made++;
+                if (all)
+                {
+                    int remaining = times;
+                    int batchSize = gs.StationBatchSize(station);
+                    while (remaining > 0)
+                    {
+                        int batch = Math.Min(batchSize, remaining);
+                        while (batch > 0 && !gs.CraftBatch(r, station, batch, bonus)) batch--;
+                        if (batch == 0) break;
+                        made += batch;
+                        remaining -= batch;
+                    }
+                }
+                else if (gs.CraftBatch(r, station, times, bonus))
+                    made = times;
             }
-            batching = false;
+            finally
+            {
+                batching = false;
+            }
             if (made > 0) { Sfx.Good(); planetView.Punch(); }
             else { Sfx.Bad(); Toast("Not enough room or materials", UiKit.Red); }
             OnStateChanged();

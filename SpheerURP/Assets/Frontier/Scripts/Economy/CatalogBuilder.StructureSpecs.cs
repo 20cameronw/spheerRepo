@@ -64,11 +64,11 @@ namespace Frontier.Economy
                 .G("V").C(650, 1.70, "scrap:1.5@1,steel:2.5@1,planks:1@1,circuit_board:1@4,servo_motor:1@7").T(2.0, 0.90).E("yieldBonus", 0, 0.20).U(2, "salvage_ops"),
 
             // ------------------------------------------------------------ Process (5)
-            S("refinery", "Refinery", Prc, 0, "Converts raw materials into fuel and planks. Higher levels unlock better recipes; level-based batch bonuses are planned.")
+            S("refinery", "Refinery", Prc, 0, "Converts raw materials into fuel and planks. Higher levels unlock better recipes and larger craft batches.")
                 .Legacy("Refinery").C(15, 1.75, "scrap:1@1,wood:0.4@2,planks:0.5@3,iron_plate:0.5@5,steel:0.6@8").T(0, 0.85).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150),
-            S("fabricator", "Fabricator", Prc, 1, "Draws wire and assembles components. Higher levels unlock better recipes; level-based batch bonuses are planned.")
+            S("fabricator", "Fabricator", Prc, 1, "Draws wire and assembles components. Higher levels unlock better recipes and larger craft batches.")
                 .Legacy("Fabricator").C(70, 1.75, "scrap:2@1,planks:1.5@1,iron_plate:1@2,copper_wire:0.8@4,steel:1@6").T(0.8, 0.90).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150).U(1, "fabrication"),
-            S("foundry", "Foundry", Prc, 1, "Smelts ore into plates and alloys. Higher levels unlock tougher alloys; level-based batch bonuses are planned.")
+            S("foundry", "Foundry", Prc, 1, "Smelts ore into plates and alloys. Higher levels unlock tougher alloys and larger craft batches.")
                 .C(90, 1.75, "scrap:2@1,planks:1.5@1,stone:1@1,iron_plate:1@3,steel:1.2@6").T(0.8, 0.90).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150).U(1, "smelting"),
             S("chem_reactor", "Chem Reactor", Prc, 3, "Mixes composites and charges plasma cells.")
                 .Footprint(2).C(4500, 1.75, "steel:3@1,planks:0.8@1,biocomposite:2@1,glass:1.5@1,circuit_board:2@3,titanium_plate:2@5").T(3.5, 0.90).ET("batchSize", 1, 2, 4, 8, 14, 24, 40, 64, 100, 150).U(3, "chemistry"),
@@ -107,7 +107,7 @@ namespace Frontier.Economy
                 .Footprint(2).C(80, 1.80, "planks:2@1,scrap:1.5@1,iron_plate:1@2,glass:1@3,copper_wire:0.8@4,circuit_board:1@6").T(1.0, 0.95).E("labLevel", 1, 1.0).U(1, null),
             S("radar_tower", "Radar Tower", Uti, 1, "Extends the survey radius: see more worlds around you before you jump.")
                 .C(60, 1.70, "scrap:2@1,planks:1.5@1,iron_plate:1@3,copper_wire:0.8@4,circuit_board:0.8@6").T(1.0, 0.85).E("surveyRadiusBonusLy", 15, 15).U(1, "survey_basics").Levels(8),
-            S("colony_hub", "Colony Hub", Uti, 3, "Adds builder crews at levels 3 and 7. Obstacle clearing is planned for a later update.")
+            S("colony_hub", "Colony Hub", Uti, 3, "Adds builder crews at levels 3 and 7 and discounts planetary obstacle clearance.")
                 .Footprint(2).C(6000, 1.80, "planks:1@1,steel:3@1,biocomposite:2@1,glass:1.5@1,circuit_board:2@3,servo_motor:1.5@6").T(3.5, 0.95)
                 .ET("extraBuilders", 0, 0, 1, 1, 1, 1, 2, 2, 2, 2).Cap("obstacleDiscountPercent", 0, 5).U(3, "colony_charter"),
             S("hangar", "Hangar", Uti, 4, "A spaceport hangar: cuts the fuel cost of every trip.")

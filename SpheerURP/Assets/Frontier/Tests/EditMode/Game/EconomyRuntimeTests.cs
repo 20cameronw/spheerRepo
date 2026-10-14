@@ -211,6 +211,30 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CraftBatch_UsesOperationalStationCapacityWithoutIncreasingPerRecipeYield()
+        {
+            var state = new GameState(db, false);
+            var refinery = state.DebugPlace(db.FindStructure("refinery"), 0);
+            var recipe = db.recipes.Single(r => r.id == "distill_wood");
+            Assert.AreEqual(1, state.StationBatchSize(refinery));
+
+            state.DebugSetStructureLevel(refinery, 2);
+            Assert.AreEqual(2, state.StationBatchSize(refinery));
+            state.backpack.Set("wood", 16);
+            int fuelBefore = state.Count(db.fuel);
+
+            Assert.IsFalse(state.CraftBatch(recipe, refinery, 3), "a tap cannot exceed the station's authored batch capacity");
+            Assert.AreEqual(16, state.Count(db.FindResource("wood")), "a rejected batch spends nothing");
+            Assert.IsTrue(state.CraftBatch(recipe, refinery, 2));
+            Assert.AreEqual(0, state.Count(db.FindResource("wood")));
+            Assert.AreEqual(fuelBefore + 6, state.Count(db.fuel), "two recipes yield two times the exact recipe output");
+
+            state.backpack.Set("wood", 8);
+            Assert.IsTrue(state.CraftBatch(recipe, refinery, 1), "a partial batch remains craftable when fewer inputs are available");
+            Assert.AreEqual(fuelBefore + 9, state.Count(db.fuel));
+        }
+
+        [Test]
         public void RealV1Fixture_LoadsWithoutLostItemsToolsOrWorldDeltas()
         {
             string original = SaveFormatTests.Fixture("save_v1_midgame.json");

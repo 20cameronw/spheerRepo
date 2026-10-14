@@ -16,7 +16,7 @@ MonoBehaviour:
   id: refinery
   displayName: Refinery
   description: Converts raw materials into fuel and planks. Higher levels unlock better
-    recipes; level-based batch bonuses are planned.
+    recipes and larger craft batches.
   kind: 0
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
   modelKey: 

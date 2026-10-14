@@ -337,6 +337,13 @@ namespace Frontier
             return s.def.effectKind == "yieldBonus" || s.def.effectKind == "waveRewardBonus" ? s.def.EffectAt(s.level) : 0f;
         }
 
+        public int StationBatchSize(PlacedStructure station)
+        {
+            if (station == null || !IsOperational(station) || !IsPlaced(station) ||
+                station.def.effectKind != "batchSize") return 1;
+            return Mathf.Max(1, Mathf.RoundToInt(station.def.EffectAt(station.level)));
+        }
+
         public float RadarRangeBonus(PlanetData p)
         {
             var radar = p == null ? null : StructureOfKind(p, StructureKind.RadarTower);
@@ -440,6 +447,40 @@ namespace Frontier
             if (!backpack.Craft(ToIds(r.inputs), outputs)) return false;
             Notify();
             return true;
+        }
+
+        public bool CraftBatch(RecipeSO recipe, PlacedStructure station, int batches, float bonus = 0f)
+        {
+            if (batches < 1 || batches > StationBatchSize(station) || RecipeLockReason(recipe, station) != null)
+                return false;
+            IdAmount[] inputs, outputs;
+            if (!TryScaleAmounts(recipe.inputs, batches, 0f, false, out inputs) ||
+                !TryScaleAmounts(recipe.outputs, batches, bonus, true, out outputs) ||
+                !backpack.Craft(inputs, outputs)) return false;
+            Notify();
+            return true;
+        }
+
+        bool TryScaleAmounts(IList<ItemAmount> items, int batches, float bonus, bool scaleOutput, out IdAmount[] amounts)
+        {
+            amounts = null;
+            var totals = new Dictionary<string, long>(StringComparer.Ordinal);
+            foreach (var item in items)
+            {
+                if (item.resource == null || string.IsNullOrEmpty(item.resource.id) || item.amount <= 0) return false;
+                int perCraft = scaleOutput ? OutputAmount(item, bonus) : item.amount;
+                long scaled = (long)perCraft * batches;
+                long total;
+                totals.TryGetValue(item.resource.id, out total);
+                total += scaled;
+                if (total > int.MaxValue) return false;
+                totals[item.resource.id] = total;
+            }
+            amounts = new IdAmount[totals.Count];
+            int index = 0;
+            foreach (var total in totals)
+                amounts[index++] = new IdAmount(total.Key, (int)total.Value);
+            return amounts.Length > 0;
         }
     }
 }

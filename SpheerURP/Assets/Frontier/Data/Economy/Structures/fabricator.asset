@@ -15,8 +15,8 @@ MonoBehaviour:
   lockedFields: []
   id: fabricator
   displayName: Fabricator
-  description: Draws wire and assembles components. Higher levels unlock better recipes;
-    level-based batch bonuses are planned.
+  description: Draws wire and assembles components. Higher levels unlock better recipes
+    and larger craft batches.
   kind: 8
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
   modelKey: 

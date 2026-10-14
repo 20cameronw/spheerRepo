@@ -15,8 +15,8 @@ MonoBehaviour:
   lockedFields: []
   id: foundry
   displayName: Foundry
-  description: Smelts ore into plates and alloys. Higher levels unlock tougher alloys;
-    level-based batch bonuses are planned.
+  description: Smelts ore into plates and alloys. Higher levels unlock tougher alloys
+    and larger craft batches.
   kind: 10
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
   modelKey: 
