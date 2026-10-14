@@ -1,7 +1,7 @@
 # Frontier → Production: Master Plan
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
-Status: **approved. Phase A (foundation + visible quick wins) is in progress**; the todo list and progress live in the Progress section below.
+Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
 
 ---
 
@@ -567,15 +567,36 @@ The authoritative todo list with dependencies lives in the session database (`to
 
 ## Progress
 
-### Economy imported (design locked, not yet wired into gameplay)
+### Economy catalog and content pipeline (gameplay wiring remains)
 
 The complete economy lives in `Scripts/Economy` (`Frontier.Economy`, pure C#) with its 91 tests, the console labs in `tools/labs` and the
 reviewable snapshot in [economy/](economy/README.md) (report, Atlas text, icon brief, tuning keys, charts, JSON exports). Locked content: 34
 resources, 24 recipes, 31 structures, 6 tool ladders x 7 tiers, 16 upgrades, 60 research nodes, 8 obstacle kinds and 606 tuning keys. The
 simulator puts a regular player in Settlement after about 3.6 days, Industry after 13, Interstellar after 89 and Ascension after 212 (casual about
 3x slower, hardcore about 4x faster) with no dead zones; the first session reaches a Warehouse at 0.3 min, the first fuel at 1.1 min and the first
-hop at 2.4 min. Next: turn the catalog into ScriptableObjects, wire the mechanics (jobs and timers, research, tool tiers, hazards, obstacles,
-shards), then the new map and Atlas.
+hop at 2.4 min. The validated export reader and idempotent importer now create 186 designer-editable ScriptableObject assets and 47 distinct
+content icons; see [CONTENT.md](CONTENT.md). The live database and save model have not yet cut over to these assets. Next: migrate runtime
+content and saves, then wire jobs/timers, research, tool tiers, hazards, obstacles, shards and the Atlas.
+
+### Map, travel and Hyperspace Run (integrated milestone)
+
+The map and travel branches are integrated with the content work. The bounded procedural star map has galaxy/sector/system views, search,
+survey filters, a detailed Worlds card and curved routes. Travel plans multi-leg routes with energy payment, hazard-plating diagnostics,
+refunds and timed autopilot. Manual legs invoke the new Hyperspace Run renderer and simulation; the result flow awards loot, XP and fuel refunds.
+The request carries the route's planned leg duration, but the run length is currently determined from distance/danger rather than that duration.
+Hyperspace supports pause/finish, revive offers, results, controls and harness scenes; the simulation core and its fairness solver remain
+deterministic and unchanged.
+
+The model calibration pass also normalized all 14 source imports and verified the 30 authored planet models at a consistent on-screen diameter,
+structure scale, ground radii and route geometry.
+
+**Integrated validation:** EditMode 513 passed / 2 platform-specific performance probes skipped; PlayMode 19 passed; universe lab 188 passed;
+economy lab 127 passed; all five editor checks passed. Seven integrated phone captures (map plus six Hyperspace states) reported zero errors,
+zero text/touch-target/overflow lint findings.
+
+Still open: live economy/runtime and save migration; pins and persisted discovery history; global name indexing and directed next-stop controls;
+device/GPU map budget and IL2CPP/ARM64 determinism; binding the mini-game duration to route time; resumable/abortable multi-leg flights and
+real jump/scanner/plating unlocks; Atlas, harvest expansion, monetization and live services.
 
 ### Foundation rework: runtime planet model, session split, save v2 (done on this branch)
 

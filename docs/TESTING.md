@@ -4,11 +4,11 @@ Everything that can run without Unity does. Five layers, fastest first:
 
 | Layer | Covers | Needs | Run it | CI |
 |-------|--------|-------|--------|----|
-| **Core tests** (plain .NET) | `Frontier.Core`: the universe generator and its flavour text (109 tests incl. the golden hashes) and the engine-free session logic: inventory, progression, world store, save schema/migrator/store/debounce, travel model, frozen shared enums (84): 193 in total | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
-| **EditMode** (Unity) | the Core tests again, in the editor's Mono, plus Data/Game tests: authored worlds, universe service, planet data and models, game state, storage, waves, content integrity, saves with the real `JsonUtility` codec (116): 309 in total | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode` | `unity-tests.yml` (needs a licence) |
-| **PlayMode** (Unity) | smoke (8): the authored database loads, `FrontierBootstrap` builds camera, planet, backdrop, defense, UI and world surface without errors, the app component writes the debounced save, every biome / size / ring / moon / model key renders, travelling between worlds of different sizes keeps the surface consistent; the universe golden digest on the PlayMode runtime (also runnable on a device) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
+| **Core tests** (plain .NET) | `Frontier.Core`: universe generator, flavour text and golden hashes, plus inventory, progression, world store, save schema/migrator/store/debounce, map queries, route geometry and frozen shared enums (188) | .NET 8 SDK only | `cd tests` then `dotnet test Frontier.Core.Tests/Frontier.Core.Tests.csproj` | `core-tests.yml` (Ubuntu + Windows) |
+| **EditMode** (Unity) | Core tests under Unity Mono, plus Data/Game/Economy/Hyperspace tests: authored worlds, universe service, model scales, saves, route planning, content import, simulation, and catalog/balance checks (513 passed in the integrated run; 2 Mono-only allocation probes skip) | Unity 6000.4.0f1 | `tools/run-tests.ps1 -Platform EditMode -IncludeSlow` | `unity-tests.yml` (needs a licence) |
+| **PlayMode** (Unity) | Runtime smoke/travel and Hyperspace lifecycle tests: authored database/bootstrap, saves, generated-world rendering and surface sizing, minigame lifecycle, pause/revive/results, and render setup (19) | Unity (a GPU is not required) | `tools/run-tests.ps1 -Platform PlayMode` | `unity-tests.yml` (needs a licence) |
 | **Check suites** (Unity editor) | the five `Frontier > Validate ...` checks: the pass/fail **gate** for every change | Unity | `tools/run-checks.ps1` | local only |
-| **Screenshot harness** (Unity, GPU) | 65 screens on each of four virtual devices (the original 45 plus 20 generated-world screens) + UI lint | Unity + GPU | `tools/capture-screens.ps1` | local only |
+| **Screenshot harness** (Unity, GPU) | Current screens across four virtual devices + UI lint; includes generated-world maps and Hyperspace states | Unity + GPU | `tools/capture-screens.ps1` | local only |
 
 Why the Core tests run twice: Unity's runner proves the code under the runtime the game actually uses (Mono in the editor), the
 plain .NET project proves it in seconds on any machine and checks the determinism hashes on other operating systems. The same
@@ -145,7 +145,7 @@ Every change must keep all five passing, and the Unity log must show no `warning
 | Planet | `Frontier > Validate Planet Model Sizes` / `FrontierPlanetChecks` | source models import at unit size, planet models fit diameter 3, structure diameters and tier capacities, map route endpoints and orbital joins, baked model ground radii match a fresh measurement (fix: `Frontier > Bake Model Ground Radii`) |
 | Storage | `Frontier > Validate Warehouse Storage` / `FrontierStorageChecks` | warehouse capacity, transfers, conservation, isolation, upgrades, persistence, full backpack |
 | Combat | `Frontier > Validate Combat Balance` / `FrontierCombatChecks` | repeatable previews for fuel 1-40 on every planet, monotonic rewards and difficulty, wave prefixes 1-20, selection shader import |
-| Icons | `Frontier > Validate Icons` / `FrontierIconChecks` | 48 icons import as 48x48 `VectorImage`, every SVG listed, every resource and structure has its own glyph |
+| Icons | `Frontier > Validate Icons` / `FrontierIconChecks` | Registered SVG icons import as `VectorImage`, every SVG is listed, every resource and structure has its own glyph |
 | Layout | `Frontier > Validate Panel Layout` / `FrontierLayoutChecks` | panel bounds, inventory rebuilds, crafting popup, mini-game arena at 900x1600 and 1600x900 |
 
 `tools/run-checks.ps1` runs them through `run-unity.ps1` (the layout suite needs `-NoQuit`, handled for you). The ported

@@ -51,7 +51,8 @@ namespace Frontier
                     seed = Frontier.Universe.Hash.Fnv1a64(leg.fromSystemId + ">" + leg.toSystemId) ^ (ulong)(uint)UnityEngine.Random.Range(int.MinValue, int.MaxValue),
                     distanceLy = leg.lengthLy, danger = target.Danger, tier = target.Tier,
                     legIndex = i, legCount = plan.LegCount, from = from, to = target,
-                    seconds = leg.seconds, fromSystemId = leg.fromSystemId, toSystemId = leg.toSystemId
+                    seconds = leg.seconds, fuelCost = leg.fuel,
+                    fromSystemId = leg.fromSystemId, toSystemId = leg.toSystemId
                 };
                 bool completed = false;
                 TravelRunResult result = default;

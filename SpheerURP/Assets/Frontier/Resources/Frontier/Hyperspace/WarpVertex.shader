@@ -2,11 +2,12 @@ Shader "Frontier/Hyperspace/WarpVertex"
 {
     SubShader
     {
-        Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Opaque" }
+        Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Transparent" "Queue" = "Transparent" }
         Pass
         {
             Cull Off
-            ZWrite On
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
@@ -24,7 +25,7 @@ Shader "Frontier/Hyperspace/WarpVertex"
             half4 Frag(Varyings input) : SV_Target
             {
                 half fog = saturate((input.depth - 25) / 150);
-                return half4(lerp(input.color.rgb, half3(0.012, 0.02, 0.055), fog), 1);
+                return half4(lerp(input.color.rgb, half3(0.012, 0.02, 0.055), fog), input.color.a);
             }
             ENDHLSL
         }

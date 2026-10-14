@@ -21,18 +21,18 @@ MonoBehaviour:
     groundScale: 1
   - key: ferrum
     prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
-    scale: 3.0000005
+    scale: 2.9999993
     referenceDiameter: 3
     groundScale: 0.7
   - key: glacia
     prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
       type: 3}
-    scale: 0.07294791
+    scale: 0.066935815
     referenceDiameter: 3
     groundScale: 1
   - key: cinder
     prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
-    scale: 3.0000005
+    scale: 2.9999993
     referenceDiameter: 3
     groundScale: 0.7
   - key: arbor
@@ -43,7 +43,7 @@ MonoBehaviour:
   - key: nyx
     prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
       type: 3}
-    scale: 0.054803535
+    scale: 0.0368842
     referenceDiameter: 3
     groundScale: 0.7
   - key: aurum
@@ -70,7 +70,7 @@ MonoBehaviour:
   - key: halcyon
     prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
       type: 3}
-    scale: 0.07294791
+    scale: 0.066935815
     referenceDiameter: 3
     groundScale: 1
   - key: mire
@@ -81,12 +81,12 @@ MonoBehaviour:
   - key: obsidian
     prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
       type: 3}
-    scale: 0.054803535
+    scale: 0.0368842
     referenceDiameter: 3
     groundScale: 0.7
   - key: vesper
     prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
-    scale: 3.0000005
+    scale: 2.9999993
     referenceDiameter: 3
     groundScale: 0.7
   - key: prism
