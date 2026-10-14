@@ -92,3 +92,6 @@ review exports are documented in `docs/economy/README.md`. This pipeline deliber
 Local, ignored artifacts: `SpheerURP/TestResults`, `SpheerURP/Logs`, and
 `SpheerURP/Screens/economy-content` (including contact sheets). Batch Unity's default logs now also stay inside
 the worktree's `SpheerURP/Logs`, rather than the system temporary directory.
+
+The harness also added six pair-adjustment records to `Barlow-Medium-SDF.asset` while rendering the new labels.
+Those additive font-feature changes are retained; no existing font data or interrupted work was discarded.
