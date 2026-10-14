@@ -204,37 +204,6 @@ namespace Frontier.Services.Unity
             }
         }
 
-        public async Task<ServiceResult> SubmitScoreAsync(string boardId, long score)
-        {
-            if (!IsConfigured)
-                return ServiceResult.NotConfigured("Unity Leaderboards");
-            if (!string.Equals(boardId, config.leaderboardId, StringComparison.Ordinal))
-                return ServiceResult.InvalidRequest("The requested leaderboard does not match the configured board.");
-            if (score < 0 || score > MaximumExactIntegerScore)
-                return ServiceResult.InvalidRequest("Score must be a non-negative integer within the supported range.");
-
-            ServiceResult initialized = await initializer.InitializeAsync();
-            if (!initialized.succeeded)
-                return initialized;
-
-            try
-            {
-                if (!AuthenticationService.Instance.IsSignedIn)
-                    return ServiceResult.InvalidRequest("Sign in before submitting a leaderboard score.");
-                await LeaderboardsService.Instance.AddPlayerScoreAsync(config.leaderboardId, score);
-                return ServiceResult.Success();
-            }
-            catch (ServicesInitializationException exception)
-            {
-                Debug.LogWarning("Unity Leaderboards submission failed: " + exception.Message);
-                return ServiceResult.Failed(exception.Message);
-            }
-            catch (RequestFailedException exception)
-            {
-                Debug.LogWarning("Unity Leaderboards submission failed: " + exception.Message);
-                return ServiceResult.Failed(exception.Message);
-            }
-        }
     }
 
     public static class FrontierUnityServicesFactory

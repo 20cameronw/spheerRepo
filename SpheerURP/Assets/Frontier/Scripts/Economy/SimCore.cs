@@ -123,7 +123,7 @@ namespace Frontier.Economy
         readonly MegaState[] mega = new MegaState[3];
         int maxTierLanded;
         double maxDistLy;
-        readonly int[] landedByTier = new int[24];
+        readonly int[] landedByTier = new int[ScoreCalculator.WorldTierBucketCount];
         int landedCount;
         int wavesCalled;
         double xp;

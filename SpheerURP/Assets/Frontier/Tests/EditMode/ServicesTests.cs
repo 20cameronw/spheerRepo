@@ -68,18 +68,12 @@ namespace Frontier.Tests
         {
             public bool IsConfigured { get { return true; } }
             public int readCount;
-            public int submitCount;
             public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
             public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
             {
                 readCount++;
                 return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.Success(
                     new List<LeaderboardEntry>()));
-            }
-            public Task<ServiceResult> SubmitScoreAsync(string boardId, long score)
-            {
-                submitCount++;
-                return Task.FromResult(ServiceResult.Success());
             }
         }
 
@@ -244,25 +238,19 @@ namespace Frontier.Tests
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Authentication.SignInAnonymouslyAsync().Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Leaderboards.InitializeAsync().Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Leaderboards.GetScoresAsync("weekly", 10).Result.status);
-            Assert.AreEqual(ServiceStatus.ConsentRequired, services.Leaderboards.SubmitScoreAsync("weekly", 100).Result.status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.ReadAsync().Result.status);
             Assert.AreEqual(0, auth.signInCount);
             Assert.AreEqual(0, leaderboards.readCount);
-            Assert.AreEqual(0, leaderboards.submitCount);
 
             consent.SavePreferences(false, false, true);
             Assert.AreEqual(ServiceStatus.Success, services.Authentication.SignInAnonymouslyAsync().Result.status);
             Assert.AreEqual(ServiceStatus.Success, services.Leaderboards.GetScoresAsync("weekly", 10).Result.status);
-            Assert.AreEqual(ServiceStatus.Success, services.Leaderboards.SubmitScoreAsync("weekly", 100).Result.status);
             Assert.AreEqual(1, auth.signInCount);
             Assert.AreEqual(1, leaderboards.readCount);
-            Assert.AreEqual(1, leaderboards.submitCount);
 
             consent.SavePreferences(false, false, false);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Authentication.SignInAnonymouslyAsync().Result.status);
-            Assert.AreEqual(ServiceStatus.ConsentRequired, services.Leaderboards.SubmitScoreAsync("weekly", 101).Result.status);
             Assert.AreEqual(1, auth.signInCount);
-            Assert.AreEqual(1, leaderboards.submitCount);
         }
 
         [Test]
@@ -277,9 +265,13 @@ namespace Frontier.Tests
 
             Assert.AreEqual(ServiceStatus.InvalidRequest, services.Leaderboards.GetScoresAsync("", 10).Result.status);
             Assert.AreEqual(ServiceStatus.InvalidRequest, services.Leaderboards.GetScoresAsync("weekly", 0).Result.status);
-            Assert.AreEqual(ServiceStatus.InvalidRequest, services.Leaderboards.SubmitScoreAsync("weekly", -1).Result.status);
             Assert.AreEqual(0, leaderboards.readCount);
-            Assert.AreEqual(0, leaderboards.submitCount);
+        }
+
+        [Test]
+        public void LeaderboardClientContract_IsReadOnlyUntilServerValidatedSubmissionExists()
+        {
+            Assert.IsNull(typeof(ILeaderboardService).GetMethod("SubmitScoreAsync"));
         }
 
         [Test]

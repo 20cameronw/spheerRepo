@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Frontier.Economy;
 using Frontier.Services;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -247,6 +248,20 @@ namespace Frontier
 
         void BuildLeaderboard(VisualElement body)
         {
+            ScoreBreakdown score = gs.FrontierScore;
+            var scoreCard = Card(UiKit.Lime);
+            scoreCard.Add(UiKit.Text("FRONTIER SCORE", "fr-h2"));
+            StatRow(scoreCard, "star", UiKit.Lime, "Total", score.total.ToString("N0"));
+            StatRow(scoreCard, "map", UiKit.Cyan, "Reach", score.reach.ToString("N0"));
+            StatRow(scoreCard, "map", UiKit.Amber, "Worlds", score.worlds.ToString("N0"));
+            StatRow(scoreCard, "base", UiKit.Lime, "Industry", score.industry.ToString("N0"));
+            StatRow(scoreCard, "research", UiKit.Magenta, "Technology", score.tech.ToString("N0"));
+            StatRow(scoreCard, "alien", UiKit.Red, "Defense", score.defense.ToString("N0"));
+            StatRow(scoreCard, "map", UiKit.Cyan, "Atlas", score.atlas.ToString("N0"));
+            if (score.multiplier != 1.0)
+                StatRow(scoreCard, "star", UiKit.Magenta, "Ascension multiplier", score.multiplier.ToString("0.0#"));
+            body.Add(scoreCard);
+
             var card = Card(UiKit.Lime);
             card.Add(UiKit.Text("YOUR RECORD", "fr-h2"));
             StatRow(card, "star", UiKit.Magenta, "Level", gs.PlayerLevel.ToString());
@@ -267,7 +282,7 @@ namespace Frontier
                 return;
             }
 
-            body.Add(UiKit.Text("Online ranks load only when requested. Scores are not submitted until Frontier Score is connected to live progression.", "fr-muted"));
+            body.Add(UiKit.Text("Online ranks load only when requested. Score submissions stay disabled until a server-validated path is available.", "fr-muted"));
             if (!string.IsNullOrEmpty(leaderboardStatus))
                 body.Add(UiKit.Text(leaderboardStatus, "fr-small"));
 

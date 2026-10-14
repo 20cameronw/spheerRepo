@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using Frontier.Economy;
 using Frontier.Universe;
 using NUnit.Framework;
 using UnityEngine;
@@ -56,6 +58,79 @@ namespace Frontier.Tests
             Assert.IsTrue(state.Ship.enforceHazardPlating);
             Assert.IsFalse(state.Rules.CanLand(state.Ship, Hazards.Heat, 0));
             Assert.IsTrue(state.Rules.CanLand(state.Ship, Hazards.None, 0));
+        }
+
+        [Test]
+        public void FrontierScore_TracksLiveProgressionDeterministicallyAndSurvivesReload()
+        {
+            var state = NewState();
+            ScoreBreakdown start = state.FrontierScore;
+            Assert.Greater(start.total, 0);
+            Assert.AreEqual(start.total, state.FrontierScore.total);
+
+            PlanetData visited = null;
+            foreach (PlanetData candidate in state.universe.AuthoredPlanets)
+            {
+                if (candidate != null && candidate.Id != state.universe.Home.Id)
+                {
+                    visited = candidate;
+                    break;
+                }
+            }
+            Assert.IsNotNull(visited);
+            state.DebugTeleport(visited);
+            ScoreBreakdown explored = state.FrontierScore;
+            Assert.Greater(explored.worlds, start.worlds);
+
+            PlacedStructure structure = state.DebugPlace(db.StructureOfKind(StructureKind.Refinery), 0);
+            Assert.IsNotNull(structure);
+            ScoreBreakdown built = state.FrontierScore;
+            Assert.Greater(built.industry, explored.industry);
+
+            state.DebugSetUpgrade(db.upgrades[0], 1);
+            ScoreBreakdown upgraded = state.FrontierScore;
+            Assert.Greater(upgraded.tech, built.tech);
+
+            PlanetData dangerous = null;
+            foreach (PlanetData candidate in state.universe.AuthoredPlanets)
+            {
+                if (candidate != null && candidate.Danger > 0)
+                {
+                    dangerous = candidate;
+                    break;
+                }
+            }
+            Assert.IsNotNull(dangerous, "the authored universe should include a world with non-zero danger");
+            state.DebugTeleport(dangerous);
+            for (int i = 0; i < 25; i++) state.WaveCleared(dangerous);
+            ScoreBreakdown capped = state.FrontierScore;
+            Assert.Greater(capped.defense, upgraded.defense);
+            state.WaveCleared(dangerous);
+            Assert.AreEqual(capped.defense, state.FrontierScore.defense, 1e-9,
+                "waves beyond the per-world cap must not increase Frontier Score");
+
+            Assert.IsTrue(state.Save());
+            var loaded = NewState(true);
+            ScoreBreakdown restored = loaded.FrontierScore;
+            Assert.AreEqual(capped.total, restored.total);
+            Assert.AreEqual(capped.reach, restored.reach, 1e-9);
+            Assert.AreEqual(capped.worlds, restored.worlds, 1e-9);
+            Assert.AreEqual(capped.industry, restored.industry, 1e-9);
+            Assert.AreEqual(capped.tech, restored.tech, 1e-9);
+            Assert.AreEqual(capped.defense, restored.defense, 1e-9);
+            Assert.AreEqual(capped.atlas, restored.atlas, 1e-9);
+        }
+
+        [Test]
+        public void FrontierScoreFormula_MatchesTheSimulatorTuning()
+        {
+            if (!db.UsesImportedEconomy) Assert.Ignore("Imported economy tuning is unavailable");
+            Assert.IsNotNull(db.scoreFormula);
+            Assert.IsNotNull(db.scoreFormula.data);
+
+            ScoreFormula simulatorFormula = ScoreFormula.From(db.tuning.Build());
+            foreach (FieldInfo field in typeof(ScoreFormula).GetFields(BindingFlags.Public | BindingFlags.Instance))
+                Assert.AreEqual(field.GetValue(simulatorFormula), field.GetValue(db.scoreFormula.data), field.Name);
         }
 
         [Test]

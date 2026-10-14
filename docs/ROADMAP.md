@@ -2,7 +2,7 @@
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
 Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
-Latest validated milestone: **consent-gated Unity Gaming Services authentication and leaderboard adapters** are wired, with an explicit configuration/compliance switch defaulted off; the Ranks screen can request real leaderboard rows without submitting a fabricated score. Frontier Score still needs to be connected to live game progression; legal/audience/account-deletion setup, LevelPlay, purchases, cloud saves and release work remain open.
+Latest validated milestone: **Frontier Score is connected to save-backed game progression and shown with a local breakdown on Ranks.** Full EditMode passed 592 tests (2 runtime-specific allocation skips), PlayMode passed 19, and standard/narrow Ranks captures had zero errors, overflow, undersized text or touch targets. The client leaderboard contract is read-only: score writes remain disabled until a server-validated Cloud Code path is available. UGS reads remain behind consent and an explicit off-by-default configuration gate; legal/audience/account-deletion setup, LevelPlay, purchases, cloud saves and release work remain open.
 
 ---
 
@@ -414,16 +414,17 @@ Icons are authored as **SVG on a 48 grid**, 2.5 px round-cap strokes, one metaph
 Monotonic, integer, computed from save state, not directly purchasable. Weights live in `ScoreFormulaSO`.
 
 ```
-Reach     R = floor(1200 × sqrt(maxDistanceFromHome_ly / 10))
-Worlds    W = Σ landed worlds 100 × (1 + tier)         (full value up to 500 worlds, then 20%)
-Industry  I = Σ structures 60 × level^1.25 × (1 + structureTier)
-Tech      T = 400 × Σ upgradeLevels + 1500 × Σ toolTiers
-Defense   D = Σ cleared waves 12 × sqrt(danger) × min(1, 25 / wavesClearedOnThatWorld)   (anti-farm)
-Atlas     A = 250 × resourcesDiscovered + 150 × recipesCrafted + 400 × megaprojectStages
+Reach     R = floor(700 × sqrt(maxDistanceFromHome_ly / 10))
+Worlds    W = Σ landed worlds 130 × (1 + tier)         (full value up to 500 worlds, then 20%)
+Industry  I = Σ structures 50 × level^1.6 × (1 + structureTier)
+          + Σ megaprojects 50 × (2 × stage)^1.6 × (1 + structureTier)
+Tech      T = 300 × total upgrade levels + 800 × purchased tool-tier steps
+Defense   D = Σ worlds 12 × sqrt(danger) × min(wavesClearedOnThatWorld, 25)   (anti-farm)
+Atlas     A = 100 × resourcesDiscovered + 80 × recipesCrafted + 28000 × megaprojectStages
 Score = floor((R + W + I + T + D + A) × (1 + 0.10 × ascensionRank))
 ```
 
-Targets: early hours ~5–10 k, mid ~100 k, endgame 1 M+. Unit tests prove monotonicity and anti-farm caps; the Rank screen shows the breakdown as bars so the number is explainable.
+The runtime maps distinct save-backed visits, completed operational structures, upgrade levels, purchased tool tiers, per-world cleared waves, validated Atlas discoveries, and completed megaproject stages into these inputs. Ascension is not implemented yet, so its rank input remains zero. Runtime reads `ScoreFormulaSO`; the simulator derives an equivalent formula from `EconomyTuningSO`, with a regression test keeping their values in sync. Both use the same `ScoreCalculator`. Targets are tracked against simulator reports in `reports/ECONOMY.md`; unit tests cover monotonicity, anti-farm caps, deterministic output and save/load stability. Ranks shows the local integer score and category breakdown.
 
 **Boards:** All-Time (keep best) and Weekly (cumulative gain, weekly reset, cosmetic/shard rewards). Clients cannot write to boards directly; a Cloud Code module (Access Control) validates plausibility (score-gain rate, save signature, version) and submits. Until then the Rank screen shows the local score and breakdown.
 
@@ -608,8 +609,8 @@ while the database temporarily falls back to legacy content.
 
 The research/tool progression, harvest expansion, obstacle-clear loop, processing-station batches and Atlas discovery/rewards are complete. Continue in small, independently verifiable gameplay slices, in this order:
 
-1. **Score integration:** connect the deterministic Frontier Score to live game progression, then submit only that real score to the configured UGS leaderboard.
-2. **Provider completion and release readiness:** UGS auth/leaderboard adapters are consent-gated and remain inactive until the explicit configuration switch, legal/audience review, account-deletion UX, HTTPS policy and dashboard setup are ready. Cloud save, LevelPlay, Unity IAP, trusted cross-device timers, monetization and release work remain open.
+1. **Trusted leaderboard writes:** implement a Cloud Code/Access Control route that validates score plausibility and submits server-side. The local score is live; the Unity client has no score-write method.
+2. **Provider completion and release readiness:** UGS auth/leaderboard reads remain consent-gated and inactive until the explicit configuration switch, legal/audience review, account-deletion UX, HTTPS policy and dashboard setup are ready. Cloud save, LevelPlay, Unity IAP, trusted cross-device timers, monetization and release work remain open.
 
 Defer ads, premium purchases, live score submission and cross-device time validation until provider SDKs and compliance foundations are ready. This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
 

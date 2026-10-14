@@ -174,7 +174,6 @@ namespace Frontier.Services
     public interface ILeaderboardService : IServiceEndpoint
     {
         Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit);
-        Task<ServiceResult> SubmitScoreAsync(string boardId, long score);
     }
 
     public interface ICloudSaveService : IServiceEndpoint
@@ -400,14 +399,6 @@ namespace Frontier.Services
             return inner.GetScoresAsync(boardId, limit);
         }
 
-        public Task<ServiceResult> SubmitScoreAsync(string boardId, long score)
-        {
-            if (!consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
-                return Task.FromResult(ServiceResult.ConsentRequired("online leaderboards"));
-            if (string.IsNullOrWhiteSpace(boardId) || score < 0)
-                return Task.FromResult(ServiceResult.InvalidRequest("A leaderboard ID and non-negative score are required."));
-            return inner.SubmitScoreAsync(boardId, score);
-        }
     }
 
     sealed class ConsentGatedCloudSaveService : ICloudSaveService
@@ -466,8 +457,6 @@ namespace Frontier.Services
         public Task<ServiceResult> DeleteAccountAsync() { return Task.FromResult(ServiceResult.NotConfigured("Authentication")); }
         public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
         { return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.NotConfigured("Leaderboards")); }
-        public Task<ServiceResult> SubmitScoreAsync(string boardId, long score)
-        { return Task.FromResult(ServiceResult.NotConfigured("Leaderboards")); }
         public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
         { return Task.FromResult(ServiceResult<CloudSaveRecord>.NotConfigured("Cloud Save")); }
         public Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)

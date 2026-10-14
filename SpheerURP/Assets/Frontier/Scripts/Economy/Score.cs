@@ -93,6 +93,8 @@ namespace Frontier.Economy
     /// <summary>The Frontier Score: monotone in every input, capped against farming, deterministic.</summary>
     public static class ScoreCalculator
     {
+        public const int WorldTierBucketCount = 24;
+
         public static ScoreBreakdown Compute(ScoreInputs s, ScoreFormula f)
         {
             var b = new ScoreBreakdown();
