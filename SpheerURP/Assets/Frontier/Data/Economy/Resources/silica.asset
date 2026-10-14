@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: silica
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: silica
+  displayName: Silica
+  color: {r: 0.92156863, g: 0.8666667, b: 0.6901961, a: 1}
+  stackSize: 30
+  description: Fine quartz sand from the dry basins and crystal flats. Melted it
+    turns to glass, and ground it polishes lenses.
+  category: 0
+  tier: 1
+  harvestMethods: 0104
+  baseValue: 2
+  hazardAffinity: 1
+  fuelEnergy: 0
+  colorHex: '#EBDDB0'
+  accentHex: '#B09050'
+  baseYield: 8
+  yieldPerTier: 0.6
+  difficultyOffset: -0.02
+  atlasDescription: Fine quartz sand from the dry basins and crystal flats. Melted
+    it turns to glass, and ground it polishes lenses.
+  iconConcept: A conical heap of sand with a rippled crest and a few loose grains
+    around the base.
+  icon: 

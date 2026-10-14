@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: hull_cold
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: hull_cold
+  displayName: Cryo Plating
+  description: Cryo composite plating for glacial worlds.
+  category: 1
+  effect: 11
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 3
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 0
+  hazard: 2
+  levels:
+  - level: 1
+    displayName: Cryo Plating
+    cost:
+    - resource: {fileID: 11400000, guid: d049073b5052aae4c8e079ee3a4d155b, type: 2}
+      amount: 200
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 230
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 180
+    value: 1
+    researchPrereq: hazmat_cold
+    requiresReachTier: 2
+    eraTier: 3
+  - level: 2
+    displayName: Thermal Break
+    cost:
+    - resource: {fileID: 11400000, guid: d049073b5052aae4c8e079ee3a4d155b, type: 2}
+      amount: 1400
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 1200
+    value: 2
+    researchPrereq: hazmat_cold
+    requiresReachTier: 5
+    eraTier: 5
+  - level: 3
+    displayName: Polar Shell
+    cost:
+    - resource: {fileID: 11400000, guid: d049073b5052aae4c8e079ee3a4d155b, type: 2}
+      amount: 6600
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 6600
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 4400
+    value: 3
+    researchPrereq: hazmat_cold
+    requiresReachTier: 9
+    eraTier: 9
+  icon: 

@@ -16,6 +16,10 @@ Three ideas carry the design:
 
 ## 1. The pieces
 
+**Economy content milestone:** the export can now be imported and validated as ScriptableObjects in a separate
+`Frontier/EconomyDatabase` resource. The live database and this document's runtime/save model have **not** switched
+to those values. See [CONTENT.md](CONTENT.md) for import ownership, reimport guarantees and the remaining runtime cutover.
+
 | Type | Assembly | Role |
 |------|----------|------|
 | `Frontier.Universe.*` (`Universe`, `UniverseConfig`, `PlanetDescriptor`, `StarSystem`, `PlanetKey`, `AuthoredContent`, ...) | Core | The deterministic generator (V1 is frozen, see [SYSTEMS.md](SYSTEMS.md)). Immutable descriptors. |

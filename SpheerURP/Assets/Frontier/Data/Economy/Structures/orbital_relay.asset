@@ -1,0 +1,227 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a77a5014ca9c1140980f1b987ea7c97, type: 3}
+  m_Name: orbital_relay
+  m_EditorClassIdentifier: Frontier.Data::Frontier.StructureSO
+  lockedFields: []
+  id: orbital_relay
+  displayName: Orbital Relay
+  description: 'Links your warehouses by a tight beam: withdraw remotely across the
+    system, then across the galaxy, for a little energy. Replaces the old Satellite.'
+  kind: 7
+  color: {r: 0.4, g: 1.6, b: 2, a: 1}
+  modelKey: 
+  buildCost:
+  - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+    amount: 920
+  - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+    amount: 790
+  - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+    amount: 610
+  - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+    amount: 600
+  maxLevel: 10
+  upgradeGrowth: 1.9
+  bonusPerLevel: 0.25
+  maxPerPlanet: 1
+  damage: 0
+  fireInterval: 0
+  range: 0
+  beamWidth: 0.07
+  storageSlots: 18
+  storageSlotsPerLevel: 9
+  role: 2
+  tier: 4
+  footprint: 1
+  effectKind: transferEnergyFactor
+  capacityKind: linkRadiusLy
+  gathers: 
+  unlockResearch: orbital_logistics
+  unlockTier: 4
+  legacyKind: Satellite
+  levels:
+  - level: 1
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 920
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 790
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 610
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 600
+    buildSeconds: 330
+    requiresReachTier: 4
+    requiresLabLevel: 0
+    effect: 1
+    capacity: 0
+  - level: 2
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1300
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 1000
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 1000
+    buildSeconds: 930
+    requiresReachTier: 4
+    requiresLabLevel: 0
+    effect: 0.93
+    capacity: 0
+  - level: 3
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 2700
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 1800
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 1800
+    buildSeconds: 2220
+    requiresReachTier: 5
+    requiresLabLevel: 0
+    effect: 0.86
+    capacity: 60
+  - level: 4
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 3600
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 2400
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 2400
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 200
+    buildSeconds: 4500
+    requiresReachTier: 5
+    requiresLabLevel: 0
+    effect: 0.79
+    capacity: 150
+  - level: 5
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 4600
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1900
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 3500
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 3500
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 300
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 750
+    buildSeconds: 12000
+    requiresReachTier: 6
+    requiresLabLevel: 0
+    effect: 0.72
+    capacity: 400
+  - level: 6
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 4600
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1900
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 3800
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 3800
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 860
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 2100
+    buildSeconds: 28800
+    requiresReachTier: 6
+    requiresLabLevel: 0
+    effect: 0.65
+    capacity: 1000
+  - level: 7
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5280
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 2200
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 4400
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 4400
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 2300
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 2600
+    buildSeconds: 53700
+    requiresReachTier: 7
+    requiresLabLevel: 0
+    effect: 0.58
+    capacity: 3000
+  - level: 8
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5280
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 2200
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 4400
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 4400
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 5300
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 2600
+    buildSeconds: 79800
+    requiresReachTier: 7
+    requiresLabLevel: 0
+    effect: 0.51
+    capacity: 10000
+  - level: 9
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5952
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 2480
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 4960
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 4960
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 7900
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 2976
+    buildSeconds: 86400
+    requiresReachTier: 8
+    requiresLabLevel: 0
+    effect: 0.44
+    capacity: 30000
+  - level: 10
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5952
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 2480
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 4960
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 4960
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 7900
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 2976
+    buildSeconds: 86400
+    requiresReachTier: 8
+    requiresLabLevel: 0
+    effect: 0.37
+    capacity: 100000

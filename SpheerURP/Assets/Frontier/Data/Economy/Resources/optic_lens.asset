@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: optic_lens
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: optic_lens
+  displayName: Optic Lens
+  color: {r: 0.56078434, g: 0.8901961, b: 1, a: 1}
+  stackSize: 32
+  description: A ground and polished lens, flawless enough to focus a laser or read
+    a star. Scanners and turrets are blind without it.
+  category: 3
+  tier: 3
+  harvestMethods: 
+  baseValue: 15.05
+  hazardAffinity: 0
+  fuelEnergy: 0
+  colorHex: '#8FE3FF'
+  accentHex: '#FFFFFF'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A ground and polished lens, flawless enough to focus a laser
+    or read a star. Scanners and turrets are blind without it.
+  iconConcept: A bi-convex lens shape with a bright crescent glint inside a thin
+    mounting ring.
+  icon: 

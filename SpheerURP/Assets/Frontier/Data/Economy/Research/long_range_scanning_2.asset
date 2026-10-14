@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: long_range_scanning_2
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: long_range_scanning_2
+    displayName: Long-Range Scanning II
+    description: Parallax surveys of whole sectors.
+    branch: Navigation
+    tier: 3
+    cost:
+    - resourceId: steel
+      amount: 180
+    - resourceId: planks
+      amount: 240
+    - resourceId: glass
+      amount: 190
+    - resourceId: circuit_board
+      amount: 70
+    - resourceId: biocomposite
+      amount: 55
+    - resourceId: optic_lens
+      amount: 35
+    prereqs:
+    - long_range_scanning_1
+    - optics
+    labLevel: 3
+    unlocks:
+    - upgrade:scanner_range:4
+    - upgrade:scanner_range:5
+  icon: research

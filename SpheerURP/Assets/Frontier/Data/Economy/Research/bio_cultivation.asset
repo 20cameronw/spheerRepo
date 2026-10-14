@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: bio_cultivation
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: bio_cultivation
+    displayName: Bio-Cultivation
+    description: Tended domes harvest the fast growth of green worlds.
+    branch: Harvest
+    tier: 1
+    cost:
+    - resourceId: scrap
+      amount: 40
+    - resourceId: wood
+      amount: 30
+    - resourceId: stone
+      amount: 21
+    - resourceId: planks
+      amount: 14
+    prereqs: []
+    labLevel: 1
+    unlocks:
+    - structure:biodome
+  icon: research

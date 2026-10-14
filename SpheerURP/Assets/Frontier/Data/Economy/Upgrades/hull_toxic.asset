@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: hull_toxic
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: hull_toxic
+  displayName: Toxic Seal
+  description: Biocomposite plating that lets the hull set down on toxic worlds.
+  category: 1
+  effect: 11
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 3
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 0
+  hazard: 4
+  levels:
+  - level: 1
+    displayName: Biocomposite Seal
+    cost:
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 160
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 70
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 150
+    value: 1
+    researchPrereq: hazmat_toxic
+    requiresReachTier: 1
+    eraTier: 2
+  - level: 2
+    displayName: Triple Seal
+    cost:
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 1400
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 610
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1300
+    value: 2
+    researchPrereq: hazmat_toxic
+    requiresReachTier: 4
+    eraTier: 4
+  - level: 3
+    displayName: Sealed Hull
+    cost:
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 3968
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5952
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 2480
+    value: 3
+    researchPrereq: hazmat_toxic
+    requiresReachTier: 8
+    eraTier: 8
+  icon: 

@@ -105,10 +105,15 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void EveryStructureKind_HasADefinition()
+        public void EveryImplementedStructureKind_HasALiveDefinition()
         {
             foreach (StructureKind kind in Enum.GetValues(typeof(StructureKind)))
-                Assert.IsNotNull(db.StructureOfKind(kind), "no structure is defined for " + kind);
+            {
+                if (kind.IsImplemented())
+                    Assert.IsNotNull(db.StructureOfKind(kind), "no live structure is defined for " + kind);
+                else
+                    Assert.IsNull(db.StructureOfKind(kind), "imported-only structure leaked into the live database: " + kind);
+            }
         }
 
         [Test]

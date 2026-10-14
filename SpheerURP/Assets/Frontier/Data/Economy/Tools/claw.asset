@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f59f118b164729b4b97c95519fb9e226, type: 3}
+  m_Name: claw
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ToolLadderSO
+  lockedFields: []
+  data:
+    id: claw
+    displayName: Salvage Claw
+    kind: 5
+    games: 05
+    tiers:
+    - tier: 1
+      displayName: Grabber
+      yieldMult: 1
+      runTimeMult: 1
+      cost: []
+      researchPrereq: 
+      requiresReachTier: 0
+      requiresLabLevel: 0
+      eraTier: 0
+    - tier: 2
+      displayName: Magnet Claw
+      yieldMult: 1.6
+      runTimeMult: 0.96
+      cost:
+      - resourceId: iron_plate
+        amount: 4
+      - resourceId: copper_wire
+        amount: 8
+      - resourceId: planks
+        amount: 6
+      researchPrereq: 
+      requiresReachTier: 0
+      requiresLabLevel: 0
+      eraTier: 0
+    - tier: 3
+      displayName: Servo Claw
+      yieldMult: 2.4
+      runTimeMult: 0.92
+      cost:
+      - resourceId: steel
+        amount: 23
+      - resourceId: copper_wire
+        amount: 65
+      - resourceId: circuit_board
+        amount: 8
+      researchPrereq: 
+      requiresReachTier: 1
+      requiresLabLevel: 1
+      eraTier: 1
+    - tier: 4
+      displayName: Titan Claw
+      yieldMult: 3.6
+      runTimeMult: 0.88
+      cost:
+      - resourceId: steel
+        amount: 170
+      - resourceId: servo_motor
+        amount: 30
+      - resourceId: titanium_plate
+        amount: 45
+      researchPrereq: toolsmithing_1
+      requiresReachTier: 2
+      requiresLabLevel: 2
+      eraTier: 2
+    - tier: 5
+      displayName: Plasma Claw
+      yieldMult: 5.4
+      runTimeMult: 0.84
+      cost:
+      - resourceId: plasma
+        amount: 80
+      - resourceId: servo_motor
+        amount: 75
+      - resourceId: thermal_alloy
+        amount: 85
+      researchPrereq: toolsmithing_2
+      requiresReachTier: 3
+      requiresLabLevel: 3
+      eraTier: 3
+    - tier: 6
+      displayName: Gravity Claw
+      yieldMult: 8.2
+      runTimeMult: 0.8
+      cost:
+      - resourceId: quantum_chip
+        amount: 60
+      - resourceId: servo_motor
+        amount: 190
+      - resourceId: titanium_plate
+        amount: 420
+      - resourceId: plasma
+        amount: 110
+      researchPrereq: toolsmithing_3
+      requiresReachTier: 4
+      requiresLabLevel: 4
+      eraTier: 4
+    - tier: 7
+      displayName: Singularity Claw
+      yieldMult: 12.5
+      runTimeMult: 0.76
+      cost:
+      - resourceId: warp_coil
+        amount: 45
+      - resourceId: void_alloy
+        amount: 110
+      - resourceId: quantum_chip
+        amount: 180
+      - resourceId: plasma
+        amount: 330
+      researchPrereq: toolsmithing_4
+      requiresReachTier: 6
+      requiresLabLevel: 6
+      eraTier: 6
+  icon: 
+  color: {r: 1, g: 1, b: 1, a: 1}

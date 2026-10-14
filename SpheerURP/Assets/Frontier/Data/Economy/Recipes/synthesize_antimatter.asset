@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: synthesize_antimatter
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: synthesize_antimatter
+  displayName: Synthesize Antimatter
+  inputs:
+  - resource: {fileID: 11400000, guid: 1c8467aec0e471441b3eb60c8022ce29, type: 2}
+    amount: 4
+  - resource: {fileID: 11400000, guid: fc9241ca824d76647ab62dab4bbf74f0, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: c2bd142397708b74ea0276039c55e0e3, type: 2}
+    amount: 2
+  outputs:
+  - resource: {fileID: 11400000, guid: 8ae394e4da0ab164798a3c49afacd9c6, type: 2}
+    amount: 1
+  fabricator: 0
+  kind: 3
+  stationId: quantum_lab
+  stationLevel: 4
+  tier: 6
+  unlockResearch: antimatter_synthesis
+  bonus: 0

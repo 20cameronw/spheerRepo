@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: terraforming
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: terraforming
+    displayName: Terraforming
+    description: Reshape a world's climate in five stages.
+    branch: Megaprojects
+    tier: 5
+    cost:
+    - resourceId: titanium_plate
+      amount: 1100
+    - resourceId: quantum_chip
+      amount: 110
+    - resourceId: servo_motor
+      amount: 370
+    - resourceId: plasma
+      amount: 310
+    - resourceId: rad_shield_alloy
+      amount: 130
+    - resourceId: biocomposite
+      amount: 770
+    prereqs:
+    - plasma_physics
+    - quantum_computing
+    - colony_charter
+    labLevel: 5
+    unlocks:
+    - structure:terraformer
+  icon: research

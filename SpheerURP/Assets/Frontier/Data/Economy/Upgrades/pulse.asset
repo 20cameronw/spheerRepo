@@ -1,0 +1,184 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: pulse
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: pulse
+  displayName: Ion Pulse
+  description: +40% tap damage.
+  category: 2
+  effect: 5
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 10
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 1
+  hazard: 0
+  levels:
+  - level: 1
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 14
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 14
+    value: 0.4
+    researchPrereq: 
+    requiresReachTier: 0
+    eraTier: 0
+  - level: 2
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 21
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 21
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 3
+    value: 0.8
+    researchPrereq: 
+    requiresReachTier: 0
+    eraTier: 0
+  - level: 3
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 80
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 80
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 13
+    value: 1.2
+    researchPrereq: 
+    requiresReachTier: 1
+    eraTier: 1
+  - level: 4
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 130
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 130
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 21
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 17
+    value: 1.6
+    researchPrereq: 
+    requiresReachTier: 1
+    eraTier: 1
+  - level: 5
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 520
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 520
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 85
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 65
+    value: 2
+    researchPrereq: 
+    requiresReachTier: 2
+    eraTier: 2
+  - level: 6
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 800
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 950
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 150
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 120
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 65
+    value: 2.4
+    researchPrereq: 
+    requiresReachTier: 2
+    eraTier: 2
+  - level: 7
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1080
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 1200
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 190
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 140
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 75
+    value: 2.8
+    researchPrereq: 
+    requiresReachTier: 3
+    eraTier: 3
+  - level: 8
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1080
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 530
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 410
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 220
+    value: 3.2
+    researchPrereq: 
+    requiresReachTier: 3
+    eraTier: 3
+  - level: 9
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1360
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2000
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 800
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 630
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 330
+    value: 3.6
+    researchPrereq: 
+    requiresReachTier: 4
+    eraTier: 4
+  - level: 10
+    displayName: Ion Pulse
+    cost:
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1360
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2000
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 2000
+    - resource: {fileID: 11400000, guid: 9a330e3a7d218764dbf78e3263546512, type: 2}
+      amount: 1500
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 820
+    value: 4
+    researchPrereq: 
+    requiresReachTier: 4
+    eraTier: 4
+  icon: 

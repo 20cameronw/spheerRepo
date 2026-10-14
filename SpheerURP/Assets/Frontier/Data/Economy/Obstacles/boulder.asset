@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: boulder
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: boulder
+    displayName: Boulder
+    description: A weathered lump of rock sits where a pad should be. Break it up
+      with picks and haul the pieces away.
+    biomes: Mineral;Desert;Obsidian;Shattered;Barren;Volcanic
+    biomeMask: 2506
+    needsVoid: 0
+    minTier: 0
+    weight: 3
+    costMult: 1
+    timeMult: 1
+    rewardResource: stone
+    iconConcept: A lone rounded boulder with one flat cut face and a chipped notch
+      in its crown.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: stone
+        amount: 5
+      - resourceId: scrap
+        amount: 3
+      reward:
+        resourceId: stone
+        amount: 3
+    - tier: 1
+      cost:
+      - resourceId: stone
+        amount: 11
+      - resourceId: scrap
+        amount: 5
+      reward:
+        resourceId: stone
+        amount: 6
+    - tier: 2
+      cost:
+      - resourceId: stone
+        amount: 21
+      - resourceId: scrap
+        amount: 11
+      reward:
+        resourceId: stone
+        amount: 12
+    - tier: 3
+      cost:
+      - resourceId: stone
+        amount: 45
+      - resourceId: scrap
+        amount: 21
+      reward:
+        resourceId: stone
+        amount: 25
+    - tier: 4
+      cost:
+      - resourceId: stone
+        amount: 50
+      - resourceId: scrap
+        amount: 25
+      - resourceId: steel
+        amount: 5
+      reward:
+        resourceId: stone
+        amount: 51
+    - tier: 5
+      cost:
+      - resourceId: stone
+        amount: 100
+      - resourceId: scrap
+        amount: 50
+      - resourceId: steel
+        amount: 11
+      reward:
+        resourceId: stone
+        amount: 102
+    - tier: 6
+      cost:
+      - resourceId: stone
+        amount: 150
+      - resourceId: scrap
+        amount: 75
+      - resourceId: steel
+        amount: 16
+      - resourceId: titanium_plate
+        amount: 8
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 7
+      cost:
+      - resourceId: stone
+        amount: 228
+      - resourceId: scrap
+        amount: 160
+      - resourceId: steel
+        amount: 35
+      - resourceId: titanium_plate
+        amount: 18
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 8
+      cost:
+      - resourceId: stone
+        amount: 250
+      - resourceId: scrap
+        amount: 360
+      - resourceId: steel
+        amount: 75
+      - resourceId: titanium_plate
+        amount: 40
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 9
+      cost:
+      - resourceId: stone
+        amount: 276
+      - resourceId: scrap
+        amount: 410
+      - resourceId: steel
+        amount: 180
+      - resourceId: titanium_plate
+        amount: 95
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 10
+      cost:
+      - resourceId: stone
+        amount: 260
+      - resourceId: scrap
+        amount: 390
+      - resourceId: steel
+        amount: 346
+      - resourceId: titanium_plate
+        amount: 182
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 11
+      cost:
+      - resourceId: stone
+        amount: 214
+      - resourceId: scrap
+        amount: 325
+      - resourceId: steel
+        amount: 520
+      - resourceId: titanium_plate
+        amount: 307
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 12
+      cost:
+      - resourceId: stone
+        amount: 212
+      - resourceId: scrap
+        amount: 317
+      - resourceId: steel
+        amount: 510
+      - resourceId: titanium_plate
+        amount: 425
+      reward:
+        resourceId: stone
+        amount: 120
+  modelKey: 

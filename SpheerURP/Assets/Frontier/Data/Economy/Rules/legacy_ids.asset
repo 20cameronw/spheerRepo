@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad96559666eb4a42804de6f56e458ee, type: 3}
+  m_Name: legacy_ids
+  m_EditorClassIdentifier: Frontier.Data::Frontier.LegacyIdMapSO
+  lockedFields: []
+  rows:
+  - kind: 0
+    legacyId: wood
+    id: wood
+  - kind: 0
+    legacyId: stone
+    id: stone
+  - kind: 0
+    legacyId: scrap
+    id: scrap
+  - kind: 0
+    legacyId: iron
+    id: iron
+  - kind: 0
+    legacyId: crystal
+    id: crystal
+  - kind: 0
+    legacyId: fuel
+    id: fuel
+  - kind: 0
+    legacyId: core
+    id: core
+  - kind: 0
+    legacyId: alloy
+    id: steel
+  - kind: 0
+    legacyId: plasma
+    id: plasma
+  - kind: 1
+    legacyId: refinery
+    id: refinery
+  - kind: 1
+    legacyId: fabricator
+    id: fabricator
+  - kind: 1
+    legacyId: alarm
+    id: alarm
+  - kind: 1
+    legacyId: lumber
+    id: lumber
+  - kind: 1
+    legacyId: mine
+    id: mine
+  - kind: 1
+    legacyId: driller
+    id: driller
+  - kind: 1
+    legacyId: gunner
+    id: gunner
+  - kind: 1
+    legacyId: laser
+    id: laser
+  - kind: 1
+    legacyId: satellite
+    id: orbital_relay
+  - kind: 1
+    legacyId: warehouse
+    id: warehouse
+  - kind: 2
+    legacyId: axe
+    id: axe
+  - kind: 2
+    legacyId: pick
+    id: pick
+  - kind: 2
+    legacyId: drill
+    id: drill
+  - kind: 2
+    legacyId: pack
+    id: pack
+  - kind: 2
+    legacyId: engine
+    id: engine
+  - kind: 2
+    legacyId: turret
+    id: turret
+  - kind: 2
+    legacyId: turretdmg
+    id: turretdmg
+  - kind: 2
+    legacyId: pulse
+    id: pulse
+  - kind: 2
+    legacyId: shield
+    id: shield
+  - kind: 2
+    legacyId: salvage
+    id: salvage

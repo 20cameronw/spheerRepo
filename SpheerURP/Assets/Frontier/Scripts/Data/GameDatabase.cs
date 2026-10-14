@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Frontier.Economy;
 using UnityEngine;
 
 namespace Frontier
@@ -21,6 +23,46 @@ namespace Frontier
 
         public int baseBackpackSlots = 9;
         public float baseReactorHealth = 100f;
+
+        [Header("Imported economy (staged in Frontier/EconomyDatabase)")]
+        public int schemaVersion;
+        public int contentVersion;
+        public int builders = 1;
+        public string[] categoryHex;
+        public ToolLadderSO[] toolLadders;
+        public ResearchNodeSO[] research;
+        public ObstacleKindSO[] obstacleKinds;
+        public HabitatTableSO habitats;
+        public ObstacleRulesSO obstacleRules;
+        public ShardRulesSO shardRules;
+        public ScoreFormulaSO scoreFormula;
+        public LegacyIdMapSO legacyIds;
+        public EconomyTuningSO tuning;
+
+        /// <summary>Reconstructs the imported catalog for validation or a future runtime cutover; does not mutate the assets.</summary>
+        public EconomyCatalog ToCatalog()
+        {
+            var catalog = new EconomyCatalog
+            {
+                schemaVersion = schemaVersion, contentVersion = contentVersion,
+                resources = resources.Select(x => x.ToDef()).ToArray(),
+                recipes = recipes.Select(x => x.ToDef()).ToArray(),
+                structures = structures.Select(x => x.ToDef()).ToArray(),
+                upgrades = upgrades.Select(x => x.ToDef()).ToArray(),
+                tools = toolLadders.Select(x => x.ToDef()).ToArray(),
+                research = research.Select(x => x.data).ToArray(),
+                obstacles = obstacleKinds.Select(x => x.data).ToArray(),
+                habitats = habitats.rows, obstacleRules = obstacleRules.data, shards = shardRules.data,
+                legacyIds = legacyIds.rows, categoryHex = categoryHex,
+                start = new StartDef
+                {
+                    startingItems = ItemAmounts.ToIds(startingItems), baseBackpackSlots = baseBackpackSlots,
+                    startPlanetId = startPlanet != null ? startPlanet.id : null, builders = builders
+                }
+            };
+            catalog.Index();
+            return catalog;
+        }
 
         /// <summary>Loads the data asset from Resources, or builds the default content in memory.</summary>
         public static GameDatabase Load()

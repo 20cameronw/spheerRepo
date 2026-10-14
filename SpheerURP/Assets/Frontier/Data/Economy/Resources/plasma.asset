@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: plasma
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: plasma
+  displayName: Plasma Cell
+  color: {r: 0.83137256, g: 0.35686275, b: 1, a: 1}
+  stackSize: 48
+  description: A magnetic bottle of superheated gas that carries eight times the
+    energy of a fuel cell. It lets a deep run fit in a few slots.
+  category: 4
+  tier: 4
+  harvestMethods: 
+  baseValue: 46.44
+  hazardAffinity: 0
+  fuelEnergy: 8
+  colorHex: '#D45BFF'
+  accentHex: '#FFD0FF'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A magnetic bottle of superheated gas that carries eight times
+    the energy of a fuel cell. It lets a deep run fit in a few slots.
+  iconConcept: A round-bottomed flask with a flat neck and an S-shaped swirl of flame
+    inside.
+  icon: 

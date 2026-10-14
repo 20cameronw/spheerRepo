@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de9785b9476714348b3d4d3f87c0d6a8, type: 3}
+  m_Name: shard_rules
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ShardRulesSO
+  lockedFields: []
+  data:
+    skipMultiplier: 1.2
+    skipExponent: 0.75
+    minSkipCost: 1
+    freeFinishSeconds: 30
+    baseBuilders: 1
+    maxBuilders: 4
+    thirdBuilderShards: 250
+    fourthBuilderShards: 600
+    reviveRunShards: 5
+    reviveWaveShards: 8
+    cosmeticMinShards: 120
+    cosmeticMaxShards: 1200
+    levelUpBase: 3
+    levelUpEveryLevels: 15
+    atlasResourceShards: 3
+    atlasRecipeShards: 2
+    atlasStructureShards: 1
+    achievementSmall: 5
+    achievementMedium: 10
+    achievementLarge: 25
+    streakDays: 0200000002000000030000000300000004000000040000000c000000
+    adReward: 2
+    adsPerDay: 3
+    boardParticipation: 20
+    boardTop10Percent: 50
+    boardTop1Percent: 150
+    weeklyObjectives: 3
+    weeklyObjectiveShards: 5
+    podBase: 1
+    podPerThreeTiers: 1
+    packs:
+    - id: shards_1
+      shards: 80
+      priceTier: 1
+    - id: shards_2
+      shards: 500
+      priceTier: 5
+    - id: shards_3
+      shards: 1100
+      priceTier: 10
+    - id: shards_4
+      shards: 2400
+      priceTier: 20
+    - id: shards_5
+      shards: 6500
+      priceTier: 50
