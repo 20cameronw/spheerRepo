@@ -3,7 +3,7 @@ using System;
 namespace Frontier
 {
     /// <summary>
-    /// The warehouse drag rules between the backpack and a storage grid, engine-free and id based. These are the semantics of the
+    /// The storage drag rules between the backpack and a storage grid, engine-free and id based. These are the semantics of the
     /// original GameState: a slot holds one resource up to its stack size, transfers move only what fits and never discard the
     /// remainder, the total number of items is conserved. Callers resolve which storage and slot are meant (and whether the player
     /// is on the right planet); every method here is a pure rule over an <see cref="Inventory"/> and a <see cref="StorageRecord"/>.
@@ -11,13 +11,14 @@ namespace Frontier
     public static class WarehouseOps
     {
         /// <summary>Moves items from the backpack into a storage slot. Returns how many moved (0 when rejected).</summary>
-        public static int Deposit(Inventory backpack, StorageRecord storage, int slot, string resourceId, int amount)
+        public static int Deposit(Inventory backpack, StorageRecord storage, int slot, string resourceId, int amount, int stackLimit = 0)
         {
             if (!backpack.IsKnown(resourceId) || amount <= 0) return 0;
             if (slot < 0 || slot >= storage.slots.Count) return 0;
             var target = storage.slots[slot];
             if (target.count > 0 && target.resourceId != resourceId) return 0;
-            int moved = Math.Min(amount, Math.Min(backpack.Count(resourceId), Math.Max(0, backpack.StackSizeOf(resourceId) - target.count)));
+            int capacity = stackLimit > 0 ? stackLimit : backpack.StackSizeOf(resourceId);
+            int moved = Math.Min(amount, Math.Min(backpack.Count(resourceId), Math.Max(0, capacity - target.count)));
             if (moved <= 0) return 0;
             backpack.Remove(resourceId, moved);
             target.resourceId = resourceId;
@@ -42,7 +43,7 @@ namespace Frontier
         /// Rearranges a storage grid: same resource merges up to the stack size, anything else swaps. False when nothing moved
         /// (empty source, same slot, out of range, or a full target stack).
         /// </summary>
-        public static bool Move(Inventory resources, StorageRecord storage, int from, int to)
+        public static bool Move(Inventory resources, StorageRecord storage, int from, int to, int stackLimit = 0)
         {
             if (from < 0 || to < 0 || from >= storage.slots.Count || to >= storage.slots.Count || from == to) return false;
             var source = storage.slots[from];
@@ -51,7 +52,8 @@ namespace Frontier
             if (source.resourceId == target.resourceId && target.count > 0)
             {
                 if (!resources.IsKnown(source.resourceId)) return false;
-                int moved = Math.Min(source.count, Math.Max(0, resources.StackSizeOf(source.resourceId) - target.count));
+                int capacity = stackLimit > 0 ? stackLimit : resources.StackSizeOf(source.resourceId);
+                int moved = Math.Min(source.count, Math.Max(0, capacity - target.count));
                 if (moved == 0) return false;
                 source.count -= moved;
                 target.count += moved;

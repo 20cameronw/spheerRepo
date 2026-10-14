@@ -107,7 +107,8 @@ namespace Frontier
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Foundry,
-                    StructureKind.ChemReactor, StructureKind.QuantumLab, StructureKind.Alarm, StructureKind.Warehouse); break;
+                    StructureKind.ChemReactor, StructureKind.QuantumLab, StructureKind.Alarm, StructureKind.Warehouse,
+                    StructureKind.FuelDepot); break;
                 case 1: ShopSection(body, StructureKind.Lumber, StructureKind.Mine, StructureKind.Drill,
                     StructureKind.SiphonRig, StructureKind.Excavator, StructureKind.SalvageYard); break;
                 case 2: ShopSection(body, StructureKind.Gunner, StructureKind.Laser); break;

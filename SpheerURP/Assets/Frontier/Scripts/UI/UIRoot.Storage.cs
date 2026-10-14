@@ -104,11 +104,14 @@ namespace Frontier
             int capacity = warehouse.def.StorageCapacity(warehouse.level);
             int used = storage.slots.FindAll(s => s.count > 0).Count;
             body.Add(UiKit.Text(gs.planet.Name + "  -  LV " + warehouse.level + "  -  " + used + " / " + capacity + " storage slots", "fr-muted"));
-            body.Add(UiKit.Text("Drag a stack between the grids. Resources stay on this planet. If a stack won't fit, only the amount that fits is moved.", "fr-tiny"));
+            bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
+            body.Add(UiKit.Text(fuelOnly
+                ? "Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger fuel stacks; reserves stay on this planet."
+                : "Drag a stack between the grids. Resources stay on this planet. If a stack won't fit, only the amount that fits is moved.", "fr-tiny"));
 
             var packSlots = new List<VisualElement>();
             var storageSlots = new List<VisualElement>();
-            body.Add(SectionLabel("WAREHOUSE"));
+            body.Add(SectionLabel(fuelOnly ? "FUEL RESERVE" : "WAREHOUSE"));
             var storageGrid = UiKit.Div("fr-grid");
             for (int i = 0; i < capacity; i++)
             {
@@ -159,8 +162,12 @@ namespace Frontier
                     int target = SlotAt(storageSlots, position);
                     if (target >= 0 && resource != null)
                     {
+                        if (!gs.CanStore(warehouse, resource))
+                        {
+                            Toast("Fuel depots only accept resources that power the ship.", UiKit.Red); return;
+                        }
                         int moved = gs.Deposit(warehouse, target, resource, packCnt[index], false);
-                        if (moved == 0) { Toast("Storage slot is full or contains another resource.", UiKit.Red); return; }
+                        if (moved == 0) { Toast(fuelOnly ? "Fuel slot is full or contains another resource." : "Storage slot is full or contains another resource.", UiKit.Red); return; }
                         packCnt[index] -= moved;
                         if (packCnt[index] == 0) packRes[index] = null;
                         Sfx.Click(); gs.Notify(); return;

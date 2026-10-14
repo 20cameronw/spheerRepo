@@ -149,7 +149,7 @@ namespace Frontier
             var pack = db.FindUpgrade("pack");
             if (pack != null) gs.DebugSetUpgrade(pack, 4);
             foreach (var r in db.resources) gs.Add(r, r == db.fuel ? 30 : 18 + (r.id.Length * 7) % 40, false);
-            string[] order = { "lumber", "mine", "refinery", "fabricator", "alarm", "gunner", "laser", "warehouse" };
+            string[] order = { "lumber", "mine", "refinery", "fabricator", "alarm", "gunner", "laser", "warehouse", "fuel_depot" };
             int slot = 0;
             foreach (var id in order)
             {
@@ -286,7 +286,7 @@ namespace Frontier
             gs.backpack.Set(GameState.PlasmaId, savedMapPlasma); gs.backpack.Set(GameState.AntimatterId, savedMapAntimatter);
             yield return new Shot("map-flight-autopilot", ui.DebugAutopilotScreen);
 
-            foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Gunner, StructureKind.Laser, StructureKind.Warehouse })
+            foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Alarm, StructureKind.Gunner, StructureKind.Laser, StructureKind.Warehouse, StructureKind.FuelDepot })
             {
                 var k = kind;
                 yield return new Shot("popup-" + k.ToString().ToLower(), () => { ResetView(); ui.DebugTapStructure(At(k)); });

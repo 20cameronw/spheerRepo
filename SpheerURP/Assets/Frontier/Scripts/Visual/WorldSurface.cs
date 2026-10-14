@@ -371,6 +371,13 @@ namespace Frontier
         {
             var metal = Lit(new Color(0.45f, 0.5f, 0.6f), 0.15f);
             var glow = Lit(c, 1.2f);
+            if (kind == StructureKind.FuelDepot)
+            {
+                Prim(t, PrimitiveType.Cylinder, new Vector3(-0.2f, 0.27f, 0f), new Vector3(0.2f, 0.54f, 0.2f), metal);
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0.2f, 0.27f, 0f), new Vector3(0.2f, 0.54f, 0.2f), metal);
+                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.56f, 0f), new Vector3(0.58f, 0.06f, 0.3f), glow);
+                return;
+            }
             if (kind == StructureKind.Warehouse)
             {
                 Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.25f, 0f), new Vector3(0.65f, 0.5f, 0.55f), metal);

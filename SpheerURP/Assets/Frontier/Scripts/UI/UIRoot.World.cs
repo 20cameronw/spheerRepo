@@ -130,7 +130,7 @@ namespace Frontier
                 return;
             }
             var k = s.def.kind;
-            if (k == StructureKind.Warehouse) OpenWarehouse(s, t);
+            if (k.IsStorage()) OpenWarehouse(s, t);
             else if (k.IsStation()) OpenRefinery(s, t);
             else if (k == StructureKind.ResearchLab) OpenResearchLab(s, t);
             else if (k == StructureKind.RadarTower) OpenRadarTower(s, t);

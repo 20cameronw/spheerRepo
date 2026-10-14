@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Frontier.Tests
 {
     /// <summary>
-    /// Warehouse storage rules, ported from <c>Frontier &gt; Validate Warehouse Storage</c> (that editor check stays as the batch gate):
-    /// capacity, stack limits, conservation of items, isolation between warehouses, upgrades, persistence and rejection rules.
+    /// Planetary storage rules, ported from <c>Frontier &gt; Validate Warehouse Storage</c> (that editor check stays as the batch gate):
+    /// capacity, stack limits, conservation of items, isolation between structures, upgrades, persistence and rejection rules.
     /// </summary>
     [TestFixture]
     public class StorageTests
@@ -130,6 +130,42 @@ namespace Frontier.Tests
             state.DebugTeleport(state.universe.Get(db.planets[1].id));
             Assert.AreEqual(0, state.Deposit(warehouse, 2, wood, 1, false));
             Assert.AreEqual(0, state.Withdraw(warehouse, 1, 1, false));
+        }
+
+        [Test]
+        public void FuelDepot_StoresOnlyFuelAndItsUpgradeExpandsFuelStacks()
+        {
+            state = new GameState(GameDatabase.Load(), false);
+            db = state.db;
+            var depot = state.DebugPlace(db.StructureOfKind(StructureKind.FuelDepot), 3);
+            var fuel = db.FindResource("fuel");
+            Assert.IsNotNull(depot, "fuel depot did not place");
+            Assert.IsNotNull(fuel, "fuel resource is missing");
+            Assert.AreEqual(StructureKind.FuelDepot, depot.def.kind);
+            Assert.IsTrue(depot.def.kind.IsStorage());
+            Assert.IsTrue(state.CanStore(depot, fuel), "fuel should be accepted by a fuel depot");
+            Assert.IsTrue(state.CanStore(depot, db.FindResource("plasma")));
+            Assert.IsTrue(state.CanStore(depot, db.FindResource("antimatter")));
+            Assert.IsFalse(state.CanStore(depot, wood));
+            Assert.IsFalse(state.CanStore(depot, db.scrap));
+
+            state.DebugSetStructureLevel(depot, 2);
+            state.Add(fuel, 10000, false);
+            int held = state.Count(fuel);
+            int expectedStack = Mathf.FloorToInt(fuel.stackSize * (1f + depot.def.EffectAt(depot.level)));
+            Assert.GreaterOrEqual(held, expectedStack);
+            Assert.AreEqual(expectedStack, state.Deposit(depot, 0, fuel, held, false));
+            Assert.AreEqual(0, state.Deposit(depot, 1, wood, 1, false));
+            Assert.AreEqual(expectedStack, state.StorageFor(depot).slots[0].count);
+        }
+
+        [Test]
+        public void FuelDepotUpgradeUsesAuthoredFuelSlotCapacity()
+        {
+            var def = GameDatabase.Load().StructureOfKind(StructureKind.FuelDepot);
+            Assert.IsNotNull(def, "the authored database has no fuel depot");
+            Assert.AreEqual(6, def.StorageCapacity(1));
+            Assert.AreEqual(9, def.StorageCapacity(2));
         }
 
         [Test]

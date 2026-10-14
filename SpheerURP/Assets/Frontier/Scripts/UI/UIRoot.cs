@@ -322,6 +322,8 @@ namespace Frontier
             int pct = Mathf.RoundToInt(effect * 100f);
             if (d.kind.IsTurret()) return "dmg " + Mathf.RoundToInt(d.damage * (d.HasLevelRows ? effect : 1f + effect));
             if (d.kind == StructureKind.Warehouse) return d.StorageCapacity(level) + " storage slots";
+            if (d.kind == StructureKind.FuelDepot)
+                return d.StorageCapacity(level) + " fuel slots" + (pct > 0 ? " · +" + pct + "% fuel stack" : "");
             if (d.kind == StructureKind.ResearchLab) return "Research Lab level " + Mathf.RoundToInt(effect);
             if (d.kind == StructureKind.RadarTower) return "+" + Mathf.RoundToInt(effect) + " ly local survey";
             if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";

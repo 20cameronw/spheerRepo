@@ -348,20 +348,33 @@ namespace Frontier
         }
 
         // ---------- Warehouses ----------
-        /// <summary>The contents of a placed warehouse, grown to its current capacity.</summary>
+        /// <summary>The contents of a placed storage structure, grown to its current capacity.</summary>
         public StorageRecord StorageFor(PlacedStructure warehouse)
         {
-            if (warehouse == null || warehouse.def.kind != StructureKind.Warehouse || !IsPlaced(warehouse))
-                throw new ArgumentException("Storage requires a placed warehouse.");
+            if (warehouse == null || !warehouse.def.kind.IsStorage() || !IsPlaced(warehouse))
+                throw new ArgumentException("Storage requires a placed storage structure.");
             return world.StorageFor(warehouse.planetId, warehouse.slot, warehouse.def.StorageCapacity(warehouse.level));
+        }
+
+        public bool CanStore(PlacedStructure storage, ResourceSO resource)
+        {
+            return storage != null && storage.def.kind.IsStorage() && resource != null &&
+                (storage.def.kind != StructureKind.FuelDepot || resource.fuelEnergy > 0);
+        }
+
+        int StorageStackSize(PlacedStructure storage, ResourceSO resource)
+        {
+            int baseSize = backpack.StackSizeOf(resource.id);
+            if (storage.def.kind != StructureKind.FuelDepot || resource.fuelEnergy <= 0) return baseSize;
+            return Mathf.Max(baseSize, Mathf.FloorToInt(baseSize * (1f + storage.def.EffectAt(storage.level))));
         }
 
         public int Deposit(PlacedStructure warehouse, int slot, ResourceSO resource, int amount, bool notify = true)
         {
-            if (warehouse.planetId != planet.Id || resource == null || amount <= 0) return 0;
+            if (warehouse == null || warehouse.planetId != planet.Id || !CanStore(warehouse, resource) || amount <= 0) return 0;
             var storage = StorageFor(warehouse);
             if (slot < 0 || slot >= warehouse.def.StorageCapacity(warehouse.level)) return 0;
-            int moved = WarehouseOps.Deposit(backpack, storage, slot, resource.id, amount);
+            int moved = WarehouseOps.Deposit(backpack, storage, slot, resource.id, amount, StorageStackSize(warehouse, resource));
             if (moved <= 0) return 0;
             saves.MarkDirty();
             if (notify) Notify();
@@ -381,7 +394,13 @@ namespace Frontier
         public bool MoveStoredSlot(PlacedStructure warehouse, int from, int to, bool notify = true)
         {
             var storage = StorageFor(warehouse);
-            if (warehouse.planetId != planet.Id || !WarehouseOps.Move(backpack, storage, from, to)) return false;
+            if (warehouse.planetId != planet.Id) return false;
+            var source = from >= 0 && from < storage.slots.Count ? db.FindResource(storage.slots[from].resourceId) : null;
+            var target = to >= 0 && to < storage.slots.Count ? db.FindResource(storage.slots[to].resourceId) : null;
+            if (warehouse.def.kind == StructureKind.FuelDepot &&
+                ((source != null && !CanStore(warehouse, source)) || (target != null && !CanStore(warehouse, target)))) return false;
+            int stackLimit = source != null ? StorageStackSize(warehouse, source) : 0;
+            if (!WarehouseOps.Move(backpack, storage, from, to, stackLimit)) return false;
             saves.MarkDirty();
             if (notify) Notify();
             return true;
