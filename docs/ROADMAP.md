@@ -759,7 +759,7 @@ and remaining harvest/XP shell string slices. A fresh focused PlayMode
 deletion-flow regression passed after the localization migration. Providers remain disabled.
 `COMPLIANCE.md` now records implemented scope and remaining legal/web/backend/native/store gates, not legal approval.
 
-**Unity Localization (§7.1):** installed 1.5.13 and registered English settings/locale plus the 839-key preloaded
+**Unity Localization (§7.1):** installed 1.5.13 and registered English settings/locale plus the 901-key preloaded
 `Frontier UI` StringTable. The editor sync command keeps `UiStrings.asset` as the English source, preserving stable
 keys and other locales. Bootstrap awaits asynchronous loading before creating UI; current-culture composite
 formatting remains unchanged. Player build guards reject drift/missing tables and force local bundled content to
@@ -767,6 +767,9 @@ build with the player. Four focused catalog/build-guard checks, earlier live UI 
 localization/bootstrap and deletion regressions passed. Local Android-target bundles built successfully, exposing
 and correcting an inherited misplaced `DefaultContent` editor-only guard. No APK/native-device claim. Remaining: generated gameplay/provider/
 content text, language selection/live switching, translations, font coverage and RTL; only English is authored.
+Development debug controls and generated-world filtering now also use stable localized keys for actions, status and
+all biome/size choices. Four catalog tests and the live localized-screen smoke test passed; untranslated generated
+content, locale switching, additional languages, font coverage and RTL remain open.
 **Harvest mini-game catalog slice:** tree/rock, drill, siphon, excavation, salvage and asteroid-field titles, tools,
 instructions, metrics, feedback states, controls and live progress now use the catalog. The player-level HUD and
 travel settings heading also use catalog entries. Four focused catalog/build-guard checks and 12 live mini-game

@@ -588,6 +588,15 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("shop.summary",
                 rt.State.planet.Name, rt.State.FreePads(rt.State.planet), rt.State.planet.BuildingSlots,
                 rt.State.BusyBuilderCount, rt.State.BuilderCount)));
+            rt.Ui.DebugMenu("debug");
+            var debugLabels = rt.Ui.DebugRoot.Query<Label>().ToList();
+            foreach (var key in new[]
+            {
+                "debug.header", "debug.items", "debug.progress", "debug.generated-world", "debug.generated-help",
+                "debug.biome.gas-giant", "debug.size.colossal", "debug.minimum-tier", "debug.dump-descriptor"
+            })
+                Assert.IsTrue(debugLabels.Exists(label => label.text == UiText.Get(key)), key);
+            Assert.IsTrue(debugLabels.Exists(label => label.text == UiText.Get("debug.now-on", rt.State.planet.Name, rt.State.planet.Id)));
             Assert.AreEqual(structures, rt.State.structures.Count);
             Assert.AreEqual(shards, rt.State.ShardBalance);
             rt.Ui.DebugReset();

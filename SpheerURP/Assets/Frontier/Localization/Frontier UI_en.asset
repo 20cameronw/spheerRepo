@@ -3581,6 +3581,183 @@ MonoBehaviour:
     m_Localized: The bonus was not saved; your base harvest is safe. {0}
     m_Metadata:
       m_Items: []
+  - m_Id: 1480661079777280
+    m_Localized: DEBUG TOOLS - FOR TESTING ONLY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829184
+    m_Localized: GIVE ITEMS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829185
+    m_Localized: x{0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829186
+    m_Localized: GIVE ONE OF EACH x{0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829187
+    m_Localized: PROGRESS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829188
+    m_Localized: Player level {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829189
+    m_Localized: LEVEL +1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829190
+    m_Localized: LEVEL +10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829191
+    m_Localized: MAX ALL UPGRADES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829192
+    m_Localized: RESET UPGRADES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829193
+    m_Localized: TELEPORT (FREE)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829194
+    m_Localized: GENERATED WORLD (FREE)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829195
+    m_Localized: Teleport to the first matching world found outwards from home. NEXT
+      cycles through matches.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829196
+    m_Localized: BIOME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829197
+    m_Localized: SIZE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829198
+    m_Localized: MINIMUM TIER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829199
+    m_Localized: '{0}+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829200
+    m_Localized: TELEPORT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829201
+    m_Localized: NEXT MATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829202
+    m_Localized: 'Now on: {0}  {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829203
+    m_Localized: DUMP DESCRIPTOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829204
+    m_Localized: No matching world found nearby.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829205
+    m_Localized: '{0} - {1}, {2}, tier {3}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829206
+    m_Localized: World descriptor copied to the log and clipboard.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829207
+    m_Localized: ANY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829208
+    m_Localized: LUSH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829209
+    m_Localized: MINERAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829210
+    m_Localized: GLACIAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829211
+    m_Localized: VOLCANIC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829212
+    m_Localized: FUNGAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829213
+    m_Localized: CRYSTAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829214
+    m_Localized: OBSIDIAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829215
+    m_Localized: SHATTERED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829216
+    m_Localized: DESERT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829217
+    m_Localized: OCEANIC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829218
+    m_Localized: GAS GIANT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829219
+    m_Localized: BARREN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829220
+    m_Localized: ANY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829221
+    m_Localized: DWARF
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829222
+    m_Localized: SMALL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829223
+    m_Localized: MEDIUM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661193023488
+    m_Localized: LARGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661193023489
+    m_Localized: GIANT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661193023490
+    m_Localized: COLOSSAL
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

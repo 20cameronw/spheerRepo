@@ -20,6 +20,94 @@ MonoBehaviour:
     text: The device clock is earlier than this save's recorded time. Offline production will resume only after that recorded time is reached. Check your device date and time.
   - key: purchase.recovery-required
     text: This save contains store purchase history. Reset and restore are unavailable until purchase recovery is configured, to protect your purchases. Your current save has not been replaced.
+  - key: debug.header
+    text: DEBUG TOOLS - FOR TESTING ONLY
+  - key: debug.items
+    text: GIVE ITEMS
+  - key: debug.amount
+    text: 'x{0}'
+  - key: debug.give-each
+    text: 'GIVE ONE OF EACH x{0}'
+  - key: debug.progress
+    text: PROGRESS
+  - key: debug.player-level
+    text: 'Player level {0}'
+  - key: debug.level-one
+    text: LEVEL +1
+  - key: debug.level-ten
+    text: LEVEL +10
+  - key: debug.max-upgrades
+    text: MAX ALL UPGRADES
+  - key: debug.reset-upgrades
+    text: RESET UPGRADES
+  - key: debug.teleport-free
+    text: TELEPORT (FREE)
+  - key: debug.generated-world
+    text: GENERATED WORLD (FREE)
+  - key: debug.generated-help
+    text: Teleport to the first matching world found outwards from home. NEXT cycles through matches.
+  - key: debug.biome.label
+    text: BIOME
+  - key: debug.size.label
+    text: SIZE
+  - key: debug.minimum-tier
+    text: MINIMUM TIER
+  - key: debug.tier-choice
+    text: '{0}+'
+  - key: debug.teleport
+    text: TELEPORT
+  - key: debug.next-match
+    text: NEXT MATCH
+  - key: debug.now-on
+    text: 'Now on: {0}  {1}'
+  - key: debug.dump-descriptor
+    text: DUMP DESCRIPTOR
+  - key: debug.no-matching-world
+    text: No matching world found nearby.
+  - key: debug.world-found
+    text: '{0} - {1}, {2}, tier {3}'
+  - key: debug.descriptor-copied
+    text: World descriptor copied to the log and clipboard.
+  - key: debug.biome.any
+    text: ANY
+  - key: debug.biome.lush
+    text: LUSH
+  - key: debug.biome.mineral
+    text: MINERAL
+  - key: debug.biome.glacial
+    text: GLACIAL
+  - key: debug.biome.volcanic
+    text: VOLCANIC
+  - key: debug.biome.fungal
+    text: FUNGAL
+  - key: debug.biome.crystal
+    text: CRYSTAL
+  - key: debug.biome.obsidian
+    text: OBSIDIAN
+  - key: debug.biome.shattered
+    text: SHATTERED
+  - key: debug.biome.desert
+    text: DESERT
+  - key: debug.biome.oceanic
+    text: OCEANIC
+  - key: debug.biome.gas-giant
+    text: GAS GIANT
+  - key: debug.biome.barren
+    text: BARREN
+  - key: debug.size.any
+    text: ANY
+  - key: debug.size.dwarf
+    text: DWARF
+  - key: debug.size.small
+    text: SMALL
+  - key: debug.size.medium
+    text: MEDIUM
+  - key: debug.size.large
+    text: LARGE
+  - key: debug.size.giant
+    text: GIANT
+  - key: debug.size.colossal
+    text: COLOSSAL
   - key: nav.command
     text: COMMAND
   - key: nav.map

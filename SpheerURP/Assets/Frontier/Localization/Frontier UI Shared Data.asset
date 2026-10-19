@@ -3443,6 +3443,182 @@ MonoBehaviour:
     m_Key: harvest.ad.save-failed
     m_Metadata:
       m_Items: []
+  - m_Id: 1480661079777280
+    m_Key: debug.header
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829184
+    m_Key: debug.items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829185
+    m_Key: debug.amount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829186
+    m_Key: debug.give-each
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829187
+    m_Key: debug.progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829188
+    m_Key: debug.player-level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829189
+    m_Key: debug.level-one
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829190
+    m_Key: debug.level-ten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829191
+    m_Key: debug.max-upgrades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829192
+    m_Key: debug.reset-upgrades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829193
+    m_Key: debug.teleport-free
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829194
+    m_Key: debug.generated-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829195
+    m_Key: debug.generated-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829196
+    m_Key: debug.biome.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829197
+    m_Key: debug.size.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829198
+    m_Key: debug.minimum-tier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829199
+    m_Key: debug.tier-choice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829200
+    m_Key: debug.teleport
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829201
+    m_Key: debug.next-match
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829202
+    m_Key: debug.now-on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829203
+    m_Key: debug.dump-descriptor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829204
+    m_Key: debug.no-matching-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829205
+    m_Key: debug.world-found
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829206
+    m_Key: debug.descriptor-copied
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829207
+    m_Key: debug.biome.any
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829208
+    m_Key: debug.biome.lush
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829209
+    m_Key: debug.biome.mineral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829210
+    m_Key: debug.biome.glacial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829211
+    m_Key: debug.biome.volcanic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829212
+    m_Key: debug.biome.fungal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829213
+    m_Key: debug.biome.crystal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829214
+    m_Key: debug.biome.obsidian
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829215
+    m_Key: debug.biome.shattered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829216
+    m_Key: debug.biome.desert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829217
+    m_Key: debug.biome.oceanic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829218
+    m_Key: debug.biome.gas-giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829219
+    m_Key: debug.biome.barren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829220
+    m_Key: debug.size.any
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829221
+    m_Key: debug.size.dwarf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829222
+    m_Key: debug.size.small
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661188829223
+    m_Key: debug.size.medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661193023488
+    m_Key: debug.size.large
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661193023489
+    m_Key: debug.size.giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1480661193023490
+    m_Key: debug.size.colossal
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

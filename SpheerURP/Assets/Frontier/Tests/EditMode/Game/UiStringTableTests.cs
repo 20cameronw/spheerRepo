@@ -64,6 +64,12 @@ namespace Frontier.Tests
             Assert.AreEqual("PLAYING: HYPERSPACE RUN", UiText.Get("travel.debug.hyperspace"));
             Assert.AreEqual("PERFORMANCE OVERLAY: ON", UiText.Get("travel.debug.overlay.on"));
             Assert.AreEqual("PERFORMANCE OVERLAY: OFF", UiText.Get("travel.debug.overlay.off"));
+            Assert.AreEqual("DEBUG TOOLS - FOR TESTING ONLY", UiText.Get("debug.header"));
+            Assert.AreEqual("GIVE ONE OF EACH x100", UiText.Get("debug.give-each", 100));
+            Assert.AreEqual("Terra - Lush, small, tier 12", UiText.Get("debug.world-found", "Terra", "Lush", "small", 12));
+            Assert.AreEqual("12+", UiText.Get("debug.tier-choice", 12));
+            Assert.AreEqual("GAS GIANT", UiText.Get("debug.biome.gas-giant"));
+            Assert.AreEqual("Now on: Terra  home-1", UiText.Get("debug.now-on", "Terra", "home-1"));
             Assert.AreEqual("QUALITY: LOW", UiText.Get("settings.quality", "LOW"));
             Assert.AreEqual("Refinery  LV3", UiText.Get("world.label.level", "Refinery", 3));
             Assert.AreEqual("Version 1.0", UiText.Get("about.version", "1.0"));

@@ -1651,16 +1651,16 @@ namespace Frontier
 
         void BuildDebug(VisualElement body)
         {
-            body.Add(UiKit.Text("DEBUG TOOLS - for testing only", "fr-muted", UiKit.Red));
+            body.Add(UiKit.Text(UiText.Get("debug.header"), "fr-muted", UiKit.Red));
 
             var give = Card(UiKit.Amber);
-            give.Add(UiKit.Text("GIVE ITEMS", "fr-h2"));
+            give.Add(UiKit.Text(UiText.Get("debug.items"), "fr-h2"));
             var amt = UiKit.Div("fr-tabs");
             amt.style.marginTop = UiKit.Space.S8;
             foreach (int a in new[] { 10, 100, 1000 })
             {
                 int v = a;
-                amt.Add(TabButton("star", "x" + a, debugAmount == v, UiKit.Amber, () => debugAmount = v));
+                amt.Add(TabButton("star", UiText.Get("debug.amount", a), debugAmount == v, UiKit.Amber, () => debugAmount = v));
             }
             give.Add(amt);
             var res = UiKit.Div("fr-row-wrap");
@@ -1673,7 +1673,7 @@ namespace Frontier
                 res.Add(b);
             }
             give.Add(res);
-            give.Add(IconBtn("GIVE ONE OF EACH x" + debugAmount, "pack", UiKit.Lime, () =>
+            give.Add(IconBtn(UiText.Get("debug.give-each", debugAmount), "pack", UiKit.Lime, () =>
             {
                 foreach (var r in gs.db.resources) gs.Add(r, debugAmount, false);
                 gs.Notify(); Sfx.Good(); RefreshModal();
@@ -1681,16 +1681,16 @@ namespace Frontier
             body.Add(give);
 
             var prog = Card(UiKit.Magenta);
-            prog.Add(UiKit.Text("PROGRESS", "fr-h2"));
-            prog.Add(UiKit.Text("Player level " + gs.PlayerLevel, "fr-small"));
-            prog.Add(IconBtn("LEVEL +1", "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 1); Sfx.Good(); RefreshModal(); }));
-            prog.Add(IconBtn("LEVEL +10", "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 10); Sfx.Good(); RefreshModal(); }));
-            prog.Add(IconBtn("MAX ALL UPGRADES", "up", UiKit.Lime, () =>
+            prog.Add(UiKit.Text(UiText.Get("debug.progress"), "fr-h2"));
+            prog.Add(UiKit.Text(UiText.Get("debug.player-level", gs.PlayerLevel), "fr-small"));
+            prog.Add(IconBtn(UiText.Get("debug.level-one"), "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 1); Sfx.Good(); RefreshModal(); }));
+            prog.Add(IconBtn(UiText.Get("debug.level-ten"), "star", UiKit.Magenta, () => { gs.DebugSetLevel(gs.PlayerLevel + 10); Sfx.Good(); RefreshModal(); }));
+            prog.Add(IconBtn(UiText.Get("debug.max-upgrades"), "up", UiKit.Lime, () =>
             {
                 foreach (var u in gs.db.upgrades) if (u != null) gs.DebugSetUpgrade(u, u.maxLevel);
                 Sfx.Good(); RefreshModal();
             }));
-            prog.Add(IconBtn("RESET UPGRADES", "close", UiKit.Red, () =>
+            prog.Add(IconBtn(UiText.Get("debug.reset-upgrades"), "close", UiKit.Red, () =>
             {
                 foreach (var u in gs.db.upgrades) if (u != null) gs.DebugSetUpgrade(u, 0);
                 Sfx.Click(); RefreshModal();
@@ -1699,7 +1699,7 @@ namespace Frontier
             BuildTravelDebug(body);
 
             var tp = Card(UiKit.Cyan);
-            tp.Add(UiKit.Text("TELEPORT (free)", "fr-h2"));
+            tp.Add(UiKit.Text(UiText.Get("debug.teleport-free"), "fr-h2"));
             foreach (var p in gs.universe.AuthoredPlanets)
             {
                 var pl = p;
@@ -1710,8 +1710,8 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ debug: generated worlds
-        static readonly string[] DebugBiomeLabels = { "ANY", "LUSH", "MINERAL", "GLACIAL", "VOLCANIC", "FUNGAL", "CRYSTAL", "OBSIDIAN", "SHATTERED", "DESERT", "OCEANIC", "GAS GIANT", "BARREN" };
-        static readonly string[] DebugSizeLabels = { "ANY", "DWARF", "SMALL", "MEDIUM", "LARGE", "GIANT", "COLOSSAL" };
+        static readonly string[] DebugBiomeLabels = { "debug.biome.any", "debug.biome.lush", "debug.biome.mineral", "debug.biome.glacial", "debug.biome.volcanic", "debug.biome.fungal", "debug.biome.crystal", "debug.biome.obsidian", "debug.biome.shattered", "debug.biome.desert", "debug.biome.oceanic", "debug.biome.gas-giant", "debug.biome.barren" };
+        static readonly string[] DebugSizeLabels = { "debug.size.any", "debug.size.dwarf", "debug.size.small", "debug.size.medium", "debug.size.large", "debug.size.giant", "debug.size.colossal" };
         static readonly int[] DebugTierChoices = { 0, 2, 4, 6, 8, 12, 20 };
         /// <summary>The menu searches this many sectors around home at most, so a rare combination cannot freeze the game.</summary>
         const int DebugSearchSectors = 3000;
@@ -1720,31 +1720,32 @@ namespace Frontier
         VisualElement BuildGeneratedPicker()
         {
             var gen = Card(UiKit.Lime);
-            gen.Add(UiKit.Text("GENERATED WORLD (free)", "fr-h2"));
-            gen.Add(UiKit.Text("Teleports to the first generated world that matches, searching outwards from home. NEXT cycles through the matches.", "fr-tiny"));
-            gen.Add(DebugChoiceRow("BIOME", DebugBiomeLabels, debugBiome, i => debugBiome = i));
-            gen.Add(DebugChoiceRow("SIZE", DebugSizeLabels, debugSize, i => debugSize = i));
+            gen.Add(UiKit.Text(UiText.Get("debug.generated-world"), "fr-h2"));
+            gen.Add(UiKit.Text(UiText.Get("debug.generated-help"), "fr-tiny"));
+            gen.Add(DebugChoiceRow("debug.biome.label", DebugBiomeLabels, debugBiome, i => debugBiome = i));
+            gen.Add(DebugChoiceRow("debug.size.label", DebugSizeLabels, debugSize, i => debugSize = i));
             var tiers = new string[DebugTierChoices.Length];
-            for (int i = 0; i < tiers.Length; i++) tiers[i] = DebugTierChoices[i] + "+";
-            gen.Add(DebugChoiceRow("MINIMUM TIER", tiers, debugTier, i => debugTier = i));
-            gen.Add(IconBtn("TELEPORT", "map", UiKit.Lime, () => DebugTeleportToGenerated(false)));
-            gen.Add(IconBtn("NEXT MATCH", "map", UiKit.Cyan, () => DebugTeleportToGenerated(true)));
-            var here = UiKit.Text("Now on: " + gs.planet.Name + "  " + gs.planet.Id, "fr-tiny");
+            for (int i = 0; i < tiers.Length; i++) tiers[i] = UiText.Get("debug.tier-choice", DebugTierChoices[i]);
+            gen.Add(DebugChoiceRow("debug.minimum-tier", tiers, debugTier, i => debugTier = i, localizeLabels: false));
+            gen.Add(IconBtn(UiText.Get("debug.teleport"), "map", UiKit.Lime, () => DebugTeleportToGenerated(false)));
+            gen.Add(IconBtn(UiText.Get("debug.next-match"), "map", UiKit.Cyan, () => DebugTeleportToGenerated(true)));
+            var here = UiKit.Text(UiText.Get("debug.now-on", gs.planet.Name, gs.planet.Id), "fr-tiny");
             here.style.marginTop = UiKit.Space.S12;
             gen.Add(here);
-            gen.Add(IconBtn("DUMP DESCRIPTOR", "tools", UiKit.Amber, DebugDumpDescriptor));
+            gen.Add(IconBtn(UiText.Get("debug.dump-descriptor"), "tools", UiKit.Amber, DebugDumpDescriptor));
             return gen;
         }
 
-        VisualElement DebugChoiceRow(string title, string[] labels, int selectedIndex, Action<int> pick)
+        VisualElement DebugChoiceRow(string title, string[] labels, int selectedIndex, Action<int> pick, bool localizeLabels = true)
         {
             var box = UiKit.Div();
-            box.Add(SectionLabel(title));
+            box.Add(SectionLabel(UiText.Get(title)));
             var row = UiKit.Div("fr-row-wrap");
             for (int i = 0; i < labels.Length; i++)
             {
                 int index = i;
-                row.Add(DebugChoice(labels[i], i == selectedIndex, () => { pick(index); debugSkip = 0; RefreshModal(); }));
+                string label = localizeLabels ? UiText.Get(labels[i]) : labels[i];
+                row.Add(DebugChoice(label, i == selectedIndex, () => { pick(index); debugSkip = 0; RefreshModal(); }));
             }
             box.Add(row);
             return box;
@@ -1776,12 +1777,12 @@ namespace Frontier
             {
                 debugSkip = 0;
                 Sfx.Bad();
-                Toast("No matching world found nearby", UiKit.Red);
+                Toast(UiText.Get("debug.no-matching-world"), UiKit.Red);
                 return;
             }
             Sfx.Good();
             DebugTeleportTo(found);
-            Toast(found.Name + "  -  " + found.BiomeName + ", " + found.SizeName.ToLower() + ", tier " + found.Tier, UiKit.Cyan);
+            Toast(UiText.Get("debug.world-found", found.Name, found.BiomeName, found.SizeName.ToLower(), found.Tier), UiKit.Cyan);
         }
 
         /// <summary>Writes a readable description of the current world's descriptor to the log and the clipboard.</summary>
@@ -1791,7 +1792,7 @@ namespace Frontier
             Debug.Log("Frontier: planet descriptor\n" + text);
             GUIUtility.systemCopyBuffer = text;
             Sfx.Click();
-            Toast("Descriptor copied to the log", UiKit.Amber);
+            Toast(UiText.Get("debug.descriptor-copied"), UiKit.Amber);
         }
 
         /// <summary>Moves the player to a world for free and shows it (debug tools).</summary>
