@@ -17,12 +17,9 @@ namespace Frontier.Hyperspace.View
             shot = library.Get(AudioCue.Zap).clip;
             hit = library.Get(AudioCue.Impact).clip;
             explosion = library.Get(AudioCue.Boom).clip;
-            pickup = SfxSynth.Render("warp-pickup", 0.25f, 0,
-                new SfxSynth.Tone(660, 660, 0, 0.12f, 0.25f), new SfxSynth.Tone(990, 990, 0.08f, 0.15f, 0.22f));
-            warning = SfxSynth.Render("warp-warning", 0.4f, 2600, new SfxSynth.Tone(280, 750, 0, 0.4f, 0.2f, 1));
-            chime = SfxSynth.Render("warp-clear", 0.6f, 0,
-                new SfxSynth.Tone(523, 523, 0, 0.25f, 0.25f), new SfxSynth.Tone(784, 784, 0.12f, 0.3f, 0.23f),
-                new SfxSynth.Tone(1047, 1047, 0.24f, 0.3f, 0.2f));
+            pickup = library.Get(AudioCue.Warp).clip;
+            warning = library.Get(AudioCue.Bad).clip;
+            chime = library.Get(AudioCue.Good).clip;
             var soundscape = Resources.Load<SoundscapeLibrary>("Frontier/SoundscapeLibrary");
             if (soundscape == null) throw new InvalidOperationException("Frontier soundscape library is missing.");
             soundscape.Validate();
@@ -56,8 +53,6 @@ namespace Frontier.Hyperspace.View
         public void Dispose()
         {
             Stop();
-            // Shot/impact/explosion clips are shared authored assets, not owned by this run.
-            UnityEngine.Object.Destroy(pickup); UnityEngine.Object.Destroy(warning); UnityEngine.Object.Destroy(chime);
         }
     }
 }
