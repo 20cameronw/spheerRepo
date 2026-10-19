@@ -468,13 +468,14 @@ namespace Frontier
             service.Play(clip, vol, bus: bus);
         }
 
-        static void Cue(AudioCue cue) { if (service != null) service.PlayCue(cue); }
+        static void Cue(AudioCue cue, float pitch = 1f) { if (service != null) service.PlayCue(cue, pitch); }
         public static void Click() { Cue(AudioCue.Click); }
         public static void Good() { Cue(AudioCue.Good); }
         public static void Bad() { Cue(AudioCue.Bad); }
-        public static void Zap() { Cue(AudioCue.Zap); }
+        public static void Zap(float pitch = 1f) { Cue(AudioCue.Zap, pitch); }
         public static void Boom() { Cue(AudioCue.Boom); }
         public static void Warp() { Cue(AudioCue.Warp); }
+        public static void Impact(float pitch = 1f) { Cue(AudioCue.Impact, pitch); }
         public static void ShipIgnition() { Cue(AudioCue.ShipIgnition); }
         public static void ShipTouchdown() { Cue(AudioCue.ShipTouchdown); }
     }

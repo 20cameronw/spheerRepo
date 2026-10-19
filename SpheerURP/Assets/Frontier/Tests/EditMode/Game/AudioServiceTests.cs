@@ -155,6 +155,32 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CombatCuesReuseLicensedClipsWithPitchVariationInsteadOfSynthesizing()
+        {
+            var host = new GameObject("Licensed combat cue test");
+            bool muted = Sfx.Muted;
+            int cachedSynthClips = Sfx.CachedSynthClipCount;
+            try
+            {
+                Sfx.Muted = false;
+                Sfx.Init(host);
+                var library = Resources.Load<AudioCueLibrary>("Frontier/AudioCueLibrary");
+                Sfx.Warp();
+                Sfx.Impact(1.15f);
+                Sfx.Zap(0.9f);
+                var sources = host.GetComponents<AudioSource>();
+                Assert.AreSame(library.Get(AudioCue.Warp).clip, sources[0].clip);
+                Assert.AreSame(library.Get(AudioCue.Impact).clip, sources[1].clip);
+                Assert.AreSame(library.Get(AudioCue.Zap).clip, sources[2].clip);
+                Assert.AreEqual(1f, sources[0].pitch);
+                Assert.AreEqual(1.15f, sources[1].pitch);
+                Assert.AreEqual(0.9f, sources[2].pitch);
+                Assert.AreEqual(cachedSynthClips, Sfx.CachedSynthClipCount);
+            }
+            finally { Object.DestroyImmediate(host); Sfx.Muted = muted; }
+        }
+
+        [Test]
         public void IndependentVolumesUpdateExistingAndFutureVoicesAndLoopsWithoutCompounding()
         {
             var host = new GameObject("Independent volume test");

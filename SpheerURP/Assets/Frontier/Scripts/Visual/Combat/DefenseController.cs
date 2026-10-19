@@ -124,7 +124,7 @@ namespace Frontier
             if (World != null)
                 foreach (var kv in World.TurretAnchors()) { placed.Add(kv.Key); placedT.Add(kv.Value); placedCd.Add(UnityEngine.Random.value * 0.5f); }
             spawnRoutine = StartCoroutine(SpawnLoop());
-            Sfx.Play(300f, 0.4f, 0.3f, 600f);
+            Sfx.Warp();
             return true;
         }
 
@@ -282,7 +282,7 @@ namespace Frontier
         public void AlienKilled(AlienActor a)
         {
             Killed++;
-            Sfx.Play(420f + UnityEngine.Random.Range(0, 200f), 0.1f, 0.18f, 800f);
+            Sfx.Impact(UnityEngine.Random.Range(0.85f, 1.15f));
             a.Die();
         }
 
