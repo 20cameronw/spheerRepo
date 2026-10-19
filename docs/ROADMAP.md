@@ -399,7 +399,7 @@ Existing Chop, Mine and Drill keep their feel (tool-rig, cooldown, weak spots, i
 | **Salvage** | Scrap, components, caches | A swinging magnet claw: time the drop to grab valuables, avoid explosive mines, chain for bonus |
 | *Harvest/Slice (optional)* | Biomass | Swipe through plants, avoid toxic pods |
 
-`m5-minigame-framework`: shared tool rig, cooldown feedback, haptics/audio hooks, pause/abort, result screen with grade (S/A/B/C → existing `0.4 + 1.1×quality` yield curve) and a **Double yield** rewarded-ad slot, difficulty and tool scaling, headless bot support. **Partial:** pause/abandon, graded result collection, all six games' headless/live bot coverage, shared tool/state feedback, shared tiered visual rigs, cached audio and default-off native haptics/settings are implemented. Grades derive from normalized quality, and the resource/progression callback waits for Collect Resources. Remaining: consent-enabled rewarded-ad yield slot, native builds and on-device validation.
+`m5-minigame-framework`: shared tool rig, cooldown feedback, haptics/audio hooks, pause/abort, result screen with grade (S/A/B/C → existing `0.4 + 1.1×quality` yield curve) and a **Double yield** rewarded-ad slot, difficulty and tool scaling, headless bot support. **Partial:** pause/abandon, graded result collection, all six games' headless/live bot coverage, shared tool/state feedback, shared tiered visual rigs, cached audio and default-off native haptics/settings are implemented. Grades derive from normalized quality, and the resource/progression callback waits for Collect Resources. The Double yield offer is wired to the consent- and policy-gated provider, persists the bonus before inventory publication, and remains hidden because no provider is configured and the authored policy disables placements. Remaining: native builds and on-device validation.
 
 Verified framework slices:
 - [x] Pause/resume, focus-loss pause, and confirmed abandon without rewards.
@@ -411,7 +411,8 @@ Verified framework slices:
 - [x] Cached tool-specific harvest cues use the bounded ten-voice pool instead of per-hit synthesis, with independent haptics dispatch connected to the native host below.
 - [x] Native harvest haptics implementation with persisted default-off setting: Android short vibration effects and iOS impact feedback, hardware support checks, 120ms minimum cadence and focus/disable cancellation. Build hooks add Android permission and link iOS frameworks. Unsupported devices show an unavailable state. Six policy/build/persistence tests and rendered lifecycle/settings tests pass; managed platform branches/build hooks compile. Native device feel and actual mobile builds remain unverified.
 - [x] Shared visual tool-rig expansion: shared seven-tier palette across all games, bounded tier hardware for drill/siphon/scanner/claw, preserved mounts and live rules. Seven focused PlayMode checks passed; standard/narrow phone captures completed without harness errors, with representative affected scenes visually inspected.
-- [ ] Device validation and a consent-enabled rewarded-ad yield slot.
+- [x] Consent- and policy-gated Double yield slot; bonus is persisted before publication and the offer is hidden while the provider/policy is unavailable.
+- [ ] Native builds and physical-device touch/audio/haptics/performance validation.
 
 Harvest bot validation: 22 focused tests pass under both .NET and Unity Mono; the full engine-free suite passes 398 tests and the full PlayMode suite passes 25. All five editor check suites pass. Corrected drilling gameplay/result captures on standard and narrow phone profiles have zero errors, text/touch-target violations or overflow. This does not complete the entire framework or replace on-device validation.
 
