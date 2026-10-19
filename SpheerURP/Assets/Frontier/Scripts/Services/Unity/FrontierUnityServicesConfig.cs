@@ -9,6 +9,15 @@ namespace Frontier.Services.Unity
         [Tooltip("Enable only after legal/audience review, account-deletion UX, leaderboard policy and Unity Dashboard setup are complete.")]
         public bool enableOnlineServices;
 
+        [Tooltip("Enable only after explicit Analytics consent is implemented and custom event schemas are configured in the Unity Dashboard.")]
+        public bool enableAnalytics;
+
+        [Tooltip("Enable only after online-services consent, an existing signed-in identity and Unity Dashboard settings are ready.")]
+        public bool enableRemoteConfig;
+
+        [Tooltip("Enable only after native notification permission, delivery and cancellation are verified on Android/iOS.")]
+        public bool enableNotifications;
+
         [Tooltip("Enable Cloud Save only after local/cloud conflict handling and account recovery UX are ready.")]
         public bool enableCloudSave;
 
@@ -38,6 +47,16 @@ namespace Frontier.Services.Unity
                 return enableOnlineServices && !string.IsNullOrWhiteSpace(Application.cloudProjectId) &&
                     HasValidPrivacyPolicy;
             }
+        }
+
+        public bool CanUseAnalytics
+        {
+            get { return enableAnalytics && !string.IsNullOrWhiteSpace(Application.cloudProjectId); }
+        }
+
+        public bool CanUseRemoteConfig
+        {
+            get { return enableRemoteConfig && CanUseAuthentication; }
         }
 
         public bool CanUseLeaderboard

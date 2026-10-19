@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -139,6 +140,12 @@ namespace Frontier
             var plasma = Res("plasma", "Plasma Cell", new Color(2.4f, 1.0f, 2.4f), "Fabricated from crystal and fuel. Powers late-game tech.");
 
             var wave = New<WaveFormulaSO>("Wave Formula");
+            wave.modifiers = new List<WaveModifier>
+            {
+                new WaveModifier { name = "Swift", description = "Faster approach. Victory rewards +10%.", speed = 1.15f, reward = 1.1f },
+                new WaveModifier { name = "Fortified", description = "Tougher aliens. Victory rewards +10%.", health = 1.2f, reward = 1.1f },
+                new WaveModifier { name = "Overcharged", description = "Harder reactor impacts. Victory rewards +10%.", damage = 1.15f, reward = 1.1f }
+            };
 
             var planets = new[]
             {
@@ -312,7 +319,6 @@ namespace Frontier
                         break;
                 }
             }
-
             var upgrades = new[]
             {
                 Tiers(Up("axe", "Axe", "Hit the glowing weak spot to fell trees. Better axes deal more damage and swing faster.", UpgradeCategory.Tools, UpgradeEffect.ToolPower, 0.6f, 6, 1.9f,
@@ -351,9 +357,11 @@ namespace Frontier
                 Alien("scout", "Scout", new Color(0.3f, 1.6f, 2.2f), PrimitiveType.Sphere, 0.45f, 10f, 1.3f, 4f, 1f, 1, 2f, L(A(core, 1))),
                 Alien("swarmer", "Swarmer", new Color(2.2f, 1.6f, 0.3f), PrimitiveType.Capsule, 0.35f, 6f, 2.2f, 3f, 1f, 3, 2f, L(A(core, 1))),
                 Alien("raider", "Raider", new Color(2.2f, 0.4f, 1.8f), PrimitiveType.Cube, 0.6f, 28f, 1.0f, 8f, 3f, 2, 1.5f, L(A(core, 1), A(fuel, 1))),
-                Alien("brute", "Brute", new Color(2.4f, 0.3f, 0.3f), PrimitiveType.Cylinder, 0.9f, 120f, 0.6f, 25f, 10f, 5, 1f, L(A(core, 3), A(fuel, 2))),
-                Alien("titan", "Titan", new Color(2.4f, 1.2f, 0.2f), PrimitiveType.Sphere, 1.5f, 500f, 0.45f, 60f, 30f, 10, 1f, L(A(core, 8), A(fuel, 5))),
+                Alien("brute", "Brute", new Color(2.4f, 0.3f, 0.3f), PrimitiveType.Cylinder, 0.9f, 120f, 0.6f, 25f, 10f, 5, 1f, L(A(core, 3), A(fuel, 2), A(scrap, 4))),
+                Alien("titan", "Titan", new Color(2.4f, 1.2f, 0.2f), PrimitiveType.Sphere, 1.5f, 500f, 0.45f, 60f, 30f, 10, 1f, L(A(core, 8), A(fuel, 5), A(crystal, 3))),
             };
+            enemies[3].rank = AlienRank.Elite; enemies[3].armor = 0.25f;
+            enemies[4].rank = AlienRank.Boss; enemies[4].armor = 0.2f;
 
             var recipes = new[]
             {
@@ -385,7 +393,7 @@ namespace Frontier
                 Struct("laser", "Laser Turret", "Slow, heavy beam with long range. Fires during waves.",
                     StructureKind.Laser, new Color(0.4f, 2.2f, 2.2f), "struct_laser", L(A(alloy, 8), A(crystal, 4)), 0.3f,
                     0, 14f, 1.3f, 11f, 0.12f),
-                Struct("satellite", "Satellite", "Uplink relay. Does nothing yet - future upgrades will plug in here.",
+                Struct("satellite", "Orbital Relay", "Withdraw stored resources from visited worlds in range. Transfers use energy.",
                     StructureKind.Satellite, new Color(0.6f, 1.4f, 2.4f), "struct_satellite", L(A(alloy, 6), A(crystal, 3)), 0.1f),
                 Struct("warehouse", "Warehouse", "Stores resources on this planet. Drag stacks between your backpack and storage. Upgrades add 9 slots.",
                     StructureKind.Warehouse, new Color(0.4f, 1.4f, 1.8f), "", L(A(scrap, 20), A(wood, 10)), 0f, 0),
@@ -409,3 +417,4 @@ namespace Frontier
         }
     }
 }
+#endif

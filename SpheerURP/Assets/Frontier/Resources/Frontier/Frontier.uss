@@ -30,6 +30,31 @@
 }
 .fr-tiny, .fr-t-caption { font-size: var(--fr-fs-caption); color: var(--fr-text-lo); white-space: normal; }
 
+.fr-surface-enter {
+    translate: 0 0;
+    transition-property: translate;
+    transition-duration: 160ms;
+    transition-timing-function: ease-out;
+}
+.fr-modal.fr-surface-enter-start { translate: 0 16px; }
+.fr-popup.fr-surface-enter-start { translate: 0 6px; }
+.fr-toast.fr-surface-enter-start { translate: 0 -8px; }
+.fr-world-label, .fr-world-pad {
+    flex-grow: 0;
+    width: 340px;
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+}
+.fr-world-label > .unity-label {
+    max-width: 340px;
+    font-size: 20px;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-SemiBold-SDF.asset");
+}
+.fr-world-pad { width: 56px; }
+.fr-world-pad > .unity-label { font-size: 36px; -unity-text-align: middle-center; }
 .fr-row { flex-direction: row; align-items: center; }
 .fr-row-wrap { flex-direction: row; flex-wrap: wrap; align-items: center; }
 .fr-spacer { flex-grow: 1; }
@@ -108,6 +133,29 @@
     white-space: nowrap;
 }
 .fr-dock-btn:active .fr-dock-label { color: var(--fr-acc); }
+
+.fr-guide-card {
+    flex-direction: column;
+    padding: var(--fr-sp-12);
+    border-radius: var(--fr-r-lg);
+    border-width: 2px;
+    border-color: var(--fr-outline-strong);
+    background-color: var(--fr-surface-1);
+}
+.fr-guide-heading { flex-direction: row; align-items: center; }
+.fr-guide-title { flex-grow: 1; flex-shrink: 1; min-width: 0; }
+.fr-guide-progress { flex-shrink: 0; margin-right: var(--fr-sp-8); }
+.fr-guide-close { background-color: var(--fr-surface-2); border-color: var(--fr-outline-strong); }
+.fr-guide-description { margin-top: var(--fr-sp-8); }
+.fr-guide-action { width: 100%; margin-top: var(--fr-sp-8); }
+.fr-guide-cue {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: var(--fr-sp-12);
+}
+.fr-guide-cue-text { flex-shrink: 1; min-width: 0; white-space: normal; }
+.fr-guide-cue-arrow { flex-shrink: 0; margin-left: var(--fr-sp-8); rotate: 180deg; }
 
 /* ---------- Buttons ---------- */
 .fr-btn {
@@ -278,6 +326,13 @@
     white-space: nowrap;
 }
 .fr-slider { flex-grow: 1; min-height: 54px; margin: 0 8px; }
+.fr-audio-slider .unity-base-slider__tracker { height: 8px; background-color: var(--fr-outline-strong); border-radius: 4px; }
+.fr-audio-slider .unity-base-slider__dragger {
+    width: 40px; height: 40px; margin-top: -16px; border-radius: 20px;
+    background-color: var(--fr-cyan); border-width: 2px; border-color: var(--fr-text-hi);
+}
+.fr-audio-slider .unity-base-slider__dragger-border { display: none; }
+.fr-audio-slider:focus .unity-base-slider__tracker { background-color: var(--fr-cyan); }
 .fr-setting-row { flex-direction: row; align-items: center; margin: var(--fr-sp-8) 0; }
 .fr-setting-row > Label { min-width: 200px; }
 .fr-back { align-self: flex-start; margin: 0 0 var(--fr-sp-12) 0; }
@@ -375,6 +430,55 @@
 .fr-map-tools .fr-iconbtn { margin-left: var(--fr-sp-12); background-color: var(--fr-surface-1); }
 
 /* ---------- Overlays / toasts ---------- */
+.fr-minigame-heading { width: 100%; }
+.fr-minigame-tool-feedback {
+    width: 100%; flex-direction: row; flex-shrink: 0;
+    margin-top: var(--fr-sp-12); padding: var(--fr-sp-8) var(--fr-sp-12);
+    background-color: var(--fr-surface-1); border-radius: var(--fr-r-sm);
+}
+.fr-minigame-tool-name, .fr-minigame-tool-state {
+    min-width: 0; flex-basis: 50%; flex-shrink: 1; white-space: normal;
+    font-size: var(--fr-fs-caption);
+}
+.fr-minigame-tool-state { -unity-text-align: middle-right; padding-left: var(--fr-sp-12); }
+.fr-minigame-pause-button { width: 190px; flex-shrink: 0; margin: 0 0 0 var(--fr-sp-12); }
+.fr-minigame-pause-layer {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    align-items: center; justify-content: center; padding: var(--fr-sp-24);
+    background-color: rgba(2, 3, 14, 0.9);
+}
+.fr-minigame-pause-panel {
+    width: 100%; max-width: 780px; padding: var(--fr-sp-24);
+    flex-direction: column; border-radius: var(--fr-r-lg);
+    border-width: 2px; border-color: var(--fr-outline-strong);
+    border-top-width: 3px; border-top-color: var(--fr-cyan);
+    background-color: var(--fr-surface-1);
+}
+.fr-minigame-pause-title {
+    font-size: var(--fr-fs-title); letter-spacing: 2px;
+    -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-Bold-SDF.asset");
+}
+.fr-minigame-pause-copy {
+    margin-top: var(--fr-sp-12); margin-bottom: var(--fr-sp-16); color: var(--fr-text-hi);
+    max-width: 100%; flex-shrink: 1; white-space: normal;
+}
+.fr-minigame-pause-actions { width: 100%; flex-direction: column; }
+.fr-minigame-result-panel {
+    width: 100%; max-width: 780px; align-self: center; justify-content: center;
+    padding: var(--fr-sp-24); flex-direction: column; border-radius: var(--fr-r-lg);
+    border-width: 2px; border-color: var(--fr-outline-strong);
+    background-color: var(--fr-surface-1);
+}
+.fr-minigame-result-title {
+    font-size: var(--fr-fs-title); letter-spacing: 2px; color: var(--fr-text-hi);
+    -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-Bold-SDF.asset");
+}
+.fr-minigame-result-grade {
+    margin-top: var(--fr-sp-8); font-size: var(--fr-fs-display); letter-spacing: 2px;
+    -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-Bold-SDF.asset");
+}
+.fr-minigame-result-quality { margin-top: var(--fr-sp-4); }
+.fr-minigame-result-detail { margin-top: var(--fr-sp-12); max-width: 100%; white-space: normal; }
 .fr-overlay {
     position: absolute; left: 0; top: 0; right: 0; bottom: 0;
     background-color: rgb(2, 3, 14);

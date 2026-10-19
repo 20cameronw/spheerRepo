@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Frontier.Economy;
@@ -74,7 +75,20 @@ namespace Frontier
             return loaded;
         }
 
-        public static GameDatabase LoadLegacy() { return Resources.Load<GameDatabase>("Frontier/GameDatabase") ?? DefaultContent.Create(); }
+        public static GameDatabase LoadLegacy()
+        {
+            var legacy = Resources.Load<GameDatabase>("Frontier/GameDatabase");
+            return legacy != null ? legacy : MissingLegacyContent();
+        }
+
+        static GameDatabase MissingLegacyContent()
+        {
+#if UNITY_EDITOR
+            return DefaultContent.Create();
+#else
+            throw new InvalidOperationException("Frontier legacy content asset is missing from Resources/Frontier/GameDatabase.");
+#endif
+        }
 
         public PlanetSO FindPlanet(string id)
         {

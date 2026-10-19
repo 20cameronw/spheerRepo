@@ -15,6 +15,7 @@ namespace Frontier
         public float damageMult;
         public float speedMult;
         public float rewardMult;
+        public WaveModifier modifier;
         public List<EnemySO> aliens = new List<EnemySO>();
         public List<ItemAmount> reward = new List<ItemAmount>();
     }
@@ -69,6 +70,14 @@ namespace Frontier
             info.damageMult = 1f + f.damagePerFuel * (fuel - 1);
             info.speedMult = 1f + f.speedPerFuel * (fuel - 1);
             info.rewardMult = f.RewardMult(info.waveNumber, rm) * gs.RewardBonus * gs.AlarmBonus(p);
+            info.modifier = f.Modifier(info.waveNumber);
+            if (info.modifier != null)
+            {
+                info.healthMult *= info.modifier.health;
+                info.damageMult *= info.modifier.damage;
+                info.speedMult *= info.modifier.speed;
+                info.rewardMult *= info.modifier.reward;
+            }
             info.xp = Mathf.Max(1, Mathf.RoundToInt(info.budget * 6f * gs.AlarmBonus(p)));
             var rng = new System.Random(PlanetSeed(p.AuthoredId ?? p.Id) ^ (info.waveNumber * 7919));
             info.aliens = f.Build(gs.db.enemies, info.waveNumber, info.budget, rng);
@@ -130,6 +139,7 @@ namespace Frontier
                 Vector2 viewport = UnityEngine.Random.value < 0.5f ? new Vector2(-0.06f, edge) : new Vector2(1.06f, edge);
                 float depth = Vector3.Dot(planetView.Spin.position - cam.transform.position, cam.transform.forward);
                 var pos = cam.ViewportToWorldPoint(new Vector3(viewport.x, viewport.y, depth));
+                gs.RecordAtlasEnemySeen(e);
                 AlienActor.Spawn(e, Current.healthMult, pos, this);
                 Spawned++;
                 yield return new WaitForSeconds(interval * UnityEngine.Random.Range(0.6f, 1.3f));
@@ -263,7 +273,7 @@ namespace Frontier
             Fx.Ripple(world, col, 0.9f, 0.3f);
             if (best != null)
             {
-                Fx.Bolt(Vector3.zero, best.transform.position, col, 0.09f, 0.18f);
+                Fx.Bolt(world, best.transform.position, col, 0.09f, 0.18f);
                 Sfx.Zap();
                 best.Damage(gs.TapDamage);
             }
@@ -296,6 +306,14 @@ namespace Frontier
             foreach (var a in new List<AlienActor>(AlienActor.All)) if (a != null) a.Die();
 
             var result = new WaveResult { victory = victory, wave = Current };
+            if (planetView != null)
+            {
+                var resultColor = victory
+                    ? new Color(0.35f, 2f, 1.8f, 1f)
+                    : new Color(2.4f, 0.26f, 0.18f, 1f);
+                Fx.Ripple(Center, resultColor, Mathf.Max(1.5f, ImpactRadius * 1.2f), 0.55f);
+                Fx.Burst(Center, resultColor, 20, 2.4f, 0.12f);
+            }
             if (victory)
             {
                 foreach (var r in Current.reward)

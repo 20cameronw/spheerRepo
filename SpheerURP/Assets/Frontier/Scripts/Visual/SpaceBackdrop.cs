@@ -22,7 +22,7 @@ namespace Frontier
             public float bright, spd, nebMul, rushRate, rushSpeed, flicker;
         }
 
-        readonly System.Collections.Generic.List<Material> nebMats = new System.Collections.Generic.List<Material>();
+        readonly System.Collections.Generic.List<MeshRenderer> nebRenderers = new System.Collections.Generic.List<MeshRenderer>();
         ParticleSystem rush;
         Mood cur, target;
         Color baseBg;
@@ -133,7 +133,7 @@ namespace Frontier
                 nebulae[i].localPosition += new Vector3(Mathf.Sin(t * 0.07f + i * 2f), Mathf.Cos(t * 0.05f + i), 0f) * 0.15f * cur.spd * dt;
                 Color nc = i % 2 == 0 ? cur.neb1 : cur.neb2;
                 float m = cur.nebMul * boost;
-                nebMats[i].SetColor("_Color", new Color(nc.r * m, nc.g * m, nc.b * m, nc.a));
+                FxTransientPool.SetColor(nebRenderers[i], new Color(nc.r * m, nc.g * m, nc.b * m, nc.a));
             }
             if (shooting != null && t > nextShoot && !Warping)
             {
@@ -210,7 +210,7 @@ namespace Frontier
             var q = Fx.GlowQuad(transform, c, size, pos);
             q.name = "Nebula";
             nebulae.Add(q.transform);
-            nebMats.Add(q.GetComponent<MeshRenderer>().sharedMaterial);
+            nebRenderers.Add(q.GetComponent<MeshRenderer>());
         }
 
         void BuildRush()

@@ -295,6 +295,68 @@ namespace Frontier.Economy.Tests
             Assert.Throws<KeyNotFoundException>(() => t.Get("no.such.key"));
         }
 
+        [Test]
+        public void TryApplyOverrides_AcceptsLegalBounds_AndUsesInvariantCulture()
+        {
+            Tuning t = Tuning.CreateDefault();
+            TuningEntry entry = t.EntryAt(IndexOf(t, "cost.scale.structure"));
+            TuningEntry timeScale = t.EntryAt(IndexOf(t, "time.scale"));
+            var overrides = new Dictionary<string, string>
+            {
+                { "cost.scale.structure", entry.min.ToString(System.Globalization.CultureInfo.InvariantCulture) },
+                { "time.scale", timeScale.max.ToString(System.Globalization.CultureInfo.InvariantCulture) },
+                { "score.world_base", "1.25" }
+            };
+
+            Tuning effective;
+            string error;
+            Assert.IsTrue(t.TryApplyOverrides(overrides, out effective, out error), error);
+            Assert.AreEqual(entry.min, effective.Get("cost.scale.structure"));
+            Assert.AreEqual(timeScale.max, effective.Get("time.scale"));
+            Assert.AreEqual(1.25f, effective.Get("score.world_base"));
+            Assert.AreEqual(entry.defaultValue, t.Get("cost.scale.structure"), "the source tuning is unchanged");
+            Assert.AreNotEqual(t.Digest(), effective.Digest());
+        }
+
+        [TestCase("unknown.key", "1")]
+        [TestCase("score.world_base", "not-a-number")]
+        [TestCase("score.world_base", "NaN")]
+        [TestCase("score.world_base", "Infinity")]
+        public void TryApplyOverrides_RejectsInvalidSetWithoutPartialChanges(string key, string value)
+        {
+            Tuning t = Tuning.CreateDefault();
+            Tuning original = t.Clone();
+            var overrides = new Dictionary<string, string>
+            {
+                { "cost.scale.structure", "2" },
+                { key, value }
+            };
+
+            Tuning effective;
+            string error;
+            Assert.IsFalse(t.TryApplyOverrides(overrides, out effective, out error));
+            Assert.IsNotEmpty(error);
+            Assert.AreEqual(original.Digest(), effective.Digest(), "failure returns the unmodified local tuning");
+            Assert.AreEqual(original.Digest(), t.Digest(), "failure does not mutate the source");
+        }
+
+        [Test]
+        public void TryApplyOverrides_RejectsValuesOutsideLegalBounds()
+        {
+            Tuning t = Tuning.CreateDefault();
+            TuningEntry entry = t.EntryAt(IndexOf(t, "score.world_base"));
+            foreach (float value in new float[] { entry.min - 1f, entry.max + 1f })
+            {
+                Tuning effective;
+                string error;
+                Assert.IsFalse(t.TryApplyOverrides(
+                    new Dictionary<string, string> { { entry.key, value.ToString(System.Globalization.CultureInfo.InvariantCulture) } },
+                    out effective, out error));
+                Assert.IsNotEmpty(error);
+                Assert.AreEqual(t.Digest(), effective.Digest());
+            }
+        }
+
         static int IndexOf(Tuning t, string key)
         {
             for (int i = 0; i < t.Count; i++) if (t.EntryAt(i).key == key) return i;

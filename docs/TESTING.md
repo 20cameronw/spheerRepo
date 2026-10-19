@@ -16,6 +16,32 @@ source files feed both (see below), so there is nothing to keep in sync.
 
 ## Running everything locally (Windows PowerShell)
 
+### Android device-test build
+
+`tools\build-android.ps1` creates a **development APK**, not a signed store release. Install this Unity
+version's Android Build Support, SDK/NDK and OpenJDK in Unity Hub first. It builds only the fresh Frontier
+scene, validates bundled localization/audio and safe notification settings, and uses existing application
+identifiers and debug signing. It never configures live providers, purchases or release credentials.
+Custom keystores are deliberately rejected; APK output must be a new path and is never overwritten.
+The Unity process shares the existing batch mutex/watchdog; temporary APK/export choices are restored.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build-android.ps1 -Output .\Builds\Frontier-device-001.apk
+```
+
+Install the resulting artifact manually on a test device. A successful build alone does not certify
+notification permission/delivery, audio/touch/haptics, offline timing, thermal/memory budgets, store receipt
+validation, signing or release readiness. Do not submit this development artifact to a store.
+The build log reports the actual APK file length separately from Unity's aggregate build size, which may
+include unshipped native debugging/symbol output. The wrapper also checks that the APK exists and is
+nonempty, then prints its byte length and SHA-256 for transfer/integrity checks.
+
+**First native development build (2026-10-19):** Android IL2CPP/arm64 succeeded; APK length
+51,992,897 bytes (49.6 MiB), minimum API 25 / target API 36, APK Signature Scheme v2 verified.
+The current development package is `com.GameDevBois.SpheerURP`; final store identifiers are still unapproved.
+Manifest inspection found Internet/network/vibration/post-notification permissions, no exact-alarm or
+advertising-ID permission. No physical-device installation or store signing was performed.
+
 Script execution is usually disabled by policy, so prefix scripts with `powershell -NoProfile -ExecutionPolicy Bypass -File`.
 
 ```powershell
@@ -68,7 +94,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-tests.ps1 -Platfor
 
 The runtime coverage check now follows raw resource definitions instead of requiring harvestable fuel. `ProgressionContentTests`
 verify research spending/save-load, supported tool-tier yield/level/save-load, invalid-entry handling, and preservation through a
-legacy-content fallback. Builder/timer jobs, Atlas discovery/rewards and unsupported tool minigames still need their separate wiring.
+legacy-content fallback. Builder/timer jobs and unsupported tool minigames still need their separate wiring. Focused Atlas encounter coverage verifies that the first actual alien spawn is recorded once, grants no unspecified reward and survives save/reload; resource-location samples and missing-cost navigation are present. `StorageTests;EconomyRuntimeTests` cover local storage capacity, stack/conservation edges, category-filtered quick transfers, Cargo Depot pooling/exclusions, same-system relay energy payment and upgraded remote range; the focused run passed 45 tests. Atlas/cost-navigation regression across economy, storage, progression and save round-trips passed 60 tests; all five Atlas phone captures linted cleanly.
+
+`FxBurstPoolTests` checks reuse of the particle, bolt and ripple pools, and verifies that multiple `GlowQuad` renderers retain independent tints while sharing the cached material. Run the focused PlayMode regression with:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform PlayMode -TestFilter FxBurstPoolTests
+```
+
+Saved map pins and surveyed-system history are covered by `SaveRoundTripTests`; compact map-discovery bitsets are tested for legacy-ID migration and multi-index sectors. `MapQueryTests` verifies that previously discovered systems remain surveyable for resource filters. The bootstrap smoke test opens the live map, checks that the home system is recorded, pins the selected world and verifies its destination entry appears.
+
+`HyperspaceView.SetupTests` verifies the route duration reaches the run setup, and `Hyperspace.DirectorTests` checks requested run lengths and the minimum boss encounter window. The legacy distance-based duration remains covered by `RouteDurationGrowsFromTwentySecondsToNinety`.
 
 **Cutover validation (2026-10-13):** final full EditMode including Slow: 535 passed / 2 Mono-only allocation probes skipped;
 PlayMode: 19 passed; all five editor suites (Planet, Storage, Combat, Icon, Layout) passed with zero compile diagnostics;
@@ -77,6 +113,109 @@ assumptions; the tests now follow the selected raw table and provision enough ba
 No new screenshot sweep or on-device/IL2CPP run was performed for this bounded milestone.
 
 ## Screenshot harness acceptance
+
+### Harvest rule and bot regressions
+
+`NodeHarvestRun`, `DrillHarvestRun`, `SiphonHarvestRun`, `ExcavationHarvestRun` and `SalvageHarvestRun` live in `Frontier.Core`
+and drive all six actual harvest games, not separate test-only simulations. Their tests are linked into the .NET test project
+and also run under Unity Mono. They cover the
+existing damage/yield rules, rejected cooldown spam, stage overkill, tool scaling, bounded bot completion, deterministic
+replays, pressure/contact and invalid inputs. `MinigameFlowTests` also drives the rendered games through completion,
+verifies paused input is ignored, and waits for explicit collection before the exactly-once result callback.
+The common harvest input gate also rejects input before scene readiness, after completion and after stage cleanup.
+
+```powershell
+dotnet test .\tests\Frontier.Core.Tests\Frontier.Core.Tests.csproj --filter "FullyQualifiedName~HarvestRun"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -TestFilter "NodeHarvestRunTests;DrillHarvestRunTests;HarvestRunsTests"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform PlayMode -TestFilter MinigameFlowTests
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "game-chop,game-mine,game-drill,minigame-result,minigame-drill-result"
+```
+
+The drill screenshot cases locate a real generated drilling deposit. A missing deposit or failed game start is an error,
+not a passing screenshot of the world HUD. Siphon bots respect timing/cooldown, excavation bots solve using only Manhattan
+echo feedback across 64 seeds, and salvage bots cover captures, misses and partial/zero yield. Rendered bots cover all six
+games, shared tool/cooldown feedback and the excavation grid's visual reset between seams. These are numerical/action-path
+bots, not automatic screen-space aiming or a substitute for touch usability and on-device performance checks.
+
+`HarvestFeedbackTests` verifies that all harvest cue/tool combinations reuse warmed clips, real playback stays within
+the ten-source voice pool, and destroyed audio hosts are treated as uninitialised. It also checks that the haptics request
+hook is independent of audio mute and does not request vibration on misses, glances, sonar clues or cooldown spam.
+`HarvestHaptics` subscribes on enable and unsubscribes on disable/destruction; it shares the audio camera's lifecycle.
+The persisted `fr_haptics` preference defaults off and is independent of sound. `HapticPulseTests` covers support/opt-in,
+120ms minimum cadence, zero-strength rejection, focus/disable cancellation, disposal and preference restoration.
+Android uses a cached vibrator service with short `VibrationEffect` pulses (legacy short-pulse fallback before API 26).
+The build hook adds `android.permission.VIBRATE` idempotently without replacing the generated manifest. iOS uses
+`UIImpactFeedbackGenerator` and hardware capability detection; the build hook links UIKit/CoreHaptics.
+Editor/desktop support is explicitly false, and Settings explains why its control is disabled.
+Both managed runtime branches and platform build hooks compile against the installed Unity modules, but that is not a
+native iOS build, Android device run or physical haptics verification. Check focus loss, app suspension, opt-out,
+hardware capability, pulse strength/cadence and OS-level settings on real devices before release.
+The live games use procedural cached audio cues; device audio-quality checks remain required.
+
+`FxBurstPoolTests` waits for burst, bolt and ripple effects to expire, then verifies the next effect reuses the warmed
+particle system or transient object rather than growing its pool. `GlowQuad` uses shared cached materials with
+per-renderer tint but still creates persistent scene objects; prefab-based authoring and native-device performance remain separate work.
+
+Empty-state navigation is covered by rendered smoke cases for backpacks, undeveloped bases, empty storage and relays
+without remote sources. Routes must open a real gatherer/shop/map and never grant resources. The `pack-empty` capture
+snapshots and restores every carried resource in `finally`; capture it together with a later `menu-settings` shot on
+both phone profiles to detect fixture leakage. After this slice the full PlayMode suite passed 32 cases and Layout
+passed; four captures had no errors, overflow, undersized text or undersized touch targets.
+Result tests poll for the actual scheduled panel with a five-second deadline, not a fixed post-animation timing margin.
+
+### Presentation budgets and live eras
+
+`PresentationBudgetTests` covers mobile hardware boundaries (including unknown memory), explicit preset limits,
+portrait/landscape/hardware texture caps, aspect rounding, no upscaling and invalid input. `PresentationQualityTests`
+checks persisted choices, immediate frame targets, authored frame caps and explicit recovery from corrupt preferences.
+Rendered smoke coverage submits the actual Settings controls and checks the live camera plus real harvest/travel RTs.
+The `quality-low-*` captures preserve and restore preference presence/values, so later shots/devices do not inherit Low.
+These checks do not certify physical-device fps, thermals, memory or battery usage.
+
+`EraRulesTests` verifies all six simulator/live era gates, compound requirements and simulator milestone identities.
+`EraProgressionTests` covers actual landing/lab/upgrade facts, a permanent reached-era high-water mark even after losing
+a project, save/reload/reset, old v2 saves without a marker and crafting proof versus merely owning antimatter.
+Inference and reload grant no retroactive premium currency. The rendered bootstrap case opens the Ranks goal card and
+submits its actual next-era map action.
+
+After live-era integration the full engine-free suite passed 433 cases; full Unity EditMode passed 684 with two
+runtime-specific allocation probes skipped; full PlayMode passed 33. All five editor checks passed. Final phone captures
+include Ranks and restored/Low Settings, with all overflow/text/touch thresholds checked explicitly.
+
+### One-time objectives and achievements
+
+`ObjectiveLedgerTests` covers duplicate normalization, malformed records, unknown-id preservation, historical baselines,
+exactly-once claims and snapshot isolation. `AchievementRewardsTests` uses the existing small/medium/large tuning and
+rejects unbudgeted or recurring ids. `ObjectiveProgressionTests` checks the authored 26-entry/275-shard lifetime budget,
+real facts, unfinished/offline construction, atomic reward/ledger persistence, old saves, reload/reset, lost evidence,
+read-only saves, a full wallet and explicit failed-write/retry handling without duplicate payment.
+`SmokeTests.Goals_CollectsRealReward_AndRoutesToTheBuildShop` submits actual UI controls.
+
+Post-objectives full regression: 444 engine-free cases; 705 Unity EditMode passed with two runtime-specific allocation
+skips; 34 PlayMode passed; all five editor checks passed. Four initial Goals/Ranks phone captures plus two final Goals
+captures have zero errors, overflowing elements, sub-12dp text or sub-48dp controls. Both phone widths were inspected.
+These goals introduce no new recurring/time-trusted reward path; the full economy simulator/band tests remain green.
+
+### First-session guidance and funnel regressions
+
+`FirstSessionFunnelTests` checks baseline vs. completed objectives, per-observation high-water deduplication, skip/reset,
+provider failures, and consent withdrawal/regrant. No events are queued while consent or configuration is unavailable,
+and an initial observation of an existing save does not invent historical completions. Only stable step/objective fields
+are sent: no save identity, world coordinates, names or resources. The external analytics provider remains unconfigured.
+`SmokeTests.FirstSessionCues_PointToLiveActions_AndRespectSkipAndAffordability` exercises the real guide actions and
+build/harvest/craft/wave UI, including one pointer per panel, disabled-action suppression and guide dismissal.
+Pointers are static and non-interactive; guide actions select existing local structures through the normal world-tap path.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -TestFilter "FirstSessionFunnelTests;ServicesTests"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform PlayMode -TestFilter FirstSessionCues
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only guide-cue
+```
+
+Guide capture fixtures activate the real guide action and require the expected pointer to exist. A failed setup cannot
+silently pass with a screenshot of the underlying HUD.
+
+### Visual acceptance
 
 `tools/capture-screens.ps1` is the visual gate for anything that draws. A run is accepted when it reports **0 errors** (an exception
 inside a shot's setup is recorded, and counted, per device and shot in `report.json`) and the UI lint is **0 / 0 / 0** on all four

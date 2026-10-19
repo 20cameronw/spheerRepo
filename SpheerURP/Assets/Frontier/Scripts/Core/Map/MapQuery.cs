@@ -28,8 +28,99 @@ namespace Frontier
     {
         public MapDensityCell[] density;
         public StarSystem[] systems;
+        public StarSystem[] surveyedSystems;
         public GalaxyInfo[] galaxies;
         public bool densityOnly, truncated;
+    }
+
+    /// <summary>Exact-name lookup for authored and surveyed destinations only.</summary>
+    public sealed class MapNameIndex
+    {
+        readonly Dictionary<string, string> planetIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        public static MapNameIndex Build(Uni universe, IEnumerable<string> discoveredSystemIds, IEnumerable<string> pinnedPlanetIds = null)
+        {
+            if (universe == null) throw new ArgumentNullException(nameof(universe));
+            var ids = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var system in universe.AuthoredSystems) ids.Add(system.Id);
+            if (discoveredSystemIds != null)
+                foreach (string id in discoveredSystemIds)
+                    if (!string.IsNullOrEmpty(id)) ids.Add(id);
+
+            var systems = new List<StarSystem>(ids.Count);
+            foreach (string id in ids)
+            {
+                StarSystem system;
+                if (universe.TryGetSystemById(id, out system)) systems.Add(system);
+            }
+            var result = new MapNameIndex();
+            result.AddSystems(universe, systems);
+            result.AddPlanets(universe, pinnedPlanetIds);
+            return result;
+        }
+
+        public void AddSystems(Uni universe, IEnumerable<StarSystem> systems)
+        {
+            if (universe == null) throw new ArgumentNullException(nameof(universe));
+            if (systems == null) return;
+            foreach (StarSystem system in systems)
+            {
+                if (system == null) continue;
+                StarSystem known;
+                if (!universe.TryGetSystem(system.Key, out known) || known.Id != system.Id) continue;
+                PlanetDescriptor[] planets = universe.PlanetsOf(known);
+                if (planets.Length == 0) continue;
+                AddName(known.Name, planets[0].Id);
+                AddName(known.Designation, planets[0].Id);
+                AddName(known.Id, planets[0].Id);
+                foreach (PlanetDescriptor planet in planets) AddPlanet(planet);
+            }
+        }
+
+        void AddPlanets(Uni universe, IEnumerable<string> planetIds)
+        {
+            if (planetIds == null) return;
+            foreach (string id in planetIds)
+            {
+                PlanetKey key;
+                PlanetDescriptor planet;
+                if (PlanetKey.TryParse(id, out key) && universe.TryGetPlanet(key, out planet))
+                {
+                    AddPlanet(planet);
+                    StarSystem system;
+                    if (universe.TryGetSystem(key.System, out system))
+                    {
+                        AddName(system.Name, planet.Id);
+                        AddName(system.Designation, planet.Id);
+                        AddName(system.Id, planet.Id);
+                    }
+                }
+            }
+        }
+
+        void AddPlanet(PlanetDescriptor planet)
+        {
+            AddName(planet.Name, planet.Id);
+            AddName(planet.Designation, planet.Id);
+            AddName(planet.Id, planet.Id);
+            AddName(planet.AuthoredId, planet.Id);
+        }
+
+        public bool TryFind(string name, out string planetId)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                planetId = null;
+                return false;
+            }
+            return planetIds.TryGetValue(name.Trim(), out planetId);
+        }
+
+        void AddName(string name, string planetId)
+        {
+            if (!string.IsNullOrWhiteSpace(name) && !planetIds.ContainsKey(name))
+                planetIds.Add(name, planetId);
+        }
     }
 
     /// <summary>Bounded, engine-free map sampling. Call on a worker; no Unity objects or session state are accessed.</summary>
@@ -51,7 +142,12 @@ namespace Frontier
 
         public static bool Surveyed(StarSystem star, MapSurveyPoint[] centers)
         {
-            if (star.IsAuthored) return true;
+            return Surveyed(star, centers, null);
+        }
+
+        public static bool Surveyed(StarSystem star, MapSurveyPoint[] centers, ISet<string> discovered)
+        {
+            if (star.IsAuthored || (discovered != null && discovered.Contains(star.Id))) return true;
             foreach (var center in centers)
             {
                 double dx = star.X - center.x, dy = star.Y - center.y;
@@ -69,6 +165,13 @@ namespace Frontier
 
         public static MapSnapshot Build(Uni universe, double x0, double y0, double x1, double y1, string resource, MapSurveyPoint[] centers)
         {
+            return Build(universe, x0, y0, x1, y1, resource, centers, new string[0]);
+        }
+
+        public static MapSnapshot Build(Uni universe, double x0, double y0, double x1, double y1, string resource,
+            MapSurveyPoint[] centers, string[] discoveredSystemIds)
+        {
+            var discovered = new HashSet<string>(discoveredSystemIds ?? new string[0], StringComparer.Ordinal);
             double width = x1 - x0, height = y1 - y0;
             var result = new MapSnapshot { density = new MapDensityCell[Columns * Rows] };
             var galaxies = new List<GalaxyInfo>();
@@ -87,10 +190,14 @@ namespace Frontier
             else
                 foreach (var star in universe.AuthoredSystems)
                     if (star.X >= x0 && star.X <= x1 && star.Y >= y0 && star.Y <= y1) systems.Add(star);
+            var surveyedSystems = new List<StarSystem>();
+            foreach (var star in systems)
+                if (Surveyed(star, centers)) surveyedSystems.Add(star);
+            result.surveyedSystems = surveyedSystems.ToArray();
             if (!string.IsNullOrEmpty(resource))
                 systems.RemoveAll(star =>
                 {
-                    if (!Surveyed(star, centers)) return true;
+                    if (!Surveyed(star, centers, discovered)) return true;
                     foreach (var world in universe.PlanetsOf(star)) if (world.HasResource(resource)) return false;
                     return true;
                 });

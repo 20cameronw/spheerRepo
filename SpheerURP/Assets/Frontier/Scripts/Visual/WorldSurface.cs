@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Frontier
 {
@@ -36,7 +37,7 @@ namespace Frontier
         readonly List<Item> obstacles = new List<Item>();
         string signature = "";
         string obstacleSignature = "";
-        static Font font;
+        PanelSettings labelPanel;
         static Shader litShader;
         Material outlineMaterial;
 
@@ -49,10 +50,16 @@ namespace Frontier
             public int slot;
             public float phase;
             public Transform glow;
-            public Renderer labelRenderer;
+            public VisualElement labelElement;
             public bool orbit;
             public readonly List<Renderer> outlines = new List<Renderer>();
             public readonly List<Material> materials = new List<Material>();
+            public Transform visual, scan;
+            public string revision;
+            public int level;
+            public bool pending;
+            public float momentAt = -10f;
+            public bool buildIn;
         }
 
         // drag state
@@ -65,6 +72,7 @@ namespace Frontier
             view = pv; cam = camera; gs = state;
             view.Rebuilt += OnPlanet;
             gs.Changed += OnChanged;
+            PresentationQuality.Changed += ApplyLabelBudget;
             if (view.Spin != null) OnPlanet(view.Current);
         }
 
@@ -72,7 +80,9 @@ namespace Frontier
         {
             if (view != null) view.Rebuilt -= OnPlanet;
             if (gs != null) gs.Changed -= OnChanged;
+            PresentationQuality.Changed -= ApplyLabelBudget;
             ClearAll();
+            if (labelPanel != null) Destroy(labelPanel);
             if (outlineMaterial != null) Destroy(outlineMaterial);
         }
 
@@ -168,15 +178,49 @@ namespace Frontier
                         .Append(':').Append(s.record.pendingUpgradeLevel);
             string sig = sb.ToString();
             if (sig == signature) return;
+            bool liveChange = signature != null;
             signature = sig;
-            for (int i = items.Count - 1; i >= 0; i--)
-                if (items[i].structure != null) { DestroyItem(items[i]); items.RemoveAt(i); }
+            var previous = new Dictionary<int, Item>();
+            foreach (var item in items) previous.Add(item.slot, item);
+            items.Clear();
             foreach (var s in gs.structures)
             {
                 if (s.planetId != gs.planet.Id) continue;
-                items.Add(MakeStructure(s));
+                string revision = StructureRevision(s);
+                previous.TryGetValue(s.slot, out var old);
+                if (old != null && old.revision == revision)
+                {
+                    old.structure = s;
+                    items.Add(old);
+                    previous.Remove(s.slot);
+                    continue;
+                }
+                var item = MakeStructure(s);
+                items.Add(item);
+                if (liveChange)
+                {
+                    bool completed = old != null && old.pending && !item.pending;
+                    bool upgraded = old != null && item.level > old.level;
+                    if (old == null || completed || upgraded)
+                    {
+                        item.momentAt = Time.unscaledTime;
+                        item.buildIn = old == null;
+                        Vector3 position = item.t.TransformPoint(Vector3.up * 0.35f);
+                        Color color = completed ? new Color(0.5f, 2f, 1f) : s.def.color;
+                        Fx.Ripple(position, color, completed ? 1.8f : 1.1f, 0.6f);
+                        Fx.Burst(position, color, completed ? 18 : 10, 1.4f, 0.1f);
+                    }
+                }
+                if (old != null) { DestroyItem(old); previous.Remove(s.slot); }
             }
+            foreach (var old in previous.Values) DestroyItem(old);
             if (buildMode) RebuildPads();
+        }
+
+        static string StructureRevision(PlacedStructure s)
+        {
+            return s.def.id + ":" + s.level + ":" + s.record.buildEndUtc + ":" +
+                s.record.upgradeEndUtc + ":" + s.record.pendingUpgradeLevel;
         }
 
         void RebuildPads()
@@ -199,7 +243,7 @@ namespace Frontier
                 ring.GetComponent<MeshRenderer>().sharedMaterial = Fx.AddMat(new Color(0.2f, 2.2f, 2.4f, 1f), Fx.Ring);
                 ring.AddComponent<Billboard>();
                 it.glow = Fx.GlowQuad(it.t, new Color(0.1f, 1f, 1.1f, 0.6f), 1.6f, new Vector3(0f, 0.18f, 0f)).transform;
-                it.label = MakeLabel(it.t, "+", new Color(0.4f, 1f, 1f), 0.6f, 0.55f, out it.labelRenderer);
+                it.label = MakeLabel(it.t, "+", new Color(0.4f, 1f, 1f), 0.6f, true, out it.labelElement);
                 pads.Add(it);
             }
         }
@@ -212,8 +256,20 @@ namespace Frontier
             foreach (var obstacle in generated) sb.Append('|').Append(obstacle.pad).Append(':').Append(obstacle.kind);
             string sig = sb.ToString();
             if (sig == obstacleSignature) return;
+            bool liveChange = obstacleSignature != null;
             obstacleSignature = sig;
-            foreach (var item in obstacles) DestroyItem(item);
+            foreach (var item in obstacles)
+            {
+                bool remains = false;
+                foreach (var obstacle in generated) if (obstacle.pad == item.slot) { remains = true; break; }
+                if (liveChange && !remains && item.t != null)
+                {
+                    Vector3 position = item.t.TransformPoint(Vector3.up * 0.2f);
+                    Fx.Burst(position, new Color(2f, 0.9f, 0.2f), 18, 2f, 0.12f);
+                    Fx.Ripple(position, new Color(1f, 0.65f, 0.25f), 1.4f, 0.5f);
+                }
+                DestroyItem(item);
+            }
             obstacles.Clear();
             foreach (var obstacle in generated)
                 obstacles.Add(MakeObstacle(obstacle));
@@ -237,8 +293,13 @@ namespace Frontier
         {
             var it = NewItem(s.slot, "Struct_" + s.def.id);
             it.structure = s;
+            it.revision = StructureRevision(s);
+            it.level = s.level;
+            it.pending = !string.IsNullOrEmpty(s.record.buildEndUtc) || !string.IsNullOrEmpty(s.record.upgradeEndUtc);
+            it.visual = new GameObject("StructureVisualRoot").transform;
+            it.visual.SetParent(it.t, false);
             Color c = s.def.color;
-            var model = SpawnModel(s.def.modelKey, it.t, 0.75f);
+            var model = SpawnModel(s.def.modelKey, it.visual, 0.75f);
             if (model == null)
             {
                 var visual = new GameObject("StructureVisual");
@@ -249,7 +310,7 @@ namespace Frontier
                     float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
                     float scale = 0.75f / Mathf.Max(0.0001f, diameter);
                     visual.transform.localScale = Vector3.one * scale;
-                    visual.transform.SetParent(it.t, false);
+                    visual.transform.SetParent(it.visual, false);
                     visual.transform.localPosition = new Vector3(-bounds.center.x, -bounds.min.y, -bounds.center.z) * scale;
                 }
                 else
@@ -259,11 +320,27 @@ namespace Frontier
                 }
             }
             PrepareStructure(it, c);
+            if (it.pending)
+            {
+                var scan = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                Destroy(scan.GetComponent<Collider>());
+                scan.name = "ConstructionScan";
+                scan.transform.SetParent(it.t, false);
+                scan.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                scan.transform.localScale = Vector3.one;
+                var scanMaterial = Fx.AddMat(new Color(0.2f, 1.4f, 2f), Fx.Ring);
+                scan.GetComponent<MeshRenderer>().sharedMaterial = scanMaterial;
+                it.materials.Add(scanMaterial);
+                it.scan = scan.transform;
+                foreach (var material in it.materials)
+                    if (material.HasProperty("_BaseColor"))
+                        material.SetColor("_BaseColor", Color.Lerp(material.GetColor("_BaseColor"), new Color(0.1f, 0.6f, 0.8f), 0.65f));
+            }
             if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
-            string label = gs.IsUnderConstruction(s) ? s.def.displayName.ToUpper() + "  BUILDING"
-                : gs.IsUpgradeInProgress(s) ? s.def.displayName.ToUpper() + "  UPGRADING"
-                : s.def.displayName.ToUpper() + "  LV" + s.level;
-            it.label = MakeLabel(it.t, label, Fx.Displayable(c), 1.0f, 0.34f, out it.labelRenderer);
+            string label = UiText.Get(gs.IsUnderConstruction(s) ? "world.label.building"
+                : gs.IsUpgradeInProgress(s) ? "world.label.upgrading" : "world.label.level",
+                s.def.displayName.ToUpper(), s.level);
+            it.label = MakeLabel(it.t, label, Fx.Displayable(c), 1.0f, false, out it.labelElement);
             it.phase = s.slot * 0.4f;
             it.orbit = s.def.kind == StructureKind.Satellite || s.def.kind == StructureKind.WarpGate ||
                 s.def.kind == StructureKind.DysonCollector;
@@ -478,24 +555,45 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ labels
-        Transform MakeLabel(Transform parent, string text, Color color, float height, float size, out Renderer renderer)
+        Transform MakeLabel(Transform parent, string text, Color color, float height, bool pad, out VisualElement element)
         {
-            if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            if (labelPanel == null)
+            {
+                labelPanel = ScriptableObject.CreateInstance<PanelSettings>();
+                labelPanel.name = "Frontier World Labels";
+                labelPanel.renderMode = PanelRenderMode.WorldSpace;
+                labelPanel.scaleMode = PanelScaleMode.ConstantPixelSize;
+                labelPanel.themeStyleSheet = Resources.Load<ThemeStyleSheet>("Frontier/FrontierTheme");
+                ApplyLabelBudget();
+            }
             var go = new GameObject("Label");
+            go.SetActive(false);
             go.transform.SetParent(parent, false);
             go.transform.localPosition = new Vector3(0f, height, 0f);
-            var tm = go.AddComponent<TextMesh>();
-            tm.font = font;
-            tm.text = text;
-            tm.fontSize = 64;
-            tm.characterSize = size * 0.1f;
-            tm.anchor = TextAnchor.MiddleCenter;
-            tm.alignment = TextAlignment.Center;
-            tm.color = color;
-            renderer = go.GetComponent<MeshRenderer>();
-            renderer.sharedMaterial = font.material;
+            var document = go.AddComponent<UIDocument>();
+            document.panelSettings = labelPanel;
+            document.worldSpaceSizeMode = UIDocument.WorldSpaceSizeMode.Dynamic;
+            go.SetActive(true);
+            element = document.rootVisualElement;
+            element.pickingMode = PickingMode.Ignore;
+            foreach (var path in new[] { "Frontier/Tokens", "Frontier/Frontier" })
+            {
+                var sheet = Resources.Load<StyleSheet>(path);
+                if (sheet == null) Debug.LogError("Frontier: world label stylesheet is missing: " + path, this);
+                else element.styleSheets.Add(sheet);
+            }
+            element.AddToClassList("fr-root");
+            element.AddToClassList(pad ? "fr-world-pad" : "fr-world-label");
+            var caption = new Label(text) { pickingMode = PickingMode.Ignore };
+            caption.style.color = color;
+            element.Add(caption);
             go.AddComponent<Billboard>();
             return go.transform;
+        }
+
+        void ApplyLabelBudget()
+        {
+            if (labelPanel != null) PresentationQuality.ApplyPanelBudget(labelPanel);
         }
 
         // ------------------------------------------------------------ frame
@@ -567,17 +665,28 @@ namespace Frontier
                 }
                 bool facing = Visible(ProbePoint(it));
                 bool selected = Selected != null && Selected == it.t;
-                foreach (var outline in it.outlines) outline.enabled = selected && !Locked;
+                float age = Time.unscaledTime - it.momentAt;
+                bool moment = age >= 0f && age < 0.65f;
+                foreach (var outline in it.outlines) outline.enabled = (selected && !Locked) || it.pending || moment;
+                if (it.visual != null)
+                {
+                    float t = Mathf.Clamp01(age / 0.65f);
+                    float size = moment ? (it.buildIn ? 1f - 0.85f * Mathf.Pow(1f - t, 3f) : 1f + 0.12f * Mathf.Sin(t * Mathf.PI)) : 1f;
+                    it.visual.localScale = Vector3.one * size;
+                }
+                if (it.scan != null)
+                    it.scan.localPosition = new Vector3(0f, 0.1f + 0.65f * Mathf.Repeat(Time.unscaledTime * 0.65f + it.phase, 1f), 0f);
                 float bob = 0.04f * Mathf.Sin(Time.time * 2.2f + it.phase);
                 if (it.label != null)
                 {
                     it.label.localPosition = new Vector3(0f, (it.structure != null ? 1.0f : 0.6f) + bob, 0f);
-                    it.labelRenderer.enabled = facing && !Locked && (it.structure == null || ShowStructureLabels || selected);
+                    bool show = facing && !Locked && (it.structure == null || ShowStructureLabels || selected);
+                    it.labelElement.style.visibility = show ? Visibility.Visible : Visibility.Hidden;
                 }
                 if (it.glow != null)
                 {
                     float k = 1f + 0.12f * Mathf.Sin(Time.time * 3f + it.phase);
-                    it.glow.localScale = Vector3.one * (it.structure != null ? 1.8f : 1.6f) * k;
+                    FxTransientPool.SetGlowQuadSize(it.glow, (it.structure != null ? 1.8f : 1.6f) * k);
                     it.glow.gameObject.SetActive(facing);
                 }
             }
@@ -649,13 +758,16 @@ namespace Frontier
             else if (SlotTapped != null) SlotTapped(it.slot, it.t);
         }
 
-        /// <summary>Taps a placed structure exactly as a finger would (harness and tests).</summary>
-        public bool SimulateTap(PlacedStructure structure)
+        /// <summary>Selects a placed structure from the UI using the same path as a world tap.</summary>
+        public bool SelectStructure(PlacedStructure structure)
         {
             foreach (var it in items)
                 if (it.structure == structure && it.t != null) { Tap(it); return true; }
             return false;
         }
+
+        /// <summary>Taps a placed structure exactly as a finger would (harness and tests).</summary>
+        public bool SimulateTap(PlacedStructure structure) { return SelectStructure(structure); }
 
         /// <summary>Taps a visible obstruction exactly as a finger would (harness and tests).</summary>
         public bool SimulateObstacleTap(int pad)

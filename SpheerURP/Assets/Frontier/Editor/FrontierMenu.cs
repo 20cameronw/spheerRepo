@@ -13,9 +13,14 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Generate Editable Data Assets")]
         public static void Generate()
         {
-            if (File.Exists(Dir + "/GameDatabase.asset") && !Application.isBatchMode &&
-                !EditorUtility.DisplayDialog("Frontier", "A GameDatabase already exists. Overwrite it with defaults?", "Overwrite", "Cancel"))
+            if (!CanGenerateDefaults(Dir + "/GameDatabase.asset", Dir + "/Data", out var reason))
+            {
+                Debug.LogWarning("Frontier: default asset bootstrap stopped without changing assets: " + reason +
+                    " Use Frontier > Economy > Import JSON to update the reviewed economy content.");
+                if (!Application.isBatchMode) EditorUtility.DisplayDialog("Frontier", reason +
+                    "\n\nExisting assets were not changed. Use Frontier > Economy > Import JSON to update reviewed economy content.", "OK");
                 return;
+            }
 
             var db = DefaultContent.Create();
             Directory.CreateDirectory(Dir + "/Data");
@@ -34,6 +39,22 @@ namespace Frontier.EditorTools
             AssetDatabase.SaveAssets();
             Selection.activeObject = db;
             Debug.Log("Frontier: data assets generated in " + Dir);
+        }
+
+        public static bool CanGenerateDefaults(string databasePath, string dataDirectory, out string reason)
+        {
+            if (File.Exists(databasePath))
+            {
+                reason = "A GameDatabase already exists at " + databasePath + ".";
+                return false;
+            }
+            if (Directory.Exists(dataDirectory) && Directory.GetFiles(dataDirectory, "*.asset", SearchOption.AllDirectories).Length > 0)
+            {
+                reason = "Default data assets already exist under " + dataDirectory + ".";
+                return false;
+            }
+            reason = null;
+            return true;
         }
 
         [MenuItem("Frontier/Setup Scene Objects")]

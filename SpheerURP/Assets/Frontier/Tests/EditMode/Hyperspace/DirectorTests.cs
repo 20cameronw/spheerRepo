@@ -186,6 +186,24 @@ namespace Frontier.Hyperspace.Tests
         }
 
         [Test]
+        public void PlannedDurationControlsRunLength_AndBossKeepsItsRequiredSlot()
+        {
+            HyperspaceTuning t = TestEnv.Tuning();
+            ShipStats ship = ShipStats.Starter();
+            RouteSpec ordinary = RouteSpec.Create(new RunParams(1UL, 5f, 0.6f, 0, 1f, RunMode.Normal, 34f), ship, t);
+            Assert.AreEqual(34f, ordinary.duration, 0.01f);
+
+            RouteSpec boss = RouteSpec.Create(new RunParams(1UL, 250f, 3f, 0, 1f, RunMode.Normal, 70f), ship, t);
+            Assert.IsTrue(boss.hasBoss);
+            Assert.AreEqual(70f, boss.duration, 0.01f);
+            Assert.AreEqual(boss.waveEnd + t.bossIntroSeconds, boss.bossStart, 1e-4f);
+
+            RouteSpec shortBoss = RouteSpec.Create(new RunParams(1UL, 250f, 3f, 0, 1f, RunMode.Normal, 30f), ship, t);
+            float minimumBossRun = 16f + t.bossIntroSeconds + t.bossArriveSeconds + t.bossMaxSeconds + t.outroSeconds;
+            Assert.AreEqual(minimumBossRun, shortBoss.duration, 0.01f, "short requests retain enough time for the minimum wave phase and full boss slot");
+        }
+
+        [Test]
         public void DifficultyIsMonotonicInDistanceDangerTierAndPower()
         {
             HyperspaceTuning t = TestEnv.Tuning();

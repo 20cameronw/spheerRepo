@@ -194,7 +194,8 @@ namespace Frontier.EditorTools
             if (db == null) throw new InvalidOperationException("Import economy first");
             var actual = db.ToCatalog();
             var expected = CatalogJson.Read(Reader());
-            var errors = CatalogValidator.Validate(actual);
+            var tuning = db.tuning.Build();
+            var errors = CatalogValidator.Validate(actual, tuning);
             errors.AddRange(ContentDrift.Compare(expected, actual, f =>
                 new[] { "resources", "recipes", "structures", "upgrades", "tools", "research", "obstacles", "habitats", "obstacleRules", "shards", "legacyIds" }.Contains(f)));
             CompareFamily(expected.resources, db.resources, x => x.ToDef(), errors);
@@ -209,7 +210,6 @@ namespace Frontier.EditorTools
             CompareRule(expected.shards, db.shardRules.data, db.shardRules, "data", errors);
             CompareRule(expected.legacyIds, db.legacyIds.rows, db.legacyIds, "rows", errors);
             CompareRule(CatalogJson.ReadScoreFormula(Reader()), db.scoreFormula.data, db.scoreFormula, "data", errors);
-            db.tuning.Build();
             if (!GameDatabase.CanActivate(db, GameDatabase.LoadLegacy(), out var reason))
                 errors.Add("Runtime compatibility: " + reason);
             if (errors.Count > 0) throw new InvalidOperationException("Imported economy invalid:\n" + string.Join("\n", errors.Take(40)));

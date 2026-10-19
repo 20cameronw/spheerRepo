@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.IO;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -20,6 +22,8 @@ namespace Frontier.Tests
         Action<string, Action<bool>> previousOffer;
         int callbacks;
         TravelRunResult result;
+        string saveDirectory, previousSaveDirectory;
+        GameState previousState;
 
         [SetUp]
         public void SetUp()
@@ -34,11 +38,16 @@ namespace Frontier.Tests
             root = doc.rootVisualElement; UiKit.ApplyStyles(root);
             root.style.flexGrow = 1;
             callbacks = 0;
+            previousSaveDirectory = GameState.SaveDirectoryOverride;
+            previousState = GameState.I;
+            saveDirectory = Path.Combine(Application.temporaryCachePath, "hyperspace-revive-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(saveDirectory);
+            GameState.SaveDirectoryOverride = saveDirectory;
         }
 
-        HyperspaceSession Begin(int tier = 0, ulong seed = 1)
+        HyperspaceSession Begin(int tier = 0, ulong seed = 1, GameState state = null)
         {
-            game = new HyperspaceGame(null);
+            game = new HyperspaceGame(state);
             game.Run(root, new TravelRunRequest { seed = seed, tier = tier, distanceLy = tier == 0 ? 5 : 3000,
                 danger = 0.6f + 1.1f * tier, fuelCost = 20 }, r => { callbacks++; result = r; });
             game.Session.DebugFrozen = true;
@@ -51,6 +60,244 @@ namespace Frontier.Tests
             if (game != null && game.Session != null && !game.Session.Closed) game.Session.Close();
             Object.Destroy(host); Object.Destroy(panel);
             TravelPrefs.Store = previousPrefs; TravelMinigames.ReviveOffer = previousOffer;
+            GameState.SaveDirectoryOverride = previousSaveDirectory;
+            GameState.I = previousState;
+            if (Directory.Exists(saveDirectory)) Directory.Delete(saveDirectory, true);
+        }
+
+        GameState FundedState(int shards)
+        {
+            var db = GameDatabase.Load();
+            var state = new GameState(db, false);
+            Assert.IsTrue(state.Save());
+            string path = Path.Combine(saveDirectory, "frontier_save.json");
+            var save = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(path)).Normalize();
+            save.wallet.Clear();
+            save.wallet.Add(new WalletEntry { currency = "shards", amount = shards });
+            File.WriteAllText(path, SaveSerializer.Instance.Serialize(save));
+            return new GameState(db, true);
+        }
+
+        [UnityTest]
+        public IEnumerator ShardReviveConfirmsSpendsOncePersistsAndPreservesInterruptionPause()
+        {
+            var state = FundedState(1000);
+            var session = Begin(12, 3, state);
+            session.DebugAdvance(15000, false);
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            yield return null;
+            var button = root.Q<Button>("hyperspace-revive-shards");
+            Assert.IsNotNull(button);
+            Assert.IsTrue(button.enabledInHierarchy);
+            int balance = state.ShardBalance;
+            int price = state.HyperspaceReviveCost;
+            using (var submit = NavigationSubmitEvent.GetPooled())
+            {
+                submit.target = button;
+                button.SendEvent(submit);
+            }
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            Assert.AreEqual(balance, state.ShardBalance);
+            Assert.AreEqual(UiText.Get("hyperspace.revive.shards-confirm", price), root.Q<Button>("hyperspace-revive-shards").text);
+            session.SendMessage("OnApplicationPause", true);
+            session.ReviveWithShards();
+            Assert.AreEqual(balance, state.ShardBalance, "Backgrounded runs cannot spend shards.");
+            session.SendMessage("OnApplicationPause", false);
+            using (var submit = NavigationSubmitEvent.GetPooled())
+            {
+                var confirm = root.Q<Button>("hyperspace-revive-shards");
+                submit.target = confirm;
+                confirm.SendEvent(submit);
+            }
+            session.ReviveWithShards();
+            Assert.AreEqual(RunState.Running, session.Run.State);
+            Assert.AreEqual(1, session.Run.RevivesUsed);
+            Assert.AreEqual(balance - price, state.ShardBalance);
+            Assert.IsTrue(session.Paused, "Revival must preserve an interruption pause.");
+            var reloaded = new GameState(state.db, true);
+            Assert.AreEqual(balance - price, reloaded.ShardBalance);
+            session.Resume();
+            session.DebugAdvance(15000, false);
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            yield return null;
+            session.ReviveWithShards();
+            session.FinishTrip();
+            session.ReviveWithShards();
+            Assert.AreEqual(balance - price, state.ShardBalance, "Finishing cancels a pending paid confirmation.");
+            Assert.AreEqual(1, session.Run.RevivesUsed);
+        }
+
+        [UnityTest]
+        public IEnumerator ShardReviveRevalidatesQuoteAndRunStateAndHonorsTheSharedCap()
+        {
+            var state = FundedState(1000);
+            var session = Begin(12, 3, state);
+            int price = state.HyperspaceReviveCost;
+            Assert.Greater(price, 0);
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(null, price, out _));
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, price, out _));
+            for (int i = 0; i < session.Run.Tuning.maxRevives; i++)
+            {
+                session.DebugAdvance(15000, false);
+                Assert.AreEqual(RunState.Downed, session.Run.State);
+                Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, price - 1, out _));
+                Assert.AreEqual(1000 - i * price, state.ShardBalance);
+                Assert.AreEqual(PaidReviveResult.Saved, state.PurchaseHyperspaceRevive(session.Run, price, out _));
+                Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, price, out _));
+            }
+            session.DebugAdvance(15000, false);
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            Assert.IsFalse(session.Run.CanRevive);
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, price, out _));
+            yield return null;
+            Assert.IsNull(root.Q<Button>("hyperspace-revive-shards"));
+            int balance = state.ShardBalance;
+            session.FinishTrip();
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, price, out _));
+            Assert.AreEqual(balance, state.ShardBalance);
+        }
+
+        [UnityTest]
+        public IEnumerator PendingExternalOfferBlocksShardSpendingAndLateAnswersCannotReviveTwice()
+        {
+            var state = FundedState(1000);
+            Action<bool> answer = null;
+            TravelMinigames.ReviveOffer = (_, callback) => answer = callback;
+            var session = Begin(12, 3, state);
+            session.DebugAdvance(15000, false);
+            yield return null;
+            session.ReviveWithShards();
+            session.Revive();
+            Assert.IsNotNull(answer);
+            Assert.IsFalse(root.Q<Button>("hyperspace-revive-shards").enabledSelf);
+            session.ReviveWithShards();
+            session.ReviveWithShards();
+            Assert.AreEqual(1000, state.ShardBalance);
+            answer(false);
+            session.ReviveWithShards();
+            Assert.AreEqual(RunState.Downed, session.Run.State, "Starting an offer clears the previous shard confirmation.");
+            session.ReviveWithShards();
+            answer(true);
+            Assert.AreEqual(RunState.Running, session.Run.State);
+            Assert.AreEqual(1, session.Run.RevivesUsed);
+            Assert.AreEqual(1000 - state.HyperspaceReviveCost, state.ShardBalance);
+        }
+
+        [UnityTest]
+        public IEnumerator ShardReviveRejectsInsufficientReadOnlyAndStalePricesWithoutMutatingRun()
+        {
+            var state = FundedState(0);
+            var session = Begin(12, 3, state);
+            session.DebugAdvance(15000, false);
+            yield return null;
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            Assert.IsFalse(root.Q<Button>("hyperspace-revive-shards").enabledSelf);
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, state.HyperspaceReviveCost, out var message));
+            Assert.IsNotEmpty(message);
+            Assert.AreEqual(0, state.ShardBalance);
+            Assert.AreEqual(0, session.Run.RevivesUsed);
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, -1, out _));
+            state.saves.Store.MarkReadOnly("Test future save");
+            Assert.AreEqual(PaidReviveResult.Rejected, state.PurchaseHyperspaceRevive(session.Run, int.MaxValue, out message));
+            StringAssert.Contains("read-only", message);
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            Assert.AreEqual(0, session.Run.RevivesUsed);
+        }
+
+        [UnityTest]
+        public IEnumerator ShardReviveSaveFailureReportsPendingWithoutRepeatingTheDebit()
+        {
+            var state = FundedState(1000);
+            var session = Begin(12, 3, state);
+            session.DebugAdvance(15000, false);
+            yield return null;
+            string path = Path.Combine(saveDirectory, "frontier_save.json");
+            File.Delete(path);
+            Directory.CreateDirectory(path);
+            int price = state.HyperspaceReviveCost;
+            int balance = state.ShardBalance;
+            session.ReviveWithShards();
+            LogAssert.Expect(LogType.Warning, new Regex("Frontier save failed:"));
+            session.ReviveWithShards();
+            Assert.AreEqual(RunState.Running, session.Run.State);
+            Assert.AreEqual(balance - price, state.ShardBalance);
+            Assert.IsTrue(state.saves.IsDirty);
+            Assert.IsTrue(root.Query<Label>().ToList().Exists(label => label.text != null && label.text.Contains("saving failed")));
+            session.ReviveWithShards();
+            Assert.AreEqual(balance - price, state.ShardBalance);
+            Directory.Delete(path);
+            Assert.IsTrue(state.Save());
+            Assert.AreEqual(balance - price, new GameState(state.db, true).ShardBalance);
+        }
+
+        [UnityTest]
+        public IEnumerator BackPausesAndResumesWithoutFinishingTheTrip()
+        {
+            var session = Begin();
+            Assert.IsTrue(game.HandleBack());
+            Assert.IsTrue(session.Paused);
+            Assert.AreEqual(UiText.Get("harvest.resume"), root.Q<Button>("hyperspace-resume").text);
+            Assert.AreEqual(UiText.Get("hyperspace.finish"), root.Q<Button>("hyperspace-finish").text);
+            Assert.IsTrue(root.Q("hyperspace-dialog").Query<Label>().ToList()
+                .Exists(label => label.text == UiText.Get("hyperspace.pause.help")));
+            int step = session.Run.StepIndex;
+            yield return null;
+            Assert.AreEqual(step, session.Run.StepIndex);
+            Assert.IsTrue(game.HandleBack());
+            Assert.IsFalse(session.Paused);
+            Assert.AreEqual(0, callbacks);
+            Assert.IsFalse(session.Closed);
+        }
+
+        [UnityTest]
+        public IEnumerator AppInterruptionRequiresExplicitResumeAndDoesNotAdvanceInBackground()
+        {
+            var session = Begin();
+            session.SendMessage("OnApplicationPause", true);
+            Assert.IsTrue(session.Paused);
+            session.Resume();
+            Assert.IsTrue(session.Paused);
+            int step = session.Run.StepIndex;
+            yield return null;
+            Assert.AreEqual(step, session.Run.StepIndex);
+            session.SendMessage("OnApplicationPause", false);
+            Assert.IsTrue(session.Paused, "Returning to the app must not auto-resume the run.");
+            session.Resume();
+            Assert.IsFalse(session.Paused);
+            session.SendMessage("OnApplicationFocus", false);
+            session.Resume();
+            Assert.IsTrue(session.Paused);
+            session.SendMessage("OnApplicationFocus", true);
+            Assert.IsTrue(session.Paused);
+            Assert.IsTrue(game.HandleBack());
+            Assert.IsFalse(session.Paused);
+            Assert.AreEqual(0, callbacks);
+        }
+
+        [UnityTest]
+        public IEnumerator ReviveAfterAppInterruptionRemainsPausedUntilExplicitResume()
+        {
+            var session = Begin(12, 3);
+            session.DebugAdvance(15000, false);
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            yield return null;
+            Action<bool> answer = null;
+            TravelMinigames.ReviveOffer = (_, callback) => answer = callback;
+            session.Revive();
+            session.SendMessage("OnApplicationPause", true);
+            answer(true);
+            Assert.AreEqual(RunState.Running, session.Run.State);
+            Assert.AreEqual(1, session.Run.RevivesUsed);
+            Assert.IsTrue(session.Paused);
+            session.SendMessage("OnApplicationPause", false);
+            Assert.IsTrue(session.Paused);
+            Assert.IsNotNull(root.Q<Button>("hyperspace-resume"));
+            int step = session.Run.StepIndex;
+            yield return null;
+            Assert.AreEqual(step, session.Run.StepIndex);
+            session.Resume();
+            Assert.IsFalse(session.Paused);
+            Assert.AreEqual(0, callbacks);
         }
 
         [UnityTest]
@@ -61,6 +308,7 @@ namespace Frontier.Tests
             Assert.AreEqual(RunState.Ended, session.Run.State);
             yield return null;
             Assert.IsNotNull(root.Q<Button>("hyperspace-continue"));
+            Assert.AreEqual(UiText.Get("hyperspace.result.continue"), root.Q<Button>("hyperspace-continue").text);
             Assert.AreEqual(0, callbacks);
             session.Close(); session.Close();
             Assert.AreEqual(1, callbacks);
@@ -82,6 +330,8 @@ namespace Frontier.Tests
             yield return new WaitForSecondsRealtime(0.12f);
             Assert.Greater(session.Run.StepIndex, step);
             session.FinishTrip(); yield return null;
+            Assert.IsTrue(root.Q("hyperspace-dialog").Query<Label>().ToList()
+                .Exists(label => label.text == UiText.Get("hyperspace.result.unfinished")));
             session.Close();
             Assert.AreEqual(1, callbacks); Assert.IsFalse(result.completed);
             Assert.AreEqual(0, result.xp); Assert.AreEqual(0, result.loot.Count);
@@ -98,6 +348,7 @@ namespace Frontier.Tests
             TravelMinigames.ReviveOffer = (_, callback) => answer = callback;
             session.Revive(); session.Revive();
             Assert.IsNotNull(answer);
+            Assert.AreEqual(UiText.Get("hyperspace.offer.pending"), root.Q<Button>("hyperspace-revive").text);
             answer(true); answer(true);
             Assert.AreEqual(1, session.Run.RevivesUsed);
             Assert.AreEqual(RunState.Running, session.Run.State);

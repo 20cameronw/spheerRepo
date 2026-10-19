@@ -1,6 +1,58 @@
 # Economy content pipeline
 
+## Licensed audio cues
+
+The editable `Resources/Frontier/AudioCueLibrary.asset` maps click/confirm/error, weapon shot, explosion,
+warp, wood/stone/metal impacts and ship ignition/touchdown to selected CC0 clips. Eleven cue mappings share
+ten short recordings/derivatives within a 1 MiB decoded sample ceiling. UI cues route through the UI mixer group; combat
+and warp cues use SFX. The existing bounded voice pool, independent volume preferences and mute behavior
+remain in force. Hyperspace borrows shot/impact/explosion assets without destroying them when a run closes;
+its generated pickup/warning/chime cues remain separate. Chopping, mining and drill-contact sounds
+use distinct wood, mining and metal assets with authored gain; grading/haptic timing remains unchanged.
+
+Sources: Kenney [Interface Sounds 1.0](https://kenney.nl/assets/interface-sounds),
+[Sci-Fi Sounds 1.0](https://kenney.nl/assets/sci-fi-sounds) and
+[Impact Sounds 1.0](https://kenney.nl/assets/impact-sounds). All three archives explicitly permit commercial use
+under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/); their original `License.txt` files are
+retained beside each pack in `Resources/Frontier/Audio`. Only selected clips are included,
+not whole archives. They import as preloaded mono PCM/decompress-on-load for predictable short-cue playback.
+**Frontier > Audio > Import Licensed Cue Library** creates a missing library or appends newly supported
+material/ship cues, preserving existing designer mappings/import settings. Ship ignition is an editor-baked,
+normalized 550ms envelope of the licensed engine recording; touchdown reuses the metal contact asset at its
+own authored gain. Neither ship cue uses runtime-generated tones.
+
+## Adaptive soundscape
+
+`Resources/Frontier/SoundscapeLibrary.asset` maps exploration/combat/travel arrangements and four weather
+textures (calm wind, rain/storm, snow and embers). `FrontierSoundscape` follows actual defense and complete
+manual/autopilot travel state; it does not change progression. Arrangement changes fade through silence on the
+existing Music source, while weather uses the existing SFX bed. Hyperspace exclusively owns that bed during
+travel. Ownership-aware cleanup prevents late engine disposal from stopping weather. Music resumes after
+unmute; application pause stops the director's loops and resume fades music back in. Effects and Music sliders
+remain independent, with twelve total sources and no runtime music/ambience synthesis.
+
+The seven original loops are deterministic editor-baked PCM files under `Audio/Original`; their provenance is
+recorded there. **Frontier > Audio > Create Original Soundscapes If Missing** bootstraps missing content but
+never overwrites an existing library. Three aligned 16-second arrangements provide an initial soundtrack,
+not an approved replacement for the master plan's commercially licensed music-pack/stem selection.
+The travel engine borrows a shared, preloaded loop derived from Kenney Sci-Fi `spaceEngineSmall_000.ogg`;
+its original source, 100ms seam-crossfaded derivative and CC0 license stay together in `Audio/KenneySciFi`.
+The original source is retained for reproducibility. All eight loop assets together have an 8 MiB decoded
+sample-data ceiling. Physical-device listening/mixing, full biome-specific art direction, menu/stem music-pack
+selection and final audio sign-off remain open.
+
 ## This milestone
+
+### Offline clock history
+
+V2 saves now additionally retain `clock.highWaterUtc`, the greatest observed gameplay UTC. Older saves
+derive it from `lastSavedUtc`. Auto-Harvester and Dyson offline production measure only intervals after
+that watermark; a backward device-clock edit, saving and restarting cannot make the earlier interval
+eligible again. Load reports warn while the clock is behind; new production resumes only past the recorded
+time. Explicit restore/undo retain the greater local/incoming watermark without mutating the supplied
+snapshot. An unreadable watermark loads read-only and rejects explicit restore rather than discarding history.
+This does not establish trusted time: forward date changes, edited/deleted files, older automatic recovery
+copies and other devices still require server authority before paid/live-service activation.
 
 The reviewed economy is now importable as editable Unity ScriptableObjects. No economy values were redesigned.
 `docs/economy/data` remains the single committed JSON source (regenerate it with the economy lab, never hand-edit it).
@@ -49,10 +101,14 @@ as free output, and upgrade rows use their cumulative values and correct units. 
 
 Editor menus:
 
+* **Frontier > Generate Editable Data Assets** is a create-only legacy bootstrap: it stops when a database or data asset already exists.
+  Use the reviewed economy importer for edits to the current economy assets.
 * **Frontier > Economy > Import JSON** — reads the exports, validates their schemas, family/version envelopes,
   tuning digest and catalog references, then creates or updates assets by canonical id.
 * **Frontier > Economy > Validate Imported Content** — reconstructs the catalog from the saved assets, runs
-  `CatalogValidator`, checks drift against the export and validates tuning completeness/digest.
+  `CatalogValidator`, checks drift against the export and validates tuning completeness/digest. Catalog validation rejects
+  recipe dependency cycles, unreachable resources and non-bonus recipes outside the tuned value-conservation band.
+  The editor icon check verifies unique resource glyph coverage; structures without a model key use the procedural kit fallback.
 
 Batch import:
 

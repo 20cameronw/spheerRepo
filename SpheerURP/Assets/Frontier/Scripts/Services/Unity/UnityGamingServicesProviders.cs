@@ -10,6 +10,10 @@ using Unity.Services.CloudSave.Models;
 using Unity.Services.Core;
 using Unity.Services.Leaderboards;
 using Unity.Services.Leaderboards.Models;
+using Unity.Services.RemoteConfig;
+using UnityCustomEvent = Unity.Services.Analytics.CustomEvent;
+using UnityAnalytics = Unity.Services.Analytics.AnalyticsService;
+using UnityRemoteConfig = Unity.Services.RemoteConfig.RemoteConfigService;
 using UgsLeaderboardEntry = Unity.Services.Leaderboards.Models.LeaderboardEntry;
 using UnityEngine;
 
@@ -27,7 +31,7 @@ namespace Frontier.Services.Unity
 
         public Task<ServiceResult> InitializeAsync()
         {
-            if (config == null || !config.CanUseAuthentication)
+            if (config == null || (!config.CanUseAuthentication && !config.CanUseAnalytics))
                 return Task.FromResult(ServiceResult.NotConfigured("Unity Gaming Services"));
 
             if (UnityServices.State == ServicesInitializationState.Initialized)
@@ -73,6 +77,14 @@ namespace Frontier.Services.Unity
         }
 
         public bool IsConfigured { get { return config != null && config.CanUseAuthentication; } }
+        public string CurrentPlayerId
+        {
+            get
+            {
+                return UnityServices.State == ServicesInitializationState.Initialized && AuthenticationService.Instance.IsSignedIn
+                    ? AuthenticationService.Instance.PlayerId : string.Empty;
+            }
+        }
         public bool CanRecoverAccount
         {
             get
@@ -189,7 +201,7 @@ namespace Frontier.Services.Unity
             }
         }
 
-        public async Task<ServiceResult> DeleteAccountAsync()
+        public async Task<ServiceResult> DeleteAccountAsync(string expectedPlayerId)
         {
             if (!IsConfigured)
                 return ServiceResult.NotConfigured("Unity Authentication");
@@ -201,8 +213,8 @@ namespace Frontier.Services.Unity
             try
             {
                 var authentication = AuthenticationService.Instance;
-                if (!authentication.IsSignedIn)
-                    return ServiceResult.InvalidRequest("There is no signed-in account to delete.");
+                if (!authentication.IsSignedIn || string.IsNullOrEmpty(expectedPlayerId) || authentication.PlayerId != expectedPlayerId)
+                    return ServiceResult.InvalidRequest("The signed-in account changed. No account was deleted.");
                 await authentication.DeleteAccountAsync();
                 return ServiceResult.Success();
             }
@@ -354,6 +366,33 @@ namespace Frontier.Services.Unity
             }
         }
 
+        public async Task<ServiceResult> DeleteSaveAsync(string expectedPlayerId)
+        {
+            if (!IsConfigured) return ServiceResult.NotConfigured("Unity Cloud Save");
+            ServiceResult initialized = await initializer.InitializeAsync();
+            if (!initialized.succeeded) return initialized;
+            var authentication = AuthenticationService.Instance;
+            if (!authentication.IsSignedIn || string.IsNullOrEmpty(expectedPlayerId) || authentication.PlayerId != expectedPlayerId)
+                return ServiceResult.InvalidRequest("The signed-in account changed. No cloud save was deleted.");
+            try
+            {
+                var records = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { SaveKey });
+                if (authentication.PlayerId != expectedPlayerId || !authentication.IsSignedIn)
+                    return ServiceResult.InvalidRequest("The signed-in account changed. No cloud save was deleted.");
+                if (!records.TryGetValue(SaveKey, out var record)) return ServiceResult.Success();
+                if (string.IsNullOrWhiteSpace(record.WriteLock))
+                    return ServiceResult.Failed("The cloud save returned no write lock. Nothing was deleted; retry before deleting the account.");
+                await CloudSaveService.Instance.Data.Player.DeleteAsync(SaveKey,
+                    new global::Unity.Services.CloudSave.Models.Data.Player.DeleteOptions { WriteLock = record.WriteLock });
+                return ServiceResult.Success();
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.LogWarning("Unity Cloud Save deletion failed: " + exception.Message);
+                return ServiceResult.Failed(exception.Message);
+            }
+        }
+
         public async Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
         {
             if (!IsConfigured)
@@ -412,6 +451,135 @@ namespace Frontier.Services.Unity
         }
     }
 
+    sealed class UnityAnalyticsProvider : IAnalyticsService
+    {
+        readonly FrontierUnityServicesConfig config;
+        readonly UnityServicesInitializer initializer;
+        bool dataCollectionAllowed;
+        bool initialized;
+
+        public UnityAnalyticsProvider(FrontierUnityServicesConfig config, UnityServicesInitializer initializer)
+        {
+            this.config = config;
+            this.initializer = initializer;
+        }
+
+        public bool IsConfigured { get { return config != null && config.CanUseAnalytics; } }
+
+        public void SetDataCollectionAllowed(bool allowed)
+        {
+            dataCollectionAllowed = allowed;
+            if (!initialized) return;
+
+            if (allowed)
+                UnityAnalytics.Instance.StartDataCollection();
+            else
+                UnityAnalytics.Instance.StopDataCollection();
+        }
+
+        public async Task<ServiceResult> InitializeAsync()
+        {
+            if (!IsConfigured)
+                return ServiceResult.NotConfigured("Unity Analytics");
+
+            ServiceResult initializedResult = await initializer.InitializeAsync();
+            if (!initializedResult.succeeded)
+                return initializedResult;
+
+            initialized = true;
+            if (dataCollectionAllowed)
+                UnityAnalytics.Instance.StartDataCollection();
+            return ServiceResult.Success();
+        }
+
+        public ServiceResult RecordEvent(string eventName, IReadOnlyDictionary<string, string> parameters)
+        {
+            if (!IsConfigured)
+                return ServiceResult.NotConfigured("Unity Analytics");
+            if (!initialized || !dataCollectionAllowed)
+                return ServiceResult.ConsentRequired("analytics data collection");
+            if (string.IsNullOrWhiteSpace(eventName))
+                return ServiceResult.InvalidRequest("An analytics event name is required.");
+
+            try
+            {
+                var analyticsEvent = new UnityCustomEvent(eventName);
+                if (parameters != null)
+                {
+                    foreach (KeyValuePair<string, string> parameter in parameters)
+                    {
+                        if (string.IsNullOrWhiteSpace(parameter.Key) || parameter.Value == null)
+                            return ServiceResult.InvalidRequest("Analytics parameters require non-empty keys and values.");
+                        analyticsEvent.Add(parameter.Key, parameter.Value);
+                    }
+                }
+
+                UnityAnalytics.Instance.RecordEvent(analyticsEvent);
+                return ServiceResult.Success();
+            }
+            catch (ArgumentException exception)
+            {
+                Debug.LogWarning("Unity Analytics rejected an event parameter: " + exception.Message);
+                return ServiceResult.InvalidRequest(exception.Message);
+            }
+            catch (InvalidOperationException exception)
+            {
+                Debug.LogWarning("Unity Analytics could not record an event: " + exception.Message);
+                return ServiceResult.Failed(exception.Message);
+            }
+        }
+    }
+
+    sealed class UnityRemoteConfigProvider : IRemoteConfigService
+    {
+        readonly FrontierUnityServicesConfig config;
+        readonly UnityServicesInitializer initializer;
+
+        public UnityRemoteConfigProvider(FrontierUnityServicesConfig config, UnityServicesInitializer initializer)
+        {
+            this.config = config;
+            this.initializer = initializer;
+        }
+
+        public bool IsConfigured { get { return config != null && config.CanUseRemoteConfig; } }
+
+        public Task<ServiceResult> InitializeAsync()
+        {
+            return IsConfigured
+                ? initializer.InitializeAsync()
+                : Task.FromResult(ServiceResult.NotConfigured("Unity Remote Config"));
+        }
+
+        public async Task<ServiceResult<IReadOnlyDictionary<string, string>>> FetchAsync()
+        {
+            if (!IsConfigured)
+                return ServiceResult<IReadOnlyDictionary<string, string>>.NotConfigured("Unity Remote Config");
+
+            ServiceResult initializedResult = await initializer.InitializeAsync();
+            if (!initializedResult.succeeded)
+                return ServiceResult<IReadOnlyDictionary<string, string>>.Failed(initializedResult.message);
+
+            if (!AuthenticationService.Instance.IsSignedIn)
+                return ServiceResult<IReadOnlyDictionary<string, string>>.InvalidRequest(
+                    "Sign in with an existing account before fetching remote configuration.");
+
+            try
+            {
+                RuntimeConfig runtimeConfig = await UnityRemoteConfig.Instance.FetchConfigsAsync(
+                    new Dictionary<string, object>(), new Dictionary<string, object>());
+                var settings = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (string key in runtimeConfig.GetKeys())
+                    settings.Add(key, runtimeConfig.GetJson(key));
+                return ServiceResult<IReadOnlyDictionary<string, string>>.Success(settings);
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.LogWarning("Unity Remote Config fetch failed: " + exception.Message);
+                return ServiceResult<IReadOnlyDictionary<string, string>>.Failed(exception.Message);
+            }
+        }
+    }
+
     public static class FrontierUnityServicesFactory
     {
         public static FrontierServices Create(IConsentService consent, FrontierUnityServicesConfig config)
@@ -424,8 +592,14 @@ namespace Frontier.Services.Unity
             var authentication = new UnityAuthenticationProvider(config, initializer, recoveryCredentials);
             var leaderboards = new UnityLeaderboardProvider(config, initializer);
             var cloudSave = new UnityCloudSaveProvider(config, initializer);
-            return new FrontierServices(consent, unavailable, unavailable, authentication, leaderboards,
-                cloudSave, unavailable, unavailable, new LocalTimeService(), unavailable,
+            var analytics = new UnityAnalyticsProvider(config, initializer);
+            var remoteConfig = new UnityRemoteConfigProvider(config, initializer);
+            var time = new LocalTimeService();
+            var adsPolicy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
+            if (adsPolicy == null) throw new InvalidOperationException("Frontier rewarded-ad policy is missing.");
+            var ads = adsPolicy.Wrap(unavailable, new PlayerPrefsRewardedAdUsageStore(), time);
+            return new FrontierServices(consent, ads, unavailable, authentication, leaderboards,
+                cloudSave, analytics, remoteConfig, time, new UnityNotificationProvider(config),
                 config == null ? null : config.leaderboardId,
                 config != null && config.HasValidPrivacyPolicy ? config.privacyPolicyUrl : null);
         }

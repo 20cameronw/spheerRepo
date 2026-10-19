@@ -23,8 +23,13 @@ MonoBehaviour:
   threat: 30
   minWave: 10
   weight: 1
+  rank: 2
+  armor: 0.2
+  bossInterval: 5
   bounty:
   - resource: {fileID: 11400000, guid: 8567583bacf739a42a16112cc194cd22, type: 2}
     amount: 8
   - resource: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
     amount: 5
+  - resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+    amount: 3

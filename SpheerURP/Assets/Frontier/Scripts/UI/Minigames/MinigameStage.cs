@@ -117,6 +117,7 @@ namespace Frontier
         public Camera cam;
         public Transform root;
         public RenderTexture rt;
+        public Action FocusLost;
         readonly List<UnityEngine.Object> owned = new List<UnityEngine.Object>();
         float shake;
         Vector3 camBase;
@@ -135,8 +136,8 @@ namespace Frontier
             s.cam.fieldOfView = 38f;
             s.cam.nearClipPlane = 0.1f;
             s.cam.farClipPlane = 150f;
-            s.cam.allowHDR = true;
-            s.cam.GetUniversalAdditionalCameraData().renderPostProcessing = true;
+            s.cam.allowHDR = PresentationQuality.Budget.PostProcessing;
+            s.cam.GetUniversalAdditionalCameraData().renderPostProcessing = PresentationQuality.Budget.PostProcessing;
             return s;
         }
 
@@ -149,8 +150,9 @@ namespace Frontier
 
         public bool Resize(float w, float h)
         {
-            float k = Mathf.Min(1f, 1280f / Mathf.Max(w, h));
-            int iw = Mathf.Max(64, Mathf.RoundToInt(w * k)), ih = Mathf.Max(64, Mathf.RoundToInt(h * k));
+            cam.allowHDR = PresentationQuality.Budget.PostProcessing;
+            cam.GetUniversalAdditionalCameraData().renderPostProcessing = PresentationQuality.Budget.PostProcessing;
+            PresentationQuality.Budget.FitSurface(w, h, SystemInfo.maxTextureSize, out int iw, out int ih);
             if (rt != null && rt.width == iw && rt.height == ih) return false;
             cam.targetTexture = null;
             if (rt != null) { rt.Release(); Destroy(rt); }
@@ -162,6 +164,9 @@ namespace Frontier
         }
 
         public void Shake(float a) { shake = Mathf.Max(shake, a); }
+
+        void OnApplicationPause(bool paused) { if (paused) FocusLost?.Invoke(); }
+        void OnApplicationFocus(bool focused) { if (!focused) FocusLost?.Invoke(); }
 
         void LateUpdate()
         {
@@ -287,11 +292,7 @@ namespace Frontier
             hitRot = Quaternion.Euler(0f, -6f, vibrate ? -4f : -10f);
 
             Color wood = new Color(0.5f, 0.3f, 0.13f);
-            Color headC; Color rim;
-            if (level <= 0) { headC = new Color(0.95f, 0.7f, 0.55f); rim = new Color(1f, 0.6f, 0.4f) * 0.4f; }
-            else if (level == 1) { headC = new Color(0.55f, 0.55f, 0.6f); rim = new Color(0.6f, 0.7f, 0.8f) * 0.5f; }
-            else if (level == 2) { headC = new Color(0.78f, 0.84f, 0.95f); rim = new Color(0.3f, 0.9f, 1.4f) * 0.8f; }
-            else { headC = new Color(0.12f, 0.3f, 0.4f); rim = new Color(accent.r, accent.g, accent.b) * 2.4f; }
+            HarvestToolVisual.Palette(level, accent, out var headC, out var rim);
             var handleM = st.Lit(wood, new Color(0.4f, 0.2f, 0.05f) * 0.4f, 0f, 10f);
             var headM = st.Lit(headC, rim, 0f, 3f);
             var glowM = st.Lit(headC * 0.6f, rim * 1.6f, 0f, 3f);

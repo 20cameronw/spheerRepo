@@ -405,12 +405,15 @@ home; **Next match** cycles), and **Dump descriptor** copies `PlanetData.Dump()`
 
 ## 12. Known gaps
 
-* Star-map pins, persistent discovery bitsets, global unseen-name search, directed next-stop UI and on-device renderer benchmarks are
-  not implemented. Survey visibility is recomputed from visits and scanner radius, not saved as a separate exploration history.
+* Star-map destination pins persist as planet IDs; surveyed-system discoveries persist as compact per-sector bitsets, with migration from
+  earlier v2 saves containing individual IDs. Pinned locations appear as map markers and selectable destinations, while previously
+  revealed systems remain available to deposit filters. Global unseen-name search, directed next-stop UI and on-device renderer
+  benchmarks are still open. Live survey coverage is still derived from visits and scanner radius.
 * The jump/scanner floors and relaxed hull enforcement are temporary until the content package imports the real ship upgrades.
   Autopilot is available without a research unlock for the same interim reason.
-* Manual flight uses the existing mini-game, which does not yet honor the planned per-leg duration. Flights are whole-route atomic,
-  not resumable between legs; pause/abort and failure consequences belong to the minigame framework work.
+* Manual Hyperspace flights use the route planner's per-leg duration, bounded by the minimum wave phase and complete boss slot when a boss
+  is present; requests without a planned duration retain the distance-based simulation default. Flights are whole-route atomic, not resumable
+  between legs; pause/abort and failure consequences belong to the minigame framework work.
 * Authored worlds with the spiky or lens models keep their authored `surfaceRadius`, so their buildings can still float a little.
 * Siphon, Excavate, Salvage and Harvest deposits play the nearest existing mini-game (`HarvestMapping`).
 * The universe golden digests have not been run on an IL2CPP/ARM64 device (see [TESTING.md](TESTING.md)).

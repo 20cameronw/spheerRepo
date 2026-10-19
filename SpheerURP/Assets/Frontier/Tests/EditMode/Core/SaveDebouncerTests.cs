@@ -118,6 +118,38 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void SessionClock_AdvancesFromMonotonicTimeAndIgnoresDeviceDateEdits()
+        {
+            var raw = new FakeClock();
+            raw.Advance(20);
+            var started = raw.UtcNow;
+            var session = new SessionClock(raw);
+            Assert.AreEqual(started, session.UtcNow);
+            Assert.AreEqual(20, session.MonotonicSeconds);
+            raw.SetUtc(started.AddYears(10));
+            Assert.AreEqual(started, session.UtcNow, "A forward date edit must not finish active jobs.");
+            raw.Advance(15.5);
+            Assert.AreEqual(started.AddSeconds(15.5), session.UtcNow);
+            raw.SetUtc(started.AddYears(-10));
+            Assert.AreEqual(started.AddSeconds(15.5), session.UtcNow, "A rewind must not extend active jobs.");
+            raw.Advance(30);
+            Assert.AreEqual(started.AddSeconds(45.5), session.UtcNow);
+            Assert.AreEqual(DateTimeKind.Utc, session.UtcNow.Kind);
+        }
+
+        [Test]
+        public void SessionClock_RestartUsesANewDeviceAnchorAndIsNotServerTime()
+        {
+            var raw = new FakeClock();
+            var original = new SessionClock(raw);
+            raw.SetUtc(raw.UtcNow.AddDays(1));
+            var restarted = new SessionClock(raw);
+            Assert.AreEqual(original.UtcNow.AddDays(1), restarted.UtcNow,
+                "Session protection must not be represented as offline or cross-device authority.");
+            Assert.Throws<ArgumentNullException>(() => new SessionClock(null));
+        }
+
+        [Test]
         public void UtcText_RoundTripsExactlyAndRejectsGarbage()
         {
             var t = new DateTime(2026, 10, 13, 20, 15, 3, 456, DateTimeKind.Utc).AddTicks(1234);

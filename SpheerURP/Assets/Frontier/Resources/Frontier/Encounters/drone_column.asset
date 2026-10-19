@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d34ee26d274254998ef72f3dca111a, type: 3}
+  m_Name: drone_column
+  m_EditorClassIdentifier: Frontier.Data::Frontier.EncounterSO
+  template:
+    id: drone_column
+    index: 2
+    minTier: 0
+    maxTier: 2
+    cost: 3
+    role: 0
+    family: 0
+    entries:
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 0.4
+      zOffset: 0
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 0.4
+      zOffset: 12
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 0.4
+      zOffset: 24
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 0.4
+      zOffset: 36
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    durationZ: 36
+    declaredSpeed: 0.2
+    weight: 1
+    mirrorable: 1
+    notes: Four drones in one lane; a lesson in sidestepping and shooting.

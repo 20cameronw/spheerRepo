@@ -10,15 +10,15 @@ namespace Frontier.Hyperspace.View
         public Button Bomb { get; private set; }
         readonly VisualElement root, dialog, panel, hullFill, progressFill, bombFill;
         readonly Label status, score, boss, notice, tip, power, perf;
-        readonly Action resume, finish, revive, close;
-        Button reviveButton;
+        readonly Action resume, finish, revive, close, shardRevive;
+        Button reviveButton, shardReviveButton;
         bool detaching;
         float noticeUntil;
 
         public HyperspaceHud(VisualElement host, Vector4 insets, RenderTexture texture,
-            Action pause, Action resume, Action finish, Action revive, Action close)
+            Action pause, Action resume, Action finish, Action revive, Action close, Action shardRevive)
         {
-            this.resume = resume; this.finish = finish; this.revive = revive; this.close = close;
+            this.resume = resume; this.finish = finish; this.revive = revive; this.close = close; this.shardRevive = shardRevive;
             root = new VisualElement { name = "hyperspace-run" };
             Fill(root); root.style.backgroundColor = new Color(0.015f, 0.025f, 0.065f);
             host.Add(root);
@@ -35,8 +35,8 @@ namespace Frontier.Hyperspace.View
             top.style.paddingTop = top.style.paddingBottom = 8;
             safe.Add(top);
             var row = new VisualElement { pickingMode = PickingMode.Ignore }; row.style.flexDirection = FlexDirection.Row;
-            var title = Text("HYPERSPACE RUN", 20, UiKit.Cyan); title.style.flexGrow = 1; row.Add(title);
-            var pauseButton = UiKit.Btn("PAUSE", UiKit.Cyan, pause);
+            var title = Text(UiText.Get("hyperspace.title"), 20, UiKit.Cyan); title.style.flexGrow = 1; row.Add(title);
+            var pauseButton = UiKit.Btn(UiText.Get("harvest.pause"), UiKit.Cyan, pause);
             pauseButton.name = "hyperspace-pause"; pauseButton.style.minWidth = 170; row.Add(pauseButton); top.Add(row);
             hullFill = Bar(top, UiKit.Cyan);
             status = Text("", 16, Color.white); top.Add(status);
@@ -51,7 +51,7 @@ namespace Frontier.Hyperspace.View
             bottom.style.position = Position.Absolute; bottom.style.bottom = 0; bottom.style.left = bottom.style.right = 0;
             tip = Text("", 16, Color.white); tip.style.whiteSpace = WhiteSpace.Normal;
             tip.style.unityTextAlign = TextAnchor.MiddleCenter; bottom.Add(tip);
-            Bomb = UiKit.Btn("BOMB", UiKit.Amber, null, true);
+            Bomb = UiKit.Btn(UiText.Get("hyperspace.bomb"), UiKit.Amber, null, true);
             Bomb.name = "hyperspace-bomb"; Bomb.style.alignSelf = Align.FlexEnd; Bomb.style.minWidth = 140;
             bottom.Add(Bomb); safe.Add(bottom);
             bombFill = Bar(bottom, UiKit.Amber);
@@ -87,13 +87,13 @@ namespace Frontier.Hyperspace.View
             var p = run.Player;
             hullFill.style.width = Length.Percent(100 * Mathf.Clamp01(p.hull / p.maxHull));
             progressFill.style.width = Length.Percent(100 * run.Progress);
-            status.text = $"HULL {Mathf.CeilToInt(p.hull)}   SHIELD {p.shield}/{p.maxShield}";
-            score.text = $"{run.Score:N0} PTS   {run.Kills} KILLS   x{p.combo}   {run.Progress:P0}";
-            boss.text = run.BossActive ? $"GUARDIAN  /  PHASE {run.BossPhase}  /  {run.BossHpFraction:P0}" : "";
-            Bomb.text = $"BOMB  {p.bombs}/{p.maxBombs}";
+            status.text = UiText.Get("hyperspace.status", Mathf.CeilToInt(p.hull), p.shield, p.maxShield);
+            score.text = UiText.Get("hyperspace.score", run.Score, run.Kills, p.combo, run.Progress);
+            boss.text = run.BossActive ? UiText.Get("hyperspace.boss", run.BossPhase, run.BossHpFraction) : "";
+            Bomb.text = UiText.Get("hyperspace.bombs", p.bombs, p.maxBombs);
             bombFill.style.width = Length.Percent(100 * Mathf.Clamp01((float)p.bombKillProgress / run.Tuning.bombKillsPerCharge));
-            power.text = p.overdrive > 0 ? $"OVERDRIVE  {p.overdrive:0.0}s"
-                : p.shield < p.maxShield ? $"SHIELD RECHARGING  {p.shieldRegenTimer:0.0}s" : "";
+            power.text = p.overdrive > 0 ? UiText.Get("hyperspace.overdrive-time", p.overdrive)
+                : p.shield < p.maxShield ? UiText.Get("hyperspace.shield-time", p.shieldRegenTimer) : "";
             Bomb.SetEnabled(run.State == RunState.Running && p.bombs > 0);
             if (Time.unscaledTime > noticeUntil) notice.text = "";
         }
@@ -116,17 +116,17 @@ namespace Frontier.Hyperspace.View
                     $"BULLETS {run.ActiveBullets}  BOLTS {run.ActiveBolts}  DROPPED EVENTS {run.Events.Dropped}  VOICES {Sfx.BusyVoices}"
                 : "";
         }
-        public void ShowTip() { tip.text = "Drag anywhere to steer. Auto-fire is on.\nDodge the warning shapes. Tap BOMB to clear danger."; }
+        public void ShowTip() { tip.text = UiText.Get("hyperspace.tip"); }
         public void React(HEvent e)
         {
             string text = null;
             switch (e.type)
             {
-                case EventType.BossWarning: text = "GUARDIAN APPROACHING"; break;
-                case EventType.BombCharged: text = "BOMB READY"; break;
-                case EventType.OverdriveStart: text = "OVERDRIVE"; break;
-                case EventType.ShieldBreak: text = "SHIELD BROKEN"; break;
-                case EventType.WaveCleared: text = "WAVE CLEAR"; break;
+                case EventType.BossWarning: text = UiText.Get("hyperspace.notice.boss"); break;
+                case EventType.BombCharged: text = UiText.Get("hyperspace.notice.bomb"); break;
+                case EventType.OverdriveStart: text = UiText.Get("hyperspace.notice.overdrive"); break;
+                case EventType.ShieldBreak: text = UiText.Get("hyperspace.notice.shield"); break;
+                case EventType.WaveCleared: text = UiText.Get("hyperspace.notice.clear"); break;
             }
             if (text != null) { notice.text = text; noticeUntil = Time.unscaledTime + 2; }
             if (e.step > 600) tip.text = "";
@@ -145,34 +145,59 @@ namespace Frontier.Hyperspace.View
         }
         public void ShowPause()
         {
-            Dialog("RUN PAUSED", "Your route is frozen. Finishing early completes the trip without loot or a fuel refund.");
-            Button("RESUME", UiKit.Cyan, resume);
-            Button("FINISH TRIP", UiKit.Amber, finish);
+            Dialog(UiText.Get("hyperspace.pause.title"), UiText.Get("hyperspace.pause.help"));
+            Button(UiText.Get("harvest.resume"), UiKit.Cyan, resume).name = "hyperspace-resume";
+            Button(UiText.Get("hyperspace.finish"), UiKit.Amber, finish).name = "hyperspace-finish";
         }
-        public void ShowDowned(bool available, bool free)
+        public void ShowDowned(bool available, bool free, int shardCost = -1, int shardBalance = 0,
+            bool shardEnabled = false, bool shardConfirm = false, string feedback = null)
         {
-            Dialog("HULL LOST", available
-                ? "Revive with half hull and 3 seconds of protection. Each revive reduces your grade."
-                : "No revives remain. You can still finish the trip, without loot or a fuel refund.");
-            reviveButton = available ? Button(free ? "REVIVE · FREE" : "REVIVE · VIEW OFFER", UiKit.Cyan, revive) : null;
+            Dialog(UiText.Get("hyperspace.downed.title"), UiText.Get(available || shardCost >= 0
+                ? "hyperspace.downed.revive-help" : "hyperspace.downed.finish-help"));
+            reviveButton = available ? Button(UiText.Get(free ? "hyperspace.revive.free" : "hyperspace.revive.offer"),
+                UiKit.Cyan, revive) : null;
             if (reviveButton != null) reviveButton.name = "hyperspace-revive";
-            Button("FINISH TRIP", UiKit.Amber, finish).name = "hyperspace-finish";
+            shardReviveButton = null;
+            if (shardCost >= 0)
+            {
+                panel.Add(Text(UiText.Get("hyperspace.revive.balance", shardBalance), 16, UiKit.Cyan));
+                shardReviveButton = Button(UiText.Get(shardConfirm ? "hyperspace.revive.shards-confirm" :
+                    "hyperspace.revive.shards", shardCost), shardConfirm ? UiKit.Amber : UiKit.Magenta, shardRevive);
+                shardReviveButton.name = "hyperspace-revive-shards";
+                UiKit.SetEnabledLook(shardReviveButton, shardEnabled);
+            }
+            if (!string.IsNullOrEmpty(feedback))
+            {
+                var message = Text(feedback, 16, UiKit.Amber);
+                message.style.whiteSpace = WhiteSpace.Normal;
+                panel.Add(message);
+            }
+            Button(UiText.Get("hyperspace.finish"), UiKit.Amber, finish).name = "hyperspace-finish";
         }
         public void SetOfferPending(bool pending)
         {
             reviveButton?.SetEnabled(!pending);
-            if (reviveButton != null && pending) reviveButton.text = "WAITING FOR OFFER…";
+            shardReviveButton?.SetEnabled(!pending);
+            if (reviveButton != null && pending) reviveButton.text = UiText.Get("hyperspace.offer.pending");
         }
         public void ShowResult(RunResult result, TravelRunResult travel, int fuel)
         {
-            string title = travel.completed ? "GRADE " + result.grade : "TRIP COMPLETE";
+            string title = travel.completed ? UiText.Get("hyperspace.result.grade", result.grade) : UiText.Get("hyperspace.result.title");
             Dialog(title, travel.completed
-                ? $"{result.killCount} kills  ·  best combo x{result.maxCombo}\n{result.hitsTaken} hits  ·  {result.revivesUsed} revives\n{(result.cleanRun ? "Clean run!\n" : "")}+{fuel} fuel refunded  ·  +{travel.xp} XP"
-                : "You reached your destination.\nNo loot or fuel refund for an unfinished run.");
+                ? UiText.Get("hyperspace.result.summary", result.killCount, result.maxCombo, result.hitsTaken, result.revivesUsed)
+                    + "\n" + (result.cleanRun ? UiText.Get("hyperspace.result.clean") + "\n" : "")
+                    + UiText.Get("hyperspace.result.rewards", fuel, travel.xp)
+                : UiText.Get("hyperspace.result.unfinished"));
             if (travel.loot != null) foreach (var drop in travel.loot) panel.Add(UiKit.ItemChip(drop.resource, drop.amount));
-            Button("CONTINUE TO DESTINATION", UiKit.Cyan, close).name = "hyperspace-continue";
+            Button(UiText.Get("hyperspace.result.continue"), UiKit.Cyan, close).name = "hyperspace-continue";
         }
         public void HideDialog() { dialog.style.display = DisplayStyle.None; }
+        public void ShowPaymentNotice(string message)
+        {
+            notice.text = message;
+            notice.style.whiteSpace = WhiteSpace.Normal;
+            noticeUntil = Time.unscaledTime + 10f;
+        }
         public void Dispose() { if (!detaching) root.RemoveFromHierarchy(); }
     }
 }

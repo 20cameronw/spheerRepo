@@ -240,6 +240,82 @@ namespace Frontier.Economy
             }
         }
 
+        static void CheckRecipeGraph(EconomyCatalog c, List<string> problems)
+        {
+            var edges = new Dictionary<string, HashSet<string>>();
+            foreach (RecipeDef recipe in c.recipes)
+            {
+                if (recipe.inputs == null || recipe.outputs == null) continue;
+                foreach (ItemAmount input in recipe.inputs)
+                {
+                    if (c.Resource(input.resourceId) == null) continue;
+                    HashSet<string> outputs;
+                    if (!edges.TryGetValue(input.resourceId, out outputs))
+                        edges[input.resourceId] = outputs = new HashSet<string>();
+                    foreach (ItemAmount output in recipe.outputs)
+                        if (c.Resource(output.resourceId) != null) outputs.Add(output.resourceId);
+                }
+            }
+
+            var states = new Dictionary<string, byte>();
+            var path = new List<string>();
+            foreach (ResourceDef resource in c.resources)
+                VisitRecipeGraph(resource.id, edges, states, path, problems);
+
+            var obtainable = new HashSet<string>();
+            foreach (ResourceDef resource in c.resources)
+                if (resource.category == ResourceCategory.Raw && resource.harvestMethods != null && resource.harvestMethods.Length > 0)
+                    obtainable.Add(resource.id);
+            if (c.start != null && c.start.startingItems != null)
+                foreach (ItemAmount item in c.start.startingItems)
+                    if (item.amount > 0 && c.Resource(item.resourceId) != null) obtainable.Add(item.resourceId);
+
+            bool changed;
+            do
+            {
+                changed = false;
+                foreach (RecipeDef recipe in c.recipes)
+                {
+                    if (recipe.inputs == null || recipe.outputs == null) continue;
+                    bool inputsAvailable = true;
+                    foreach (ItemAmount input in recipe.inputs)
+                        if (!obtainable.Contains(input.resourceId)) { inputsAvailable = false; break; }
+                    if (!inputsAvailable) continue;
+                    foreach (ItemAmount output in recipe.outputs)
+                        if (c.Resource(output.resourceId) != null && obtainable.Add(output.resourceId)) changed = true;
+                }
+            } while (changed);
+
+            foreach (ResourceDef resource in c.resources)
+                if (!obtainable.Contains(resource.id))
+                    problems.Add("resource " + resource.id + " is not obtainable from a harvest, starting item, or reachable recipe");
+        }
+
+        static void VisitRecipeGraph(string id, Dictionary<string, HashSet<string>> edges, Dictionary<string, byte> states,
+            List<string> path, List<string> problems)
+        {
+            byte state;
+            if (states.TryGetValue(id, out state))
+            {
+                if (state == 2) return;
+                if (state == 1)
+                {
+                    int first = path.IndexOf(id);
+                    problems.Add("recipe graph contains a cycle: " + string.Join(" -> ", path.GetRange(first, path.Count - first)) + " -> " + id);
+                    return;
+                }
+            }
+
+            states[id] = 1;
+            path.Add(id);
+            HashSet<string> next;
+            if (edges.TryGetValue(id, out next))
+                foreach (string output in next)
+                    VisitRecipeGraph(output, edges, states, path, problems);
+            path.RemoveAt(path.Count - 1);
+            states[id] = 2;
+        }
+
         static void Unique(string kind, IEnumerable<string> ids, HashSet<string> global, List<string> problems)
         {
             var local = new HashSet<string>();
@@ -266,7 +342,9 @@ namespace Frontier.Economy
             return true;
         }
 
-        public static List<string> Validate(EconomyCatalog c)
+        public static List<string> Validate(EconomyCatalog c) { return Validate(c, null); }
+
+        public static List<string> Validate(EconomyCatalog c, Tuning tuning)
         {
             var problems = new List<string>();
             var global = new HashSet<string>();
@@ -369,6 +447,26 @@ namespace Frontier.Economy
                 int profiles = 0;
                 foreach (HabitatDef h in c.habitats) if (h.resourceId == r.id) profiles++;
                 if (profiles < 1) problems.Add("raw resource " + r.id + " has no habitat");
+            }
+            CheckRecipeGraph(c, problems);
+            if (tuning != null)
+            {
+                foreach (RecipeDef recipe in c.recipes)
+                {
+                    if (recipe.bonus || recipe.inputs == null || recipe.outputs == null) continue;
+                    double inputValue = c.Prices.Value(recipe.inputs);
+                    double outputValue = c.Prices.Value(recipe.outputs);
+                    if (!(inputValue > 0.0) || double.IsNaN(inputValue) || double.IsInfinity(inputValue) ||
+                        double.IsNaN(outputValue) || double.IsInfinity(outputValue))
+                    {
+                        problems.Add("recipe " + recipe.id + " has an invalid value cost");
+                        continue;
+                    }
+                    double ratio = outputValue / inputValue;
+                    if (ratio < tuning.D("value.min_ratio") || ratio > ValueModel.MaxRatio(recipe.tier, tuning))
+                        problems.Add("recipe " + recipe.id + " value ratio " + ratio.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) +
+                            " is outside the conservation band");
+                }
             }
             foreach (LegacyIdEntry e in c.legacyIds)
             {

@@ -4,11 +4,12 @@ using UnityEngine.UIElements;
 
 namespace Frontier.Hyperspace.View
 {
-    public sealed class HyperspaceGame : ITravelMinigame
+    public sealed class HyperspaceGame : ITravelMinigame, ITravelBackHandler
     {
         readonly GameState game;
         public HyperspaceSession Session { get; private set; }
         public HyperspaceGame(GameState game) { this.game = game; }
+        public bool HandleBack() { return Session != null && Session.HandleBack(); }
 
         public void Run(VisualElement host, TravelRunRequest request, Action<TravelRunResult> done)
         {

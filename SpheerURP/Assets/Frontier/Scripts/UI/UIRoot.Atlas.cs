@@ -19,26 +19,32 @@ namespace Frontier
         {
             var tabs = UiKit.Div();
             var firstTabRow = UiKit.Div("fr-tabs");
-            firstTabRow.Add(TabButton("core", "RESOURCES", atlasTab == 0, UiKit.Cyan, () => atlasTab = 0));
-            firstTabRow.Add(TabButton("refinery", "RECIPES", atlasTab == 1, UiKit.Cyan, () => atlasTab = 1));
+            firstTabRow.Add(TabButton("core", UiText.Get("atlas.resources"), atlasTab == 0, UiKit.Cyan, () => atlasTab = 0));
+            firstTabRow.Add(TabButton("refinery", UiText.Get("atlas.recipes"), atlasTab == 1, UiKit.Cyan, () => atlasTab = 1));
             tabs.Add(firstTabRow);
             var secondTabRow = UiKit.Div("fr-tabs");
-            secondTabRow.Add(TabButton("map", "WORLDS", atlasTab == 2, UiKit.Cyan, () => atlasTab = 2));
-            secondTabRow.Add(TabButton("alien", "FIELD GUIDE", atlasTab == 3, UiKit.Cyan, () => atlasTab = 3));
+            secondTabRow.Add(TabButton("map", UiText.Get("atlas.worlds"), atlasTab == 2, UiKit.Cyan, () => atlasTab = 2));
+            secondTabRow.Add(TabButton("alien", UiText.Get("atlas.bestiary"), atlasTab == 3, UiKit.Cyan, () => atlasTab = 3));
             tabs.Add(secondTabRow);
+            var thirdTabRow = UiKit.Div("fr-tabs");
+            thirdTabRow.Add(TabButton("build", UiText.Get("atlas.structures"), atlasTab == 4, UiKit.Cyan, () => atlasTab = 4));
+            tabs.Add(thirdTabRow);
             body.Add(tabs);
 
-            body.Add(UiKit.Text("FIELD NOTES  /  CATALOG DATA", "fr-tiny", UiKit.Muted));
-            body.Add(UiKit.Text("RESOURCES  " + gs.AtlasDiscoveredCount("resource") + "/" + gs.AtlasCatalogCount("resource") +
-                "  ·  RECIPES  " + gs.AtlasDiscoveredCount("recipe") + "/" + gs.AtlasCatalogCount("recipe"), "fr-small"));
-            body.Add(UiKit.Text("STRUCTURES  " + gs.AtlasDiscoveredCount("structure") + "/" + gs.AtlasCatalogCount("structure"), "fr-small"));
-            body.Add(UiKit.Text("Find resources, craft recipes and complete builds to discover entries and earn one-time Nova Shards. World visits are tracked separately.", "fr-muted"));
+            body.Add(UiKit.Text(UiText.Get("atlas.notes"), "fr-tiny", UiKit.Muted));
+            body.Add(UiKit.Text(UiText.Get("atlas.summary.resources-recipes",
+                gs.AtlasDiscoveredCount("resource"), gs.AtlasCatalogCount("resource"),
+                gs.AtlasDiscoveredCount("recipe"), gs.AtlasCatalogCount("recipe")), "fr-small"));
+            body.Add(UiKit.Text(UiText.Get("atlas.summary.structures", gs.AtlasDiscoveredCount("structure"), gs.AtlasCatalogCount("structure")), "fr-small"));
+            body.Add(UiKit.Text(UiText.Get("atlas.summary.aliens", gs.AtlasDiscoveredCount("enemy"), gs.AtlasCatalogCount("enemy")), "fr-small"));
+            body.Add(UiKit.Text(UiText.Get("atlas.help"), "fr-muted"));
             switch (atlasTab)
             {
                 case 0: BuildAtlasResources(body); break;
                 case 1: BuildAtlasRecipes(body); break;
                 case 2: BuildAtlasWorlds(body); break;
-                default: BuildAtlasFieldGuide(body); break;
+                case 3: BuildAtlasBestiary(body); break;
+                default: BuildAtlasStructures(body); break;
             }
         }
 
@@ -54,11 +60,12 @@ namespace Frontier
 
         void BuildAtlasResources(VisualElement body)
         {
-            var categoryLabel = UiKit.Text("RESOURCE FAMILY", "fr-tiny");
+            var categoryLabel = UiKit.Text(UiText.Get("atlas.resource.family"), "fr-tiny");
             categoryLabel.style.marginTop = UiKit.Space.S12;
             body.Add(categoryLabel);
             var category = new DropdownField();
-            category.choices = Enum.GetNames(typeof(ResourceCategory)).Select(PrettyName).ToList();
+            category.choices = Enum.GetNames(typeof(ResourceCategory))
+                .Select(name => UiText.Get("resource.category." + name.ToLowerInvariant())).ToList();
             category.index = (int)atlasCategory;
             category.RegisterValueChangedCallback(e =>
             {
@@ -74,14 +81,14 @@ namespace Frontier
             var resources = AtlasResources(atlasCategory);
             if (resources.Count == 0)
             {
-                body.Add(UiKit.Text("No resources are configured for this family.", "fr-muted"));
+                body.Add(UiKit.Text(UiText.Get("atlas.resource.empty"), "fr-muted"));
                 return;
             }
 
             int selectedIndex = resources.FindIndex(r => r.id == atlasResourceId);
             if (selectedIndex < 0) selectedIndex = 0;
             atlasResourceId = resources[selectedIndex].id;
-            var resourceLabel = UiKit.Text("RESOURCE", "fr-tiny");
+            var resourceLabel = UiKit.Text(UiText.Get("atlas.resource"), "fr-tiny");
             resourceLabel.style.marginTop = UiKit.Space.S12;
             body.Add(resourceLabel);
             var resourcePicker = new DropdownField();
@@ -105,47 +112,83 @@ namespace Frontier
             header.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconXl));
             var heading = UiKit.Div("fr-card-text");
             heading.Add(UiKit.Text(resource.displayName.ToUpper(), "fr-h2"));
-            heading.Add(UiKit.Text(resource.category + "  /  TIER " + resource.tier + "  /  STACK " + resource.stackSize, "fr-tiny"));
+            heading.Add(UiKit.Text(UiText.Get("atlas.resource.summary",
+                UiText.Get("resource.category." + resource.category.ToString().ToLowerInvariant()), resource.tier, resource.stackSize), "fr-tiny"));
             header.Add(heading);
             card.Add(header);
             card.Add(UiKit.Text(
-                gs.IsAtlasDiscovered("resource", resource.id)
-                    ? "DISCOVERED"
-                    : "NOT DISCOVERED  ·  FIRST FIND EARNS SHARDS",
+                UiText.Get(gs.IsAtlasDiscovered("resource", resource.id)
+                    ? "atlas.resource.discovered"
+                    : "atlas.resource.undiscovered"),
                 "fr-tiny",
                 gs.IsAtlasDiscovered("resource", resource.id) ? UiKit.Lime : UiKit.Muted));
             if (!string.IsNullOrEmpty(resource.DetailText)) card.Add(UiKit.Text(resource.DetailText, "fr-muted"));
 
-            card.Add(SectionLabel("WHERE TO FIND IT"));
+            card.Add(SectionLabel(UiText.Get("atlas.resource.where")));
             int habitatCount = 0;
             if (resource.IsRaw && gs.db.habitats != null && gs.db.habitats.rows != null)
             {
                 foreach (var habitat in gs.db.habitats.rows)
                 {
                     if (habitat == null || habitat.resourceId != resource.id) continue;
-                    string area = habitat.belt ? "Asteroid belt" : PrettyName(habitat.biome.ToString());
-                    card.Add(UiKit.Text(area + "  ·  " + PrettyName(habitat.method.ToString()) + "  ·  tier " + habitat.minTier + "+", "fr-small"));
+                    string area = habitat.belt ? UiText.Get("atlas.resource.belt") : PrettyName(habitat.biome.ToString());
+                    card.Add(UiKit.Text(UiText.Get("atlas.resource.habitat", area, PrettyName(habitat.method.ToString()), habitat.minTier), "fr-small"));
                     habitatCount++;
                 }
             }
             if (habitatCount == 0 && resource.harvestMethods != null)
                 foreach (var method in resource.harvestMethods)
-                    card.Add(UiKit.Text(PrettyName(method.ToString()) + " harvest", "fr-small"));
+                    card.Add(UiKit.Text(UiText.Get("atlas.resource.harvest", PrettyName(method.ToString())), "fr-small"));
             if (habitatCount == 0 && (resource.harvestMethods == null || resource.harvestMethods.Length == 0))
-                card.Add(UiKit.Text("Produced by processing or crafting.", "fr-small"));
+                card.Add(UiKit.Text(UiText.Get("atlas.resource.processed"), "fr-small"));
+
+            if (resource.IsRaw)
+            {
+                card.Add(SectionLabel(UiText.Get("atlas.resource.samples")));
+                var samples = AtlasSurveyedWorldSamples(resource);
+                if (samples.Count == 0) card.Add(UiKit.Text(UiText.Get("atlas.resource.samples.empty"), "fr-small"));
+                for (int i = 0; i < samples.Count && i < 3; i++)
+                    card.Add(UiKit.Text(UiText.Get("atlas.resource.sample", samples[i].planet.Name, samples[i].distance), "fr-small"));
+            }
 
             body.Add(card);
             BuildAtlasRelatedRecipes(body, resource);
             BuildAtlasBuildUses(body, resource);
             if (resource.IsRaw)
             {
-                var find = IconBtn("FIND SURVEYED DEPOSITS", "map", UiKit.Cyan, () =>
+                var find = IconBtn(UiText.Get("atlas.resource.find"), "map", UiKit.Cyan, () =>
                 {
                     CloseModal();
                     OpenMapForResource(resource.id);
                 });
                 body.Add(find);
             }
+        }
+
+        List<(PlanetData planet, double distance)> AtlasSurveyedWorldSamples(ResourceSO resource)
+        {
+            var samples = new List<(PlanetData planet, double distance)>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            var home = gs.universe.Home;
+            if (gs.planet != null) AddAtlasSample(gs.planet, resource, home, seen, samples);
+            if (gs.world != null)
+                foreach (var record in gs.world.All)
+                {
+                    if (record == null || record.visits <= 0) continue;
+                    AddAtlasSample(gs.universe.Get(record.planetId), resource, home, seen, samples);
+                }
+            samples.Sort((a, b) => a.distance.CompareTo(b.distance));
+            return samples;
+        }
+
+        static void AddAtlasSample(PlanetData planet, ResourceSO resource, PlanetData home, HashSet<string> seen,
+            List<(PlanetData planet, double distance)> samples)
+        {
+            if (planet == null || !seen.Add(planet.Id) || planet.Resources == null ||
+                !planet.Resources.Any(candidate => candidate != null && candidate.id == resource.id)) return;
+            double dx = planet.Star.X - home.Star.X;
+            double dy = planet.Star.Y - home.Star.Y;
+            samples.Add((planet, Math.Sqrt(dx * dx + dy * dy)));
         }
 
         void BuildAtlasBuildUses(VisualElement body, ResourceSO resource)
@@ -156,7 +199,7 @@ namespace Frontier
                 foreach (var structure in gs.db.structures)
                     if (structure != null && structure.buildCost != null &&
                         structure.buildCost.Exists(item => item.resource == resource))
-                        uses.Add(structure.displayName + "  ·  Structure");
+                        uses.Add(UiText.Get("atlas.resource.use-structure", structure.displayName));
             }
             if (gs.db.upgrades != null)
             {
@@ -166,12 +209,12 @@ namespace Frontier
                     for (int level = 0; level < upgrade.MaxLevel; level++)
                     {
                         if (upgrade.CostAt(level).Exists(item => item.resource == resource))
-                            uses.Add(upgrade.NameAtLevel(level + 1) + "  ·  Upgrade");
+                            uses.Add(UiText.Get("atlas.resource.use-upgrade", upgrade.NameAtLevel(level + 1)));
                     }
                 }
             }
             if (uses.Count == 0) return;
-            body.Add(SectionLabel("ALSO USED TO BUILD / UPGRADE"));
+            body.Add(SectionLabel(UiText.Get("atlas.resource.uses")));
             foreach (var use in uses) body.Add(UiKit.Text(use, "fr-small"));
         }
 
@@ -187,22 +230,22 @@ namespace Frontier
                 if (!uses && !makes) continue;
                 if (!headingAdded)
                 {
-                    body.Add(SectionLabel("MADE FROM  /  USED IN"));
+                    body.Add(SectionLabel(UiText.Get("atlas.resource.related")));
                     headingAdded = true;
                 }
                 AddAtlasRecipeCard(body, recipe);
             }
-            if (!headingAdded) body.Add(UiKit.Text("No recipes reference this resource yet.", "fr-muted"));
+            if (!headingAdded) body.Add(UiKit.Text(UiText.Get("atlas.resource.related.empty"), "fr-muted"));
         }
 
         void BuildAtlasRecipes(VisualElement body)
         {
             if (gs.db.recipes == null || gs.db.recipes.Length == 0)
             {
-                body.Add(UiKit.Text("No recipes are configured.", "fr-muted"));
+                body.Add(UiKit.Text(UiText.Get("atlas.recipes.empty"), "fr-muted"));
                 return;
             }
-            body.Add(UiKit.Text("Follow the input-to-output flow. Station, tier and research gates are shown on each recipe.", "fr-muted"));
+            body.Add(UiKit.Text(UiText.Get("atlas.recipes.help"), "fr-muted"));
             var recipes = gs.db.recipes.Where(r => r != null)
                 .OrderBy(r => r.tier).ThenBy(r => r.kind).ThenBy(r => r.displayName, StringComparer.Ordinal);
             foreach (var recipe in recipes) AddAtlasRecipeCard(body, recipe);
@@ -212,19 +255,19 @@ namespace Frontier
         {
             var card = Card(UiKit.Cyan);
             card.Add(UiKit.Text(recipe.displayName.ToUpper(), "fr-h2"));
-            string gate = PrettyName(recipe.kind.ToString()) + "  ·  TIER " + recipe.tier + "  ·  " +
-                PrettyName(recipe.stationId) + " LV " + recipe.stationLevel;
-            if (!string.IsNullOrEmpty(recipe.unlockResearch)) gate += "  ·  RESEARCH: " + PrettyName(recipe.unlockResearch);
+            string gate = UiText.Get(string.IsNullOrEmpty(recipe.unlockResearch) ? "atlas.recipe.gate" : "atlas.recipe.gate-research",
+                PrettyName(recipe.kind.ToString()), recipe.tier, PrettyName(recipe.stationId),
+                recipe.stationLevel, PrettyName(recipe.unlockResearch));
             card.Add(UiKit.Text(gate, "fr-tiny"));
             bool discovered = gs.IsAtlasDiscovered("recipe", recipe.id);
             card.Add(UiKit.Text(
-                discovered ? "CRAFTED" : "NOT CRAFTED  ·  FIRST CRAFT EARNS SHARDS",
+                UiText.Get(discovered ? "atlas.recipe.crafted" : "atlas.recipe.uncrafted"),
                 "fr-tiny",
                 discovered ? UiKit.Lime : UiKit.Muted));
 
             var flow = UiKit.Div("fr-recipe-flow");
             var inputs = UiKit.Div("fr-recipe-side");
-            inputs.Add(UiKit.Text("INPUT", "fr-tiny"));
+            inputs.Add(UiKit.Text(UiText.Get("atlas.recipe.input"), "fr-tiny"));
             if (recipe.inputs != null)
                 foreach (var item in recipe.inputs)
                     if (item.resource != null) inputs.Add(RecipeResource(item.resource, item.amount));
@@ -233,7 +276,7 @@ namespace Frontier
             arrow.AddToClassList("fr-recipe-arrow");
             flow.Add(arrow);
             var outputs = UiKit.Div("fr-recipe-side");
-            outputs.Add(UiKit.Text("OUTPUT", "fr-tiny"));
+            outputs.Add(UiKit.Text(UiText.Get("atlas.recipe.output"), "fr-tiny"));
             if (recipe.outputs != null)
                 foreach (var item in recipe.outputs)
                     if (item.resource != null) outputs.Add(RecipeResource(item.resource, item.amount));
@@ -247,7 +290,7 @@ namespace Frontier
             var planets = AtlasKnownWorlds();
             if (planets.Count == 0)
             {
-                body.Add(UiKit.Text("No visited worlds are recorded yet.", "fr-muted"));
+                body.Add(UiKit.Text(UiText.Get("atlas.worlds.empty"), "fr-muted"));
                 return;
             }
             int selectedIndex = planets.FindIndex(p => p.Id == atlasWorldId);
@@ -263,7 +306,7 @@ namespace Frontier
                 atlasWorldId = planets[index].Id;
                 RefreshModal();
             });
-            body.Add(UiKit.Text("VISITED WORLDS  ·  TRACKED SEPARATELY FROM CATALOG DISCOVERIES", "fr-tiny"));
+            body.Add(UiKit.Text(UiText.Get("atlas.worlds.help"), "fr-tiny"));
             body.Add(picker);
             BuildAtlasWorldDetails(body, planets[selectedIndex]);
         }
@@ -295,9 +338,10 @@ namespace Frontier
         {
             var card = Card(UiKit.Cyan, true);
             card.Add(UiKit.Text(planet.Name.ToUpper(), "fr-h2"));
-            card.Add(UiKit.Text(planet.SystemName + "  ·  " + planet.BiomeName + "  ·  TIER " + planet.Tier + "  ·  " + planet.Descriptor.Kind, "fr-small"));
-            card.Add(UiKit.Text("DANGER " + planet.Danger.ToString("0.0") + "  ·  HAZARDS " + (planet.Hazards == Hazards.None ? "NONE" : planet.Hazards.ToString()), "fr-tiny"));
-            card.Add(SectionLabel("AVAILABLE RESOURCES"));
+            card.Add(UiKit.Text(UiText.Get("atlas.world.summary", planet.SystemName, planet.BiomeName, planet.Tier, planet.Descriptor.Kind), "fr-small"));
+            card.Add(UiKit.Text(UiText.Get("atlas.world.hazards", planet.Danger,
+                planet.Hazards == Hazards.None ? UiText.Get("atlas.world.hazards.none") : planet.Hazards.ToString()), "fr-tiny"));
+            card.Add(SectionLabel(UiText.Get("atlas.world.resources")));
             foreach (var resource in planet.Resources)
             {
                 if (resource == null) continue;
@@ -317,65 +361,87 @@ namespace Frontier
             body.Add(card);
         }
 
-        void BuildAtlasFieldGuide(VisualElement body)
+        void BuildAtlasStructures(VisualElement body)
         {
-            body.Add(SectionLabel("STRUCTURES"));
             if (gs.db.structures != null)
             {
                 foreach (var structure in gs.db.structures)
                 {
                     if (structure == null) continue;
+                    bool discovered = !structure.Implemented || gs.IsAtlasDiscovered("structure", structure.kind.ToString());
                     var card = Card(structure.color);
                     var header = UiKit.Div("fr-card-head");
-                    header.Add(Icons.Make(StructureIcon(structure.kind), UiKit.Ui(structure.color), UiKit.Size.IconLg));
+                    header.Add(Icons.Make(discovered ? StructureIcon(structure.kind) : "lock",
+                        discovered ? UiKit.Ui(structure.color) : UiKit.Muted, UiKit.Size.IconLg));
                     var text = UiKit.Div("fr-card-text");
-                    text.Add(UiKit.Text(structure.displayName.ToUpper(), "fr-h2"));
-                    text.Add(UiKit.Text(structure.role + "  ·  TIER " + structure.tier + "  ·  " + (structure.Implemented ? "GAMEPLAY ACTIVE" : "CATALOGUE ONLY"), "fr-tiny"));
+                    text.Add(UiKit.Text(discovered ? structure.displayName.ToUpper() : UiText.Get("atlas.structure.unknown"), "fr-h2"));
+                    text.Add(UiKit.Text(discovered ? UiText.Get("atlas.structure.summary", structure.role, structure.tier,
+                        UiText.Get(structure.Implemented ? "atlas.structure.active" : "atlas.structure.catalog-only"))
+                        : UiText.Get("atlas.structure.identify"), "fr-tiny"));
                     header.Add(text);
                     card.Add(header);
                     if (structure.Implemented)
-                    {
-                        bool discovered = gs.IsAtlasDiscovered("structure", structure.kind.ToString());
-                        card.Add(UiKit.Text(
-                            discovered ? "BUILT" : "NOT BUILT  ·  FIRST COMPLETED BUILD EARNS SHARDS",
-                            "fr-tiny",
-                            discovered ? UiKit.Lime : UiKit.Muted));
-                    }
-                    card.Add(UiKit.Text(structure.description, "fr-muted"));
+                        card.Add(UiKit.Text(UiText.Get(discovered ? "atlas.structure.built" : "atlas.structure.unbuilt"),
+                            "fr-tiny", discovered ? UiKit.Lime : UiKit.Muted));
+                    if (discovered) card.Add(UiKit.Text(structure.description, "fr-muted"));
                     if (!structure.Implemented)
-                        card.Add(Note("This definition is in the content catalog; its gameplay behavior is not implemented.", UiKit.Amber));
+                        card.Add(Note(UiText.Get("atlas.structure.unimplemented"), UiKit.Amber));
                     body.Add(card);
                 }
             }
+        }
 
-            body.Add(SectionLabel("ALIENS"));
+        void OpenAtlasResource(ResourceSO resource)
+        {
+            if (resource == null) return;
+            atlasCategory = resource.category;
+            atlasResourceId = resource.id;
+            atlasTab = 0;
+            if (resource.IsRaw)
+            {
+                CloseModal();
+                OpenMapForResource(resource.id);
+                return;
+            }
+            menuPage = "atlas";
+            OpenModal("menu", "menu", UiText.Get("nav.menu"), UiKit.Cyan, BuildMenu, true);
+        }
+
+        void BuildAtlasBestiary(VisualElement body)
+        {
             if (gs.db.enemies == null || gs.db.enemies.Length == 0)
             {
-                body.Add(UiKit.Text("No alien entries are configured.", "fr-muted"));
+                body.Add(UiKit.Text(UiText.Get("atlas.bestiary.empty"), "fr-muted"));
                 return;
             }
             foreach (var enemy in gs.db.enemies)
             {
                 if (enemy == null) continue;
-                var card = Card(enemy.color);
+                bool discovered = gs.IsAtlasDiscovered("enemy", enemy.id);
+                var card = Card(discovered ? enemy.color : UiKit.Muted);
                 var header = UiKit.Div("fr-card-head");
-                var dot = UiKit.Div("fr-dot");
-                dot.style.width = UiKit.Size.IconLg;
-                dot.style.height = UiKit.Size.IconLg;
-                dot.style.backgroundColor = UiKit.Ui(enemy.color);
-                header.Add(dot);
+                header.Add(Icons.Make("alien",
+                    discovered ? UiKit.Ui(enemy.color) : new Color(0.16f, 0.2f, 0.27f), UiKit.Size.IconLg));
                 var text = UiKit.Div("fr-card-text");
-                text.Add(UiKit.Text(enemy.displayName.ToUpper(), "fr-h2"));
-                text.Add(UiKit.Text("FIRST WAVE " + enemy.minWave + "  ·  THREAT " + enemy.threat.ToString("0.0"), "fr-tiny"));
+                text.Add(UiKit.Text(discovered ? enemy.displayName.ToUpper() : UiText.Get("atlas.enemy.unknown"), "fr-h2"));
+                text.Add(UiKit.Text(discovered ? UiText.Get("atlas.enemy.summary", enemy.minWave, enemy.threat)
+                    : UiText.Get("atlas.enemy.reveal"), "fr-tiny"));
                 header.Add(text);
                 card.Add(header);
+                if (!discovered) { body.Add(card); continue; }
                 var stats = UiKit.Div("fr-row-wrap");
-                stats.Add(UiKit.Chip("heart", UiKit.Red, "HP " + enemy.health.ToString("0")));
-                stats.Add(UiKit.Chip("alien", UiKit.Magenta, "DMG " + enemy.damage.ToString("0")));
+                stats.Add(UiKit.Chip("heart", UiKit.Red, UiText.Get("atlas.enemy.health", enemy.health)));
+                stats.Add(UiKit.Chip("alien", UiKit.Magenta, UiText.Get("atlas.enemy.damage", enemy.damage)));
+                if (enemy.rank != AlienRank.Standard)
+                    stats.Add(UiKit.Chip("alien", UiKit.Amber, UiText.Get("wave.rank." + enemy.rank.ToString().ToLowerInvariant())));
+                if (enemy.armor > 0f)
+                    stats.Add(UiKit.Chip("shield", UiKit.Cyan, UiText.Get("atlas.enemy.armor", Mathf.RoundToInt(enemy.armor * 100f))));
                 card.Add(stats);
+                if (enemy.rank == AlienRank.Boss)
+                    card.Add(UiKit.Text(UiText.Get("atlas.enemy.boss-return", enemy.bossInterval), "fr-small"));
                 if (enemy.bounty != null && enemy.bounty.Count > 0)
                 {
-                    card.Add(UiKit.Text("WAVE REWARD", "fr-tiny"));
+                    card.Add(UiKit.Text(UiText.Get("atlas.enemy.reward"), "fr-tiny"));
                     foreach (var item in enemy.bounty)
                         if (item.resource != null) card.Add(RecipeResource(item.resource, item.amount));
                 }

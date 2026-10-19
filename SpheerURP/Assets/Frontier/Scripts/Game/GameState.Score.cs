@@ -20,7 +20,7 @@ namespace Frontier
 
         ScoreInputs BuildFrontierScoreInputs()
         {
-            var inputs = new ScoreInputs();
+            var inputs = new ScoreInputs { ascensionRank = AscensionRank };
             var landedByTier = new int[ScoreCalculator.WorldTierBucketCount];
             double maxDistance = Math.Max(0.0, stats.maxDistanceFromHomeLy);
             var waveDangers = new List<double>();

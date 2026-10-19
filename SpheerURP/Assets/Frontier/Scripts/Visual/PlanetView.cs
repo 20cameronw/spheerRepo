@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Frontier.Universe;
 using UnityEngine;
 
 namespace Frontier
@@ -24,7 +25,7 @@ namespace Frontier
         float appear = 1f;
         GameObject glow;
         Material atmosphereMat;
-        Material glowMat;
+        MeshRenderer glowRenderer;
         Color baseRim;
         int terraformingStage;
         bool punchWas;
@@ -49,6 +50,11 @@ namespace Frontier
 
         static float CraterSoftness(PlanetData p) { return p.IsAuthored ? 0f : 1f; }
 
+        static void SetWeatherSurface(Material material, PlanetData p, Color primary)
+        {
+            PlanetSurfaceStyle.ApplyClimate(material, p, primary);
+        }
+
         static void TerraformPalette(PlanetData p, int level, out Color primary, out Color secondary, out Color rim)
         {
             float terraforming = Mathf.Clamp01(level / 5f);
@@ -72,6 +78,7 @@ namespace Frontier
                 mat.SetColor("_BaseColor", alt ? Color.Lerp(secondary, primary, 0.35f) : primary);
                 mat.SetColor("_AltColor", alt ? secondary * 0.6f : secondary);
                 mat.SetColor("_RimColor", baseRim);
+                SetWeatherSurface(mat, p, primary);
                 mat.SetFloat("_Bands", bands);
                 mat.SetFloat("_Seed", seed);
                 mat.SetFloat("_Style", p.Style);
@@ -132,6 +139,7 @@ namespace Frontier
                 coreMat.SetColor("_BaseColor", primary);
                 coreMat.SetColor("_AltColor", secondary);
                 coreMat.SetColor("_RimColor", baseRim);
+                SetWeatherSurface(coreMat, p, primary);
                 coreMat.SetFloat("_Bands", EffectiveBands(p, p.SurfaceBands > 0f ? p.SurfaceBands : 4f + (float)rng.NextDouble() * 6f));
                 coreMat.SetFloat("_Seed", (float)rng.NextDouble() * 10f);
                 coreMat.SetFloat("_Style", p.Style);
@@ -156,7 +164,7 @@ namespace Frontier
             atmo.GetComponent<MeshRenderer>().sharedMaterial = atmosphereMat;
 
             glow = Fx.GlowQuad(root, new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f), Radius * 6.5f, new Vector3(0, 0, 0.5f));
-            glowMat = glow.GetComponent<MeshRenderer>().sharedMaterial;
+            glowRenderer = glow.GetComponent<MeshRenderer>();
 
             if (p.HasRings)
                 for (int i = 0; i < 2; i++)
@@ -193,6 +201,7 @@ namespace Frontier
                 coreMat.SetColor("_BaseColor", primary);
                 coreMat.SetColor("_AltColor", secondary);
                 coreMat.SetColor("_RimColor", baseRim);
+                coreMat.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
             }
             if (modelMats != null)
             {
@@ -202,14 +211,15 @@ namespace Frontier
                     material.SetColor("_BaseColor", primary);
                     material.SetColor("_AltColor", secondary);
                     material.SetColor("_RimColor", baseRim);
+                    material.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
                 }
             }
 
             Color atmosphereColor = rim * (1.2f * Current.AtmosphereIntensity);
             if (atmosphereMat != null)
                 atmosphereMat.SetColor("_Color", new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
-            if (glowMat != null)
-                glowMat.SetColor("_Color", new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f));
+            if (glowRenderer != null)
+                FxTransientPool.SetColor(glowRenderer, new Color(baseRim.r, baseRim.g, baseRim.b, 0.28f));
         }
 
         // Free trackball control: drags rotate about the camera's up/right axes, so any direction works.

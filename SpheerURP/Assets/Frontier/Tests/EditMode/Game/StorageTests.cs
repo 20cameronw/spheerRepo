@@ -178,6 +178,33 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void QuickTransfers_HonorCategoryFilterAndKeepOtherResources()
+        {
+            db = GameDatabase.Load();
+            state = new GameState(db, false);
+            wood = db.FindResource("wood");
+            warehouse = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 1);
+            storage = state.StorageFor(warehouse);
+            ResourceSO other = null;
+            foreach (var candidate in db.resources)
+                if (candidate != null && candidate.category != wood.category) { other = candidate; break; }
+            Assert.IsNotNull(other, "fixture needs more than one resource family");
+            state.backpack.Clear();
+            state.Add(wood, 20, false);
+            state.Add(other, 12, false);
+
+            Assert.AreEqual(20, state.QuickStore(warehouse, wood.category, false));
+            Assert.AreEqual(0, state.Count(wood));
+            Assert.AreEqual(12, state.Count(other), "the filter must leave other resource families in the backpack");
+            Assert.AreEqual(20, WarehouseOps.Held(storage, wood.id));
+
+            Assert.AreEqual(20, state.QuickWithdraw(warehouse, wood.category, false));
+            Assert.AreEqual(20, state.Count(wood));
+            Assert.AreEqual(12, state.Count(other));
+            Assert.AreEqual(0, WarehouseOps.Held(storage, wood.id));
+        }
+
+        [Test]
         public void RandomOperations_NeverCreateOrDestroyItems()
         {
             var rng = new System.Random(12345);

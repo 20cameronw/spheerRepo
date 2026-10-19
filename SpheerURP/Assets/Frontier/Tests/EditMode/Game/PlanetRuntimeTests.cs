@@ -49,6 +49,46 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void NeonPlanetShader_ExposesDescriptorDrivenCloudAndCapControls()
+        {
+            var shader = Shader.Find("Frontier/NeonPlanet");
+            Assert.IsNotNull(shader);
+            var material = new Material(shader);
+            try
+            {
+                Assert.IsTrue(material.HasProperty("_CloudColor"));
+                Assert.IsTrue(material.HasProperty("_CloudCoverage"));
+                Assert.IsTrue(material.HasProperty("_PolarCaps"));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(material); }
+        }
+
+        [Test]
+        public void PlanetSurfaceStyle_MapsWeatherBiomeAndGasAtmosphereToShaderCoverage()
+        {
+            var glacial = service.Get("glacia");
+            Assert.AreEqual(1f, PlanetSurfaceStyle.PolarCapCoverage(glacial));
+            Assert.Greater(PlanetSurfaceStyle.CloudCoverage(glacial), 0f);
+
+            var gasGiant = service.FindGenerated(Biome.GasGiant, null);
+            Assert.IsNotNull(gasGiant);
+            Assert.GreaterOrEqual(PlanetSurfaceStyle.CloudCoverage(gasGiant),
+                0.72f * Mathf.Clamp01(gasGiant.AtmosphereIntensity));
+        }
+
+        [Test]
+        public void PlanetContactSheet_SamplesTwoHundredDeterministicAuthoredAndGeneratedWorlds()
+        {
+            var sample = Frontier.EditorTools.FrontierPlanetContactSheet.BuildSample(service);
+            Assert.AreEqual(200, sample.Length);
+            Assert.AreEqual(30, Array.FindAll(sample, planet => planet.IsAuthored).Length);
+            Assert.AreEqual(200, new HashSet<string>(Array.ConvertAll(sample, planet => planet.Id)).Count);
+            var biomes = new HashSet<Biome>();
+            foreach (var planet in sample) biomes.Add(planet.Biome);
+            Assert.GreaterOrEqual(biomes.Count, 6, "the contact sheet should exercise several generated biome shader paths");
+        }
+
+        [Test]
         public void AuthoredPlanetData_MirrorsItsAsset_FieldForField()
         {
             foreach (var so in db.planets)

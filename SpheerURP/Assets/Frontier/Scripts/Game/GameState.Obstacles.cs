@@ -6,6 +6,8 @@ using EItem = Frontier.Economy.ItemAmount;
 
 namespace Frontier
 {
+    public enum PaidReviveResult { Rejected, Saved, PendingSave }
+
     public partial class GameState
     {
         const string ShardCurrency = "shards";
@@ -22,6 +24,50 @@ namespace Frontier
                         if (entry != null && entry.currency == ShardCurrency && entry.amount > 0) total += entry.amount;
                 return (int)Math.Min(int.MaxValue, total);
             }
+        }
+
+        public int HyperspaceReviveCost
+        {
+            get { return db.shardRules != null && db.shardRules.data != null ? Math.Max(0, db.shardRules.data.reviveRunShards) : -1; }
+        }
+
+        public PaidReviveResult PurchaseHyperspaceRevive(Hyperspace.HyperspaceRun run, int maximumCost, out string message)
+        {
+            if (SaveIsReadOnly)
+            {
+                message = UiText.Get("revive.read-only");
+                return PaidReviveResult.Rejected;
+            }
+            int cost = HyperspaceReviveCost;
+            if (run == null || !run.CanRevive || cost < 0)
+            {
+                message = UiText.Get("revive.unavailable");
+                return PaidReviveResult.Rejected;
+            }
+            if (cost > maximumCost || maximumCost < 0)
+            {
+                message = UiText.Get("revive.price-changed");
+                return PaidReviveResult.Rejected;
+            }
+            if (ShardBalance < cost)
+            {
+                message = UiText.Get("revive.shards-missing");
+                return PaidReviveResult.Rejected;
+            }
+            if (!run.Revive())
+            {
+                message = UiText.Get("revive.rejected");
+                return PaidReviveResult.Rejected;
+            }
+            SpendShards(cost);
+            Notify();
+            if (!saves.Save())
+            {
+                message = UiText.Get("revive.pending-save", saves.LastError);
+                return PaidReviveResult.PendingSave;
+            }
+            message = UiText.Get("revive.done");
+            return PaidReviveResult.Saved;
         }
 
         public List<ObstacleInstance> ObstaclesOn(PlanetData p)
@@ -68,12 +114,12 @@ namespace Frontier
 
         public string ObstacleClearLockReason(int pad)
         {
-            if (!db.UsesImportedEconomy || GetObstacleCatalog() == null) return "Obstacle clearing is unavailable";
+            if (!db.UsesImportedEconomy || GetObstacleCatalog() == null) return UiText.Get("clearance.unavailable");
             var obstacle = ObstacleAt(planet, pad);
-            if (!obstacle.HasValue) return "This obstruction is no longer here";
-            if (FindObstacleJob(planet.Id, pad) != null) return "Clearance crew assigned";
+            if (!obstacle.HasValue) return UiText.Get("clearance.absent");
+            if (FindObstacleJob(planet.Id, pad) != null) return UiText.Get("clearance.assigned");
             if (obstacle.Value.seconds > 0 && AvailableBuilderCount <= 0) return BuilderAvailabilityReason();
-            return Has(ObstacleClearCost(planet, pad)) ? null : "Not enough resources";
+            return Has(ObstacleClearCost(planet, pad)) ? null : UiText.Get("build.resources-missing");
         }
 
         public bool StartObstacleClear(int pad)
@@ -104,7 +150,12 @@ namespace Frontier
 
         public int ObstacleClearSecondsRemaining(int pad)
         {
-            var job = FindObstacleJob(planet.Id, pad);
+            return ObstacleClearSecondsRemaining(planet, pad);
+        }
+
+        public int ObstacleClearSecondsRemaining(PlanetData p, int pad)
+        {
+            var job = p == null ? null : FindObstacleJob(p.Id, pad);
             if (job == null || !UtcText.TryParse(job.endUtc, out var end)) return 0;
             double remaining = (end - clock.UtcNow).TotalSeconds;
             return remaining <= 0 ? 0 : (int)Math.Ceiling(remaining);
@@ -237,7 +288,7 @@ namespace Frontier
         double ColonyHubObstacleDiscount(PlanetData p)
         {
             var hub = p == null ? null : StructureOfKind(p, StructureKind.ColonyHub);
-            return hub == null ? 0.0 : Math.Max(0.0, hub.def.EffectAt(hub.level));
+            return hub == null ? 0.0 : Math.Max(0.0, hub.def.CapacityAt(hub.level));
         }
 
         void AddShards(int amount)

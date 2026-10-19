@@ -6,14 +6,15 @@ using UnityEngine.Rendering.Universal;
 
 namespace Frontier.Hyperspace.View
 {
-    /// <summary>One preallocated, vertex-coloured mesh, one draw call; no scene objects per entity.</summary>
+    /// <summary>One pooled entity mesh plus a bounded shared player ship rig; no scene objects per enemy.</summary>
     public sealed class HyperspaceScene : IDisposable
     {
         public RenderTexture Texture { get; private set; }
-        public int TriangleCount { get { return indices.Count / 3; } }
+        public int TriangleCount { get { return indices.Count / 3 + playerRig.TriangleCount; } }
         readonly Camera camera;
         readonly Mesh mesh;
         readonly Material material;
+        readonly ShipRig playerRig;
         readonly UniversalRenderPipeline.SingleCameraRequest renderRequest;
         readonly List<Vector3> vertices = new List<Vector3>(60000);
         readonly List<Color> colors = new List<Color>(60000);
@@ -24,9 +25,13 @@ namespace Frontier.Hyperspace.View
         struct Burst { public Vector3 p; public Color color; public float start; public float size; }
         static readonly Color Cyan = new Color(0.3f, 0.95f, 1f);
         static readonly Color Orange = new Color(1f, 0.55f, 0.16f);
+        readonly int ascensionRank;
+        public Color TrailColor { get; private set; }
 
-        public HyperspaceScene(Transform parent)
+        public HyperspaceScene(Transform parent, int ascensionRank = 0)
         {
+            this.ascensionRank = Math.Max(0, ascensionRank);
+            TrailColor = this.ascensionRank > 0 ? AscensionStyle.Accent(this.ascensionRank) : Cyan;
             var go = new GameObject("Warp Camera"); go.transform.SetParent(parent, false);
             camera = go.AddComponent<Camera>();
             camera.enabled = false;
@@ -38,14 +43,16 @@ namespace Frontier.Hyperspace.View
             camera.cullingMask = 1 << 31;
             camera.allowHDR = false; camera.allowMSAA = false;
             camera.depth = -10;
-            int height = Mathf.Min(1280, ScreenMetrics.Height);
-            int width = Mathf.Max(320, Mathf.RoundToInt(height * ScreenMetrics.Aspect));
+            PresentationQuality.Budget.FitSurface(ScreenMetrics.Width, ScreenMetrics.Height, SystemInfo.maxTextureSize,
+                out int width, out int height);
             Texture = new RenderTexture(width, height, 24) { name = "Hyperspace View", antiAliasing = 1 };
             Texture.Create(); camera.targetTexture = Texture;
             renderRequest = new UniversalRenderPipeline.SingleCameraRequest { destination = Texture };
             mesh = new Mesh { name = "Hyperspace pooled geometry", indexFormat = IndexFormat.UInt32 };
             mesh.MarkDynamic();
             material = new Material(Resources.Load<Shader>("Frontier/Hyperspace/WarpVertex")) { name = "Warp vertex colour" };
+            playerRig = ShipRig.Create(parent, 31, cameraOnly: true);
+            playerRig.transform.localScale = Vector3.one * 0.42f;
         }
 
         public void Present(HyperspaceRun run, float alpha)
@@ -59,7 +66,7 @@ namespace Frontier.Hyperspace.View
             camera.transform.position = new Vector3(Mathf.Sin(Time.unscaledTime * 73) * kick * 0.1f, 1.8f, -distance);
             camera.transform.LookAt(new Vector3(0, 0.2f, 30));
             // Stable star positions belong to presentation, never consume the simulation RNG.
-            for (int i = 0; i < 180; i++)
+            for (int i = 0; i < PresentationQuality.Budget.TravelStars; i++)
             {
                 float angle = i * 2.399963f, radius = 5 + (i % 13) * 0.8f;
                 float z = Mathf.Repeat(i * 9.73f - scroll, 160);
@@ -161,10 +168,19 @@ namespace Frontier.Hyperspace.View
             }
             var player = run.Player;
             var ship = new Vector3(player.x + player.vx * dt, player.y + player.vy * dt, 0);
-            if (player.invulnerable <= 0 || (run.StepIndex / 5) % 2 == 0)
-                Ship(ship, 0.32f, -player.vx * 0.05f, Color.white, true);
+            playerRig.transform.position = ship;
+            playerRig.gameObject.SetActive(player.invulnerable <= 0 || (run.StepIndex / 5) % 2 == 0);
+            playerRig.SetFlight(Mathf.Clamp01(run.Speed / 50f), 0f, -player.vx * 4f);
             Line(ship + Vector3.back * 0.3f, ship + Vector3.back * (1.2f + run.Speed * 0.025f), 0.16f,
-                player.overdrive > 0 ? Color.magenta : Cyan);
+                player.overdrive > 0 ? Color.magenta : TrailColor);
+            if (ascensionRank > 0)
+            {
+                float spread = 0.12f + (ascensionRank % 3) * 0.025f;
+                for (int side = -1; side <= 1; side += 2)
+                    Line(ship + Vector3.right * side * spread + Vector3.back * 0.4f,
+                        ship + Vector3.right * side * spread + Vector3.back * (1.6f + run.Speed * 0.025f),
+                        0.025f, TrailColor * 0.6f);
+            }
             if (player.shield > 0) Ring(ship, 0.52f, 0.025f, Cyan);
             if (player.overdrive > 0) Ring(ship, 0.65f, 0.045f, Color.magenta);
             for (int i = 0; i < bursts.Length; i++)
@@ -184,6 +200,7 @@ namespace Frontier.Hyperspace.View
             mesh.SetTriangles(indices, 0, false);
             mesh.bounds = new Bounds(new Vector3(0, 0, 70), new Vector3(100, 100, 240));
             Graphics.DrawMesh(mesh, Matrix4x4.identity, material, 31, camera, 0, null, ShadowCastingMode.Off, false);
+            playerRig.DrawForCamera(camera);
             RenderPipeline.SubmitRenderRequest(camera, renderRequest);
         }
 
@@ -324,6 +341,7 @@ namespace Frontier.Hyperspace.View
         }
         public void Dispose()
         {
+            if (playerRig != null) UnityEngine.Object.Destroy(playerRig.gameObject);
             camera.targetTexture = null; camera.enabled = false;
             Texture.Release(); UnityEngine.Object.Destroy(Texture);
             UnityEngine.Object.Destroy(mesh); UnityEngine.Object.Destroy(material);

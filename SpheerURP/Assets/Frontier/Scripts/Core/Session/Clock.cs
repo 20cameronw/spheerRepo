@@ -25,6 +25,46 @@ namespace Frontier
         public double MonotonicSeconds { get { return watch.Elapsed.TotalSeconds; } }
     }
 
+    /// <summary>
+    /// Anchors UTC once at startup and advances it only by elapsed monotonic time. This protects active-session
+    /// timers from device-date edits, but the startup anchor is still untrusted offline device time.
+    /// </summary>
+    public sealed class SessionClock : IClock
+    {
+        readonly IClock source;
+        readonly DateTime startedUtc;
+        readonly double startedSeconds;
+
+        public SessionClock(IClock source)
+        {
+            this.source = source ?? throw new ArgumentNullException(nameof(source));
+            startedSeconds = source.MonotonicSeconds;
+            if (double.IsNaN(startedSeconds) || double.IsInfinity(startedSeconds))
+                throw new InvalidOperationException("The session clock requires finite monotonic time.");
+            startedUtc = DateTime.SpecifyKind(source.UtcNow, DateTimeKind.Utc);
+        }
+
+        public DateTime UtcNow
+        {
+            get
+            {
+                double elapsed = MonotonicSeconds - startedSeconds;
+                return startedUtc.AddSeconds(elapsed);
+            }
+        }
+
+        public double MonotonicSeconds
+        {
+            get
+            {
+                double now = source.MonotonicSeconds;
+                if (double.IsNaN(now) || double.IsInfinity(now) || now < startedSeconds)
+                    throw new InvalidOperationException("The session clock's monotonic time is invalid.");
+                return now;
+            }
+        }
+    }
+
     /// <summary>A manually driven clock for tests: time only moves when the test says so.</summary>
     public sealed class FakeClock : IClock
     {

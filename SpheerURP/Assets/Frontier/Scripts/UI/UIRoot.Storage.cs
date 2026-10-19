@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Frontier.Economy;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,6 +10,7 @@ namespace Frontier
     {
         VisualElement dragGhost, dragSource;
         int inventoryDragPointer;
+        ResourceCategory? warehouseCategoryFilter;
 
         void OnDisable() { EndInventoryDrag(); }
         void OnApplicationFocus(bool focused) { if (!focused) EndInventoryDrag(); }
@@ -108,13 +110,16 @@ namespace Frontier
         void BuildRelay(VisualElement body, PlacedStructure relay)
         {
             int radius = relay.def.CapacityAt(relay.level);
-            body.Add(UiKit.Text(gs.planet.Name + " · LV " + relay.level + " · " +
-                (radius > 0 ? radius + " LY beam" : "system beam"), "fr-muted"));
-            body.Add(UiKit.Text("Pull stacks from operational storage on other visited worlds. Each pull costs energy based on stack size and distance; only fuel in your backpack can pay. Fuel Depot reserves stay isolated.", "fr-tiny"));
+            body.Add(UiKit.Text(UiText.Get("relay.summary", gs.planet.Name, relay.level,
+                UiText.Get(radius > 0 ? "relay.beam.range" : "relay.beam.system", radius)), "fr-muted"));
+            body.Add(UiKit.Text(UiText.Get("relay.help"), "fr-tiny"));
             var sources = gs.RelayWarehouses(relay);
             if (sources.Count == 0)
             {
-                body.Add(UiKit.Text("No remote warehouses are in range. Build storage on another visited world, or upgrade the relay to extend its beam.", "fr-small"));
+                body.Add(UiKit.Text(UiText.Get("relay.empty"), "fr-small"));
+                var map = IconBtn(UiText.Get("guide.action.map"), "map", UiKit.Cyan, () => { CloseModal(); OpenMap(); });
+                map.name = "empty-relay-action";
+                body.Add(map);
                 return;
             }
 
@@ -123,7 +128,7 @@ namespace Frontier
                 var sourcePlanet = gs.universe.Get(source.planetId);
                 if (sourcePlanet == null) continue;
                 double distance = gs.RelayDistanceLy(relay, source);
-                string range = distance <= 0.0 ? "SAME SYSTEM" : distance.ToString("0.#") + " LY";
+                string range = UiText.Get(distance <= 0.0 ? "relay.range.system" : "relay.range.distance", distance);
                 var card = Card(UiKit.Cyan);
                 card.Add(UiKit.Text(sourcePlanet.Name + " · " + source.def.displayName.ToUpperInvariant(), "fr-h2"));
                 card.Add(UiKit.Text(sourcePlanet.SystemName + " · " + range, "fr-tiny"));
@@ -140,19 +145,19 @@ namespace Frontier
                     int energy = amount > 0 ? gs.RelayTransferEnergyCost(relay, source, amount) : 0;
                     var row = UiKit.Div("fr-row-wrap");
                     row.Add(ResourceIconChip(resource, resource.displayName + " ×" + stack.count));
-                    string action = amount > 0 ? "PULL " + amount + " · " + energy + " ENERGY" : "BACKPACK FULL";
+                    string action = UiText.Get(amount > 0 ? "relay.pull" : "storage.pack-full", amount, energy);
                     var pull = IconBtn(action, "pack", UiKit.Cyan, () =>
                     {
                         int moved = gs.WithdrawThroughRelay(relay, source, slotIndex, amount);
-                        if (moved > 0) { Sfx.Good(); Toast("Relayed " + moved + " " + resource.displayName, UiKit.Cyan); }
-                        else Toast("Transfer blocked: check backpack space and carried fuel.", UiKit.Amber);
+                        if (moved > 0) { Sfx.Good(); Toast(UiText.Get("relay.transferred", moved, resource.displayName), UiKit.Cyan); }
+                        else Toast(UiText.Get("relay.blocked"), UiKit.Amber);
                         RefreshModal();
                     });
                     UiKit.SetEnabledLook(pull, amount > 0 && energy <= gs.FuelOnBoard.Energy);
                     row.Add(pull);
                     card.Add(row);
                 }
-                if (!hasStacks) card.Add(UiKit.Text("No stored resources", "fr-tiny"));
+                if (!hasStacks) card.Add(UiKit.Text(UiText.Get("relay.storage-empty", sourcePlanet.Name), "fr-tiny"));
                 body.Add(card);
             }
         }
@@ -163,28 +168,50 @@ namespace Frontier
             var storage = gs.StorageFor(warehouse);
             int capacity = warehouse.def.StorageCapacity(warehouse.level);
             int used = storage.slots.FindAll(s => s.count > 0).Count;
-            body.Add(UiKit.Text(gs.planet.Name + "  -  LV " + warehouse.level + "  -  " + used + " / " + capacity + " storage slots", "fr-muted"));
+            body.Add(UiKit.Text(UiText.Get("storage.summary", gs.planet.Name, warehouse.level, used, capacity), "fr-muted"));
             bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
             bool cargoDepot = warehouse.def.kind == StructureKind.CargoDepot;
             bool autoHarvester = warehouse.def.kind == StructureKind.AutoHarvester;
             bool cargoPoolActive = gs.StructureOfKind(gs.planet, StructureKind.CargoDepot) != null;
-            body.Add(UiKit.Text(fuelOnly
-                ? "Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger fuel stacks; reserves stay on this planet and never pay travel costs."
+            body.Add(UiKit.Text(UiText.Get(fuelOnly
+                ? "storage.help.fuel"
                 : autoHarvester
-                    ? "This hopper stores the Auto-Harvester's offline output. A local Cargo Depot connects its materials to this planet's shared build and craft pool."
+                    ? "storage.help.harvester"
                     : cargoDepot
-                    ? "This shared buffer joins operational Warehouses and Auto-Harvester hoppers on this planet. Build and craft costs draw from the pool automatically; travel still uses your backpack."
+                    ? "storage.help.cargo"
                     : cargoPoolActive
-                        ? "Connected to this planet's Cargo Depot. Build and craft costs can draw from this storage automatically."
-                        : "Drag a stack between the grids. Resources stay on this planet. Costs use the backpack until a Cargo Depot connects its storage.", "fr-tiny"));
+                        ? "storage.help.connected"
+                        : "storage.help.warehouse"), "fr-tiny"));
             if (autoHarvester)
-                body.Add(UiKit.Text("OFFLINE " + warehouse.def.EffectAt(warehouse.level).ToString("0.#") +
-                    " run-eq/hr  ·  " + warehouse.def.CapacityAt(warehouse.level) + "h cap", "fr-small"));
+                body.Add(UiKit.Text(UiText.Get("storage.offline", warehouse.def.EffectAt(warehouse.level),
+                    warehouse.def.CapacityAt(warehouse.level)), "fr-small"));
+
+            var categories = (ResourceCategory[])Enum.GetValues(typeof(ResourceCategory));
+            var filter = new DropdownField();
+            filter.choices = new List<string> { UiText.Get("storage.filter.all") };
+            foreach (var category in categories) filter.choices.Add(UiText.Get("resource.category." + category.ToString().ToLowerInvariant()));
+            filter.index = warehouseCategoryFilter.HasValue
+                ? Array.IndexOf(categories, warehouseCategoryFilter.Value) + 1
+                : 0;
+            filter.tooltip = UiText.Get("storage.filter.help");
+            filter.RegisterValueChangedCallback(e =>
+            {
+                int index = filter.choices.IndexOf(e.newValue);
+                if (index < 0) return;
+                warehouseCategoryFilter = index == 0 ? (ResourceCategory?)null : categories[index - 1];
+                RefreshModal();
+            });
+            body.Add(filter);
+
+            var quickActions = UiKit.Div("fr-row-wrap");
+            quickActions.Add(IconBtn(UiText.Get("storage.quick-store"), "pack", UiKit.Cyan, () => QuickStore(warehouse)));
+            quickActions.Add(IconBtn(UiText.Get("storage.quick-withdraw"), "warehouse", UiKit.Cyan, () => QuickWithdraw(warehouse)));
+            body.Add(quickActions);
 
             var packSlots = new List<VisualElement>();
             var storageSlots = new List<VisualElement>();
-            body.Add(SectionLabel(fuelOnly ? "FUEL RESERVE" : autoHarvester ? "HARVESTER HOPPER" :
-                cargoDepot ? "SHARED BUFFER" : "WAREHOUSE"));
+            body.Add(SectionLabel(UiText.Get(fuelOnly ? "storage.title.fuel" : autoHarvester ? "storage.title.harvester" :
+                cargoDepot ? "storage.title.cargo" : "storage.title.warehouse")));
             var storageGrid = UiKit.Div("fr-grid");
             for (int i = 0; i < capacity; i++)
             {
@@ -192,27 +219,28 @@ namespace Frontier
                 var stack = storage.slots[index];
                 var resource = gs.db.FindResource(stack.resourceId);
                 var slot = Slot(resource, stack.count, false);
+                if (resource != null && !PassWarehouseFilter(resource)) slot.style.display = DisplayStyle.None;
                 BindInventoryDrag(slot, resource, stack.count, () =>
                 {
-                    if (resource != null) Toast(resource.displayName + ": " + stack.count + " stored", UiKit.Ui(resource.color));
+                    if (resource != null) Toast(UiText.Get("storage.stored-count", resource.displayName, stack.count), UiKit.Ui(resource.color));
                 }, position =>
                 {
                     int target = SlotAt(storageSlots, position);
                     if (target >= 0)
                     {
                         if (!gs.MoveStoredSlot(warehouse, index, target) && target != index)
-                            Toast("That stack is full.", UiKit.Red);
+                            Toast(UiText.Get("storage.stack-full"), UiKit.Red);
                         return;
                     }
                     target = SlotAt(packSlots, position);
                     if (target < 0 || resource == null) return;
                     if (packRes[target] != null && packRes[target] != resource)
                     {
-                        Toast("Drop on an empty slot or the same resource.", UiKit.Red); return;
+                        Toast(UiText.Get("storage.drop-help"), UiKit.Red); return;
                     }
                     int room = Mathf.Max(0, resource.stackSize - packCnt[target]);
                     int moved = gs.Withdraw(warehouse, index, room, false);
-                    if (moved == 0) { Toast("Backpack slot is full.", UiKit.Red); return; }
+                    if (moved == 0) { Toast(UiText.Get("storage.pack-slot-full"), UiKit.Red); return; }
                     packRes[target] = resource; packCnt[target] += moved;
                     Sfx.Click(); gs.Notify();
                 });
@@ -220,16 +248,35 @@ namespace Frontier
             }
             SizeInventoryGrid(storageGrid, storageSlots);
             body.Add(storageGrid);
-            body.Add(SectionLabel("BACKPACK  -  " + gs.SlotsUsed + " / " + gs.Slots));
+            if (used == 0)
+            {
+                var hint = UiKit.Text(UiText.Get(autoHarvester
+                    ? "storage.empty.harvester"
+                    : gs.SlotsUsed == 0
+                        ? "storage.empty.both"
+                        : fuelOnly
+                            ? "storage.empty.fuel"
+                            : "storage.empty.warehouse"), "fr-tiny");
+                hint.name = "empty-storage-hint";
+                body.Add(hint);
+                if (!autoHarvester && gs.SlotsUsed == 0)
+                {
+                    var gather = IconBtn(UiText.Get("storage.find-resources"), "mine", UiKit.Lime, RunEmptyPackAction);
+                    gather.name = "empty-storage-action";
+                    body.Add(gather);
+                }
+            }
+            body.Add(SectionLabel(UiText.Get("storage.pack-capacity", gs.SlotsUsed, gs.Slots)));
             var packGrid = UiKit.Div("fr-grid");
             for (int i = 0; i < packRes.Length; i++)
             {
                 int index = i;
                 var resource = packRes[index];
                 var slot = Slot(resource, packCnt[index], false);
+                if (resource != null && !PassWarehouseFilter(resource)) slot.style.display = DisplayStyle.None;
                 BindInventoryDrag(slot, resource, packCnt[index], () =>
                 {
-                    if (resource != null) Toast(resource.displayName + ": " + packCnt[index] + " carried", UiKit.Ui(resource.color));
+                    if (resource != null) Toast(UiText.Get("storage.carried-count", resource.displayName, packCnt[index]), UiKit.Ui(resource.color));
                 }, position =>
                 {
                     int target = SlotAt(storageSlots, position);
@@ -237,10 +284,10 @@ namespace Frontier
                     {
                         if (!gs.CanStore(warehouse, resource))
                         {
-                            Toast("Fuel depots only accept resources that power the ship.", UiKit.Red); return;
+                            Toast(UiText.Get("storage.fuel-only"), UiKit.Red); return;
                         }
                         int moved = gs.Deposit(warehouse, target, resource, packCnt[index], false);
-                        if (moved == 0) { Toast(fuelOnly ? "Fuel slot is full or contains another resource." : "Storage slot is full or contains another resource.", UiKit.Red); return; }
+                        if (moved == 0) { Toast(UiText.Get(fuelOnly ? "storage.fuel-slot-full" : "storage.slot-full"), UiKit.Red); return; }
                         packCnt[index] -= moved;
                         if (packCnt[index] == 0) packRes[index] = null;
                         Sfx.Click(); gs.Notify(); return;
@@ -256,6 +303,35 @@ namespace Frontier
             SizeInventoryGrid(packGrid, packSlots);
             body.Add(packGrid);
             UpgradeButton(body, warehouse, UiKit.Cyan);
+        }
+
+        bool PassWarehouseFilter(ResourceSO resource)
+        {
+            return resource == null || !warehouseCategoryFilter.HasValue || resource.category == warehouseCategoryFilter.Value;
+        }
+
+        void QuickStore(PlacedStructure warehouse)
+        {
+            int moved = gs.QuickStore(warehouse, warehouseCategoryFilter, false);
+            FinishQuickTransfer(moved, "storage.quick-stored", "storage.quick-store-empty");
+        }
+
+        void QuickWithdraw(PlacedStructure warehouse)
+        {
+            int moved = gs.QuickWithdraw(warehouse, warehouseCategoryFilter, false);
+            FinishQuickTransfer(moved, "storage.quick-withdrew", "storage.quick-withdraw-empty");
+        }
+
+        void FinishQuickTransfer(int moved, string successKey, string emptyKey)
+        {
+            if (moved > 0)
+            {
+                gs.Notify();
+                Sfx.Click();
+                Toast(UiText.Get(successKey, moved), UiKit.Cyan);
+            }
+            else Toast(UiText.Get(emptyKey), UiKit.Muted);
+            RefreshModal();
         }
 
         static void SizeInventoryGrid(VisualElement grid, List<VisualElement> slots)

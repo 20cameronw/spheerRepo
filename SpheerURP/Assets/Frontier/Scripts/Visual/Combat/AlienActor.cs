@@ -12,8 +12,9 @@ namespace Frontier
         public float speed;
         DefenseController owner;
         Transform visual;
-        Material mat;
-        Material glowMaterial, trailMaterial;
+        Material mat, trailMaterial;
+        LineRenderer healthRing;
+        Material ringMaterial;
         Color baseColor;
         float flash;
         float spin;
@@ -88,8 +89,7 @@ namespace Frontier
                 body.GetComponent<MeshRenderer>().sharedMaterial = mat;
             }
 
-            glowMaterial = Fx.GlowQuad(transform, new Color(baseColor.r, baseColor.g, baseColor.b, 0.55f), d.scale * 4.2f)
-                .GetComponent<MeshRenderer>().sharedMaterial;
+            Fx.GlowQuad(transform, new Color(baseColor.r, baseColor.g, baseColor.b, 0.55f), d.scale * 4.2f);
 
             var tr = gameObject.AddComponent<TrailRenderer>();
             tr.time = 0.5f;
@@ -100,6 +100,19 @@ namespace Frontier
             tr.startColor = Color.white;
             tr.endColor = new Color(1, 1, 1, 0);
 
+            if (d.rank != AlienRank.Standard)
+            {
+                var ring = new GameObject(d.rank + "Health");
+                ring.transform.SetParent(transform, false);
+                healthRing = ring.AddComponent<LineRenderer>();
+                healthRing.useWorldSpace = false;
+                healthRing.widthMultiplier = d.rank == AlienRank.Boss ? 0.08f : 0.05f;
+                ringMaterial = Fx.AddMat(baseColor);
+                healthRing.sharedMaterial = ringMaterial;
+                healthRing.startColor = healthRing.endColor = Color.white;
+                UpdateHealthRing();
+            }
+
             All.Add(this);
         }
 
@@ -108,8 +121,8 @@ namespace Frontier
             All.Remove(this);
             foreach (var material in bodyMaterials) if (material != null) Destroy(material);
             if (mat != null) Destroy(mat);
-            if (glowMaterial != null) Destroy(glowMaterial);
             if (trailMaterial != null) Destroy(trailMaterial);
+            if (ringMaterial != null) Destroy(ringMaterial);
         }
 
         void Update()
@@ -155,10 +168,25 @@ namespace Frontier
         public void Damage(float amount)
         {
             if (dead) return;
-            health -= amount;
+            health -= data.DamageAfterArmor(amount);
+            UpdateHealthRing();
             flash = 1f;
             Fx.Burst(transform.position, baseColor, 6, 2f, 0.12f);
             if (health <= 0f) owner.AlienKilled(this);
+        }
+
+        void UpdateHealthRing()
+        {
+            if (healthRing == null) return;
+            float fraction = Mathf.Clamp01(health / Mathf.Max(0.01f, maxHealth));
+            int points = Mathf.Max(2, Mathf.CeilToInt(32f * fraction) + 1);
+            healthRing.positionCount = points;
+            float radius = data.scale * 0.85f;
+            for (int i = 0; i < points; i++)
+            {
+                float angle = Mathf.PI * 0.5f + Mathf.PI * 2f * fraction * i / (points - 1);
+                healthRing.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, -data.scale * 0.65f));
+            }
         }
 
         public void Die()

@@ -85,6 +85,8 @@ namespace Frontier.Hyperspace
         public ulong seed;
         /// <summary>Length of the hop in light-years (same-system hops: pass a small value such as 1).</summary>
         public float distanceLy;
+        /// <summary>Requested total run length in seconds; zero keeps the distance-based default.</summary>
+        public float plannedDurationSeconds;
         /// <summary>Destination danger rating (PlanetData.danger, roughly 0.6 + 1.1 x tier).</summary>
         public float danger;
         /// <summary>Destination tier 0..12 (higher is clamped).</summary>
@@ -94,9 +96,15 @@ namespace Frontier.Hyperspace
         public RunMode mode;
 
         public RunParams(ulong seed, float distanceLy, float danger, int tier, float shipPower, RunMode mode)
+            : this(seed, distanceLy, danger, tier, shipPower, mode, 0f)
+        {
+        }
+
+        public RunParams(ulong seed, float distanceLy, float danger, int tier, float shipPower, RunMode mode, float plannedDurationSeconds)
         {
             this.seed = seed;
             this.distanceLy = distanceLy;
+            this.plannedDurationSeconds = plannedDurationSeconds;
             this.danger = danger;
             this.tier = tier;
             this.shipPower = shipPower;

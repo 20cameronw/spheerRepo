@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: c290d6cb15c5489195ee83fdab797c53
+PluginImporter:
+  serializedVersion: 2
+  isPreloaded: 0
+  isOverridable: 0
+  isExplicitlyReferenced: 0
+  platformData:
+  - first:
+      Any:
+    second:
+      enabled: 0
+      settings: {}
+  - first:
+      iPhone: iOS
+    second:
+      enabled: 1
+      settings:
+        AddToEmbeddedBinaries: false
+        CompileFlags:
+        FrameworkDependencies: UIKit;CoreHaptics

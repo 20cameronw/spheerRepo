@@ -10,6 +10,7 @@ namespace Frontier
         public float quality;
         public int perfects;
         public int total;
+        public bool abandoned;
     }
 
     /// <summary>
@@ -19,6 +20,7 @@ namespace Frontier
     {
         protected VisualElement overlay, arena, controls;
         protected Label status, titleLabel;
+        Label toolState;
         protected float tolerance = 1f, difficulty = 0.3f;
         /// <summary>Damage multiplier of the equipped tool (1 = bare hands).</summary>
         public float toolDamage = 1f;
@@ -27,14 +29,21 @@ namespace Frontier
         protected Color color = UiKit.Cyan;
         protected Color rawColor = Color.cyan;
         protected bool finished;
+        public bool IsPaused { get; private set; }
         protected MinigameStage stage;
         IVisualElementScheduledItem loop;
         Action<MinigameResult> onDone;
+        VisualElement pauseLayer;
         long lastMs;
-        bool sceneReady, cleaned;
+        bool sceneReady, cleaned, confirmingAbandon;
+        bool resultAwaitingConfirmation;
+        MinigameResult pendingResult;
 
         protected abstract string Title { get; }
         protected abstract string Hint { get; }
+        protected virtual string DefaultToolName { get { return UiText.Get("harvest.tool"); } }
+        protected virtual MinigameKind FeedbackKind { get { return MinigameKind.Chop; } }
+        protected virtual string ResultMetric { get { return UiText.Get("harvest.perfect-hits"); } }
         protected virtual Color StageBg { get { return new Color(0.015f, 0.02f, 0.05f); } }
         protected abstract void Build();
         protected abstract void BuildScene();
@@ -43,16 +52,34 @@ namespace Frontier
 
         protected float ArenaW { get { float w = arena.layout.width; return float.IsNaN(w) ? 0f : w; } }
         protected float ArenaH { get { float h = arena.layout.height; return float.IsNaN(h) ? 0f : h; } }
+        protected bool CanInteract { get { return sceneReady && !finished && !IsPaused && !cleaned && stage != null; } }
 
         public void Run(VisualElement host, Color accent, float tol, float diff, Action<MinigameResult> done)
         {
+            HarvestFeedback.Warmup();
             rawColor = accent;
             color = UiKit.Ui(accent); tolerance = tol; difficulty = diff; onDone = done;
 
             overlay = UiKit.Div("fr-overlay");
             titleLabel = UiKit.Text(Title, "fr-title", color);
-            overlay.Add(titleLabel);
+            titleLabel.style.flexGrow = 1f;
+            titleLabel.style.minWidth = 0f;
+            var heading = UiKit.Div("fr-row fr-minigame-heading");
+            heading.Add(titleLabel);
+            var pause = UiKit.Btn(UiText.Get("harvest.pause"), UiKit.Cyan, Pause);
+            pause.name = "minigame-pause";
+            pause.AddToClassList("fr-minigame-pause-button");
+            heading.Add(pause);
+            overlay.Add(heading);
             overlay.Add(UiKit.Text(Hint, "fr-muted"));
+            var toolFeedback = UiKit.Div("fr-minigame-tool-feedback");
+            toolFeedback.name = "minigame-tool-feedback";
+            toolFeedback.Add(UiKit.Text(string.IsNullOrEmpty(toolName) ? DefaultToolName : toolName,
+                "fr-minigame-tool-name", color));
+            toolState = UiKit.Text(UiText.Get("harvest.getting-ready"), "fr-minigame-tool-state", UiKit.Muted);
+            toolState.name = "minigame-tool-state";
+            toolFeedback.Add(toolState);
+            overlay.Add(toolFeedback);
             arena = UiKit.Div("fr-arena");
             UiKit.Border(arena, new Color(color.r, color.g, color.b, 0.7f), 3f);
             overlay.Add(arena);
@@ -65,6 +92,7 @@ namespace Frontier
             overlay.RegisterCallback<DetachFromPanelEvent>(e => Cleanup());
 
             stage = MinigameStage.Create(StageBg);
+            stage.FocusLost = Pause;
             Build();
             lastMs = (long)(Time.realtimeSinceStartup * 1000f);
             loop = overlay.schedule.Execute(() =>
@@ -72,12 +100,19 @@ namespace Frontier
                 long now = (long)(Time.realtimeSinceStartup * 1000f);
                 float dt = Mathf.Min(0.05f, (now - lastMs) / 1000f);
                 lastMs = now;
-                if (finished || ArenaW <= 1f || stage == null) return;
+                if (finished || IsPaused || ArenaW <= 1f || stage == null) return;
                 bool changed = SyncStage();
-                if (!sceneReady) { sceneReady = true; BuildScene(); changed = true; }
+                if (!sceneReady) { sceneReady = true; BuildScene(); SetToolState(UiText.Get("harvest.ready")); changed = true; }
                 if (changed) Frame(stage.cam.aspect);
                 Tick(dt);
             }).Every(16);
+        }
+
+        protected void SetToolState(string message, bool ready = true)
+        {
+            if (toolState.text == message) return;
+            toolState.text = message;
+            toolState.style.color = ready ? UiKit.Cyan : UiKit.Muted;
         }
 
         bool SyncStage()
@@ -94,20 +129,157 @@ namespace Frontier
             if (cleaned) return;
             cleaned = true;
             if (loop != null) loop.Pause();
+            if (stage != null) stage.FocusLost = null;
             if (stage != null) UnityEngine.Object.Destroy(stage.gameObject);
             stage = null;
+        }
+
+        public void Pause()
+        {
+            if (finished || IsPaused || cleaned || overlay == null) return;
+            IsPaused = true;
+            confirmingAbandon = false;
+            lastMs = (long)(Time.realtimeSinceStartup * 1000f);
+            ShowPauseDialog(false);
+        }
+
+        public void Resume()
+        {
+            if (finished || !IsPaused) return;
+            IsPaused = false;
+            confirmingAbandon = false;
+            lastMs = (long)(Time.realtimeSinceStartup * 1000f);
+            if (pauseLayer != null) pauseLayer.RemoveFromHierarchy();
+            pauseLayer = null;
+        }
+
+        public void RequestAbandon()
+        {
+            if (finished || !IsPaused) return;
+            confirmingAbandon = true;
+            ShowPauseDialog(true);
+        }
+
+        public bool HandleBack()
+        {
+            if (finished) return true; // Collecting a result must remain an explicit action.
+            if (confirmingAbandon) CancelAbandon();
+            else if (IsPaused) Resume();
+            else Pause();
+            return true;
+        }
+
+        public void CancelAbandon()
+        {
+            if (finished || !IsPaused || !confirmingAbandon) return;
+            confirmingAbandon = false;
+            ShowPauseDialog(false);
+        }
+
+        public void ConfirmAbandon()
+        {
+            if (finished || !IsPaused || !confirmingAbandon) return;
+            Finish(new MinigameResult { abandoned = true });
+        }
+
+        void ShowPauseDialog(bool confirm)
+        {
+            if (pauseLayer != null) pauseLayer.RemoveFromHierarchy();
+            pauseLayer = UiKit.Div("fr-minigame-pause-layer");
+            pauseLayer.name = "minigame-pause-layer";
+            pauseLayer.pickingMode = PickingMode.Position;
+            var panel = UiKit.Div("fr-minigame-pause-panel");
+            panel.pickingMode = PickingMode.Position;
+            panel.Add(UiKit.Text(UiText.Get(confirm ? "harvest.abandon.title" : "harvest.paused.title"),
+                "fr-minigame-pause-title", confirm ? UiKit.Amber : UiKit.Cyan));
+            panel.Add(UiKit.Text(UiText.Get(confirm ? "harvest.abandon.help" : "harvest.paused.help"),
+                "fr-minigame-pause-copy"));
+            var actions = UiKit.Div("fr-minigame-pause-actions");
+            if (confirm)
+            {
+                actions.Add(PauseAction(UiText.Get("harvest.keep-playing"), UiKit.Cyan, CancelAbandon, "minigame-keep-playing", true));
+                actions.Add(PauseAction(UiText.Get("harvest.abandon"), UiKit.Red, ConfirmAbandon, "minigame-confirm-abandon", false));
+            }
+            else
+            {
+                actions.Add(PauseAction(UiText.Get("harvest.resume"), UiKit.Cyan, Resume, "minigame-resume", true));
+                actions.Add(PauseAction(UiText.Get("harvest.abandon"), UiKit.Red, RequestAbandon, "minigame-abandon", false));
+            }
+            panel.Add(actions);
+            pauseLayer.Add(panel);
+            overlay.Add(pauseLayer);
+        }
+
+        static Button PauseAction(string text, Color accent, Action action, string name, bool primary)
+        {
+            var button = UiKit.Btn(text, accent, action, true, primary);
+            button.name = name;
+            button.style.width = Length.Percent(100f);
+            button.style.marginLeft = 0f;
+            return button;
         }
 
         protected void Finish(MinigameResult r)
         {
             if (finished) return;
             finished = true;
+            if (!r.abandoned) HarvestFeedback.Play(HarvestCue.Complete, FeedbackKind);
             overlay.schedule.Execute(() =>
             {
                 Cleanup();
-                overlay.RemoveFromHierarchy();
-                if (onDone != null) onDone(r);
-            }).StartingIn(1000);
+                if (r.abandoned) Complete(r);
+                else ShowResult(r);
+            }).StartingIn(r.abandoned ? 250 : 1000);
+        }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public void DebugComplete(float quality, int perfects, int total)
+        {
+            Finish(new MinigameResult { quality = quality, perfects = perfects, total = total });
+        }
+#endif
+
+        void ShowResult(MinigameResult result)
+        {
+            overlay.Clear();
+            var panel = UiKit.Div("fr-minigame-result-panel");
+            panel.name = "minigame-result";
+            panel.Add(UiKit.Text(UiText.Get("harvest.complete"), "fr-minigame-result-title", color));
+            panel.Add(UiKit.Text(UiText.Get("harvest.grade", Grade(result.quality)), "fr-minigame-result-grade", color));
+            panel.Add(UiKit.Text(UiText.Get("harvest.performance", Mathf.Clamp01(result.quality).ToString("P0")),
+                "fr-minigame-result-quality", UiKit.Muted));
+            panel.Add(UiKit.Text(UiText.Get("harvest.result.metric", ResultMetric, Mathf.Max(0, result.perfects), Mathf.Max(0, result.total)),
+                "fr-minigame-result-detail", UiKit.Muted));
+            pendingResult = result;
+            resultAwaitingConfirmation = true;
+            var next = PauseAction(UiText.Get("harvest.collect"), UiKit.Cyan, ContinueResult,
+                "minigame-collect-resources", true);
+            panel.Add(next);
+            overlay.Add(panel);
+        }
+
+        static string Grade(float quality)
+        {
+            if (quality >= 0.9f) return "S";
+            if (quality >= 0.75f) return "A";
+            if (quality >= 0.55f) return "B";
+            return "C";
+        }
+
+        public void ContinueResult()
+        {
+            if (!resultAwaitingConfirmation) return;
+            resultAwaitingConfirmation = false;
+            Complete(pendingResult);
+        }
+
+        void Complete(MinigameResult result)
+        {
+            resultAwaitingConfirmation = false;
+            if (overlay != null) overlay.RemoveFromHierarchy();
+            var callback = onDone;
+            onDone = null;
+            callback?.Invoke(result);
         }
 
         protected Ray PointerRay(PointerDownEvent e)
@@ -121,23 +293,6 @@ namespace Frontier
             float t = Mathf.Tan(stage.cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
             float d = Mathf.Max(needH / (2f * t), needW / (2f * t * Mathf.Max(0.2f, aspect)));
             stage.Pose(new Vector3(0f, lookY + camLift, -d), new Vector3(0f, lookY, 0f));
-        }
-
-        protected static VisualElement Pill(string text, Color c)
-        {
-            var chip = UiKit.Div();
-            chip.pickingMode = PickingMode.Ignore;
-            chip.style.position = Position.Absolute;
-            chip.style.left = 14; chip.style.top = 14;
-            chip.style.flexDirection = FlexDirection.Row;
-            chip.style.alignItems = Align.Center;
-            chip.style.paddingLeft = 14; chip.style.paddingRight = 14;
-            chip.style.paddingTop = 6; chip.style.paddingBottom = 6;
-            chip.style.backgroundColor = new Color(0f, 0f, 0f, 0.55f);
-            UiKit.Radius(chip, 18f);
-            UiKit.Border(chip, new Color(c.r, c.g, c.b, 0.8f), 2f);
-            chip.Add(UiKit.Text(text, "fr-small", c));
-            return chip;
         }
 
         protected static bool RaySphere(Ray r, Vector3 c, float rad, out Vector3 hit)
@@ -160,7 +315,7 @@ namespace Frontier
     /// </summary>
     public class NodeGame : Minigame
     {
-        const int Stages = 4;
+        const int Stages = NodeHarvestRun.StageCount;
         static readonly float[] RockScale = { 1f, 0.86f, 0.7f, 0.54f };
         static readonly Color SpotColor = new Color(1.8f, 1.4f, 0.4f, 1f);
 
@@ -174,22 +329,24 @@ namespace Frontier
         ToolRig tool;
         Vector3 spotLocal;
         float spotR, spotBaseY, trunkScaleY = 1f;
-        float stageHp, hp, cd, swingTime, pulse, pop, nodeShake, frameW, frameH, lookY;
-        int step, swings, spotHits, crits, rockSeed;
+        NodeHarvestRun run;
+        float pulse, pop, nodeShake, frameW, frameH, lookY;
+        int rockSeed;
+        int step { get { return run.CompletedStages; } }
         VisualElement[] pipFill;
         VisualElement swingFill;
 
         public NodeGame(bool tree) { this.tree = tree; }
 
-        protected override string Title { get { return tree ? "FELL THE TREE" : "BREAK THE NODE"; } }
-        protected override string Hint { get { return "Hit the glowing weak spot. It keeps moving, and every swing needs a moment to recover"; } }
+        protected override string Title { get { return UiText.Get(tree ? "harvest.node.title.tree" : "harvest.node.title.rock"); } }
+        protected override string DefaultToolName { get { return UiText.Get(tree ? "harvest.tool.axe" : "harvest.tool.pick"); } }
+        protected override MinigameKind FeedbackKind { get { return tree ? MinigameKind.Chop : MinigameKind.Mine; } }
+        protected override string Hint { get { return UiText.Get("harvest.node.hint"); } }
         protected override Color StageBg { get { return new Color(color.r * 0.05f + 0.01f, color.g * 0.05f + 0.015f, color.b * 0.06f + 0.03f); } }
 
         // ------------------------------------------------------------ UI
         protected override void Build()
         {
-            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? (tree ? "Axe" : "Pick") : toolName, color));
-
             var pips = UiKit.Div();
             pips.pickingMode = PickingMode.Ignore;
             pips.style.position = Position.Absolute;
@@ -236,9 +393,7 @@ namespace Frontier
         // ------------------------------------------------------------ 3D scene
         protected override void BuildScene()
         {
-            swingTime = 0.55f / Mathf.Sqrt(Mathf.Max(1f, toolDamage));
-            stageHp = Mathf.Lerp(2.6f, 4.6f, difficulty);
-            hp = stageHp;
+            run = new NodeHarvestRun(toolDamage, difficulty);
             spotR = Mathf.Clamp(0.36f * tolerance * (1.1f - 0.35f * difficulty), 0.24f, 0.5f);
             rockSeed = UnityEngine.Random.Range(1, 999);
             var st = stage;
@@ -346,18 +501,16 @@ namespace Frontier
         // ------------------------------------------------------------ input
         void OnTap(PointerDownEvent e)
         {
-            if (finished || stage == null || tool == null) return;
-            if (cd > 0f) { Sfx.Play(260f, 0.04f, 0.08f); return; }
+            if (!CanInteract || tool == null) return;
+            if (run.Cooldown > 0f) { HarvestFeedback.Play(HarvestCue.Recovering, FeedbackKind); return; }
 
             Ray ray = PointerRay(e);
             Vector3 sp = spot.position;
             float d = Vector3.Cross(ray.direction, sp - ray.origin).magnitude;
-            swings++;
-            float dmg;
             Vector3 hitW;
             int kind;
-            if (d <= spotR * 0.4f) { kind = 2; dmg = toolDamage * 1.7f; hitW = sp; crits++; spotHits++; }
-            else if (d <= spotR) { kind = 1; dmg = toolDamage; hitW = sp; spotHits++; }
+            if (d <= spotR * 0.4f) { kind = 2; hitW = sp; }
+            else if (d <= spotR) { kind = 1; hitW = sp; }
             else
             {
                 bool glance;
@@ -380,14 +533,28 @@ namespace Frontier
                     }
                 }
                 kind = glance ? 0 : -1;
-                dmg = glance ? toolDamage * 0.15f : 0f;
             }
 
-            cd = swingTime;
-            tool.Strike(stage.root.InverseTransformPoint(hitW), swingTime);
+            Strike(kind, hitW);
+        }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public void DebugStrike(HarvestStrike strike)
+        {
+            if (spot != null) Strike((int)strike, spot.position);
+        }
+#endif
+
+        void Strike(int kind, Vector3 hitW)
+        {
+            if (!CanInteract || run == null || tool == null) return;
+            int previousStep = step;
+            if (!run.TryStrike((HarvestStrike)kind)) return;
+            SetToolState(UiText.Get("harvest.state.recovering"), false);
+            tool.Strike(stage.root.InverseTransformPoint(hitW), run.SwingSeconds);
             if (kind == 2)
             {
-                Sfx.Good();
+                HarvestFeedback.Play(HarvestCue.Perfect, FeedbackKind);
                 stage.Shake(0.5f); nodeShake = 1f; pop = 1f;
                 Fx.Burst(hitW, new Color(2f, 1.6f, 0.5f), 26, 4.5f, 0.2f);
                 Fx.Burst(hitW, new Color(rawColor.r, rawColor.g, rawColor.b) * 1.6f, 14, 3f, 0.16f);
@@ -395,32 +562,29 @@ namespace Frontier
             }
             else if (kind == 1)
             {
-                Sfx.Play(520f, 0.1f, 0.3f);
+                HarvestFeedback.Play(HarvestCue.Impact, FeedbackKind);
                 stage.Shake(0.3f); nodeShake = 0.7f; pop = 0.6f;
                 Fx.Burst(hitW, new Color(1.6f, 1.3f, 0.5f), 16, 3.5f, 0.16f);
             }
             else if (kind == 0)
             {
-                Sfx.Bad();
+                HarvestFeedback.Play(HarvestCue.Glance, FeedbackKind);
                 stage.Shake(0.1f); nodeShake = 0.25f;
                 Fx.Burst(hitW, new Color(0.6f, 0.6f, 0.7f), 6, 1.8f, 0.1f);
             }
-            else Sfx.Play(200f, 0.1f, 0.1f);
+            else HarvestFeedback.Play(HarvestCue.Miss, FeedbackKind);
 
-            if (dmg <= 0f) return;
-            hp -= dmg;
+            if (kind < 0) return;
             if (kind >= 1) MoveSpot();
-            if (hp <= 0f) BreakStep();
+            if (step != previousStep) BreakStep();
         }
 
         // ------------------------------------------------------------ breaking
         void BreakStep()
         {
-            step++;
-            Sfx.Play(300f, 0.22f, 0.4f, -120f);
+            HarvestFeedback.Play(HarvestCue.Break, FeedbackKind);
             stage.Shake(0.8f);
             if (step >= Stages) { FinalBreak(); return; }
-            hp = stageHp;
             Chunks(8, 0.28f, 4.5f);
             pop = 1.4f;
             if (tree)
@@ -449,8 +613,7 @@ namespace Frontier
             else rockGo.SetActive(false);
             spot.gameObject.SetActive(false);
             for (int i = 0; i < Stages; i++) pipFill[i].style.width = Length.Percent(100f);
-            float acc = swings > 0 ? (float)spotHits / swings : 0f;
-            Finish(new MinigameResult { quality = Mathf.Clamp01(0.3f + 0.7f * acc), perfects = crits, total = swings });
+            Finish(new MinigameResult { quality = run.Quality, perfects = run.Perfects, total = run.Swings });
         }
 
         void Chunks(int n, float size, float speed)
@@ -473,7 +636,9 @@ namespace Frontier
         protected override void Tick(float dt)
         {
             float t = Time.time;
-            cd = Mathf.Max(0f, cd - dt);
+            run.Advance(dt);
+            SetToolState(UiText.Get(run.Cooldown > 0f ? "harvest.state.recovering" : "harvest.ready"),
+                run.Cooldown <= 0f);
             pulse += dt * 5f;
             pop = Mathf.MoveTowards(pop, 0f, dt * 3.2f);
             nodeShake = Mathf.MoveTowards(nodeShake, 0f, dt * 3f);
@@ -500,7 +665,7 @@ namespace Frontier
             spot.localPosition = spotLocal;
             spot.rotation = stage.root.rotation;
 
-            float ready = cd > 0f ? 0.45f : 1f;
+            float ready = run.Cooldown > 0f ? 0.45f : 1f;
             float pu = 1f + 0.12f * Mathf.Sin(pulse);
             spotCore.localScale = Vector3.one * spotR * 0.9f * pu * ready;
             spotRing.localScale = Vector3.one * spotR * 3.2f * (1f + 0.1f * Mathf.Sin(pulse * 0.7f)) * ready;
@@ -508,11 +673,11 @@ namespace Frontier
 
             for (int i = 0; i < Stages; i++)
             {
-                float f = i < step ? 1f : i == step ? Mathf.Clamp01(hp / stageHp) : 0f;
+                float f = i < step ? 1f : i == step ? Mathf.Clamp01(run.Health / run.StageHealth) : 0f;
                 pipFill[i].style.width = Length.Percent(f * 100f);
             }
-            swingFill.style.width = Length.Percent((swingTime > 0f ? 1f - cd / swingTime : 1f) * 100f);
-            swingFill.style.backgroundColor = cd > 0f ? new Color(1f, 1f, 1f, 0.5f) : color;
+            swingFill.style.width = Length.Percent((1f - run.Cooldown / run.SwingSeconds) * 100f);
+            swingFill.style.backgroundColor = run.Cooldown > 0f ? new Color(1f, 1f, 1f, 0.5f) : color;
         }
     }
 
@@ -520,20 +685,29 @@ namespace Frontier
     public class DrillGame : Minigame
     {
         VisualElement gauge, band, needle, progFill;
-        float t, pressure = 0.1f, vel, inBand, progress, sparkT, chunkT, spinAngle, tipY, impact;
-        bool holding, inside, contact;
+        DrillHarvestRun run;
+        float sparkT, chunkT, spinAngle, impact;
+        float t { get { return run.Elapsed; } }
+        float pressure { get { return run.Pressure; } }
+        float progress { get { return run.Progress; } }
+        bool inside { get { return run.Inside; } }
+        bool contact { get { return run.Contact; } }
+        bool holding;
         Transform rig, spin, ore, oreGlow, dust;
         Material oreMat;
         Mesh chunkMesh;
         float frameW = 5.4f, frameH = 7.8f;
 
-        protected override string Title { get { return "BORE"; } }
-        protected override string Hint { get { return "Press to drive the drill into the ore. Keep the pressure needle inside the green band"; } }
+        protected override string Title { get { return UiText.Get("harvest.drill.title"); } }
+        protected override string DefaultToolName { get { return UiText.Get("harvest.tool.drill"); } }
+        protected override MinigameKind FeedbackKind { get { return MinigameKind.Drill; } }
+        protected override string Hint { get { return UiText.Get("harvest.drill.hint"); } }
+        protected override string ResultMetric { get { return UiText.Get("harvest.drill.metric"); } }
         protected override Color StageBg { get { return new Color(color.r * 0.04f + 0.01f, color.g * 0.04f + 0.012f, color.b * 0.05f + 0.025f); } }
 
         protected override void Build()
         {
-            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Drill" : toolName, color));
+            run = new DrillHarvestRun(toolDamage, difficulty, tolerance);
 
             gauge = UiKit.Div();
             gauge.pickingMode = PickingMode.Ignore;
@@ -580,7 +754,7 @@ namespace Frontier
             prog.Add(progFill);
             arena.Add(prog);
 
-            var btn = UiKit.Btn("HOLD", color, null, true);
+            var btn = UiKit.Btn(UiText.Get("harvest.drill.hold-control"), color, null, true);
             btn.style.minWidth = 420;
             // TrickleDown: the Button's own clickable stops pointer events before normal callbacks run.
             HoldArea(btn);
@@ -590,9 +764,15 @@ namespace Frontier
 
         void HoldArea(VisualElement el)
         {
-            el.RegisterCallback<PointerDownEvent>(e => { holding = true; el.CapturePointer(e.pointerId); }, TrickleDown.TrickleDown);
+            el.RegisterCallback<PointerDownEvent>(e =>
+            {
+                if (!CanInteract) return;
+                holding = true;
+                el.CapturePointer(e.pointerId);
+            }, TrickleDown.TrickleDown);
             el.RegisterCallback<PointerUpEvent>(e => { holding = false; if (el.HasPointerCapture(e.pointerId)) el.ReleasePointer(e.pointerId); }, TrickleDown.TrickleDown);
             el.RegisterCallback<PointerCancelEvent>(e => holding = false, TrickleDown.TrickleDown);
+            el.RegisterCallback<PointerCaptureOutEvent>(e => holding = false);
         }
 
         protected override void BuildScene()
@@ -620,17 +800,17 @@ namespace Frontier
             spin = new GameObject("Spin").transform;
             spin.SetParent(rig, false);
 
-            Color rimC = toolLevel <= 0 ? new Color(0.5f, 0.6f, 0.7f) * 0.5f
-                       : toolLevel == 1 ? new Color(0.3f, 0.9f, 1.4f) * 0.7f
-                       : new Color(rawColor.r, rawColor.g, rawColor.b) * 2.4f;
+            HarvestToolVisual.Palette(toolLevel, rawColor, out var casingColor, out var rimC);
             if (!UseDrillPrefab(rimC)) BuildFallbackBit(rimC);
-            tipY = OreTop() + Lift;
-            rig.localPosition = new Vector3(0f, tipY, 0f);
+            var casing = st.Lit(casingColor, rimC, 0f, 6f);
+            var active = st.Lit(casingColor * 0.6f, rimC * 1.6f, 0f, 3f);
+            HarvestToolVisual.AddTierHardware(st, spin, toolLevel, casing, active);
+            rig.localPosition = new Vector3(0f, run.TipY, 0f);
         }
 
-        const float OreR = 0.95f, OreCenter = 0.2f, Lift = 1.5f;
-        float OreScale { get { return Mathf.Lerp(1f, 0.45f, Mathf.Clamp01(progress)); } }
-        float OreTop() { return OreCenter + OreR * 0.9f * OreScale; }
+        const float OreR = DrillHarvestRun.OreRadius, OreCenter = DrillHarvestRun.OreCenter;
+        float OreScale { get { return run.OreScale; } }
+        float OreTop() { return run.OreTop; }
 
         // Uses the moving part ("PartsToMove": drill head + staff) of the real drill structure, tip at the rig origin.
         bool UseDrillPrefab(Color rimC)
@@ -685,29 +865,35 @@ namespace Frontier
 
         protected override void Tick(float dt)
         {
-            t += dt;
             // Safety net in case a pointer-up is swallowed elsewhere; Space also works as hold.
             if (holding && !Input.GetMouseButton(0) && Input.touchCount == 0) holding = false;
             bool press = holding || Input.GetKey(KeyCode.Space);
-            float target = press ? 0.7f : -0.8f;
-            vel = Mathf.Lerp(vel, target, 5f * dt);
-            pressure = Mathf.Clamp01(pressure + vel * dt);
-            if (pressure <= 0f || pressure >= 1f) vel = 0f;
+            Advance(dt, press);
+        }
 
-            float center = 0.5f + 0.3f * Mathf.Sin(t * (0.6f + difficulty)) + 0.08f * Mathf.Sin(t * 2.1f);
-            float half = Mathf.Lerp(0.16f, 0.07f, difficulty) * tolerance;
-            inside = Mathf.Abs(pressure - center) <= half;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public DrillHarvestRun DebugRun { get { return run; } }
+        public void DebugAdvance(float seconds, bool press)
+        {
+            if (CanInteract && rig != null) Advance(seconds, press);
+        }
+#endif
+
+        void Advance(float dt, bool press)
+        {
+            bool wasContact = contact;
+            run.Advance(dt, press);
+            string stateKey = !contact ? "harvest.drill.hold" :
+                inside ? "harvest.drill.locked" : "harvest.drill.adjust";
+            SetToolState(UiText.Get(stateKey), contact && inside);
+            float center = run.BandCenter;
+            float half = run.BandHalfWidth;
             band.style.bottom = Length.Percent((center - half) * 100f);
             band.style.height = Length.Percent(half * 2f * 100f);
             needle.style.bottom = Length.Percent(pressure * 100f);
             needle.style.backgroundColor = inside ? Color.white : new Color(1f, 0.4f, 0.4f);
 
-            // Pressing slams the bit down onto the ore; releasing lets it spring back up.
-            float top = OreTop();
-            float goalY = press ? top - 0.08f : top + Lift;
-            tipY = Mathf.Lerp(tipY, goalY, 1f - Mathf.Exp(-(press ? 22f : 7f) * dt));
-            bool wasContact = contact;
-            contact = press && tipY <= top + 0.04f;
+            float top = run.ContactHeight;
 
             if (contact && !wasContact)
             {
@@ -716,20 +902,15 @@ namespace Frontier
                 stage.Shake(0.28f);
                 impact = 1f;
                 Chunks(4, 0.14f, 3.2f);
-                Sfx.Play(inside ? 150f : 110f, 0.09f, 0.35f, -60f);
+                HarvestFeedback.Play(inside ? HarvestCue.Perfect : HarvestCue.Impact, FeedbackKind);
             }
 
-            if (contact && inside)
-            {
-                inBand += dt;
-                progress += dt * 0.11f * toolDamage / (0.6f + difficulty);
-            }
             progFill.style.height = Length.Percent(Mathf.Clamp01(progress) * 100f);
 
             impact = Mathf.MoveTowards(impact, 0f, dt * 5f);
             float shakeAmt = contact ? (inside ? 0.035f : 0.07f) + impact * 0.06f : 0f;
             if (contact) stage.Shake(inside ? 0.05f : 0.09f);
-            rig.localPosition = new Vector3(UnityEngine.Random.Range(-1f, 1f) * shakeAmt, Mathf.Max(tipY, top - 0.12f), UnityEngine.Random.Range(-1f, 1f) * shakeAmt);
+            rig.localPosition = new Vector3(UnityEngine.Random.Range(-1f, 1f) * shakeAmt, Mathf.Max(run.TipY, top - 0.12f), UnityEngine.Random.Range(-1f, 1f) * shakeAmt);
             spinAngle += dt * (press ? 500f + 900f * pressure : 90f) * (contact ? 1.4f : 1f);
             spin.localRotation = Quaternion.Euler(0f, spinAngle, 0f);
 
@@ -758,12 +939,10 @@ namespace Frontier
 
             if (progress >= 1f)
             {
-                Sfx.Good();
                 stage.Shake(0.6f);
                 Chunks(16, 0.2f, 5f);
                 Fx.Burst(stage.root.TransformPoint(new Vector3(0f, OreCenter, -0.2f)), new Color(rawColor.r, rawColor.g, rawColor.b) * 1.8f, 40, 6f, 0.24f);
-                float eff = inBand / Mathf.Max(0.01f, t);
-                Finish(new MinigameResult { quality = Mathf.Clamp01(0.3f + 0.7f * eff), perfects = Mathf.RoundToInt(inBand), total = Mathf.Max(1, Mathf.RoundToInt(t)) });
+                Finish(new MinigameResult { quality = run.Quality, perfects = Mathf.RoundToInt(run.InBandSeconds), total = Mathf.Max(1, Mathf.RoundToInt(t)) });
             }
         }
 
@@ -779,22 +958,25 @@ namespace Frontier
     /// <summary>Time each pump to the moving pressure window and draw gas from a glowing planetary vent.</summary>
     public class SiphonGame : Minigame
     {
-        const int Pulses = 7;
+        const int Pulses = SiphonHarvestRun.PulseCount;
         VisualElement track, catchBand, needle;
-        float elapsed, bandWidth, cooldown, quality;
-        float needlePosition, targetPosition;
-        int pulses, perfect;
+        SiphonHarvestRun run;
+        float elapsed { get { return run.Elapsed; } }
+        int pulses { get { return run.Pulses; } }
         Transform reservoir, vent, stream;
         readonly Transform[] bubbles = new Transform[9];
         float frameW = 6.4f, frameH = 7.6f;
 
-        protected override string Title { get { return "ATMOSPHERIC SIPHON"; } }
-        protected override string Hint { get { return "Tap PUMP when the needle crosses the capture window. Clean pulses keep the gas flowing"; } }
+        protected override string Title { get { return UiText.Get("harvest.siphon.title"); } }
+        protected override string DefaultToolName { get { return UiText.Get("harvest.tool.hand-pump"); } }
+        protected override MinigameKind FeedbackKind { get { return MinigameKind.Siphon; } }
+        protected override string ResultMetric { get { return UiText.Get("harvest.siphon.metric"); } }
+        protected override string Hint { get { return UiText.Get("harvest.siphon.hint"); } }
         protected override Color StageBg { get { return new Color(color.r * 0.04f + 0.005f, color.g * 0.04f + 0.01f, color.b * 0.05f + 0.03f); } }
 
         protected override void Build()
         {
-            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Hand Pump" : toolName, color));
+            run = new SiphonHarvestRun(difficulty, tolerance);
             status.style.display = DisplayStyle.Flex;
             track = UiKit.Div();
             track.pickingMode = PickingMode.Ignore;
@@ -824,10 +1006,10 @@ namespace Frontier
             track.Add(needle);
             arena.Add(track);
 
-            var pump = UiKit.Btn("PUMP", color, null, true);
+            var pump = UiKit.Btn(UiText.Get("harvest.siphon.pump"), color, null, true);
             pump.clicked += Pump;
             controls.Add(pump);
-            UpdateStatus("Watch the flow window");
+            UpdateStatus(UiText.Get("harvest.siphon.watch"));
         }
 
         protected override void BuildScene()
@@ -844,7 +1026,7 @@ namespace Frontier
             st.Prim(PrimitiveType.Cylinder, st.root, new Vector3(0f, 0.3f, -0.02f), new Vector3(0.43f, 0.55f, 0.43f), Vector3.zero, gas);
             reservoir = st.AddMesh(MeshKit.Ico(2, d => 0.95f * (0.84f + 0.18f * Mathf.PerlinNoise(d.x * 2f, d.y * 2f + d.z))),
                 gas, st.root, new Vector3(0f, 1.05f, 0.02f)).transform;
-            vent = st.AddMesh(MeshKit.Cyl(0.3f, 0.18f, 1.0f, 12), metal, st.root, new Vector3(0f, 1.9f, 0f)).transform;
+            vent = HarvestToolVisual.Build(st, MinigameKind.Siphon, toolLevel, rawColor, new Vector3(0f, 1.9f, 0f));
             stream = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.8f), 1.5f, new Vector3(0f, 2.8f, -0.25f));
             var bubbleMat = st.Additive(new Color(1f, 1.5f, 2f, 0.7f));
             for (int i = 0; i < bubbles.Length; i++)
@@ -858,15 +1040,13 @@ namespace Frontier
 
         protected override void Tick(float dt)
         {
-            elapsed += dt;
-            cooldown = Mathf.Max(0f, cooldown - dt);
-            float rate = 1.2f + difficulty * 1.5f;
-            needlePosition = 0.5f + 0.43f * Mathf.Sin(elapsed * rate);
-            targetPosition = 0.5f + 0.31f * Mathf.Sin(elapsed * (0.68f + difficulty * 0.3f) + 1.1f);
-            bandWidth = Mathf.Clamp(0.15f * tolerance - difficulty * 0.035f, 0.065f, 0.23f);
-            catchBand.style.left = Length.Percent(Mathf.Clamp01(targetPosition - bandWidth) * 100f);
-            catchBand.style.width = Length.Percent(bandWidth * 200f);
-            needle.style.left = Length.Percent(needlePosition * 100f);
+            run.Advance(dt);
+            SetToolState(UiText.Get(run.Cooldown > 0f
+                    ? "harvest.state.recovering" : "harvest.siphon.ready"),
+                run.Cooldown <= 0f);
+            catchBand.style.left = Length.Percent(Mathf.Clamp01(run.Target - run.BandWidth) * 100f);
+            catchBand.style.width = Length.Percent(run.BandWidth * 200f);
+            needle.style.left = Length.Percent(run.Needle * 100f);
 
             float pulse = 1f + 0.08f * Mathf.Sin(elapsed * 5f);
             reservoir.localScale = Vector3.one * pulse;
@@ -881,53 +1061,59 @@ namespace Frontier
 
         void Pump()
         {
-            if (pulses >= Pulses || cooldown > 0f) return;
-            cooldown = 0.22f;
-            float error = Mathf.Abs(needlePosition - targetPosition);
-            float hit = Mathf.Clamp01(1f - error / Mathf.Max(0.01f, bandWidth * 2.2f));
-            quality += hit;
-            if (hit >= 0.78f) perfect++;
-            pulses++;
-            UpdateStatus(hit >= 0.78f ? "Clean pressure lock" : hit > 0.05f ? "Partial capture" : "Pressure lost");
+            if (!CanInteract || !run.TryPump(out float hit)) return;
+            SetToolState(UiText.Get("harvest.state.recovering"), false);
+            string resultKey = hit >= 0.78f ? "harvest.siphon.clean" :
+                hit > 0.05f ? "harvest.siphon.partial" : "harvest.siphon.lost";
+            UpdateStatus(UiText.Get(resultKey));
             if (hit > 0.05f)
             {
                 Vector3 point = stage.root.TransformPoint(reservoir.localPosition);
                 Fx.Burst(point, color * (hit >= 0.78f ? 2f : 1.1f), hit >= 0.78f ? 18 : 8, 3.5f, 0.18f);
                 stage.Shake(hit >= 0.78f ? 0.28f : 0.12f);
-                if (hit >= 0.78f) Sfx.Good(); else Sfx.Play(135f, 0.07f, 0.25f, -80f);
+                HarvestFeedback.Play(hit >= 0.78f ? HarvestCue.Perfect : HarvestCue.Impact, FeedbackKind);
             }
-            else Sfx.Bad();
+            else HarvestFeedback.Play(HarvestCue.Miss, FeedbackKind);
             if (pulses >= Pulses)
-                Finish(new MinigameResult { quality = quality / Pulses, perfects = perfect, total = Pulses });
+                Finish(new MinigameResult { quality = run.Quality, perfects = run.Perfects, total = Pulses });
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public SiphonHarvestRun DebugRun { get { return run; } }
+        public void DebugPump() { Pump(); }
+        public void DebugAdvance(float seconds) { if (CanInteract) Tick(seconds); }
+#endif
 
         void UpdateStatus(string message)
         {
-            status.text = "PULSES " + pulses + "/" + Pulses + "   ·   " + message;
+            status.text = UiText.Get("harvest.siphon.status", pulses, Pulses, message);
         }
     }
 
     /// <summary>Use sonar echoes to locate buried seams without wasting the scanner's limited pulses.</summary>
     public class ExcavationGame : Minigame
     {
-        const int GridSide = 3;
-        const int Seams = 3;
-        const int MaxPings = 18;
+        const int GridSide = ExcavationHarvestRun.GridSide;
+        const int Seams = ExcavationHarvestRun.SeamCount;
+        const int MaxPings = ExcavationHarvestRun.MaxPings;
         readonly Button[] cells = new Button[GridSide * GridSide];
-        readonly bool[] revealed = new bool[GridSide * GridSide];
-        int target, pings, seamsFound;
+        ExcavationHarvestRun run;
+        int pings { get { return run.Pings; } }
+        int seamsFound { get { return run.SeamsFound; } }
         float elapsed;
         Transform scanner, echo, pulseRing, ground;
         readonly Vector3[] echoPositions = { new Vector3(-0.75f, -0.28f, -0.15f), new Vector3(0.5f, 0.05f, -0.15f), new Vector3(0.15f, 0.4f, -0.15f) };
         const float frameW = 6.2f, frameH = 7.3f;
 
-        protected override string Title { get { return "SONAR EXCAVATION"; } }
-        protected override string Hint { get { return "Ping the grid to read echoes. Brighter returns mark the buried seam"; } }
+        protected override string Title { get { return UiText.Get("harvest.excavate.title"); } }
+        protected override string DefaultToolName { get { return UiText.Get("harvest.tool.trowel"); } }
+        protected override MinigameKind FeedbackKind { get { return MinigameKind.Excavate; } }
+        protected override string ResultMetric { get { return UiText.Get("harvest.excavate.metric"); } }
+        protected override string Hint { get { return UiText.Get("harvest.excavate.hint"); } }
         protected override Color StageBg { get { return new Color(0.008f, 0.025f, 0.045f); } }
 
         protected override void Build()
         {
-            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Trowel" : toolName, color));
             arena.style.flexGrow = 0f;
             arena.style.flexBasis = Length.Percent(38f);
             arena.style.minHeight = 220f;
@@ -938,7 +1124,7 @@ namespace Frontier
             overlay.Remove(status);
             controls.Add(status);
             status.style.marginBottom = 8f;
-            target = UnityEngine.Random.Range(0, cells.Length);
+            run = new ExcavationHarvestRun(UnityEngine.Random.Range(0, int.MaxValue));
             var grid = UiKit.Div();
             grid.style.flexDirection = FlexDirection.Row;
             grid.style.flexWrap = Wrap.Wrap;
@@ -948,7 +1134,7 @@ namespace Frontier
             for (int i = 0; i < cells.Length; i++)
             {
                 int cell = i;
-                var button = UiKit.Btn("PING", color, () => Ping(cell), false);
+                var button = UiKit.Btn(UiText.Get("harvest.excavate.ping"), color, () => Ping(cell), false);
                 button.name = "excavate-cell-" + i;
                 button.style.width = Length.Percent(30f);
                 button.style.height = 58;
@@ -960,7 +1146,7 @@ namespace Frontier
                 grid.Add(button);
             }
             controls.Add(grid);
-            UpdateStatus("SEAM 0/3  ·  18 SCANS");
+            UpdateStatus(UiText.Get("harvest.excavate.progress", 0, Seams, MaxPings));
         }
 
         protected override void BuildScene()
@@ -977,12 +1163,7 @@ namespace Frontier
                 crystal, st.root, echoPositions[0]).transform;
             echo.gameObject.SetActive(false);
 
-            scanner = new GameObject("SonarScanner").transform;
-            scanner.SetParent(st.root, false);
-            st.Prim(PrimitiveType.Cylinder, scanner, new Vector3(0f, 0.55f, 0f), new Vector3(0.15f, 0.7f, 0.15f), Vector3.zero, stratum);
-            st.Prim(PrimitiveType.Cylinder, scanner, new Vector3(0f, 1.0f, 0f), new Vector3(0.62f, 0.08f, 0.62f), Vector3.zero, crystal);
-            st.Prim(PrimitiveType.Sphere, scanner, new Vector3(0f, 1.12f, 0f), new Vector3(0.2f, 0.2f, 0.2f), Vector3.zero, crystal);
-            scanner.localPosition = new Vector3(0f, 1.2f, 0.1f);
+            scanner = HarvestToolVisual.Build(st, MinigameKind.Excavate, toolLevel, rawColor, new Vector3(0f, 1.2f, 0.1f));
             pulseRing = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.8f), 1.7f,
                 new Vector3(0f, -0.48f, -0.1f), true);
             pulseRing.localScale = Vector3.zero;
@@ -993,47 +1174,55 @@ namespace Frontier
 
         void Ping(int cell)
         {
-            if (finished || revealed[cell] || pings >= MaxPings) return;
-            revealed[cell] = true;
+            if (!CanInteract || !run.TryPing(cell, out int distance)) return;
             cells[cell].SetEnabled(false);
-            pings++;
-            int row = cell / GridSide, col = cell % GridSide;
-            int targetRow = target / GridSide, targetCol = target % GridSide;
-            int distance = Mathf.Abs(row - targetRow) + Mathf.Abs(col - targetCol);
             if (distance == 0)
             {
-                seamsFound++;
                 echo.localPosition = echoPositions[(seamsFound - 1) % echoPositions.Length];
                 echo.gameObject.SetActive(true);
                 Fx.Burst(stage.root.TransformPoint(echo.localPosition), color * 1.8f, 22, 4f, 0.18f);
                 stage.Shake(0.34f);
-                Sfx.Good();
+                HarvestFeedback.Play(HarvestCue.Perfect, FeedbackKind);
                 if (seamsFound >= Seams || pings >= MaxPings) { Complete(); return; }
-                target = UnityEngine.Random.Range(0, cells.Length);
-                Array.Clear(revealed, 0, revealed.Length);
-                foreach (var button in cells) button.SetEnabled(true);
-                UpdateStatus("SEAM " + seamsFound + "/3  ·  " + (MaxPings - pings) + " SCANS");
+                foreach (var button in cells)
+                {
+                    button.SetEnabled(true);
+                    button.text = UiText.Get("harvest.excavate.ping");
+                    button.style.backgroundColor = StyleKeyword.Null;
+                    button.style.color = StyleKeyword.Null;
+                }
+                SetToolState(UiText.Get("harvest.excavate.new-seam"));
+                UpdateStatus(UiText.Get("harvest.excavate.progress", seamsFound, Seams, MaxPings - pings));
                 return;
             }
 
             Color echoColor = distance == 1 ? new Color(0.9f, 0.92f, 0.32f) :
                 distance == 2 ? new Color(0.95f, 0.55f, 0.2f) : new Color(0.18f, 0.38f, 0.5f);
-            cells[cell].text = distance == 1 ? "NEAR" : distance == 2 ? "WARM" : "FAINT";
+            cells[cell].text = UiText.Get(distance == 1 ? "harvest.excavate.near" :
+                distance == 2 ? "harvest.excavate.warm" : "harvest.excavate.faint");
             cells[cell].style.backgroundColor = new Color(echoColor.r * 0.22f, echoColor.g * 0.22f, echoColor.b * 0.22f);
             cells[cell].style.color = echoColor;
+            SetToolState(UiText.Get(distance == 1
+                ? "harvest.excavate.near-seam" : "harvest.excavate.follow-echo"));
             pulseRing.localScale = Vector3.one * 1.1f;
-            Sfx.Play(distance == 1 ? 560f : 310f, 0.1f, 0.22f, -80f);
-            UpdateStatus((distance == 1 ? "STRONG ECHO" : distance == 2 ? "WARM RETURN" : "WEAK RETURN") +
-                "  ·  SEAM " + seamsFound + "/3  ·  " + (MaxPings - pings) + " SCANS");
+            HarvestFeedback.Play(distance == 1 ? HarvestCue.ScanNear : HarvestCue.ScanFar, FeedbackKind);
+            string echoKey = distance == 1 ? "harvest.excavate.strong-echo" :
+                distance == 2 ? "harvest.excavate.warm-return" : "harvest.excavate.weak-return";
+            UpdateStatus(UiText.Get("harvest.excavate.echo-status", UiText.Get(echoKey),
+                seamsFound, Seams, MaxPings - pings));
             if (pings >= MaxPings) Complete();
         }
 
         void Complete()
         {
-            float q = seamsFound == 0 ? 0f : 0.2f + 0.8f * seamsFound / Seams;
-            UpdateStatus("SEAMS LOCATED " + seamsFound + "/3");
-            Finish(new MinigameResult { quality = q, perfects = seamsFound, total = Seams });
+            UpdateStatus(UiText.Get("harvest.excavate.located", seamsFound, Seams));
+            Finish(new MinigameResult { quality = run.Quality, perfects = seamsFound, total = Seams });
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public ExcavationHarvestRun DebugRun { get { return run; } }
+        public void DebugPing(int cell) { Ping(cell); }
+#endif
 
         void UpdateStatus(string message) { status.text = message; }
 
@@ -1052,26 +1241,30 @@ namespace Frontier
     /// <summary>Cast a magnetic claw to collect drifting wreckage before it escapes the salvage field.</summary>
     public class SalvageGame : Minigame
     {
-        const int Targets = 6;
-        const int MaxCasts = 10;
+        const int Targets = SalvageHarvestRun.TargetCount;
+        const int MaxCasts = SalvageHarvestRun.MaxCasts;
         readonly Transform[] debris = new Transform[Targets];
         readonly float[] radii = new float[Targets];
         readonly float[] phases = new float[Targets];
-        int casts, captured;
+        readonly SalvageHarvestRun run = new SalvageHarvestRun();
+        int casts { get { return run.Casts; } }
+        int captured { get { return run.Captured; } }
         float elapsed;
         Transform claw, tether;
         const float frameW = 8f, frameH = 7.2f;
 
-        protected override string Title { get { return "WRECKAGE SALVAGE"; } }
-        protected override string Hint { get { return "Tap tumbling wreckage to catch it with your claw. Misses cost a cast"; } }
+        protected override string Title { get { return UiText.Get("harvest.salvage.title"); } }
+        protected override string DefaultToolName { get { return UiText.Get("harvest.tool.grabber"); } }
+        protected override MinigameKind FeedbackKind { get { return MinigameKind.Salvage; } }
+        protected override string ResultMetric { get { return UiText.Get("harvest.salvage.metric"); } }
+        protected override string Hint { get { return UiText.Get("harvest.salvage.hint"); } }
         protected override Color StageBg { get { return new Color(0.018f, 0.015f, 0.04f); } }
 
         protected override void Build()
         {
-            arena.Add(Pill(string.IsNullOrEmpty(toolName) ? "Grabber" : toolName, color));
             status.style.display = DisplayStyle.Flex;
             arena.RegisterCallback<PointerDownEvent>(OnCast);
-            UpdateStatus("RECOVER 6 FRAGMENTS  ·  TAP A TARGET");
+            UpdateStatus(UiText.Get("harvest.salvage.help", Targets));
         }
 
         protected override void BuildScene()
@@ -1115,20 +1308,14 @@ namespace Frontier
                 debris[i] = root;
             }
 
-            claw = new GameObject("MagnetClaw").transform;
-            claw.SetParent(st.root, false);
-            st.Prim(PrimitiveType.Cylinder, claw, new Vector3(0f, 0.48f, 0f), new Vector3(0.1f, 0.48f, 0.1f), Vector3.zero, alloy);
-            st.Prim(PrimitiveType.Sphere, claw, new Vector3(0f, 0.95f, 0f), new Vector3(0.4f, 0.3f, 0.4f), Vector3.zero, glowing);
-            st.GlowQuad(claw, new Color(color.r, color.g, color.b, 0.8f), 1.2f, new Vector3(0f, 0.95f, -0.3f));
-            claw.localPosition = new Vector3(0f, -1.55f, -0.65f);
+            claw = HarvestToolVisual.Build(st, MinigameKind.Salvage, toolLevel, rawColor, new Vector3(0f, -1.55f, -0.65f));
         }
 
         protected override void Frame(float aspect) { FramePose(frameW, frameH, -0.15f, aspect, 0.75f); }
 
         void OnCast(PointerDownEvent e)
         {
-            if (finished || casts >= MaxCasts) return;
-            casts++;
+            if (!CanInteract || casts >= MaxCasts) return;
             Ray ray = PointerRay(e);
             int hit = -1;
             float nearest = float.MaxValue;
@@ -1145,23 +1332,30 @@ namespace Frontier
                 if (distance < nearest) { nearest = distance; hit = i; }
             }
 
+            Cast(hit);
+        }
+
+        void Cast(int hit)
+        {
+            if (!CanInteract || !run.TryCast(hit)) return;
             if (hit >= 0)
             {
                 Vector3 point = debris[hit].position;
                 debris[hit].gameObject.SetActive(false);
-                captured++;
                 claw.localPosition = new Vector3(point.x, -1.55f, -0.65f);
                 tether.localPosition = (point + claw.position) * 0.5f - stage.root.position;
                 tether.localScale = new Vector3(0.08f, Vector3.Distance(point, claw.position) * 0.5f, 0.08f);
                 Fx.Burst(point, color * 1.8f, 20, 4f, 0.18f);
                 stage.Shake(0.22f);
-                Sfx.Good();
-                UpdateStatus("FRAGMENT LOCKED  ·  " + captured + "/6  ·  " + (MaxCasts - casts) + " CASTS");
+                HarvestFeedback.Play(HarvestCue.Impact, FeedbackKind);
+                UpdateStatus(UiText.Get("harvest.salvage.locked", captured, Targets, MaxCasts - casts));
+                SetToolState(UiText.Get("harvest.salvage.recovered-target"));
             }
             else
             {
-                Sfx.Bad();
-                UpdateStatus("CLAW MISSED  ·  " + captured + "/6  ·  " + (MaxCasts - casts) + " CASTS");
+                HarvestFeedback.Play(HarvestCue.Miss, FeedbackKind);
+                UpdateStatus(UiText.Get("harvest.salvage.missed", captured, Targets, MaxCasts - casts));
+                SetToolState(UiText.Get("harvest.salvage.aim"), false);
             }
 
             if (captured >= Targets || casts >= MaxCasts) Complete();
@@ -1169,12 +1363,16 @@ namespace Frontier
 
         void Complete()
         {
-            float q = captured == 0 ? 0f : 0.2f + 0.8f * (captured / (float)Targets);
-            UpdateStatus("RECOVERED " + captured + "/6 FRAGMENTS");
-            Finish(new MinigameResult { quality = q, perfects = captured, total = Targets });
+            UpdateStatus(UiText.Get("harvest.salvage.complete", captured, Targets));
+            Finish(new MinigameResult { quality = run.Quality, perfects = captured, total = Targets });
         }
 
-        void UpdateStatus(string message) { status.text = "CASTS " + casts + "/" + MaxCasts + "  ·  " + message; }
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public SalvageHarvestRun DebugRun { get { return run; } }
+        public void DebugCast(int target) { Cast(target); }
+#endif
+
+        void UpdateStatus(string message) { status.text = UiText.Get("harvest.salvage.status", casts, MaxCasts, message); }
 
         protected override void Tick(float dt)
         {
@@ -1206,8 +1404,10 @@ namespace Frontier
         float spawnT = 0.6f, hitFlash, shipX, gap = 2.2f, unit = 1f, bob;
         bool shipReady;
 
-        protected override string Title { get { return "ASTEROID FIELD"; } }
-        protected override string Hint { get { return "Tap a lane to steer. Dodge rocks, grab orbs. Clean flying refunds fuel"; } }
+        protected override string Title { get { return UiText.Get("harvest.travel.title"); } }
+        protected override string DefaultToolName { get { return UiText.Get("harvest.tool.ship"); } }
+        protected override string ResultMetric { get { return UiText.Get("harvest.travel.metric"); } }
+        protected override string Hint { get { return UiText.Get("harvest.travel.hint"); } }
         protected override Color StageBg { get { return new Color(0.01f, 0.01f, 0.04f); } }
 
         protected override void Build()
@@ -1221,7 +1421,7 @@ namespace Frontier
             Status();
         }
 
-        void Status() { status.text = "Orbs " + orbs + "     Hits " + hits; }
+        void Status() { status.text = UiText.Get("harvest.travel.status", orbs, hits); }
 
         protected override void BuildScene()
         {

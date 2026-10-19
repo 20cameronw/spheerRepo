@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Frontier.Universe;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,14 +19,18 @@ namespace Frontier
         {
             if (mapQuery != null && mapQuery.IsCompleted)
             {
-                if (mapQuery.IsFaulted) { Debug.LogException(mapQuery.Exception); mapNotice.text = "Map unavailable · pan or zoom to retry"; }
+                if (mapQuery.IsFaulted) { Debug.LogException(mapQuery.Exception); mapNotice.text = UiText.Get("map.unavailable"); }
                 else if (queryVersion == mapVersion)
                 {
                     mapSnapshot = mapQuery.Result;
+                    gs.RecordMapDiscoveries(mapSnapshot.surveyedSystems);
+                    if (mapNameIndex != null) mapNameIndex.AddSystems(gs.universe.Universe, mapSnapshot.surveyedSystems);
                     PositionMapLabels();
                     mapWorld.MarkDirtyRepaint();
-                    mapReadout.text = (mapSnapshot.densityOnly ? "Galaxy · zoom in for stars" : viewport.Scale >= 8 ? "System · orbits schematic" : "Sector · " + mapSnapshot.systems.Length + " stars")
-                        + (mapSnapshot.truncated ? " · zoom in for more" : "");
+                    string readout = mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
+                        : viewport.Scale >= 8 ? UiText.Get("map.view.system")
+                        : UiText.Get("map.view.sector", mapSnapshot.systems.Length);
+                    mapReadout.text = mapSnapshot.truncated ? UiText.Get("map.view.truncated", readout) : readout;
                 }
                 mapQuery = null;
             }
@@ -35,17 +40,27 @@ namespace Frontier
                 MapPoint a = viewport.Unproject(0, viewport.Height), b = viewport.Unproject(viewport.Width, 0);
                 var universe = gs.universe.Universe;
                 var points = SurveyPoints();
+                var discovered = gs.MapDiscoveryIds();
                 string resource = mapResource;
-                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points));
+                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, discovered));
             }
             if (mapPreviewTask != null && mapPreviewTask.IsCompleted)
             {
                 if (mapPreviewTask.IsFaulted)
                 {
                     Debug.LogException(mapPreviewTask.Exception);
-                    if (runningPreviewVersion == previewVersion) mapPreview = RoutePlan.Blocked(RouteReasons.Unknown);
+                    if (runningPreviewVersion == previewVersion)
+                    {
+                        mapPreview = RoutePlan.Blocked(RouteReasons.Unknown);
+                        mapNextStopPlanetId = null;
+                    }
                 }
-                else if (runningPreviewVersion == previewVersion) mapPreview = mapPreviewTask.Result;
+                else if (runningPreviewVersion == previewVersion)
+                {
+                    MapPreviewResult result = mapPreviewTask.Result;
+                    mapPreview = result.plan;
+                    mapNextStopPlanetId = result.nextStopPlanetId;
+                }
                 mapPreviewTask = null;
                 if (mapPreview != null) { BuildMapCard(); mapWorld.MarkDirtyRepaint(); }
             }
@@ -55,7 +70,20 @@ namespace Frontier
                 var planner = gs.universe.NewPlanner();
                 var from = gs.universe.EndpointOf(gs.planet); var to = gs.universe.EndpointOf(selected);
                 var caps = gs.Ship; var stock = gs.FuelOnBoard; bool auto = mapAutopilot;
-                mapPreviewTask = Task.Run(() => planner.Plan(from, to, caps, auto, stock));
+                var fromSystem = gs.planet.Star;
+                double targetX = selected.Star.X, targetY = selected.Star.Y;
+                mapPreviewTask = Task.Run(() =>
+                {
+                    var plan = planner.Plan(from, to, caps, auto, stock);
+                    string nextStopPlanetId = null;
+                    if (!plan.reachable && (plan.Has(RouteReasons.OutOfRange) || plan.Has(RouteReasons.SearchLimit)))
+                    {
+                        StarSystem next = planner.NextStopToward(fromSystem, targetX, targetY, caps);
+                        var worlds = planner.Universe.PlanetsOf(next);
+                        if (worlds.Length > 0) nextStopPlanetId = worlds[0].Id;
+                    }
+                    return new MapPreviewResult { plan = plan, nextStopPlanetId = nextStopPlanetId };
+                });
             }
         }
 

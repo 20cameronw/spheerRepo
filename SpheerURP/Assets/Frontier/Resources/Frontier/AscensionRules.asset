@@ -1,0 +1,14 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f132e5d945c7424c8aa6643cc3db6f07, type: 3}
+  m_Name: AscensionRules
+  enableAscension: 0
+  data:
+    requiredResearch: ascension_protocol
+    requiredProjectStage: 3
+    legacyPointsPerRank: 1
+    harvestBonusPerPoint: 0.05
+    maxHarvestBonus: 0.5

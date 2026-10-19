@@ -65,8 +65,13 @@ namespace Frontier
         /// <summary>Switches an element (and everything inside it) to the accent nearest to the colour.</summary>
         public static void SetAccent(VisualElement e, Color c)
         {
-            foreach (var cls in AccentClasses) e.RemoveFromClassList(cls);
+            ClearAccent(e);
             e.AddToClassList(AccentClass(c));
+        }
+
+        public static void ClearAccent(VisualElement e)
+        {
+            foreach (var cls in AccentClasses) e.RemoveFromClassList(cls);
         }
 
         /// <summary>A colour mixed into the dark surface colour (an opaque tint; translucent overlays blend unpredictably in linear space).</summary>
@@ -77,7 +82,8 @@ namespace Frontier
 
         public static VisualElement Div(string cls = null)
         {
-            var e = new VisualElement();
+            VisualElement e = cls == "fr-tabs" ? new FrontierTabBar() :
+                cls == "fr-card-head" ? new FrontierListRow() : new VisualElement();
             if (cls != null) foreach (var c in cls.Split(' ')) e.AddToClassList(c);
             return e;
         }
@@ -137,13 +143,9 @@ namespace Frontier
         /// </summary>
         public static Button Btn(string text, Color color, Action onClick, bool big = false, bool primary = false)
         {
-            var b = new Button();
-            b.AddToClassList("fr-btn");
-            if (big) b.AddToClassList("fr-btn-big");
-            if (primary) b.AddToClassList("fr-btn-primary");
-            SetAccent(b, color);
+            var b = new FrontierButton { Large = big, Primary = primary, Accent = color };
             if (!string.IsNullOrEmpty(text)) b.text = text;
-            b.clicked += () => { Sfx.Click(); if (onClick != null) onClick(); };
+            if (onClick != null) b.clicked += onClick;
             return b;
         }
 
@@ -155,10 +157,8 @@ namespace Frontier
 
         public static VisualElement Bar(Color c, out VisualElement fill)
         {
-            var track = Div("fr-bar");
-            fill = Div("fr-bar-fill");
-            fill.style.backgroundColor = Ui(c);
-            track.Add(fill);
+            var track = new FrontierProgress { Tint = c };
+            fill = track.Fill;
             return track;
         }
 
@@ -170,11 +170,7 @@ namespace Frontier
         /// <summary>An icon + value chip (cost, reward, tag). The icon carries the colour, the chip stays tonal.</summary>
         public static VisualElement Chip(string icon, Color iconColor, string text, bool low = false)
         {
-            var chip = Div("fr-itemchip");
-            if (low) chip.AddToClassList("fr-itemchip-low");
-            chip.Add(Icons.Make(icon, iconColor));
-            chip.Add(Text(text, "fr-small", low ? Red : (Color?)null));
-            return chip;
+            return new FrontierChip { Tint = iconColor, Icon = icon, Text = text, Low = low };
         }
 
         public static VisualElement ItemChip(ResourceSO r, int amount, int have = -1)
@@ -184,11 +180,22 @@ namespace Frontier
             return Chip(Icons.ForResource(r), Ui(r.color), label, short_);
         }
 
-        public static VisualElement CostRow(System.Collections.Generic.List<ItemAmount> items, GameState gs, bool showHave)
+        public static VisualElement CostRow(System.Collections.Generic.List<ItemAmount> items, GameState gs, bool showHave,
+            Action<ResourceSO> onFind = null)
         {
             var row = Div("fr-row-wrap");
             foreach (var i in items)
-                if (i.resource != null) row.Add(ItemChip(i.resource, i.amount, showHave ? gs.Count(i.resource) : -1));
+            {
+                if (i.resource == null) continue;
+                row.Add(ItemChip(i.resource, i.amount, showHave ? gs.Count(i.resource) : -1));
+                if (onFind != null && gs.PlanetCount(i.resource) < i.amount)
+                {
+                    ResourceSO resource = i.resource;
+                    var find = Btn("FIND", Cyan, () => onFind(resource));
+                    find.AddToClassList("fr-cost-find");
+                    row.Add(find);
+                }
+            }
             return row;
         }
     }

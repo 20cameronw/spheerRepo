@@ -21,21 +21,21 @@ namespace Frontier
 
         public string ResearchLockReason(ResearchNodeSO node)
         {
-            if (node == null || node.data == null || !ContainsResearch(node)) return "Unknown research";
-            if (!db.UsesImportedEconomy) return "Research is unavailable in this database";
-            if (IsResearched(node.data.id)) return "Already researched";
-            if (node.data.tier > ReachTier) return "Reach planet tier " + node.data.tier;
+            if (node == null || node.data == null || !ContainsResearch(node)) return UiText.Get("gate.research.unknown");
+            if (!db.UsesImportedEconomy) return UiText.Get("gate.research.unavailable");
+            if (IsResearched(node.data.id)) return UiText.Get("gate.research.complete");
+            if (node.data.tier > ReachTier) return UiText.Get("gate.reach-tier", node.data.tier);
             if (node.data.labLevel > 0)
             {
                 var lab = StructureOfKind(planet, StructureKind.ResearchLab);
                 if (lab == null || lab.level < node.data.labLevel)
-                    return "Requires Research Lab level " + node.data.labLevel + " on this world";
+                    return UiText.Get("gate.lab-world", node.data.labLevel);
             }
             if (node.data.prereqs != null)
                 foreach (string prereq in node.data.prereqs)
-                    if (!IsResearched(prereq)) return "Requires " + DisplayId(prereq);
-            if (!TryBuildCost(node.data.cost, out var cost)) return "Invalid research cost";
-            return Has(cost) ? null : "Missing research materials";
+                    if (!IsResearched(prereq)) return UiText.Get("gate.requires", DisplayId(prereq));
+            if (!TryBuildCost(node.data.cost, out var cost)) return UiText.Get("gate.research.invalid-cost");
+            return Has(cost) ? null : UiText.Get("gate.research.materials");
         }
 
         public bool CanResearch(ResearchNodeSO node)
@@ -60,21 +60,21 @@ namespace Frontier
 
         public string ToolTierLockReason(ToolLadderSO ladder)
         {
-            if (!IsSupportedTool(ladder)) return "This tool's harvest game is not implemented";
+            if (!IsSupportedTool(ladder)) return UiText.Get("gate.tool.unavailable");
             int current = ToolTier(ladder);
             var next = FindToolTier(ladder, current + 1);
-            if (next == null) return "Maximum tool tier";
-            if (next.requiresReachTier > ReachTier) return "Reach planet tier " + next.requiresReachTier;
+            if (next == null) return UiText.Get("gate.tool.max");
+            if (next.requiresReachTier > ReachTier) return UiText.Get("gate.reach-tier", next.requiresReachTier);
             if (!string.IsNullOrEmpty(next.researchPrereq) && !IsResearched(next.researchPrereq))
-                return "Requires " + DisplayId(next.researchPrereq);
+                return UiText.Get("gate.requires", DisplayId(next.researchPrereq));
             if (next.requiresLabLevel > 0)
             {
                 var lab = StructureOfKind(planet, StructureKind.ResearchLab);
                 if (lab == null || lab.level < next.requiresLabLevel)
-                    return "Requires Research Lab level " + next.requiresLabLevel + " on this world";
+                    return UiText.Get("gate.lab-world", next.requiresLabLevel);
             }
-            if (!TryBuildCost(next.cost, out var cost)) return "Invalid tool cost";
-            return Has(cost) ? null : "Missing tool materials";
+            if (!TryBuildCost(next.cost, out var cost)) return UiText.Get("gate.tool.invalid-cost");
+            return Has(cost) ? null : UiText.Get("gate.tool.materials");
         }
 
         public bool BuyToolTier(ToolLadderSO ladder)

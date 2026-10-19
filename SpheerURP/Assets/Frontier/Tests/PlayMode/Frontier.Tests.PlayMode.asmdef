@@ -8,6 +8,7 @@
         "Frontier.Economy",
         "Frontier.Data",
         "Frontier.Game",
+        "Frontier.Services",
         "Frontier.Visual",
         "Frontier.UI",
         "Frontier.HyperspaceView",

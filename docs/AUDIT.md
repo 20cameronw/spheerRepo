@@ -72,7 +72,7 @@ Before and after, phone 1080x1920 (top row before, bottom row after):
 | 1 | Unlabeled dock, robot-head build icon, menu button colliding with the top bar | **Fixed.** Four captioned dock buttons (COMMAND, MAP, PACK, BUILD), build = hammer crossed with a saw, hamburger menu button with its own slot beside the top bar. |
 | 2 | Map: muddy brown background, `+`/`-` over the galaxy title | **Mostly fixed.** The brown was oversized system halos at too much alpha; they are now faint and capped, the map is opaque deep navy, and the tools sit in a row at the top right. The selected world is still not re-centred (map track). |
 | 3 | Worlds card: names only, bare fuel cost | **Restyled only.** Tonal card, WARP is the single primary action; content changes belong to the map/atlas track. |
-| 4 | Build / Command: neon on every card, ~10 text sizes | **Fixed.** Tonal cards with thin outlines, accent only on the selected tab/card and the primary button, five type sizes. Satellite is still "coming soon" (content). |
+| 4 | Build / Command: neon on every card, ~10 text sizes | **Fixed.** Tonal cards with thin outlines, accent only on the selected tab/card and the primary button, five type sizes. Satellite has since been folded into the functional Orbital Relay. |
 | 5 | Popups: world labels through the popup, 27 dp buttons | **Fixed** for buttons (52 dp) and surfaces (opaque). A world-space label can still peek out just below a popup edge. |
 | 6 | DEBUG tile visible to everyone | **Fixed.** Hidden unless `Debug.isDebugBuild || Application.isEditor`. Ranks still says leaderboards are not connected (content). |
 | 7 | Backpack: flat grid, no categories | Unchanged (components track). Slot layout tidied: icon on top, count bottom-right. |

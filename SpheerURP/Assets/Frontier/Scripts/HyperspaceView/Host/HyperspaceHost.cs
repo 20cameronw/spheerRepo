@@ -71,13 +71,24 @@ namespace Frontier.Hyperspace.View
         static EncounterLibrary library;
 
         /// <summary>The encounter library is immutable: built once and shared by every run.</summary>
-        public static EncounterLibrary Library { get { return library ?? (library = EncounterLibrary.CreateDefault()); } }
+        public static EncounterLibrary Library
+        {
+            get
+            {
+                if (library != null) return library;
+                var catalog = Resources.Load<EncounterCatalogSO>("Frontier/EncounterCatalog");
+                if (catalog == null) throw new InvalidOperationException("Hyperspace encounter catalog is missing.");
+                library = catalog.BuildLibrary();
+                return library;
+            }
+        }
 
         public static RunParams BuildParams(TravelRunRequest request, ShipStats ship, HyperspaceTuning tuning, bool assist)
         {
             // Same-system hops report a distance of zero light years: the simulation expects at least 1.
             float ly = (float)Math.Max(1.0, double.IsNaN(request.distanceLy) ? 1.0 : request.distanceLy);
-            return new RunParams(request.seed, ly, request.danger, Mathf.Clamp(request.tier, 0, 12), ship.Power(tuning), assist ? RunMode.Assist : RunMode.Normal);
+            float plannedDuration = request.seconds > 0 ? request.seconds : 0f;
+            return new RunParams(request.seed, ly, request.danger, Mathf.Clamp(request.tier, 0, 12), ship.Power(tuning), assist ? RunMode.Assist : RunMode.Normal, plannedDuration);
         }
 
         public static HyperspaceRun CreateRun(TravelRunRequest request, ShipStats ship, HyperspaceTuning tuning, bool assist)

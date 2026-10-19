@@ -28,6 +28,49 @@ namespace Frontier.Hyperspace
             return lib;
         }
 
+        public static EncounterLibrary FromTemplates(IEnumerable<EncounterTemplate> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            var lib = new EncounterLibrary();
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var t in source)
+            {
+                if (t == null || string.IsNullOrWhiteSpace(t.id) || !ids.Add(t.id))
+                    throw new ArgumentException("Encounter IDs must be nonempty and unique.", nameof(source));
+                if (t.minTier < 0 || t.maxTier > 12 || t.maxTier < t.minTier ||
+                    !Positive(t.cost) || !Positive(t.weight) ||
+                    !Finite(t.declaredSpeed) || t.declaredSpeed < 0f || t.declaredSpeed > 1f ||
+                    !Enum.IsDefined(typeof(EncounterRole), t.role) || !Enum.IsDefined(typeof(EncounterFamily), t.family) ||
+                    t.entries == null || t.entries.Length == 0 || !Finite(t.durationZ) || t.durationZ < 0f)
+                    throw new ArgumentException("Invalid encounter metadata: " + t.id, nameof(source));
+                float lastZ = 0f;
+                foreach (var entry in t.entries)
+                {
+                    if (!Enum.IsDefined(typeof(EntityType), entry.type) || !Enum.IsDefined(typeof(PathType), entry.path) ||
+                        !Enum.IsDefined(typeof(PickupType), entry.pickup) ||
+                        !Finite(entry.x) || !Finite(entry.y) || !Finite(entry.zOffset) || entry.zOffset < lastZ ||
+                        !Finite(entry.vzOwn) || !Finite(entry.p0) || !Finite(entry.p1) || !Finite(entry.p2) ||
+                        !Finite(entry.p3) || !Finite(entry.p4) || !Finite(entry.p5))
+                        throw new ArgumentException("Invalid or unsorted spawn entry: " + t.id, nameof(source));
+                    lastZ = entry.zOffset;
+                }
+                if (t.entries[0].zOffset != 0f || lastZ != t.durationZ)
+                    throw new ArgumentException("Encounter offsets must start at zero and span durationZ: " + t.id, nameof(source));
+                lib.templates.Add(new EncounterTemplate
+                {
+                    id = t.id, index = lib.templates.Count, minTier = t.minTier, maxTier = t.maxTier,
+                    cost = t.cost, role = t.role, family = t.family, entries = (SpawnEntry[])t.entries.Clone(),
+                    durationZ = t.durationZ, declaredSpeed = t.declaredSpeed, weight = t.weight,
+                    mirrorable = t.mirrorable, notes = t.notes
+                });
+            }
+            if (lib.Count == 0) throw new ArgumentException("An encounter library cannot be empty.", nameof(source));
+            return lib;
+        }
+
+        static bool Positive(float value) { return Finite(value) && value > 0f; }
+        static bool Finite(float value) { return !float.IsNaN(value) && !float.IsInfinity(value); }
+
         void Register(TemplateBuilder b)
         {
             EncounterTemplate t = b.Done();

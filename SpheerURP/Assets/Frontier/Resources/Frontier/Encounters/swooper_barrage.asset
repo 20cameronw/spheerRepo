@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d34ee26d274254998ef72f3dca111a, type: 3}
+  m_Name: swooper_barrage
+  m_EditorClassIdentifier: Frontier.Data::Frontier.EncounterSO
+  template:
+    id: swooper_barrage
+    index: 28
+    minTier: 4
+    maxTier: 12
+    cost: 12
+    role: 2
+    family: 7
+    entries:
+    - type: 3
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -4.2
+      y: 3.2
+      zOffset: 0
+      vzOwn: 8
+      path: 3
+      p0: -0.4
+      p1: 3.6
+      p2: 0.3
+      p3: -1.2
+      p4: 1.5
+      p5: 0
+      group: 0
+    - type: 3
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 4.2
+      y: 3.2
+      zOffset: 8
+      vzOwn: 8
+      path: 3
+      p0: 0.4
+      p1: 3.6
+      p2: -0.55
+      p3: -0.7
+      p4: 1.5
+      p5: 0
+      group: 0
+    - type: 3
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -4.2
+      y: 3.2
+      zOffset: 16
+      vzOwn: 8
+      path: 3
+      p0: -0.4
+      p1: 3.6
+      p2: 0.8
+      p3: -0.2
+      p4: 1.5
+      p5: 0
+      group: 0
+    - type: 3
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 4.2
+      y: 3.2
+      zOffset: 24
+      vzOwn: 8
+      path: 3
+      p0: 0.4
+      p1: 3.6
+      p2: -0.3
+      p3: -1.2
+      p4: 1.5
+      p5: 0
+      group: 0
+    - type: 3
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -4.2
+      y: 3.2
+      zOffset: 32
+      vzOwn: 8
+      path: 3
+      p0: -0.4
+      p1: 3.6
+      p2: 0.55
+      p3: -0.7
+      p4: 1.5
+      p5: 0
+      group: 0
+    - type: 3
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 4.2
+      y: 3.2
+      zOffset: 40
+      vzOwn: 8
+      path: 3
+      p0: 0.4
+      p1: 3.6
+      p2: -0.8
+      p3: -0.2
+      p4: 1.5
+      p5: 0
+      group: 0
+    durationZ: 40
+    declaredSpeed: 0.65
+    weight: 1
+    mirrorable: 1
+    notes: Six swoopers in a staggered volley.

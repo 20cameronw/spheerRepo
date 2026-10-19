@@ -41,6 +41,7 @@ namespace Frontier.Hyperspace
     /// between this entry's arrival at the ship plane and the arrival of the first entry of the template; it is converted to seconds, so timing never depends on route speed.
     /// vzOwn is the extra approach speed of enemies that fly toward the ship. Path parameters are documented on <see cref="PathType"/> and <see cref="Hazards"/>.
     /// </summary>
+    [System.Serializable]
     public struct SpawnEntry
     {
         public EntityType type;
@@ -57,6 +58,7 @@ namespace Frontier.Hyperspace
     }
 
     /// <summary>Authored formation: what to spawn, where, in which tiers, and what it costs in director budget points.</summary>
+    [System.Serializable]
     public sealed class EncounterTemplate
     {
         public string id;

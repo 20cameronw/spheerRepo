@@ -133,9 +133,10 @@ planet, backdrop, defense, UI and world surface from the `GameDatabase` asset, t
 
 | Menu | Purpose |
 |------|---------|
-| Generate Editable Data Assets / Generate Deep Space Planets | bootstrap or extend data assets |
+| Generate Editable Data Assets / Generate Deep Space Planets | create-only bootstrap for fresh data folders; refuses to overwrite existing database/data assets |
 | Build Model Library / Calibrate Model Scales / Bake Model Ground Radii | rebuild the model library, bake scale corrections, bake the per-model ground radius that generated worlds use |
 | Validate Planet Model Sizes / Storage / Combat Balance / Panel Layout / Icons | validation suites (the batch gate, see [TESTING.md](TESTING.md)) |
+| Universe > Universe Viewer | read-only seed/coordinate preview with density heat map, sector/system/planet inspector and descriptor copy |
 | Universe > Render Density PNG | draws the galaxy density map of the universe generator (30,000 ly across) to `SpheerURP/Screens/universe/` |
 | Build Font Assets | regenerate the SDF FontAssets next to the TTFs in `Art/Fonts` |
 | Capture Screens | screenshot harness from inside the editor |

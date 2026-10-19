@@ -16,6 +16,28 @@ namespace Frontier
         public GameDatabase ContentSource { get; private set; }
         public bool UsesImportedEconomy { get { return ContentSource != null; } }
 
+        public bool TryWithTravelOverrides(IReadOnlyDictionary<string, string> overrides,
+            out GameDatabase effective, out string error)
+        {
+            effective = this;
+            if (!UsesImportedEconomy)
+            {
+                error = "Remote travel tuning requires the validated imported economy.";
+                return false;
+            }
+            var bundled = ContentSource.tuning.Build();
+            if (!TravelTuningOverrides.TryApply(bundled, overrides, out var values, out error)) return false;
+            if (values.Digest() == tuning.Build().Digest()) return true;
+            var view = Instantiate(this);
+            view.hideFlags = HideFlags.HideAndDontSave;
+            view.ContentSource = ContentSource;
+            view.tuning = view.Copy(ContentSource.tuning);
+            view.tuning.digest = values.Digest().ToString("x");
+            view.tuning.values = values.Entries.Select(e => new TuningValue { key = e.key, value = e.value }).ToArray();
+            effective = view;
+            return true;
+        }
+
         /// <summary>Inspector overrides use the same guard as the default; legacy/custom databases remain supported.</summary>
         public static GameDatabase ForRuntime(GameDatabase database)
         {
@@ -31,7 +53,7 @@ namespace Frontier
         /// <summary>Pure selection inputs make missing/old/broken imports testable without modifying Resources.</summary>
         public static GameDatabase Select(GameDatabase imported, GameDatabase legacy, out string reason)
         {
-            if (!CanActivate(imported, legacy, out reason)) return legacy != null ? legacy : DefaultContent.Create();
+            if (!CanActivate(imported, legacy, out reason)) return legacy != null ? legacy : MissingLegacyContent();
             var view = Instantiate(imported);
             view.hideFlags = HideFlags.HideAndDontSave;
             view.ContentSource = imported;
@@ -122,10 +144,9 @@ namespace Frontier
                 Require(catalog.resources.Length == 34 && catalog.recipes.Length == 24 && catalog.structures.Length == 31 &&
                     catalog.upgrades.Length == 16 && catalog.tools.Length == 6 && catalog.research.Length == 60 &&
                     catalog.obstacles.Length == 8, "incomplete economy catalog");
-                var errors = CatalogValidator.Validate(catalog);
-                Require(errors.Count == 0, string.Join("; ", errors.Take(5)));
                 Require(candidate.scoreFormula != null && candidate.scoreFormula.data != null && candidate.tuning != null, "missing economy rules");
-                candidate.tuning.Build();
+                var errors = CatalogValidator.Validate(catalog, candidate.tuning.Build());
+                Require(errors.Count == 0, string.Join("; ", errors.Take(5)));
                 Require(candidate.baseBackpackSlots > 0 && candidate.builders > 0 && candidate.baseReactorHealth > 0, "invalid starting capacities");
                 Require(candidate.fuel == candidate.FindResource("fuel") && candidate.fuel != null &&
                     candidate.scrap == candidate.FindResource("scrap") && candidate.scrap != null, "fuel/scrap link is broken");
@@ -171,7 +192,20 @@ namespace Frontier
                     Require(planet.spots.Any(s => candidate.FindResource(candidate.ResolveResourceId(s.resource.id)).IsRaw),
                         "authored world has no raw deposits");
                 }
-                foreach (var enemy in candidate.enemies) checkItems(enemy.bounty);
+                foreach (var enemy in candidate.enemies)
+                {
+                    checkItems(enemy.bounty);
+                    Require(Enum.IsDefined(typeof(AlienRank), enemy.rank) && enemy.armor >= 0f && enemy.armor <= 0.9f &&
+                        enemy.bossInterval > 0 && enemy.minWave > 0 && enemy.health > 0f && enemy.health < float.PositiveInfinity &&
+                        enemy.threat > 0f && enemy.threat < float.PositiveInfinity, "invalid alien rules " + enemy.id);
+                }
+                Require(candidate.formula.modifiersFromWave > 0 && candidate.formula.modifiers != null, "invalid wave modifiers");
+                foreach (var modifier in candidate.formula.modifiers)
+                    Require(modifier != null && !string.IsNullOrWhiteSpace(modifier.name) && !string.IsNullOrWhiteSpace(modifier.description) &&
+                        modifier.health >= 1f && modifier.health < float.PositiveInfinity &&
+                        modifier.damage >= 1f && modifier.damage < float.PositiveInfinity &&
+                        modifier.speed >= 1f && modifier.speed < float.PositiveInfinity &&
+                        modifier.reward >= 1f && modifier.reward < float.PositiveInfinity, "invalid wave modifier rules");
                 foreach (var recipe in candidate.recipes)
                 {
                     Require(candidate.FindStructure(recipe.stationId).kind.IsStation(), "recipe station has no crafting behaviour");

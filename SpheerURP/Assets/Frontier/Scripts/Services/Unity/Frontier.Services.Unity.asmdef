@@ -6,7 +6,12 @@
         "Unity.Services.Core",
         "Unity.Services.Authentication",
         "Unity.Services.CloudSave",
-        "Unity.Services.Leaderboards"
+        "Unity.Services.Leaderboards",
+        "Unity.Services.Analytics",
+        "Unity.Services.RemoteConfig",
+        "Unity.Notifications.Unified",
+        "Unity.Notifications.Android",
+        "Unity.Notifications.iOS"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

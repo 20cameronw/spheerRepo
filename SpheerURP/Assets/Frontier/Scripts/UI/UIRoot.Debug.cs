@@ -11,6 +11,7 @@ namespace Frontier
         public VisualElement DebugRoot { get { return root; } }
         public float DebugPanelScale { get { return panelSettings != null ? panelSettings.scale : 1f; } }
         public bool DebugBusy { get { return busy; } }
+        public void DebugSetServices(Frontier.Services.FrontierServices serviceSet) { services = serviceSet; }
 
         public void DebugRelayout() { ApplyLayout(true); }
 
@@ -18,21 +19,47 @@ namespace Frontier
         public void DebugReset()
         {
             CloseAll();
+            CloseWaveResult();
             if (root != null) { var oldSheet = root.Q("icon-sheet"); if (oldSheet != null) oldSheet.RemoveFromHierarchy(); }
             if (overlayLayer != null) overlayLayer.Clear();
             if (travelLayer != null) travelLayer.Clear();
             if (toastLayer != null) toastLayer.Clear();
             busy = false;
+            activeGatherMinigame = null;
+            activeTravelMinigame = null;
             debugToolsOverride = null;
+            debugFirstSessionGuideOverride = false;
             menuPage = ""; shopTab = 0; researchTab = 0; toolTab = 0; packSel = -1; confirmReset = false;
             selected = gs.planet;
+            RefreshFirstSessionGuide();
+        }
+
+        public void DebugFirstSessionGuide(int step)
+        {
+            DebugReset();
+            debugFirstSessionGuideOverride = true;
+            debugFirstSessionGuideStep = step;
+            RefreshFirstSessionGuide();
+        }
+
+        public void DebugFirstSessionGuideShop(int step)
+        {
+            DebugFirstSessionGuide(step);
+            shopTab = step == 0 ? 1 : 0;
+            OpenShop();
+        }
+
+        public void DebugFirstSessionGuideAction(int step)
+        {
+            DebugFirstSessionGuide(step);
+            RunFirstSessionGuideAction();
         }
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
         public void DebugAtlas(int tab)
         {
             DebugReset();
-            atlasTab = Mathf.Clamp(tab, 0, 3);
+            atlasTab = Mathf.Clamp(tab, 0, 4);
             OpenMenu();
             menuPage = "atlas";
             RefreshModal();
@@ -47,6 +74,15 @@ namespace Frontier
             OpenResearch();
         }
         public void DebugPack(int select) { DebugReset(); packSel = select; OpenPack(); }
+        public void DebugEmptyPackAction() { RunEmptyPackAction(); }
+        public void DebugEmptyPack()
+        {
+            DebugReset();
+            foreach (var resource in gs.db.resources) gs.backpack.Set(resource.id, 0);
+            gs.Notify();
+            packSel = -1;
+            OpenPack();
+        }
 
         public void DebugMenu(string page, bool scrollToEnd = false)
         {
@@ -112,6 +148,21 @@ namespace Frontier
             return true;
         }
 
+        public bool DebugPausedGather(MinigameKind kind, bool confirmAbandon = false)
+        {
+            if (!DebugGather(kind) || activeGatherMinigame == null) return false;
+            activeGatherMinigame.Pause();
+            if (confirmAbandon) activeGatherMinigame.RequestAbandon();
+            return true;
+        }
+
+        public bool DebugGatherResult(MinigameKind kind)
+        {
+            if (!DebugGather(kind) || activeGatherMinigame == null) return false;
+            activeGatherMinigame.DebugComplete(0.82f, 7, 10);
+            return true;
+        }
+
         public void DebugTravelGame()
         {
             DebugReset();
@@ -126,7 +177,8 @@ namespace Frontier
             busy = true;
             request.fullscreenHost = travelLayer;
             request.safeInsets = inset;
-            game.Run(overlayLayer, request, r => { busy = false; if (done != null) done(r); });
+            activeTravelMinigame = game;
+            game.Run(overlayLayer, request, r => { activeTravelMinigame = null; busy = false; if (done != null) done(r); });
             return request;
         }
 

@@ -82,6 +82,13 @@ namespace Frontier
         /// <summary>Writes now whether or not anything changed (tests, the harness, explicit saves).</summary>
         public bool Save() { return Write(); }
 
+        /// <summary>Persists a detached candidate before the caller publishes its transactional state.</summary>
+        internal bool CommitSnapshot(SaveV2 candidate)
+        {
+            if (candidate == null) throw new ArgumentNullException(nameof(candidate));
+            return Write(candidate);
+        }
+
         bool Write()
         {
             if (store.ReadOnly)

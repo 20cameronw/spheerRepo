@@ -94,3 +94,10 @@ SpheerURP/Recordings/
 
 # Console labs (tools/labs): everything they build or render goes to tools/labs/out
 /tools/labs/out/
+
+# Localization Addressables build output; authored settings/groups remain tracked.
+SpheerURP/Assets/AddressableAssetsData/*/addressables_content_state.bin*
+SpheerURP/Assets/AddressableAssetsData/Android.meta
+SpheerURP/Assets/AddressableAssetsData/iOS.meta
+SpheerURP/Assets/StreamingAssets/aa/
+SpheerURP/Assets/StreamingAssets/aa.meta

@@ -590,5 +590,26 @@ namespace Frontier.Tests
             Assert.AreEqual(before + db.shardRules.data.atlasRecipeShards, state.ShardBalance);
             Assert.AreEqual(1, state.AtlasDiscoveredCount("recipe"));
         }
+
+        [Test]
+        public void AtlasEnemyDiscovery_RecordsFirstEncounterWithoutCurrencyReward()
+        {
+            var state = new GameState(db, false);
+            var enemy = db.enemies[0];
+            int before = state.ShardBalance;
+
+            Assert.IsTrue(state.RecordAtlasEnemySeen(enemy));
+            Assert.IsTrue(state.IsAtlasDiscovered("enemy", enemy.id));
+            Assert.AreEqual(1, state.AtlasDiscoveredCount("enemy"));
+            Assert.AreEqual(db.enemies.Length, state.AtlasCatalogCount("enemy"));
+            Assert.AreEqual(before, state.ShardBalance, "alien silhouettes reveal on encounter without adding an unbudgeted reward");
+            Assert.IsFalse(state.RecordAtlasEnemySeen(enemy));
+            Assert.IsFalse(state.IsAtlasDiscovered("enemy", "unknown"));
+            Assert.AreEqual(before, state.ShardBalance);
+            Assert.IsTrue(state.Save());
+            var loaded = new GameState(db, true);
+            Assert.IsTrue(loaded.IsAtlasDiscovered("enemy", enemy.id), "encounter knowledge is stored in the save-backed Atlas ledger");
+            Assert.AreEqual(1, loaded.AtlasDiscoveredCount("enemy"));
+        }
     }
 }

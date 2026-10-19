@@ -270,8 +270,76 @@ namespace Frontier
             PlanetData obstacleShowcase = null;
             int obstacleShowcasePad = -1;
             PlacedStructure At(StructureKind k) { return gs.StructureOfKind(gs.planet, k); }
+            void DrillShot(bool result)
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    foreach (var deposit in d.Deposits)
+                        if (deposit.Method == Frontier.Universe.HarvestMethod.Drill) return true;
+                    return false;
+                }, 2, 0, 10000);
+                if (world == null) throw new InvalidOperationException("no generated world with drilling deposits");
+                GoTo(world);
+                bool started = result ? ui.DebugGatherResult(MinigameKind.Drill) : ui.DebugGather(MinigameKind.Drill);
+                if (!started) throw new InvalidOperationException("world has no drill gather spot");
+            }
 
             yield return new Shot("hud", ResetView);
+            bool hadQuality = PlayerPrefs.HasKey(PresentationQuality.QualityKey);
+            bool hadFrameRate = PlayerPrefs.HasKey(PresentationQuality.FrameRateKey);
+            int savedQuality = PlayerPrefs.GetInt(PresentationQuality.QualityKey);
+            int savedFrameRate = PlayerPrefs.GetInt(PresentationQuality.FrameRateKey);
+            bool usedLowQuality = false;
+            void LowQualityView()
+            {
+                usedLowQuality = true;
+                PresentationQuality.Preset = QualityPreset.Low;
+                PresentationQuality.FrameRate = 0;
+                ResetView();
+            }
+            try
+            {
+                yield return new Shot("quality-low-settings", () => { LowQualityView(); ui.DebugMenu("settings"); });
+                yield return new Shot("quality-low-harvest", () =>
+                {
+                    LowQualityView();
+                    if (!ui.DebugGather(MinigameKind.Chop)) throw new InvalidOperationException("Low-quality harvest fixture has no chopping deposit.");
+                }, 1.8f);
+                yield return new Shot("quality-low-travel", () => { LowQualityView(); HyperspaceShot(3, 900); });
+            }
+            finally
+            {
+                if (usedLowQuality)
+                {
+                    ResetView();
+                    if (hadQuality) PlayerPrefs.SetInt(PresentationQuality.QualityKey, savedQuality);
+                    else PlayerPrefs.DeleteKey(PresentationQuality.QualityKey);
+                    if (hadFrameRate) PlayerPrefs.SetInt(PresentationQuality.FrameRateKey, savedFrameRate);
+                    else PlayerPrefs.DeleteKey(PresentationQuality.FrameRateKey);
+                    PlayerPrefs.Save();
+                    PresentationQuality.Initialize(FrontierSettings.I.targetFrameRate);
+                }
+            }
+            yield return new Shot("minigame-paused", () => { ResetView(); ui.DebugPausedGather(MinigameKind.Chop); });
+            yield return new Shot("minigame-abandon-confirm", () => { ResetView(); ui.DebugPausedGather(MinigameKind.Chop, true); });
+            yield return new Shot("minigame-result", () => { ResetView(); ui.DebugGatherResult(MinigameKind.Chop); }, 1.2f);
+            yield return new Shot("first-session-guide", () => ui.DebugFirstSessionGuide(0));
+            yield return new Shot("first-session-guide-defense", () => ui.DebugFirstSessionGuide(4));
+            yield return new Shot("first-session-guide-travel", () => ui.DebugFirstSessionGuide(5));
+            yield return new Shot("guide-cue-harvest", () =>
+            {
+                ResetView();
+                ui.DebugFirstSessionGuideAction(1);
+                if (ui.DebugRoot.Q("first-session-cue-1") == null)
+                    throw new InvalidOperationException("Harvest guide cue was not rendered.");
+            });
+            yield return new Shot("guide-cue-craft", () =>
+            {
+                ResetView();
+                ui.DebugFirstSessionGuideAction(3);
+                if (ui.DebugRoot.Q("first-session-cue-3") == null)
+                    throw new InvalidOperationException("Craft guide cue needs an affordable recipe.");
+            });
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
             for (int tab = 0; tab < 4; tab++) { int t = tab; yield return new Shot("shop-tab" + t, () => { ResetView(); ui.DebugShop(t); }); }
             yield return new Shot("command-bases", () => ui.DebugResearch(0));
@@ -283,13 +351,99 @@ namespace Frontier
             yield return new Shot("command-defense", () => ui.DebugResearch(2, 0, 2));
             yield return new Shot("pack", () => ui.DebugPack(-1));
             yield return new Shot("pack-selected", () => ui.DebugPack(0));
+            var carriedBeforeEmptyShot = new Dictionary<ResourceSO, int>();
+            foreach (var resource in db.resources) carriedBeforeEmptyShot[resource] = gs.Count(resource);
+            try
+            {
+                yield return new Shot("pack-empty", () =>
+                {
+                    ResetView();
+                    ui.DebugEmptyPack();
+                    if (ui.DebugRoot.Q("empty-pack-action") == null)
+                        throw new InvalidOperationException("Empty backpack action was not rendered.");
+                });
+            }
+            finally
+            {
+                foreach (var carried in carriedBeforeEmptyShot) gs.backpack.Set(carried.Key.id, carried.Value);
+                gs.Notify();
+            }
             yield return new Shot("menu", () => ui.DebugMenu(""));
-            foreach (var page in new[] { "ranks", "tutorial", "about", "settings", "debug" })
+            foreach (var page in new[] { "ranks", "goals", "ascension", "tutorial", "about", "settings", "debug" })
             {
                 string pg = page;
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
             }
-            string[] atlasShots = { "resources", "recipes", "worlds", "structures" };
+            SaveV2 ascensionBaseline = null;
+            var ascensionRules = Resources.Load<AscensionRulesSO>("Frontier/AscensionRules");
+            bool ascensionWasEnabled = ascensionRules != null && ascensionRules.enableAscension;
+            bool ascensionFixtureEnabled = false;
+            void PrepareAscensionFixture()
+            {
+                ResetView();
+                if (ascensionRules == null) throw new InvalidOperationException("Ascension fixture rules are missing.");
+                ascensionRules.enableAscension = true;
+                ascensionFixtureEnabled = true;
+                if (!gs.TryCreateCloudSaveSnapshot(out ascensionBaseline, out var problem))
+                    throw new InvalidOperationException(problem);
+                var candidate = JsonUtility.FromJson<SaveV2>(JsonUtility.ToJson(ascensionBaseline));
+                if (!candidate.player.researched.Contains("ascension_protocol"))
+                    candidate.player.researched.Add("ascension_protocol");
+                PlanetDelta current = null;
+                foreach (var delta in candidate.worlds)
+                    if (delta.planetId == candidate.location.currentPlanetId) { current = delta; break; }
+                if (current == null) throw new InvalidOperationException("Ascension fixture requires a visited current world.");
+                var record = new StructureRecord { defId = db.StructureOfKind(StructureKind.Terraformer).id, slot = 0, level = 3 };
+                if (current.structures.Count == 0) current.structures.Add(record);
+                else { record.slot = current.structures[0].slot; current.structures[0] = record; }
+                if (!gs.TryRestoreCloudSave(candidate, out problem)) throw new InvalidOperationException(problem);
+            }
+            try
+            {
+                yield return new Shot("ascension-confirmation", () =>
+                {
+                    PrepareAscensionFixture();
+                    ui.DebugMenu("ascension");
+                    var review = ui.DebugRoot.Q<Button>("ascension-review");
+                    if (review == null) throw new InvalidOperationException("Ascension fixture did not unlock review.");
+                    using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = review; review.SendEvent(submit); }
+                    if (ui.DebugRoot.Q<Button>("ascension-confirm") == null)
+                        throw new InvalidOperationException("Ascension confirmation was not rendered.");
+                });
+                yield return new Shot("ascension-rank-one", () =>
+                {
+                    if (ascensionBaseline == null) PrepareAscensionFixture();
+                    if (!gs.TryAscend(out var problem)) throw new InvalidOperationException(problem);
+                    ui.DebugMenu("ascension");
+                });
+                yield return new Shot("ascension-halo", () =>
+                {
+                    if (ascensionBaseline == null)
+                    {
+                        PrepareAscensionFixture();
+                        if (!gs.TryAscend(out var problem)) throw new InvalidOperationException(problem);
+                    }
+                    ResetView();
+                }, 1.0f);
+            }
+            finally
+            {
+                try
+                {
+                    if (ascensionBaseline != null)
+                    {
+                        ResetView();
+                        if (!gs.TryRestoreCloudSave(ascensionBaseline, out var problem))
+                            throw new InvalidOperationException("Ascension fixture restoration failed: " + problem);
+                        ResetView();
+                    }
+                }
+                finally
+                {
+                    if (ascensionFixtureEnabled) ascensionRules.enableAscension = ascensionWasEnabled;
+                }
+            }
+            string[] atlasShots = { "resources", "recipes", "worlds", "bestiary", "structures" };
             for (int tab = 0; tab < atlasShots.Length; tab++)
             {
                 int t = tab;
@@ -318,6 +472,59 @@ namespace Frontier
             }
             yield return new Shot("toast", () => { ResetView(); ui.DebugToast("+14 Wood", UiKit.Lime); ui.DebugToast("Backpack full!", UiKit.Red); }, 0.3f);
 
+            ShipRig shipFixture = null;
+            try
+            {
+                yield return new Shot("ship-rig-landed", () =>
+                {
+                    ResetView();
+                    shipFixture = ShipRig.Create(transform);
+                    shipFixture.transform.position = rt.Planet.Spin.position +
+                        (rt.Camera.transform.position - rt.Planet.Spin.position).normalized * (rt.Planet.SurfaceRadius() + 0.7f);
+                    shipFixture.transform.rotation = Quaternion.Euler(20f, 155f, -8f);
+                    shipFixture.transform.localScale = Vector3.one * 0.8f;
+                    shipFixture.SetFlight(0f, 1f, 0f);
+                });
+            }
+            finally { if (shipFixture != null) Destroy(shipFixture.gameObject); }
+
+            PlacedStructure constructionFixture = null;
+            string constructionEnd = null;
+            void PrepareConstructionFixture()
+            {
+                GoTo("sylva");
+                ResetView();
+                if (constructionFixture == null)
+                {
+                    constructionFixture = At(StructureKind.Refinery);
+                    if (constructionFixture == null) throw new InvalidOperationException("Missing construction showcase refinery.");
+                    constructionEnd = constructionFixture.record.buildEndUtc;
+                }
+                gs.DebugSetBuilderJob(constructionFixture, 3600);
+            }
+            try
+            {
+                yield return new Shot("structure-moments-construction", () =>
+                {
+                    PrepareConstructionFixture();
+                    ui.DebugTapStructure(constructionFixture);
+                }, 0.3f);
+                yield return new Shot("command-crews", () =>
+                {
+                    PrepareConstructionFixture();
+                    ui.DebugResearch(3);
+                }, 0.3f);
+            }
+            finally
+            {
+                if (constructionFixture != null)
+                {
+                    gs.DebugSetBuilderJob(constructionFixture, 0);
+                    constructionFixture.record.buildEndUtc = constructionEnd;
+                    gs.Notify();
+                }
+            }
+
             yield return new Shot("game-chop", () => ui.DebugGather(MinigameKind.Chop), 1.8f);
             yield return new Shot("game-mine", () => ui.DebugGather(MinigameKind.Mine), 1.8f);
             yield return new Shot("game-travel", () => ui.DebugTravelGame(), 2.5f);
@@ -331,10 +538,44 @@ namespace Frontier
                 var session = HyperspaceShot(6, 0);
                 session.DebugAdvance(Mathf.CeilToInt((session.Run.Route.bossStart + 5) * 60), true, true);
             });
-            yield return new Shot("game-drill", () => { GoTo("glacia"); ui.DebugGather(MinigameKind.Drill); }, 1.8f);
+            yield return new Shot("game-drill", () => DrillShot(false), 1.8f);
+            yield return new Shot("minigame-drill-result", () => DrillShot(true), 1.2f);
             yield return new Shot("glacia-hud", () => { ResetView(); }, 0.3f);
             yield return new Shot("wave-hud", () => { GoTo("sylva"); ResetView(); rt.Defense.StartWave(3); }, 4.0f);
             yield return new Shot("wave-result", () => rt.Defense.DebugEnd(true), 0.5f);
+            void PrepareBossWave()
+            {
+                if (rt.Defense.Active) rt.Defense.DebugEnd(false);
+                GoTo("ferrum");
+                ResetView();
+                while (gs.NextWave(gs.planet) < 10) gs.WaveCleared(gs.planet);
+                gs.backpack.Set(gs.db.fuel.id, 40);
+                if (At(StructureKind.Alarm) == null && gs.DebugPlace(db.FindStructure("alarm"), 0) == null)
+                    throw new InvalidOperationException("Cannot prepare boss wave alarm fixture.");
+            }
+            yield return new Shot("wave-boss-preview", () =>
+            {
+                PrepareBossWave();
+                ui.DebugTapStructure(At(StructureKind.Alarm));
+            });
+            yield return new Shot("wave-boss-hud", () =>
+            {
+                PrepareBossWave();
+                if (!rt.Defense.StartWave(1)) throw new InvalidOperationException("Cannot start boss wave fixture.");
+                // Hold a representative ranked pair in view rather than capturing a timing-dependent reactor loss.
+                rt.Defense.StopAllCoroutines();
+                float depth = Vector3.Dot(rt.Planet.Spin.position - rt.Camera.transform.position, rt.Camera.transform.forward);
+                foreach (var rank in new[] { AlienRank.Elite, AlienRank.Boss })
+                {
+                    var enemy = Array.Find(db.enemies, e => e.rank == rank);
+                    if (enemy == null) throw new InvalidOperationException("Missing ranked alien fixture: " + rank);
+                    var pos = rt.Camera.ViewportToWorldPoint(new Vector3(rank == AlienRank.Boss ? 0.8f : 0.2f, 0.65f, depth));
+                    var alien = AlienActor.Spawn(enemy, rt.Defense.Current.healthMult, pos, rt.Defense);
+                    alien.enabled = false;
+                    alien.Damage(alien.maxHealth * 0.3f);
+                }
+            }, 0.5f);
+            yield return new Shot("wave-boss-result", () => rt.Defense.DebugEnd(false), 0.5f);
             yield return new Shot("hud-after", ResetView, 0.3f);
             yield return new Shot("menu-release", () => ui.DebugMenuAsRelease(), 0.2f);
             yield return new Shot("icons-ui", () => ui.DebugIconSheet(0), 0.3f);

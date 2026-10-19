@@ -23,20 +23,20 @@ namespace Frontier
         string GateReason(string research, int reach, int lab = 0)
         {
             if (!string.IsNullOrEmpty(research) && !IsResearched(research))
-                return "Requires research: " + research.Replace('_', ' ');
-            if (reach > ReachTier) return "Reach planet tier " + reach;
+                return UiText.Get("gate.research", research.Replace('_', ' '));
+            if (reach > ReachTier) return UiText.Get("gate.reach-tier", reach);
             if (lab > 0)
             {
                 var placed = StructureOfKind(planet, StructureKind.ResearchLab);
-                if (placed == null || placed.level < lab) return "Requires Research Lab level " + lab;
+                if (placed == null || placed.level < lab) return UiText.Get("gate.lab-level", lab);
             }
             return null;
         }
 
         public string BuildLockReason(StructureSO def)
         {
-            if (def == null || db.FindStructure(def.id) != def) return "Unknown structure";
-            if (!def.Implemented) return "Structure gameplay coming later";
+            if (def == null || db.FindStructure(def.id) != def) return UiText.Get("gate.structure.unknown");
+            if (!def.Implemented) return UiText.Get("gate.structure.future");
             if (!db.UsesImportedEconomy) return null;
             var row = def.Row(1);
             return GateReason(def.unlockResearch, Math.Max(def.unlockTier, row.requiresReachTier), row.requiresLabLevel);
@@ -46,12 +46,12 @@ namespace Frontier
 
         public string UpgradeLockReason(UpgradeSO upgrade)
         {
-            if (upgrade == null || db.FindUpgrade(upgrade.id) != upgrade) return "Unknown upgrade";
+            if (upgrade == null || db.FindUpgrade(upgrade.id) != upgrade) return UiText.Get("gate.upgrade.unknown");
             int level = Level(upgrade);
-            if (level >= upgrade.MaxLevel) return "Max level";
+            if (level >= upgrade.MaxLevel) return UiText.Get("gate.max-level");
             if (!db.UsesImportedEconomy || !upgrade.HasLevelRows) return null;
             if (upgrade.effect == UpgradeEffect.StackMultiplier || upgrade.effect == UpgradeEffect.FuelTankSlots)
-                return "Upgrade gameplay coming later";
+                return UiText.Get("gate.upgrade.future");
             var row = upgrade.NextRow(level);
             return GateReason(row.researchPrereq, row.requiresReachTier);
         }
@@ -63,12 +63,12 @@ namespace Frontier
 
         public string StructureUpgradeLockReason(PlacedStructure placed)
         {
-            if (!IsPlaced(placed)) return "Unknown structure";
-            if (!IsOperational(placed)) return "Structure is still under construction";
-            if (IsUpgradeInProgress(placed)) return "Upgrade already in progress";
-            if (placed.level >= placed.def.maxLevel) return "Max level";
+            if (!IsPlaced(placed)) return UiText.Get("gate.structure.unknown");
+            if (!IsOperational(placed)) return UiText.Get("gate.structure.building");
+            if (IsUpgradeInProgress(placed)) return UiText.Get("gate.structure.upgrading");
+            if (placed.level >= placed.def.maxLevel) return UiText.Get("gate.max-level");
             if (!db.UsesImportedEconomy) return null;
-            if (!placed.def.Implemented) return "Structure gameplay coming later";
+            if (!placed.def.Implemented) return UiText.Get("gate.structure.future");
             var row = placed.def.Row(placed.level + 1);
             string gate = GateReason(placed.def.unlockResearch, row.requiresReachTier, row.requiresLabLevel);
             if (gate != null) return gate;
@@ -84,10 +84,10 @@ namespace Frontier
 
         public string RecipeLockReason(RecipeSO recipe, PlacedStructure station)
         {
-            if (recipe == null || Array.IndexOf(db.recipes, recipe) < 0) return "Unknown recipe";
-            if (!IsOperational(station) || station.planetId != planet.Id || !RecipeAt(recipe, station)) return "Requires its crafting station";
+            if (recipe == null || Array.IndexOf(db.recipes, recipe) < 0) return UiText.Get("gate.recipe.unknown");
+            if (!IsOperational(station) || station.planetId != planet.Id || !RecipeAt(recipe, station)) return UiText.Get("gate.recipe.station");
             if (!db.UsesImportedEconomy) return null;
-            if (station.level < recipe.stationLevel) return "Requires station level " + recipe.stationLevel;
+            if (station.level < recipe.stationLevel) return UiText.Get("gate.recipe.station-level", recipe.stationLevel);
             return GateReason(recipe.unlockResearch, recipe.tier);
         }
 

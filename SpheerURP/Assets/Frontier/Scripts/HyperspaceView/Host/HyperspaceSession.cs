@@ -20,8 +20,9 @@ namespace Frontier.Hyperspace.View
         HyperspaceAudio sound;
         HyperspaceInput input;
         float accumulator, hudClock;
-        bool background, downedShown, resultShown, offerPending;
+        bool background, unfocused, downedShown, resultShown, offerPending;
         int freeRevives;
+        int confirmedShardCost = -1;
 
         public void Begin(GameState state, VisualElement host, TravelRunRequest req, Action<TravelRunResult> callback)
         {
@@ -30,8 +31,8 @@ namespace Frontier.Hyperspace.View
             var ship = state != null ? ShipStatsMapper.Map(ShipFamiliesFromGame.Read(state)) : ShipStats.Starter();
             Run = HyperspaceSetup.CreateRun(req, ship, tuning, TravelPrefs.AssistMode);
             freeRevives = Mathf.Max(0, FrontierSettings.I.freeRevivesPerRun);
-            scene = new HyperspaceScene(transform);
-            hud = new HyperspaceHud(host, req.safeInsets, scene.Texture, Pause, Resume, FinishTrip, Revive, Close);
+            scene = new HyperspaceScene(transform, state != null ? state.AscensionRank : 0);
+            hud = new HyperspaceHud(host, req.safeInsets, scene.Texture, Pause, Resume, FinishTrip, Revive, Close, ReviveWithShards);
             hud.BuildRoute(Run);
             input = new HyperspaceInput(hud.Surface, tuning);
             hud.Bomb.clicked += input.PressBomb;
@@ -66,7 +67,7 @@ namespace Frontier.Hyperspace.View
             {
                 downedShown = true; accumulator = 0; input.Cancel();
                 sound.Stop();
-                hud.ShowDowned(CanOfferRevive(), TravelMinigames.ReviveOffer == null);
+                ShowDowned();
             }
             if (Run.State == RunState.Ended && !resultShown)
             {
@@ -107,21 +108,65 @@ namespace Frontier.Hyperspace.View
             return Run.CanRevive && (TravelMinigames.ReviveOffer != null || freeRevives > 0);
         }
 
+        void ShowDowned(string feedback = null)
+        {
+            int cost = game != null && Run.CanRevive ? game.HyperspaceReviveCost : -1;
+            bool enabled = cost >= 0 && !game.SaveIsReadOnly && game.ShardBalance >= cost && !offerPending;
+            if (cost >= 0 && game.SaveIsReadOnly) feedback = UiText.Get("hyperspace.revive.read-only");
+            hud.ShowDowned(CanOfferRevive(), TravelMinigames.ReviveOffer == null, cost,
+                game != null ? game.ShardBalance : 0, enabled, confirmedShardCost >= 0, feedback);
+        }
+
+        public void ReviveWithShards()
+        {
+            if (Closed || offerPending || background || unfocused || game == null || !Run.CanRevive) return;
+            int cost = game.HyperspaceReviveCost;
+            if (cost < 0) return;
+            if (confirmedShardCost < 0)
+            {
+                confirmedShardCost = cost;
+                ShowDowned();
+                return;
+            }
+            int quote = confirmedShardCost;
+            confirmedShardCost = -1;
+            var result = game.PurchaseHyperspaceRevive(Run, quote, out string message);
+            if (result == PaidReviveResult.Rejected)
+            {
+                ShowDowned(message);
+                return;
+            }
+            Revived();
+            if (result == PaidReviveResult.PendingSave) hud.ShowPaymentNotice(message);
+        }
+
         public void Pause()
         {
             if (Closed || Run.State != RunState.Running) return;
             Paused = true; accumulator = 0; input.Cancel(); sound.Stop(); hud.ShowPause();
         }
 
+        public bool HandleBack()
+        {
+            if (Closed) return false;
+            if (Run.State == RunState.Running)
+            {
+                if (Paused) Resume();
+                else Pause();
+            }
+            return true;
+        }
+
         public void Resume()
         {
-            if (Closed || Run.State != RunState.Running) return;
+            if (Closed || background || unfocused || Run.State != RunState.Running) return;
             Paused = false; accumulator = 0; input.Cancel(); hud.HideDialog();
         }
 
         public void Revive()
         {
             if (Closed || offerPending || Run.State != RunState.Downed || !CanOfferRevive()) return;
+            confirmedShardCost = -1;
             if (TravelMinigames.ReviveOffer == null)
             {
                 if (Run.Revive()) { freeRevives--; Revived(); }
@@ -138,26 +183,29 @@ namespace Frontier.Hyperspace.View
                     answered = true; offerPending = false;
                     if (Run.State != RunState.Downed) return;
                     if (accepted && Run.State == RunState.Downed && Run.Revive()) Revived();
-                    else hud.ShowDowned(CanOfferRevive(), false);
+                    else ShowDowned();
                 });
             }
             catch (Exception e)
             {
                 Debug.LogException(e); offerPending = false;
-                if (!Closed && Run.State == RunState.Downed) hud.ShowDowned(CanOfferRevive(), false);
+                if (!Closed && Run.State == RunState.Downed) ShowDowned();
             }
         }
 
         void Revived()
         {
-            downedShown = false; Paused = false; accumulator = 0;
-            input.Cancel(); hud.HideDialog(); Drain();
+            confirmedShardCost = -1;
+            downedShown = false; Paused |= background || unfocused; accumulator = 0;
+            input.Cancel(); Drain();
+            if (Paused) hud.ShowPause();
+            else hud.HideDialog();
         }
 
         public void FinishTrip()
         {
             if (Closed) return;
-            Run.Abandon(); Paused = false; offerPending = false; Drain();
+            Run.Abandon(); Paused = false; offerPending = false; confirmedShardCost = -1; Drain();
         }
 
         public void Close()
@@ -175,12 +223,24 @@ namespace Frontier.Hyperspace.View
         void OnApplicationPause(bool paused)
         {
             background = paused; accumulator = 0;
-            if (paused && Run != null && Run.State == RunState.Running) Pause();
+            if (paused) PauseForInterruption();
         }
 
         void OnApplicationFocus(bool focused)
         {
-            if (!focused && Run != null && Run.State == RunState.Running) Pause();
+            unfocused = !focused;
+            if (!focused) PauseForInterruption();
+        }
+
+        void PauseForInterruption()
+        {
+            if (Closed || Run == null) return;
+            if (Run.State == RunState.Running) Pause();
+            else if (Run.State == RunState.Downed)
+            {
+                // A revive callback may arrive after an ad or OS interruption.
+                Paused = true; accumulator = 0; input.Cancel(); sound.Stop();
+            }
         }
 
         void OnApplicationQuit() { if (Run != null && !Closed) Run.Abandon(); }

@@ -21,7 +21,7 @@ namespace Frontier
         public static string SaveDirectoryOverride;
 
         public readonly GameDatabase db;
-        public readonly UniverseService universe;
+        public UniverseService universe { get; private set; }
         public readonly IClock clock;
         /// <summary>The backpack (id based rules, see <see cref="Inventory"/>).</summary>
         public readonly Inventory backpack;
@@ -42,7 +42,7 @@ namespace Frontier
             if (db == null) throw new ArgumentNullException("db");
             db = GameDatabase.ForRuntime(db);
             this.db = db;
-            this.clock = clock ?? new SystemClock();
+            this.clock = clock ?? new SessionClock(new SystemClock());
             I = this;
             foreach (var r in db.resources) if (r != null && !string.IsNullOrEmpty(r.id)) resourceById[r.id] = r;
             universe = UniverseService.For(db);
@@ -51,6 +51,8 @@ namespace Frontier
             world = new WorldStore();
             stats = new PlayerStats();
             saves = new SaveService(SaveDirectory(), this.clock, BuildSave);
+            InitializeObjectiveCatalog();
+            InitializeAscensionRules();
             lastTickAt = this.clock.MonotonicSeconds;
             LoadReport = new SaveLoadReport { source = SaveSource.NewGame };
             if (loadExistingSave) LoadOrStart();
@@ -83,6 +85,13 @@ namespace Frontier
             }
             if (notify) Notify();
             return accepted;
+        }
+
+        public void RecordHarvestRunCompleted()
+        {
+            stats.RecordHarvestRunCompleted();
+            ObserveObjectives();
+            saves.MarkDirty();
         }
 
         static IdAmount[] ToIds(List<ItemAmount> list)
@@ -264,7 +273,7 @@ namespace Frontier
             float m = 1f;
             foreach (var u in db.upgrades)
                 if (u != null && u.effect == UpgradeEffect.ToolPower && u.tool == k) m += u.valuePerLevel * Level(u);
-            return m * CatalogToolYieldMultiplier(k);
+            return m * CatalogToolYieldMultiplier(k) * LegacyHarvestMultiplier;
         }
 
         public float ToolTolerance(MinigameKind k) { return Mathf.Min(1.6f, 1f + 0.08f * ToolLevel(k)); }
@@ -592,6 +601,43 @@ namespace Frontier
             if (moved <= 0) return 0;
             saves.MarkDirty();
             if (notify) Notify();
+            return moved;
+        }
+
+        public int QuickStore(PlacedStructure warehouse, ResourceCategory? category = null, bool notify = true)
+        {
+            if (warehouse == null || warehouse.planetId != planet.Id || !IsPlaced(warehouse)) return 0;
+            int moved = 0;
+            int capacity = warehouse.def.StorageCapacity(warehouse.level);
+            foreach (var resource in db.resources)
+            {
+                if (resource == null || (category.HasValue && resource.category != category.Value) ||
+                    !CanStore(warehouse, resource)) continue;
+                int remaining = Count(resource);
+                for (int slot = 0; slot < capacity && remaining > 0; slot++)
+                {
+                    int deposited = Deposit(warehouse, slot, resource, remaining, false);
+                    remaining -= deposited;
+                    moved += deposited;
+                }
+            }
+            if (moved > 0 && notify) Notify();
+            return moved;
+        }
+
+        public int QuickWithdraw(PlacedStructure warehouse, ResourceCategory? category = null, bool notify = true)
+        {
+            if (warehouse == null || warehouse.planetId != planet.Id || !IsPlaced(warehouse)) return 0;
+            int moved = 0;
+            var storage = StorageFor(warehouse);
+            for (int slot = 0; slot < storage.slots.Count; slot++)
+            {
+                var entry = storage.slots[slot];
+                var resource = entry == null ? null : db.FindResource(entry.resourceId);
+                if (resource == null || entry.count <= 0 || (category.HasValue && resource.category != category.Value)) continue;
+                moved += Withdraw(warehouse, slot, entry.count, false);
+            }
+            if (moved > 0 && notify) Notify();
             return moved;
         }
 

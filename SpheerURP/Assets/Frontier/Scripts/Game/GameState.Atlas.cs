@@ -8,6 +8,7 @@ namespace Frontier
         const string AtlasResourceType = "resource";
         const string AtlasRecipeType = "recipe";
         const string AtlasStructureType = "structure";
+        const string AtlasEnemyType = "enemy";
 
         public bool IsAtlasDiscovered(string entryType, string id)
         {
@@ -55,6 +56,14 @@ namespace Frontier
                         if (structure != null && structure.Implemented) kinds.Add(structure.kind.ToString());
                 return kinds.Count;
             }
+            if (entryType == AtlasEnemyType)
+            {
+                int count = 0;
+                if (db.enemies != null)
+                    foreach (var enemy in db.enemies)
+                        if (enemy != null && !string.IsNullOrEmpty(enemy.id)) count++;
+                return count;
+            }
             return 0;
         }
 
@@ -77,6 +86,9 @@ namespace Frontier
                 foreach (var structure in db.structures)
                     if (structure != null && structure.Implemented && structure.kind.ToString() == id) return true;
             }
+            if (entryType == AtlasEnemyType && db.enemies != null)
+                foreach (var enemy in db.enemies)
+                    if (enemy != null && enemy.id == id) return true;
             return false;
         }
 
@@ -110,6 +122,13 @@ namespace Frontier
         void RecordAtlasRecipeCrafted(RecipeSO recipe)
         {
             if (recipe != null) RecordAtlasDiscovery(AtlasRecipeType, recipe.id, true);
+        }
+
+        public bool RecordAtlasEnemySeen(EnemySO enemy)
+        {
+            if (enemy == null || !RecordAtlasDiscovery(AtlasEnemyType, enemy.id, false)) return false;
+            Notify();
+            return true;
         }
 
         void RecordAtlasStructureBuilt(StructureSO structure, bool payReward = true)

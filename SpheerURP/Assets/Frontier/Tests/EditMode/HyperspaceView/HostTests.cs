@@ -265,6 +265,10 @@ namespace Frontier.Tests.HyperspaceView
             Assert.AreEqual(tuning.ShipPower(ship), p.shipPower, 1e-5f);
             Assert.AreEqual(RunMode.Normal, p.mode);
             Assert.AreEqual(RunMode.Assist, HyperspaceSetup.BuildParams(req, ship, tuning, true).mode);
+            req.seconds = 36;
+            Assert.AreEqual(36f, HyperspaceSetup.BuildParams(req, ship, tuning, false).plannedDurationSeconds);
+            req.seconds = 0;
+            Assert.AreEqual(0f, HyperspaceSetup.BuildParams(req, ship, tuning, false).plannedDurationSeconds);
             req.distanceLy = 812.5; req.tier = -3;
             p = HyperspaceSetup.BuildParams(req, ship, tuning, false);
             Assert.AreEqual(812.5f, p.distanceLy, 1e-3f);
@@ -310,6 +314,16 @@ namespace Frontier.Tests.HyperspaceView
 
         [SetUp] public void Swap() { previous = TravelPrefs.Store; TravelPrefs.Store = new MemoryPrefsStore(); }
         [TearDown] public void Restore() { TravelPrefs.Store = previous; }
+
+        [Test]
+        public void LaunchIntroFlagPersistsIndependentlyOfTravelTutorialTips()
+        {
+            Assert.IsFalse(TravelPrefs.IntroSeen);
+            TravelPrefs.MarkIntroSeen();
+            Assert.IsTrue(TravelPrefs.IntroSeen);
+            Assert.IsTrue(TravelPrefs.ShowTutorial);
+            Assert.AreEqual(1, TravelPrefs.Store.GetInt(TravelPrefs.IntroSeenKey, 0));
+        }
 
         [Test]
         public void TutorialTips_AppearOnTheFirstTwoRunsOnly()

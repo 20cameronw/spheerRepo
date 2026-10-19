@@ -1,0 +1,169 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 408ae05595fd43bf9b22c327b4e397f2, type: 3}
+  m_Name: ObjectiveCatalog
+  entries:
+  - id: first_structure
+    title: Make landfall yours
+    description: Complete your first structure. Construction must finish before it counts.
+    metric: 1
+    target: 1
+    route: 1
+  - id: first_harvest
+    title: First haul
+    description: Complete and collect a harvest run. Abandoned runs do not count.
+    metric: 0
+    target: 1
+    route: 0
+  - id: first_warehouse
+    title: Room to grow
+    description: Complete a Warehouse to store resources beyond your backpack.
+    metric: 2
+    targetId: warehouse
+    target: 1
+    route: 1
+  - id: first_fuel
+    title: Fuel the frontier
+    description: Craft fuel at a processing station. Found or starting fuel does not count.
+    metric: 3
+    targetId: fuel
+    target: 1
+    route: 4
+  - id: first_hop
+    title: Leave the cradle
+    description: Land on a second distinct world.
+    metric: 4
+    target: 2
+    route: 2
+  - id: first_wave
+    title: Hold your ground
+    description: Call and clear an alien wave on your planet.
+    metric: 5
+    target: 1
+    route: 1
+  - id: research_lab
+    title: A place for discovery
+    description: Complete a Research Lab to unlock advanced technology.
+    metric: 2
+    targetId: research_lab
+    target: 1
+    route: 1
+  - id: jump_range_1
+    title: A longer reach
+    description: Purchase the first Jump Range upgrade. Temporary debug settings do not count.
+    metric: 6
+    targetId: jump
+    target: 1
+    route: 3
+  - id: first_steel
+    title: Stronger foundations
+    description: Craft steel at a Foundry.
+    metric: 3
+    targetId: steel
+    target: 1
+    route: 4
+  - id: first_hazard_plating
+    title: Beyond safe skies
+    description: Purchase any hazard plating to prepare for hostile worlds.
+    metric: 7
+    target: 1
+    route: 3
+  - id: mega_first_stage
+    title: Think on a planetary scale
+    description: Complete the first stage of a megaproject.
+    metric: 8
+    target: 1
+    route: 1
+  - id: mega_stage_3
+    title: Megaproject mastery
+    description: Complete stage three of any one megaproject.
+    metric: 8
+    target: 3
+    route: 1
+  - id: era_foothold
+    title: Foothold
+    description: Reach the Foothold era by landing on a second world.
+    metric: 9
+    target: 1
+    route: 2
+  - id: era_settlement
+    title: Settlement
+    description: Complete a Research Lab and purchase Jump Range level one.
+    metric: 9
+    target: 2
+    route: 3
+  - id: era_industry
+    title: Industry
+    description: Purchase hazard plating and enter the Industry era.
+    metric: 9
+    target: 3
+    route: 3
+  - id: era_interstellar
+    title: Interstellar
+    description: Purchase Rad-Shield Plating and craft an Antimatter Pod.
+    metric: 9
+    target: 4
+    route: 3
+  - id: era_ascension
+    title: Ready for the unknown
+    description: Reach the Ascension era by completing stage three of a megaproject.
+    metric: 9
+    target: 5
+    route: 1
+  - id: reach_tier_1
+    title: Tier one explorer
+    description: Land on a tier one or deeper world.
+    metric: 10
+    target: 1
+    route: 2
+  - id: reach_tier_2
+    title: Tier two explorer
+    description: Land on a tier two or deeper world.
+    metric: 10
+    target: 2
+    route: 2
+  - id: reach_tier_3
+    title: Tier three explorer
+    description: Land on a tier three or deeper world.
+    metric: 10
+    target: 3
+    route: 2
+  - id: reach_tier_4
+    title: Tier four explorer
+    description: Land on a tier four or deeper world.
+    metric: 10
+    target: 4
+    route: 2
+  - id: reach_tier_5
+    title: Tier five explorer
+    description: Land on a tier five or deeper world.
+    metric: 10
+    target: 5
+    route: 2
+  - id: reach_tier_6
+    title: Tier six explorer
+    description: Land on a tier six or deeper world.
+    metric: 10
+    target: 6
+    route: 2
+  - id: reach_tier_7
+    title: Tier seven explorer
+    description: Land on a tier seven or deeper world.
+    metric: 10
+    target: 7
+    route: 2
+  - id: reach_tier_8
+    title: Tier eight explorer
+    description: Land on a tier eight or deeper world.
+    metric: 10
+    target: 8
+    route: 2
+  - id: reach_tier_9
+    title: Deep frontier explorer
+    description: Land on a tier nine or deeper world.
+    metric: 10
+    target: 9
+    route: 2

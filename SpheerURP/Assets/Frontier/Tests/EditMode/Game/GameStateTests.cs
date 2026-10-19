@@ -854,7 +854,7 @@ namespace Frontier.Tests
             StringAssert.Contains("unobtainium", warnings);
             StringAssert.Contains("ghost-structure", warnings);
             StringAssert.Contains("p:7:7:7:7", warnings);
-            StringAssert.Contains("another universe", warnings);
+            Assert.AreEqual(1UL, state.universe.Seed, "the saved seed must regenerate the correct universe");
             Assert.AreEqual(5, state.xp);
             Assert.AreEqual(1, state.Level(db.FindUpgrade("pack")));
             Assert.AreEqual(7, state.Count(db.FindResource("wood")));

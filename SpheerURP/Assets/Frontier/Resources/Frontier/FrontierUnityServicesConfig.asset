@@ -13,5 +13,8 @@ MonoBehaviour:
   m_Name: FrontierUnityServicesConfig
   m_EditorClassIdentifier:
   enableOnlineServices: 0
+  enableAnalytics: 0
+  enableRemoteConfig: 0
+  enableNotifications: 0
   leaderboardId:
   privacyPolicyUrl:

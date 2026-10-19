@@ -14,6 +14,7 @@ namespace Frontier
     public partial class UIRoot : MonoBehaviour
     {
         GameState gs;
+        UniverseService observedUniverse;
         DefenseController defense;
         PlanetView planetView;
         SpaceBackdrop backdrop;
@@ -25,10 +26,14 @@ namespace Frontier
 
         VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
-        Label waveLabel, reactorLabel, fuelLabel, packLabel, levelLabel, planetLabel;
+        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, packLabel, levelLabel, planetLabel;
+        WaveInfo waveHudInfo;
         VisualElement planetTag;
 
-        bool busy;
+        bool busy, introActive;
+        public bool IsTravelling { get; private set; }
+        Minigame activeGatherMinigame;
+        VisualElement waveResultPanel;
         /// <summary>UI units per dp (1 unit = 0.5 dp).</summary>
         public const float UnitsPerDp = 2f;
         /// <summary>The canvas is never wider than this many units: tablets scale up instead of stretching the layout.</summary>
@@ -59,8 +64,11 @@ namespace Frontier
         {
             doc = document; gs = state; defense = def; planetView = pv; backdrop = bd; world = ws; cam = camera;
             services = serviceSet;
+            observedUniverse = gs.universe;
             LoadPrefs();
             panelSettings = doc.panelSettings;
+            PresentationQuality.Changed += ApplyPanelBudget;
+            ApplyPanelBudget();
             selected = gs.planet;
 
             root = doc.rootVisualElement;
@@ -80,6 +88,7 @@ namespace Frontier
             safe = Layer(); safe.style.display = DisplayStyle.Flex;
             root.Add(safe);
             BuildHud();
+            BuildFirstSessionGuide();
             BuildWaveHud();
 
             popupLayer = Layer(); modalLayer = Layer(); bannerLayer = Layer(); mapLayer = Layer();
@@ -96,6 +105,7 @@ namespace Frontier
             ApplyLayout(true);
 
             gs.Changed += OnStateChanged;
+            NotificationPreferences.StatusChanged += OnNotificationStatusChanged;
             defense.WaveEnded += OnWaveEnded;
             world.StructureTapped += OnStructureTapped;
             world.SlotTapped += OnSlotTapped;
@@ -112,6 +122,8 @@ namespace Frontier
 
         void OnDestroy()
         {
+            PresentationQuality.Changed -= ApplyPanelBudget;
+            NotificationPreferences.StatusChanged -= OnNotificationStatusChanged;
             if (gs != null) gs.Changed -= OnStateChanged;
             if (defense != null) defense.WaveEnded -= OnWaveEnded;
             if (world != null)
@@ -120,6 +132,17 @@ namespace Frontier
                 world.SlotTapped -= OnSlotTapped;
                 world.ObstacleTapped -= OnObstacleTapped;
             }
+
+        }
+
+        void ApplyPanelBudget()
+        {
+            if (panelSettings != null) PresentationQuality.ApplyPanelBudget(panelSettings);
+        }
+
+        void OnNotificationStatusChanged()
+        {
+            if (root != null && modalKey == "menu" && menuPage == "settings") RefreshModal();
         }
 
         // ------------------------------------------------------------ responsive layout
@@ -164,6 +187,7 @@ namespace Frontier
             safe.Add(hud);
 
             var top = UiKit.Div("fr-topbar"); top.pickingMode = PickingMode.Ignore;
+            top.usageHints = UsageHints.DynamicTransform;
             planetTag = UiKit.Div("fr-topbar-bar");
             planetTag.pickingMode = PickingMode.Ignore;
             planetLabel = UiKit.Text("", "fr-planet-name");
@@ -179,10 +203,11 @@ namespace Frontier
             hud.Add(top);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
-            dock.Add(DockButton("research", "COMMAND", UiKit.Magenta, OpenResearch));
-            dock.Add(DockButton("map", "MAP", UiKit.Cyan, OpenMap));
-            dock.Add(DockButton("pack", "PACK", UiKit.Amber, OpenPack));
-            dock.Add(DockButton("build", "BUILD", UiKit.Lime, OpenShop));
+            dock.usageHints = UsageHints.DynamicTransform;
+            dock.Add(DockButton("research", UiText.Get("nav.command"), UiKit.Magenta, OpenResearch));
+            dock.Add(DockButton("map", UiText.Get("nav.map"), UiKit.Cyan, OpenMap));
+            dock.Add(DockButton("pack", UiText.Get("nav.pack"), UiKit.Amber, OpenPack));
+            dock.Add(DockButton("build", UiText.Get("nav.build"), UiKit.Lime, OpenShop));
             hud.Add(dock);
         }
 
@@ -230,7 +255,10 @@ namespace Frontier
             waveLabel = UiKit.Text("", "fr-h2", UiKit.Cyan);
             top.Add(waveLabel);
             top.Add(UiKit.Bar(UiKit.Cyan, out waveFill));
-            var hint = UiKit.Text("Tap aliens to zap them", "fr-tiny");
+            waveModifierLabel = UiKit.Text("", "fr-small", UiKit.Amber);
+            waveModifierLabel.style.whiteSpace = WhiteSpace.Normal;
+            top.Add(waveModifierLabel);
+            var hint = UiKit.Text(UiText.Get("wave.tap-help"), "fr-tiny");
             hint.style.marginTop = UiKit.Space.S8;
             top.Add(hint);
             waveHud.Add(top);
@@ -248,43 +276,62 @@ namespace Frontier
         void OnStateChanged()
         {
             if (batching) return;
+            if (observedUniverse != gs.universe)
+            {
+                observedUniverse = gs.universe;
+                CloseMap();
+                ClosePopup();
+                ExitBuild();
+                selected = gs.planet;
+                planetView.Show(gs.planet, false, gs.TerraformerStageOn(gs.planet));
+            }
             if (planetView.Current != null && planetView.Current.Id == gs.planet.Id)
                 planetView.SetTerraformingStage(gs.TerraformerStageOn(gs.planet));
             fuelLabel.text = gs.Count(gs.db.fuel).ToString();
             packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
-            levelLabel.text = "LV " + gs.PlayerLevel;
+            levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
             planetLabel.text = gs.planet.Name.ToUpper();
             planetLabel.style.color = UiKit.Ui(gs.planet.Rim);
-            UiKit.Border(planetTag, UiKit.Tint(gs.planet.Rim, 0.5f), 2f);
+            UiKit.Border(planetTag, UiKit.Tint(gs.AscensionRank > 0 ? AscensionAccent(gs.AscensionRank) : gs.planet.Rim, 0.5f), 2f);
             UiKit.SetFill(xpFill, gs.LevelProgress);
+            RefreshFirstSessionGuide();
             RefreshModal();
             RefreshPopup();
-            if (mapOpen) { InvalidateMapPreview(); BuildMapCard(); }
+            if (mapOpen) { RefreshMapPinPlanets(); InvalidateMapPreview(); BuildMapCard(); }
         }
 
         // ------------------------------------------------------------ frame
         void Update()
         {
             if (root == null) return;
+            if (Input.GetKeyDown(KeyCode.Escape)) HandleBack();
             ApplyLayout(false);
 
             bool wave = defense.Active;
             world.Locked = wave || busy;
+            UpdateFirstSessionGuideVisibility();
             if (waveHud != null)
             {
                 waveHud.style.display = wave ? DisplayStyle.Flex : DisplayStyle.None;
                 if (wave)
                 {
+                    if (waveHudInfo != defense.Current)
+                    {
+                        waveHudInfo = defense.Current;
+                        waveModifierLabel.text = waveHudInfo.modifier == null ? "" :
+                            UiText.Get("wave.modifier", waveHudInfo.modifier.name.ToUpperInvariant(), waveHudInfo.modifier.description);
+                        waveModifierLabel.style.display = waveHudInfo.modifier == null ? DisplayStyle.None : DisplayStyle.Flex;
+                    }
                     int total = defense.Current.aliens.Count;
                     UiKit.SetFill(waveFill, total == 0 ? 0f : defense.Killed / (float)total);
                     UiKit.SetFill(reactorFill, defense.ReactorHp / Mathf.Max(1f, defense.ReactorMax));
-                    waveLabel.text = "WAVE " + defense.Current.waveNumber + "   " + defense.Killed + " / " + total;
-                    reactorLabel.text = "REACTOR " + Mathf.CeilToInt(defense.ReactorHp);
+                    waveLabel.text = UiText.Get("wave.progress", defense.Current.waveNumber, defense.Killed, total);
+                    reactorLabel.text = UiText.Get("wave.reactor", Mathf.CeilToInt(defense.ReactorHp));
                     float hp = defense.ReactorHp / Mathf.Max(1f, defense.ReactorMax);
                     reactorFill.style.backgroundColor = Color.Lerp(UiKit.Red, UiKit.Lime, hp);
                 }
             }
-            hud.style.display = wave ? DisplayStyle.None : DisplayStyle.Flex;
+            hud.style.display = wave || introActive ? DisplayStyle.None : DisplayStyle.Flex;
             if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
 
             UpdatePopupPosition();
@@ -301,13 +348,34 @@ namespace Frontier
             ExitBuild();
         }
 
+        public bool HandleBack()
+        {
+            if (skipShipMoment != null) { skipShipMoment(); return true; }
+            if (activeGatherMinigame != null) return activeGatherMinigame.HandleBack();
+            if (activeTravelMinigame is ITravelBackHandler travel) return travel.HandleBack();
+            if (busy || defense.Active) return true;
+            if (waveResultPanel != null) { CloseWaveResult(); return true; }
+            if (popup != null) { ClosePopup(); return true; }
+            if (modal != null)
+            {
+                if (modalKey == "menu" && !string.IsNullOrEmpty(menuPage))
+                {
+                    menuPage = "";
+                    RefreshModal();
+                }
+                else CloseModal();
+                return true;
+            }
+            if (mapOpen) { CloseMap(); return true; }
+            if (buildDef != null) { ExitBuild(); return true; }
+            return false;
+        }
+
         // ------------------------------------------------------------ helpers
         /// <summary>A tonal glass card. Only the selected/equipped one (<paramref name="highlight"/>) gets accent colour.</summary>
         VisualElement Card(Color accent, bool highlight = false)
         {
-            var c = UiKit.Div("fr-card");
-            if (highlight) { UiKit.SetAccent(c, accent); c.AddToClassList("fr-card-on"); }
-            return c;
+            return new FrontierCard { Accent = accent, Highlighted = highlight };
         }
 
         /// <summary>A tonal action button with an icon. <paramref name="primary"/> marks the screen's single main action.</summary>
@@ -328,27 +396,27 @@ namespace Frontier
         {
             float effect = d.EffectAt(level);
             int pct = Mathf.RoundToInt(effect * 100f);
-            if (d.kind.IsTurret()) return "dmg " + Mathf.RoundToInt(d.damage * (d.HasLevelRows ? effect : 1f + effect));
-            if (d.kind == StructureKind.Warehouse) return d.StorageCapacity(level) + " storage slots";
+            if (d.kind.IsTurret()) return UiText.Get("effect.damage", Mathf.RoundToInt(d.damage * (d.HasLevelRows ? effect : 1f + effect)));
+            if (d.kind == StructureKind.Warehouse) return UiText.Get("effect.storage", d.StorageCapacity(level));
             if (d.kind == StructureKind.FuelDepot)
-                return d.StorageCapacity(level) + " fuel slots" + (pct > 0 ? " · +" + pct + "% fuel stack" : "");
+                return UiText.Get(pct > 0 ? "effect.fuel-storage-stack" : "effect.fuel-storage", d.StorageCapacity(level), pct);
             if (d.kind == StructureKind.AutoHarvester)
-                return effect.ToString("0.#") + " runs/hr · " + d.CapacityAt(level) + "h offline · " +
-                    d.StorageCapacity(level) + " output slots";
+                return UiText.Get("effect.offline-harvest", effect, d.CapacityAt(level), d.StorageCapacity(level));
             if (d.kind == StructureKind.Satellite)
-                return (d.CapacityAt(level) > 0 ? d.CapacityAt(level) + " ly beam" : "system beam") +
-                    " · " + Mathf.RoundToInt(effect * 100f) + "% energy";
-            if (d.kind == StructureKind.ResearchLab) return "Research Lab level " + Mathf.RoundToInt(effect);
-            if (d.kind == StructureKind.RadarTower) return "+" + Mathf.RoundToInt(effect) + " ly local survey";
-            if (d.kind == StructureKind.ColonyHub) return "+" + Mathf.RoundToInt(effect) + " builder crews";
-            if (d.kind == StructureKind.WarpGate) return "-" + pct + "% fuel · +" + pct + "% jump range";
+                return UiText.Get(d.CapacityAt(level) > 0 ? "effect.beam.range" : "effect.beam.system",
+                    d.CapacityAt(level), Mathf.RoundToInt(effect * 100f));
+            if (d.kind == StructureKind.ResearchLab) return UiText.Get("effect.lab", Mathf.RoundToInt(effect));
+            if (d.kind == StructureKind.RadarTower) return UiText.Get("effect.survey", Mathf.RoundToInt(effect));
+            if (d.kind == StructureKind.ColonyHub) return UiText.Get("effect.builders-discount",
+                Mathf.RoundToInt(effect), Mathf.Clamp(d.CapacityAt(level), 0, 90));
+            if (d.kind == StructureKind.WarpGate) return UiText.Get("effect.warp-gate", pct);
             if (d.kind == StructureKind.DysonCollector)
-                return effect.ToString("0") + " energy/hr · " + d.CapacityAt(level) + "h reserve";
-            if (d.kind == StructureKind.Terraformer) return "+" + pct + "% global harvest";
-            if (d.HasLevelRows && d.kind.IsStation()) return "Batch size " + Mathf.RoundToInt(effect) + " (level bonus planned)";
-            if (d.kind == StructureKind.Refinery) return "+" + pct + "% output";
-            if (d.kind.IsGather()) return "+" + pct + "% yield";
-            return "+" + pct + "% rewards, XP";
+                return UiText.Get("effect.dyson", effect, d.CapacityAt(level));
+            if (d.kind == StructureKind.Terraformer) return UiText.Get("effect.terraformer", pct);
+            if (d.HasLevelRows && d.kind.IsStation()) return UiText.Get("effect.batch", Mathf.RoundToInt(effect));
+            if (d.kind == StructureKind.Refinery) return UiText.Get("effect.output", pct);
+            if (d.kind.IsGather()) return UiText.Get("effect.yield", pct);
+            return UiText.Get("effect.rewards", pct);
         }
 
         string UpgradeEffectText(UpgradeSO u, int level)
@@ -356,17 +424,17 @@ namespace Frontier
             float v = u.ContributionAt(level, gs.db.baseBackpackSlots);
             switch (u.effect)
             {
-                case UpgradeEffect.ToolPower: return "x" + (1f + v).ToString("0.0") + " yield";
-                case UpgradeEffect.BackpackSlots: return "+" + Mathf.RoundToInt(v) + " slots";
-                case UpgradeEffect.TurretFireRate: return "+" + Mathf.RoundToInt(v * 100f) + "% firing speed";
-                case UpgradeEffect.ReactorHealth: return "+" + Mathf.RoundToInt(v) + " HP";
+                case UpgradeEffect.ToolPower: return UiText.Get("effect.tool-power", 1f + v);
+                case UpgradeEffect.BackpackSlots: return UiText.Get("effect.pack-slots", Mathf.RoundToInt(v));
+                case UpgradeEffect.TurretFireRate: return UiText.Get("effect.fire-rate", Mathf.RoundToInt(v * 100f));
+                case UpgradeEffect.ReactorHealth: return UiText.Get("effect.health", Mathf.RoundToInt(v));
                 case UpgradeEffect.JumpRange:
-                case UpgradeEffect.ScannerRange: return u.ValueAt(level).ToString("0") + " ly";
-                case UpgradeEffect.FuelEfficiency: return "-" + Mathf.RoundToInt(v * 100f) + "% fuel use";
-                case UpgradeEffect.FuelTankSlots: return u.ValueAt(level).ToString("0") + " tank slots (coming later)";
-                case UpgradeEffect.HullPlating: return "Protection level " + level;
-                case UpgradeEffect.StackMultiplier: return "x" + u.ValueAt(level, 1f).ToString("0.00") + " stacks (coming later)";
-                default: return "+" + Mathf.RoundToInt(v * 100f) + "%";
+                case UpgradeEffect.ScannerRange: return UiText.Get("effect.range", u.ValueAt(level));
+                case UpgradeEffect.FuelEfficiency: return UiText.Get("effect.fuel-use", Mathf.RoundToInt(v * 100f));
+                case UpgradeEffect.FuelTankSlots: return UiText.Get("effect.tank-slots", u.ValueAt(level));
+                case UpgradeEffect.HullPlating: return UiText.Get("effect.plating", level);
+                case UpgradeEffect.StackMultiplier: return UiText.Get("effect.stack-multiplier", u.ValueAt(level, 1f));
+                default: return UiText.Get("effect.percent", Mathf.RoundToInt(v * 100f));
             }
         }
 
@@ -393,58 +461,71 @@ namespace Frontier
             g.toolDamage = gs.ToolDamage(spot.game);
             g.toolLevel = gs.ToolLevel(spot.game);
             g.toolName = gs.ToolName(spot.game);
+            activeGatherMinigame = g;
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;
+                if (activeGatherMinigame == g) activeGatherMinigame = null;
+                if (r.abandoned)
+                {
+                    Toast(UiText.Get("harvest.abandoned"), UiKit.Amber);
+                    return;
+                }
                 float amount = spot.baseYield * gs.ToolMultiplier(spot.game) *
                     (1f + bonus + gs.TerraformerHarvestBonus) * (0.4f + 1.1f * r.quality);
                 int n = r.quality > 0.05f ? Mathf.Max(1, Mathf.RoundToInt(amount)) : 0;
+                if (r.quality > 0.05f) gs.RecordHarvestRunCompleted();
                 int got = gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);
                 if (got > 0)
                 {
-                    Toast("+" + got + " " + spot.resource.displayName, ui);
+                    Toast(UiText.Get("harvest.reward", got, spot.resource.displayName), ui);
                     Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
                     planetView.Punch();
                     Sfx.Good();
                 }
-                else Toast(n > 0 ? "Backpack full!" : "Missed everything...", UiKit.Red);
-                if (got < n) Toast("Lost " + (n - got) + " (backpack full)", UiKit.Amber);
+                else Toast(UiText.Get(n > 0 ? "harvest.backpack-full" : "harvest.missed"), UiKit.Red);
+                if (got < n) Toast(UiText.Get("harvest.overflow", n - got), UiKit.Amber);
             });
         }
 
         // ------------------------------------------------------------ wave end
         void OnWaveEnded(WaveResult r)
         {
+            CloseWaveResult();
             var panel = UiKit.Div("fr-overlay");
+            waveResultPanel = panel;
             panel.AddToClassList("fr-overlay-clear");
             panel.pickingMode = PickingMode.Position;
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             Color c = r.victory ? UiKit.Lime : UiKit.Red;
             UiKit.SetAccent(panel, c);
-            panel.Add(UiKit.Text(r.victory ? "WAVE CLEARED" : "REACTOR OVERLOADED", "fr-title", c));
+            panel.Add(UiKit.Text(UiText.Get(r.victory ? "wave.victory" : "wave.defeat"), "fr-title", c));
             if (r.victory)
             {
-                panel.Add(UiKit.Text("Salvage recovered", "fr-muted"));
+                panel.Add(UiKit.Text(UiText.Get("wave.salvage"), "fr-muted"));
                 panel.Add(UiKit.CostRow(r.granted, gs, false));
-                if (defense.Current != null) panel.Add(UiKit.Chip("star", UiKit.Magenta, "+" + defense.Current.xp + " XP"));
+                if (defense.Current != null) panel.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("wave.xp", defense.Current.xp)));
                 if (r.lost.Count > 0)
                 {
-                    panel.Add(UiKit.Text("Backpack full - lost:", "fr-muted", UiKit.Amber));
+                    panel.Add(UiKit.Text(UiText.Get("wave.overflow"), "fr-muted", UiKit.Amber));
                     panel.Add(UiKit.CostRow(r.lost, gs, false));
                 }
             }
-            else panel.Add(UiKit.Text("The aliens broke through. No salvage this time.", "fr-muted"));
-            var b = UiKit.Btn("CONTINUE", c, null, true, true);
-            b.clicked += () =>
-            {
-                panel.RemoveFromHierarchy();
-                if (scrimLayer != null && modal == null) scrimLayer.style.display = DisplayStyle.None;
-            };
+            else panel.Add(UiKit.Text(UiText.Get("wave.defeat.help"), "fr-muted"));
+            var b = UiKit.Btn(UiText.Get("common.continue"), c, null, true, true);
+            b.clicked += CloseWaveResult;
             b.style.marginTop = UiKit.Space.S32;
             panel.Add(b);
             overlayLayer.Add(panel);
             OnStateChanged();
+        }
+
+        void CloseWaveResult()
+        {
+            if (waveResultPanel != null) waveResultPanel.RemoveFromHierarchy();
+            waveResultPanel = null;
+            if (scrimLayer != null && modal == null) scrimLayer.style.display = DisplayStyle.None;
         }
 
         // ------------------------------------------------------------ travel
@@ -453,11 +534,8 @@ namespace Frontier
         // ------------------------------------------------------------ toast
         void Toast(string text, Color color)
         {
-            var t = UiKit.Div("fr-toast");
-            t.pickingMode = PickingMode.Ignore;
-            UiKit.Border(t, color, 2f);
+            var t = new FrontierToast { Text = text, Tint = color };
             UiKit.Halo(t, color, 24f, 0.25f);
-            t.Add(UiKit.Text(text, "fr-h2", color));
             toastLayer.Add(t);
             t.schedule.Execute(() => t.RemoveFromHierarchy()).StartingIn(1800);
         }

@@ -3,7 +3,9 @@
     "rootNamespace": "Frontier",
     "references": [
         "Frontier.Core",
-        "Frontier.Economy"
+        "Frontier.Economy",
+        "Unity.Localization",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -22,6 +22,46 @@ namespace Frontier.Economy.Tests
         }
 
         [Test]
+        public void Validator_RejectsRecipeCyclesAndUnobtainableResources()
+        {
+            var broken = Fx.NewCatalog();
+            Array.Resize(ref broken.recipes, broken.recipes.Length + 1);
+            broken.recipes[broken.recipes.Length - 1] = new RecipeDef
+            {
+                id = "cycle_test", stationId = "refinery", stationLevel = 1, tier = 0,
+                inputs = new[] { new ItemAmount("wood", 1) }, outputs = new[] { new ItemAmount("wood", 1) }
+            };
+            Array.Resize(ref broken.resources, broken.resources.Length + 1);
+            broken.resources[broken.resources.Length - 1] = new ResourceDef
+            {
+                id = "unobtainable_test", displayName = "Unobtainable", category = ResourceCategory.Component,
+                tier = 0, baseValue = 1, stackSize = 1, atlasDescription = "Test resource.",
+                iconConcept = "A test-only item.", colorHex = "#FFFFFF", accentHex = "#FFFFFF"
+            };
+            broken.Index();
+
+            List<string> problems = CatalogValidator.Validate(broken);
+            Assert.That(problems, Has.Some.Contains("cycle"));
+            Assert.That(problems, Has.Some.Contains("unobtainable_test is not obtainable"));
+        }
+
+        [Test]
+        public void Validator_RejectsRecipeCostsOutsideTheTunedConservationBand()
+        {
+            var broken = Fx.NewCatalog();
+            Array.Resize(ref broken.recipes, broken.recipes.Length + 1);
+            broken.recipes[broken.recipes.Length - 1] = new RecipeDef
+            {
+                id = "overpriced_test", stationId = "refinery", stationLevel = 1, tier = 0,
+                inputs = new[] { new ItemAmount("wood", 1) }, outputs = new[] { new ItemAmount("quantum_chip", 1000) }
+            };
+            broken.Index();
+
+            List<string> problems = CatalogValidator.Validate(broken, Tuning.CreateDefault());
+            Assert.That(problems, Has.Some.Contains("overpriced_test value ratio"));
+        }
+
+        [Test]
         public void Counts_MatchTheLockedDesign()
         {
             Assert.AreEqual(34, _c.resources.Length);

@@ -2,7 +2,29 @@
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
 Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
-Latest validated milestone: **manual local/cloud comparison, explicit backup/restore and one-deep local undo are implemented; automatic cloud sync/upload remains off.** Full EditMode passed 601 tests, with 0 failures and 2 runtime-specific allocation skips (603 total); PlayMode passed 19 tests. Standard and narrow phone Settings captures both had zero UI errors, overflow, undersized text or undersized touch targets. Cloud Save and account recovery remain disabled pending provider/legal setup, and no live UGS request or native recovery flow was tested. Frontier Score remains local; there is no client leaderboard write path. Next, build a trusted server-side leaderboard route only when progression can be verified server-side and Access Control blocks direct client writes.
+The subsequent **objectives/achievements milestone is complete**: 26 authored one-time goals, persistent completion/claim
+records, actionable Goals UI and bounded rewards (275 shards at current tuning, already represented in simulator
+milestones). Old saves baseline completed goals without payouts. Full engine-free: 444 passed; Unity EditMode:
+705 passed / 2 runtime skips; PlayMode: 34 passed; all five editor checks and final phone captures passed.
+Optional Ascension remains unfinished and disabled while its unspecified permanent-bonus design is unresolved; continue other approved
+checklist work instead of assuming balance values. Prior verified milestones include
+mobile presentation budgets, live eras, harvest feedback, contextual onboarding and actionable empty states.
+Production audio/FX integration, remaining provider integrations and external activation/device/release gates remain open.
+Licensed CC0 UI/combat/wood-stone-metal harvest and ship cues now ship in an editable cue library with retained
+Kenney source licenses; the bounded mixer/volume/mute path remains unchanged. Adaptive exploration/combat/travel
+playback, four weather textures and a shared licensed engine loop are implemented through an editable
+soundscape library without adding audio sources. The initial music is original editor-baked material, not
+the planned approved commercial music-pack/stem selection. Final biome direction, music selection and
+physical-device sound sign-off remain open. Consent-gated Analytics and Remote Config adapters are implemented but disabled by default. Automatic cloud sync/upload and
+competitive score writes stay off; Cloud Save/account recovery remain disabled pending platform/legal setup.
+Paid-history saves now refuse gameplay reset and cloud restore/undo until authoritative purchase recovery
+is configured, including equal-journal restores that could roll back spending. Settings explains refusal
+without replacing current data. Purchase-free resets/restores are unchanged; this safety gate does not
+complete native IAP, backup/cross-device reconciliation or store recovery policy.
+Offline production now retains a greatest-observed UTC watermark across saves/restarts and explicit
+restore/undo. Rewound clocks warn and cannot re-credit an already-observed production interval; older saves
+derive the watermark from their last save time, and corrupt history is protected read-only. Forward edits,
+manual file/automatic-backup replacement and cross-device time remain untrusted and require server authority.
 
 ---
 
@@ -68,15 +90,15 @@ Method: full read of Data, Core, UI, Minigames, Visual, Combat, Editor; asset re
 
 | # | Finding | Fix |
 |---|---------|-----|
-| P1 | No guided first session. Only a text wall "HOW TO PLAY" (`BuildTutorial`); no objective tracker | `m8-ftue`, objectives in `m4-progression-pacing` |
+| P1 | No guided first session. Only a text wall "HOW TO PLAY" (`BuildTutorial`); no objective tracker | `[x]` **Completed:** save-backed six-step objective tracker; tutorial remains replayable |
 | P2 | Resources look alike: `Icons.ForResource` maps scrap, alloy and plasma to the same "core" glyph; dock icons have no captions | `ui-icon-system-v2`, `ui-hud-dock` |
 | P3 | Worlds card lists resource names only. Not how to harvest, how rich, hazards, or where else to find them | `m3-map-ui`, `m4-atlas` |
-| P4 | No rank or goal beyond XP level. Ranks page says "Online leaderboards aren't connected yet" | `m4-progression-pacing`, `m7-score-leaderboard` |
+| P4 | No rank or goal beyond XP level. Ranks page says "Online leaderboards aren't connected yet" | `[x]` **Local progression completed:** Frontier Score and breakdown are shown; trusted competitive writes remain deferred |
 | P5 | Travel is a 3-lane dodge loop: no shooting, no escalation, same every trip | `m5-hyperspace-run` |
-| P6 | Debug/cheat tools are visible to every player in Menu | gate behind `Debug.isDebugBuild` in `ui-hud-dock` |
+| P6 | Debug/cheat tools are visible to every player in Menu | `[x]` Completed: DEBUG tile and route are gated to editor/development builds |
 | P7 | Audio is generated sine beeps (`Sfx.Play`); no music, no haptics | `m2-fx-audio-pooling`, `m8-audio-pass` |
-| P8 | Build ▸ ORBIT tab only offers "Satellite: coming soon" (dead end) | `m4-structures-expansion` |
-| P9 | Mini-games and travel cannot be paused or aborted | `m5-minigame-framework` |
+| P8 | Build ▸ ORBIT tab only offers "Satellite: coming soon" (dead end) | `[x]` Completed: Satellite is the functional Orbital Relay with visited-world storage transfers |
+| P9 | Harvest mini-games lacked pause/abort; Hyperspace already supports pause and finish-trip | `[x]` Pause/abandon slice completed: harvest games pause/resume, pause on app focus loss, and require confirmation to abandon without rewards. Remaining framework work is tracked under `m5-minigame-framework`. |
 | P10 | No empty, loading or error states (only a red toast) | `ui-components` |
 
 ### 1.2 Expert game designer
@@ -89,7 +111,7 @@ Method: full read of Data, Core, UI, Minigames, Visual, Combat, Editor; asset re
 | G4 | Faucets and sinks are unmeasured (cost growth 1.5–1.9× over 6–10 levels, no simulator) | `m4-progression-pacing` simulator + targets |
 | G5 | Endgame is a finite list (30 worlds, tier 8) | infinite universe, megaprojects, Ascension |
 | G6 | No retention hooks: quests, achievements, dailies, timers, events | `m4-progression-pacing`, `m7-*` |
-| G7 | Combat is isolated and shallow: no elites/bosses/turret roles, one loot type | `m4-combat-expansion` |
+| G7 | Combat is isolated and shallow: no elites/bosses/turret roles, one loot type | `[x]` Implementation: armored Brute elite, recurring budgeted Titan boss, deterministic wave modifiers, richer bounties, health arcs and existing Missile/Tesla/Shield/Repair roles. Device balance remains a release gate. |
 | G8 | Pads grow with tier but there is no expansion or clutter mechanic | obstacles in `m7-timers-builders-obstacles` |
 
 ### 1.3 Software engineer
@@ -164,7 +186,7 @@ Dependency rule: Core ← Data ← Game ← UI; Services depends on Core only an
 
 ### 2.4 Content pipeline
 
-ScriptableObjects are the single source of truth. `DefaultContent` becomes an **editor-only bootstrap** (never overwrites existing assets). EditMode validators enforce: referential integrity, recipe graph reachability (every resource obtainable), no cost cycles, cost sanity bands, every resource has an icon, every structure has a model key or kit fallback.
+ScriptableObjects are the runtime source of truth. The reviewed catalog importer creates/updates content assets by stable id and validates references and drift. `DefaultContent` is now compiled only for editor bootstrap/compatibility use, and its bootstrap refuses to overwrite an existing database or data asset. Catalog validation checks recipe reachability/cycles and tuned recipe value bands; the icon check verifies distinct resource glyphs. Structures with no model key receive the procedural kit fallback.
 
 ### 2.5 Services layer (interfaces + null/mock + real)
 
@@ -172,8 +194,10 @@ ScriptableObjects are the single source of truth. `DefaultContent` becomes an **
 
 ### 2.6 Runtime quality
 
-- Pooled FX (prefab-based) replacing per-call `new ParticleSystem`/`new Material`; `AudioService` with mixer groups and pooled sources replacing `Sfx`.
-- Zero steady-state GC in mini-game loops; allocation budget checked in PlayMode tests.
+- Runtime FX/audio work is partial. `Burst`, `FxBolt`, `FxRipple` and `FxGlow` now instantiate editable Resources prefabs with shared authored materials/textures, preserving the 24-burst, 24-bolt, 24-ripple and 128-glow pool limits. Destroyed slots are replaced; excess simultaneous glows stay visible until owner loss rather than stealing active instances, and detached glows hide when their owners are inactive. `Frontier > FX > Create Templates If Missing` preserves existing designer assets. `AudioService` owns ten pooled one-shot voices, an engine bed and a music source, routed through the authored Music/SFX/UI mixer. `Sfx` remains only a compatibility facade; UI click/result cues route to UI, other cues and the bed route to SFX. Repeated initialization does not add voices, and mute stops every active source immediately. The 64-clip numeric synth cache avoids string keys and evicts only non-playing clips; cache misses still allocate.
+- Called-wave player-tap beams now originate at the same world-space tap point as their ripple instead of the scene origin; damage targeting and values are unchanged.
+- Focused FX prefab/lifecycle checks: 6 PlayMode passed; guarded Unity allocation probe skipped because it could not detect a known allocation. Focused audio checks: 8 EditMode passed / 1 allocation probe skipped. The corrected engine-free harvest allocation probe passed on .NET 8 with zero managed bytes over 1,024 active steps per simulation; this is not a rendered Unity/device measurement. Rendered mini-game/device allocation budgets remain open, so §2.6 is not complete.
+- Target zero steady-state GC in mini-game loops; allocation probes must verify counter support before asserting a measurement. Rendered-game and device allocation budgets remain unverified.
 - Stable hashing everywhere (no `string.GetHashCode`, no sequential `System.Random` for world generation).
 
 ### 2.7 Tests and CI
@@ -253,12 +277,18 @@ Three levels of detail: galaxy (density tiles + galaxy labels), sector (system d
 **Working milestone (2026-10-13, `feature/star-map`).** The locked economy route planner now supplies real stepping-stone legs,
 energy payment (1/8/64), plating/fuel diagnostics and guarded arrival. Manual flight runs once per leg; autopilot skips the mini-game
 and takes 12 s per leg at x1.6 fuel. The viewport-sized Painter2D map has bounded background queries, double-precision pan/zoom,
-galaxy/sector/system views, known-name/id/coordinate search, recenter/range ring, survey-based deposit filtering and a detailed Worlds
-card. See [RUNTIME_MODEL.md §6](RUNTIME_MODEL.md#6-travel) for budgets, interim settings and execution semantics.
+galaxy/sector/system views, exact-name lookup across authored, surveyed and pinned destinations plus ID/coordinate search, recenter/range ring,
+survey-based deposit filtering, a detailed Worlds card, save-backed destination pins with map markers and direct pinned-destination
+selection, and persisted surveyed-system history that keeps previously revealed deposits available to the map filter, compacted to
+per-sector bitsets with migration from older v2 saves. Searches respect fog of war and do not index unknown systems. When a direct
+route is out of range or route search is limited, the map card offers an explicit suggested next stop; selecting it changes the
+destination rather than altering the existing route automatically. Focused `MapQueryTests;SaveRoundTripTests`: 18 passed;
+`RoutePlannerTests`: 12 passed; targeted map UI integration smoke: 1 passed; earlier PlayMode
+`SmokeTests`: 16 passed including the live discovery and pin actions. See [RUNTIME_MODEL.md §6](RUNTIME_MODEL.md#6-travel) for budgets,
+interim settings and execution semantics.
 
-Still open for `m3-*`: pins and persisted discovery history; global name indexing; directed next-stop controls; on-device A/B
-Painter2D-versus-GPU/RT performance gate; real jump/scanner/plating content and autopilot unlock. Manual timing is an estimate until the
-new flight mini-game consumes `TravelRunRequest.seconds`; flight resume/abort and new failure consequences remain in `m5-*`.
+Still open for `m3-*`: on-device A/B Painter2D-versus-GPU/RT performance gate;
+real jump/scanner/plating content and autopilot unlock. Flight resume/abort and new failure consequences remain in `m5-*`.
 
 ### 4.6 What gets saved
 
@@ -266,11 +296,11 @@ new flight mini-game consumes `TravelRunRequest.seconds`; flight resume/abort an
 
 ### 4.7 Planet visuals for infinite variety
 
-Extend `NeonPlanet` into a parametric procedural shader (biome palettes, continents/craters/lava/ice/bands/storms, cloud layer, polar caps, city lights later) driven by descriptor values. The 7 distinct planet meshes become base silhouettes; rings, moons, atmosphere colour and weather add variety. A validation scene renders 200 random planets as a contact sheet.
+`NeonPlanet` is a parametric procedural shader driven by descriptor values. Weather and atmosphere intensity shape surface cloud patterns; Glacial biome and Cold hazard descriptors drive polar ice caps; Volcanic, Glacial, Crystal and Desert worlds receive distinct fissure, ice-vein, crystal-vein and dune patterns. Existing bands, swirls, craters, lava veins, crystalline facets, mesh silhouettes, rings, moons and weather effects remain intact. `Frontier > Planets > Render 200 Planet Contact Sheet` creates a deterministic 20×10 sheet of all 30 authored worlds plus 170 generated worlds at `Assets/Frontier/Art/Validation/PlanetContactSheet.png`; the repeatable renderer and its generated sheet were validated and visually inspected.
 
 ### 4.8 Tools
 
-`Universe Viewer` editor window (density heat map, sector inspector, seed field, jump-to-coordinates), debug teleport, descriptor dump.
+**Implemented:** `Frontier > Universe > Universe Viewer` opens a read-only editor window with a density heat map, hexadecimal seed input, light-year coordinate jump, sector/system/planet inspection and descriptor copy. It generates previews with the selected runtime universe adapter without mutating the live session or save, validates input and generator bounds, and releases replaced/closed preview textures. The existing debug teleport, descriptor dump and density PNG tools remain available.
 
 ---
 
@@ -309,7 +339,9 @@ Late recipes and megaprojects consume tier-0 volume (Planks, Biocomposite, Steel
 | Utility | Alarm Beacon 0, **Research Lab 1, Radar Tower 1, Colony Hub 3, Hangar/Spaceport 4, Auto-Harvester 4** (slow trickle, active play stays 3–5× better) | 1 / 5 |
 | Megaprojects | **Terraformer, Warp Gate, Dyson Collector** (staged, multi-timer, visible planet changes) | 3 / 3 |
 
-Of the 9 existing structures, 6 have hand-made models (Refinery, Alarm, Mine, Driller, Gunner, Laser); Lumber Camp, Fabricator and Warehouse use the primitive fallback today. Satellite is removed or folded into Orbital Relay. New models come from your modeler or a kit (§11). A **procedural kit-bash fallback** (primitives + neon trim) keeps the game shippable if a model is late.
+Of the 9 existing structures, 6 have hand-made models (Refinery, Alarm, Mine, Driller, Gunner, Laser); Lumber Camp, Fabricator and Warehouse use the primitive fallback today. Satellite has been folded into the functional Orbital Relay. New models come from your modeler or a kit (§11). A **procedural kit-bash fallback** (primitives + neon trim) keeps the game shippable if a model is late.
+
+**Called-wave combat implementation:** `EnemySO` authors Standard/Elite/Boss rank, armor, boss recurrence and resource bounties. Brute is an elite with 25% armor and extra scrap; Titan is a boss with 20% armor and extra crystal, eligible on wave 10 and every five waves after that. A wave reserves at most one eligible boss within its threat budget before spending on random escorts; increasing fuel preserves the alien-sequence prefix. Rank health arcs track actual remaining health; every weapon and player tap uses the same armor calculation. `WaveFormulaSO.modifiers` rotates Swift (speed 1.15), Fortified (health 1.20) and Overcharged (damage 1.15) from wave four, each with reward multiplier 1.10. These are editable initial balance values, not device-playtested balance. The fuel preview exposes modifier, rank, armor and exact rewards; the active HUD keeps modifier information visible. Bestiary reveals rank, armor and recurrence only after discovery. The existing victory-only resource grant and backpack-overflow rules remain authoritative. Focused combat/content checks: 17 EditMode and two PlayMode passed. Six standard/narrow phone preview/staged-HUD/result captures passed lint; representative views inspected. Device combat balance/performance and final art/audio remain release gates.
 
 ### 5.5 Tools, upgrades, research
 
@@ -317,7 +349,7 @@ Tool ladders (6–7 tiers) for Axe, Pick, Drill, **Siphon, Scanner/Excavator, Cl
 
 ### 5.6 Atlas (Astroneer-style codex)
 
-Tabs: **Resources · Alloys & Recipes · Worlds · Bestiary · Structures**. Each resource entry: icon, category/tier, description, **how to obtain** (harvest method + biomes + sample surveyed worlds with distance), **used in** (recipes, structures, upgrades), **made from**. Catalog references stay visible with clear discovered/undiscovered states. The first actual resource acquisition, successful recipe craft and completed implemented structure-kind build each grant their configured shard bounty once; the total is bounded by catalog entries. World visits remain separate from catalog discoveries. Deep links: "Find on map" applies the resource filter; a missing ingredient on any cost row has a **Find** chip.
+Tabs: **Resources · Alloys & Recipes · Worlds · Bestiary · Structures**. Each resource entry: icon, category/tier, description, **how to obtain** (harvest method + biomes + up to three visited surveyed-world samples with distance), **used in** (recipes, structures, upgrades), **made from**. Catalog references stay visible with clear discovered/undiscovered states. The first actual resource acquisition, successful recipe craft and completed implemented structure-kind build each grant their configured shard bounty once; the total is bounded by catalog entries. World visits remain separate from catalog discoveries. Deep links: "Find on map" applies the resource filter; missing items on build, upgrade, obstacle-clear and research cost rows have **Find** actions to the Atlas entry or filtered map. The Bestiary keeps undiscovered aliens anonymous until their first actual spawn; encounter knowledge is stored in the existing Atlas save list without an added currency reward.
 
 ### 5.7 Logistics model
 
@@ -354,6 +386,8 @@ Forward-moving 3D rail shooter on a chase camera. Drag to fly across a bounded p
 - **Rewards:** fuel refund by performance, loot from kills, combo and clean-run bonus. Ship upgrades change weapons, hull, shield, magnet, handling.
 - **Tech:** pooled projectiles/enemies, simple spatial-grid collisions (no PhysX), seeded runs so a headless bot can test it.
 
+Implemented authoring slice: the live host now loads an ordered `EncounterCatalogSO` referencing 64 editable `EncounterSO` assets, bootstrapped from the existing formations without changing balance or seeded outputs. Imports validate metadata, finite sorted spawn data and unique IDs, copy asset data for runtime isolation, and fail explicitly for missing/invalid content. The editor bootstrap preserves existing designer assets; a selected-formation fairness command checks all allowed tiers, speeds and mirrors. All nine canonical plan/event/state digests are unchanged. Remaining Hyperspace work stays tracked under `m5-hyperspace-run`.
+
 ### 6.2 Harvest games
 
 Existing Chop, Mine and Drill keep their feel (tool-rig, cooldown, weak spots, impact-driven drilling) with polished visuals and tool-level progression. New:
@@ -365,13 +399,59 @@ Existing Chop, Mine and Drill keep their feel (tool-rig, cooldown, weak spots, i
 | **Salvage** | Scrap, components, caches | A swinging magnet claw: time the drop to grab valuables, avoid explosive mines, chain for bonus |
 | *Harvest/Slice (optional)* | Biomass | Swipe through plants, avoid toxic pods |
 
-`m5-minigame-framework`: shared tool rig, cooldown feedback, haptics/audio hooks, pause/abort, result screen with grade (S/A/B/C → existing `0.4 + 1.1×quality` yield curve) and a **Double yield** rewarded-ad slot, difficulty and tool scaling, headless bot support.
+`m5-minigame-framework`: shared tool rig, cooldown feedback, haptics/audio hooks, pause/abort, result screen with grade (S/A/B/C → existing `0.4 + 1.1×quality` yield curve) and a **Double yield** rewarded-ad slot, difficulty and tool scaling, headless bot support. **Partial:** pause/abandon, graded result collection, all six games' headless/live bot coverage, shared tool/state feedback, shared tiered visual rigs, cached audio and default-off native haptics/settings are implemented. Grades derive from normalized quality, and the resource/progression callback waits for Collect Resources. Remaining: consent-enabled rewarded-ad yield slot, native builds and on-device validation.
+
+Verified framework slices:
+- [x] Pause/resume, focus-loss pause, and confirmed abandon without rewards.
+- [x] Grade/result handoff with exactly-once collection and game-specific metrics (including drilling time, rather than calling every metric "perfect hits").
+- [x] Chop/mine and drill use engine-free numerical rules in the live games; headless bots cover damage, cooldown spam, stage overkill, tool scaling, pressure/contact, bounded completion and deterministic replays.
+- [x] Rendered chop/mine/drill bot tests cover pause input gating, stage completion, resource callback timing and result handoff. All six harvest games share an input gate that rejects actions before scene readiness, while paused, after completion and after cleanup. Drilling screenshots select a compatible generated deposit and fail explicitly if setup cannot start the game.
+- [x] Siphon/Excavate/Salvage live games use engine-free rules. Timing/cooldown bots, seeded echo-only excavation bots, capture/miss budgets, duplicate rejection and partial/zero yield are covered. Excavation resets both numerical and visual echo clues between seams.
+- [x] Shared responsive tool/state row in all harvest games replaces overlapping tool pills. Readiness, cooldown recovery, pressure lock and sonar/salvage cues are explicit text, not color alone.
+- [x] Cached tool-specific harvest cues use the bounded ten-voice pool instead of per-hit synthesis, with independent haptics dispatch connected to the native host below.
+- [x] Native harvest haptics implementation with persisted default-off setting: Android short vibration effects and iOS impact feedback, hardware support checks, 120ms minimum cadence and focus/disable cancellation. Build hooks add Android permission and link iOS frameworks. Unsupported devices show an unavailable state. Six policy/build/persistence tests and rendered lifecycle/settings tests pass; managed platform branches/build hooks compile. Native device feel and actual mobile builds remain unverified.
+- [x] Shared visual tool-rig expansion: shared seven-tier palette across all games, bounded tier hardware for drill/siphon/scanner/claw, preserved mounts and live rules. Seven focused PlayMode checks passed; standard/narrow phone captures completed without harness errors, with representative affected scenes visually inspected.
+- [ ] Device validation and a consent-enabled rewarded-ad yield slot.
+
+Harvest bot validation: 22 focused tests pass under both .NET and Unity Mono; the full engine-free suite passes 398 tests and the full PlayMode suite passes 25. All five editor check suites pass. Corrected drilling gameplay/result captures on standard and narrow phone profiles have zero errors, text/touch-target violations or overflow. This does not complete the entire framework or replace on-device validation.
+
+Remaining-game follow-through: all 37 harvest core cases pass under .NET and Unity Mono, with rendered bot coverage for Siphon, Excavate and Salvage. The full engine-free suite passes 413 tests and the full PlayMode suite passes 28 after shared-row and audio integration. Four focused Unity audio tests cover clip reuse, independent haptics dispatch, invalid input, bounded live voices and destroyed-host behavior. Result-screen tests now wait for the actual scheduled UI with a bounded deadline rather than relying on a 50ms timing margin. All six games plus drill results were captured at standard/narrow phone widths (14 captures, zero harness errors, overflow, undersized text or undersized touch targets). Procedural cues do not replace a production audio pack or device listening/touch checks.
 
 ---
 
 ## 7. UI/UX
 
 ### 7.1 Design system
+
+**UXML control implementation:** twelve `[UxmlElement]` controls in `FrontierControls.cs` now cover button, card,
+progress, chip, tab, tab bar, stat row, modal, popup, list row, badge and toast using the incumbent USS.
+UiKit and live screen helpers use these shared types. A real UXML fixture checks attribute/nesting support;
+three focused EditMode checks and four live PlayMode checks passed. Eight standard/narrow Build/Command/refinery/toast
+captures passed layout lint; representative views inspected.
+
+**Motion/world labels:** shared modal/popup/toast entrances use a 160 ms transform-only ease-out; native Unity 6.4
+world-space `UIDocument` labels replace surface `TextMesh` for structures and build pads. Labels share one panel,
+the existing UI fonts and the existing camera-facing/occlusion/locked/selected-only rules, and ignore picking.
+Long interactive popups retain the safe-area overlay/anchor projection. Three focused motion/structure/label
+PlayMode checks passed; six standard/narrow Build/refinery/construction captures passed overlay layout lint and
+representative views were inspected. The overlay linter does not measure world-space label text size.
+String tables and the remaining standardized states/device gates remain open.
+
+**String-table/memory slice:** an editable, validated 106-entry English ScriptableObject table now supplies main
+navigation/modal titles/menu, Build shop UI, tutorial/About, basic settings, harvest pause/abandon/results/reward messages,
+wave results, structure labels and travel/route-status templates. Stable keys
+and complete sentence templates keep this copy out of display code; missing/duplicate/empty keys and bad format
+arguments fail explicitly. This is not complete localization: remaining screen/content copy, locale selection,
+translations, RTL/font coverage and device checks remain open. Overlay/world-label dynamic atlases now follow
+Low/Medium/High caps of 1024/2048/4096 without editing authored panel assets.
+Focused controls/strings/budgets/preferences: 26 EditMode passed; live navigation/harvest/motion/labels: six PlayMode
+passed, including exact Low-tier caps on both runtime panels. No broad regression suite was repeated.
+Travel-copy follow-up: two string-table EditMode and three live route/manual/autopilot checks passed. The focused
+motion check also verifies the actual initial 16/6/-8 px translations before they settle, not just CSS class removal.
+Menu/shop/tutorial follow-up: two EditMode and three PlayMode checks passed. Tutorial Map/Command directions now
+match their bottom-dock locations. Other screens/content remain unmigrated; the broader milestone stays open.
+
+**Back navigation implementation:** Escape/Android Back now dispatches to the topmost active surface. Harvest/travel runs pause or resume; Back cancels an abandon confirmation rather than abandoning. Result collection remains explicit. Menu subpages return to Menu, then close on the next Back; ordinary modal, popup, map, build mode and wave-result dismissal reuse their existing close paths. Busy transitions and called waves consume Back without silently cancelling progression; the world view does not quit the app. Three focused PlayMode checks cover menu/map and live harvest/Hyperspace behavior. Physical-device Back verification remains open.
 
 Tokens as USS variables (USS variables cannot be nested in functions or used in math, so the UI scale is computed in C#): colour roles (surface 0–3, outline, text hi/lo, accent cyan/magenta/lime/amber, danger), spacing 4/8/12/16/24/32, radii, type scale (caption ≥ 12 dp, body ≥ 14 dp, title, display), motion (durations/easings), elevation as restrained glow. **Hierarchy rule:** neon is reserved for the primary action, selection and live state; everything else is tonal glass. Fonts: one display + one text face under OFL (candidates Oxanium or Chakra Petch + Inter or Barlow) as TextCore font assets referenced with `-unity-font-definition`. `DESIGN.md` documents it.
 
@@ -402,7 +482,7 @@ Icons are authored as **SVG on a 48 grid**, 2.5 px round-cap strokes, one metaph
 | Menu / Settings | Debug visible; thin | Hide debug; sliders for music/SFX, haptics, quality, notifications, language, consent management, restore purchases, account/cloud, delete data, credits |
 | Rank / Leaderboard | Placeholder | Score breakdown + all-time/weekly boards |
 | **Shop** (new) | — | Shards, offers, boosts, cosmetics, Free Shards (ad) |
-| **Builders panel** (new) | — | Active jobs, timers, speed-up with shards/ad |
+| **Builders panel** (new) | Implemented in Command → Crews | Active jobs/live timers, confirmed shard/free structure finishing; clearance management links. Ad speed-up remains open |
 | FTUE | Text page | Guided first session with contextual arrows |
 
 ---
@@ -438,9 +518,34 @@ The runtime maps distinct save-backed visits, completed operational structures, 
 
 Tabs: Shards (5 consumable tiers), Offers (one-time Starter Pack, later rotating), Boosts, Cosmetics, Free Shards. Restore Purchases (store requirement). Prices come from the store, never hard-coded. Subscription ("Pioneer Pass") is a later option, not in v1.
 
+**Pending-purchase protocol foundation:** `PurchaseFulfillment` requires a receipt payload plus product and
+transaction IDs, delegates receipt verification, checks the verified identities, then calls the atomic
+grant/journal contract before acknowledging the store. Verification failures, destination changes and failed
+commits never reach confirmation; overlapping callbacks remain pending. A confirmation failure explicitly
+reports that the reward was already saved and must be retried without another grant. Tests use an in-memory
+transaction journal to exercise duplicate replay, failed commits, confirmation retry and callback ordering.
+The real `GameState` now implements the grant store for the five authored shard packs: it writes a detached
+wallet/transaction-journal snapshot through the existing atomic save protocol before publishing spendable
+shards. Write failure leaves the wallet unchanged; replay of the same store/transaction/product after reload
+does not pay again, and product conflicts, corrupt records, read-only saves, unknown packs and full wallets
+are rejected. A save replacement/reset invalidates in-flight destination tokens. This current-save
+implementation is not a receipt validator or an active shop. Purchases remain unavailable until Unity IAP v5,
+native verification and reset/restore/backup/cross-device journal reconciliation are implemented; resetting
+or replacing a save currently replaces its journal. Store configuration and prices remain required too.
+
 ### 8.4 Rewarded ads (opt-in only, never forced)
 
 Placements: **Double yield** after a harvest, **Emergency fuel** (small, capped), **-N min on a timer** (capped per job/day), **Revive**, **Daily supply drop ×2**, **Free Shards** (capped). `RewardedAdsPolicy` SO holds caps and cooldowns; consent before first load; fully functional with ads off.
+
+**Local policy foundation implemented:** the editable `Resources/Frontier/RewardedAdsPolicy` asset lists all
+six placements, disabled with zero daily caps until reviewed values are authored. The live service factory
+wraps the unavailable ad provider in the policy, behind the existing consent gate. Per-placement UTC-day
+limits and cooldowns persist independently of progression resets; unknown/disabled placements, overlapping
+requests, mismatched provider rewards, malformed usage, storage failures and observed clock rewinds reject
+delivery. In-flight rewards are discarded after consent withdrawal, even if the player opts back in before
+completion. These are local limits, not trusted time, cross-device verification or durable reward grants.
+LevelPlay/mediation, reviewed limits, per-job speed-up caps, gameplay reward transactions and placement UI
+remain open; no SDK initialization or real ad request is enabled by this slice.
 
 ### 8.5 Timers, builders, obstacles
 
@@ -449,7 +554,20 @@ Placements: **Double yield** after a harvest, **Emergency fuel** (small, capped)
 - **Speed-up:** shards (curve above) or rewarded ad (-N minutes, capped).
 - **Obstacles (D2):** each planet generates deterministic clutter on pads (boulders, dead trees, wreckage, fungal growth by biome); home world starts mostly clear and the first pads are always free. Clearing costs resources + a short builder timer, grants XP/resources, and ~5% are "shard pods". Instant clear costs a few shards.
 - **Time source:** the official Cloud Code server-time pattern is primary (server stores the job start/end timestamps and recomputes elapsed time; the client clock is never trusted). Offline, jobs use monotonic session time plus clock-rewind detection and settle against server time at the next sync, so a tampered clock can never complete a job early.
+- **Active-session protection implemented:** the default game clock captures device UTC once at startup and
+  thereafter advances by monotonic elapsed time. Forward/backward device-date edits while the session runs
+  neither finish jobs early nor extend them. Explicitly injected test clocks retain their existing behavior.
+  This is not server authority: changing the date before restart can still change the next startup anchor,
+  offline accrual and overdue-job recovery. Persistent rewind detection and server settlement remain open.
 - **Local notifications** when a job finishes (permission requested at the first timer, not at launch).
+
+  Implemented behind a default-off native feature flag and a separate default-off device preference:
+  Mobile Notifications 2.5.0, unified Android/iOS provider, Settings control, and saved active crew deadlines
+  for construction/upgrades/clearance. Permission is deferred until an active timer; denial is not repeatedly
+  prompted. Reconciliation uses eight reserved IDs, cancels completed/reset/restored/disabled jobs and stale
+  previous-session reminders, and suppresses new reminders when the save write fails. Native builds reject
+  launch authorization, push/APNs capability and exact-alarm permissions. Physical-device permission,
+  delivery, process-restart and cancellation remain activation gates; OS notification timing is advisory.
 
 ### 8.6 Retention and live-ops
 
@@ -472,27 +590,208 @@ Daily login streak, objectives/quests, achievements, weekly Sector Challenge on 
 | Cinematics | Cinemachine + Timeline (free) | |
 | Localization | Unity Localization (free) | |
 
-Package updates: Phase A removes `com.unity.ads`; Cloud Save 3.4.2 is installed as a disabled provider foundation. Apple Sign-In 1.5.0 and Google Play Games 2.3.0 are installed for disabled-by-default account recovery. UGS Authentication remains 3.6.1. Remaining planned additions include LevelPlay, IAP 5.4, Cloud Code client, Remote Config, Analytics, Notifications, Cinemachine and Localization.
+Package updates: Phase A removes `com.unity.ads`; Cloud Save 3.4.2 is installed as a disabled provider foundation. Apple Sign-In 1.5.0 and Google Play Games 2.3.0 are installed for disabled-by-default account recovery. UGS Authentication remains 3.6.1. Unity Localization 1.5.13 supplies preloaded English UI tables through local Addressables bundles; Analytics 6.3 and Remote Config 4.2.5 adapters are consent-gated and feature-flagged off. Mobile Notifications 2.5.0 now supplies the default-off local crew reminder provider. Remaining planned package additions include LevelPlay, IAP 5.4, Cloud Code client and Cinemachine.
 
 ### 8.8 Compliance
 
 - **Consent:** GDPR/CCPA/COPPA flags through the ad SDK's privacy API before the first ad load; iOS ATT prompt (explainer screen first, no fixed timing mandate; IDFA is zeroed until granted).
 - **Apple App Privacy labels:** User ID (leaderboards), Device ID/IDFA (ads), Purchase History (IAP), Usage/Advertising data (analytics), declared even when a third-party SDK collects it. Age-rating questionnaire includes advertising. We have **no randomized purchases**, so Guideline 3.1.1 odds disclosure does not apply.
 - **Google Play:** Data Safety form (Advertising ID under device identifiers), **"Contains ads"** declaration, IARC rating, privacy policy in the listing and in-app.
-- **Account/data deletion:** anonymous-only auth likely does not trigger the account-deletion rule, but **linking Apple/Google accounts likely does** (conservative reading; confirm against current Apple 5.1.1(v) and Google policy). Plan an in-app delete-data/account action and a Google-required web deletion link either way.
+- **Account/data deletion:** confirmed in-app cloud-save/account erasure is implemented for already signed-in accounts, including after consent withdrawal. It preserves local progression/restore backup and explicitly reports partial failure. The public web deletion route, other backend retention/erasure, native verification and current store-policy/legal review remain open; see `COMPLIANCE.md`.
 - Documented in `docs/COMPLIANCE.md`; store-console setup (agreements, test tracks) follows Apple/Google documentation, which Unity does not cover.
 
 ---
 
 ## 9. Presentation and animation
 
+**Shared ship implementation slice:** a single procedural low-poly `ShipRig` now appears in both Hyperspace
+and the takeoff/touchdown beats around existing planet depart/approach. It has a steel/cyan vertex palette,
+twin engine plumes, three folding landing legs and landing lamps (85 triangles, eight renderers, four owned
+meshes and one material). Throttle/gear/bank are presentation-only. Short 0.7-second travel beats support Skip
+and Back; neither bypasses route execution, fuel payment or reward rules. Hyperspace's triangle counter includes
+the rig; its reserved layer 31 is excluded from the world camera. Five focused rig/travel/Hyperspace checks passed
+before the final Back-skip integration; the final Back-skip/bootstrap/manual/autopilot/Hyperspace selection passed
+all six checks. Eight initial and four confirmation phone captures passed layout lint, but the narrow combat
+confirmation still showed stray corner geometry, so visual sign-off remains open. The offscreen rig now has its
+ordinary renderers disabled and uses camera-scoped draw calls; three ownership/render checks plus an exact
+64x64 unrelated-camera black-pixel regression passed, even when that observer includes reserved layer 31.
+Startup now uses a skippable wordmark/starfield hold (0.65s), a shared ship descent (1.4s), and a transform-only
+HUD reveal (0.22s). Later launches omit the wordmark and use a short 0.7s arrival. The presentation preference
+is stored only after completion/skip; no resources, XP, levels or visits are granted. Pooled heat glow, dust and
+touchdown ripple accompany arrival. Runtime readiness waits until controls/world visibility are restored.
+Four focused startup/Back/button-skip/bootstrap/manual/autopilot checks passed. Visual sign-off remains open.
+World-space ships now have two exhaust emitters, reusing authored Burst/shared material with at most 24 particles
+per engine (Low: 11, 27/sec) and live quality scaling. Zero throttle clears emissions. Preloaded licensed
+ignition/touchdown cues use the SFX bus: ignition is an enveloped Kenney engine derivative and touchdown
+reuses the metal contact recording with independent authored gain. Eleven cue mappings share ten clips
+within a 1 MiB decoded sample-data ceiling. Camera-only
+Hyperspace keeps its geometric plumes/trails and has no globally rendered particles. Two focused rig checks
+passed, including live Low-tier limits and positive/negative target-camera pixels. The startup input check now
+waits for actual coroutine completion/frame-driven layout instead of a timing-only sleep; its final run passed.
+Touchdown adds a 0.24s damped camera impulse and restores the exact camera position on completion or skip;
+the focused startup regression observes the natural impulse and checks cleanup after both paths. Harness boot
+bypasses startup cinematics and does not modify the real player's intro preference. The planned procedural
+beats do not require an additional Timeline/Cinemachine/DOTween package. Remaining: production art/audio and
+physical-device performance/visual sign-off.
+
+Called-wave resolution now adds a pooled neon ripple and burst centered on the current planet: cyan for a
+cleared wave and red for a defeat. The effect is presentation-only and does not change wave rewards or enable
+cross-planet combat. The focused bootstrap PlayMode regression passed and verifies that ending a real wave
+adds a pooled ripple at the current planet.
+
+**Hyperspace string-table slice (§7.1):** pause, steering tips, status, warning, revive/offer, failure and result
+copy now uses the editable English catalog (137 total entries). Numeric score/percentage/time formats and
+multi-line result text retain their existing output. Two focused catalog checks and four live pause/result/offer
+checks passed. Developer performance counters remain diagnostic strings; other screens and full localization
+are still open.
+
+**Guide/inventory/logistics copy (§7.1):** first-session objective headings/descriptions/cues/actions, backpack
+and salvage, warehouse/fuel/hopper/cargo/relay headers/help, category filters, empty states and whole transfer
+messages now use the English table (227 entries). Two catalog and three guide/backpack/startup checks passed;
+the storage follow-up passed two catalog and two live empty-state/quick-transfer checks. Real Quick Store/
+Withdraw buttons preserve all 20 test resources and report both success and no-op through catalog messages.
+This does not close remaining screens/authored content or locale/translation/font/RTL support.
+
+**Command/goals copy (§7.1):** Command/base/tool/upgrade rows, research shell, catalog tier feedback, Goals
+shell/reward/navigation states, travel assist/sensitivity and shared structure/upgrade effect templates use stable
+keys (321 English entries). Authored names/descriptions and GameState-generated lock/claim messages remain
+separate. Corrected stale future-tool help and a busy low-level base card falsely displaying MAXED. Two focused
+catalog checks and three live command/assist/goals/construction checks passed. Progression rules are unchanged.
+
+**World-action copy (§7.1):** construction headers/stages/upgrades, obstacle clearance/skip feedback,
+harvest actions/tool estimates, recipe batch controls and called-wave previews/HUD now use the same catalog
+(385 English entries). Whole batch-capacity sentences retain singular/plural forms. Two focused catalog checks
+passed; three live construction/guide/action checks passed after correcting the new test's native text-button
+lookup. Actual craft submission conserves every resource against recipe inputs/outputs, and actual wave
+submission spends the preview's three fuel once. Specialty panels, generated status text and full localization
+remain open.
+
+**Specialty popup follow-up (§7.1 / §8.5):** the remaining Terraformer/Warp Gate/Dyson/Lab/Hub/Radar/Hangar/
+Shield/Repair/turret help and stats, duration units and ranked-alien/modifier captions use stable keys (431 English
+entries). A live check opens all twelve specialty structures without granting resources. This pass exposed and
+corrected a runtime/catalog mismatch: Colony Hub clearance prices used its extra-builder effect (0/1/2) rather
+than its authored percentage capacity (0–45). Live prices now match the existing economy model; popup and upgrade
+copy show the actual clearance discount instead of claiming it is inactive. Four focused catalog/runtime Hub
+checks and the twelve-popup live check passed; the runtime check covers levels 1/2/3/7/10, unfinished-Hub
+exclusion and payment of the discounted material amounts. No catalog rebalance or provider activation was added.
+
+**Builders panel (§7.3 / §8.5):** Command → Crews and the Build shortcut now expose construction/upgrade and
+clearance jobs across visited worlds, live remaining time, shard balance and confirmed structure finishing.
+Timer/price refresh preserves the actual button instances. Paid and free finishes reuse the authored shard curve
+and normal completion/reward path, reject stale quotes/insufficient balances/read-only saves/missing assignments,
+and immediately persist job/currency together. Save failure explicitly reports a pending session result; retry
+cannot duplicate charges or rewards. Off-world finishing does not move the player or charge fuel. Clearance
+opens local controls or the remote world's map card. Twenty focused builder/catalog checks plus one off-world
+check and two live panel/menu checks passed. Initial and confirmation standard/narrow phone captures had clean
+overlay lint; the confirmation fixes the narrow tab caption and uses a real fixture crew assignment. English
+catalog: 448 entries. Rewarded-ad speed-up, purchased crews, server-authoritative time and notifications stay open.
+
+**Crew recruitment (§8.2 / §8.5):** Crews now offers the authored third/fourth crew prices, with no purchase
+before the progression-earned second crew and no offer above the shared cap. Hub crews and purchased crews
+use the existing capped `BuilderPlan`. Second-press confirmation revalidates crew count, price, wallet and
+read-only state, then saves the entitlement and debit together. A failed write reports the session grant and
+keeps it dirty for retry; repeating a stale confirmation cannot buy another crew. Save-backed purchase flags
+survive reload/recovery and clear on reset. Active jobs remain above recruitment. Focused builder/catalog:
+28 passed; live recruit/finish confirmation: two passed. Store purchases, ads, trusted time and notifications
+remain open; this uses earned Nova Shards, not an IAP/provider implementation. English catalog: 455 entries.
+
+**Hyperspace interruption safety (§6.1):** focus loss and backgrounding require explicit Resume, including a
+revive callback arriving while the app/ad is interrupted. Resume cannot run in the background or without focus.
+Six focused interruption/revive/cleanup/travel checks passed. Finish/defeat still reaches the destination with
+no reward/refund for that unfinished leg. This does not introduce durable process-restart resume.
+
+**Shard revive (§6.1 / §8.2):** the downed dialog displays the authored price/balance and requires a second
+press to spend earned shards. Payment rejects stale quotes, read-only saves, insufficient balance and
+ineligible/max-revive runs, then immediately saves the single debit. Failed saves report pending session state
+and retry without another charge. Existing free/provider paths, shared revive cap, interruption pauses and
+unfinished-leg consequences are preserved; pending offers block spending and late answers cannot double-revive.
+Five focused paid-flow checks, three existing free/provider/interruption regressions and two catalog checks
+passed. Two standard/narrow phone captures have clean lint; the narrow dialog was inspected. English catalog:
+459 entries. Actual ad/IAP providers, process-restart run restoration and physical-device gates remain open.
+
+**Map strings (§7.1):** search help/empty/not-found/error states, galaxy/sector/system readouts, destination/pin,
+survey/hazard/deposit captions and manual/autopilot prices/actions now use whole catalog templates. Authored
+names and generated descriptor identities stay separate; invariant x,y parsing is unchanged. Two catalog checks
+and the live latest-selection/fuel/search check passed, including exact price captions and no fuel/shard/world
+mutation during previews. English catalog: 505 entries. Atlas/settings/generated identities, translations/fonts/
+RTL and the existing physical-device map performance decision remain open.
+
+**Atlas strings (§7.1):** all five tabs, discovery summaries/states, acquisition/samples/uses, recipe gates/flows,
+visited worlds, unidentified structures/lifeforms and revealed enemy stats/boss/bounty captions use the catalog.
+Resource categories reuse shared keys; authored identities/descriptions and generated names remain content.
+Two catalog checks and one live integration check passed: actual tab submissions, all five resource categories,
+hidden/revealed bestiary and unchanged discovery/resource/shard/location state while browsing. English catalog:
+566 entries. Settings/generated identities and complete localization remain open.
+
+**Privacy/recovery strings (§7.1 / §8.7):** privacy choices and account recovery/manual cloud comparison,
+backup/restore/undo captions, statuses, errors and confirmation warnings now use catalog templates. Provider/
+GameState messages remain generated text. Corrected stale privacy help to describe already-implemented manual
+cloud movement; no provider was activated and no automatic sync was added. Two catalog checks and one live
+settings/menu check passed, including all three consent labels and ON/OFF states without altering consent.
+English catalog: 630 entries. Enabled-provider/native flows, remaining generated/rank/content strings and full
+locale selection/translations/font/RTL coverage stay open.
+
+**Ranks strings (§7.1):** score/category/record labels, era actions, leaderboard availability/opt-in/loading/empty
+states and connection feedback now use catalog keys, reusing existing guide actions. Two catalog checks and the
+live bootstrap/rank/map check passed; each of the seven displayed score rows matches its live component and the
+next-era button opens Map. Numeric formatting and online explicit-request/read-only behavior are unchanged.
+English catalog: 660 entries. Generated era/requirement/provider/content text and full localization remain open.
+
+**Independent audio volume (§7.3 / §9):** Settings now has separate persisted Effects & UI and Music sliders,
+live percentages and 104px input areas. Existing/future pooled voices and loop sources apply the correct level
+while retaining nominal cue gains and authored mixer routing. Zero silences its bus; master mute still stops all
+sources and never overwrites slider preferences. Dragging does not rebuild the active control. Six focused audio/
+catalog checks and one live slider/reopen/state-conservation check passed. Two phone captures have clean overlay
+lint; narrow Settings inspected. Catalog: 663 English entries. Production audio/music assets and device gates stay open.
+
+**Online deletion (§8.8):** Settings has separate two-press confirmation tied to the signed-in player ID,
+explicit Cancel and confirmation reset when leaving. No implicit sign-in/account creation/upload or consent grant
+occurs. A fresh write lock protects removal of only Frontier's cloud key; only successful removal permits deletion
+of the exact UGS account. Failure stops or reports the explicit partial result and permits retry. Local game and
+restore backup remain intact. Cloud/recovery/rank actions cannot overlap the deletion flow. Twenty-three focused
+service/catalog and two live UI checks passed; the English catalog now has 839 entries after the Ascension
+and remaining harvest/XP shell string slices. A fresh focused PlayMode
+deletion-flow regression passed after the localization migration. Providers remain disabled.
+`COMPLIANCE.md` now records implemented scope and remaining legal/web/backend/native/store gates, not legal approval.
+
+**Unity Localization (§7.1):** installed 1.5.13 and registered English settings/locale plus the 839-key preloaded
+`Frontier UI` StringTable. The editor sync command keeps `UiStrings.asset` as the English source, preserving stable
+keys and other locales. Bootstrap awaits asynchronous loading before creating UI; current-culture composite
+formatting remains unchanged. Player build guards reject drift/missing tables and force local bundled content to
+build with the player. Four focused catalog/build-guard checks, earlier live UI checks, and fresh focused PlayMode
+localization/bootstrap and deletion regressions passed. Local Android-target bundles built successfully, exposing
+and correcting an inherited misplaced `DefaultContent` editor-only guard. No APK/native-device claim. Remaining: generated gameplay/provider/
+content text, language selection/live switching, translations, font coverage and RTL; only English is authored.
+**Harvest mini-game catalog slice:** tree/rock, drill, siphon, excavation, salvage and asteroid-field titles, tools,
+instructions, metrics, feedback states, controls and live progress now use the catalog. The player-level HUD and
+travel settings heading also use catalog entries. Four focused catalog/build-guard checks and 12 live mini-game
+flow checks passed; a combined 13-case mini-game/startup PlayMode run passed. No harvest rules changed.
+Ranks now converts known consent/configuration/request/connection failure statuses into localized copy while
+retaining provider detail for request and connection errors. The player-level HUD and travel debug labels are also
+catalog-backed. Fourteen focused tuning/catalog EditMode tests and 13 combined mini-game/startup PlayMode checks
+passed.
+
+Ascension's panel labels, keep/reset disclosures, confirmation actions, lock reasons and save/result messages now
+use 24 catalog entries with structured rank/stage/yield/error arguments. The focused catalog plus Ascension EditMode
+selection passed 11/11, and the live confirmation/retained-progress PlayMode check passed 1/1. This changes only UI
+copy: Ascension remains disabled in the authored build and its proposed permanent-bonus design remains unresolved.
+
 - **Ship:** a rigged ship (from `spaceship.fbx` or a new model) with engine particles, landing lights and legs. The same ship appears in Hyperspace Run, so travel reads as one continuous journey.
 - **Cold open:** logo → starfield → ship descends through atmosphere (heat glow, shake) → **touchdown** (dust ring, camera settle, legs, lights) → HUD slides in. Skippable; a short variant plays after the first launch.
 - **Takeoff and warp:** engines ignite, ship lifts, planet recedes, `SpaceBackdrop.DoWarp`; **arrival:** drop out of warp, approach, atmospheric entry, touchdown.
 - **Structure moments:** build-in (holographic scan → solid), upgrade pulse, obstacle clear (dig/blast), timer complete glow.
+
+**Structure moments implemented:** `WorldSurface` retains unchanged models during state refreshes and snapshots each visible structure's revision/job state. New placement grows in over 0.65s; pending jobs show a cyan outline/tint and moving scan ring; live completion and level changes pulse with bounded pooled burst/ripple cues. Removed obstacles receive pooled clear bursts. First load and world arrival suppress retrospective effects. These are presentation-only observations, not timer/reward authority. Three focused structure/navigation/bootstrap PlayMode checks passed; two standard/narrow construction captures were inspected with clean layout lint. Ship cold-open/takeoff/arrival cinematics and final VFX/device gates remain open.
 - Built with Timeline + Cinemachine for authored beats and DOTween for UI/world tweens; replaces LeanTween.
 - **Audio:** `AudioService`, mixer (Music/SFX/UI), per-material harvest impacts, biome ambience, adaptive music (calm / combat / travel), haptics on impacts.
 - **Quality tiers:** auto-detected Low/Med/High; toggles for post FX, particle density, 30/60 fps; budgets in §10.
+
+**Presentation-budget implementation completed:** Automatic chooses conservative mobile tiers from reported RAM, GPU memory
+and processor count, with a persisted Low/Medium/High override. Low/Medium/High bound both axes of harvest/travel render
+textures to 768/1024/1280 pixels while preserving aspect and respecting hardware limits; UI stays full resolution.
+Low disables HDR/post-processing; Medium omits chromatic aberration. Decorative particles/stars scale down, never enemy
+counts, input targets or telegraphs. Automatic/30/60 fps is independent, capped by the authored frame limit. Authored URP
+assets are never modified. These are initial heuristics; target-device profiling and thermal calibration remain open.
 
 ---
 
@@ -585,17 +884,18 @@ and on dependent content. Unsupported tool minigames and unfinished structure/ef
 **Atlas UI vertical slice:** the Menu now opens a catalogue backed by the selected economy database. Resource entries show category, tier,
 stack size, catalog description, harvest method and habitat/minimum-tier rows, plus recipes that make or consume the item. Raw resources
 can hand off to the map's surveyed-deposit filter. Recipe entries show input → output, station and progression gates. The Worlds tab is
-limited to the current and visited worlds and links their resource entries; the Field Guide lists structure definitions (clearly marking
-catalogue-only behavior) and configured aliens.
+limited to the current and visited worlds and links their resource entries. The five planned tabs are separated; Structures marks
+catalogue-only behavior, while the Bestiary keeps undiscovered species generic until first spawn and then saves that encounter in the
+Atlas ledger without an unplanned bounty. Surveyed-world samples/distances and missing-cost Find chips are now implemented.
 
-**Atlas discovery and rewards completed:** namespaced resource, recipe and implemented structure-kind discoveries use the reserved v2
+**Atlas discovery and rewards completed:** namespaced resource, recipe, implemented structure-kind and first-spawn alien discoveries use the reserved v2
 `atlas` save list; duplicate and empty entries are normalized without discarding legacy/unknown values. Successful resource additions
 (including obstacle salvage), single/batch crafts and completed builds award the configured first-discovery shards once. Timed builds pay
 only on completion, including offline completion recovery. Existing saves seed discoveries from resources and structures already owned
 without retroactive rewards; starting resources are discovered normally. Atlas progress and entry badges show discovery/craft/build state,
-while the visited-world list stays independent. All four Atlas tabs are covered by the screenshot harness. Validation: EditMode including
-Slow 560 passed / 2 runtime-specific allocation skips; PlayMode 19 passed; all five editor checks passed. Twelve Atlas captures across standard
-phone, narrow phone and tablet reported zero errors, overflow, undersized text or undersized touch targets.
+while the visited-world list stays independent. Bestiary identity is concealed until first actual spawn without awarding an unspecified bounty. Resource details include visited surveyed-world samples/distances, and missing items on cost rows link to Atlas or map. Five Atlas phone captures (Resources, Recipes, Worlds, Bestiary, Structures) reported zero errors, overflow, undersized text or undersized touch targets. Focused `EconomyRuntimeTests;StorageTests;ProgressionContentTests;SaveRoundTripTests`: 60 passed; all five editor checks passed.
+
+**Logistics model completed:** Warehouse panels now filter both grids by resource family and provide one-tap Quick Store and Quick Withdraw actions that move only what fits. Existing storage capacity display, multiple local Warehouses, Cargo Depot pooled crafting/build costs, relay same-system and upgraded cross-system pulls, carried-energy payment and Fuel Depot isolation are covered by storage/economy tests. Focused `StorageTests;EconomyRuntimeTests`: 45 passed, including category-filtered quick transfers; all five editor checks passed.
 
 **Persistent progression slice:** Command now exposes branch-filtered research and catalog tool ladders. Research requires
 its authored prerequisites, reach tier, current-world Research Lab level and catalog resource costs; successful purchases
@@ -607,12 +907,31 @@ while the database temporarily falls back to legacy content.
 
 ### Next implementation sequence
 
-The research/tool progression, harvest expansion, obstacle-clear loop, processing-station batches and Atlas discovery/rewards are complete. Continue in small, independently verifiable gameplay slices, in this order:
+The research/tool progression, harvest expansion, obstacle-clear loop, processing-station batches, Atlas discovery/rewards, first-session objective guide, harvest pause/abandon, grades, all-six bots, shared tool/state feedback, shared visual rigs, cached audio and native haptics/settings implementation are present. The wider mini-game framework remains partial: rewarded yield, actual native builds and on-device validation are still open. Continue in small, independently verifiable slices:
 
-1. **Trusted leaderboard writes:** design a Cloud Code/Access Control route only when progression has server-verifiable evidence and direct client leaderboard writes are denied. Recalculating client-submitted score inputs is insufficient; the current local score is not authoritative and the Unity client has no score-write method.
-2. **Provider completion and release readiness:** finish Apple/Google provider setup and native-device recovery tests; then address Analytics, Remote Config, LevelPlay, Unity IAP, trusted cross-device timers, account-deletion UX, legal review, dashboard setup and release work. UGS auth, leaderboard reads and Cloud Save stay consent-gated and inactive until configuration and compliance prerequisites are ready.
+The app master plan is the execution checklist. Live-era confirmation is complete; the next progression work is
+remaining objectives/quests/achievements and optional Ascension. Keep broader presentation/device gates and external
+service prerequisites distinct. Existing three-megaproject support does not complete Ascension.
+
+**Live era progression:** Landfall, Foothold, Settlement, Industry, Interstellar and Ascension-era thresholds are now shared
+between the simulator and real gameplay. Actual world visits, completed lab history, purchased upgrades, crafted recipe
+history and completed megaproject stages supply the facts. The reached-era high-water mark persists in existing v2
+settings; older saves infer proven progress without granting currency. Ranks shows the current era, next requirements
+and a real map/Command/build/Atlas route. The Ascension era is a progression milestone, not the still-unimplemented
+optional universe-reset feature. Six focused cases plus the full suites above cover this integration.
+
+1. **Trusted leaderboard writes (deferred):** the current score is computed from mutable client-side save/GameState data; the UGS adapter exposes reads only, and this repo has no Cloud Code package or module. Preserve offline-first play and keep writes disabled until authoritative server progression exists and Access Control denies direct client writes. A server function that merely recalculates client-submitted inputs is not authoritative.
+2. **Provider completion and release readiness:** finish Apple/Google provider setup and native-device recovery tests; configure Analytics event schemas and reviewed Remote Config settings before their consent-gated adapters can be enabled; then address LevelPlay, Unity IAP, trusted cross-device timers, legal review, dashboard setup and release work. UGS auth, leaderboard reads, Cloud Save, Analytics and Remote Config stay disabled until their configuration and compliance prerequisites are ready.
 
 This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
+
+**Guided first-session objective tracker completed:** new games receive an optional HUD card that advances through an operational Lumber Camp, a successful harvest run, an operational Warehouse, a crafted recipe, a cleared called wave, and a distinct-world landing. Guide actions now open the operational local Lumber Camp, Refinery or Alarm directly, falling back to the relevant build tab when absent; map and Atlas actions remain available, and the full tutorial remains replayable. Skip state is stored in the existing v2 save settings, legacy saves do not get unexpectedly interrupted, and resetting progress starts the guide again. A successful harvest-run counter is persisted with the existing stats and is not included in Frontier Score. Initial validation: full EditMode including Slow 603 passed / 2 runtime-specific allocation skips (605 total); PlayMode 19 passed; all five editor checks passed; standard/narrow guide captures 6/6 without harness errors.
+
+**Contextual guidance and funnel hooks completed:** static, non-blocking arrows identify the current objective beside actionable shop, harvest, recipe and wave controls. Relevant shop entries are prioritised without reordering the others; only one affordable recipe is pointed out, disabled actions have no pointer, and skipping removes the hints. Eight funnel cases cover consent opt-out/withdrawal, no retrospective activity or retries, provider failure reporting, duplicate refresh/regression suppression, save reset and payload minimisation. Events contain only step/objective; the local save identity and debug previews are never transmitted. No analytics provider is activated. Full EditMode after funnel integration: 652 passed / 2 runtime skips; full PlayMode after contextual guidance: 29 passed. Four final standard/narrow phone captures have zero errors, overflow, undersized text or undersized touch targets; Layout passed.
+
+**Actionable empty states completed:** backpack, undeveloped base, warehouse, fuel reserve, harvester hopper and relay screens explain the next real action rather than inviting impossible transfers. Empty backpack/storage paths open a compatible operational local gatherer or Gather Shop without granting items; a relay with no remote sources opens the map. Two rendered regressions cover these routes. Full PlayMode after this slice: 32 passed, Layout passed, four phone captures passed all harness thresholds. The empty-pack capture restores every carried resource in `finally` so later captures/devices retain their baseline. Broader onboarding usability, provider activation and physical-device completion remain open.
+
+**Harvest mini-game pause and abandon completed:** every harvest game now has a pause control with resume and a two-step abandon confirmation. Abandoning closes the run without resources or progression; the UI explains that outcome before confirmation. The game automatically pauses when the app loses focus, and Hyperspace Run retains its existing pause/finish-trip semantics. Validation: full PlayMode 20 passed; standard and narrow phone captures of pause and abandon confirmation completed (4 shots, 0 harness errors).
 
 **Additional structure behaviors completed:** Cargo Depot provides its authored shared-buffer slots and, when operational, pools this planet's operational Warehouses and its own buffer for structure construction, structure upgrades and recipe inputs. Inputs spend from the backpack first, then pooled storage; crafted outputs stay in the backpack. Fuel Depot reserves and travel fuel remain isolated, and other planets are never accessible. Recipe affordability/counts and the storage UI reflect the pool. Hangar discounts trips leaving its planet. Shield Pylon increases local reactor maximum health; Repair Bay restores reactor health during that planet's called wave. Missile Silo deals splash damage and Tesla Coil chains diminishing damage between nearby wave enemies; neither enables attacks against another planet. Biodome now requires actual Harvest-method deposits, presents only plant-growth resources (not ordinary tree deposits), and launches active harvesting through the existing chop minigame under a HARVEST action. Validation: EditMode including Slow 566 passed / 2 runtime-specific allocation skips, PlayMode 19 passed, all five editor checks passed. Eight standard/narrow phone captures for Cargo Depot, Hangar, Shield Pylon and refinery panels reported zero errors, overflow, undersized text or undersized touch targets.
 
@@ -648,6 +967,8 @@ This sequence is a delivery plan, not a claim that those systems are implemented
 
 **Manual Cloud Save comparison, backup, restore and undo completed (disabled by default):** Settings explicitly compares the current device snapshot with the account's cloud snapshot, displays differing revisions without assuming which is newer progress, and allows a confirmed one-way backup or restore. Both create and replace uploads require a second confirmation; writes re-read the cloud record and use its current write lock. Restore rechecks the cloud payload/lock, validates schema and generator compatibility, preserves the current local save in a separate one-deep backup, applies the selected snapshot, and offers a second-confirmation local undo. Ordinary saves do not rotate that restore point; player-requested reset removes all recovery copies. No automatic upload or sync is added; Cloud Save remains off by default and no live UGS request was made. Validation: full EditMode 601 passed / 2 runtime-specific allocation skips (603 total); PlayMode 19 passed; standard and narrow Settings captures 2/2 had zero errors, overflow, undersized text or undersized touch targets. The Settings captures used the default disabled provider, so cloud-enabled controls and native account flows remain unverified.
 
+**Analytics and Remote Config adapters implemented (disabled by default):** the Analytics adapter explicitly starts collection only after the separate analytics opt-in and stops it on withdrawal; Frontier does not queue pre-consent events. Remote Config requires online-services consent and an already signed-in identity, never initiating sign-in; responses are discarded if consent is withdrawn during a fetch, even after re-opt-in. Both require explicit configuration flags and a linked Unity project. The scene now selects a validated local travel-only snapshot for the same signed-in player, or the bundled economy without waiting for the network, and fetches once per existing identity in the background. Cold startup without an initialized identity uses bundled defaults. Registered `travel.*` keys apply all-or-nothing with finite ranges and related duration/plating checks; other keys are rejected. New responses are staged for the next scene startup so running prices, trips, content assets, score rules and purchase rewards remain unchanged. Bundled digest changes invalidate the cache; consent withdrawal removes it and invalidates pending responses. No live providers are enabled. General catalog/event tuning, dashboard schemas/settings, privacy/deletion review and native-device tests remain open.
+
 **Harvest expansion completed:** Siphon uses a seven-pulse pressure-window game; Excavation uses a sonar echo-grid puzzle; Salvage is a tap-to-catch 3D wreckage run. Their dedicated Siphon/Scanner/Claw ladders are enabled, generator methods map to matching minigames, and Siphon Rig, Excavator and Salvage Yard now use the corresponding gather loops. EditMode coverage checks mappings, tool progression, and structure behavior, including preservation of synthetic mineable scrap beside dedicated salvage deposits. Validation: full EditMode 524 passed / 2 runtime-specific allocation skips, PlayMode 19 passed, all five editor checks passed. Phone captures of all three new games had 0 errors, 0 overflow findings and 0 undersized-touch-target findings.
 
 **Fuel Depot behavior completed:** Fuel Depot is buildable behind its existing Fuel Logistics research/tier gates and opens the shared drag-and-drop storage panel. It accepts only resources with ship-fuel value, stores reserves on the current planet, grows its dedicated fuel-slot count by level, and expands fuel stack size using its authored energy-stack bonus. The build listing, upgrade summary, panel copy and procedural fallback model identify it as fuel storage; the Cargo Depot now separately provides pooled planet storage. Validation: focused storage tests 14/14 passed; full EditMode including Slow 551 passed / 2 runtime-specific allocation skips, PlayMode 19 passed, all five editor checks passed. Narrow-phone shop and depot captures reported zero errors, overflow, undersized text or undersized touch targets.
@@ -664,9 +985,9 @@ No new screenshot sweep or on-device/IL2CPP validation was performed.
 The map and travel branches are integrated with the content work. The bounded procedural star map has galaxy/sector/system views, search,
 survey filters, a detailed Worlds card and curved routes. Travel plans multi-leg routes with energy payment, hazard-plating diagnostics,
 refunds and timed autopilot. Manual legs invoke the new Hyperspace Run renderer and simulation; the result flow awards loot, XP and fuel refunds.
-The request carries the route's planned leg duration, but the run length is currently determined from distance/danger rather than that duration.
-Hyperspace supports pause/finish, revive offers, results, controls and harness scenes; the simulation core and its fairness solver remain
-deterministic and unchanged.
+Manual Hyperspace runs now consume the route planner's per-leg duration; boss routes retain the minimum wave phase and complete boss slot.
+Requests without a planned duration keep the simulation's distance-based default. Hyperspace supports pause/finish, revive offers, results,
+controls and harness scenes; the simulation core and its fairness solver remain deterministic and unchanged.
 
 The model calibration pass also normalized all 14 source imports and verified the 30 authored planet models at a consistent on-screen diameter,
 structure scale, ground radii and route geometry.
@@ -675,9 +996,9 @@ structure scale, ground radii and route geometry.
 economy lab 127 passed; all five editor checks passed. Seven integrated phone captures (map plus six Hyperspace states) reported zero errors,
 zero text/touch-target/overflow lint findings.
 
-Still open: remaining economy and structure behaviours; pins; global name indexing and directed next-stop controls;
-device/GPU map budget and IL2CPP/ARM64 determinism; binding the mini-game duration to route time; resumable/abortable multi-leg flights and
-real jump/scanner/plating unlocks; monetization and live services.
+Still open: remaining economy and structure behaviours; global name indexing and directed next-stop controls;
+device/GPU map budget and IL2CPP/ARM64 determinism; resumable/abortable multi-leg flights and real jump/scanner/plating unlocks; monetization
+and live services.
 
 ### Foundation rework: runtime planet model, session split, save v2 (done on this branch)
 

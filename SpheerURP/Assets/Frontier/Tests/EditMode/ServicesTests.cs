@@ -22,6 +22,7 @@ namespace Frontier.Tests
             public bool IsConfigured { get { return true; } }
             public int initializeCount;
             public int showCount;
+            public TaskCompletionSource<ServiceResult<RewardedAdResult>> pendingShow;
             public Task<ServiceResult> InitializeAsync()
             {
                 initializeCount++;
@@ -30,6 +31,7 @@ namespace Frontier.Tests
             public Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId)
             {
                 showCount++;
+                if (pendingShow != null) return pendingShow.Task;
                 return Task.FromResult(ServiceResult<RewardedAdResult>.Success(new RewardedAdResult(true, placementId)));
             }
         }
@@ -39,6 +41,8 @@ namespace Frontier.Tests
             public bool IsConfigured { get { return true; } }
             public int initializeCount;
             public int eventCount;
+            public bool dataCollectionAllowed;
+            public void SetDataCollectionAllowed(bool allowed) { dataCollectionAllowed = allowed; }
             public Task<ServiceResult> InitializeAsync()
             {
                 initializeCount++;
@@ -51,8 +55,31 @@ namespace Frontier.Tests
             }
         }
 
+        sealed class TestRemoteConfigService : IRemoteConfigService
+        {
+            public bool IsConfigured { get { return true; } }
+            public int initializeCount;
+            public int fetchCount;
+            public TaskCompletionSource<ServiceResult<IReadOnlyDictionary<string, string>>> pendingFetch;
+            public Task<ServiceResult> InitializeAsync()
+            {
+                initializeCount++;
+                return Task.FromResult(ServiceResult.Success());
+            }
+            public Task<ServiceResult<IReadOnlyDictionary<string, string>>> FetchAsync()
+            {
+                fetchCount++;
+                if (pendingFetch != null) return pendingFetch.Task;
+                IReadOnlyDictionary<string, string> settings =
+                    new Dictionary<string, string> { { "harvest_yield", "1.25" } };
+                return Task.FromResult(ServiceResult<IReadOnlyDictionary<string, string>>.Success(settings));
+            }
+        }
+
         sealed class TestAuthService : IAuthService
         {
+            public string playerId = "player";
+            public string CurrentPlayerId { get { return playerId; } }
             public bool IsConfigured { get { return true; } }
             public bool CanRecoverAccount { get { return true; } }
             public string RecoveryProviderName { get { return "Test"; } }
@@ -75,7 +102,14 @@ namespace Frontier.Tests
                 recoverySignInCount++;
                 return Task.FromResult(ServiceResult<AuthIdentity>.Success(new AuthIdentity("player", false)));
             }
-            public Task<ServiceResult> DeleteAccountAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public int deleteCount;
+            public ServiceResult deleteResult = ServiceResult.Success();
+            public Task<ServiceResult> DeleteAccountAsync(string expectedPlayerId)
+            {
+                Assert.AreEqual(playerId, expectedPlayerId);
+                deleteCount++;
+                return Task.FromResult(deleteResult);
+            }
         }
 
         sealed class TestLeaderboardService : ILeaderboardService
@@ -96,6 +130,15 @@ namespace Frontier.Tests
             public bool IsConfigured { get { return true; } }
             public int readCount;
             public int writeCount;
+            public int deleteCount;
+            public ServiceResult deleteResult = ServiceResult.Success();
+            public Func<Task<ServiceResult>> delete;
+            public Task<ServiceResult> DeleteSaveAsync(string expectedPlayerId)
+            {
+                Assert.AreEqual("player", expectedPlayerId);
+                deleteCount++;
+                return delete != null ? delete() : Task.FromResult(deleteResult);
+            }
             public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
             public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
             {
@@ -116,6 +159,103 @@ namespace Frontier.Tests
             var unavailable = new UnavailableFrontierProvider();
             return new FrontierServices(consent, ads, unavailable, unavailable, unavailable, unavailable,
                 analytics, unavailable, new LocalTimeService(), unavailable);
+        }
+
+        static FrontierServices DeletionServices(TestAuthService auth, TestCloudSaveService cloud)
+        {
+            var unavailable = new UnavailableFrontierProvider();
+            return new FrontierServices(new ConsentService(new MemoryConsentStore()), unavailable, unavailable,
+                auth, unavailable, cloud, unavailable, unavailable, new LocalTimeService(), unavailable);
+        }
+
+        [Test]
+        public async Task AccountDeletion_RemainsAvailableAfterWithdrawalAndNeverSignsInOrUploads()
+        {
+            var auth = new TestAuthService();
+            var cloud = new TestCloudSaveService();
+            var services = DeletionServices(auth, cloud);
+            Assert.IsFalse(services.Consent.Current.onlineServicesAllowed);
+            cloud.delete = () =>
+            {
+                Assert.AreEqual(0, auth.deleteCount, "Cloud removal must precede account deletion.");
+                return Task.FromResult(ServiceResult.Success());
+            };
+            var result = await services.DeleteCurrentAccountAndSaveAsync("player");
+            Assert.IsTrue(result.succeeded, result.message);
+            Assert.AreEqual(1, cloud.deleteCount);
+            Assert.AreEqual(1, auth.deleteCount);
+            Assert.AreEqual(0, auth.signInCount + auth.recoverySignInCount + auth.linkRecoveryCount);
+            Assert.AreEqual(0, cloud.writeCount);
+            Assert.IsFalse(services.AccountDeletionBusy);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, (await services.CloudSave.ReadAsync()).status);
+        }
+
+        [Test]
+        public async Task AccountDeletion_RejectsMissingChangedAndUnconfiguredIdentityBeforeDeleting()
+        {
+            var auth = new TestAuthService();
+            var cloud = new TestCloudSaveService();
+            var services = DeletionServices(auth, cloud);
+            foreach (string id in new[] { null, "", "different-player" })
+                Assert.AreEqual(ServiceStatus.InvalidRequest, (await services.DeleteCurrentAccountAndSaveAsync(id)).status);
+            auth.playerId = "";
+            Assert.AreEqual(ServiceStatus.InvalidRequest, (await services.DeleteCurrentAccountAndSaveAsync("player")).status);
+            Assert.AreEqual(0, cloud.deleteCount + auth.deleteCount);
+            var offline = FrontierServices.CreateOffline(new ConsentService(new MemoryConsentStore()));
+            Assert.AreEqual(ServiceStatus.NotConfigured, (await offline.DeleteCurrentAccountAndSaveAsync("player")).status);
+        }
+
+        [Test]
+        public async Task AccountDeletion_CloudFailurePreservesAccountAndAllowsExplicitRetry()
+        {
+            var auth = new TestAuthService();
+            var cloud = new TestCloudSaveService { deleteResult = ServiceResult.Failed("Write-lock conflict") };
+            var services = DeletionServices(auth, cloud);
+            var result = await services.DeleteCurrentAccountAndSaveAsync("player");
+            Assert.IsFalse(result.succeeded);
+            StringAssert.Contains("Write-lock conflict", result.message);
+            Assert.AreEqual(0, auth.deleteCount);
+            cloud.deleteResult = ServiceResult.Success();
+            Assert.IsTrue((await services.DeleteCurrentAccountAndSaveAsync("player")).succeeded);
+            Assert.AreEqual(2, cloud.deleteCount);
+            Assert.AreEqual(1, auth.deleteCount);
+        }
+
+        [Test]
+        public async Task AccountDeletion_ReportsPartialFailureAndRechecksIdentityAfterCloudRemoval()
+        {
+            var auth = new TestAuthService { deleteResult = ServiceResult.Failed("Account offline") };
+            var cloud = new TestCloudSaveService();
+            var services = DeletionServices(auth, cloud);
+            var result = await services.DeleteCurrentAccountAndSaveAsync("player");
+            Assert.IsFalse(result.succeeded);
+            StringAssert.Contains("cloud save was deleted", result.message);
+            StringAssert.Contains("Account offline", result.message);
+            cloud.delete = () => { auth.playerId = "other"; return Task.FromResult(ServiceResult.Success()); };
+            result = await services.DeleteCurrentAccountAndSaveAsync("player");
+            Assert.IsFalse(result.succeeded);
+            StringAssert.Contains("No account was deleted", result.message);
+            Assert.AreEqual(1, auth.deleteCount);
+        }
+
+        [Test]
+        public async Task AccountDeletion_BlocksDuplicatesAndSurfacesThrownProviderErrors()
+        {
+            var auth = new TestAuthService();
+            var pending = new TaskCompletionSource<ServiceResult>();
+            var cloud = new TestCloudSaveService { delete = () => pending.Task };
+            var services = DeletionServices(auth, cloud);
+            var first = services.DeleteCurrentAccountAndSaveAsync("player");
+            Assert.IsTrue(services.AccountDeletionBusy);
+            Assert.AreEqual(ServiceStatus.InvalidRequest, (await services.DeleteCurrentAccountAndSaveAsync("player")).status);
+            Assert.AreEqual(1, cloud.deleteCount);
+            pending.SetException(new InvalidOperationException("Provider unavailable"));
+            var result = await first;
+            Assert.IsFalse(result.succeeded);
+            StringAssert.Contains("before cloud-save removal was confirmed", result.message);
+            StringAssert.Contains("Provider unavailable", result.message);
+            Assert.AreEqual(0, auth.deleteCount);
+            Assert.IsFalse(services.AccountDeletionBusy);
         }
 
         [Test]
@@ -234,8 +374,10 @@ namespace Frontier.Tests
             Assert.AreEqual(0, ads.showCount);
             Assert.AreEqual(0, analytics.initializeCount);
             Assert.AreEqual(0, analytics.eventCount);
+            Assert.IsFalse(analytics.dataCollectionAllowed);
 
             consent.SavePreferences(true, false, false);
+            Assert.IsTrue(analytics.dataCollectionAllowed);
             Assert.AreEqual(ServiceStatus.Success, services.Analytics.InitializeAsync().Result.status);
             Assert.AreEqual(ServiceStatus.Success, services.Analytics.RecordEvent("session_start", null).status);
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Ads.InitializeAsync().Result.status);
@@ -256,6 +398,90 @@ namespace Frontier.Tests
             Assert.AreEqual(ServiceStatus.ConsentRequired, services.Analytics.RecordEvent("session_end", null).status);
             Assert.AreEqual(1, ads.showCount);
             Assert.AreEqual(1, analytics.eventCount);
+            Assert.IsFalse(analytics.dataCollectionAllowed);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task RewardedAds_DiscardInFlightRewardsAfterConsentWithdrawal(bool optBackIn)
+        {
+            var consent = new ConsentService(new MemoryConsentStore());
+            consent.SavePreferences(false, true, false);
+            var ads = new TestAdsService
+            {
+                pendingShow = new TaskCompletionSource<ServiceResult<RewardedAdResult>>()
+            };
+            var services = Services(consent, ads, new TestAnalyticsService());
+            var request = services.Ads.ShowRewardedAsync("free-shards");
+            Assert.AreEqual(1, ads.showCount);
+            consent.SavePreferences(false, false, false);
+            if (optBackIn) consent.SavePreferences(false, true, false);
+            ads.pendingShow.SetResult(ServiceResult<RewardedAdResult>.Success(
+                new RewardedAdResult(true, "free-shards")));
+            var result = await request;
+            Assert.AreEqual(ServiceStatus.ConsentRequired, result.status);
+            Assert.IsFalse(result.value.rewardEarned);
+        }
+
+        [Test]
+        public async Task RemoteConfig_RequiresOnlineConsentAndStopsAfterWithdrawal()
+        {
+            var consent = new ConsentService(new MemoryConsentStore());
+            var remoteConfig = new TestRemoteConfigService();
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(consent, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, remoteConfig, new LocalTimeService(), unavailable);
+
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                (await services.RemoteConfig.InitializeAsync()).status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                (await services.RemoteConfig.FetchAsync()).status);
+            Assert.AreEqual(0, remoteConfig.initializeCount + remoteConfig.fetchCount);
+
+            consent.SavePreferences(false, false, true);
+            Assert.AreEqual(ServiceStatus.Success,
+                (await services.RemoteConfig.InitializeAsync()).status);
+            ServiceResult<IReadOnlyDictionary<string, string>> result =
+                await services.RemoteConfig.FetchAsync();
+            Assert.AreEqual(ServiceStatus.Success, result.status);
+            Assert.AreEqual("1.25", result.value["harvest_yield"]);
+            Assert.AreEqual(1, remoteConfig.initializeCount);
+            Assert.AreEqual(1, remoteConfig.fetchCount);
+
+            remoteConfig.pendingFetch =
+                new TaskCompletionSource<ServiceResult<IReadOnlyDictionary<string, string>>>();
+            Task<ServiceResult<IReadOnlyDictionary<string, string>>> pending =
+                services.RemoteConfig.FetchAsync();
+            consent.SavePreferences(false, false, false);
+            remoteConfig.pendingFetch.SetResult(ServiceResult<IReadOnlyDictionary<string, string>>.Success(
+                new Dictionary<string, string> { { "harvest_yield", "2.0" } }));
+            Assert.AreEqual(ServiceStatus.ConsentRequired, (await pending).status,
+                "A response must not be applied after online consent is withdrawn.");
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                (await services.RemoteConfig.FetchAsync()).status);
+            Assert.AreEqual(2, remoteConfig.fetchCount);
+        }
+
+        [Test]
+        public async Task RemoteConfig_WithdrawalAndReOptInStillDiscardThePendingResponse()
+        {
+            var consent = new ConsentService(new MemoryConsentStore());
+            consent.SavePreferences(false, false, true);
+            var remote = new TestRemoteConfigService
+            {
+                pendingFetch = new TaskCompletionSource<ServiceResult<IReadOnlyDictionary<string, string>>>()
+            };
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(consent, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, remote, new LocalTimeService(), unavailable);
+            var pending = services.RemoteConfig.FetchAsync();
+            consent.SavePreferences(false, false, false);
+            consent.SavePreferences(false, false, true);
+            remote.pendingFetch.SetResult(ServiceResult<IReadOnlyDictionary<string, string>>.Success(
+                new Dictionary<string, string> { { "travel.k", "0.5" } }));
+            Assert.AreEqual(ServiceStatus.ConsentRequired, (await pending).status);
+            remote.pendingFetch = null;
+            Assert.IsTrue((await services.RemoteConfig.FetchAsync()).succeeded);
         }
 
         [Test]
@@ -420,6 +646,32 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void UnityServicesConfig_AnalyticsAndRemoteConfigRemainDisabledByDefault()
+        {
+            var config = ScriptableObject.CreateInstance<FrontierUnityServicesConfig>();
+            try
+            {
+                Assert.IsFalse(config.enableAnalytics);
+                Assert.IsFalse(config.enableRemoteConfig);
+                Assert.IsFalse(config.CanUseAnalytics);
+                Assert.IsFalse(config.CanUseRemoteConfig);
+
+                config.enableAnalytics = true;
+                Assert.AreEqual(!string.IsNullOrWhiteSpace(Application.cloudProjectId),
+                    config.CanUseAnalytics);
+                config.enableRemoteConfig = true;
+                config.enableOnlineServices = true;
+                config.privacyPolicyUrl = "https://example.com/privacy";
+                Assert.AreEqual(!string.IsNullOrWhiteSpace(Application.cloudProjectId),
+                    config.CanUseRemoteConfig);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(config);
+            }
+        }
+
+        [Test]
         public void UnityServicesFactory_LeavesProvidersUnavailableUntilConfigured()
         {
             var config = ScriptableObject.CreateInstance<FrontierUnityServicesConfig>();
@@ -429,7 +681,7 @@ namespace Frontier.Tests
                 config.leaderboardId = string.Empty;
                 config.privacyPolicyUrl = string.Empty;
                 var consent = new ConsentService(new MemoryConsentStore());
-                consent.SavePreferences(false, false, true);
+                consent.SavePreferences(true, false, true);
                 var services = FrontierUnityServicesFactory.Create(
                     consent, config);
 
@@ -437,9 +689,13 @@ namespace Frontier.Tests
                 Assert.IsFalse(services.Authentication.CanRecoverAccount);
                 Assert.IsFalse(services.Leaderboards.IsConfigured);
                 Assert.IsFalse(services.CloudSave.IsConfigured);
+                Assert.IsFalse(services.Analytics.IsConfigured);
+                Assert.IsFalse(services.RemoteConfig.IsConfigured);
                 Assert.AreEqual(ServiceStatus.NotConfigured, services.Authentication.InitializeAsync().Result.status);
                 Assert.AreEqual(ServiceStatus.NotConfigured, services.Leaderboards.InitializeAsync().Result.status);
                 Assert.AreEqual(ServiceStatus.NotConfigured, services.CloudSave.InitializeAsync().Result.status);
+                Assert.AreEqual(ServiceStatus.NotConfigured, services.Analytics.InitializeAsync().Result.status);
+                Assert.AreEqual(ServiceStatus.NotConfigured, services.RemoteConfig.InitializeAsync().Result.status);
                 Assert.AreEqual(string.Empty, services.PrivacyPolicyUrl);
             }
             finally
@@ -458,6 +714,8 @@ namespace Frontier.Tests
             Assert.IsFalse(config.enableOnlineServices);
             Assert.IsFalse(config.enableCloudSave);
             Assert.IsFalse(config.enableAccountRecovery);
+            Assert.IsFalse(config.enableAnalytics);
+            Assert.IsFalse(config.enableRemoteConfig);
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.leaderboardId));
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.privacyPolicyUrl));
         }

@@ -77,11 +77,13 @@ namespace Frontier.Services
     {
         public readonly string productId;
         public readonly string transactionId;
+        public readonly string receiptPayload;
 
-        public PurchaseReceipt(string productId, string transactionId)
+        public PurchaseReceipt(string productId, string transactionId, string receiptPayload = "")
         {
             this.productId = productId ?? string.Empty;
             this.transactionId = transactionId ?? string.Empty;
+            this.receiptPayload = receiptPayload ?? string.Empty;
         }
     }
 
@@ -169,12 +171,13 @@ namespace Frontier.Services
 
     public interface IAuthService : IServiceEndpoint
     {
+        string CurrentPlayerId { get; }
         bool CanRecoverAccount { get; }
         string RecoveryProviderName { get; }
         Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync();
         Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync();
         Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync();
-        Task<ServiceResult> DeleteAccountAsync();
+        Task<ServiceResult> DeleteAccountAsync(string expectedPlayerId);
     }
 
     public interface ILeaderboardService : IServiceEndpoint
@@ -186,10 +189,12 @@ namespace Frontier.Services
     {
         Task<ServiceResult<CloudSaveRecord>> ReadAsync();
         Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock);
+        Task<ServiceResult> DeleteSaveAsync(string expectedPlayerId);
     }
 
     public interface IAnalyticsService : IServiceEndpoint
     {
+        void SetDataCollectionAllowed(bool allowed);
         ServiceResult RecordEvent(string eventName, IReadOnlyDictionary<string, string> parameters);
     }
 
@@ -241,6 +246,7 @@ namespace Frontier.Services
     public interface IConsentService
     {
         ConsentPreferences Current { get; }
+        event Action<ConsentPreferences> PreferencesChanged;
         void SavePreferences(bool analyticsAllowed, bool adsAllowed, bool onlineServicesAllowed);
         void Reset();
     }
@@ -252,6 +258,8 @@ namespace Frontier.Services
         readonly IConsentStore store;
         readonly Func<DateTimeOffset> utcNow;
         ConsentPreferences current;
+
+        public event Action<ConsentPreferences> PreferencesChanged;
 
         public ConsentService(IConsentStore store, Func<DateTimeOffset> utcNow = null)
         {
@@ -268,15 +276,19 @@ namespace Frontier.Services
 
         public void SavePreferences(bool analyticsAllowed, bool adsAllowed, bool onlineServicesAllowed)
         {
-            current = new ConsentPreferences(CurrentPolicyVersion, true, analyticsAllowed, adsAllowed, onlineServicesAllowed,
+            ConsentPreferences updated = new ConsentPreferences(CurrentPolicyVersion, true, analyticsAllowed, adsAllowed, onlineServicesAllowed,
                 utcNow().UtcDateTime.Ticks);
-            store.Save(current);
+            store.Save(updated);
+            current = updated;
+            PreferencesChanged?.Invoke(current);
         }
 
         public void Reset()
         {
-            current = new ConsentPreferences(CurrentPolicyVersion, false, false, false, false, 0);
-            store.Save(current);
+            ConsentPreferences updated = new ConsentPreferences(CurrentPolicyVersion, false, false, false, false, 0);
+            store.Save(updated);
+            current = updated;
+            PreferencesChanged?.Invoke(current);
         }
     }
 
@@ -300,13 +312,26 @@ namespace Frontier.Services
             return inner.InitializeAsync();
         }
 
-        public Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId)
+        public async Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId)
         {
             if (!consent.Current.hasDecision || !consent.Current.adsAllowed)
-                return Task.FromResult(ServiceResult<RewardedAdResult>.ConsentRequired("advertising"));
+                return ServiceResult<RewardedAdResult>.ConsentRequired("advertising");
             if (string.IsNullOrWhiteSpace(placementId))
-                return Task.FromResult(ServiceResult<RewardedAdResult>.InvalidRequest("A rewarded-ad placement is required."));
-            return inner.ShowRewardedAsync(placementId);
+                return ServiceResult<RewardedAdResult>.InvalidRequest("A rewarded-ad placement is required.");
+            bool withdrawn = false;
+            void ObserveConsent(ConsentPreferences preferences)
+            {
+                if (!preferences.hasDecision || !preferences.adsAllowed) withdrawn = true;
+            }
+            consent.PreferencesChanged += ObserveConsent;
+            try
+            {
+                var result = await inner.ShowRewardedAsync(placementId);
+                if (withdrawn || !consent.Current.hasDecision || !consent.Current.adsAllowed)
+                    return ServiceResult<RewardedAdResult>.ConsentRequired("advertising");
+                return result;
+            }
+            finally { consent.PreferencesChanged -= ObserveConsent; }
         }
     }
 
@@ -319,9 +344,22 @@ namespace Frontier.Services
         {
             this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
             this.consent = consent ?? throw new ArgumentNullException(nameof(consent));
+            this.inner.SetDataCollectionAllowed(consent.Current.hasDecision && consent.Current.analyticsAllowed);
+            this.consent.PreferencesChanged += OnPreferencesChanged;
         }
 
         public bool IsConfigured { get { return inner.IsConfigured; } }
+
+        public void SetDataCollectionAllowed(bool allowed)
+        {
+            inner.SetDataCollectionAllowed(allowed &&
+                consent.Current.hasDecision && consent.Current.analyticsAllowed);
+        }
+
+        void OnPreferencesChanged(ConsentPreferences preferences)
+        {
+            SetDataCollectionAllowed(preferences.hasDecision && preferences.analyticsAllowed);
+        }
 
         public Task<ServiceResult> InitializeAsync()
         {
@@ -340,6 +378,54 @@ namespace Frontier.Services
         }
     }
 
+    sealed class ConsentGatedRemoteConfigService : IRemoteConfigService
+    {
+        readonly IRemoteConfigService inner;
+        readonly IConsentService consent;
+
+        public ConsentGatedRemoteConfigService(IRemoteConfigService inner, IConsentService consent)
+        {
+            this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            this.consent = consent ?? throw new ArgumentNullException(nameof(consent));
+        }
+
+        public bool IsConfigured { get { return inner.IsConfigured; } }
+
+        public Task<ServiceResult> InitializeAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? inner.InitializeAsync()
+                : Task.FromResult(ServiceResult.ConsentRequired("online remote configuration"));
+        }
+
+        public async Task<ServiceResult<IReadOnlyDictionary<string, string>>> FetchAsync()
+        {
+            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
+                ? await FetchWithConsentRecheckAsync()
+                : ServiceResult<IReadOnlyDictionary<string, string>>.ConsentRequired(
+                    "online remote configuration");
+        }
+
+        async Task<ServiceResult<IReadOnlyDictionary<string, string>>> FetchWithConsentRecheckAsync()
+        {
+            bool withdrawn = false;
+            void ObserveConsent(ConsentPreferences preferences)
+            {
+                if (!preferences.hasDecision || !preferences.onlineServicesAllowed) withdrawn = true;
+            }
+            consent.PreferencesChanged += ObserveConsent;
+            try
+            {
+                var result = await inner.FetchAsync();
+                if (withdrawn || !consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
+                    return ServiceResult<IReadOnlyDictionary<string, string>>.ConsentRequired(
+                        "online remote configuration");
+                return result;
+            }
+            finally { consent.PreferencesChanged -= ObserveConsent; }
+        }
+    }
+
     sealed class ConsentGatedAuthenticationService : IAuthService
     {
         readonly IAuthService inner;
@@ -354,6 +440,7 @@ namespace Frontier.Services
         public bool IsConfigured { get { return inner.IsConfigured; } }
         public bool CanRecoverAccount { get { return inner.CanRecoverAccount; } }
         public string RecoveryProviderName { get { return inner.RecoveryProviderName; } }
+        public string CurrentPlayerId { get { return inner.CurrentPlayerId; } }
 
         public Task<ServiceResult> InitializeAsync()
         {
@@ -383,11 +470,10 @@ namespace Frontier.Services
                 : Task.FromResult(ServiceResult<AuthIdentity>.ConsentRequired("online account services"));
         }
 
-        public Task<ServiceResult> DeleteAccountAsync()
+        public Task<ServiceResult> DeleteAccountAsync(string expectedPlayerId)
         {
-            return consent.Current.hasDecision && consent.Current.onlineServicesAllowed
-                ? inner.DeleteAccountAsync()
-                : Task.FromResult(ServiceResult.ConsentRequired("online account services"));
+            // Erasure must remain available after consent withdrawal; it never signs the player in.
+            return inner.DeleteAccountAsync(expectedPlayerId);
         }
     }
 
@@ -458,6 +544,11 @@ namespace Frontier.Services
                 return Task.FromResult(ServiceResult<CloudSaveRecord>.InvalidRequest("A cloud-save payload is required."));
             return inner.WriteAsync(payload, writeLock);
         }
+
+        public Task<ServiceResult> DeleteSaveAsync(string expectedPlayerId)
+        {
+            return inner.DeleteSaveAsync(expectedPlayerId);
+        }
     }
 
     public sealed class UnavailableFrontierProvider : IAdsService, IPurchaseService, IAuthService,
@@ -477,20 +568,24 @@ namespace Frontier.Services
         public Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync()
         { return Task.FromResult(ServiceResult<AuthIdentity>.NotConfigured("Authentication")); }
         public bool CanRecoverAccount { get { return false; } }
+        public string CurrentPlayerId { get { return string.Empty; } }
         public string RecoveryProviderName { get { return string.Empty; } }
         public Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync()
         { return Task.FromResult(ServiceResult<AuthIdentity>.NotConfigured("Account recovery")); }
         public Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync()
         { return Task.FromResult(ServiceResult<AuthIdentity>.NotConfigured("Account recovery")); }
-        public Task<ServiceResult> DeleteAccountAsync() { return Task.FromResult(ServiceResult.NotConfigured("Authentication")); }
+        public Task<ServiceResult> DeleteAccountAsync(string expectedPlayerId) { return Task.FromResult(ServiceResult.NotConfigured("Authentication")); }
         public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
         { return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.NotConfigured("Leaderboards")); }
         public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
         { return Task.FromResult(ServiceResult<CloudSaveRecord>.NotConfigured("Cloud Save")); }
         public Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
         { return Task.FromResult(ServiceResult<CloudSaveRecord>.NotConfigured("Cloud Save")); }
+        public Task<ServiceResult> DeleteSaveAsync(string expectedPlayerId)
+        { return Task.FromResult(ServiceResult.NotConfigured("Cloud Save")); }
         public ServiceResult RecordEvent(string eventName, IReadOnlyDictionary<string, string> parameters)
         { return ServiceResult.NotConfigured("Analytics"); }
+        public void SetDataCollectionAllowed(bool allowed) { }
         public Task<ServiceResult<IReadOnlyDictionary<string, string>>> FetchAsync()
         { return Task.FromResult(ServiceResult<IReadOnlyDictionary<string, string>>.NotConfigured("Remote Config")); }
         public Task<ServiceResult> RequestPermissionAsync() { return Task.FromResult(ServiceResult.NotConfigured("Notifications")); }
@@ -518,6 +613,37 @@ namespace Frontier.Services
         public readonly INotificationService Notifications;
         public readonly string LeaderboardId;
         public readonly string PrivacyPolicyUrl;
+        public bool AccountDeletionBusy { get; private set; }
+
+        public async Task<ServiceResult> DeleteCurrentAccountAndSaveAsync(string expectedPlayerId)
+        {
+            if (AccountDeletionBusy)
+                return ServiceResult.InvalidRequest("Account deletion is already in progress.");
+            if (!Authentication.IsConfigured || !CloudSave.IsConfigured)
+                return ServiceResult.NotConfigured("Account and cloud-save deletion");
+            if (string.IsNullOrEmpty(expectedPlayerId) || Authentication.CurrentPlayerId != expectedPlayerId)
+                return ServiceResult.InvalidRequest("The signed-in account changed. Review deletion again.");
+            AccountDeletionBusy = true;
+            bool cloudDeleted = false;
+            try
+            {
+                ServiceResult removed = await CloudSave.DeleteSaveAsync(expectedPlayerId);
+                if (!removed.succeeded) return removed;
+                cloudDeleted = true;
+                if (Authentication.CurrentPlayerId != expectedPlayerId)
+                    return ServiceResult.Failed("The cloud save was deleted, but the signed-in account changed. No account was deleted.");
+                ServiceResult deleted = await Authentication.DeleteAccountAsync(expectedPlayerId);
+                return deleted.succeeded ? ServiceResult.Success()
+                    : ServiceResult.Failed("The cloud save was deleted, but account deletion failed. Retry account deletion. " + deleted.message);
+            }
+            catch (Exception exception)
+            {
+                return ServiceResult.Failed((cloudDeleted
+                    ? "The cloud save was deleted, but account deletion failed. Retry account deletion. "
+                    : "Online deletion failed before cloud-save removal was confirmed. ") + exception.Message);
+            }
+            finally { AccountDeletionBusy = false; }
+        }
 
         public FrontierServices(IConsentService consent, IAdsService ads, IPurchaseService purchases,
             IAuthService authentication, ILeaderboardService leaderboards, ICloudSaveService cloudSave,
@@ -531,7 +657,7 @@ namespace Frontier.Services
             Leaderboards = new ConsentGatedLeaderboardService(leaderboards, consent);
             CloudSave = new ConsentGatedCloudSaveService(cloudSave, consent);
             Analytics = new ConsentGatedAnalyticsService(analytics, consent);
-            RemoteConfig = remoteConfig ?? throw new ArgumentNullException(nameof(remoteConfig));
+            RemoteConfig = new ConsentGatedRemoteConfigService(remoteConfig, consent);
             Time = time ?? throw new ArgumentNullException(nameof(time));
             Notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
             LeaderboardId = leaderboardId ?? string.Empty;

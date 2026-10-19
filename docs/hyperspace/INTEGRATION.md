@@ -14,7 +14,7 @@ The simulation source and its golden constants are unchanged.
 * **Presentation:** an isolated URP camera explicitly renders into a full-bleed UI Toolkit texture. One reusable vertex-colour mesh batches ships, hazards, bullets, pickups, star streaks and bounded event bursts. There are no per-entity GameObjects or per-step instantiate/destroy calls. Laser gate geometry comes directly from `Hazards.Gate`; turret and Guardian fan markers use the simulation's spread/count. Safe-area HUD shows hull, shields, bomb recharge, combo, score, route/encounter progress, overdrive and Guardian phase/health.
 * **Results/arrival:** results stay visible until Continue. The adapter returns `fuelRefundFraction` in the existing travel result's `quality` field, scales raw loot once, and leaves currency/XP crediting to `UIRoot.TravelSequence`. Abandoning still permits arrival but grants no refund, loot or XP. Removing the overlay or destroying the session abandons an unfinished run and completes the callback once.
 * **Revives:** absent a wallet/ad provider, `FrontierSettings.freeRevivesPerRun` defaults to one. Set it to zero when monetized revives ship. A non-null `TravelMinigames.ReviveOffer` replaces the free offer; it must answer on the Unity main thread. Duplicate/late callbacks cannot revive a finished or disposed session. Finish trip remains available while an offer is pending.
-* **Audio/debug:** procedural clips are synthesized at run startup, not per event. Ten reusable one-shot voices plus the engine bed and legacy UI source cap audio sources at twelve. Settings preserve assist and drag sensitivity; Debug exposes the performance overlay and an on-device comparison of all nine golden digests.
+* **Audio/debug:** procedural travel clips are synthesized at run startup, not per event. `AudioService` owns ten reusable one-shot voices shared with UI/combat cues plus an engine bed and music source (twelve sources total). The authored `FrontierAudio` mixer routes Music/SFX/UI separately; `Sfx` forwards legacy callers, and mute immediately stops active playback. Legacy synthesized cues use a bounded 64-clip numeric cache; eviction preserves clips still playing. Unseen randomized parameters still allocate when rendering a new clip, so the cache is not a zero-GC guarantee. Settings preserve assist and drag sensitivity; Debug exposes the performance overlay and an on-device comparison of all nine golden digests.
 
 ### Current-schema integration assumptions
 
@@ -269,7 +269,13 @@ Groups: **world** (`areaHalfWidth/Height, spawnDistance, despawnZ, nominalSpeed,
 
 ## 12. Encounter template authoring guide (designers)
 
-Templates are data in `src\Hyperspace\EncounterLibrary*.cs` (63 playable templates = 52 hand-designed + 11 solver-searched composites, plus the Guardian; files `EncounterLibrary.cs/.Mid/.Intense/.Composite/.Recipes/.Tiers`).
+The live Unity host loads `Assets/Frontier/Resources/Frontier/EncounterCatalog.asset`, which references 64 editable `EncounterSO` assets under `Encounters` (63 playable formations plus the Guardian). Catalog order determines stable runtime indices; preserve that order when changing existing content. A run copies the data before use, so simulation changes never mutate ScriptableObjects.
+
+Use **Create > Frontier > Hyperspace Encounter** for a new formation and add it to the catalog. Each entry exposes its entity, path, parameters, offsets and group; offsets must be sorted, begin at zero, and end at `durationZ`. IDs must be unique, tiers must be within 0-12, costs/weights positive, and all numerical fields finite. Invalid data fails explicitly rather than silently using defaults. Select a non-boss asset and use **Assets > Frontier > Validate Encounter Fairness** to prove its declared speed at every allowed tier, both route speeds and both permitted mirrors. Guardian behavior still requires its dedicated boss-phase tests.
+
+**Frontier > Hyperspace > Create Encounter Assets If Missing** bootstraps missing assets from the engine-free defaults without overwriting an existing catalog or encounter. The existing `EncounterLibrary*.cs` builder library remains the engine-free lab/bootstrap source, not the Unity runtime content source. The initial exported catalog preserves every field and all nine canonical plan/event/state digests. Editing the shipped catalog intentionally invalidates that parity baseline; update the content expectations and run the fairness/pacing checks before shipping the change.
+
+The engine-free lab workflow below edits its builder source; its CLI does not automatically load Unity assets.
 
 1. **Write it** with the fluent `TemplateBuilder` inside a `BuildXxx()` method and `Register(builder)` it:
 ```csharp

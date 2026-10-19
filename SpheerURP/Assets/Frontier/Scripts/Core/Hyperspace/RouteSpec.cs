@@ -62,6 +62,9 @@ namespace Frontier.Hyperspace
 
             double distN = HMath.Clamp01(HMath.Log10(1.0 + dist) / HMath.Log10(1.0 + (double)t.distanceRefLy));
             double baseDuration = HMath.Clamp(t.durationBase + t.durationScale * HMath.Pow(dist, t.durationExp), t.durationMin, t.durationMax);
+            double requestedDuration = HMath.Finite(p.plannedDurationSeconds, 0f);
+            bool hasRequestedDuration = requestedDuration > 0.0;
+            if (hasRequestedDuration) baseDuration = HMath.Clamp(requestedDuration, t.durationMin, t.durationMax);
             r.hasBoss = dist >= t.bossMinDistanceLy || tier >= t.bossMinTier;
 
             double modeBudget = p.mode == RunMode.Assist ? t.assistBudgetScale : (p.mode == RunMode.Challenge ? t.challengeBudgetScale : 1f);
@@ -79,7 +82,10 @@ namespace Frontier.Hyperspace
             if (r.hasBoss)
             {
                 double slotMax = (double)t.bossIntroSeconds + t.bossArriveSeconds + t.bossMaxSeconds;
-                r.waveEnd = (float)HMath.Max(HMath.Min(baseDuration - outro, t.durationMax - outro - slotMax), 16f);
+                if (hasRequestedDuration)
+                    r.waveEnd = (float)HMath.Clamp(baseDuration - outro - slotMax, 16f, t.durationMax - outro - slotMax);
+                else
+                    r.waveEnd = (float)HMath.Max(HMath.Min(baseDuration - outro, t.durationMax - outro - slotMax), 16f);
                 r.bossStart = (float)((double)r.waveEnd + t.bossIntroSeconds);
                 r.duration = (float)((double)r.bossStart + t.bossArriveSeconds + t.bossMaxSeconds + outro);
                 double dps = (double)ship.damage * ship.fireRate * (1.0 + (double)t.powerPierceDps * ship.pierce);

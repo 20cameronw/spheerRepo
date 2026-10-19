@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Linq;
 
 namespace Frontier.Tests
 {
@@ -31,6 +32,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(pack);
             a.DebugSetUpgrade(pack, 2);
             a.AddXp(77);
+            a.RecordHarvestRunCompleted();
             var visited = a.universe.Get(db.planets[2].id);
             a.DebugTeleport(visited);
             var warehouse = a.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 4, 2);
@@ -57,6 +59,94 @@ namespace Frontier.Tests
             Assert.AreEqual(SaveSource.Primary, b.LoadReport.source);
             Assert.AreEqual(0, b.LoadReport.migratedFrom);
             Assert.AreEqual(a.stats.worldsLanded, b.stats.worldsLanded);
+            Assert.AreEqual(a.stats.harvestRunsCompleted, b.stats.harvestRunsCompleted);
+        }
+
+        [Test]
+        public void MapPins_ToggleAndPersistAcrossSaveReload()
+        {
+            var state = new GameState(db, false);
+            PlanetData destination = state.universe.Get(db.planets[2].id);
+            Assert.IsNotNull(destination);
+            Assert.IsTrue(state.ToggleMapPin(destination));
+            Assert.IsTrue(state.RecordMapDiscoveries(new[] { destination.Star }));
+            Assert.IsTrue(state.IsMapPinned(destination.Id));
+            Assert.IsTrue(state.IsMapDiscovered(destination.Star.Id));
+            Assert.IsTrue(state.Save());
+            SaveV2 compact = SaveSerializer.Instance.DeserializeV2(System.IO.File.ReadAllText(sandbox.SaveFile));
+            Assert.AreEqual(0, compact.mapDiscoveries.Count, "new saves should not repeat individual system IDs");
+            Assert.AreEqual(1, compact.mapDiscoverySectors.Count);
+            CollectionAssert.Contains(MapDiscoveryBits.Decode(compact.mapDiscoverySectors), destination.Star.Id);
+
+            var loaded = new GameState(db, true);
+            Assert.IsTrue(loaded.IsMapPinned(destination.Id));
+            Assert.IsTrue(loaded.IsMapDiscovered(destination.Star.Id));
+            Assert.IsFalse(loaded.ToggleMapPin(loaded.universe.Get(destination.Id)));
+            Assert.IsFalse(loaded.IsMapPinned(destination.Id));
+            Assert.IsTrue(loaded.Save());
+            Assert.IsFalse(new GameState(db, true).IsMapPinned(destination.Id));
+        }
+
+        [Test]
+        public void MapDiscoveryBits_MigrateLegacyIdsAndRoundTripSectorIndices()
+        {
+            var ids = new[]
+            {
+                new Frontier.Universe.SystemKey(-3, 7, 0).ToString(),
+                new Frontier.Universe.SystemKey(-3, 7, 37).ToString(),
+                new Frontier.Universe.SystemKey(2, -1, Frontier.Universe.SystemKey.MaxIndex).ToString()
+            };
+            var encoded = MapDiscoveryBits.Encode(ids);
+            Assert.AreEqual(2, encoded.Count, "systems in the same sector share one bitset");
+            CollectionAssert.AreEqual(ids.OrderBy(id => id, System.StringComparer.Ordinal), MapDiscoveryBits.Decode(encoded));
+
+            var legacy = new SaveV2 { mapDiscoveries = new System.Collections.Generic.List<string>(ids) }.Normalize();
+            Assert.AreEqual(0, legacy.mapDiscoveries.Count);
+            CollectionAssert.AreEqual(MapDiscoveryBits.Decode(encoded), MapDiscoveryBits.Decode(legacy.mapDiscoverySectors));
+        }
+
+        [Test]
+        public void FirstSessionObjectives_AdvanceOnCompletedGameActions()
+        {
+            var state = new GameState(db, false);
+            Assert.IsTrue(state.FirstSessionGuideAvailable);
+            Assert.AreEqual(0, FirstSessionObjectives.CurrentStep(state));
+
+            state.DebugPlace(db.StructureOfKind(StructureKind.Lumber), 0);
+            Assert.AreEqual(1, FirstSessionObjectives.CurrentStep(state));
+
+            state.RecordHarvestRunCompleted();
+            Assert.AreEqual(2, FirstSessionObjectives.CurrentStep(state));
+
+            state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 1);
+            Assert.AreEqual(3, FirstSessionObjectives.CurrentStep(state));
+
+            state.DebugPlace(db.FindStructure("refinery"), 2);
+            state.backpack.Set("wood", 8);
+            Assert.IsTrue(state.Craft(db.recipes.Single(recipe => recipe.id == "distill_wood")));
+            Assert.AreEqual(4, FirstSessionObjectives.CurrentStep(state));
+
+            state.WaveCleared(state.planet);
+            Assert.AreEqual(5, FirstSessionObjectives.CurrentStep(state));
+
+            state.stats.RecordLanding(1.0, true);
+            Assert.AreEqual(FirstSessionObjectives.Count, FirstSessionObjectives.CurrentStep(state));
+        }
+
+        [Test]
+        public void FirstSessionGuideDismissal_PersistsAndResetEnablesItAgain()
+        {
+            var state = new GameState(db, false);
+            Assert.IsTrue(state.FirstSessionGuideAvailable);
+            state.DismissFirstSessionGuide();
+            Assert.IsFalse(state.FirstSessionGuideAvailable);
+            Assert.IsTrue(state.Save());
+
+            var loaded = new GameState(db, true);
+            Assert.IsFalse(loaded.FirstSessionGuideAvailable);
+
+            loaded.ResetProgress();
+            Assert.IsTrue(loaded.FirstSessionGuideAvailable);
         }
 
         [Test]

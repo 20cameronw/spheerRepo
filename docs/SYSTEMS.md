@@ -26,7 +26,14 @@ resources, saved by planet and slot.
 Tap a warehouse to open its storage and your backpack together. Drag stacks either way or rearrange either grid; matching
 resources merge up to the stack limit, transfers move only what fits and never discard the remainder. Stored resources stay
 on that planet and are not used automatically for crafting, fuel or construction. A translucent icon and stack count follow
-mouse/touch drags, including ordinary backpack rearrangement.
+mouse/touch drags, including ordinary backpack rearrangement. A resource-family filter applies to both grids; **Quick Store**
+and **Quick Withdraw** transfer as much as fits in the selected family (or all families), preserving any remainder.
+The panel shows used versus total storage slots. Multiple Warehouses are allowed; an operational Cargo Depot pools local
+Warehouse and Auto-Harvester contents for building and crafting without exposing Fuel Depot reserves.
+
+An **Orbital Relay** pulls from operational storage on other visited worlds. Same-system transfers are available at every
+relay tier; higher tiers extend the beam into other systems. Each pull spends energy from fuel carried in the backpack,
+scaled by stack size and distance. Remote Fuel Depot reserves remain inaccessible.
 
 The starter backpack has 9 slots on purpose: it fills quickly, which teaches the Warehouse early. Research adds 9 slots per
 tier (up to 63).
@@ -108,5 +115,7 @@ is in [RUNTIME_MODEL.md](RUNTIME_MODEL.md).
   V1 is frozen, every change to its output is a new generator version.
 * **Cost.** On a desktop editor 1,000 sectors with every planet generate in about 4 ms (1,326 planets) and repeated lookups
   allocate nothing; sectors and planet blocks are cached in bounded LRU caches and the type is safe to use from a background worker.
-* **Look at it.** **Frontier > Universe > Render Density PNG** writes the galaxy density map (30,000 ly across) to
-  `SpheerURP/Screens/universe/`.
+* **Look at it.** **Frontier > Universe > Universe Viewer** previews a read-only density heat map at a chosen hexadecimal
+  seed and coordinate, then inspects the containing sector, systems and planets; selecting a planet shows its runtime
+  descriptor, which can be copied. Preview changes do not affect the active game or save. **Frontier > Universe > Render
+  Density PNG** still writes the default 30,000 ly galaxy map to `SpheerURP/Screens/universe/`.

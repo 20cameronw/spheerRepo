@@ -34,18 +34,26 @@ namespace Frontier
     }
 
     /// <summary>
-    /// Player options of the travel mini-game, kept in the same PlayerPrefs mechanism as the other settings (keys start with fr_).
+    /// Travel options and the shared ship's launch-intro flag, kept with the other settings (keys start with fr_).
     /// The store is replaceable so tests never touch the real preferences.
     /// </summary>
     public static class TravelPrefs
     {
         public const string AssistKey = "fr_hs_assist", SensitivityKey = "fr_hs_sensitivity", TutorialRunsKey = "fr_hs_tutorial_runs",
-            LegacyKey = "fr_hs_legacy", OverlayKey = "fr_hs_overlay";
+            LegacyKey = "fr_hs_legacy", OverlayKey = "fr_hs_overlay", IntroSeenKey = "fr_ship_intro_seen";
         /// <summary>The tips are shown on this many runs, then never again.</summary>
         public const int TutorialRuns = 2;
         public const float SensitivityMin = 0.7f, SensitivityMax = 2.0f, SensitivityStep = 0.1f, SensitivityDefault = 1.3f;
 
         public static IPrefsStore Store = new PlayerPrefsStore();
+
+        public static bool IntroSeen { get { return Store.GetInt(IntroSeenKey, 0) == 1; } }
+
+        public static void MarkIntroSeen()
+        {
+            Store.SetInt(IntroSeenKey, 1);
+            Store.Save();
+        }
 
         /// <summary>Assist mode: easier travel (smaller encounter budget, softer hits) for lower rewards (quality is capped).</summary>
         public static bool AssistMode

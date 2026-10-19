@@ -3,6 +3,17 @@ using UnityEngine;
 
 namespace Frontier
 {
+    [System.Serializable]
+    public sealed class WaveModifier
+    {
+        public string name;
+        public string description;
+        [Min(1f)] public float health = 1f;
+        [Min(1f)] public float damage = 1f;
+        [Min(1f)] public float speed = 1f;
+        [Min(1f)] public float reward = 1f;
+    }
+
     /// <summary>
     /// Turns (wave number, planet danger, risk) into a threat budget, then spends the
     /// budget on aliens. Tune the numbers here to retune the whole game's difficulty.
@@ -27,6 +38,14 @@ namespace Frontier
         public float spawnInterval = 0.9f;
         public int maxAliens = 120;
         [Range(0f, 1f)] public float eliteChance = 0.35f;
+        [Min(1)] public int modifiersFromWave = 4;
+        public List<WaveModifier> modifiers = new List<WaveModifier>();
+
+        public WaveModifier Modifier(int wave)
+        {
+            if (wave < modifiersFromWave || modifiers.Count == 0) return null;
+            return modifiers[(wave - modifiersFromWave) % modifiers.Count];
+        }
 
         public float Budget(int wave, float danger, float risk)
         {
@@ -43,7 +62,16 @@ namespace Frontier
         public List<EnemySO> Build(IList<EnemySO> pool, int wave, float budget, System.Random rng)
         {
             var avail = new List<EnemySO>();
-            foreach (var e in pool) if (e != null && e.minWave <= wave) avail.Add(e);
+            EnemySO boss = null;
+            foreach (var e in pool)
+            {
+                if (e == null || !e.Available(wave)) continue;
+                if (e.rank == AlienRank.Boss)
+                {
+                    if (boss == null || e.threat > boss.threat) boss = e;
+                }
+                else avail.Add(e);
+            }
             var result = new List<EnemySO>();
             if (avail.Count == 0) return result;
 
@@ -51,6 +79,14 @@ namespace Frontier
             foreach (var e in avail) if (e.threat < cheapest.threat) cheapest = e;
             result.Add(cheapest);
             budget -= Mathf.Max(0.01f, cheapest.threat);
+
+            // Reserve the boss before random escorts: more fuel still extends the same sequence.
+            if (boss != null && result.Count < maxAliens)
+            {
+                if (boss.threat > budget) return result;
+                result.Add(boss);
+                budget -= Mathf.Max(0.01f, boss.threat);
+            }
 
             while (result.Count < maxAliens)
             {

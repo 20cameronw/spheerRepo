@@ -11,26 +11,26 @@ namespace Frontier.Hyperspace.View
 
         public HyperspaceAudio()
         {
-            shot = SfxSynth.Render("warp-shot", 0.1f, 4000, new SfxSynth.Tone(1000, 220, 0, 0.1f, 0.15f, 1));
-            hit = SfxSynth.Render("warp-hit", 0.15f, 2500, new SfxSynth.Tone(160, 50, 0, 0.15f, 0.35f, 4));
-            explosion = SfxSynth.Render("warp-burst", 0.4f, 1800,
-                new SfxSynth.Tone(90, 30, 0, 0.4f, 0.45f), new SfxSynth.Tone(300, 50, 0, 0.3f, 0.25f, 4));
+            var library = Resources.Load<AudioCueLibrary>("Frontier/AudioCueLibrary");
+            if (library == null) throw new InvalidOperationException("Frontier audio cue library is missing.");
+            library.Validate();
+            shot = library.Get(AudioCue.Zap).clip;
+            hit = library.Get(AudioCue.Impact).clip;
+            explosion = library.Get(AudioCue.Boom).clip;
             pickup = SfxSynth.Render("warp-pickup", 0.25f, 0,
                 new SfxSynth.Tone(660, 660, 0, 0.12f, 0.25f), new SfxSynth.Tone(990, 990, 0.08f, 0.15f, 0.22f));
             warning = SfxSynth.Render("warp-warning", 0.4f, 2600, new SfxSynth.Tone(280, 750, 0, 0.4f, 0.2f, 1));
             chime = SfxSynth.Render("warp-clear", 0.6f, 0,
                 new SfxSynth.Tone(523, 523, 0, 0.25f, 0.25f), new SfxSynth.Tone(784, 784, 0.12f, 0.3f, 0.23f),
                 new SfxSynth.Tone(1047, 1047, 0.24f, 0.3f, 0.2f));
-            // Integer cycles and a closed waveform keep the bed's loop seam silent.
-            var samples = new float[SfxSynth.Rate];
-            for (int i = 0; i < samples.Length; i++)
-                samples[i] = 0.1f * Mathf.Sin(2 * Mathf.PI * 60 * i / samples.Length) +
-                    0.04f * Mathf.Sin(2 * Mathf.PI * 121 * i / samples.Length);
-            hum = AudioClip.Create("warp-engine", samples.Length, 1, SfxSynth.Rate, false); hum.SetData(samples, 0);
+            var soundscape = Resources.Load<SoundscapeLibrary>("Frontier/SoundscapeLibrary");
+            if (soundscape == null) throw new InvalidOperationException("Frontier soundscape library is missing.");
+            soundscape.Validate();
+            hum = soundscape.engine;
             for (int i = 0; i < lastCue.Length; i++) lastCue[i] = -100;
         }
         public void Engine(float speed) { Sfx.SetBed(hum, 0.25f, Mathf.Clamp(speed / 30, 0.7f, 1.6f)); }
-        public void Stop() { Sfx.SetBed(null, 0); }
+        public void Stop() { Sfx.ClearBedIfOwnedBy(hum); }
         public void React(HEvent e)
         {
             int key = (int)e.type;
@@ -56,9 +56,8 @@ namespace Frontier.Hyperspace.View
         public void Dispose()
         {
             Stop();
-            UnityEngine.Object.Destroy(shot); UnityEngine.Object.Destroy(hit); UnityEngine.Object.Destroy(explosion);
+            // Shot/impact/explosion clips are shared authored assets, not owned by this run.
             UnityEngine.Object.Destroy(pickup); UnityEngine.Object.Destroy(warning); UnityEngine.Object.Destroy(chime);
-            UnityEngine.Object.Destroy(hum);
         }
     }
 }

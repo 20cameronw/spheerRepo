@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Frontier.Universe;
 
 namespace Frontier
 {
@@ -58,6 +60,84 @@ namespace Frontier
     {
         /// <summary>UTC, ISO 8601: when this file was written.</summary>
         public string lastSavedUtc = "";
+        /// <summary>Greatest observed gameplay UTC; offline production never reuses time before this point.</summary>
+        public string highWaterUtc = "";
+    }
+
+    [Serializable]
+    public sealed class AscensionProgress
+    {
+        public int rank;
+        public int legacyPoints;
+    }
+
+    [Serializable]
+    public sealed class MapDiscoverySector
+    {
+        public string sectorId;
+        public string bits;
+    }
+
+    /// <summary>Stores discovered system indices as one bitset per sector.</summary>
+    public static class MapDiscoveryBits
+    {
+        const int ByteCount = (SystemKey.MaxIndex + 8) / 8;
+
+        public static List<MapDiscoverySector> Encode(IEnumerable<string> systemIds)
+        {
+            var sectors = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+            if (systemIds != null)
+                foreach (string id in systemIds)
+                {
+                    SystemKey key;
+                    if (!SystemKey.TryParse(id, out key) || key.ToString() != id) continue;
+                    string sectorId = key.Sector.ToString();
+                    byte[] bits;
+                    if (!sectors.TryGetValue(sectorId, out bits))
+                    {
+                        bits = new byte[ByteCount];
+                        sectors.Add(sectorId, bits);
+                    }
+                    bits[key.Index >> 3] |= (byte)(1 << (key.Index & 7));
+                }
+
+            var result = new List<MapDiscoverySector>(sectors.Count);
+            foreach (var entry in sectors)
+            {
+                int length = entry.Value.Length;
+                while (length > 0 && entry.Value[length - 1] == 0) length--;
+                var compact = new byte[length];
+                Array.Copy(entry.Value, compact, length);
+                result.Add(new MapDiscoverySector { sectorId = entry.Key, bits = Convert.ToBase64String(compact) });
+            }
+            result.Sort((a, b) => string.CompareOrdinal(a.sectorId, b.sectorId));
+            return result;
+        }
+
+        public static string[] Decode(IEnumerable<MapDiscoverySector> records)
+        {
+            var ids = new SortedSet<string>(StringComparer.Ordinal);
+            if (records == null) return ids.ToArray();
+            foreach (MapDiscoverySector record in records)
+            {
+                if (record == null) continue;
+                SectorCoord sector;
+                if (!SectorCoord.TryParse(record.sectorId, out sector) || sector.ToString() != record.sectorId ||
+                    string.IsNullOrEmpty(record.bits)) continue;
+                byte[] bits;
+                try { bits = Convert.FromBase64String(record.bits); }
+                catch (FormatException) { continue; }
+                if (bits.Length == 0 || bits.Length > ByteCount || bits.Length == ByteCount && (bits[ByteCount - 1] & 0x80) != 0) continue;
+                for (int byteIndex = 0; byteIndex < bits.Length; byteIndex++)
+                    for (int bit = 0; bit < 8; bit++)
+                        if ((bits[byteIndex] & (1 << bit)) != 0)
+                        {
+                            int index = byteIndex * 8 + bit;
+                            if (index <= SystemKey.MaxIndex) ids.Add(new SystemKey(sector, index).ToString());
+                        }
+            }
+            return ids.ToArray();
+        }
     }
 
     // ---- reserved sections: empty today, they exist so later work packages can fill them without a schema bump ----
@@ -68,6 +148,15 @@ namespace Frontier
     {
         public string currency;
         public int amount;
+    }
+
+    [Serializable]
+    public sealed class PurchaseGrantRecord
+    {
+        public string store;
+        public string transactionId;
+        public string productId;
+        public int shards;
     }
 
     /// <summary>Reserved: builder slots and the job each one is busy with.</summary>
@@ -106,9 +195,17 @@ namespace Frontier
         public PlayerStats stats = new PlayerStats();
         public ClockSave clock = new ClockSave();
         public List<WalletEntry> wallet = new List<WalletEntry>();
+        public List<PurchaseGrantRecord> purchaseGrants = new List<PurchaseGrantRecord>();
         public List<BuilderSlot> builders = new List<BuilderSlot>();
         public List<string> atlas = new List<string>();
+        public List<string> mapPins = new List<string>();
+        /// <summary>Legacy v2 map discoveries, migrated to mapDiscoverySectors by Normalize.</summary>
+        public List<string> mapDiscoveries = new List<string>();
+        public List<MapDiscoverySector> mapDiscoverySectors = new List<MapDiscoverySector>();
         public List<SettingEntry> settings = new List<SettingEntry>();
+        public bool objectivesInitialized;
+        public List<ObjectiveRecord> objectives = new List<ObjectiveRecord>();
+        public AscensionProgress ascension = new AscensionProgress();
 
         /// <summary>Repairs nulls a hand-edited or truncated file can leave behind, so the rest of the game never null-checks.</summary>
         public SaveV2 Normalize()
@@ -129,12 +226,26 @@ namespace Frontier
             if (stats == null) stats = new PlayerStats();
             if (clock == null) clock = new ClockSave();
             if (clock.lastSavedUtc == null) clock.lastSavedUtc = "";
+            if (clock.highWaterUtc == null) clock.highWaterUtc = "";
             if (wallet == null) wallet = new List<WalletEntry>();
+            if (purchaseGrants == null) purchaseGrants = new List<PurchaseGrantRecord>();
             if (builders == null) builders = new List<BuilderSlot>();
             if (atlas == null) atlas = new List<string>();
+            if (mapPins == null) mapPins = new List<string>();
+            if (mapDiscoveries == null) mapDiscoveries = new List<string>();
+            if (mapDiscoverySectors == null) mapDiscoverySectors = new List<MapDiscoverySector>();
             if (settings == null) settings = new List<SettingEntry>();
+            objectives = new ObjectiveLedger(objectives).Export();
+            if (ascension == null) ascension = new AscensionProgress();
+            ascension.rank = Math.Max(0, ascension.rank);
+            ascension.legacyPoints = Math.Max(0, ascension.legacyPoints);
             var atlasEntries = new HashSet<string>(StringComparer.Ordinal);
             atlas.RemoveAll(id => string.IsNullOrEmpty(id) || !atlasEntries.Add(id));
+            var pinnedPlanets = new HashSet<string>(StringComparer.Ordinal);
+            mapPins.RemoveAll(id => string.IsNullOrEmpty(id) || !pinnedPlanets.Add(id));
+            mapDiscoverySectors = MapDiscoveryBits.Encode(
+                MapDiscoveryBits.Decode(mapDiscoverySectors).Concat(mapDiscoveries));
+            mapDiscoveries.Clear();
             player.upgrades.RemoveAll(u => u == null || string.IsNullOrEmpty(u.id));
             player.researched.RemoveAll(id => string.IsNullOrEmpty(id));
             player.toolTiers.RemoveAll(t => t == null || string.IsNullOrEmpty(t.id) || t.level <= 0);

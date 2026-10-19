@@ -14,6 +14,15 @@ namespace Frontier.Tests
     public sealed class ContentImportTests
     {
         [Test]
+        public void DefaultBootstrap_RefusesToOverwriteExistingAssets()
+        {
+            Assert.IsFalse(FrontierMenu.CanGenerateDefaults(
+                "Assets/Frontier/Resources/Frontier/GameDatabase.asset",
+                "Assets/Frontier/Resources/Frontier/Data", out var reason));
+            StringAssert.Contains("already exists", reason);
+        }
+
+        [Test]
         public void CommittedAssets_RoundTripAndValidate()
         {
             EconomyImporter.Validate();

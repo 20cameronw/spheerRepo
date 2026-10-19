@@ -16,6 +16,8 @@ namespace Frontier
         Action<VisualElement> modalBuild;
         string modalKey;
         int researchTab;
+        PlacedStructure confirmBuilderFinish;
+        int confirmBuilderPurchaseOwned = -1;
 
         // ------------------------------------------------------------ modal core
         void OpenModal(string key, string icon, string title, Color accent, Action<VisualElement> build, bool wide = true)
@@ -33,8 +35,7 @@ namespace Frontier
             backdropEl.RegisterCallback<PointerDownEvent>(e => { if (e.target == backdropEl) CloseModal(); });
             modal = backdropEl;
 
-            var panel = UiKit.Div("fr-modal");
-            if (wide) panel.AddToClassList("fr-modal-wide");
+            var panel = new FrontierModal { Wide = wide };
             UiKit.SetAccent(panel, c);
             var head = UiKit.Div("fr-modal-head");
             head.Add(Icons.Make(icon, c));
@@ -52,6 +53,10 @@ namespace Frontier
 
         void CloseModal()
         {
+            accountDeletionPlayerId = null;
+            confirmAscension = false;
+            confirmBuilderFinish = null;
+            confirmBuilderPurchaseOwned = -1;
             EndInventoryDrag();
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.None;
             if (modalKey == "warehouse")
@@ -74,9 +79,9 @@ namespace Frontier
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
         }
 
-        void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", "BUILD", UiKit.Lime, BuildShop, true); }
-        void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", "COMMAND", UiKit.Magenta, BuildResearch, true); }
-        void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", "BACKPACK", UiKit.Amber, BuildPack, true); }
+        void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", UiText.Get("nav.build"), UiKit.Lime, BuildShop, true); }
+        void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", UiText.Get("nav.command"), UiKit.Magenta, BuildResearch, true); }
+        void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", UiText.Get("nav.backpack"), UiKit.Amber, BuildPack, true); }
 
         // ------------------------------------------------------------ build shop
         int shopTab;
@@ -84,28 +89,29 @@ namespace Frontier
 
         VisualElement TabButton(string icon, string label, bool on, Color accent, Action onClick)
         {
-            var t = new Button();
-            t.AddToClassList("fr-tab");
-            UiKit.SetAccent(t, accent);
-            if (on) t.AddToClassList("fr-tab-on");
-            t.Add(Icons.Make(icon, on ? UiKit.Ui(accent) : UiKit.Muted, UiKit.Size.IconMd));
-            t.Add(UiKit.Text(label, "fr-tab-label"));
-            t.clicked += () => { Sfx.Click(); onClick(); RefreshModal(); };
+            var t = new FrontierTab { Accent = accent, Selected = on, Icon = icon, Caption = label };
+            t.clicked += () => { confirmBuilderFinish = null; confirmBuilderPurchaseOwned = -1; onClick(); RefreshModal(); };
             return t;
         }
 
         void BuildShop(VisualElement body)
         {
             var tabs = UiKit.Div("fr-tabs");
-            tabs.Add(TabButton("refinery", "ECON", shopTab == 0, UiKit.Lime, () => shopTab = 0));
-            tabs.Add(TabButton("mine", "GATHER", shopTab == 1, UiKit.Lime, () => shopTab = 1));
-            tabs.Add(TabButton("shield", "DEFENSE", shopTab == 2, UiKit.Lime, () => shopTab = 2));
-            tabs.Add(TabButton("research", "UTILITY", shopTab == 3, UiKit.Lime, () => shopTab = 3));
+            tabs.Add(TabButton("refinery", UiText.Get("shop.economy"), shopTab == 0, UiKit.Lime, () => shopTab = 0));
+            tabs.Add(TabButton("mine", UiText.Get("shop.gather"), shopTab == 1, UiKit.Lime, () => shopTab = 1));
+            tabs.Add(TabButton("shield", UiText.Get("shop.defense"), shopTab == 2, UiKit.Lime, () => shopTab = 2));
+            tabs.Add(TabButton("research", UiText.Get("shop.utility"), shopTab == 3, UiKit.Lime, () => shopTab = 3));
             body.Add(tabs);
-            var note = UiKit.Text("Build on " + gs.planet.Name + "  -  " + gs.FreePads(gs.planet) + " / " + gs.planet.BuildingSlots +
-                " free slots  ·  CREWS " + gs.BusyBuilderCount + "/" + gs.BuilderCount + " busy. Tap a structure on the planet to use it.", "fr-muted");
+            var note = UiKit.Text(UiText.Get("shop.summary", gs.planet.Name, gs.FreePads(gs.planet),
+                gs.planet.BuildingSlots, gs.BusyBuilderCount, gs.BuilderCount), "fr-muted");
             note.style.marginBottom = UiKit.Space.S12;
             body.Add(note);
+            body.Add(IconBtn(UiText.Get("builders.view"), "build", UiKit.Cyan, () =>
+            {
+                CloseModal();
+                researchTab = 3;
+                OpenResearch();
+            }));
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Foundry,
@@ -124,7 +130,14 @@ namespace Frontier
             var list = new List<StructureSO>();
             foreach (var sd in gs.db.structures)
                 if (sd != null && Array.IndexOf(kinds, sd.kind) >= 0) list.Add(sd);
-            if (list.Count == 0) { body.Add(UiKit.Text("Nothing here yet.", "fr-muted")); return; }
+            if (list.Count == 0) { body.Add(UiKit.Text(UiText.Get("shop.empty"), "fr-muted")); return; }
+            int guideIndex = list.FindIndex(def => IsFirstSessionBuildTarget(def.kind));
+            if (guideIndex > 0)
+            {
+                var next = list[guideIndex];
+                list.RemoveAt(guideIndex);
+                list.Insert(0, next);
+            }
             foreach (var sd in list)
             {
                 var def = sd;
@@ -146,17 +159,19 @@ namespace Frontier
                 foreach (var structure in gs.StructuresOn(gs.planet))
                     if (structure.def == def && gs.IsBuilderBusy(structure)) { activeJob = structure; break; }
                 if (activeJob != null) card.Add(Note(gs.BuilderJobStatus(activeJob), UiKit.Cyan));
-                else if (gs.AtLimit(gs.planet, def)) card.Add(Note("BUILT - tap it on the planet", UiKit.Lime));
+                else if (gs.AtLimit(gs.planet, def)) card.Add(Note(UiText.Get("shop.built"), UiKit.Lime));
                 else if (gs.BuildLockReason(def) != null) card.Add(Note(gs.BuildLockReason(def), UiKit.Amber));
-                else if (!gs.CanBuildHere(def)) card.Add(Note("Nothing to harvest on this planet", UiKit.Amber));
+                else if (!gs.CanBuildHere(def)) card.Add(Note(UiText.Get("shop.no-harvest"), UiKit.Amber));
                 else
                 {
-                    card.Add(UiKit.CostRow(def.buildCost, gs, true));
+                    card.Add(UiKit.CostRow(def.buildCost, gs, true, OpenAtlasResource));
                     bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
                     if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
                     bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
-                    var place = IconBtn("PLACE", "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
+                    var place = IconBtn(UiText.Get("shop.place"), "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
                     UiKit.SetEnabledLook(place, can);
+                    if (can && IsFirstSessionBuildTarget(def.kind))
+                        AddFirstSessionCue(card, CurrentFirstSessionGuideStep);
                     card.Add(place);
                 }
                 body.Add(card);
@@ -172,7 +187,7 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ menu (leaderboard, tutorial, about, settings)
-        void OpenMenu() { if (defense.Active || busy) return; menuPage = ""; OpenModal("menu", "menu", "MENU", UiKit.Cyan, BuildMenu, true); }
+        void OpenMenu() { if (defense.Active || busy) return; menuPage = ""; OpenModal("menu", "menu", UiText.Get("nav.menu"), UiKit.Cyan, BuildMenu, true); }
 
         string menuPage = "";
 
@@ -194,10 +209,12 @@ namespace Frontier
 
         void BuildMenu(VisualElement body)
         {
+            if (menuPage != "settings") accountDeletionPlayerId = null;
+            if (menuPage != "ascension") confirmAscension = false;
             if (menuPage == "debug" && !DebugToolsAvailable) menuPage = "";
             if (menuPage != "")
             {
-                var back = IconBtn("BACK", "back", UiKit.Muted, () => { menuPage = ""; RefreshModal(); });
+                var back = IconBtn(UiText.Get("common.back"), "back", UiKit.Muted, () => { menuPage = ""; RefreshModal(); });
                 back.AddToClassList("fr-btn-ghost");
                 back.AddToClassList("fr-back");
                 body.Add(back);
@@ -205,6 +222,8 @@ namespace Frontier
                 {
                     case "debug": BuildDebug(body); break;
                     case "ranks": BuildLeaderboard(body); break;
+                    case "goals": BuildGoals(body); break;
+                    case "ascension": BuildAscension(body); break;
                     case "tutorial": BuildTutorial(body); break;
                     case "about": BuildAbout(body); break;
                     case "atlas": BuildAtlas(body); break;
@@ -213,12 +232,14 @@ namespace Frontier
                 return;
             }
             var grid = UiKit.Div("fr-menu-grid");
-            grid.Add(MenuTile("ranks", "RANKS", UiKit.Lime, "ranks"));
-            grid.Add(MenuTile("map", "ATLAS", UiKit.Cyan, "atlas"));
-            grid.Add(MenuTile("tutorial", "HOW TO PLAY", UiKit.Cyan, "tutorial"));
-            grid.Add(MenuTile("about", "ABOUT", UiKit.Magenta, "about"));
-            grid.Add(MenuTile("gear", "SETTINGS", UiKit.Cyan, "settings"));
-            if (DebugToolsAvailable) grid.Add(MenuTile("tools", "DEBUG", UiKit.Red, "debug"));
+            grid.Add(MenuTile("ranks", UiText.Get("menu.ranks"), UiKit.Lime, "ranks"));
+            grid.Add(MenuTile("star", UiText.Get("menu.goals"), UiKit.Amber, "goals"));
+            if (gs.AscensionAvailable) grid.Add(MenuTile("play", UiText.Get("menu.ascension"), UiKit.Magenta, "ascension"));
+            grid.Add(MenuTile("map", UiText.Get("menu.atlas"), UiKit.Cyan, "atlas"));
+            grid.Add(MenuTile("tutorial", UiText.Get("menu.tutorial"), UiKit.Cyan, "tutorial"));
+            grid.Add(MenuTile("about", UiText.Get("menu.about"), UiKit.Magenta, "about"));
+            grid.Add(MenuTile("gear", UiText.Get("menu.settings"), UiKit.Cyan, "settings"));
+            if (DebugToolsAvailable) grid.Add(MenuTile("tools", UiText.Get("menu.debug"), UiKit.Red, "debug"));
             body.Add(grid);
         }
 
@@ -236,53 +257,50 @@ namespace Frontier
 
         void StatRow(VisualElement body, string icon, Color color, string label, string value)
         {
-            var row = UiKit.Div("fr-row"); row.style.marginTop = UiKit.Space.S12;
-            var ic = Icons.Make(icon, UiKit.Ui(color), UiKit.Size.IconMd);
-            ic.style.marginRight = UiKit.Space.S12;
-            row.Add(ic);
-            row.Add(UiKit.Text(label, "fr-small"));
-            row.Add(UiKit.Div("fr-spacer"));
-            row.Add(UiKit.Text(value, "fr-h2"));
-            body.Add(row);
+            body.Add(new FrontierStatRow { Tint = color, Icon = icon, Caption = label, Value = value });
         }
 
         void BuildLeaderboard(VisualElement body)
         {
+            BuildEraProgress(body);
+            if (gs.AscensionAvailable)
+                body.Add(IconBtn(UiText.Get("ranks.ascension"), "play", UiKit.Magenta, () => { menuPage = "ascension"; RefreshModal(); }));
+            body.Add(IconBtn(UiText.Get("ranks.goals"), "star", UiKit.Amber, () => { menuPage = "goals"; RefreshModal(); }));
             ScoreBreakdown score = gs.FrontierScore;
             var scoreCard = Card(UiKit.Lime);
-            scoreCard.Add(UiKit.Text("FRONTIER SCORE", "fr-h2"));
-            StatRow(scoreCard, "star", UiKit.Lime, "Total", score.total.ToString("N0"));
-            StatRow(scoreCard, "map", UiKit.Cyan, "Reach", score.reach.ToString("N0"));
-            StatRow(scoreCard, "map", UiKit.Amber, "Worlds", score.worlds.ToString("N0"));
-            StatRow(scoreCard, "base", UiKit.Lime, "Industry", score.industry.ToString("N0"));
-            StatRow(scoreCard, "research", UiKit.Magenta, "Technology", score.tech.ToString("N0"));
-            StatRow(scoreCard, "alien", UiKit.Red, "Defense", score.defense.ToString("N0"));
-            StatRow(scoreCard, "map", UiKit.Cyan, "Atlas", score.atlas.ToString("N0"));
+            scoreCard.Add(UiKit.Text(UiText.Get("ranks.score"), "fr-h2"));
+            StatRow(scoreCard, "star", UiKit.Lime, UiText.Get("ranks.total"), score.total.ToString("N0"));
+            StatRow(scoreCard, "map", UiKit.Cyan, UiText.Get("ranks.reach"), score.reach.ToString("N0"));
+            StatRow(scoreCard, "map", UiKit.Amber, UiText.Get("ranks.worlds"), score.worlds.ToString("N0"));
+            StatRow(scoreCard, "base", UiKit.Lime, UiText.Get("ranks.industry"), score.industry.ToString("N0"));
+            StatRow(scoreCard, "research", UiKit.Magenta, UiText.Get("ranks.technology"), score.tech.ToString("N0"));
+            StatRow(scoreCard, "alien", UiKit.Red, UiText.Get("ranks.defense"), score.defense.ToString("N0"));
+            StatRow(scoreCard, "map", UiKit.Cyan, UiText.Get("ranks.atlas"), score.atlas.ToString("N0"));
             if (score.multiplier != 1.0)
-                StatRow(scoreCard, "star", UiKit.Magenta, "Ascension multiplier", score.multiplier.ToString("0.0#"));
+                StatRow(scoreCard, "star", UiKit.Magenta, UiText.Get("ranks.multiplier"), score.multiplier.ToString("0.0#"));
             body.Add(scoreCard);
 
             var card = Card(UiKit.Lime);
-            card.Add(UiKit.Text("YOUR RECORD", "fr-h2"));
-            StatRow(card, "star", UiKit.Magenta, "Level", gs.PlayerLevel.ToString());
-            StatRow(card, "alien", UiKit.Red, "Waves cleared", gs.totalWavesCleared.ToString());
-            StatRow(card, "base", UiKit.Cyan, "Structures", gs.structures.Count.ToString());
+            card.Add(UiKit.Text(UiText.Get("ranks.record"), "fr-h2"));
+            StatRow(card, "star", UiKit.Magenta, UiText.Get("ranks.level"), gs.PlayerLevel.ToString());
+            StatRow(card, "alien", UiKit.Red, UiText.Get("ranks.waves"), gs.totalWavesCleared.ToString());
+            StatRow(card, "base", UiKit.Cyan, UiText.Get("ranks.structures"), gs.structures.Count.ToString());
             var planets = new HashSet<string>();
             foreach (var s in gs.structures) planets.Add(s.planetId);
-            StatRow(card, "map", UiKit.Amber, "Bases", planets.Count.ToString());
+            StatRow(card, "map", UiKit.Amber, UiText.Get("ranks.bases"), planets.Count.ToString());
             body.Add(card);
             if (services == null || !services.Leaderboards.IsConfigured)
             {
-                body.Add(UiKit.Text("Online ranks are unavailable until Unity services, a leaderboard and an HTTPS privacy policy are configured and approved. Your local record remains available above.", "fr-muted"));
+                body.Add(UiKit.Text(UiText.Get("ranks.unavailable"), "fr-muted"));
                 return;
             }
             if (!services.Consent.Current.hasDecision || !services.Consent.Current.onlineServicesAllowed)
             {
-                body.Add(UiKit.Text("Enable online account and leaderboard access in Settings to load online ranks. Nothing is sent before you opt in and request the list.", "fr-muted"));
+                body.Add(UiKit.Text(UiText.Get("ranks.enable"), "fr-muted"));
                 return;
             }
 
-            body.Add(UiKit.Text("Online ranks load only when requested. Score submissions stay disabled until a server-validated path is available.", "fr-muted"));
+            body.Add(UiKit.Text(UiText.Get("ranks.online.help"), "fr-muted"));
             if (!string.IsNullOrEmpty(leaderboardStatus))
                 body.Add(UiKit.Text(leaderboardStatus, "fr-small"));
 
@@ -291,19 +309,61 @@ namespace Frontier
                 foreach (LeaderboardEntry entry in onlineLeaderboardEntries)
                 {
                     var row = UiKit.Div("fr-stat-row");
-                    row.Add(UiKit.Text("#" + entry.rank + "  " + entry.displayName, "fr-small"));
+                    row.Add(UiKit.Text(UiText.Get("ranks.entry", entry.rank, entry.displayName), "fr-small"));
                     row.Add(UiKit.Div("fr-spacer"));
                     row.Add(UiKit.Text(entry.score.ToString("N0"), "fr-small"));
                     body.Add(row);
                 }
                 if (onlineLeaderboardEntries.Count == 0)
-                    body.Add(UiKit.Text("No scores have been posted to this board yet.", "fr-muted"));
+                    body.Add(UiKit.Text(UiText.Get("ranks.empty"), "fr-muted"));
             }
 
-            var load = IconBtn(leaderboardLoading ? "LOADING RANKS" : "CONNECT AND LOAD RANKS",
+            var load = IconBtn(UiText.Get(leaderboardLoading ? "ranks.loading" : "ranks.load"),
                 "ranks", UiKit.Cyan, LoadOnlineLeaderboard);
             UiKit.SetEnabledLook(load, !leaderboardLoading);
             body.Add(load);
+        }
+
+        void BuildEraProgress(VisualElement body)
+        {
+            var era = gs.Era;
+            var card = Card(UiKit.Cyan);
+            card.name = "era-progress";
+            card.Add(UiKit.Text(UiText.Get("ranks.era", SimBands.EraNames[(int)era].ToUpperInvariant()), "fr-h2"));
+            card.Add(UiKit.Text(UiText.Get("ranks.era.help"), "fr-tiny"));
+            if (era == FrontierEra.Ascension)
+            {
+                card.Add(UiKit.Text(UiText.Get("ranks.era.mastery"), "fr-muted"));
+                card.Add(IconBtn(UiText.Get("guide.action.atlas"), "research", UiKit.Cyan, OpenGuideAtlas));
+            }
+            else
+            {
+                card.Add(UiKit.Text(UiText.Get("ranks.era.next", SimBands.EraNames[(int)era + 1].ToUpperInvariant()), "fr-small"));
+                foreach (var requirement in EraRules.NextRequirements(era, gs.EraProgress))
+                {
+                    var row = UiKit.Div("fr-row");
+                    var requirementIcon = Icons.Make(requirement.Complete ? "check" : "lock",
+                        requirement.Complete ? UiKit.Lime : UiKit.Muted, UiKit.Size.IconSm);
+                    requirementIcon.style.marginRight = UiKit.Space.S12;
+                    row.Add(requirementIcon);
+                    row.Add(UiKit.Text(requirement.Label, "fr-small"));
+                    card.Add(row);
+                }
+                Action action;
+                string label, icon;
+                if (era == FrontierEra.Landfall) { action = OpenMap; label = UiText.Get("guide.action.map"); icon = "map"; }
+                else if (era == FrontierEra.Interstellar) { action = OpenShop; label = UiText.Get("guide.action.build-shop"); icon = "build"; }
+                else
+                {
+                    action = () => { researchTab = 2; OpenResearch(); };
+                    label = UiText.Get("ranks.era.command");
+                    icon = "research";
+                }
+                var next = IconBtn(label, icon, UiKit.Cyan, action);
+                next.name = "era-next-action";
+                card.Add(next);
+            }
+            body.Add(card);
         }
 
         IReadOnlyList<LeaderboardEntry> onlineLeaderboardEntries;
@@ -312,16 +372,16 @@ namespace Frontier
 
         async void LoadOnlineLeaderboard()
         {
-            if (leaderboardLoading || services == null) return;
+            if (leaderboardLoading || services == null || services.AccountDeletionBusy) return;
             leaderboardLoading = true;
-            leaderboardStatus = "Connecting to online services...";
+            leaderboardStatus = UiText.Get("ranks.connecting");
             RefreshModal();
 
             ServiceResult<AuthIdentity> signIn = await services.Authentication.SignInAnonymouslyAsync();
             if (this == null) return;
             if (!signIn.succeeded)
             {
-                leaderboardStatus = signIn.message;
+                leaderboardStatus = LeaderboardError(signIn.status, signIn.message);
                 leaderboardLoading = false;
                 RefreshModal();
                 return;
@@ -333,25 +393,42 @@ namespace Frontier
             leaderboardLoading = false;
             if (!scores.succeeded)
             {
-                leaderboardStatus = scores.message;
+                leaderboardStatus = LeaderboardError(scores.status, scores.message);
                 RefreshModal();
                 return;
             }
 
             onlineLeaderboardEntries = scores.value;
-            leaderboardStatus = "Online leaderboard connected.";
+            leaderboardStatus = UiText.Get("ranks.connected");
             RefreshModal();
+        }
+
+        static string LeaderboardError(ServiceStatus status, string details)
+        {
+            switch (status)
+            {
+                case ServiceStatus.NotConfigured:
+                    return UiText.Get("ranks.error.not-configured");
+                case ServiceStatus.ConsentRequired:
+                    return UiText.Get("ranks.error.consent");
+                case ServiceStatus.InvalidRequest:
+                    return UiText.Get("ranks.error.request", details);
+                case ServiceStatus.Failed:
+                    return UiText.Get("ranks.error.failed", details);
+                default:
+                    return details;
+            }
         }
 
         void BuildTutorial(VisualElement body)
         {
-            TutorialStep(body, "build", UiKit.Lime, "1. Build", "Open the shop (bottom right) and place a Lumber Camp, then a Refinery and a Warehouse.");
-            TutorialStep(body, "pack", UiKit.Cyan, "2. Storage", "Your starter backpack has only 9 slots. Build a Warehouse early to store extra resources and drag stacks between grids.");
-            TutorialStep(body, "wood", UiKit.Amber, "3. Gather", "Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and collect resources.");
-            TutorialStep(body, "fuel", UiKit.Amber, "4. Refine", "Tap the Refinery to turn raw resources into fuel.");
-            TutorialStep(body, "alarm", UiKit.Magenta, "5. Defend", "Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight and bigger rewards. Gunners and Lasers defend automatically.");
-            TutorialStep(body, "map", UiKit.Cyan, "6. Travel", "Open the world map (top left) and spend fuel to visit new planets. Your bases stay where you built them.");
-            TutorialStep(body, "research", UiKit.Magenta, "7. Upgrade", "The research button (bottom left) manages your bases and unlocks upgrades, including more backpack space.");
+            TutorialStep(body, "build", UiKit.Lime, UiText.Get("tutorial.build.title"), UiText.Get("tutorial.build.body"));
+            TutorialStep(body, "pack", UiKit.Cyan, UiText.Get("tutorial.storage.title"), UiText.Get("tutorial.storage.body"));
+            TutorialStep(body, "wood", UiKit.Amber, UiText.Get("tutorial.gather.title"), UiText.Get("tutorial.gather.body"));
+            TutorialStep(body, "fuel", UiKit.Amber, UiText.Get("tutorial.refine.title"), UiText.Get("tutorial.refine.body"));
+            TutorialStep(body, "alarm", UiKit.Magenta, UiText.Get("tutorial.defend.title"), UiText.Get("tutorial.defend.body"));
+            TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.travel.title"), UiText.Get("tutorial.travel.body"));
+            TutorialStep(body, "research", UiKit.Magenta, UiText.Get("tutorial.upgrade.title"), UiText.Get("tutorial.upgrade.body"));
         }
 
         void TutorialStep(VisualElement body, string icon, Color color, string title, string text)
@@ -371,11 +448,11 @@ namespace Frontier
         void BuildAbout(VisualElement body)
         {
             var card = Card(UiKit.Magenta);
-            card.Add(UiKit.Text("FRONTIER", "fr-title", UiKit.Magenta));
-            var blurb = UiKit.Text("Build bases across the stars. Gather, refine, travel, and defend your worlds from alien waves.", "fr-muted");
+            card.Add(UiKit.Text(UiText.Get("about.title"), "fr-title", UiKit.Magenta));
+            var blurb = UiKit.Text(UiText.Get("about.body"), "fr-muted");
             blurb.style.marginTop = UiKit.Space.S8;
             card.Add(blurb);
-            var version = UiKit.Text("Version " + Application.version, "fr-tiny");
+            var version = UiKit.Text(UiText.Get("about.version", Application.version), "fr-tiny");
             version.style.marginTop = UiKit.Space.S8;
             card.Add(version);
             body.Add(card);
@@ -385,7 +462,7 @@ namespace Frontier
 
         void BuildSettings(VisualElement body)
         {
-            var snd = IconBtn(Sfx.Muted ? "SOUND OFF" : "SOUND ON", Sfx.Muted ? "mute" : "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
+            var snd = IconBtn(UiText.Get(Sfx.Muted ? "settings.sound.off" : "settings.sound.on"), Sfx.Muted ? "mute" : "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
             {
                 Sfx.Muted = !Sfx.Muted;
                 PlayerPrefs.SetInt("fr_muted", Sfx.Muted ? 1 : 0);
@@ -393,7 +470,56 @@ namespace Frontier
             });
             snd.style.marginTop = 0;
             body.Add(snd);
-            body.Add(IconBtn(world.ShowStructureLabels ? "STRUCTURE LABELS: ALWAYS" : "STRUCTURE LABELS: SELECTED ONLY", "base", UiKit.Cyan, () =>
+            BuildAudioVolume(body, "settings.audio.effects", "settings-effects-volume", Sfx.EffectsVolume,
+                value => Sfx.EffectsVolume = value);
+            BuildAudioVolume(body, "settings.audio.music", "settings-music-volume", Sfx.MusicVolume,
+                value => Sfx.MusicVolume = value);
+            var haptics = IconBtn(UiText.Get(HarvestHaptics.Enabled ? "settings.haptics.on" : "settings.haptics.off"), "tools", UiKit.Cyan, () =>
+            {
+                HarvestHaptics.Enabled = !HarvestHaptics.Enabled;
+                RefreshModal();
+            });
+            haptics.name = "settings-haptics";
+            UiKit.SetEnabledLook(haptics, HarvestHaptics.IsSupported);
+            body.Add(haptics);
+            body.Add(UiKit.Text(UiText.Get(HarvestHaptics.IsSupported
+                ? "settings.haptics.help" : "settings.haptics.unavailable"), "fr-tiny"));
+            var notifications = IconBtn(UiText.Get(NotificationPreferences.Enabled
+                ? "notifications.on" : "notifications.off"), "gear", UiKit.Cyan, () =>
+            {
+                NotificationPreferences.Enabled = !NotificationPreferences.Enabled;
+                RefreshModal();
+            });
+            notifications.name = "settings-notifications";
+            UiKit.SetEnabledLook(notifications, services != null && services.Notifications.IsConfigured);
+            body.Add(notifications);
+            body.Add(UiKit.Text(UiText.Get(services != null && services.Notifications.IsConfigured
+                ? "notifications.help" : "notifications.unavailable"), "fr-muted"));
+            if (!string.IsNullOrEmpty(NotificationPreferences.LastError))
+                body.Add(UiKit.Text(UiText.Get("notifications.error",
+                    NotificationPreferences.LastError), "fr-small", UiKit.Amber));
+            var preset = PresentationQuality.Preset;
+            var quality = IconBtn(UiText.Get("settings.quality", preset.ToString().ToUpperInvariant()), "gear", UiKit.Cyan, () =>
+            {
+                PresentationQuality.Preset = (QualityPreset)(((int)PresentationQuality.Preset + 1) % 4);
+                RefreshModal();
+            });
+            quality.name = "settings-quality";
+            body.Add(quality);
+            body.Add(UiKit.Text(UiText.Get("settings.quality.help",
+                PresentationQuality.Budget.Tier.ToString().ToLowerInvariant()), "fr-tiny"));
+            var fps = IconBtn(UiText.Get("settings.frame-rate", PresentationQuality.FrameRate == 0
+                ? UiText.Get("settings.automatic") : UiText.Get("settings.fps", PresentationQuality.FrameRate)),
+                "bolt", UiKit.Cyan, () =>
+            {
+                int current = PresentationQuality.FrameRate;
+                PresentationQuality.FrameRate = current == 0 ? 30 : current == 30 ? 60 : 0;
+                RefreshModal();
+            });
+            fps.name = "settings-frame-rate";
+            body.Add(fps);
+            body.Add(UiKit.Text(UiText.Get("settings.frame-rate.help", PresentationQuality.TargetFrameRate), "fr-tiny"));
+            body.Add(IconBtn(UiText.Get(world.ShowStructureLabels ? "settings.labels.always" : "settings.labels.selected"), "base", UiKit.Cyan, () =>
             {
                 world.ShowStructureLabels = !world.ShowStructureLabels;
                 PlayerPrefs.SetInt("fr_structure_labels", world.ShowStructureLabels ? 1 : 0);
@@ -402,18 +528,48 @@ namespace Frontier
             }));
             BuildTravelSettings(body);
             BuildConsentSettings(body);
+            BuildAccountDeletionSettings(body);
 
-            var reset = IconBtn(confirmReset ? "TAP AGAIN TO ERASE" : "RESET PROGRESS", "close", UiKit.Red, () =>
+            var reset = IconBtn(UiText.Get(confirmReset ? "settings.reset.confirm" : "settings.reset"), "close", UiKit.Red, () =>
             {
                 if (!confirmReset) { confirmReset = true; RefreshModal(); return; }
                 confirmReset = false;
+                if (!gs.TryResetProgress(out string resetMessage))
+                {
+                    RefreshModal();
+                    Toast(resetMessage, UiKit.Red);
+                    return;
+                }
                 CloseModal();
-                gs.ResetProgress();
                 planetView.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet));
                 selected = gs.planet;
             });
             reset.style.marginTop = UiKit.Space.S24;
+            reset.name = "settings-reset";
             body.Add(reset);
+        }
+
+        void BuildAudioVolume(VisualElement body, string labelKey, string name, float initial, Action<float> changed)
+        {
+            body.Add(SectionLabel(UiText.Get(labelKey)));
+            var row = UiKit.Div("fr-row");
+            var slider = new Slider(0f, 1f) { name = name, value = initial };
+            slider.AddToClassList("fr-slider");
+            slider.AddToClassList("fr-audio-slider");
+            slider.tooltip = UiText.Get(labelKey);
+            slider.style.minHeight = UiKit.Size.Touch;
+            slider.style.minWidth = 0;
+            var value = UiKit.Text(UiText.Get("settings.audio.percent", Mathf.RoundToInt(initial * 100f)), "fr-small");
+            value.style.minWidth = 100;
+            value.style.unityTextAlign = TextAnchor.MiddleRight;
+            slider.RegisterValueChangedCallback(e =>
+            {
+                changed(e.newValue);
+                value.text = UiText.Get("settings.audio.percent", Mathf.RoundToInt(e.newValue * 100f));
+            });
+            row.Add(slider);
+            row.Add(value);
+            body.Add(row);
         }
 
         void BuildConsentSettings(VisualElement body)
@@ -424,25 +580,23 @@ namespace Frontier
             bool adsAllowed = saved.hasDecision && saved.adsAllowed;
             bool onlineServicesAllowed = saved.hasDecision && saved.onlineServicesAllowed;
 
-            body.Add(SectionLabel("PRIVACY"));
-            body.Add(UiKit.Text(
-                "Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. Choices save locally and online services stay opt-in. Online services require legal, audience and account-deletion setup. Cloud Save is not yet connected to local save syncing; no progress is uploaded automatically.",
-                "fr-muted"));
+            body.Add(SectionLabel(UiText.Get("privacy.title")));
+            body.Add(UiKit.Text(UiText.Get("privacy.help"), "fr-muted"));
             if (!string.IsNullOrEmpty(services.PrivacyPolicyUrl))
-                body.Add(IconBtn("VIEW PRIVACY POLICY", "about", UiKit.Cyan,
+                body.Add(IconBtn(UiText.Get("privacy.policy"), "about", UiKit.Cyan,
                     () => Application.OpenURL(services.PrivacyPolicyUrl)));
 
-            ConsentChoice(body, "Gameplay analytics", analyticsAllowed, value =>
+            ConsentChoice(body, UiText.Get("privacy.analytics"), analyticsAllowed, value =>
             {
                 analyticsAllowed = value;
                 SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
             });
-            ConsentChoice(body, "Rewarded ads", adsAllowed, value =>
+            ConsentChoice(body, UiText.Get("privacy.ads"), adsAllowed, value =>
             {
                 adsAllowed = value;
                 SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
             });
-            ConsentChoice(body, "Online account, leaderboard and cloud features", onlineServicesAllowed, value =>
+            ConsentChoice(body, UiText.Get("privacy.online"), onlineServicesAllowed, value =>
             {
                 onlineServicesAllowed = value;
                 SaveConsentPreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
@@ -452,6 +606,80 @@ namespace Frontier
         }
 
         bool accountRecoveryBusy;
+        string accountDeletionPlayerId, accountDeletionStatus;
+        bool accountDeletionIsError;
+
+        void BuildAccountDeletionSettings(VisualElement body)
+        {
+            body.Add(SectionLabel(UiText.Get("deletion.title")));
+            body.Add(UiKit.Text(UiText.Get("deletion.help"), "fr-muted"));
+            if (!string.IsNullOrEmpty(accountDeletionStatus))
+                body.Add(UiKit.Text(accountDeletionStatus, "fr-small", accountDeletionIsError ? UiKit.Amber : UiKit.Cyan));
+            if (services == null || !services.Authentication.IsConfigured || !services.CloudSave.IsConfigured)
+            {
+                body.Add(UiKit.Text(UiText.Get("deletion.unavailable"), "fr-small"));
+                return;
+            }
+            string playerId = services.Authentication.CurrentPlayerId;
+            if (string.IsNullOrEmpty(playerId))
+            {
+                accountDeletionPlayerId = null;
+                body.Add(UiKit.Text(UiText.Get("deletion.sign-in"), "fr-small"));
+                return;
+            }
+            if (accountDeletionPlayerId != playerId) accountDeletionPlayerId = null;
+            bool confirming = accountDeletionPlayerId != null;
+            var remove = IconBtn(UiText.Get(services.AccountDeletionBusy ? "deletion.busy"
+                : confirming ? "deletion.confirm" : "deletion.action"), "close", UiKit.Red, RequestAccountDeletion);
+            remove.name = "settings-delete-account";
+            UiKit.SetEnabledLook(remove, !accountRecoveryBusy && !cloudSaveBusy && !leaderboardLoading && !services.AccountDeletionBusy);
+            body.Add(remove);
+            if (confirming)
+            {
+                body.Add(UiKit.Text(UiText.Get("deletion.warning"), "fr-small", UiKit.Amber));
+                var cancel = UiKit.Btn(UiText.Get("deletion.cancel"), UiKit.Muted, () =>
+                {
+                    accountDeletionPlayerId = null;
+                    RefreshModal();
+                });
+                cancel.name = "settings-delete-account-cancel";
+                body.Add(cancel);
+            }
+        }
+
+        async void RequestAccountDeletion()
+        {
+            if (services == null || accountRecoveryBusy || cloudSaveBusy || leaderboardLoading || services.AccountDeletionBusy) return;
+            string playerId = services.Authentication.CurrentPlayerId;
+            if (string.IsNullOrEmpty(playerId)) { accountDeletionPlayerId = null; RefreshModal(); return; }
+            if (accountDeletionPlayerId != playerId)
+            {
+                accountDeletionPlayerId = playerId;
+                RefreshModal();
+                return;
+            }
+            accountDeletionPlayerId = null;
+            accountRecoveryBusy = true;
+            cloudSaveBusy = true;
+            accountDeletionStatus = UiText.Get("deletion.busy");
+            accountDeletionIsError = false;
+            RefreshModal();
+            ServiceResult result = await services.DeleteCurrentAccountAndSaveAsync(playerId);
+            if (this == null) return;
+            accountRecoveryBusy = false;
+            cloudSaveBusy = false;
+            accountDeletionIsError = !result.succeeded;
+            accountDeletionStatus = result.succeeded ? UiText.Get("deletion.done") : result.message;
+            cloudSaveChecked = false;
+            cloudBackupConfirm = cloudRestoreConfirm = localRestoreConfirm = false;
+            cloudSnapshot = localCloudSnapshot = null;
+            cloudRecord = default;
+            cloudSaveStatus = accountRecoveryStatus = null;
+            onlineLeaderboardEntries = null;
+            leaderboardStatus = null;
+            RefreshModal();
+        }
+
         string accountRecoveryStatus;
         bool cloudSaveBusy;
         bool cloudSaveChecked;
@@ -466,14 +694,12 @@ namespace Frontier
 
         void BuildAccountRecoverySettings(VisualElement body, bool onlineServicesAllowed)
         {
-            body.Add(SectionLabel("SAVE RECOVERY"));
-            body.Add(UiKit.Text(
-                "Protect this device's save with Apple Sign-In on iPhone or Google Play Games on Android. Signing in never replaces local progress; cloud copies are compared and moved only when you choose.",
-                "fr-muted"));
+            body.Add(SectionLabel(UiText.Get("recovery.title")));
+            body.Add(UiKit.Text(UiText.Get("recovery.help"), "fr-muted"));
 
             if (!onlineServicesAllowed)
             {
-                body.Add(UiKit.Text("Enable online account features above to manage save recovery.", "fr-small"));
+                body.Add(UiKit.Text(UiText.Get("recovery.enable"), "fr-small"));
                 if (!string.IsNullOrEmpty(cloudSaveStatus))
                     body.Add(UiKit.Text(cloudSaveStatus, "fr-small",
                         cloudSaveStatusIsError ? UiKit.Amber : UiKit.Cyan));
@@ -483,21 +709,21 @@ namespace Frontier
 
             if (services.Authentication.CanRecoverAccount)
             {
-                body.Add(UiKit.Text("Provider: " + services.Authentication.RecoveryProviderName, "fr-small"));
+                body.Add(UiKit.Text(UiText.Get("recovery.provider", services.Authentication.RecoveryProviderName), "fr-small"));
                 if (!string.IsNullOrEmpty(accountRecoveryStatus))
                     body.Add(UiKit.Text(accountRecoveryStatus, "fr-small"));
 
-                var protect = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "PROTECT THIS SAVE",
+                var protect = IconBtn(UiText.Get(accountRecoveryBusy ? "recovery.connecting" : "recovery.protect"),
                     "about", UiKit.Cyan, ProtectCurrentSave);
                 UiKit.SetEnabledLook(protect, !accountRecoveryBusy);
                 body.Add(protect);
 
-                var recover = IconBtn(accountRecoveryBusy ? "CONNECTING..." : "SIGN IN TO RECOVER",
+                var recover = IconBtn(UiText.Get(accountRecoveryBusy ? "recovery.connecting" : "recovery.sign-in"),
                     "about", UiKit.Magenta, SignInToRecoverSave);
                 UiKit.SetEnabledLook(recover, !accountRecoveryBusy);
                 body.Add(recover);
             }
-            else body.Add(UiKit.Text("Account recovery is not enabled for this build.", "fr-small"));
+            else body.Add(UiKit.Text(UiText.Get("recovery.unavailable"), "fr-small"));
 
             BuildCloudSaveSettings(body);
         }
@@ -506,7 +732,7 @@ namespace Frontier
         {
             if (accountRecoveryBusy || services == null) return;
             accountRecoveryBusy = true;
-            accountRecoveryStatus = "Preparing the current save for account linking...";
+            accountRecoveryStatus = UiText.Get("recovery.preparing");
             RefreshModal();
 
             ServiceResult<AuthIdentity> current = await services.Authentication.SignInAnonymouslyAsync();
@@ -518,17 +744,16 @@ namespace Frontier
             }
             if (!current.value.isAnonymous)
             {
-                FinishAccountRecovery("This save is already linked to a recovery account.");
+                FinishAccountRecovery(UiText.Get("recovery.already-linked"));
                 return;
             }
 
-            accountRecoveryStatus = "Complete the sign-in prompt to link this save...";
+            accountRecoveryStatus = UiText.Get("recovery.link-prompt");
             RefreshModal();
             ServiceResult<AuthIdentity> linked = await services.Authentication.LinkRecoveryAccountAsync();
             if (this == null) return;
             FinishAccountRecovery(linked.succeeded
-                ? "Save protected with " + services.Authentication.RecoveryProviderName +
-                    ". Local progress remains on this device; cloud sync is still off."
+                ? UiText.Get("recovery.protected", services.Authentication.RecoveryProviderName)
                 : linked.message);
         }
 
@@ -536,15 +761,14 @@ namespace Frontier
         {
             if (accountRecoveryBusy || services == null) return;
             accountRecoveryBusy = true;
-            accountRecoveryStatus = "Complete the sign-in prompt for your recovery account...";
+            accountRecoveryStatus = UiText.Get("recovery.sign-in-prompt");
             RefreshModal();
 
             ServiceResult<AuthIdentity> recovered =
                 await services.Authentication.SignInWithRecoveryAccountAsync();
             if (this == null) return;
             FinishAccountRecovery(recovered.succeeded
-                ? "Signed in with " + services.Authentication.RecoveryProviderName +
-                    ". This device's local save was not replaced; cloud restore remains a separate step."
+                ? UiText.Get("recovery.signed-in", services.Authentication.RecoveryProviderName)
                 : recovered.message);
         }
 
@@ -560,10 +784,8 @@ namespace Frontier
 
         void BuildCloudSaveSettings(VisualElement body)
         {
-            body.Add(SectionLabel("CLOUD SAVE"));
-            body.Add(UiKit.Text(
-                "No automatic upload or restore. Compare both snapshots, then choose which direction to move data. Replacing a save requires a second confirmation; the local snapshot replaced by a restore stays on this device for undo.",
-                "fr-muted"));
+            body.Add(SectionLabel(UiText.Get("cloud.title")));
+            body.Add(UiKit.Text(UiText.Get("cloud.help"), "fr-muted"));
 
             if (!string.IsNullOrEmpty(cloudSaveStatus))
                 body.Add(UiKit.Text(cloudSaveStatus, "fr-small",
@@ -571,12 +793,12 @@ namespace Frontier
 
             if (!services.CloudSave.IsConfigured)
             {
-                body.Add(UiKit.Text("Cloud Save is disabled or not configured for this build.", "fr-small"));
+                body.Add(UiKit.Text(UiText.Get("cloud.unavailable"), "fr-small"));
                 BuildLocalRestoreBackupSettings(body);
                 return;
             }
 
-            var compare = IconBtn(cloudSaveBusy ? "CHECKING..." : "COMPARE DEVICE AND CLOUD",
+            var compare = IconBtn(UiText.Get(cloudSaveBusy ? "cloud.checking" : "cloud.compare"),
                 "map", UiKit.Cyan, CompareCloudSave);
             UiKit.SetEnabledLook(compare, !cloudSaveBusy);
             body.Add(compare);
@@ -584,15 +806,15 @@ namespace Frontier
             if (cloudSaveChecked)
             {
                 if (localCloudSnapshot != null)
-                    body.Add(UiKit.Text("THIS DEVICE  ·  " + CloudSaveSummary(localCloudSnapshot), "fr-small"));
+                    body.Add(UiKit.Text(UiText.Get("cloud.device-summary", CloudSaveSummary(localCloudSnapshot)), "fr-small"));
 
                 if (!cloudRecord.hasValue)
                 {
-                    body.Add(UiKit.Text("CLOUD  ·  No save exists for this account yet.", "fr-small"));
+                    body.Add(UiKit.Text(UiText.Get("cloud.empty"), "fr-small"));
                     if (localCloudSnapshot != null)
                     {
-                        var create = IconBtn(cloudSaveBusy ? "SAVING..." :
-                                cloudBackupConfirm ? "TAP AGAIN TO CREATE CLOUD COPY" : "CREATE CLOUD COPY",
+                        var create = IconBtn(UiText.Get(cloudSaveBusy ? "cloud.saving" :
+                                cloudBackupConfirm ? "cloud.create.confirm" : "cloud.create"),
                             "about", cloudBackupConfirm ? UiKit.Amber : UiKit.Cyan, RequestCloudBackup);
                         UiKit.SetEnabledLook(create, !cloudSaveBusy);
                         body.Add(create);
@@ -600,24 +822,24 @@ namespace Frontier
                 }
                 else if (cloudSnapshot == null)
                 {
-                    body.Add(UiKit.Text("CLOUD  ·  The stored copy could not be validated and was not changed.", "fr-small", UiKit.Amber));
+                    body.Add(UiKit.Text(UiText.Get("cloud.invalid"), "fr-small", UiKit.Amber));
                 }
                 else
                 {
-                    body.Add(UiKit.Text("CLOUD  ·  " + CloudSaveSummary(cloudSnapshot), "fr-small"));
+                    body.Add(UiKit.Text(UiText.Get("cloud.cloud-summary", CloudSaveSummary(cloudSnapshot)), "fr-small"));
                     string relation = localCloudSnapshot != null &&
                         localCloudSnapshot.saveId == cloudSnapshot.saveId &&
                         localCloudSnapshot.revision == cloudSnapshot.revision
-                        ? "These snapshots have the same save ID and revision."
-                        : "These are different snapshots. Revision alone cannot determine which has the right progress.";
+                        ? UiText.Get("cloud.same")
+                        : UiText.Get("cloud.different");
                     body.Add(UiKit.Text(relation, "fr-small", UiKit.Amber));
 
                     bool safeCloudVersion = gs.CanRestoreCloudSaveSnapshot(cloudSnapshot, out string compatibilityMessage);
                     if (localCloudSnapshot != null && safeCloudVersion)
                     {
-                        var backup = IconBtn(cloudBackupConfirm
-                                ? "TAP AGAIN TO REPLACE CLOUD SAVE"
-                                : "BACK UP THIS DEVICE TO CLOUD",
+                        var backup = IconBtn(UiText.Get(cloudBackupConfirm
+                                ? "cloud.backup.confirm"
+                                : "cloud.backup"),
                             "about", cloudBackupConfirm ? UiKit.Amber : UiKit.Cyan, RequestCloudBackup);
                         UiKit.SetEnabledLook(backup, !cloudSaveBusy);
                         body.Add(backup);
@@ -627,9 +849,9 @@ namespace Frontier
 
                     if (safeCloudVersion)
                     {
-                        var restore = IconBtn(cloudRestoreConfirm
-                                ? "TAP AGAIN TO RESTORE CLOUD SAVE"
-                                : "RESTORE CLOUD SAVE TO THIS DEVICE",
+                        var restore = IconBtn(UiText.Get(cloudRestoreConfirm
+                                ? "cloud.restore.confirm"
+                                : "cloud.restore"),
                             "back", cloudRestoreConfirm ? UiKit.Red : UiKit.Magenta, RequestCloudRestore);
                         UiKit.SetEnabledLook(restore, !cloudSaveBusy);
                         body.Add(restore);
@@ -643,10 +865,10 @@ namespace Frontier
         void BuildLocalRestoreBackupSettings(VisualElement body)
         {
             if (!gs.HasCloudRestoreBackup) return;
-            body.Add(UiKit.Text("A previous device save is retained locally after a cloud restore.", "fr-small"));
-            var undo = IconBtn(localRestoreConfirm
-                    ? "TAP AGAIN TO RESTORE PREVIOUS DEVICE SAVE"
-                    : "UNDO CLOUD RESTORE",
+            body.Add(UiKit.Text(UiText.Get("cloud.undo.help"), "fr-small"));
+            var undo = IconBtn(UiText.Get(localRestoreConfirm
+                    ? "cloud.undo.confirm"
+                    : "cloud.undo"),
                 "back", localRestoreConfirm ? UiKit.Red : UiKit.Muted, RequestLocalRestore);
             UiKit.SetEnabledLook(undo, !cloudSaveBusy);
             body.Add(undo);
@@ -654,16 +876,15 @@ namespace Frontier
 
         static string CloudSaveSummary(SaveV2 save)
         {
-            return "XP " + save.player.xp + "  ·  " + save.worlds.Count + " worlds  ·  revision " +
-                save.revision + "  ·  current world " +
-                (string.IsNullOrEmpty(save.location.currentPlanetId) ? "unknown" : save.location.currentPlanetId);
+            return UiText.Get("cloud.snapshot", save.player.xp, save.worlds.Count, save.revision,
+                string.IsNullOrEmpty(save.location.currentPlanetId) ? UiText.Get("cloud.world.unknown") : save.location.currentPlanetId);
         }
 
         async void CompareCloudSave()
         {
             if (cloudSaveBusy || services == null) return;
             cloudSaveBusy = true;
-            cloudSaveStatus = "Writing the latest device snapshot, then reading the cloud copy...";
+            cloudSaveStatus = UiText.Get("cloud.comparing");
             cloudSaveStatusIsError = false;
             cloudBackupConfirm = false;
             cloudRestoreConfirm = false;
@@ -696,12 +917,12 @@ namespace Frontier
                 }
 
                 FinishCloudSaveAction(cloudRecord.hasValue
-                    ? "Both saves are ready to compare. No copy was changed."
-                    : "No cloud copy exists. The device save is unchanged.", false);
+                    ? UiText.Get("cloud.compared")
+                    : UiText.Get("cloud.compared-empty"), false);
             }
             catch (Exception exception)
             {
-                FinishCloudSaveAction("Cloud save comparison failed: " + exception.Message, true);
+                FinishCloudSaveAction(UiText.Get("cloud.compare-failed", exception.Message), true);
             }
         }
 
@@ -713,14 +934,13 @@ namespace Frontier
             {
                 if (!JsonShape.IsCompleteObject(payload))
                 {
-                    message = "The cloud save is incomplete and was not changed.";
+                    message = UiText.Get("cloud.incomplete");
                     return false;
                 }
                 int schema = SaveSerializer.Instance.ReadSchemaVersion(payload);
                 if (schema != SaveSchema.Current)
                 {
-                    message = "The cloud save uses schema " + schema +
-                        "; this build can compare only schema " + SaveSchema.Current + ".";
+                    message = UiText.Get("cloud.schema", schema, SaveSchema.Current);
                     return false;
                 }
                 save = SaveSerializer.Instance.DeserializeV2(payload).Normalize();
@@ -728,7 +948,7 @@ namespace Frontier
             }
             catch (Exception exception)
             {
-                message = "The cloud save could not be validated: " + exception.Message;
+                message = UiText.Get("cloud.validation-failed", exception.Message);
                 return false;
             }
         }
@@ -740,8 +960,8 @@ namespace Frontier
             {
                 cloudBackupConfirm = true;
                 cloudSaveStatus = cloudRecord.hasValue
-                    ? "This will replace the current cloud copy with this device's save. Tap again to confirm."
-                    : "This will create a cloud copy of this device's save. Tap again to confirm.";
+                    ? UiText.Get("cloud.backup.warning")
+                    : UiText.Get("cloud.create.warning");
                 cloudSaveStatusIsError = false;
                 RefreshModal();
                 return;
@@ -754,7 +974,7 @@ namespace Frontier
         {
             if (cloudSaveBusy || services == null) return;
             cloudSaveBusy = true;
-            cloudSaveStatus = "Securing the device save and checking the cloud write lock...";
+            cloudSaveStatus = UiText.Get("cloud.backing-up");
             cloudSaveStatusIsError = false;
             RefreshModal();
 
@@ -777,7 +997,7 @@ namespace Frontier
                     cloudRecord = current.value;
                     cloudSaveChecked = false;
                     cloudSnapshot = null;
-                    FinishCloudSaveAction("The cloud copy changed since comparison. Compare again before choosing an action.", true);
+                    FinishCloudSaveAction(UiText.Get("cloud.backup.changed"), true);
                     return;
                 }
 
@@ -794,11 +1014,11 @@ namespace Frontier
                 cloudRecord = written.value;
                 cloudSnapshot = localCloudSnapshot;
                 cloudSaveChecked = true;
-                FinishCloudSaveAction("This device's save was backed up to the cloud. No local progress was replaced.", false);
+                FinishCloudSaveAction(UiText.Get("cloud.backed-up"), false);
             }
             catch (Exception exception)
             {
-                FinishCloudSaveAction("Cloud backup failed: " + exception.Message, true);
+                FinishCloudSaveAction(UiText.Get("cloud.backup-failed", exception.Message), true);
             }
         }
 
@@ -808,7 +1028,7 @@ namespace Frontier
             if (!cloudRestoreConfirm)
             {
                 cloudRestoreConfirm = true;
-                cloudSaveStatus = "This replaces device progress with the shown cloud save. The current device save will be retained for undo. Tap again to confirm.";
+                cloudSaveStatus = UiText.Get("cloud.restore.warning");
                 cloudSaveStatusIsError = false;
                 RefreshModal();
                 return;
@@ -821,7 +1041,7 @@ namespace Frontier
         {
             if (cloudSaveBusy || services == null) return;
             cloudSaveBusy = true;
-            cloudSaveStatus = "Verifying the cloud copy has not changed...";
+            cloudSaveStatus = UiText.Get("cloud.restoring");
             cloudSaveStatusIsError = false;
             RefreshModal();
 
@@ -839,7 +1059,7 @@ namespace Frontier
                     cloudRecord = current.value;
                     cloudSaveChecked = false;
                     cloudSnapshot = null;
-                    FinishCloudSaveAction("The cloud copy changed since comparison. Compare again before restoring.", true);
+                    FinishCloudSaveAction(UiText.Get("cloud.restore.changed"), true);
                     return;
                 }
 
@@ -854,7 +1074,7 @@ namespace Frontier
             }
             catch (Exception exception)
             {
-                FinishCloudSaveAction("Cloud restore failed: " + exception.Message, true);
+                FinishCloudSaveAction(UiText.Get("cloud.restore-failed", exception.Message), true);
             }
         }
 
@@ -864,7 +1084,7 @@ namespace Frontier
             if (!localRestoreConfirm)
             {
                 localRestoreConfirm = true;
-                cloudSaveStatus = "This swaps the current save with the retained device save. Tap again to confirm.";
+                cloudSaveStatus = UiText.Get("cloud.undo.warning");
                 cloudSaveStatusIsError = false;
                 RefreshModal();
                 return;
@@ -896,13 +1116,13 @@ namespace Frontier
             var button = new Button();
             button.AddToClassList("fr-consent-choice");
             button.Add(UiKit.Text(label, "fr-small"));
-            var state = UiKit.Text(value ? "ON" : "OFF", "fr-consent-choice-state");
+            var state = UiKit.Text(UiText.Get(value ? "privacy.on" : "privacy.off"), "fr-consent-choice-state");
             state.style.color = value ? UiKit.Lime : UiKit.Muted;
             button.Add(state);
             button.clicked += () =>
             {
                 value = !value;
-                state.text = value ? "ON" : "OFF";
+                state.text = UiText.Get(value ? "privacy.on" : "privacy.off");
                 state.style.color = value ? UiKit.Lime : UiKit.Muted;
                 onChanged(value);
             };
@@ -913,23 +1133,181 @@ namespace Frontier
         {
             services.Consent.SavePreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
             Sfx.Good();
-            Toast("Privacy choice saved on this device", UiKit.Cyan);
+            Toast(UiText.Get("privacy.saved"), UiKit.Cyan);
         }
 
         // ------------------------------------------------------------ command (bases + research)
         void BuildResearch(VisualElement body)
         {
             var tabs = UiKit.Div("fr-tabs");
-            tabs.Add(TabButton("base", "BASES", researchTab == 0, UiKit.Magenta, () => researchTab = 0));
-            tabs.Add(TabButton("tools", "TOOLS", researchTab == 1, UiKit.Magenta, () => researchTab = 1));
-            tabs.Add(TabButton("research", "UPGRADES", researchTab == 2, UiKit.Magenta, () => researchTab = 2));
+            tabs.Add(TabButton("base", UiText.Get("command.bases"), researchTab == 0, UiKit.Magenta, () => researchTab = 0));
+            tabs.Add(TabButton("tools", UiText.Get("command.tools"), researchTab == 1, UiKit.Magenta, () => researchTab = 1));
+            tabs.Add(TabButton("research", UiText.Get("command.tech"), researchTab == 2, UiKit.Magenta, () => researchTab = 2));
+            tabs.Add(TabButton("build", UiText.Get("builders.tab"), researchTab == 3, UiKit.Magenta, () => researchTab = 3));
             body.Add(tabs);
             switch (researchTab)
             {
                 case 0: BuildBases(body); break;
                 case 1: BuildTools(body); break;
+                case 3: BuildBuilders(body); break;
                 default: BuildProgression(body); break;
             }
+        }
+
+        void BuildBuilders(VisualElement body)
+        {
+            body.Add(UiKit.Text(UiText.Get("builders.help"), "fr-muted"));
+            var jobs = UiKit.Div();
+            jobs.name = "builder-jobs";
+            body.Add(jobs);
+            void RefreshJobs()
+            {
+                jobs.Clear();
+                var summary = UiKit.Text(UiText.Get("builders.summary", gs.BusyBuilderCount, gs.BuilderCount, gs.ShardBalance), "fr-small");
+                jobs.Add(summary);
+                summary.schedule.Execute(() => summary.text = UiText.Get("builders.summary",
+                    gs.BusyBuilderCount, gs.BuilderCount, gs.ShardBalance)).Every(1000);
+                int count = 0;
+                foreach (var structure in gs.structures)
+                {
+                    if (!gs.IsBuilderBusy(structure)) continue;
+                    count++;
+                    var job = structure;
+                    var planet = gs.universe.Get(job.planetId);
+                    if (planet == null)
+                    {
+                        jobs.Add(Note(UiText.Get("builders.unknown-world", job.planetId), UiKit.Amber));
+                        continue;
+                    }
+                    var card = Card(UiKit.Cyan);
+                    card.Add(UiKit.Text(UiText.Get("builders.structure", job.def.displayName, planet.Name), "fr-h2"));
+                    var status = UiKit.Text(gs.BuilderJobStatus(job), "fr-small");
+                    card.Add(status);
+                    int cost = gs.BuilderSkipCost(job);
+                    bool confirming = confirmBuilderFinish == job;
+                    string key = cost == 0 ? confirming ? "builders.confirm-free" : "builders.finish-free" :
+                        confirming ? "builders.confirm-paid" : "builders.finish-paid";
+                    var finish = IconBtn(UiText.Get(key, cost), "bolt", confirming ? UiKit.Amber : UiKit.Magenta, () =>
+                    {
+                        if (confirmBuilderFinish != job)
+                        {
+                            confirmBuilderPurchaseOwned = -1;
+                            confirmBuilderFinish = job;
+                            RefreshModal();
+                            return;
+                        }
+                        confirmBuilderFinish = null;
+                        var result = gs.FinishBuilderJob(job, cost, out string message);
+                        if (result == BuilderFinishResult.Rejected) Sfx.Bad();
+                        else Sfx.Good();
+                        Toast(message, result == BuilderFinishResult.Saved ? UiKit.Lime :
+                            result == BuilderFinishResult.PendingSave ? UiKit.Amber : UiKit.Red);
+                        RefreshModal();
+                    });
+                    finish.name = "builder-finish-" + job.planetId + "-" + job.slot;
+                    UiKit.SetEnabledLook(finish, !gs.SaveIsReadOnly && gs.ShardBalance >= cost &&
+                        gs.db.shardRules != null && gs.db.shardRules.data != null);
+                    card.Add(finish);
+                    var finishText = finish.Q<Label>(className: "fr-btn-label");
+                    card.schedule.Execute(() =>
+                    {
+                        status.text = gs.BuilderJobStatus(job);
+                        cost = gs.BuilderSkipCost(job);
+                        bool armed = confirmBuilderFinish == job;
+                        string currentKey = cost == 0 ? armed ? "builders.confirm-free" : "builders.finish-free" :
+                            armed ? "builders.confirm-paid" : "builders.finish-paid";
+                        finishText.text = UiText.Get(currentKey, cost);
+                        UiKit.SetEnabledLook(finish, gs.IsBuilderBusy(job) && !gs.SaveIsReadOnly && gs.ShardBalance >= cost &&
+                            gs.db.shardRules != null && gs.db.shardRules.data != null);
+                    }).Every(1000);
+                    jobs.Add(card);
+                }
+                foreach (var delta in gs.world.All)
+                {
+                    foreach (var clearance in delta.obstacleJobs)
+                    {
+                        var planet = gs.universe.Get(delta.planetId);
+                        if (planet == null)
+                        {
+                            jobs.Add(Note(UiText.Get("builders.unknown-world", delta.planetId), UiKit.Amber));
+                            count++;
+                            continue;
+                        }
+                        int pad = clearance.pad;
+                        var card = Card(UiKit.Amber);
+                        card.Add(UiKit.Text(UiText.Get("builders.clearance", planet.Name, pad + 1), "fr-h2"));
+                        var status = UiKit.Text("", "fr-small");
+                        card.Add(status);
+                        void UpdateClearance()
+                        {
+                            int remaining = gs.ObstacleClearSecondsRemaining(planet, pad);
+                            status.text = UiText.Get(remaining > 0 ? "obstacle.clearing" : "obstacle.completing", FormatJobDuration(remaining));
+                        }
+                        UpdateClearance();
+                        card.schedule.Execute(UpdateClearance).Every(1000);
+                        card.Add(IconBtn(UiText.Get(planet.Id == gs.planet.Id ? "builders.manage-clearance" : "builders.view-world"),
+                            "map", UiKit.Amber, () =>
+                            {
+                                CloseModal();
+                                if (planet.Id == gs.planet.Id)
+                                {
+                                    if (!world.SimulateObstacleTap(pad)) Toast(UiText.Get("builders.clearance-unavailable"), UiKit.Amber);
+                                }
+                                else
+                                {
+                                    OpenMap();
+                                    SelectMapWorld(planet);
+                                }
+                            }));
+                        jobs.Add(card);
+                        count++;
+                    }
+                }
+                if (count == 0) jobs.Add(Note(UiText.Get("builders.empty"), UiKit.Cyan));
+                BuildCrewRecruitment(jobs);
+                if (gs.SaveIsReadOnly) jobs.Add(Note(UiText.Get("builders.read-only"), UiKit.Amber));
+            }
+            RefreshJobs();
+        }
+
+        void BuildCrewRecruitment(VisualElement body)
+        {
+            var rules = gs.db.shardRules != null ? gs.db.shardRules.data : null;
+            if (rules == null) return;
+            int owned = gs.BuilderCount;
+            int price = gs.NextBuilderPurchaseCost;
+            var card = Card(UiKit.Cyan);
+            card.Add(UiKit.Text(UiText.Get("builders.recruit-title"), "fr-small"));
+            card.Add(UiKit.Text(UiText.Get("builders.recruit-help"), "fr-tiny"));
+            if (price < 0)
+                card.Add(Note(UiText.Get(owned >= rules.maxBuilders ? "builders.cap-reached" : "builders.earn-second"), UiKit.Muted));
+            else
+            {
+                bool confirming = confirmBuilderPurchaseOwned == owned;
+                card.Add(UiKit.Text(UiText.Get("builders.recruit-offer", owned + 1, rules.maxBuilders), "fr-small"));
+                var buy = IconBtn(UiText.Get(confirming ? "builders.recruit-confirm" : "builders.recruit", price),
+                    "build", confirming ? UiKit.Amber : UiKit.Cyan, () =>
+                    {
+                        if (confirmBuilderPurchaseOwned != owned)
+                        {
+                            confirmBuilderFinish = null;
+                            confirmBuilderPurchaseOwned = owned;
+                            RefreshModal();
+                            return;
+                        }
+                        confirmBuilderPurchaseOwned = -1;
+                        var result = gs.PurchaseBuilder(owned, price, out string message);
+                        if (result == BuilderPurchaseResult.Rejected) Sfx.Bad();
+                        else Sfx.Good();
+                        Toast(message, result == BuilderPurchaseResult.Saved ? UiKit.Lime :
+                            result == BuilderPurchaseResult.PendingSave ? UiKit.Amber : UiKit.Red);
+                        RefreshModal();
+                    });
+                buy.name = "builder-recruit";
+                UiKit.SetEnabledLook(buy, !gs.SaveIsReadOnly && gs.ShardBalance >= price);
+                card.Add(buy);
+            }
+            body.Add(card);
         }
 
         void BuildTools(VisualElement body)
@@ -950,7 +1328,8 @@ namespace Frontier
             var u2 = tools[toolTab];
             int lvl = gs.Level(u2);
             body.Add(UiKit.Text(u2.description, "fr-muted"));
-            var equipped = UiKit.Text("Equipped: " + gs.ToolName(u2.tool) + "   DMG x" + gs.ToolDamage(u2.tool).ToString("0.0") + "   Yield x" + gs.ToolMultiplier(u2.tool).ToString("0.0"), "fr-small");
+            var equipped = UiKit.Text(UiText.Get("tools.equipped-summary", gs.ToolName(u2.tool),
+                gs.ToolDamage(u2.tool), gs.ToolMultiplier(u2.tool)), "fr-small");
             equipped.style.marginTop = UiKit.Space.S8; equipped.style.marginBottom = UiKit.Space.S12;
             body.Add(equipped);
             for (int l = 0; l <= u2.maxLevel; l++)
@@ -962,16 +1341,18 @@ namespace Frontier
                 var top = UiKit.Div("fr-row");
                 top.Add(UiKit.Text(u2.NameAtLevel(l), "fr-h2"));
                 top.Add(UiKit.Div("fr-spacer"));
-                top.Add(UiKit.Text(owned ? (l == lvl ? "EQUIPPED" : "OWNED") : next ? "NEXT" : "LOCKED", "fr-tiny", l == lvl ? UiKit.Lime : (Color?)null));
+                top.Add(UiKit.Text(UiText.Get(owned ? (l == lvl ? "tools.equipped" : "tools.owned")
+                    : next ? "tools.next-state" : "tools.locked"), "fr-tiny", l == lvl ? UiKit.Lime : (Color?)null));
                 card.Add(top);
-                card.Add(UiKit.Text("DMG x" + (1f + FrontierSettings.I.toolDamagePerLevel * l).ToString("0.0") + "   Yield x" + ((1f + u2.valuePerLevel * l) * gs.CatalogToolYieldMultiplier(u2.tool)).ToString("0.0") + "   Faster swing", "fr-tiny"));
+                card.Add(UiKit.Text(UiText.Get("tools.level-summary", 1f + FrontierSettings.I.toolDamagePerLevel * l,
+                    (1f + u2.valuePerLevel * l) * gs.CatalogToolYieldMultiplier(u2.tool)), "fr-tiny"));
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);
-                    card.Add(UiKit.CostRow(cost, gs, true));
-                    var buy = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
+                    card.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+                    var buy = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                     {
-                        if (gs.Buy(u2)) { Sfx.Good(); Toast(u2.NameAtLevel(gs.Level(u2)) + " ready!", UiKit.Ui(u2.color)); planetView.Punch(); }
+                        if (gs.Buy(u2)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", u2.NameAtLevel(gs.Level(u2))), UiKit.Ui(u2.color)); planetView.Punch(); }
                         else Sfx.Bad();
                     });
                     UiKit.SetEnabledLook(buy, gs.CanBuy(u2));
@@ -1006,9 +1387,15 @@ namespace Frontier
                 var hn = UiKit.Text(p.Name.ToUpper(), "fr-small", UiKit.Ui(p.Rim));
                 hn.style.marginRight = UiKit.Space.S12;
                 h.Add(hn);
-                if (p.Id == gs.planet.Id) h.Add(UiKit.Text("YOU ARE HERE", "fr-tiny"));
+                if (p.Id == gs.planet.Id) h.Add(UiKit.Text(UiText.Get("command.here"), "fr-tiny"));
                 body.Add(h);
-                if (here.Count == 0) body.Add(UiKit.Text("No base yet - place structures from the build menu.", "fr-muted"));
+                if (here.Count == 0)
+                {
+                    body.Add(UiKit.Text(UiText.Get("command.empty-base", p.Name), "fr-muted"));
+                    var build = IconBtn(UiText.Get("guide.action.gather-shop"), "build", UiKit.Lime, OpenGatherShop);
+                    build.name = "empty-base-action";
+                    body.Add(build);
+                }
                 foreach (var st in here)
                 {
                     var s = st;
@@ -1017,7 +1404,7 @@ namespace Frontier
                     var top = UiKit.Div("fr-card-head");
                     top.Add(Icons.Make(StructureIcon(s.def.kind), c, UiKit.Size.IconLg));
                     var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
-                    col.Add(UiKit.Text(s.def.displayName.ToUpper() + "  LV " + s.level + "/" + s.def.maxLevel, "fr-h2"));
+                    col.Add(UiKit.Text(UiText.Get("command.structure-level", s.def.displayName.ToUpper(), s.level, s.def.maxLevel), "fr-h2"));
                     bool max = s.level >= s.def.maxLevel;
                     col.Add(UiKit.Text(StructureEffect(s.def, s.level) + (max ? "" : "  >  " + StructureEffect(s.def, s.level + 1)), "fr-tiny"));
                     top.Add(col);
@@ -1026,14 +1413,14 @@ namespace Frontier
                     if (!max && !gs.IsBuilderBusy(s))
                     {
                         var cost = s.def.UpgradeCost(s.level);
-                        card.Add(UiKit.CostRow(cost, gs, true));
-                        var up = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
+                        card.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+                        var up = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                         {
                             if (gs.UpgradeStructure(s))
                             {
                                 Sfx.Good();
-                                Toast(gs.IsUpgradeInProgress(s) ? "Upgrade started · " + gs.BuilderJobStatus(s) :
-                                    s.def.displayName + " LV " + s.level, c);
+                                Toast(gs.IsUpgradeInProgress(s) ? UiText.Get("command.upgrade-started", gs.BuilderJobStatus(s)) :
+                                    UiText.Get("command.upgraded", s.def.displayName, s.level), c);
                             }
                             else Sfx.Bad();
                         });
@@ -1041,11 +1428,11 @@ namespace Frontier
                         UiKit.SetEnabledLook(up, gs.CanUpgradeStructure(s));
                         card.Add(up);
                     }
-                    else card.Add(Note("MAXED", UiKit.Lime));
+                    else if (max) card.Add(Note(UiText.Get("command.maxed"), UiKit.Lime));
                     body.Add(card);
                 }
             }
-            if (!any) body.Add(UiKit.Text("Build a refinery and an alarm to establish a base.", "fr-muted"));
+            if (!any) body.Add(UiKit.Text(UiText.Get("command.no-bases"), "fr-muted"));
         }
 
         void BuildUpgrades(VisualElement body, UpgradeCategory cat)
@@ -1061,24 +1448,25 @@ namespace Frontier
                     var top = UiKit.Div("fr-row");
                     top.Add(UiKit.Text(u.NameAtLevel(lvl), "fr-h2"));
                     top.Add(UiKit.Div("fr-spacer"));
-                    top.Add(UiKit.Text("LV " + lvl + "/" + u.maxLevel, "fr-small"));
+                    top.Add(UiKit.Text(UiText.Get("command.level", lvl, u.maxLevel), "fr-small"));
                     card.Add(top);
                     card.Add(UiKit.Text(u.description, "fr-muted"));
-                    card.Add(UiKit.Text("Now " + UpgradeEffectText(u, lvl) + (max ? "" : "  >  " + UpgradeEffectText(u, lvl + 1)), "fr-tiny"));
+                    card.Add(UiKit.Text(UiText.Get(max ? "command.effect.current" : "command.effect.next",
+                        UpgradeEffectText(u, lvl), max ? "" : UpgradeEffectText(u, lvl + 1)), "fr-tiny"));
                     if (!max)
                     {
                         var cost = u.CostAt(lvl);
-                        card.Add(UiKit.CostRow(cost, gs, true));
-                        var buy = IconBtn("UPGRADE", "up", UiKit.Magenta, () =>
+                        card.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+                        var buy = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                         {
-                            if (gs.Buy(u)) { Sfx.Good(); Toast(u.NameAtLevel(gs.Level(u)) + " ready!", UiKit.Ui(u.color)); planetView.Punch(); }
+                            if (gs.Buy(u)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", u.NameAtLevel(gs.Level(u))), UiKit.Ui(u.color)); planetView.Punch(); }
                             else Sfx.Bad();
                         });
                         if (gs.UpgradeLockReason(u) != null) card.Add(Note(gs.UpgradeLockReason(u), UiKit.Amber));
                         UiKit.SetEnabledLook(buy, gs.CanBuy(u));
                         card.Add(buy);
                     }
-                    else card.Add(Note("MAXED", UiKit.Lime));
+                    else card.Add(Note(UiText.Get("command.maxed"), UiKit.Lime));
                     body.Add(card);
                 }
             }
@@ -1090,7 +1478,19 @@ namespace Frontier
         void BuildPack(VisualElement body)
         {
             SyncPack();
-            body.Add(UiKit.Text(gs.SlotsUsed + " / " + gs.Slots + " slots used  -  drag to rearrange", "fr-muted"));
+            bool empty = gs.SlotsUsed == 0;
+            body.Add(UiKit.Text(UiText.Get(empty ? "pack.capacity" : "pack.capacity.rearrange", gs.SlotsUsed, gs.Slots), "fr-muted"));
+            if (empty)
+            {
+                body.Add(UiKit.Text(UiText.Get("pack.empty.title"), "fr-h2"));
+                body.Add(UiKit.Text(UiText.Get("pack.empty.help"), "fr-muted"));
+                var harvest = AvailableLocalGatherer();
+                var gather = IconBtn(harvest != null ? UiText.Get("pack.open-gatherer", harvest.def.displayName.ToUpperInvariant())
+                    : UiText.Get("guide.action.gather-shop"),
+                    harvest != null ? StructureIcon(harvest.def.kind) : "build", UiKit.Lime, RunEmptyPackAction);
+                gather.name = "empty-pack-action";
+                body.Add(gather);
+            }
             var grid = UiKit.Div("fr-grid");
             grid.style.marginTop = UiKit.Space.S8;
 
@@ -1116,8 +1516,8 @@ namespace Frontier
                 row.Add(Icons.Make(Icons.ForResource(r), c, UiKit.Size.IconXl));
                 var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
                 col.Add(UiKit.Text(r.displayName.ToUpper(), "fr-h2"));
-                col.Add(UiKit.Text("In this slot: " + packCnt[packSel] + " / " + r.stackSize, "fr-small"));
-                col.Add(UiKit.Text("Total carried: " + gs.Count(r), "fr-small"));
+                col.Add(UiKit.Text(UiText.Get("pack.slot-count", packCnt[packSel], r.stackSize), "fr-small"));
+                col.Add(UiKit.Text(UiText.Get("pack.total-count", gs.Count(r)), "fr-small"));
                 row.Add(col);
                 detail.Add(row);
                 if (!string.IsNullOrEmpty(r.description))
@@ -1127,12 +1527,12 @@ namespace Frontier
                     detail.Add(desc);
                 }
             }
-            else detail.Add(UiKit.Text("Tap an item to see its details.", "fr-muted"));
-            body.Add(detail);
+            else if (!empty) detail.Add(UiKit.Text(UiText.Get("pack.select-help"), "fr-muted"));
+            if (!empty) body.Add(detail);
             var salvage = gs.ObstacleRewardsOn(gs.planet);
             if (salvage.Count > 0)
             {
-                body.Add(SectionLabel("RECOVERED SURFACE SALVAGE"));
+                body.Add(SectionLabel(UiText.Get("pack.salvage.title")));
                 foreach (var reward in salvage)
                 {
                     ResourceSO resource = gs.db.FindResource(reward.resourceId);
@@ -1142,20 +1542,20 @@ namespace Frontier
                     row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconLg));
                     var text = UiKit.Div("fr-card-text");
                     text.Add(UiKit.Text(resource.displayName, "fr-small"));
-                    text.Add(UiKit.Text(reward.amount + " waiting on " + gs.planet.Name, "fr-tiny"));
+                    text.Add(UiKit.Text(UiText.Get("pack.salvage.waiting", reward.amount, gs.planet.Name), "fr-tiny"));
                     row.Add(text);
                     int pad = reward.pad;
-                    var claim = IconBtn("CLAIM", "pack", UiKit.Amber, () =>
+                    var claim = IconBtn(UiText.Get("pack.salvage.claim"), "pack", UiKit.Amber, () =>
                     {
                         if (gs.ClaimObstacleReward(gs.planet, pad))
                         {
                             Sfx.Good();
-                            Toast("Surface salvage added to backpack", UiKit.Lime);
+                            Toast(UiText.Get("pack.salvage.added"), UiKit.Lime);
                         }
                         else
                         {
                             Sfx.Bad();
-                            Toast("Make room in your backpack to claim salvage", UiKit.Red);
+                            Toast(UiText.Get("pack.salvage.full"), UiKit.Red);
                         }
                     });
                     UiKit.SetEnabledLook(claim, gs.FreeSpace(resource) > 0);
@@ -1163,7 +1563,7 @@ namespace Frontier
                     body.Add(row);
                 }
             }
-            body.Add(UiKit.Text("Upgrade the backpack in Command > Research for more slots.", "fr-tiny"));
+            body.Add(UiKit.Text(UiText.Get("pack.upgrade-help"), "fr-tiny"));
         }
 
         ResourceSO[] packRes = new ResourceSO[0];

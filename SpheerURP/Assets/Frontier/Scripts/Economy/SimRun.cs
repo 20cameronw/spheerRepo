@@ -265,12 +265,11 @@ namespace Frontier.Economy
             if (insts.Count > 0) Mark("first_structure");
             if (BuiltLevel(homePlanet, sWarehouse, 1) >= 1) Mark("first_warehouse");
             if (craftedOnce[rFuel]) Mark("first_fuel");
-            if (landedCount >= 2) { Mark("first_hop"); Mark("era_foothold"); }
+            if (landedCount >= 2) Mark("first_hop");
             if (HomeLevel(sLab) >= 1) Mark("research_lab");
             if (wavesCalled >= 1) Mark("first_wave");
             if (upgLevel[uJump] >= 1) Mark("jump_range_1");
             if (Builders() >= 2) Mark("second_builder");
-            if (res.milestones.ContainsKey("research_lab") && res.milestones.ContainsKey("jump_range_1")) Mark("era_settlement");
             if (craftedOnce[rSteel]) Mark("first_steel");
             if (HomeLevel(sCargoDepot) >= 1) Mark("cargo_depot");
             bool anySystem = false;
@@ -278,7 +277,7 @@ namespace Frontier.Economy
             if (anySystem) Mark("second_system");
             bool plating = false, radPlating = upgLevel[uHull[3]] >= 1;
             for (int i = 0; i < TravelModel.HazardCount; i++) if (upgLevel[uHull[i]] >= 1) plating = true;
-            if (plating) { Mark("first_hazard_plating"); Mark("era_industry"); }
+            if (plating) Mark("first_hazard_plating");
             if (HomeLevel(SI("chem_reactor")) >= 1) Mark("chem_reactor");
             if (craftedOnce[rPlasma]) Mark("plasma_crafted");
             if (HomeLevel(sRelay) >= 1) Mark("orbital_relay");
@@ -287,11 +286,23 @@ namespace Frontier.Economy
             if (HomeLevel(sAuto) >= 1) Mark("auto_harvester");
             if (radPlating) Mark("rad_plating");
             if (craftedOnce[rAnti]) Mark("antimatter_crafted");
-            if (radPlating && craftedOnce[rAnti]) Mark("era_interstellar");
             if (craftedOnce[RI("void_alloy")]) Mark("void_alloy_crafted");
             int stages = mega[0].stage + mega[1].stage + mega[2].stage;
             if (stages >= 1) Mark("mega_first_stage");
-            if (mega[0].stage >= 3 || mega[1].stage >= 3 || mega[2].stage >= 3) { Mark("mega_stage_3"); Mark("era_ascension"); }
+            int highestStage = Math.Max(mega[0].stage, Math.Max(mega[1].stage, mega[2].stage));
+            if (highestStage >= 3) Mark("mega_stage_3");
+            var eraFacts = new EraFacts
+            {
+                worldsLanded = landedCount,
+                researchLabBuilt = res.milestones.ContainsKey("research_lab"),
+                jumpRangePurchased = res.milestones.ContainsKey("jump_range_1"),
+                hazardPlatingPurchased = plating,
+                radiationPlatingPurchased = radPlating,
+                antimatterCrafted = craftedOnce[rAnti],
+                highestMegaprojectStage = highestStage
+            };
+            for (var era = FrontierEra.Foothold; era <= FrontierEra.Ascension; era++)
+                if (EraRules.Meets(era, eraFacts)) Mark(SimBands.EraMilestones[(int)era]);
             for (int k = 1; k <= 9; k++) if (maxTierLanded >= k) Mark("reach_tier_" + k);
             if (HomeLevel(SI("fuel_depot")) >= 1) Mark("fuel_depot");
             if (toolTier[TI("axe")] >= 2) Mark("axe_2");

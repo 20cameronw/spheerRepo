@@ -11,25 +11,25 @@ namespace Frontier
         void BuildTravelSettings(VisualElement body)
         {
             bool assist = TravelPrefs.AssistMode;
-            var assistBtn = IconBtn(assist ? "ASSIST MODE: ON" : "ASSIST MODE: OFF", "shield", assist ? UiKit.Lime : UiKit.Cyan, () =>
+            var assistBtn = IconBtn(UiText.Get(assist ? "settings.assist.on" : "settings.assist.off"), "shield", assist ? UiKit.Lime : UiKit.Cyan, () =>
             {
                 TravelPrefs.AssistMode = !TravelPrefs.AssistMode;
                 RefreshModal();
             });
             assistBtn.name = "assist-toggle";
             body.Add(assistBtn);
-            var hint = UiKit.Text("Assist mode: easier travel, lower rewards.", "fr-tiny");
+            var hint = UiKit.Text(UiText.Get("settings.assist.help"), "fr-tiny");
             hint.style.marginTop = UiKit.Space.S4;
             body.Add(hint);
 
-            body.Add(SectionLabel("TRAVEL DRAG SENSITIVITY"));
+            body.Add(SectionLabel(UiText.Get("settings.drag-sensitivity")));
             var stepper = UiKit.Div("fr-stepper");
             float s = TravelPrefs.DragSensitivity;
             var minus = Icons.IconButton("minus", UiKit.Cyan, () => { TravelPrefs.DragSensitivity = TravelPrefs.DragSensitivity - TravelPrefs.SensitivityStep; RefreshModal(); });
             var plus = Icons.IconButton("plus", UiKit.Cyan, () => { TravelPrefs.DragSensitivity = TravelPrefs.DragSensitivity + TravelPrefs.SensitivityStep; RefreshModal(); });
             UiKit.SetEnabledLook(minus, s > TravelPrefs.SensitivityMin + 0.01f);
             UiKit.SetEnabledLook(plus, s < TravelPrefs.SensitivityMax - 0.01f);
-            var val = UiKit.Text(s.ToString("0.0") + "x", "fr-h2");
+            var val = UiKit.Text(UiText.Get("settings.drag-value", s), "fr-h2");
             val.style.minWidth = 140;
             val.style.unityTextAlign = TextAnchor.MiddleCenter;
             stepper.Add(minus); stepper.Add(val); stepper.Add(plus);
@@ -40,15 +40,15 @@ namespace Frontier
         void BuildTravelDebug(VisualElement body)
         {
             var card = Card(UiKit.Amber);
-            card.Add(UiKit.Text("TRAVEL GAME", "fr-h2"));
+            card.Add(UiKit.Text(UiText.Get("travel.game.title"), "fr-h2"));
             bool legacy = TravelPrefs.UseLegacyGame;
-            card.Add(IconBtn(legacy ? "PLAYING: LEGACY TAP GAME" : "PLAYING: HYPERSPACE RUN", "warp", legacy ? UiKit.Red : UiKit.Lime, () =>
+            card.Add(IconBtn(UiText.Get(legacy ? "travel.debug.legacy" : "travel.debug.hyperspace"), "warp", legacy ? UiKit.Red : UiKit.Lime, () =>
             {
                 TravelPrefs.UseLegacyGame = !TravelPrefs.UseLegacyGame;
                 RefreshModal();
             }));
             bool overlay = TravelPrefs.DebugOverlay;
-            card.Add(IconBtn(overlay ? "PERFORMANCE OVERLAY: ON" : "PERFORMANCE OVERLAY: OFF", "tools", overlay ? UiKit.Lime : UiKit.Cyan, () =>
+            card.Add(IconBtn(UiText.Get(overlay ? "travel.debug.overlay.on" : "travel.debug.overlay.off"), "tools", overlay ? UiKit.Lime : UiKit.Cyan, () =>
             {
                 TravelPrefs.DebugOverlay = !TravelPrefs.DebugOverlay;
                 RefreshModal();

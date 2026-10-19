@@ -344,8 +344,19 @@ namespace Frontier
                 back.revision != written.revision ||
                 back.player == null || back.player.xp != written.player.xp ||
                 back.worlds == null || back.worlds.Count != written.worlds.Count ||
+                back.mapPins == null || written.mapPins == null || back.mapPins.Count != written.mapPins.Count ||
+                back.mapDiscoverySectors == null || written.mapDiscoverySectors == null ||
+                back.mapDiscoverySectors.Count != written.mapDiscoverySectors.Count ||
                 back.player.inventory == null || back.player.inventory.Count != written.player.inventory.Count)
                 throw new IOException("verification failed: the written file does not match the state");
+            for (int i = 0; i < written.mapPins.Count; i++)
+                if (back.mapPins[i] != written.mapPins[i])
+                    throw new IOException("verification failed: the written file does not match the pinned destinations");
+            for (int i = 0; i < written.mapDiscoverySectors.Count; i++)
+                if (back.mapDiscoverySectors[i] == null || written.mapDiscoverySectors[i] == null ||
+                    back.mapDiscoverySectors[i].sectorId != written.mapDiscoverySectors[i].sectorId ||
+                    back.mapDiscoverySectors[i].bits != written.mapDiscoverySectors[i].bits)
+                    throw new IOException("verification failed: the written file does not match discovered map systems");
         }
 
         bool IsReadable(string path)

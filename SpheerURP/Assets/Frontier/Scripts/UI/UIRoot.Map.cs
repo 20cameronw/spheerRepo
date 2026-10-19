@@ -26,17 +26,26 @@ namespace Frontier
         float lastPinch, mapQueryAt;
         int mapVersion, queryVersion, previewVersion, runningPreviewVersion;
         MapSnapshot mapSnapshot;
+        MapNameIndex mapNameIndex;
+        string mapNextStopPlanetId;
         Task<MapSnapshot> mapQuery;
-        Task<RoutePlan> mapPreviewTask;
+        Task<MapPreviewResult> mapPreviewTask;
         RoutePlan mapPreview;
         readonly List<StarSystem> surveyCenters = new List<StarSystem>();
         readonly List<double> surveyRadii = new List<double>();
         readonly List<PlanetData> mapPlanets = new List<PlanetData>();
+        readonly List<PlanetData> mapPinPlanets = new List<PlanetData>();
         readonly List<Label> mapLabels = new List<Label>();
         readonly List<Rect> mapLabelBounds = new List<Rect>();
         string mapResource = "";
         double mapJumpRange;
         readonly List<string> mapResourceIds = new List<string>();
+
+        struct MapPreviewResult
+        {
+            public RoutePlan plan;
+            public string nextStopPlanetId;
+        }
 
         void OpenMap()
         {
@@ -44,6 +53,7 @@ namespace Frontier
             if (mapOpen) { CloseMap(); return; }
             ClosePopup(); CloseModal(); ExitBuild();
             mapOpen = true; selected = gs.planet; mapAutopilot = false; mapResource = ""; mapZoom = 2f;
+            mapNameIndex = MapNameIndex.Build(gs.universe.Universe, gs.MapDiscoveryIds(), gs.MapPins);
             surveyCenters.Clear();
             surveyRadii.Clear();
             var centerIndices = new Dictionary<SystemKey, int>();
@@ -90,9 +100,10 @@ namespace Frontier
             mapTools.Add(Icons.IconButton("plus", UiKit.Muted, () => ZoomAt(ViewCenter(), 1.4f)));
             mapTools.Add(Icons.IconButton("minus", UiKit.Muted, () => ZoomAt(ViewCenter(), 1f / 1.4f)));
             var home = Icons.IconButton("map", UiKit.Cyan, () => { SelectMapWorld(gs.planet); CenterOn(gs.planet); });
-            home.tooltip = "Recenter on your ship"; mapTools.Add(home);
+            home.tooltip = UiText.Get("map.recenter"); mapTools.Add(home);
             mapView.Add(mapTools);
             BuildMapSearch();
+            RefreshMapPinPlanets();
             BuildMapNodes();
             InvalidateMapPreview();
             BuildMapCard();
@@ -119,9 +130,11 @@ namespace Frontier
             if (mapView != null) mapView.RemoveFromHierarchy();
             mapView = null; mapWorld = null; mapCard = null; mapTools = null;
             mapOpen = false; lastPinch = 0f; mapSnapshot = null;
+            mapNameIndex = null;
             mapFilter = null;
             mapVersion++; previewVersion++;
             mapLabels.Clear(); mapPlanets.Clear();
+            mapPinPlanets.Clear();
             // Workers never touch UI/GameObjects. Keep their handles until completion so reopening cannot fan out new workers.
         }
 
@@ -220,7 +233,7 @@ namespace Frontier
 
         bool Surveyed(StarSystem star)
         {
-            if (star.IsAuthored) return true;
+            if (star.IsAuthored || gs.IsMapDiscovered(star.Id)) return true;
             for (int i = 0; i < surveyCenters.Count; i++)
             {
                 var center = surveyCenters[i];
@@ -259,7 +272,7 @@ namespace Frontier
 
         void InvalidateMapPreview()
         {
-            mapPreview = null; previewVersion++;
+            mapPreview = null; mapNextStopPlanetId = null; previewVersion++;
             var caps = gs.Ship;
             mapJumpRange = gs.Rules.JumpRangeLy(caps);
         }
@@ -269,6 +282,16 @@ namespace Frontier
             mapPlanets.Clear();
             if (selected != null) mapPlanets.AddRange(gs.universe.PlanetsOf(selected.Star));
             PositionMapLabels();
+        }
+
+        void RefreshMapPinPlanets()
+        {
+            mapPinPlanets.Clear();
+            foreach (string id in gs.MapPins)
+            {
+                PlanetData pinned = gs.universe.Get(id);
+                if (pinned != null) mapPinPlanets.Add(pinned);
+            }
         }
 
         Vector2 PlanetPoint(PlanetData planet)
@@ -365,6 +388,16 @@ namespace Frontier
                     p.BeginPath(); p.Arc(at, planet.Id == selected.Id ? 13 : 9, Angle.Degrees(0), Angle.Degrees(360)); p.Fill();
                 }
             }
+            foreach (var pinned in mapPinPlanets)
+            {
+                Vector2 at = Project(pinned.Star.X, pinned.Star.Y);
+                if (at.x < -12 || at.y < -12 || at.x > viewport.Width + 12 || at.y > viewport.Height + 12) continue;
+                p.strokeColor = UiKit.Magenta;
+                p.lineWidth = 2f;
+                p.BeginPath(); p.Arc(at, 10f, Angle.Degrees(0), Angle.Degrees(360)); p.Stroke();
+                p.fillColor = Color.white;
+                p.BeginPath(); p.Arc(at, 2.5f, Angle.Degrees(0), Angle.Degrees(360)); p.Fill();
+            }
             DrawMapRoute(p);
         }
 
@@ -409,17 +442,17 @@ namespace Frontier
         {
             var bar = UiKit.Div("fr-map-search");
             bar.style.top = 140 + inset.y; bar.style.left = 16 + inset.x; bar.style.right = 16 + inset.z;
-            mapSearch = new TextField { tooltip = "Known system/world name, canonical id, or x,y light-years" };
-            mapSearch.textEdition.placeholder = "World / system name or x,y";
+            mapSearch = new TextField { tooltip = UiText.Get("map.search.tooltip") };
+            mapSearch.textEdition.placeholder = UiText.Get("map.search.placeholder");
             mapSearch.style.flexGrow = 1;
             mapSearch.RegisterCallback<KeyDownEvent>(e => { if (e.keyCode == KeyCode.Return) { SearchMap(); e.StopPropagation(); } });
-            bar.Add(mapSearch); bar.Add(UiKit.Btn("FIND", UiKit.Cyan, SearchMap));
+            bar.Add(mapSearch); bar.Add(UiKit.Btn(UiText.Get("map.search.find"), UiKit.Cyan, SearchMap));
             mapView.Add(bar);
             var filter = new DropdownField();
             mapFilter = filter;
             filter.AddToClassList("fr-map-filter");
-            filter.tooltip = "Filter systems by surveyed deposits";
-            filter.choices = new List<string> { "All deposits" }; mapResourceIds.Clear(); mapResourceIds.Add("");
+            filter.tooltip = UiText.Get("map.filter.tooltip");
+            filter.choices = new List<string> { UiText.Get("map.filter.all") }; mapResourceIds.Clear(); mapResourceIds.Add("");
             foreach (var r in gs.db.resources) { filter.choices.Add(r.displayName); mapResourceIds.Add(r.id); }
             filter.index = 0;
             filter.RegisterValueChangedCallback(e => { mapResource = mapResourceIds[filter.index]; mapVersion++; mapQueryAt = 0; });
@@ -428,7 +461,7 @@ namespace Frontier
             mapReadout = UiKit.Text("", "fr-tiny", UiKit.Muted);
             mapReadout.style.position = Position.Absolute; mapReadout.style.left = 296 + inset.x; mapReadout.style.right = 16 + inset.z; mapReadout.style.top = 266 + inset.y;
             mapView.Add(mapReadout);
-            mapNotice = UiKit.Text("STAR MAP\nDrag · pinch to zoom", "fr-tiny", UiKit.Muted);
+            mapNotice = UiKit.Text(UiText.Get("map.help"), "fr-tiny", UiKit.Muted);
             mapNotice.style.position = Position.Absolute; mapNotice.style.left = 16 + inset.x; mapNotice.style.top = 24 + inset.y; mapNotice.style.width = 260;
             mapView.Add(mapNotice);
         }
@@ -436,13 +469,13 @@ namespace Frontier
         void SearchMap()
         {
             string text = mapSearch.value.Trim();
-            if (text.Length == 0) { mapNotice.text = "Enter a world name or x,y"; return; }
+            if (text.Length == 0) { mapNotice.text = UiText.Get("map.search.empty"); return; }
             string[] xy = text.Split(',');
             double x, y;
             if (xy.Length == 2 && double.TryParse(xy[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) && double.TryParse(xy[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y)
                 && !double.IsNaN(x) && !double.IsNaN(y) && Math.Abs(x) <= 1e7 && Math.Abs(y) <= 1e7)
             {
-                viewport.Center(x, y); ApplyMapTransform(); mapNotice.text = "Coordinates in light-years · zoom out to explore"; return;
+                viewport.Center(x, y); ApplyMapTransform(); mapNotice.text = UiText.Get("map.search.coordinates"); return;
             }
             var byPlanetId = gs.universe.Get(text);
             if (byPlanetId != null) { SelectMapWorld(byPlanetId); CenterOn(byPlanetId); return; }
@@ -465,7 +498,13 @@ namespace Frontier
                 foreach (var star in mapSnapshot.systems)
                     if (string.Equals(star.Name, text, StringComparison.OrdinalIgnoreCase) || star.Id == text || string.Equals(star.Designation, text, StringComparison.OrdinalIgnoreCase))
                     { var worlds = gs.universe.PlanetsOf(star); if (worlds.Count > 0) { SelectMapWorld(worlds[0]); CenterOn(selected); return; } }
-            mapNotice.text = "Not found · use an exact Core World / visible system name or x,y";
+            string knownPlanetId;
+            if (mapNameIndex != null && mapNameIndex.TryFind(text, out knownPlanetId))
+            {
+                var knownWorld = gs.universe.Get(knownPlanetId);
+                if (knownWorld != null) { SelectMapWorld(knownWorld); CenterOn(knownWorld); return; }
+            }
+            mapNotice.text = UiText.Get("map.search.not-found");
         }
     }
 }

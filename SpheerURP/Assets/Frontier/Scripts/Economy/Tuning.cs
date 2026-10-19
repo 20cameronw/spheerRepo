@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Frontier.Universe;
 
 namespace Frontier.Economy
@@ -84,6 +85,48 @@ namespace Frontier.Economy
             TuningEntry e = Find(key);
             double v = value < e.min ? e.min : (value > e.max ? e.max : value);
             e.value = (float)v;
+        }
+
+        /// <summary>
+        /// Applies a complete set of parsed tuning overrides to a copy. Unknown keys, invalid numbers, and out-of-range values
+        /// reject the entire set; on failure, <paramref name="effective"/> remains an unchanged copy of this tuning set.
+        /// </summary>
+        public bool TryApplyOverrides(IReadOnlyDictionary<string, string> overrides, out Tuning effective, out string error)
+        {
+            if (overrides == null) throw new ArgumentNullException(nameof(overrides));
+
+            effective = Clone();
+            error = null;
+            Tuning candidate = effective.Clone();
+            foreach (KeyValuePair<string, string> pair in overrides)
+            {
+                int index;
+                if (string.IsNullOrEmpty(pair.Key) || !_index.TryGetValue(pair.Key, out index))
+                {
+                    error = "Unknown tuning key '" + pair.Key + "'.";
+                    return false;
+                }
+
+                float value;
+                if (!float.TryParse(pair.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
+                    || float.IsNaN(value) || float.IsInfinity(value))
+                {
+                    error = "Tuning override '" + pair.Key + "' must be a finite invariant-culture number.";
+                    return false;
+                }
+
+                TuningEntry entry = _entries[index];
+                if (value < entry.min || value > entry.max)
+                {
+                    error = "Tuning override '" + pair.Key + "' must be within [" + entry.min + ", " + entry.max + "].";
+                    return false;
+                }
+
+                candidate._entries[index].value = value;
+            }
+
+            effective = candidate;
+            return true;
         }
 
         public void Reset(string key) { TuningEntry e = Find(key); e.value = e.defaultValue; }

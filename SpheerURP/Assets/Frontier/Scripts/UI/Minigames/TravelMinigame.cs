@@ -54,6 +54,11 @@ namespace Frontier
         void Run(VisualElement host, TravelRunRequest request, Action<TravelRunResult> done);
     }
 
+    public interface ITravelBackHandler
+    {
+        bool HandleBack();
+    }
+
     /// <summary>Factory and host hooks for travel mini-games. The app registers the real game here; the default is the legacy one.</summary>
     public static class TravelMinigames
     {
@@ -68,20 +73,23 @@ namespace Frontier
     }
 
     /// <summary>The original tap game behind the new interface.</summary>
-    public sealed class LegacyTravelMinigame : ITravelMinigame
+    public sealed class LegacyTravelMinigame : ITravelMinigame, ITravelBackHandler
     {
+        TravelGame game;
+        public bool HandleBack() { return game != null && game.HandleBack(); }
+
         public void Run(VisualElement host, TravelRunRequest request, Action<TravelRunResult> done)
         {
-            var game = new TravelGame();
+            game = new TravelGame();
             float tier = Mathf.Clamp01(request.tier / 8f);
             game.Run(host, UiKit.Magenta, 1f, tier, r =>
             {
-                if (done != null) done(new TravelRunResult { quality = r.quality, completed = true, grade = "" });
+                if (done != null) done(new TravelRunResult { quality = r.quality, completed = !r.abandoned, grade = "" });
             });
             if (host.childCount > 0)
             {
                 var title = host[host.childCount - 1].Q<Label>();
-                if (title != null) title.text += " · LEG " + (request.legIndex + 1) + " / " + request.legCount;
+                if (title != null) title.text = UiText.Get("travel.legacy-leg-title", title.text, request.legIndex + 1, request.legCount);
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Frontier.Tests
 {
@@ -79,6 +80,60 @@ namespace Frontier.Tests
             var a = formula.Build(db.enemies, 7, 80f, new System.Random(42));
             var b = formula.Build(db.enemies, 7, 80f, new System.Random(42));
             CollectionAssert.AreEqual(a, b);
+        }
+
+        [Test]
+        public void BossesAreSingularScheduledAndPaidFromTheThreatBudget()
+        {
+            var boss = System.Array.Find(db.enemies, e => e.rank == AlienRank.Boss);
+            Assert.IsNotNull(boss);
+            for (int wave = 1; wave <= 30; wave++)
+            {
+                var aliens = formula.Build(db.enemies, wave, 1000f, new System.Random(wave));
+                Assert.AreEqual(boss.Available(wave) ? 1 : 0, aliens.FindAll(e => e.rank == AlienRank.Boss).Count, "wave " + wave);
+                float spent = 0f;
+                foreach (var alien in aliens) spent += alien.threat;
+                Assert.LessOrEqual(spent, 1000f);
+            }
+            Assert.AreEqual(1, formula.Build(db.enemies, boss.minWave, 0f, new System.Random(1)).Count,
+                "an unaffordable boss must not bypass the threat budget");
+        }
+
+        [Test]
+        public void ArmorAppliesToAllDamageWithoutHealingOrImmunity()
+        {
+            var elite = System.Array.Find(db.enemies, e => e.rank == AlienRank.Elite);
+            Assert.IsNotNull(elite);
+            Assert.Greater(elite.armor, 0f);
+            Assert.AreEqual(100f * (1f - elite.armor), elite.DamageAfterArmor(100f), 0.001f);
+            Assert.AreEqual(0f, elite.DamageAfterArmor(-100f));
+            Assert.Greater(elite.DamageAfterArmor(100f), 0f);
+        }
+
+        [Test]
+        public void ModifiersLeaveOpeningWavesAloneAndRepeatDeterministically()
+        {
+            Assert.Greater(formula.modifiers.Count, 0);
+            for (int wave = 1; wave < formula.modifiersFromWave; wave++) Assert.IsNull(formula.Modifier(wave));
+            for (int i = 0; i < formula.modifiers.Count; i++)
+            {
+                var modifier = formula.Modifier(formula.modifiersFromWave + i);
+                Assert.AreSame(formula.modifiers[i], modifier);
+                Assert.AreSame(modifier, formula.Modifier(formula.modifiersFromWave + i + formula.modifiers.Count));
+                Assert.GreaterOrEqual(modifier.reward, 1f);
+            }
+        }
+
+        [Test]
+        public void BossReservationHonorsTheAlienCap()
+        {
+            var copy = Object.Instantiate(formula);
+            try
+            {
+                copy.maxAliens = 1;
+                Assert.AreEqual(1, copy.Build(db.enemies, 10, 10000f, new System.Random(1)).Count);
+            }
+            finally { Object.DestroyImmediate(copy); }
         }
 
         [Test]

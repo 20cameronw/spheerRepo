@@ -18,12 +18,14 @@ namespace Frontier
         public PanelSettings panelSettings;
         public Camera sceneCamera;
         public Light keyLight;
+        GameDatabase tunedDatabase;
 
         IEnumerator Start()
         {
             FrontierSettings.Use(settings);
             var cfg = FrontierSettings.I;
-            Application.targetFrameRate = cfg.targetFrameRate;
+            PresentationQuality.Initialize(cfg.targetFrameRate);
+            yield return UiText.InitializeLocalization();
 
             var db = GameDatabase.ForRuntime(database);
             var consent = new ConsentService(new PlayerPrefsConsentStore());
@@ -32,6 +34,12 @@ namespace Frontier
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HarnessRunner.PrepareFromCommandLine();
 #endif
+            var bundledDb = db;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (!HarnessRunner.Requested)
+#endif
+                db = FrontierRemoteTravelTuning.SelectForSession(bundledDb, services);
+            if (db != bundledDb) tunedDatabase = db;
             var gs = new GameState(db);
             TravelMinigames.Create = () =>
             {
@@ -45,7 +53,10 @@ namespace Frontier
             {
                 return Hyperspace.View.HyperspaceDiagnostics.Check();
             });
-            new GameObject("App").AddComponent<FrontierApp>().Init(gs);
+            var app = new GameObject("App");
+            app.AddComponent<FrontierApp>().Init(gs);
+            app.AddComponent<FrontierRemoteTravelTuning>().Init(bundledDb, services);
+            app.AddComponent<FrontierBuilderNotifications>().Init(gs, services.Notifications);
 
             var cam = sceneCamera != null ? sceneCamera : Camera.main;
             GameObject camGo;
@@ -53,6 +64,11 @@ namespace Frontier
             {
                 camGo = new GameObject("Main Camera") { tag = "MainCamera" };
                 cam = camGo.AddComponent<Camera>();
+            }
+
+            void OnDestroy()
+            {
+                if (tunedDatabase != null) Destroy(tunedDatabase);
             }
             camGo = cam.gameObject;
             camGo.transform.position = new Vector3(0f, 0f, -12f);
@@ -62,9 +78,12 @@ namespace Frontier
             cam.fieldOfView = cfg.cameraFov;
             cam.nearClipPlane = 0.1f;
             cam.farClipPlane = 100f;
+            // Layer 31 belongs to the offscreen Hyperspace stage, not the world camera.
+            cam.cullingMask &= ~(1 << 31);
             cam.allowHDR = true;
             if (camGo.GetComponent<AudioListener>() == null) camGo.AddComponent<AudioListener>();
             Sfx.Init(camGo);
+            if (camGo.GetComponent<HarvestHaptics>() == null) camGo.AddComponent<HarvestHaptics>();
             Fx.SetupPost(cam);
             if (camGo.GetComponent<CameraFit>() == null) camGo.AddComponent<CameraFit>();
 
@@ -74,6 +93,7 @@ namespace Frontier
             var planet = new GameObject("Planet").AddComponent<PlanetView>();
             planet.Rebuilt += backdrop.Apply;
             planet.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet));
+            planet.gameObject.AddComponent<AscensionAura>().Init(planet, gs);
 
             var defense = new GameObject("Defense").AddComponent<DefenseController>();
             defense.Init(planet, cam, gs);
@@ -108,6 +128,18 @@ namespace Frontier
             defense.IsOverUi = ui.IsOverUi;
             defense.World = surface;
             ui.Init(doc, gs, defense, planet, backdrop, surface, cam, services);
+            app.AddComponent<FrontierSoundscape>().Init(camGo.GetComponent<AudioService>(), ui, defense, gs);
+
+            bool playIntro = true;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            playIntro = !HarnessRunner.Requested;
+#endif
+            if (playIntro)
+            {
+                bool firstLaunch = !TravelPrefs.IntroSeen;
+                yield return ui.PlayArrivalIntro(firstLaunch);
+                if (firstLaunch) TravelPrefs.MarkIntroSeen();
+            }
 
             FrontierRuntime.Publish(new FrontierRuntime
             {

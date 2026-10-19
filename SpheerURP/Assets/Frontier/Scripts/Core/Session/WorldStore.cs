@@ -96,6 +96,7 @@ namespace Frontier
         public double maxDistanceFromHomeLy;
         public int worldsLanded;
         public int totalWavesCleared;
+        public int harvestRunsCompleted;
         public int megaprojectStages;
         public double playSeconds;
 
@@ -107,6 +108,11 @@ namespace Frontier
         }
 
         public void RecordWaveCleared() { totalWavesCleared++; }
+
+        public void RecordHarvestRunCompleted()
+        {
+            if (harvestRunsCompleted < int.MaxValue) harvestRunsCompleted++;
+        }
 
         public void RecordMegaprojectStage() { megaprojectStages++; }
 
@@ -120,6 +126,7 @@ namespace Frontier
             maxDistanceFromHomeLy = 0.0;
             worldsLanded = 0;
             totalWavesCleared = 0;
+            harvestRunsCompleted = 0;
             megaprojectStages = 0;
             playSeconds = 0.0;
         }
