@@ -57,10 +57,14 @@ Do not activate them solely because their adapters compile.
   for every planned placement. The service persists per-placement counts/cooldowns in device preferences
   (not the progression save), rejects invalid stored usage and observed clock rewind, and does not deliver
   a provider reward until its usage write succeeds. Withdrawal during playback discards the pending reward,
-  including withdrawal followed by re-opt-in. This cannot undo an SDK request already in progress.
+  including withdrawal followed by re-opt-in. A configured provider exposes the harvest double-yield offer
+  only when the result can fit a bonus; the extra inventory is written in the same save transaction before
+  it is published to the backpack. Failed bonus writes leave the base harvest intact and report the failure.
+  This cannot undo an SDK request already in progress.
   Device UTC and preferences are not server authority or cross-device anti-cheat; forward clock changes
-  and cleared preferences are outside this local protection. Provider reward verification, durable gameplay
-  grants, per-job limits, SDK privacy settings and native-device evidence remain required.
+  and cleared preferences are outside this local protection. The UI remains hidden while the provider is
+  unavailable, and the asset retains its disabled/zero-cap defaults. LevelPlay verification and privacy
+  setup, reviewed limits, other placements, per-job limits and native-device evidence remain required.
 
 ## Required before enabling providers
 

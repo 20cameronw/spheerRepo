@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Threading.Tasks;
+using Frontier.Services;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -22,6 +24,7 @@ namespace Frontier.Tests
             {
                 Finish(new MinigameResult { quality = quality, perfects = perfects, total = total });
             }
+            public void RequestDoubleYield() { base.RequestDoubleYield(); }
         }
 
         sealed class NodeProbeMinigame : NodeGame
@@ -233,6 +236,41 @@ namespace Frontier.Tests
             Assert.IsNull(root.Q("minigame-result"));
             game.ContinueResult();
             Assert.AreEqual(1, callbacks, "The result handoff must only run once.");
+        }
+
+        [UnityTest]
+        public IEnumerator ResultScreen_AppliesOnlyACompletedDoubleYieldOffer()
+        {
+            var game = new PauseProbeMinigame();
+            MinigameResult result = default;
+            game.Run(root, UiKit.Cyan, 1f, 0.2f, r => result = r,
+                () => Task.FromResult(ServiceResult<RewardedAdResult>.Success(
+                    new RewardedAdResult(true, "double-yield"))),
+                _ => true);
+            yield return null;
+            game.Complete(0.8f, 8, 10);
+            yield return WaitForResult();
+            Assert.IsNotNull(root.Q<Button>("minigame-double-yield"));
+
+            game.RequestDoubleYield();
+            Assert.AreEqual("BONUS UNLOCKED", root.Q<Button>("minigame-double-yield").text);
+            Assert.IsTrue(root.Q<Button>("minigame-collect-resources").enabledSelf);
+            game.ContinueResult();
+            Assert.IsTrue(result.rewardedDoubleYield);
+        }
+
+        [UnityTest]
+        public IEnumerator ResultScreen_HidesDoubleYieldWhenCallerRejectsTheOffer()
+        {
+            var game = new PauseProbeMinigame();
+            game.Run(root, UiKit.Cyan, 1f, 0.2f, null,
+                () => Task.FromResult(ServiceResult<RewardedAdResult>.Success(
+                    new RewardedAdResult(true, "double-yield"))),
+                _ => false);
+            yield return null;
+            game.Complete(0.8f, 8, 10);
+            yield return WaitForResult();
+            Assert.IsNull(root.Q<Button>("minigame-double-yield"));
         }
 
         [UnityTest]

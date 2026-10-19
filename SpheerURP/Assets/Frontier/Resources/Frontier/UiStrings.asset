@@ -84,6 +84,22 @@ MonoBehaviour:
     text: RESUME
   - key: harvest.collect
     text: COLLECT RESOURCES
+  - key: harvest.ad.double-yield
+    text: WATCH VIDEO FOR DOUBLE YIELD
+  - key: harvest.ad.loading
+    text: Loading rewarded video...
+  - key: harvest.ad.earned
+    text: BONUS UNLOCKED
+  - key: harvest.ad.collect
+    text: Collect to apply the bonus.
+  - key: harvest.ad.failed
+    text: Rewarded video could not be completed. Try again.
+  - key: harvest.ad.consent-required
+    text: Advertising consent is no longer active. Your harvest is unchanged.
+  - key: harvest.ad.not-earned
+    text: No reward was issued. You can try again.
+  - key: harvest.ad.save-failed
+    text: The bonus was not saved; your base harvest is safe. {0}
   - key: harvest.tool
     text: Tool
   - key: harvest.perfect-hits

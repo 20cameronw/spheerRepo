@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Frontier.Services;
@@ -462,6 +463,10 @@ namespace Frontier
             g.toolLevel = gs.ToolLevel(spot.game);
             g.toolName = gs.ToolName(spot.game);
             activeGatherMinigame = g;
+            Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield =
+                services != null && services.Ads.IsConfigured
+                    ? (Func<Task<ServiceResult<RewardedAdResult>>>) (() => services.Ads.ShowRewardedAsync("double-yield"))
+                    : null;
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;
@@ -471,9 +476,7 @@ namespace Frontier
                     Toast(UiText.Get("harvest.abandoned"), UiKit.Amber);
                     return;
                 }
-                float amount = spot.baseYield * gs.ToolMultiplier(spot.game) *
-                    (1f + bonus + gs.TerraformerHarvestBonus) * (0.4f + 1.1f * r.quality);
-                int n = r.quality > 0.05f ? Mathf.Max(1, Mathf.RoundToInt(amount)) : 0;
+                int n = HarvestAmount(spot, bonus, r);
                 if (r.quality > 0.05f) gs.RecordHarvestRunCompleted();
                 int got = gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);
@@ -486,7 +489,34 @@ namespace Frontier
                 }
                 else Toast(UiText.Get(n > 0 ? "harvest.backpack-full" : "harvest.missed"), UiKit.Red);
                 if (got < n) Toast(UiText.Get("harvest.overflow", n - got), UiKit.Amber);
+                if (r.rewardedDoubleYield && got > 0)
+                {
+                    if (gs.TryCommitHarvestBonus(spot.resource, got, out int bonusGot, out string error))
+                    {
+                        if (bonusGot > 0)
+                        {
+                            Toast(UiText.Get("harvest.reward", bonusGot, spot.resource.displayName), ui);
+                            Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
+                            planetView.Punch();
+                            Sfx.Good();
+                        }
+                    }
+                    else Toast(UiText.Get("harvest.ad.save-failed", error), UiKit.Red);
+                }
+            }, offerDoubleYield, r =>
+            {
+                int expected = HarvestAmount(spot, bonus, r);
+                int free = gs.FreeSpace(spot.resource);
+                return expected > 0 && (long)free >= (long)expected * 2;
             });
+        }
+
+        int HarvestAmount(GatherSpot spot, float bonus, MinigameResult result)
+        {
+            if (result.quality <= 0.05f) return 0;
+            float amount = spot.baseYield * gs.ToolMultiplier(spot.game) *
+                (1f + bonus + gs.TerraformerHarvestBonus) * (0.4f + 1.1f * result.quality);
+            return Mathf.Max(1, Mathf.RoundToInt(amount));
         }
 
         // ------------------------------------------------------------ wave end

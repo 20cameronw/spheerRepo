@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Frontier.Services;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,6 +13,7 @@ namespace Frontier
         public int perfects;
         public int total;
         public bool abandoned;
+        public bool rewardedDoubleYield;
     }
 
     /// <summary>
@@ -33,10 +36,14 @@ namespace Frontier
         protected MinigameStage stage;
         IVisualElementScheduledItem loop;
         Action<MinigameResult> onDone;
+        Func<Task<ServiceResult<RewardedAdResult>>> doubleYieldOffer;
+        Func<MinigameResult, bool> canOfferDoubleYield;
+        Button doubleYieldButton, collectButton;
+        Label doubleYieldStatus;
         VisualElement pauseLayer;
         long lastMs;
         bool sceneReady, cleaned, confirmingAbandon;
-        bool resultAwaitingConfirmation;
+        bool resultAwaitingConfirmation, doubleYieldPending;
         MinigameResult pendingResult;
 
         protected abstract string Title { get; }
@@ -54,11 +61,15 @@ namespace Frontier
         protected float ArenaH { get { float h = arena.layout.height; return float.IsNaN(h) ? 0f : h; } }
         protected bool CanInteract { get { return sceneReady && !finished && !IsPaused && !cleaned && stage != null; } }
 
-        public void Run(VisualElement host, Color accent, float tol, float diff, Action<MinigameResult> done)
+        public void Run(VisualElement host, Color accent, float tol, float diff, Action<MinigameResult> done,
+            Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield = null,
+            Func<MinigameResult, bool> canOfferDoubleYield = null)
         {
             HarvestFeedback.Warmup();
             rawColor = accent;
             color = UiKit.Ui(accent); tolerance = tol; difficulty = diff; onDone = done;
+            doubleYieldOffer = offerDoubleYield;
+            this.canOfferDoubleYield = canOfferDoubleYield;
 
             overlay = UiKit.Div("fr-overlay");
             titleLabel = UiKit.Text(Title, "fr-title", color);
@@ -128,6 +139,7 @@ namespace Frontier
         {
             if (cleaned) return;
             cleaned = true;
+            resultAwaitingConfirmation = false;
             if (loop != null) loop.Pause();
             if (stage != null) stage.FocusLost = null;
             if (stage != null) UnityEngine.Object.Destroy(stage.gameObject);
@@ -252,10 +264,71 @@ namespace Frontier
                 "fr-minigame-result-detail", UiKit.Muted));
             pendingResult = result;
             resultAwaitingConfirmation = true;
-            var next = PauseAction(UiText.Get("harvest.collect"), UiKit.Cyan, ContinueResult,
+            if (doubleYieldOffer != null && result.quality > 0.05f &&
+                (canOfferDoubleYield == null || canOfferDoubleYield(result)))
+            {
+                doubleYieldButton = PauseAction(UiText.Get("harvest.ad.double-yield"), UiKit.Magenta,
+                    RequestDoubleYield, "minigame-double-yield", false);
+                panel.Add(doubleYieldButton);
+                doubleYieldStatus = UiKit.Text("", "fr-tiny");
+                doubleYieldStatus.name = "minigame-double-yield-status";
+                panel.Add(doubleYieldStatus);
+            }
+            collectButton = PauseAction(UiText.Get("harvest.collect"), UiKit.Cyan, ContinueResult,
                 "minigame-collect-resources", true);
-            panel.Add(next);
+            panel.Add(collectButton);
             overlay.Add(panel);
+        }
+
+        protected async void RequestDoubleYield()
+        {
+            if (!resultAwaitingConfirmation || doubleYieldPending || pendingResult.rewardedDoubleYield ||
+                doubleYieldOffer == null) return;
+
+            doubleYieldPending = true;
+            doubleYieldButton?.SetEnabled(false);
+            collectButton?.SetEnabled(false);
+            if (doubleYieldButton != null) doubleYieldButton.text = UiText.Get("harvest.ad.loading");
+            doubleYieldStatus.text = UiText.Get("harvest.ad.loading");
+            try
+            {
+                ServiceResult<RewardedAdResult> result = await doubleYieldOffer();
+                if (!resultAwaitingConfirmation) return;
+                if (!result.succeeded)
+                {
+                    doubleYieldStatus.text = result.status == ServiceStatus.ConsentRequired
+                        ? UiText.Get("harvest.ad.consent-required")
+                        : UiText.Get("harvest.ad.failed");
+                    return;
+                }
+                if (!result.value.rewardEarned || result.value.placementId != "double-yield")
+                {
+                    doubleYieldStatus.text = UiText.Get("harvest.ad.not-earned");
+                    return;
+                }
+
+                pendingResult.rewardedDoubleYield = true;
+                doubleYieldButton.text = UiText.Get("harvest.ad.earned");
+                doubleYieldStatus.text = UiText.Get("harvest.ad.collect");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Frontier rewarded harvest offer failed: " + e.Message);
+                if (doubleYieldStatus != null) doubleYieldStatus.text = UiText.Get("harvest.ad.failed");
+            }
+            finally
+            {
+                doubleYieldPending = false;
+                if (resultAwaitingConfirmation)
+                {
+                    if (collectButton != null) collectButton.SetEnabled(true);
+                    if (!pendingResult.rewardedDoubleYield && doubleYieldButton != null)
+                    {
+                        doubleYieldButton.text = UiText.Get("harvest.ad.double-yield");
+                        doubleYieldButton.SetEnabled(true);
+                    }
+                }
+            }
         }
 
         static string Grade(float quality)

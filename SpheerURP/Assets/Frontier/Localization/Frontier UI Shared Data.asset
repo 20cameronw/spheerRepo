@@ -3411,6 +3411,38 @@ MonoBehaviour:
     m_Key: clock.rewind-detected
     m_Metadata:
       m_Items: []
+  - m_Id: 1476164609728512
+    m_Key: harvest.ad.double-yield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003200
+    m_Key: harvest.ad.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003201
+    m_Key: harvest.ad.earned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003202
+    m_Key: harvest.ad.collect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003203
+    m_Key: harvest.ad.failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003204
+    m_Key: harvest.ad.consent-required
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003205
+    m_Key: harvest.ad.not-earned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1476164702003206
+    m_Key: harvest.ad.save-failed
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

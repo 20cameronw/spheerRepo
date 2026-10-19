@@ -543,9 +543,13 @@ wraps the unavailable ad provider in the policy, behind the existing consent gat
 limits and cooldowns persist independently of progression resets; unknown/disabled placements, overlapping
 requests, mismatched provider rewards, malformed usage, storage failures and observed clock rewinds reject
 delivery. In-flight rewards are discarded after consent withdrawal, even if the player opts back in before
-completion. These are local limits, not trusted time, cross-device verification or durable reward grants.
-LevelPlay/mediation, reviewed limits, per-job speed-up caps, gameplay reward transactions and placement UI
-remain open; no SDK initialization or real ad request is enabled by this slice.
+completion. These are local limits, not trusted time or cross-device verification. The harvest results UI now
+offers double yield only when a configured provider is available and the backpack has room. A successful,
+matching placement is not reported as earned until the bonus inventory is committed to the progression save;
+a failed write leaves the base harvest intact. The offer remains hidden in this build because no ad SDK is
+configured, and the authored policy still disables every placement. LevelPlay/mediation, reviewed limits,
+per-job speed-up caps, the other placement UIs and native-device validation remain open. Focused save/localization
+EditMode passed 17/17 and the harvest result PlayMode suite passed 14/14.
 
 ### 8.5 Timers, builders, obstacles
 

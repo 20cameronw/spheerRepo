@@ -379,3 +379,8 @@ modules). Run `tools/run-checks.ps1` before every commit. The PlayMode smoke tes
   build projects.
 * A test passes alone but fails after others: a test left a static behind (`GameState.I`, `FrontierRuntime`, a save override).
   Use `SaveSandbox` and clean up in `TearDown`.
+
+**Rewarded harvest transaction check:** `SaveRoundTripTests` verifies that a double-yield bonus is committed before the
+extra inventory is published, survives reload, and leaves the base harvest unchanged after a failed write. `MinigameFlowTests`
+verifies result-screen offer success and suppression when the caller disallows it. Focused run: 17 EditMode and 14 PlayMode
+tests passed; the default-off ad policy and unavailable provider remain unchanged.

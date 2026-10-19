@@ -1,5 +1,8 @@
+using System.IO;
 using NUnit.Framework;
 using System.Linq;
+using System.Text.RegularExpressions;
+using UnityEngine.TestTools;
 
 namespace Frontier.Tests
 {
@@ -60,6 +63,48 @@ namespace Frontier.Tests
             Assert.AreEqual(0, b.LoadReport.migratedFrom);
             Assert.AreEqual(a.stats.worldsLanded, b.stats.worldsLanded);
             Assert.AreEqual(a.stats.harvestRunsCompleted, b.stats.harvestRunsCompleted);
+        }
+
+        [Test]
+        public void RewardedHarvestBonusIsSavedBeforeInventoryChangesAndSurvivesReload()
+        {
+            var state = new GameState(db, false);
+            var wood = db.FindResource("wood");
+            Assert.IsNotNull(wood);
+            int before = state.Count(wood);
+            Assert.AreEqual(3, state.Add(wood, 3, false));
+
+            Assert.IsTrue(state.TryCommitHarvestBonus(wood, 3, out int granted, out string message), message);
+            Assert.AreEqual(3, granted);
+            Assert.AreEqual(before + 6, state.Count(wood));
+            Assert.IsFalse(state.saves.IsDirty);
+            var saved = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(sandbox.SaveFile)).Normalize();
+            Assert.AreEqual(before + 6, saved.player.inventory.Single(stack => stack.resourceId == wood.id).count);
+            Assert.AreEqual(before + 6, new GameState(db, true).Count(wood));
+        }
+
+        [Test]
+        public void FailedRewardedHarvestBonusWriteLeavesBaseHarvestUntouchedAndCanRetry()
+        {
+            var state = new GameState(db, false);
+            var wood = db.FindResource("wood");
+            Assert.IsNotNull(wood);
+            int before = state.Count(wood);
+            Assert.AreEqual(2, state.Add(wood, 2, false));
+            Directory.CreateDirectory(sandbox.SaveFile);
+            LogAssert.Expect(UnityEngine.LogType.Warning, new Regex("Frontier save failed:"));
+
+            Assert.IsFalse(state.TryCommitHarvestBonus(wood, 2, out int failedGrant, out string error));
+            Assert.AreEqual(0, failedGrant);
+            Assert.IsNotEmpty(error);
+            Assert.AreEqual(before + 2, state.Count(wood), "A failed bonus commit must not publish the extra items.");
+
+            Directory.Delete(sandbox.SaveFile);
+            Assert.IsTrue(state.TryCommitHarvestBonus(wood, 2, out int granted, out string message), message);
+            Assert.AreEqual(2, granted);
+            Assert.AreEqual(before + 4, state.Count(wood));
+            Assert.AreEqual(before + 4, SaveSerializer.Instance.DeserializeV2(File.ReadAllText(sandbox.SaveFile))
+                .Normalize().player.inventory.Single(stack => stack.resourceId == wood.id).count);
         }
 
         [Test]

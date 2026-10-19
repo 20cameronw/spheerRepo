@@ -87,6 +87,61 @@ namespace Frontier
             return accepted;
         }
 
+        /// <summary>Commits a rewarded harvest bonus to disk before publishing the extra inventory.</summary>
+        public bool TryCommitHarvestBonus(ResourceSO resource, int amount, out int granted, out string message)
+        {
+            granted = 0;
+            message = "";
+            if (resource == null || amount <= 0 || backpack.Count(resource.id) <= 0)
+            {
+                message = "A collected harvest reward is required before its bonus can be granted.";
+                return false;
+            }
+            if (SaveIsReadOnly)
+            {
+                message = saves.LastError;
+                return false;
+            }
+
+            int accepted = Math.Min(amount, backpack.FreeSpace(resource.id));
+            if (accepted <= 0)
+            {
+                message = "The backpack has no room for the harvest bonus.";
+                return false;
+            }
+
+            var candidate = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(BuildSave())).Normalize();
+            StackRecord stack = null;
+            foreach (var entry in candidate.player.inventory)
+            {
+                if (entry.resourceId != resource.id) continue;
+                stack = entry;
+                break;
+            }
+            int current = stack != null ? stack.count : 0;
+            if ((long)current + accepted > int.MaxValue)
+            {
+                message = "The harvest stack has reached its maximum size.";
+                return false;
+            }
+            if (stack == null)
+                candidate.player.inventory.Add(new StackRecord { resourceId = resource.id, count = accepted });
+            else stack.count += accepted;
+            candidate.player.inventory.Sort((a, b) => string.CompareOrdinal(a.resourceId, b.resourceId));
+
+            if (!saves.CommitSnapshot(candidate))
+            {
+                message = string.IsNullOrEmpty(saves.LastError) ? "The harvest bonus could not be saved." : saves.LastError;
+                return false;
+            }
+
+            granted = backpack.Add(resource.id, accepted);
+            if (granted != accepted)
+                throw new InvalidOperationException("The committed harvest bonus no longer fits the backpack.");
+            if (Changed != null) Changed();
+            return true;
+        }
+
         public void RecordHarvestRunCompleted()
         {
             stats.RecordHarvestRunCompleted();
