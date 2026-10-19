@@ -168,13 +168,16 @@ namespace Frontier.Tests
                 Sfx.Warp();
                 Sfx.Impact(1.15f);
                 Sfx.Zap(0.9f);
+                Sfx.Zap();
                 var sources = host.GetComponents<AudioSource>();
                 Assert.AreSame(library.Get(AudioCue.Warp).clip, sources[0].clip);
                 Assert.AreSame(library.Get(AudioCue.Impact).clip, sources[1].clip);
                 Assert.AreSame(library.Get(AudioCue.Zap).clip, sources[2].clip);
+                Assert.AreSame(library.Get(AudioCue.Zap).clip, sources[3].clip);
                 Assert.AreEqual(1f, sources[0].pitch);
                 Assert.AreEqual(1.15f, sources[1].pitch);
                 Assert.AreEqual(0.9f, sources[2].pitch);
+                Assert.AreEqual(1f, sources[3].pitch);
                 Assert.AreEqual(cachedSynthClips, Sfx.CachedSynthClipCount);
             }
             finally { Object.DestroyImmediate(host); Sfx.Muted = muted; }

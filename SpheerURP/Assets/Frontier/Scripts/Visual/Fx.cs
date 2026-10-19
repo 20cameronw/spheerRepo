@@ -472,7 +472,8 @@ namespace Frontier
         public static void Click() { Cue(AudioCue.Click); }
         public static void Good() { Cue(AudioCue.Good); }
         public static void Bad() { Cue(AudioCue.Bad); }
-        public static void Zap(float pitch = 1f) { Cue(AudioCue.Zap, pitch); }
+        public static void Zap() { Cue(AudioCue.Zap); }
+        public static void Zap(float pitch) { Cue(AudioCue.Zap, pitch); }
         public static void Boom() { Cue(AudioCue.Boom); }
         public static void Warp() { Cue(AudioCue.Warp); }
         public static void Impact(float pitch = 1f) { Cue(AudioCue.Impact, pitch); }
