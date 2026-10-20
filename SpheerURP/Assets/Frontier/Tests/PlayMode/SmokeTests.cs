@@ -287,6 +287,11 @@ namespace Frontier.Tests
             Assert.IsNotNull(rt);
             yield return null;
             rt.Ui.DebugMenu("settings");
+            var language = rt.Ui.DebugRoot.Q<DropdownField>("settings-language");
+            Assert.IsNotNull(language);
+            Assert.AreEqual(UnityEngine.Localization.Settings.LocalizationSettings.AvailableLocales.Locales.Count,
+                language.choices.Count);
+            Assert.IsFalse(language.enabledSelf, "Only authored English is shipped; do not advertise unshipped translations.");
             Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("settings-haptics"));
             var notifications = rt.Ui.DebugRoot.Q<Button>("settings-notifications");
             Assert.IsNotNull(notifications);
@@ -313,6 +318,116 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.HandleBack());
             Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("minigame-resume"));
             rt.Ui.DebugReset();
+        }
+
+        sealed class LanguageTableProvider : UnityEngine.Localization.Settings.ITableProvider
+        {
+            public UnityEngine.Localization.Tables.StringTable complete, incomplete;
+
+            public UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<TTable> ProvideTableAsync<TTable>(
+                string tableCollectionName, UnityEngine.Localization.Locale locale)
+                where TTable : UnityEngine.Localization.Tables.LocalizationTable
+            {
+                if (tableCollectionName != UiText.CollectionName) return default;
+                var selected = locale.Identifier.Code == "fr" ? complete
+                    : locale.Identifier.Code == "de" ? incomplete : null;
+                return selected == null ? default
+                    : UnityEngine.AddressableAssets.Addressables.ResourceManager.CreateCompletedOperation(selected as TTable, null);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator LanguageSelectionRefreshesLiveUiAndPersistsWithoutChangingProgress()
+        {
+            new GameObject("LanguageBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30f;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var runtime = FrontierRuntime.Current;
+            Assert.IsNotNull(runtime);
+            var database = UnityEngine.Localization.Settings.LocalizationSettings.StringDatabase;
+            var locales = UnityEngine.Localization.Settings.LocalizationSettings.AvailableLocales;
+            var previousProvider = database.TableProvider;
+            var previousLocale = UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale;
+            bool hadPreference = PlayerPrefs.HasKey(UiText.LocalePreferenceKey);
+            string preference = PlayerPrefs.GetString(UiText.LocalePreferenceKey, "");
+            var french = UnityEngine.Localization.Locale.CreateLocale("fr");
+            var german = UnityEngine.Localization.Locale.CreateLocale("de");
+            var complete = ScriptableObject.CreateInstance<UnityEngine.Localization.Tables.StringTable>();
+            var incomplete = ScriptableObject.CreateInstance<UnityEngine.Localization.Tables.StringTable>();
+            var source = Resources.Load<UiStringTableSO>("Frontier/UiStrings");
+            complete.SharedData = ScriptableObject.CreateInstance<UnityEngine.Localization.Tables.SharedTableData>();
+            incomplete.SharedData = ScriptableObject.CreateInstance<UnityEngine.Localization.Tables.SharedTableData>();
+            complete.SharedData.TableCollectionName = incomplete.SharedData.TableCollectionName = UiText.CollectionName;
+            complete.LocaleIdentifier = french.Identifier;
+            incomplete.LocaleIdentifier = german.Identifier;
+            foreach (var entry in source.entries) complete.AddEntry(entry.key, entry.text);
+            complete.GetEntry("nav.command").Value = "LOCALIZED COMMAND";
+            complete.GetEntry("nav.menu").Value = "LOCALIZED MENU";
+            complete.GetEntry("settings.language").Value = "LOCALIZED LANGUAGE";
+            complete.GetEntry("guide.skip").Value = "LOCALIZED SKIP";
+            var provider = new LanguageTableProvider { complete = complete, incomplete = incomplete };
+            locales.AddLocale(french);
+            locales.AddLocale(german);
+            database.TableProvider = provider;
+            int structures = runtime.State.structures.Count, shards = runtime.State.ShardBalance;
+            string planet = runtime.State.planet.Id;
+            try
+            {
+                runtime.Ui.DebugMenu("settings");
+                var dropdown = runtime.Ui.DebugRoot.Q<DropdownField>("settings-language");
+                Assert.IsTrue(dropdown.enabledSelf);
+                dropdown.value = french.LocaleName;
+                string overlapping = null;
+                yield return UiText.SelectLocale("en", message => overlapping = message);
+                Assert.AreEqual(UiText.Get("settings.language.busy"), overlapping);
+                deadline = Time.realtimeSinceStartup + 10f;
+                while (UiText.IsChangingLocale && Time.realtimeSinceStartup < deadline) yield return null;
+                yield return null;
+                Assert.AreEqual("fr", UiText.LocaleCode);
+                Assert.AreEqual("fr", PlayerPrefs.GetString(UiText.LocalePreferenceKey));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED COMMAND"));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED MENU"));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED LANGUAGE"));
+                Assert.AreEqual("LOCALIZED SKIP", runtime.Ui.DebugRoot.Q("first-session-guide-skip").tooltip);
+                Assert.IsTrue(runtime.Ui.DebugRoot.enabledSelf);
+
+                string failure = null;
+                LogAssert.Expect(LogType.Warning, "Frontier UI localization is missing a plain-text entry: " + source.entries[0].key);
+                yield return UiText.SelectLocale("de", message => failure = message);
+                Assert.AreEqual(UiText.Get("settings.language.failed"), failure);
+                Assert.AreEqual("fr", UiText.LocaleCode);
+                Assert.AreEqual(french, UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale);
+                Assert.AreEqual("fr", PlayerPrefs.GetString(UiText.LocalePreferenceKey));
+                yield return UiText.SelectLocale("not-installed", message => failure = message);
+                Assert.AreEqual(UiText.Get("settings.language.unavailable"), failure);
+                Assert.AreEqual("fr", UiText.LocaleCode);
+
+                UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale = previousLocale;
+                yield return UiText.InitializeLocalization();
+                Assert.AreEqual("fr", UiText.LocaleCode, "Startup must honor the saved language, not the device locale.");
+                Assert.AreEqual(structures, runtime.State.structures.Count);
+                Assert.AreEqual(shards, runtime.State.ShardBalance);
+                Assert.AreEqual(planet, runtime.State.planet.Id);
+                yield return UiText.SelectLocale("en", message => Assert.IsNull(message));
+            }
+            finally
+            {
+                database.TableProvider = previousProvider;
+                UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale = previousLocale;
+                database.ReleaseTable(UiText.CollectionName, french);
+                database.ReleaseTable(UiText.CollectionName, german);
+                locales.RemoveLocale(french);
+                locales.RemoveLocale(german);
+                if (hadPreference) PlayerPrefs.SetString(UiText.LocalePreferenceKey, preference);
+                else PlayerPrefs.DeleteKey(UiText.LocalePreferenceKey);
+                PlayerPrefs.Save();
+                Object.Destroy(complete.SharedData);
+                Object.Destroy(incomplete.SharedData);
+                Object.Destroy(complete);
+                Object.Destroy(incomplete);
+                Object.Destroy(french);
+                Object.Destroy(german);
+            }
         }
 
         [UnityTest]

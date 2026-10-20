@@ -94,7 +94,7 @@ namespace Frontier
             message = "";
             if (resource == null || amount <= 0 || backpack.Count(resource.id) <= 0)
             {
-                message = "A collected harvest reward is required before its bonus can be granted.";
+                message = UiText.Get("harvest.bonus.collect-first");
                 return false;
             }
             if (SaveIsReadOnly)
@@ -106,7 +106,7 @@ namespace Frontier
             int accepted = Math.Min(amount, backpack.FreeSpace(resource.id));
             if (accepted <= 0)
             {
-                message = "The backpack has no room for the harvest bonus.";
+                message = UiText.Get("harvest.bonus.no-room");
                 return false;
             }
 
@@ -121,7 +121,7 @@ namespace Frontier
             int current = stack != null ? stack.count : 0;
             if ((long)current + accepted > int.MaxValue)
             {
-                message = "The harvest stack has reached its maximum size.";
+                message = UiText.Get("harvest.bonus.stack-full");
                 return false;
             }
             if (stack == null)
@@ -131,7 +131,7 @@ namespace Frontier
 
             if (!saves.CommitSnapshot(candidate))
             {
-                message = string.IsNullOrEmpty(saves.LastError) ? "The harvest bonus could not be saved." : saves.LastError;
+                message = string.IsNullOrEmpty(saves.LastError) ? UiText.Get("harvest.bonus.save-failed") : saves.LastError;
                 return false;
             }
 

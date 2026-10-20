@@ -451,7 +451,7 @@ namespace Frontier
 
         static string PrettyName(string value)
         {
-            if (string.IsNullOrEmpty(value)) return "Unknown";
+            if (string.IsNullOrEmpty(value)) return UiText.Get("common.unknown");
             var words = new List<string>();
             var word = new System.Text.StringBuilder();
             for (int i = 0; i < value.Length; i++)

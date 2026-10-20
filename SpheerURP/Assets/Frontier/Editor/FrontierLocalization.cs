@@ -100,6 +100,17 @@ namespace Frontier.EditorTools
                     throw new BuildFailedException("English localization drift: " + entry.key +
                         ". Run Frontier > Localization > Sync English Catalog.");
             }
+            foreach (var locale in LocalizationEditorSettings.GetLocales())
+            {
+                var localized = collection.GetTable(locale.Identifier) as StringTable;
+                if (localized == null || !LocalizationEditorSettings.GetPreloadTableFlag(localized))
+                    throw new BuildFailedException("Frontier language must have a complete preloaded UI table: " + locale.Identifier.Code);
+                try { UiText.ValidateLocalizedTable(localized); }
+                catch (InvalidOperationException exception)
+                {
+                    throw new BuildFailedException("Frontier language " + locale.Identifier.Code + ": " + exception.Message);
+                }
+            }
         }
 
         public void OnPreprocessBuild(BuildReport report) { ValidateEnglishCatalog(); }

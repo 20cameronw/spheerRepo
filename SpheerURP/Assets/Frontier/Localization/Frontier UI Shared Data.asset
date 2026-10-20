@@ -3619,6 +3619,50 @@ MonoBehaviour:
     m_Key: debug.size.colossal
     m_Metadata:
       m_Items: []
+  - m_Id: 1497536836755456
+    m_Key: settings.language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030144
+    m_Key: settings.language.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030145
+    m_Key: settings.language.only-english
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030146
+    m_Key: settings.language.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030147
+    m_Key: settings.language.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030148
+    m_Key: settings.language.failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421709070336
+    m_Key: common.unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956416
+    m_Key: harvest.bonus.collect-first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956417
+    m_Key: harvest.bonus.no-room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956418
+    m_Key: harvest.bonus.stack-full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956419
+    m_Key: harvest.bonus.save-failed
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

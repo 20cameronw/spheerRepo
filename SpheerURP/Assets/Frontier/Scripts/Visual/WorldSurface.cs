@@ -596,6 +596,20 @@ namespace Frontier
             if (labelPanel != null) PresentationQuality.ApplyPanelBudget(labelPanel);
         }
 
+        public void RefreshLocalizedLabels()
+        {
+            foreach (var item in items)
+            {
+                var structure = item.structure;
+                if (structure == null || item.labelElement == null) continue;
+                var caption = item.labelElement.Q<Label>();
+                if (caption != null)
+                    caption.text = UiText.Get(gs.IsUnderConstruction(structure) ? "world.label.building"
+                        : gs.IsUpgradeInProgress(structure) ? "world.label.upgrading" : "world.label.level",
+                        structure.def.displayName.ToUpper(), structure.level);
+            }
+        }
+
         // ------------------------------------------------------------ frame
         public bool Facing(Vector3 worldPos)
         {

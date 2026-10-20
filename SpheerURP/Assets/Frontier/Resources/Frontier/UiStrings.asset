@@ -14,6 +14,28 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   locale: en
   entries:
+  - key: common.unknown
+    text: Unknown
+  - key: harvest.bonus.collect-first
+    text: A collected harvest reward is required before its bonus can be granted.
+  - key: harvest.bonus.no-room
+    text: The backpack has no room for the harvest bonus.
+  - key: harvest.bonus.stack-full
+    text: The harvest stack has reached its maximum size.
+  - key: harvest.bonus.save-failed
+    text: The harvest bonus could not be saved.
+  - key: settings.language
+    text: LANGUAGE
+  - key: settings.language.help
+    text: Changes interface text immediately. Your game and progress are unchanged.
+  - key: settings.language.only-english
+    text: English is the only language included in this build.
+  - key: settings.language.busy
+    text: A language is already loading. Please wait.
+  - key: settings.language.unavailable
+    text: That language is not installed. Your current language is unchanged.
+  - key: settings.language.failed
+    text: Could not load a complete language table. Your current language is unchanged. Try again.
   - key: clock.history-invalid
     text: Saved clock history is unreadable. This save is protected from writes; restore a valid backup.
   - key: clock.rewind-detected

@@ -39,6 +39,9 @@ namespace Frontier.Tests
             Assert.IsNotNull(table);
             table.Validate();
             Assert.AreEqual("en", table.locale);
+            Assert.AreEqual("LANGUAGE", UiText.Get("settings.language"));
+            StringAssert.Contains("only language", UiText.Get("settings.language.only-english"));
+            StringAssert.Contains("no room", UiText.Get("harvest.bonus.no-room"));
             Assert.AreEqual("COMMAND", UiText.Get("nav.command"));
             Assert.AreEqual("COLLECT RESOURCES", UiText.Get("harvest.collect"));
             Assert.AreEqual("Run abandoned. No resources collected.", UiText.Get("harvest.abandoned"));

@@ -26,6 +26,24 @@ restore/undo. Rewound clocks warn and cannot re-credit an already-observed produ
 derive the watermark from their last save time, and corrupt history is protected read-only. Forward edits,
 manual file/automatic-backup replacement and cross-device time remain untrusted and require server authority.
 
+### Execution status: unfinished is not the same as running
+
+The old in-progress indicators included milestones waiting on external acceptance or undecided requirements.
+Those milestones are now tracked as **blocked**, not complete or actively running. Some also contain unfinished
+code that depends on the listed prerequisite; this is not a claim that only testing remains.
+
+| Remaining work | Execution state / prerequisite |
+| --- | --- |
+| Generated gameplay/provider/content localization | Pending local implementation; language selection and live switching are implemented. Only English is shipped. |
+| Durable Hyperspace process-restart restoration | Pending local implementation; pause/focus-loss handling is implemented, but terminating the process does not preserve an in-flight run. |
+| Map renderer decision, harvest/Hyperspace touch/audio/haptics, cinematics/VFX/FTUE, quality/memory/thermal budgets and release QA | Blocked on physical-device measurements/acceptance. No Android device was attached when checked. The existing debug APK is not device or release certification. |
+| Ascension and endgame | Blocked on an approved permanent-bonus design; keep Ascension disabled. Weekly boards also need server authority. |
+| Production audio | Blocked on approved music/stems and biome direction plus device listening/mix acceptance. Existing original/CC0 material is not final approval. |
+| Purchases and premium shop | Blocked on native receipt verification/store setup and authoritative purchase recovery. IAP/store-price/restore integration, Starter Pack/cosmetics/shop and backup/cross-device reconciliation are not complete. |
+| Rewarded ads | Blocked on SDK/mediation/privacy setup and reviewed placement limits. Per-job speed-up caps and other placement UIs remain unimplemented; all placements stay disabled. |
+| Progression/events, leaderboard writes and wider cloud/config work | Blocked on approved tuning rules, server-verifiable progression/trusted time, Access Control and dashboard schemas/setup. Non-travel runtime tuning and recurring events remain unfinished. |
+| Compliance and store release | Blocked on public/backend deletion and retention, privacy/legal/audience/ATT decisions, enabled-provider verification, final app identities/signing and store declarations. |
+
 ---
 
 ## 0. What you asked for, and where it is handled
@@ -759,17 +777,29 @@ and remaining harvest/XP shell string slices. A fresh focused PlayMode
 deletion-flow regression passed after the localization migration. Providers remain disabled.
 `COMPLIANCE.md` now records implemented scope and remaining legal/web/backend/native/store gates, not legal approval.
 
-**Unity Localization (§7.1):** installed 1.5.13 and registered English settings/locale plus the 901-key preloaded
+**Unity Localization (§7.1):** installed 1.5.13 and registered English settings/locale plus the 912-key preloaded
 `Frontier UI` StringTable. The editor sync command keeps `UiStrings.asset` as the English source, preserving stable
 keys and other locales. Bootstrap awaits asynchronous loading before creating UI; current-culture composite
 formatting remains unchanged. Player build guards reject drift/missing tables and force local bundled content to
 build with the player. Four focused catalog/build-guard checks, earlier live UI checks, and fresh focused PlayMode
 localization/bootstrap and deletion regressions passed. Local Android-target bundles built successfully, exposing
 and correcting an inherited misplaced `DefaultContent` editor-only guard. No APK/native-device claim. Remaining: generated gameplay/provider/
-content text, language selection/live switching, translations, font coverage and RTL; only English is authored.
+content text, translations, font coverage and RTL; only English is authored.
 Development debug controls and generated-world filtering now also use stable localized keys for actions, status and
 all biome/size choices. Four catalog tests and the live localized-screen smoke test passed; untranslated generated
-content, locale switching, additional languages, font coverage and RTL remain open.
+content, additional languages, font coverage and RTL remain open.
+
+**Language selection/live switching (§7.1):** Settings now lists only installed locales, disables the selector
+when only English is installed, and explicitly explains the single-language build. A language change loads and
+validates the complete plain-text catalog before changing the selected locale or saved preference; missing,
+incomplete and overlapping requests report explicit failures without replacing the current language. Input is
+locked only while loading. The live menu, dock, guide, wave HUD and world-space structure captions refresh without
+restarting the scene, recreating gameplay or replaying the tutorial funnel. Startup honors the persisted choice;
+removed locales produce a warning and use the startup locale. Player build validation requires complete preloaded
+tables for every installed locale. A complete test-only alternate table verifies the live flow and saved-language
+startup; no translated language is shipped or claimed. Harvest-bonus refusal messages and the Atlas unknown label
+are also catalog-backed. Physical-device language/font/RTL acceptance and authored translations remain open.
+Focused catalog/save checks passed 17/17; live language selection, Back navigation and menu/guide checks passed 3/3.
 **Harvest mini-game catalog slice:** tree/rock, drill, siphon, excavation, salvage and asteroid-field titles, tools,
 instructions, metrics, feedback states, controls and live progress now use the catalog. The player-level HUD and
 travel settings heading also use catalog entries. Four focused catalog/build-guard checks and 12 live mini-game

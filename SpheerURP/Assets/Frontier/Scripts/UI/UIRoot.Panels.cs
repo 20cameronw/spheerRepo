@@ -462,6 +462,7 @@ namespace Frontier
 
         void BuildSettings(VisualElement body)
         {
+            BuildLanguageSettings(body);
             var snd = IconBtn(UiText.Get(Sfx.Muted ? "settings.sound.off" : "settings.sound.on"), Sfx.Muted ? "mute" : "sound", Sfx.Muted ? UiKit.Red : UiKit.Lime, () =>
             {
                 Sfx.Muted = !Sfx.Muted;
@@ -547,6 +548,65 @@ namespace Frontier
             reset.style.marginTop = UiKit.Space.S24;
             reset.name = "settings-reset";
             body.Add(reset);
+        }
+
+        void BuildLanguageSettings(VisualElement body)
+        {
+            body.Add(SectionLabel(UiText.Get("settings.language")));
+            var locales = UnityEngine.Localization.Settings.LocalizationSettings.AvailableLocales.Locales;
+            var names = new List<string>();
+            int current = 0;
+            for (int i = 0; i < locales.Count; i++)
+            {
+                names.Add(locales[i].LocaleName);
+                if (locales[i].Identifier.Code == UiText.LocaleCode) current = i;
+            }
+            var language = new DropdownField(names, current) { name = "settings-language" };
+            language.AddToClassList("fr-slider");
+            language.style.minHeight = UiKit.Size.Touch;
+            language.tooltip = UiText.Get("settings.language");
+            language.SetEnabled(locales.Count > 1 && !UiText.IsChangingLocale);
+            language.RegisterValueChangedCallback(e =>
+            {
+                int index = names.IndexOf(e.newValue);
+                if (index >= 0 && !busy && !defense.Active)
+                    StartCoroutine(ChangeLanguage(locales[index].Identifier.Code));
+            });
+            body.Add(language);
+            body.Add(UiKit.Text(UiText.Get(locales.Count > 1
+                ? "settings.language.help" : "settings.language.only-english"), "fr-tiny"));
+        }
+
+        System.Collections.IEnumerator ChangeLanguage(string code)
+        {
+            busy = true;
+            root.SetEnabled(false);
+            string error = null;
+            try { yield return UiText.SelectLocale(code, message => error = message); }
+            finally
+            {
+                busy = false;
+                root.SetEnabled(true);
+            }
+            if (error != null)
+            {
+                RefreshModal();
+                Toast(error, UiKit.Red);
+                yield break;
+            }
+            hud.RemoveFromHierarchy();
+            BuildHud();
+            firstSessionGuideVisibilityKnown = false;
+            BuildFirstSessionGuide();
+            int waveHudIndex = root.IndexOf(waveHud);
+            waveHud.RemoveFromHierarchy();
+            BuildWaveHud();
+            root.Insert(waveHudIndex, waveHud);
+            if (modal != null)
+                modal.Q<Label>(className: "fr-modal-title").text = UiText.Get("nav.menu");
+            world.RefreshLocalizedLabels();
+            ApplyLayout(true);
+            OnStateChanged();
         }
 
         void BuildAudioVolume(VisualElement body, string labelKey, string name, float initial, Action<float> changed)

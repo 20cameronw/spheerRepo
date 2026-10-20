@@ -3758,6 +3758,51 @@ MonoBehaviour:
     m_Localized: COLOSSAL
     m_Metadata:
       m_Items: []
+  - m_Id: 1497536836755456
+    m_Localized: LANGUAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030144
+    m_Localized: Changes interface text immediately. Your game and progress are unchanged.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030145
+    m_Localized: English is the only language included in this build.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030146
+    m_Localized: A language is already loading. Please wait.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030147
+    m_Localized: That language is not installed. Your current language is unchanged.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1497536929030148
+    m_Localized: Could not load a complete language table. Your current language
+      is unchanged. Try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421709070336
+    m_Localized: Unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956416
+    m_Localized: A collected harvest reward is required before its bonus can be granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956417
+    m_Localized: The backpack has no room for the harvest bonus.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956418
+    m_Localized: The harvest stack has reached its maximum size.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1498421792956419
+    m_Localized: The harvest bonus could not be saved.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

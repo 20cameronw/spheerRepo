@@ -27,7 +27,7 @@ namespace Frontier
 
         void BuildFirstSessionGuide()
         {
-            if (services != null)
+            if (services != null && firstSessionFunnel == null)
                 firstSessionFunnel = new FirstSessionFunnel(services, message => Debug.LogWarning(message));
             firstSessionGuideCard = UiKit.Div("fr-guide-card");
             firstSessionGuideCard.pickingMode = PickingMode.Position;

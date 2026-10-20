@@ -4,6 +4,9 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Unity.Localization",
+        "Unity.ResourceManager",
+        "Unity.Addressables",
         "Frontier.Core",
         "Frontier.Economy",
         "Frontier.Data",
