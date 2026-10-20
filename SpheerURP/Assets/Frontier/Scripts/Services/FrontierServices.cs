@@ -17,19 +17,23 @@ namespace Frontier.Services
     {
         public readonly ServiceStatus status;
         public readonly string message;
+        public readonly ServiceMessage text;
         public bool succeeded { get { return status == ServiceStatus.Success; } }
 
-        ServiceResult(ServiceStatus status, string message)
+        ServiceResult(ServiceStatus status, ServiceMessage text)
         {
             this.status = status;
-            this.message = message ?? string.Empty;
+            this.text = text;
+            message = text.ToString();
         }
 
-        public static ServiceResult Success(string message = "") { return new ServiceResult(ServiceStatus.Success, message); }
-        public static ServiceResult NotConfigured(string service) { return new ServiceResult(ServiceStatus.NotConfigured, service + " is not configured."); }
-        public static ServiceResult ConsentRequired(string category) { return new ServiceResult(ServiceStatus.ConsentRequired, "Opt-in consent is required for " + category + "."); }
-        public static ServiceResult InvalidRequest(string message) { return new ServiceResult(ServiceStatus.InvalidRequest, message); }
-        public static ServiceResult Failed(string message) { return new ServiceResult(ServiceStatus.Failed, message); }
+        public static ServiceResult Success(string message = "") { return new ServiceResult(ServiceStatus.Success, ServiceMessage.Literal(message)); }
+        public static ServiceResult NotConfigured(string service) { return new ServiceResult(ServiceStatus.NotConfigured, ServiceMessage.NotConfigured(service)); }
+        public static ServiceResult ConsentRequired(string category) { return new ServiceResult(ServiceStatus.ConsentRequired, ServiceMessage.ConsentRequired(category)); }
+        public static ServiceResult InvalidRequest(string message) { return InvalidRequest(ServiceMessage.Literal(message)); }
+        public static ServiceResult Failed(string message) { return Failed(ServiceMessage.Literal(message)); }
+        public static ServiceResult InvalidRequest(ServiceMessage text) { return new ServiceResult(ServiceStatus.InvalidRequest, text); }
+        public static ServiceResult Failed(ServiceMessage text) { return new ServiceResult(ServiceStatus.Failed, text); }
     }
 
     public readonly struct ServiceResult<T>
@@ -37,20 +41,24 @@ namespace Frontier.Services
         public readonly ServiceStatus status;
         public readonly T value;
         public readonly string message;
+        public readonly ServiceMessage text;
         public bool succeeded { get { return status == ServiceStatus.Success; } }
 
-        ServiceResult(ServiceStatus status, T value, string message)
+        ServiceResult(ServiceStatus status, T value, ServiceMessage text)
         {
             this.status = status;
             this.value = value;
-            this.message = message ?? string.Empty;
+            this.text = text;
+            message = text.ToString();
         }
 
-        public static ServiceResult<T> Success(T value, string message = "") { return new ServiceResult<T>(ServiceStatus.Success, value, message); }
-        public static ServiceResult<T> NotConfigured(string service) { return new ServiceResult<T>(ServiceStatus.NotConfigured, default(T), service + " is not configured."); }
-        public static ServiceResult<T> ConsentRequired(string category) { return new ServiceResult<T>(ServiceStatus.ConsentRequired, default(T), "Opt-in consent is required for " + category + "."); }
-        public static ServiceResult<T> InvalidRequest(string message) { return new ServiceResult<T>(ServiceStatus.InvalidRequest, default(T), message); }
-        public static ServiceResult<T> Failed(string message) { return new ServiceResult<T>(ServiceStatus.Failed, default(T), message); }
+        public static ServiceResult<T> Success(T value, string message = "") { return new ServiceResult<T>(ServiceStatus.Success, value, ServiceMessage.Literal(message)); }
+        public static ServiceResult<T> NotConfigured(string service) { return new ServiceResult<T>(ServiceStatus.NotConfigured, default(T), ServiceMessage.NotConfigured(service)); }
+        public static ServiceResult<T> ConsentRequired(string category) { return new ServiceResult<T>(ServiceStatus.ConsentRequired, default(T), ServiceMessage.ConsentRequired(category)); }
+        public static ServiceResult<T> InvalidRequest(string message) { return InvalidRequest(ServiceMessage.Literal(message)); }
+        public static ServiceResult<T> Failed(string message) { return Failed(ServiceMessage.Literal(message)); }
+        public static ServiceResult<T> InvalidRequest(ServiceMessage text) { return new ServiceResult<T>(ServiceStatus.InvalidRequest, default(T), text); }
+        public static ServiceResult<T> Failed(ServiceMessage text) { return new ServiceResult<T>(ServiceStatus.Failed, default(T), text); }
     }
 
     public interface IServiceEndpoint
@@ -117,13 +125,15 @@ namespace Frontier.Services
         public readonly string displayName;
         public readonly long score;
         public readonly int rank;
+        public readonly bool usesFallbackName;
 
-        public LeaderboardEntry(string playerId, string displayName, long score, int rank)
+        public LeaderboardEntry(string playerId, string displayName, long score, int rank, bool usesFallbackName = false)
         {
             this.playerId = playerId ?? string.Empty;
             this.displayName = displayName ?? string.Empty;
             this.score = score;
             this.rank = rank;
+            this.usesFallbackName = usesFallbackName;
         }
     }
 
@@ -317,7 +327,7 @@ namespace Frontier.Services
             if (!consent.Current.hasDecision || !consent.Current.adsAllowed)
                 return ServiceResult<RewardedAdResult>.ConsentRequired("advertising");
             if (string.IsNullOrWhiteSpace(placementId))
-                return ServiceResult<RewardedAdResult>.InvalidRequest("A rewarded-ad placement is required.");
+                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.placement"));
             bool withdrawn = false;
             void ObserveConsent(ConsentPreferences preferences)
             {
@@ -373,7 +383,7 @@ namespace Frontier.Services
             if (!consent.Current.hasDecision || !consent.Current.analyticsAllowed)
                 return ServiceResult.ConsentRequired("analytics");
             if (string.IsNullOrWhiteSpace(eventName))
-                return ServiceResult.InvalidRequest("An analytics event name is required.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.analytics.event"));
             return inner.RecordEvent(eventName, parameters);
         }
     }
@@ -503,7 +513,7 @@ namespace Frontier.Services
                 return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.ConsentRequired("online leaderboards"));
             if (string.IsNullOrWhiteSpace(boardId) || limit < 1)
                 return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.InvalidRequest(
-                    "A leaderboard ID and positive result limit are required."));
+                    ServiceMessage.Get("service.leaderboard.request")));
             return inner.GetScoresAsync(boardId, limit);
         }
 
@@ -541,7 +551,7 @@ namespace Frontier.Services
             if (!consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
                 return Task.FromResult(ServiceResult<CloudSaveRecord>.ConsentRequired("cloud saves"));
             if (payload == null)
-                return Task.FromResult(ServiceResult<CloudSaveRecord>.InvalidRequest("A cloud-save payload is required."));
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.InvalidRequest(ServiceMessage.Get("service.cloud.payload")));
             return inner.WriteAsync(payload, writeLock);
         }
 
@@ -618,11 +628,11 @@ namespace Frontier.Services
         public async Task<ServiceResult> DeleteCurrentAccountAndSaveAsync(string expectedPlayerId)
         {
             if (AccountDeletionBusy)
-                return ServiceResult.InvalidRequest("Account deletion is already in progress.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.deletion.busy"));
             if (!Authentication.IsConfigured || !CloudSave.IsConfigured)
                 return ServiceResult.NotConfigured("Account and cloud-save deletion");
             if (string.IsNullOrEmpty(expectedPlayerId) || Authentication.CurrentPlayerId != expectedPlayerId)
-                return ServiceResult.InvalidRequest("The signed-in account changed. Review deletion again.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.deletion.review"));
             AccountDeletionBusy = true;
             bool cloudDeleted = false;
             try
@@ -631,16 +641,15 @@ namespace Frontier.Services
                 if (!removed.succeeded) return removed;
                 cloudDeleted = true;
                 if (Authentication.CurrentPlayerId != expectedPlayerId)
-                    return ServiceResult.Failed("The cloud save was deleted, but the signed-in account changed. No account was deleted.");
+                    return ServiceResult.Failed(ServiceMessage.Get("service.deletion.cloud-only"));
                 ServiceResult deleted = await Authentication.DeleteAccountAsync(expectedPlayerId);
                 return deleted.succeeded ? ServiceResult.Success()
-                    : ServiceResult.Failed("The cloud save was deleted, but account deletion failed. Retry account deletion. " + deleted.message);
+                    : ServiceResult.Failed(ServiceMessage.Get("service.deletion.partial", deleted.text));
             }
             catch (Exception exception)
             {
-                return ServiceResult.Failed((cloudDeleted
-                    ? "The cloud save was deleted, but account deletion failed. Retry account deletion. "
-                    : "Online deletion failed before cloud-save removal was confirmed. ") + exception.Message);
+                return ServiceResult.Failed(ServiceMessage.Get(cloudDeleted
+                    ? "service.deletion.partial" : "service.deletion.unconfirmed", exception.Message));
             }
             finally { AccountDeletionBusy = false; }
         }

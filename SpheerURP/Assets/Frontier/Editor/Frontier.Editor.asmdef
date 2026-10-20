@@ -3,6 +3,7 @@
     "rootNamespace": "Frontier.EditorTools",
     "references": [
         "Frontier.Core",
+        "Frontier.Services",
         "Frontier.Economy",
         "Frontier.Data",
         "Frontier.Game",

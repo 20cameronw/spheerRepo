@@ -37,6 +37,11 @@ namespace Frontier
             return string.IsNullOrEmpty(id) ? UiText.Get("common.unknown") : Get("label", id, "name", EnglishLabel(id));
         }
 
+        public static string EraName(Economy.FrontierEra era)
+        {
+            return Get("era", era.ToString().ToLowerInvariant(), "name", Economy.SimBands.EraNames[(int)era]);
+        }
+
         static string EnglishLabel(string value)
         {
             var words = new List<string>();
@@ -65,6 +70,12 @@ namespace Frontier
             KeyValuePair<string, string> Entry(string category, string id, string field, string text)
             {
                 return new KeyValuePair<string, string>("content." + category + "." + id + "." + field, text);
+            }
+            foreach (Economy.FrontierEra era in Enum.GetValues(typeof(Economy.FrontierEra)))
+            {
+                yield return Entry("era", era.ToString().ToLowerInvariant(), "name", Economy.SimBands.EraNames[(int)era]);
+                foreach (var requirement in Economy.EraRules.NextRequirements(era, default))
+                    yield return Entry("era-requirement", requirement.Id, "label", requirement.Label);
             }
             foreach (var resource in db.resources)
             {

@@ -36,6 +36,13 @@ namespace Frontier.EditorTools
             foreach (var entry in ContentText.EnglishEntries(GameDatabase.Load(), Resources.Load<ObjectiveCatalogSO>("Frontier/ObjectiveCatalog")))
                 if (!string.IsNullOrWhiteSpace(entry.Value) && keys.Add(entry.Key))
                     entries.Add(new UiStringTableSO.Entry { key = entry.Key, text = entry.Value });
+            foreach (var entry in Frontier.Services.ServiceMessage.EnglishEntries)
+            {
+                int index = entries.FindIndex(candidate => candidate.key == entry.Key);
+                var value = new UiStringTableSO.Entry { key = entry.Key, text = entry.Value };
+                if (index < 0) entries.Add(value);
+                else entries[index] = value;
+            }
             source.entries = entries.ToArray();
             source.Validate();
             EditorUtility.SetDirty(source);
@@ -107,6 +114,10 @@ namespace Frontier.EditorTools
             foreach (var entry in ContentText.EnglishEntries(GameDatabase.Load(), Resources.Load<ObjectiveCatalogSO>("Frontier/ObjectiveCatalog")))
                 if (!string.IsNullOrWhiteSpace(entry.Value) && !sourceKeys.Contains(entry.Key))
                     throw new BuildFailedException("Authored-content localization is missing: " + entry.Key +
+                        ". Run Frontier > Localization > Sync English Catalog.");
+            foreach (var entry in Frontier.Services.ServiceMessage.EnglishEntries)
+                if (!sourceKeys.Contains(entry.Key) || source.Template(entry.Key) != entry.Value)
+                    throw new BuildFailedException("Service-message localization is missing or stale: " + entry.Key +
                         ". Run Frontier > Localization > Sync English Catalog.");
             if (LocalizationEditorSettings.ActiveLocalizationSettings == null)
                 throw new BuildFailedException("Frontier localization settings are missing.");

@@ -10,6 +10,46 @@ namespace Frontier.Tests
 {
     public sealed class ServicesTests
     {
+        [Test]
+        public void ServiceMessagesRetainEnglishAndResolveNestedProviderFailures()
+        {
+            var inner = ServiceResult<CloudSaveRecord>.Failed(ServiceMessage.Get("service.cloud.conflict"));
+            var outer = ServiceResult.Failed(ServiceMessage.Get("service.deletion.partial", inner.text));
+            Assert.AreEqual("The cloud save was deleted, but account deletion failed. Retry account deletion. " + inner.message,
+                outer.message);
+            var translations = new Dictionary<string, string>
+            {
+                { "service.deletion.partial", "PARTIAL {0}" },
+                { "service.cloud.conflict", "CONFLICT" },
+                { "service.not-configured", "UNAVAILABLE {0}" },
+                { "service.label.recovery", "RECOVERY" }
+            };
+            string Resolve(string key, object[] args) { return string.Format(translations[key], args); }
+            Assert.AreEqual("PARTIAL CONFLICT", outer.text.Resolve(Resolve));
+            Assert.AreEqual("CONFLICT", ServiceResult<AuthIdentity>.Failed(inner.text).text.Resolve(Resolve));
+            Assert.AreEqual("UNAVAILABLE RECOVERY", ServiceResult.NotConfigured("Account recovery").text.Resolve(Resolve));
+            Assert.AreEqual("UNAVAILABLE Unity Authentication",
+                ServiceResult<AuthIdentity>.NotConfigured("Unity Authentication").text.Resolve(Resolve));
+            var native = ServiceResult.Failed("SDK detail {not a placeholder}");
+            Assert.AreEqual("PARTIAL SDK detail {not a placeholder}",
+                ServiceMessage.Get("service.deletion.partial", native.text).Resolve(Resolve));
+            Assert.AreEqual(native.message, native.text.Resolve(Resolve));
+        }
+
+        [Test]
+        public void ServiceMessagesCaptureArgumentsAndDoNotHideMissingTranslations()
+        {
+            object[] arguments = { 50 };
+            var message = ServiceMessage.Get("service.leaderboard.limit", arguments);
+            arguments[0] = 99;
+            Assert.AreEqual("Leaderboard page size must be between 1 and 50.", message.ToString());
+            Assert.Throws<KeyNotFoundException>(() => ServiceMessage.Get("service.missing"));
+            Assert.Throws<KeyNotFoundException>(() => message.Resolve((key, args) =>
+                throw new KeyNotFoundException(key)));
+            Assert.Throws<ArgumentNullException>(() => ServiceMessage.Get("service.cloud.conflict", null));
+            Assert.Throws<ArgumentNullException>(() => message.Resolve(null));
+        }
+
         sealed class MemoryConsentStore : IConsentStore
         {
             public ConsentPreferences saved;
@@ -231,10 +271,20 @@ namespace Frontier.Tests
             Assert.IsFalse(result.succeeded);
             StringAssert.Contains("cloud save was deleted", result.message);
             StringAssert.Contains("Account offline", result.message);
+            Assert.AreEqual("PARTIAL Account offline", result.text.Resolve((key, args) =>
+            {
+                Assert.AreEqual("service.deletion.partial", key);
+                return string.Format("PARTIAL {0}", args);
+            }));
             cloud.delete = () => { auth.playerId = "other"; return Task.FromResult(ServiceResult.Success()); };
             result = await services.DeleteCurrentAccountAndSaveAsync("player");
             Assert.IsFalse(result.succeeded);
             StringAssert.Contains("No account was deleted", result.message);
+            Assert.AreEqual("CLOUD ONLY", result.text.Resolve((key, args) =>
+            {
+                Assert.AreEqual("service.deletion.cloud-only", key);
+                return "CLOUD ONLY";
+            }));
             Assert.AreEqual(1, auth.deleteCount);
         }
 
@@ -254,6 +304,11 @@ namespace Frontier.Tests
             Assert.IsFalse(result.succeeded);
             StringAssert.Contains("before cloud-save removal was confirmed", result.message);
             StringAssert.Contains("Provider unavailable", result.message);
+            Assert.AreEqual("UNCONFIRMED Provider unavailable", result.text.Resolve((key, args) =>
+            {
+                Assert.AreEqual("service.deletion.unconfirmed", key);
+                return string.Format("UNCONFIRMED {0}", args);
+            }));
             Assert.AreEqual(0, auth.deleteCount);
             Assert.IsFalse(services.AccountDeletionBusy);
         }

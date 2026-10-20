@@ -1,4 +1,5 @@
 using System;
+using Frontier.Services;
 using UnityEngine;
 
 namespace Frontier
@@ -9,15 +10,23 @@ namespace Frontier
         public static event Action Changed;
         public static event Action StatusChanged;
         static string lastError;
+        static ServiceMessage? lastFailure;
         public static string LastError
         {
-            get { return lastError; }
+            get { return lastFailure.HasValue ? lastFailure.Value.Resolve(UiText.Get) : lastError; }
             set
             {
-                if (lastError == value) return;
+                if (lastError == value && !lastFailure.HasValue) return;
                 lastError = value;
+                lastFailure = null;
                 StatusChanged?.Invoke();
             }
+        }
+        public static void ReportFailure(ServiceMessage text)
+        {
+            lastError = text.ToString();
+            lastFailure = text;
+            StatusChanged?.Invoke();
         }
         public static bool Enabled
         {

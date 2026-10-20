@@ -12,9 +12,11 @@ namespace Frontier.Economy
 
     public readonly struct EraRequirement
     {
+        public readonly string Id;
         public readonly string Label;
         public readonly bool Complete;
-        public EraRequirement(string label, bool complete) { Label = label; Complete = complete; }
+        public EraRequirement(string label, bool complete) : this(null, label, complete) { }
+        public EraRequirement(string id, string label, bool complete) { Id = id; Label = label; Complete = complete; }
     }
 
     /// <summary>The same milestone gates for live progression and the economy simulator; never inferred from XP or currency.</summary>
@@ -45,19 +47,19 @@ namespace Frontier.Economy
         {
             switch (era)
             {
-                case FrontierEra.Landfall: return new[] { new EraRequirement("Land on a second world", facts.worldsLanded >= 2) };
+                case FrontierEra.Landfall: return new[] { new EraRequirement("second-world", "Land on a second world", facts.worldsLanded >= 2) };
                 case FrontierEra.Foothold: return new[]
                 {
-                    new EraRequirement("Build a Research Lab", facts.researchLabBuilt),
-                    new EraRequirement("Purchase Jump Range level 1", facts.jumpRangePurchased)
+                    new EraRequirement("research-lab", "Build a Research Lab", facts.researchLabBuilt),
+                    new EraRequirement("jump-range", "Purchase Jump Range level 1", facts.jumpRangePurchased)
                 };
-                case FrontierEra.Settlement: return new[] { new EraRequirement("Purchase any hazard plating", facts.hazardPlatingPurchased) };
+                case FrontierEra.Settlement: return new[] { new EraRequirement("hazard-plating", "Purchase any hazard plating", facts.hazardPlatingPurchased) };
                 case FrontierEra.Industry: return new[]
                 {
-                    new EraRequirement("Purchase Rad-Shield Plating", facts.radiationPlatingPurchased),
-                    new EraRequirement("Craft an Antimatter Pod", facts.antimatterCrafted)
+                    new EraRequirement("radiation-plating", "Purchase Rad-Shield Plating", facts.radiationPlatingPurchased),
+                    new EraRequirement("antimatter", "Craft an Antimatter Pod", facts.antimatterCrafted)
                 };
-                case FrontierEra.Interstellar: return new[] { new EraRequirement("Complete stage 3 of any megaproject", facts.highestMegaprojectStage >= 3) };
+                case FrontierEra.Interstellar: return new[] { new EraRequirement("megaproject", "Complete stage 3 of any megaproject", facts.highestMegaprojectStage >= 3) };
                 case FrontierEra.Ascension: return Array.Empty<EraRequirement>();
                 default: throw new ArgumentOutOfRangeException(nameof(era));
             }

@@ -7623,6 +7623,438 @@ MonoBehaviour:
     m_Key: travel.recovery.read-only
     m_Metadata:
       m_Items: []
+  - m_Id: 1514782137081856
+    m_Key: settings.quality-preset.automatic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745152
+    m_Key: settings.quality-preset.low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745153
+    m_Key: settings.quality-preset.medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745154
+    m_Key: settings.quality-preset.high
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745155
+    m_Key: settings.quality-tier.low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745156
+    m_Key: settings.quality-tier.medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745157
+    m_Key: settings.quality-tier.high
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939456
+    m_Key: service.not-configured
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939457
+    m_Key: service.consent-required
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939458
+    m_Key: service.label.external
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939459
+    m_Key: service.label.ads
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939460
+    m_Key: service.label.purchases
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939461
+    m_Key: service.label.authentication
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939462
+    m_Key: service.label.recovery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939463
+    m_Key: service.label.leaderboards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939464
+    m_Key: service.label.cloud
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939465
+    m_Key: service.label.analytics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939466
+    m_Key: service.label.remote
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939467
+    m_Key: service.label.notifications
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939468
+    m_Key: service.label.local-notifications
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939469
+    m_Key: service.label.deletion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939470
+    m_Key: service.label.advertising-consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939471
+    m_Key: service.label.analytics-consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939472
+    m_Key: service.label.analytics-collection
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939473
+    m_Key: service.label.remote-consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939474
+    m_Key: service.label.account-consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939475
+    m_Key: service.label.leaderboard-consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939476
+    m_Key: service.label.cloud-consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939477
+    m_Key: service.ads.placement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939478
+    m_Key: service.ads.unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133760
+    m_Key: service.ads.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133761
+    m_Key: service.ads.disabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133762
+    m_Key: service.ads.invalid-time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133763
+    m_Key: service.ads.limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133764
+    m_Key: service.ads.cooldown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133765
+    m_Key: service.ads.mismatch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133766
+    m_Key: service.ads.rewound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133767
+    m_Key: service.purchase.receipt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133768
+    m_Key: service.purchase.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133769
+    m_Key: service.purchase.destination
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133770
+    m_Key: service.purchase.verification
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133771
+    m_Key: service.purchase.mismatch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133772
+    m_Key: service.purchase.destination-changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133773
+    m_Key: service.purchase.confirmation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133774
+    m_Key: service.purchase.read-only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133775
+    m_Key: service.purchase.retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133776
+    m_Key: service.purchase.identity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133777
+    m_Key: service.purchase.journal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133778
+    m_Key: service.purchase.conflict
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133779
+    m_Key: service.purchase.rewards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133780
+    m_Key: service.purchase.unsupported
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133781
+    m_Key: service.purchase.wallet-full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133782
+    m_Key: service.purchase.save-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133783
+    m_Key: service.analytics.event
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133784
+    m_Key: service.analytics.parameters
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133785
+    m_Key: service.leaderboard.request
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133786
+    m_Key: service.leaderboard.board
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133787
+    m_Key: service.leaderboard.limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133788
+    m_Key: service.leaderboard.sign-in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133789
+    m_Key: service.leaderboard.score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133790
+    m_Key: service.leaderboard.unknown-pilot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133791
+    m_Key: service.cloud.payload
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133792
+    m_Key: service.cloud.nonempty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133793
+    m_Key: service.cloud.limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133794
+    m_Key: service.cloud.sign-in-load
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133795
+    m_Key: service.cloud.sign-in-write
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133796
+    m_Key: service.cloud.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133797
+    m_Key: service.cloud.changed-account
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133798
+    m_Key: service.cloud.delete-lock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133799
+    m_Key: service.cloud.replace-lock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133800
+    m_Key: service.cloud.missing-lock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133801
+    m_Key: service.cloud.conflict
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133802
+    m_Key: service.recovery.sign-in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133803
+    m_Key: service.recovery.credential
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133804
+    m_Key: service.recovery.provider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133805
+    m_Key: service.remote.sign-in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133806
+    m_Key: service.deletion.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133807
+    m_Key: service.deletion.review
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133808
+    m_Key: service.deletion.changed-account
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133809
+    m_Key: service.deletion.cloud-only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133810
+    m_Key: service.deletion.partial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133811
+    m_Key: service.deletion.unconfirmed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133812
+    m_Key: service.notifications.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133813
+    m_Key: service.notifications.limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133814
+    m_Key: service.notifications.jobs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133815
+    m_Key: service.notifications.request
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133816
+    m_Key: service.notifications.permission-changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133817
+    m_Key: service.notifications.sync-changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133818
+    m_Key: service.notifications.schedule-changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133819
+    m_Key: service.notifications.denied
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133820
+    m_Key: service.notifications.future
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133821
+    m_Key: service.notifications.revoked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133822
+    m_Key: service.notifications.id
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133823
+    m_Key: service.notifications.channel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133824
+    m_Key: service.notifications.channel-description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929782542336
+    m_Key: content.era.landfall.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011328
+    m_Key: content.era-requirement.second-world.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011329
+    m_Key: content.era.foothold.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011330
+    m_Key: content.era-requirement.research-lab.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011331
+    m_Key: content.era-requirement.jump-range.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011332
+    m_Key: content.era.settlement.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011333
+    m_Key: content.era-requirement.hazard-plating.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011334
+    m_Key: content.era.industry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011335
+    m_Key: content.era-requirement.radiation-plating.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011336
+    m_Key: content.era-requirement.antimatter.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011337
+    m_Key: content.era.interstellar.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011338
+    m_Key: content.era-requirement.megaproject.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011339
+    m_Key: content.era.ascension.name
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

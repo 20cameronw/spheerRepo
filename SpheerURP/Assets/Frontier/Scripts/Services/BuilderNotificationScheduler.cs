@@ -22,19 +22,19 @@ namespace Frontier.Services
             DateTimeOffset now, bool mayRequestPermission)
         {
             if (jobs == null) throw new ArgumentNullException(nameof(jobs));
-            if (busy) return ServiceResult.InvalidRequest("Notification synchronization is already pending.");
+            if (busy) return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.busy"));
             if (!provider.IsConfigured) return ServiceResult.NotConfigured("Local notifications");
             var desired = new Dictionary<string, NotificationRequest>(StringComparer.Ordinal);
             if (enabled)
             {
-                if (jobs.Count > 8) return ServiceResult.InvalidRequest("At most eight crew notifications are supported.");
+                if (jobs.Count > 8) return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.limit"));
                 foreach (var job in jobs)
                 {
                     bool known = false;
                     for (int i = 1; i <= 8; i++) known |= job.id == "frontier-crew-" + i;
                     if (!known || desired.ContainsKey(job.id)
                         || string.IsNullOrWhiteSpace(job.title) || string.IsNullOrWhiteSpace(job.body))
-                        return ServiceResult.InvalidRequest("Crew notifications must have unique IDs and nonempty text.");
+                        return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.jobs"));
                     if (job.scheduledUtc > now) desired.Add(job.id, job);
                 }
             }
@@ -68,18 +68,18 @@ namespace Frontier.Services
                 if (!permissionGranted)
                 {
                     if (!mayRequestPermission || permissionAttempted)
-                        return ServiceResult.InvalidRequest("Enable notifications again to request device permission when a timer is active.");
+                        return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.request"));
                     permissionAttempted = true;
                     var permission = await provider.RequestPermissionAsync();
                     if (!permission.succeeded) return permission;
                     permissionGranted = true;
                 }
                 if (requestedRevision != revision)
-                    return ServiceResult.InvalidRequest("Notification settings or jobs changed while permission was pending.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.permission-changed"));
                 foreach (var pair in desired)
                 {
                     if (requestedRevision != revision)
-                        return ServiceResult.InvalidRequest("Notification settings or jobs changed during synchronization.");
+                        return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.sync-changed"));
                     if (scheduled.TryGetValue(pair.Key, out var previous)
                         && Math.Abs((previous.scheduledUtc - pair.Value.scheduledUtc).TotalSeconds) < 2
                         && previous.title == pair.Value.title && previous.body == pair.Value.body) continue;
@@ -91,7 +91,7 @@ namespace Frontier.Services
                         var cancelled = await provider.CancelAsync(pair.Key);
                         if (!cancelled.succeeded) return cancelled;
                         scheduled.Remove(pair.Key);
-                        return ServiceResult.InvalidRequest("Notification settings or jobs changed during scheduling.");
+                        return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.schedule-changed"));
                     }
                 }
                 return ServiceResult.Success();

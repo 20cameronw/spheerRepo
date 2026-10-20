@@ -375,6 +375,12 @@ namespace Frontier.Tests
             complete.GetEntry("nav.menu").Value = "LOCALIZED MENU";
             complete.GetEntry("settings.language").Value = "LOCALIZED LANGUAGE";
             complete.GetEntry("guide.skip").Value = "LOCALIZED SKIP";
+            complete.GetEntry("service.deletion.partial").Value = "LOCALIZED PARTIAL {0}";
+            complete.GetEntry("service.cloud.conflict").Value = "LOCALIZED CONFLICT";
+            complete.GetEntry("service.notifications.denied").Value = "LOCALIZED NOTIFICATIONS";
+            foreach (var entry in source.entries)
+                if (entry.key.StartsWith("settings.quality-preset.", StringComparison.Ordinal))
+                    complete.GetEntry(entry.key).Value = "LOCALIZED QUALITY";
             var provider = new LanguageTableProvider { complete = complete, incomplete = incomplete };
             locales.AddLocale(french);
             locales.AddLocale(german);
@@ -391,9 +397,17 @@ namespace Frontier.Tests
             var generated = runtime.State.universe.FindGenerated(Frontier.Universe.Biome.Lush, null);
             string generatedEnglish = generated.Description;
             ulong generatedSeed = generated.Seed;
+            string notificationError = NotificationPreferences.LastError;
             try
             {
+                var partialDeletion = ServiceMessage.Get("service.deletion.partial",
+                    ServiceMessage.Get("service.cloud.conflict"));
+                runtime.Ui.GetType().GetField("accountDeletionFailure",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                    .SetValue(runtime.Ui, partialDeletion);
+                NotificationPreferences.ReportFailure(ServiceMessage.Get("service.notifications.denied"));
                 runtime.Ui.DebugMenu("settings");
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == partialDeletion.ToString()));
                 var dropdown = runtime.Ui.DebugRoot.Q<DropdownField>("settings-language");
                 Assert.IsTrue(dropdown.enabledSelf);
                 dropdown.value = french.LocaleName;
@@ -408,6 +422,12 @@ namespace Frontier.Tests
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED COMMAND"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED MENU"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED LANGUAGE"));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                    .Exists(label => label.text == "LOCALIZED PARTIAL LOCALIZED CONFLICT"));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                    .Exists(label => label.text != null && label.text.Contains("LOCALIZED NOTIFICATIONS")));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Q("settings-quality").Query<Label>().ToList()
+                    .Exists(label => label.text == "QUALITY: LOCALIZED QUALITY"));
                 Assert.AreEqual("LOCALIZED SKIP", runtime.Ui.DebugRoot.Q("first-session-guide-skip").tooltip);
                 StringAssert.Contains("LOCALIZED TERRAIN", generated.Description);
                 Assert.AreEqual("LOCALIZED BIOME", generated.BiomeName);
@@ -435,6 +455,12 @@ namespace Frontier.Tests
                     .Exists(label => label.text == ladder.LocalizedName.ToUpper()));
                 runtime.Ui.DebugMenu("goals");
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == objective.LocalizedTitle));
+                runtime.Ui.DebugMenu("ranks");
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text ==
+                    "YOUR FRONTIER: LOCALIZED CONTENT.ERA." + runtime.State.Era.ToString().ToUpperInvariant() + ".NAME"));
+                foreach (var requirement in Frontier.Economy.EraRules.NextRequirements(runtime.State.Era, runtime.State.EraProgress))
+                    Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text ==
+                        "LOCALIZED content.era-requirement." + requirement.Id + ".label"));
 
                 string failure = null;
                 LogAssert.Expect(LogType.Warning, "Frontier UI localization is missing a plain-text entry: " + source.entries[0].key);
@@ -457,9 +483,13 @@ namespace Frontier.Tests
                 Assert.AreEqual(generatedEnglish, generated.Description);
                 Assert.AreEqual(structureEnglish, existingStructure.LocalizedName);
                 Assert.AreEqual(catalogEnglish, JsonUtility.ToJson(contentDb.ToCatalog()));
+                runtime.Ui.DebugMenu("settings");
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == partialDeletion.ToString()));
+                Assert.AreEqual(ServiceMessage.Get("service.notifications.denied").ToString(), NotificationPreferences.LastError);
             }
             finally
             {
+                NotificationPreferences.LastError = notificationError;
                 database.TableProvider = previousProvider;
                 UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale = previousLocale;
                 database.ReleaseTable(UiText.CollectionName, french);

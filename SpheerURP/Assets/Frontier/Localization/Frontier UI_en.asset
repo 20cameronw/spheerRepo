@@ -7875,6 +7875,454 @@ MonoBehaviour:
       saved journey on disk is unchanged.
     m_Metadata:
       m_Items: []
+  - m_Id: 1514782137081856
+    m_Localized: AUTOMATIC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745152
+    m_Localized: LOW
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745153
+    m_Localized: MEDIUM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745154
+    m_Localized: HIGH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745155
+    m_Localized: low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745156
+    m_Localized: medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782237745157
+    m_Localized: high
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939456
+    m_Localized: '{0} is not configured.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939457
+    m_Localized: Opt-in consent is required for {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939458
+    m_Localized: External services
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939459
+    m_Localized: Rewarded ads
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939460
+    m_Localized: Purchases
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939461
+    m_Localized: Authentication
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939462
+    m_Localized: Account recovery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939463
+    m_Localized: Leaderboards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939464
+    m_Localized: Cloud Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939465
+    m_Localized: Analytics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939466
+    m_Localized: Remote Config
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939467
+    m_Localized: Notifications
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939468
+    m_Localized: Local notifications
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939469
+    m_Localized: Account and cloud-save deletion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939470
+    m_Localized: advertising
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939471
+    m_Localized: analytics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939472
+    m_Localized: analytics data collection
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939473
+    m_Localized: online remote configuration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939474
+    m_Localized: online account services
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939475
+    m_Localized: online leaderboards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939476
+    m_Localized: cloud saves
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939477
+    m_Localized: A rewarded-ad placement is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782241939478
+    m_Localized: Unknown rewarded-ad placement.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133760
+    m_Localized: A rewarded ad is already in progress.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133761
+    m_Localized: This rewarded-ad placement is disabled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133762
+    m_Localized: Rewarded-ad usage or device time is invalid. Retry after the device
+      clock is corrected.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133763
+    m_Localized: The daily limit for this rewarded-ad placement has been reached.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133764
+    m_Localized: This rewarded-ad placement is cooling down.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133765
+    m_Localized: The ad provider returned a different reward placement.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133766
+    m_Localized: The device clock moved backwards during the rewarded ad.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133767
+    m_Localized: A purchase product, transaction ID and receipt payload are required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133768
+    m_Localized: A purchase is already being processed. Keep this purchase pending
+      and retry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133769
+    m_Localized: A persistent purchase destination is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133770
+    m_Localized: 'Purchase verification did not complete: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133771
+    m_Localized: The verified purchase does not match the pending store transaction.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133772
+    m_Localized: The purchase destination changed. Keep this purchase pending and
+      retry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133773
+    m_Localized: The purchase reward is saved, but store confirmation is pending.
+      Retry without granting again. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133774
+    m_Localized: Purchases cannot be granted while this save is read-only.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133775
+    m_Localized: The purchase destination changed. Retry this pending purchase.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133776
+    m_Localized: The verified purchase identity is incomplete.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133777
+    m_Localized: The purchase journal is invalid. Store reconciliation is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133778
+    m_Localized: The purchase journal conflicts with this transaction. Store reconciliation
+      is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133779
+    m_Localized: The purchased shard pack has invalid catalog rewards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133780
+    m_Localized: This store product has no supported catalog reward.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133781
+    m_Localized: The shard wallet is full. Keep the purchase pending until there
+      is room.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133782
+    m_Localized: The purchase reward was not granted because its save failed. Keep
+      the store transaction pending. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133783
+    m_Localized: An analytics event name is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133784
+    m_Localized: Analytics parameters require non-empty keys and values.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133785
+    m_Localized: A leaderboard ID and positive result limit are required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133786
+    m_Localized: The requested leaderboard does not match the configured board.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133787
+    m_Localized: Leaderboard page size must be between 1 and {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133788
+    m_Localized: Sign in before loading leaderboard scores.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133789
+    m_Localized: The configured leaderboard contains a score outside the supported
+      integer range.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133790
+    m_Localized: Unknown pilot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133791
+    m_Localized: A cloud-save payload is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133792
+    m_Localized: A non-empty cloud-save payload is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133793
+    m_Localized: The cloud-save payload exceeds the 5 MiB limit.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133794
+    m_Localized: Sign in before loading a cloud save.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133795
+    m_Localized: Sign in before writing a cloud save.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133796
+    m_Localized: The stored cloud save is empty and cannot be restored.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133797
+    m_Localized: The signed-in account changed. No cloud save was deleted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133798
+    m_Localized: The cloud save returned no write lock. Nothing was deleted; retry
+      before deleting the account.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133799
+    m_Localized: A write lock is required to replace an existing cloud save. Reload
+      it before retrying.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133800
+    m_Localized: Unity Cloud Save did not return a write lock. Reload the save before
+      retrying.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133801
+    m_Localized: The cloud save changed on another device. Reload it before retrying.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133802
+    m_Localized: Sign in to the current save before linking an account.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133803
+    m_Localized: The recovery provider returned an empty credential.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133804
+    m_Localized: The configured recovery provider is not supported.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133805
+    m_Localized: Sign in with an existing account before fetching remote configuration.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133806
+    m_Localized: Account deletion is already in progress.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133807
+    m_Localized: The signed-in account changed. Review deletion again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133808
+    m_Localized: The signed-in account changed. No account was deleted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133809
+    m_Localized: The cloud save was deleted, but the signed-in account changed. No
+      account was deleted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133810
+    m_Localized: The cloud save was deleted, but account deletion failed. Retry account
+      deletion. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133811
+    m_Localized: Online deletion failed before cloud-save removal was confirmed.
+      {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133812
+    m_Localized: Notification synchronization is already pending.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133813
+    m_Localized: At most eight crew notifications are supported.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133814
+    m_Localized: Crew notifications must have unique IDs and nonempty text.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133815
+    m_Localized: Enable notifications again to request device permission when a timer
+      is active.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133816
+    m_Localized: Notification settings or jobs changed while permission was pending.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133817
+    m_Localized: Notification settings or jobs changed during synchronization.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133818
+    m_Localized: Notification settings or jobs changed during scheduling.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133819
+    m_Localized: Notification permission was denied. Enable it in device settings
+      to receive completion alerts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133820
+    m_Localized: A future Frontier crew notification with title and body is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133821
+    m_Localized: Device notification permission is no longer granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133822
+    m_Localized: A valid Frontier crew notification ID is required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133823
+    m_Localized: Construction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1514782246133824
+    m_Localized: Completed construction, upgrades and clearance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929782542336
+    m_Localized: Landfall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011328
+    m_Localized: Land on a second world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011329
+    m_Localized: Foothold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011330
+    m_Localized: Build a Research Lab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011331
+    m_Localized: Purchase Jump Range level 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011332
+    m_Localized: Settlement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011333
+    m_Localized: Purchase any hazard plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011334
+    m_Localized: Industry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011335
+    m_Localized: Purchase Rad-Shield Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011336
+    m_Localized: Craft an Antimatter Pod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011337
+    m_Localized: Interstellar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011338
+    m_Localized: Complete stage 3 of any megaproject
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1515929879011339
+    m_Localized: Ascension
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

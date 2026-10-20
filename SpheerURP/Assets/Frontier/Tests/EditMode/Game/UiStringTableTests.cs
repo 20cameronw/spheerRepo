@@ -15,6 +15,36 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void ServiceMessageAndQualitySourcesAreCoveredAndGuarded()
+        {
+            var table = Resources.Load<UiStringTableSO>("Frontier/UiStrings");
+            int count = 0;
+            foreach (var entry in Services.ServiceMessage.EnglishEntries)
+            {
+                Assert.AreEqual(entry.Value, table.Template(entry.Key), entry.Key);
+                count++;
+            }
+            Assert.Greater(count, 80);
+            foreach (QualityPreset preset in Enum.GetValues(typeof(QualityPreset)))
+                Assert.IsNotEmpty(table.Template("settings.quality-preset." + preset.ToString().ToLowerInvariant()));
+            foreach (PerformanceTier tier in Enum.GetValues(typeof(PerformanceTier)))
+                Assert.IsNotEmpty(table.Template("settings.quality-tier." + tier.ToString().ToLowerInvariant()));
+            int index = Array.FindIndex(table.entries, entry => entry.key == "service.deletion.partial");
+            var original = table.entries[index];
+            try
+            {
+                table.entries[index].text = "Outdated warning {0}";
+                table.Validate();
+                Assert.Throws<UnityEditor.Build.BuildFailedException>(EditorTools.FrontierLocalization.ValidateEnglishCatalog);
+            }
+            finally
+            {
+                table.entries[index] = original;
+                table.Validate();
+            }
+        }
+
+        [Test]
         public void AuthoredContentKeysAreUniqueCoveredAndKeepEnglishAuthoringLive()
         {
             var db = GameDatabase.Load();

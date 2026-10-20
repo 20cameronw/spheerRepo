@@ -276,6 +276,20 @@ MonoBehaviour:
     text: Harvest vibrations are unavailable on this device.
   - key: settings.quality
     text: 'QUALITY: {0}'
+  - key: settings.quality-preset.automatic
+    text: AUTOMATIC
+  - key: settings.quality-preset.low
+    text: LOW
+  - key: settings.quality-preset.medium
+    text: MEDIUM
+  - key: settings.quality-preset.high
+    text: HIGH
+  - key: settings.quality-tier.low
+    text: low
+  - key: settings.quality-tier.medium
+    text: medium
+  - key: settings.quality-tier.high
+    text: high
   - key: settings.quality.help
     text: Using {0} quality. Lower settings reduce effects and mini-game resolution,
       not gameplay.
@@ -4041,3 +4055,216 @@ MonoBehaviour:
     text: Warp Gate Engineering
   - key: content.label.warp_theory.name
     text: Warp Theory
+  - key: service.not-configured
+    text: '{0} is not configured.'
+  - key: service.consent-required
+    text: Opt-in consent is required for {0}.
+  - key: service.label.external
+    text: External services
+  - key: service.label.ads
+    text: Rewarded ads
+  - key: service.label.purchases
+    text: Purchases
+  - key: service.label.authentication
+    text: Authentication
+  - key: service.label.recovery
+    text: Account recovery
+  - key: service.label.leaderboards
+    text: Leaderboards
+  - key: service.label.cloud
+    text: Cloud Save
+  - key: service.label.analytics
+    text: Analytics
+  - key: service.label.remote
+    text: Remote Config
+  - key: service.label.notifications
+    text: Notifications
+  - key: service.label.local-notifications
+    text: Local notifications
+  - key: service.label.deletion
+    text: Account and cloud-save deletion
+  - key: service.label.advertising-consent
+    text: advertising
+  - key: service.label.analytics-consent
+    text: analytics
+  - key: service.label.analytics-collection
+    text: analytics data collection
+  - key: service.label.remote-consent
+    text: online remote configuration
+  - key: service.label.account-consent
+    text: online account services
+  - key: service.label.leaderboard-consent
+    text: online leaderboards
+  - key: service.label.cloud-consent
+    text: cloud saves
+  - key: service.ads.placement
+    text: A rewarded-ad placement is required.
+  - key: service.ads.unknown
+    text: Unknown rewarded-ad placement.
+  - key: service.ads.busy
+    text: A rewarded ad is already in progress.
+  - key: service.ads.disabled
+    text: This rewarded-ad placement is disabled.
+  - key: service.ads.invalid-time
+    text: Rewarded-ad usage or device time is invalid. Retry after the device clock
+      is corrected.
+  - key: service.ads.limit
+    text: The daily limit for this rewarded-ad placement has been reached.
+  - key: service.ads.cooldown
+    text: This rewarded-ad placement is cooling down.
+  - key: service.ads.mismatch
+    text: The ad provider returned a different reward placement.
+  - key: service.ads.rewound
+    text: The device clock moved backwards during the rewarded ad.
+  - key: service.purchase.receipt
+    text: A purchase product, transaction ID and receipt payload are required.
+  - key: service.purchase.busy
+    text: A purchase is already being processed. Keep this purchase pending and retry.
+  - key: service.purchase.destination
+    text: A persistent purchase destination is required.
+  - key: service.purchase.verification
+    text: 'Purchase verification did not complete: {0}'
+  - key: service.purchase.mismatch
+    text: The verified purchase does not match the pending store transaction.
+  - key: service.purchase.destination-changed
+    text: The purchase destination changed. Keep this purchase pending and retry.
+  - key: service.purchase.confirmation
+    text: The purchase reward is saved, but store confirmation is pending. Retry
+      without granting again. {0}
+  - key: service.purchase.read-only
+    text: Purchases cannot be granted while this save is read-only.
+  - key: service.purchase.retry
+    text: The purchase destination changed. Retry this pending purchase.
+  - key: service.purchase.identity
+    text: The verified purchase identity is incomplete.
+  - key: service.purchase.journal
+    text: The purchase journal is invalid. Store reconciliation is required.
+  - key: service.purchase.conflict
+    text: The purchase journal conflicts with this transaction. Store reconciliation
+      is required.
+  - key: service.purchase.rewards
+    text: The purchased shard pack has invalid catalog rewards.
+  - key: service.purchase.unsupported
+    text: This store product has no supported catalog reward.
+  - key: service.purchase.wallet-full
+    text: The shard wallet is full. Keep the purchase pending until there is room.
+  - key: service.purchase.save-failed
+    text: The purchase reward was not granted because its save failed. Keep the store
+      transaction pending. {0}
+  - key: service.analytics.event
+    text: An analytics event name is required.
+  - key: service.analytics.parameters
+    text: Analytics parameters require non-empty keys and values.
+  - key: service.leaderboard.request
+    text: A leaderboard ID and positive result limit are required.
+  - key: service.leaderboard.board
+    text: The requested leaderboard does not match the configured board.
+  - key: service.leaderboard.limit
+    text: Leaderboard page size must be between 1 and {0}.
+  - key: service.leaderboard.sign-in
+    text: Sign in before loading leaderboard scores.
+  - key: service.leaderboard.score
+    text: The configured leaderboard contains a score outside the supported integer
+      range.
+  - key: service.leaderboard.unknown-pilot
+    text: Unknown pilot
+  - key: service.cloud.payload
+    text: A cloud-save payload is required.
+  - key: service.cloud.nonempty
+    text: A non-empty cloud-save payload is required.
+  - key: service.cloud.limit
+    text: The cloud-save payload exceeds the 5 MiB limit.
+  - key: service.cloud.sign-in-load
+    text: Sign in before loading a cloud save.
+  - key: service.cloud.sign-in-write
+    text: Sign in before writing a cloud save.
+  - key: service.cloud.empty
+    text: The stored cloud save is empty and cannot be restored.
+  - key: service.cloud.changed-account
+    text: The signed-in account changed. No cloud save was deleted.
+  - key: service.cloud.delete-lock
+    text: The cloud save returned no write lock. Nothing was deleted; retry before
+      deleting the account.
+  - key: service.cloud.replace-lock
+    text: A write lock is required to replace an existing cloud save. Reload it before
+      retrying.
+  - key: service.cloud.missing-lock
+    text: Unity Cloud Save did not return a write lock. Reload the save before retrying.
+  - key: service.cloud.conflict
+    text: The cloud save changed on another device. Reload it before retrying.
+  - key: service.recovery.sign-in
+    text: Sign in to the current save before linking an account.
+  - key: service.recovery.credential
+    text: The recovery provider returned an empty credential.
+  - key: service.recovery.provider
+    text: The configured recovery provider is not supported.
+  - key: service.remote.sign-in
+    text: Sign in with an existing account before fetching remote configuration.
+  - key: service.deletion.busy
+    text: Account deletion is already in progress.
+  - key: service.deletion.review
+    text: The signed-in account changed. Review deletion again.
+  - key: service.deletion.changed-account
+    text: The signed-in account changed. No account was deleted.
+  - key: service.deletion.cloud-only
+    text: The cloud save was deleted, but the signed-in account changed. No account
+      was deleted.
+  - key: service.deletion.partial
+    text: The cloud save was deleted, but account deletion failed. Retry account
+      deletion. {0}
+  - key: service.deletion.unconfirmed
+    text: Online deletion failed before cloud-save removal was confirmed. {0}
+  - key: service.notifications.busy
+    text: Notification synchronization is already pending.
+  - key: service.notifications.limit
+    text: At most eight crew notifications are supported.
+  - key: service.notifications.jobs
+    text: Crew notifications must have unique IDs and nonempty text.
+  - key: service.notifications.request
+    text: Enable notifications again to request device permission when a timer is
+      active.
+  - key: service.notifications.permission-changed
+    text: Notification settings or jobs changed while permission was pending.
+  - key: service.notifications.sync-changed
+    text: Notification settings or jobs changed during synchronization.
+  - key: service.notifications.schedule-changed
+    text: Notification settings or jobs changed during scheduling.
+  - key: service.notifications.denied
+    text: Notification permission was denied. Enable it in device settings to receive
+      completion alerts.
+  - key: service.notifications.future
+    text: A future Frontier crew notification with title and body is required.
+  - key: service.notifications.revoked
+    text: Device notification permission is no longer granted.
+  - key: service.notifications.id
+    text: A valid Frontier crew notification ID is required.
+  - key: service.notifications.channel
+    text: Construction
+  - key: service.notifications.channel-description
+    text: Completed construction, upgrades and clearance
+  - key: content.era.landfall.name
+    text: Landfall
+  - key: content.era-requirement.second-world.label
+    text: Land on a second world
+  - key: content.era.foothold.name
+    text: Foothold
+  - key: content.era-requirement.research-lab.label
+    text: Build a Research Lab
+  - key: content.era-requirement.jump-range.label
+    text: Purchase Jump Range level 1
+  - key: content.era.settlement.name
+    text: Settlement
+  - key: content.era-requirement.hazard-plating.label
+    text: Purchase any hazard plating
+  - key: content.era.industry.name
+    text: Industry
+  - key: content.era-requirement.radiation-plating.label
+    text: Purchase Rad-Shield Plating
+  - key: content.era-requirement.antimatter.label
+    text: Craft an Antimatter Pod
+  - key: content.era.interstellar.name
+    text: Interstellar
+  - key: content.era-requirement.megaproject.label
+    text: Complete stage 3 of any megaproject
+  - key: content.era.ascension.name
+    text: Ascension

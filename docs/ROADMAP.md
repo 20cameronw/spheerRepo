@@ -1,7 +1,7 @@
 # Frontier → Production: Master Plan
 
 Branch `20cameronw-spheer-rework-uitoolkit` · PR #42 · Unity 6000.4.0f1 · URP 17.4 · UI Toolkit · portrait only.
-Status: **approved. Phase A is complete; Phase B (universe/travel) and Phase C (gameplay expansion) are in progress**; the todo list and progress live below.
+Status: **approved. Phase A's local foundation is implemented; remaining milestones are partially implemented and blocked on the explicit design, provider, backend, device and release prerequisites below**. No implementation task is currently running.
 The subsequent **objectives/achievements milestone is complete**: 26 authored one-time goals, persistent completion/claim
 records, actionable Goals UI and bounded rewards (275 shards at current tuning, already represented in simulator
 milestones). Old saves baseline completed goals without payouts. Full engine-free: 444 passed; Unity EditMode:
@@ -34,7 +34,7 @@ code that depends on the listed prerequisite; this is not a claim that only test
 
 | Remaining work | Execution state / prerequisite |
 | --- | --- |
-| Remaining generated/provider localization | Pending local implementation; generated-world and authored-content presentation, language selection and live switching are implemented. Only English is shipped. |
+| Localization acceptance | Local generated-world, authored-content, era/requirement, provider-status and quality-label migration is implemented, including live language switching. Blocked on production translations and physical-device font/RTL/layout acceptance; only English is shipped. |
 | Hyperspace recovery device acceptance | Local process-restart recovery is implemented; physical Android/iOS kill/relaunch, storage-pressure and performance acceptance remain gated on devices. |
 | Map renderer decision, harvest/Hyperspace touch/audio/haptics, cinematics/VFX/FTUE, quality/memory/thermal budgets and release QA | Blocked on physical-device measurements/acceptance. No Android device was attached when checked. The existing debug APK is not device or release certification. |
 | Ascension and endgame | Blocked on an approved permanent-bonus design; keep Ascension disabled. Weekly boards also need server authority. |
@@ -835,8 +835,21 @@ Research branch/prerequisite/unlock labels also use catalog entries. English ins
 missing source keys without overwriting existing wording. Planet/player proper names remain identities, not translated
 content. The source and preloaded English table contain 1891 entries. Focused catalog/runtime/progression checks
 passed 26/26; live alternate-language coverage verifies authored UI/captions, unchanged gameplay catalog data and exact
-English restoration. Remaining provider/generated-status copy, production translations and device font/RTL acceptance
-are not claimed complete.
+English restoration. Provider/generated-status copy was still outstanding at that checkpoint; the subsequent slice
+below completes its local migration. Production translations and device font/RTL acceptance remain open.
+
+**Provider and generated-status presentation (§7.1):** engine-free `ServiceMessage` values carry stable catalog keys
+and captured arguments while `ServiceResult.message` retains its English diagnostic contract. Account/cloud recovery,
+partial account deletion, notification permission/scheduling, purchase fulfillment and rewarded-ad policy messages are
+catalog-backed. Nested failures preserve both the partial-operation warning and provider detail; native SDK exceptions
+and provider product names remain literal diagnostic/identity arguments, never format templates. Settings/Ranks retain
+structured provider failures so a later language switch updates existing errors without repeating a service operation.
+Missing leaderboard names, quality presets/tiers, era names and the seven next-era requirements also use catalog keys.
+The era predicates, simulator English labels, provider gates and purchase/reward accounting are unchanged.
+The source and preloaded English table now contain 2010 entries. Focused provider/purchase/ad/notification/catalog
+checks passed 87/87; final catalog/era checks passed 12/12. The live alternate-language regression verifies nested
+partial-deletion details, notification errors, quality/era/requirement labels, unchanged progress and English restoration.
+No native-provider activation, additional shipping language, RTL/font/device acceptance or production certification is claimed.
 
 **Harvest mini-game catalog slice:** tree/rock, drill, siphon, excavation, salvage and asteroid-field titles, tools,
 instructions, metrics, feedback states, controls and live progress now use the catalog. The player-level HUD and

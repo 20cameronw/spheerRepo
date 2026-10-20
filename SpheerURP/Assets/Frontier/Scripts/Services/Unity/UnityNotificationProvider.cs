@@ -33,8 +33,8 @@ namespace Frontier.Services.Unity
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
             var args = NotificationCenterArgs.Default;
             args.AndroidChannelId = "frontier-builders";
-            args.AndroidChannelName = "Construction";
-            args.AndroidChannelDescription = "Completed construction, upgrades and clearance";
+            args.AndroidChannelName = ServiceMessage.Get("service.notifications.channel").Resolve(UiText.Get);
+            args.AndroidChannelDescription = ServiceMessage.Get("service.notifications.channel-description").Resolve(UiText.Get);
             NotificationCenter.Initialize(args);
 #endif
             return Task.FromResult(ServiceResult.Success());
@@ -56,7 +56,7 @@ namespace Frontier.Services.Unity
             while (request.Status == NotificationsPermissionStatus.RequestPending) await Task.Yield();
             return request.Status == NotificationsPermissionStatus.Granted
                 ? ServiceResult.Success()
-                : ServiceResult.InvalidRequest("Notification permission was denied. Enable it in device settings to receive completion alerts.");
+                : ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.denied"));
 #else
             return ServiceResult.NotConfigured("Local notifications");
 #endif
@@ -66,7 +66,7 @@ namespace Frontier.Services.Unity
         {
             if (!TryIdentifier(request.id, out int identifier) || string.IsNullOrWhiteSpace(request.title)
                 || string.IsNullOrWhiteSpace(request.body) || request.scheduledUtc <= DateTimeOffset.UtcNow)
-                return ServiceResult.InvalidRequest("A future Frontier crew notification with title and body is required.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.future"));
             var initialized = await InitializeAsync();
             if (!initialized.succeeded) return initialized;
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -78,7 +78,7 @@ namespace Frontier.Services.Unity
             allowed = global::Unity.Notifications.iOS.iOSNotificationCenter.GetNotificationSettings().AuthorizationStatus
                 == global::Unity.Notifications.iOS.AuthorizationStatus.Authorized;
 #endif
-            if (!allowed) return ServiceResult.InvalidRequest("Device notification permission is no longer granted.");
+            if (!allowed) return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.revoked"));
             NotificationCenter.ScheduleNotification(new Notification
             {
                 Identifier = identifier, Title = request.title, Text = request.body
@@ -90,7 +90,7 @@ namespace Frontier.Services.Unity
         public async Task<ServiceResult> CancelAsync(string id)
         {
             if (!TryIdentifier(id, out int identifier))
-                return ServiceResult.InvalidRequest("A valid Frontier crew notification ID is required.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.notifications.id"));
             var initialized = await InitializeAsync();
             if (!initialized.succeeded) return initialized;
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR

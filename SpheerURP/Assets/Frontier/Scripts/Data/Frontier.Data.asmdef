@@ -3,6 +3,7 @@
     "rootNamespace": "Frontier",
     "references": [
         "Frontier.Core",
+        "Frontier.Services",
         "Frontier.Economy",
         "Unity.Localization",
         "Unity.ResourceManager"

@@ -71,7 +71,7 @@ namespace Frontier
                 var result = await scheduler.SyncAsync(enabled, jobs, now, !paused);
                 if (!result.succeeded && !dirty)
                 {
-                    NotificationPreferences.LastError = result.message;
+                    NotificationPreferences.ReportFailure(result.text);
                     Debug.LogWarning("Frontier: builder notification synchronization failed. " + result.message);
                     synchronized = true;
                     previousEnabled = enabled;

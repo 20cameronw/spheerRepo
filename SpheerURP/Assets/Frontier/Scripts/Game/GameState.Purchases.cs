@@ -17,12 +17,12 @@ namespace Frontier
         ServiceResult IPurchaseGrantStore.CommitVerifiedPurchase(string expectedContextId, VerifiedPurchase purchase)
         {
             if (SaveIsReadOnly)
-                return ServiceResult.InvalidRequest("Purchases cannot be granted while this save is read-only.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.read-only"));
             if (!string.Equals(expectedContextId, purchaseContextId, StringComparison.Ordinal))
-                return ServiceResult.InvalidRequest("The purchase destination changed. Retry this pending purchase.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.retry"));
             if (string.IsNullOrWhiteSpace(purchase.store) || string.IsNullOrWhiteSpace(purchase.transactionId) ||
                 string.IsNullOrWhiteSpace(purchase.productId))
-                return ServiceResult.InvalidRequest("The verified purchase identity is incomplete.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.identity"));
 
             PurchaseGrantRecord existing = null;
             foreach (var grant in purchaseGrants)
@@ -30,10 +30,10 @@ namespace Frontier
                 if (grant == null || string.IsNullOrWhiteSpace(grant.store) ||
                     string.IsNullOrWhiteSpace(grant.transactionId) || string.IsNullOrWhiteSpace(grant.productId) ||
                     grant.shards <= 0)
-                    return ServiceResult.InvalidRequest("The purchase journal is invalid. Store reconciliation is required.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.journal"));
                 if (grant.store != purchase.store || grant.transactionId != purchase.transactionId) continue;
                 if (existing != null || grant.productId != purchase.productId)
-                    return ServiceResult.InvalidRequest("The purchase journal conflicts with this transaction. Store reconciliation is required.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.conflict"));
                 existing = grant;
             }
             if (existing != null)
@@ -46,13 +46,13 @@ namespace Frontier
                 {
                     if (pack == null || pack.id != purchase.productId) continue;
                     if (reward != 0 || pack.shards <= 0)
-                        return ServiceResult.InvalidRequest("The purchased shard pack has invalid catalog rewards.");
+                        return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.rewards"));
                     reward = pack.shards;
                 }
             if (reward <= 0)
-                return ServiceResult.InvalidRequest("This store product has no supported catalog reward.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.unsupported"));
             if ((long)ShardBalance + reward > int.MaxValue)
-                return ServiceResult.InvalidRequest("The shard wallet is full. Keep the purchase pending until there is room.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.wallet-full"));
 
             // Detach every field: a failed write must not grant spendable shards or mark a transaction fulfilled.
             var candidate = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(BuildSave())).Normalize();
@@ -71,8 +71,7 @@ namespace Frontier
             }
             destination.amount = Math.Max(0, destination.amount) + reward;
             if (!saves.CommitSnapshot(candidate))
-                return ServiceResult.Failed("The purchase reward was not granted because its save failed. Keep the store transaction pending. " +
-                    saves.LastError);
+                return ServiceResult.Failed(ServiceMessage.Get("service.purchase.save-failed", saves.LastError));
 
             wallet = new List<WalletEntry>();
             foreach (var entry in candidate.wallet)

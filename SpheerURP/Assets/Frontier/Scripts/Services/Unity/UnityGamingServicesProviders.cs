@@ -110,7 +110,7 @@ namespace Frontier.Services.Unity
 
             ServiceResult initialized = await InitializeAsync();
             if (!initialized.succeeded)
-                return ServiceResult<AuthIdentity>.Failed(initialized.message);
+                return ServiceResult<AuthIdentity>.Failed(initialized.text);
 
             try
             {
@@ -147,20 +147,20 @@ namespace Frontier.Services.Unity
 
             ServiceResult initialized = await InitializeAsync();
             if (!initialized.succeeded)
-                return ServiceResult<AuthIdentity>.Failed(initialized.message);
+                return ServiceResult<AuthIdentity>.Failed(initialized.text);
 
             var authentication = AuthenticationService.Instance;
             if (linkCurrentAccount && !authentication.IsSignedIn)
                 return ServiceResult<AuthIdentity>.InvalidRequest(
-                    "Sign in to the current save before linking an account.");
+                    ServiceMessage.Get("service.recovery.sign-in"));
 
             ServiceResult<RecoveryCredential> credentialResult =
                 await recoveryCredentials.AcquireAsync();
             if (!credentialResult.succeeded)
-                return ServiceResult<AuthIdentity>.Failed(credentialResult.message);
+                return ServiceResult<AuthIdentity>.Failed(credentialResult.text);
             if (string.IsNullOrWhiteSpace(credentialResult.value.token))
                 return ServiceResult<AuthIdentity>.Failed(
-                    "The recovery provider returned an empty credential.");
+                    ServiceMessage.Get("service.recovery.credential"));
 
             try
             {
@@ -181,7 +181,7 @@ namespace Frontier.Services.Unity
                         break;
                     default:
                         return ServiceResult<AuthIdentity>.InvalidRequest(
-                            "The configured recovery provider is not supported.");
+                            ServiceMessage.Get("service.recovery.provider"));
                 }
 
                 bool anonymous = authentication.PlayerInfo != null &&
@@ -214,7 +214,7 @@ namespace Frontier.Services.Unity
             {
                 var authentication = AuthenticationService.Instance;
                 if (!authentication.IsSignedIn || string.IsNullOrEmpty(expectedPlayerId) || authentication.PlayerId != expectedPlayerId)
-                    return ServiceResult.InvalidRequest("The signed-in account changed. No account was deleted.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.deletion.changed-account"));
                 await authentication.DeleteAccountAsync();
                 return ServiceResult.Success();
             }
@@ -256,20 +256,20 @@ namespace Frontier.Services.Unity
                 return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.NotConfigured("Unity Leaderboards");
             if (!string.Equals(boardId, config.leaderboardId, StringComparison.Ordinal))
                 return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.InvalidRequest(
-                    "The requested leaderboard does not match the configured board.");
+                    ServiceMessage.Get("service.leaderboard.board"));
             if (limit < 1 || limit > MaximumPageSize)
                 return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.InvalidRequest(
-                    "Leaderboard page size must be between 1 and " + MaximumPageSize + ".");
+                    ServiceMessage.Get("service.leaderboard.limit", MaximumPageSize));
 
             ServiceResult initialized = await initializer.InitializeAsync();
             if (!initialized.succeeded)
-                return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.Failed(initialized.message);
+                return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.Failed(initialized.text);
 
             try
             {
                 if (!AuthenticationService.Instance.IsSignedIn)
                     return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.InvalidRequest(
-                        "Sign in before loading leaderboard scores.");
+                        ServiceMessage.Get("service.leaderboard.sign-in"));
                 LeaderboardScoresPage page = await LeaderboardsService.Instance.GetScoresAsync(
                     config.leaderboardId, new GetScoresOptions { Limit = limit });
                 var entries = new List<Frontier.Services.LeaderboardEntry>(
@@ -281,13 +281,13 @@ namespace Frontier.Services.Unity
                         if (entry.Score < 0 || entry.Score > MaximumExactIntegerScore ||
                             entry.Score != Math.Truncate(entry.Score))
                             return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.Failed(
-                                "The configured leaderboard contains a score outside the supported integer range.");
+                                ServiceMessage.Get("service.leaderboard.score"));
 
                         entries.Add(new Frontier.Services.LeaderboardEntry(
                             entry.PlayerId,
                             string.IsNullOrWhiteSpace(entry.PlayerName) ? "Unknown pilot" : entry.PlayerName,
                             long.Parse(entry.Score.ToString("0", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture),
-                            entry.Rank));
+                            entry.Rank, string.IsNullOrWhiteSpace(entry.PlayerName)));
                     }
                 }
 
@@ -337,11 +337,11 @@ namespace Frontier.Services.Unity
 
             ServiceResult initialized = await initializer.InitializeAsync();
             if (!initialized.succeeded)
-                return ServiceResult<CloudSaveRecord>.Failed(initialized.message);
+                return ServiceResult<CloudSaveRecord>.Failed(initialized.text);
 
             if (!AuthenticationService.Instance.IsSignedIn)
                 return ServiceResult<CloudSaveRecord>.InvalidRequest(
-                    "Sign in before loading a cloud save.");
+                    ServiceMessage.Get("service.cloud.sign-in-load"));
 
             try
             {
@@ -354,7 +354,7 @@ namespace Frontier.Services.Unity
                 string payload = item.Value.GetAs<string>();
                 if (string.IsNullOrWhiteSpace(payload))
                     return ServiceResult<CloudSaveRecord>.Failed(
-                        "The stored cloud save is empty and cannot be restored.");
+                        ServiceMessage.Get("service.cloud.empty"));
 
                 return ServiceResult<CloudSaveRecord>.Success(
                     new CloudSaveRecord(true, payload, item.WriteLock));
@@ -373,15 +373,15 @@ namespace Frontier.Services.Unity
             if (!initialized.succeeded) return initialized;
             var authentication = AuthenticationService.Instance;
             if (!authentication.IsSignedIn || string.IsNullOrEmpty(expectedPlayerId) || authentication.PlayerId != expectedPlayerId)
-                return ServiceResult.InvalidRequest("The signed-in account changed. No cloud save was deleted.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.cloud.changed-account"));
             try
             {
                 var records = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { SaveKey });
                 if (authentication.PlayerId != expectedPlayerId || !authentication.IsSignedIn)
-                    return ServiceResult.InvalidRequest("The signed-in account changed. No cloud save was deleted.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.cloud.changed-account"));
                 if (!records.TryGetValue(SaveKey, out var record)) return ServiceResult.Success();
                 if (string.IsNullOrWhiteSpace(record.WriteLock))
-                    return ServiceResult.Failed("The cloud save returned no write lock. Nothing was deleted; retry before deleting the account.");
+                    return ServiceResult.Failed(ServiceMessage.Get("service.cloud.delete-lock"));
                 await CloudSaveService.Instance.Data.Player.DeleteAsync(SaveKey,
                     new global::Unity.Services.CloudSave.Models.Data.Player.DeleteOptions { WriteLock = record.WriteLock });
                 return ServiceResult.Success();
@@ -399,18 +399,18 @@ namespace Frontier.Services.Unity
                 return ServiceResult<CloudSaveRecord>.NotConfigured("Unity Cloud Save");
             if (string.IsNullOrWhiteSpace(payload))
                 return ServiceResult<CloudSaveRecord>.InvalidRequest(
-                    "A non-empty cloud-save payload is required.");
+                    ServiceMessage.Get("service.cloud.nonempty"));
             if (Encoding.UTF8.GetByteCount(payload) > MaximumPayloadBytes)
                 return ServiceResult<CloudSaveRecord>.InvalidRequest(
-                    "The cloud-save payload exceeds the 5 MiB limit.");
+                    ServiceMessage.Get("service.cloud.limit"));
 
             ServiceResult initialized = await initializer.InitializeAsync();
             if (!initialized.succeeded)
-                return ServiceResult<CloudSaveRecord>.Failed(initialized.message);
+                return ServiceResult<CloudSaveRecord>.Failed(initialized.text);
 
             if (!AuthenticationService.Instance.IsSignedIn)
                 return ServiceResult<CloudSaveRecord>.InvalidRequest(
-                    "Sign in before writing a cloud save.");
+                    ServiceMessage.Get("service.cloud.sign-in-write"));
 
             try
             {
@@ -420,7 +420,7 @@ namespace Frontier.Services.Unity
                         new HashSet<string> { SaveKey });
                     if (existing.ContainsKey(SaveKey))
                         return ServiceResult<CloudSaveRecord>.InvalidRequest(
-                            "A write lock is required to replace an existing cloud save. Reload it before retrying.");
+                            ServiceMessage.Get("service.cloud.replace-lock"));
                 }
 
                 var data = new Dictionary<string, SaveItem>
@@ -432,7 +432,7 @@ namespace Frontier.Services.Unity
                 if (writeLocks == null || !writeLocks.TryGetValue(SaveKey, out string updatedWriteLock) ||
                     string.IsNullOrWhiteSpace(updatedWriteLock))
                     return ServiceResult<CloudSaveRecord>.Failed(
-                        "Unity Cloud Save did not return a write lock. Reload the save before retrying.");
+                        ServiceMessage.Get("service.cloud.missing-lock"));
 
                 return ServiceResult<CloudSaveRecord>.Success(
                     new CloudSaveRecord(true, payload, updatedWriteLock));
@@ -441,7 +441,7 @@ namespace Frontier.Services.Unity
             {
                 Debug.LogWarning("Unity Cloud Save write conflict: " + exception.Message);
                 return ServiceResult<CloudSaveRecord>.Failed(
-                    "The cloud save changed on another device. Reload it before retrying.");
+                    ServiceMessage.Get("service.cloud.conflict"));
             }
             catch (RequestFailedException exception)
             {
@@ -499,7 +499,7 @@ namespace Frontier.Services.Unity
             if (!initialized || !dataCollectionAllowed)
                 return ServiceResult.ConsentRequired("analytics data collection");
             if (string.IsNullOrWhiteSpace(eventName))
-                return ServiceResult.InvalidRequest("An analytics event name is required.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.analytics.event"));
 
             try
             {
@@ -509,7 +509,7 @@ namespace Frontier.Services.Unity
                     foreach (KeyValuePair<string, string> parameter in parameters)
                     {
                         if (string.IsNullOrWhiteSpace(parameter.Key) || parameter.Value == null)
-                            return ServiceResult.InvalidRequest("Analytics parameters require non-empty keys and values.");
+                            return ServiceResult.InvalidRequest(ServiceMessage.Get("service.analytics.parameters"));
                         analyticsEvent.Add(parameter.Key, parameter.Value);
                     }
                 }
@@ -557,11 +557,11 @@ namespace Frontier.Services.Unity
 
             ServiceResult initializedResult = await initializer.InitializeAsync();
             if (!initializedResult.succeeded)
-                return ServiceResult<IReadOnlyDictionary<string, string>>.Failed(initializedResult.message);
+                return ServiceResult<IReadOnlyDictionary<string, string>>.Failed(initializedResult.text);
 
             if (!AuthenticationService.Instance.IsSignedIn)
                 return ServiceResult<IReadOnlyDictionary<string, string>>.InvalidRequest(
-                    "Sign in with an existing account before fetching remote configuration.");
+                    ServiceMessage.Get("service.remote.sign-in"));
 
             try
             {

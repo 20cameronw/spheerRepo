@@ -309,7 +309,8 @@ namespace Frontier
                 foreach (LeaderboardEntry entry in onlineLeaderboardEntries)
                 {
                     var row = UiKit.Div("fr-stat-row");
-                    row.Add(UiKit.Text(UiText.Get("ranks.entry", entry.rank, entry.displayName), "fr-small"));
+                    row.Add(UiKit.Text(UiText.Get("ranks.entry", entry.rank, entry.usesFallbackName
+                        ? UiText.Get("service.leaderboard.unknown-pilot") : entry.displayName), "fr-small"));
                     row.Add(UiKit.Div("fr-spacer"));
                     row.Add(UiKit.Text(entry.score.ToString("N0"), "fr-small"));
                     body.Add(row);
@@ -329,7 +330,7 @@ namespace Frontier
             var era = gs.Era;
             var card = Card(UiKit.Cyan);
             card.name = "era-progress";
-            card.Add(UiKit.Text(UiText.Get("ranks.era", SimBands.EraNames[(int)era].ToUpperInvariant()), "fr-h2"));
+            card.Add(UiKit.Text(UiText.Get("ranks.era", ContentText.EraName(era).ToUpperInvariant()), "fr-h2"));
             card.Add(UiKit.Text(UiText.Get("ranks.era.help"), "fr-tiny"));
             if (era == FrontierEra.Ascension)
             {
@@ -338,7 +339,7 @@ namespace Frontier
             }
             else
             {
-                card.Add(UiKit.Text(UiText.Get("ranks.era.next", SimBands.EraNames[(int)era + 1].ToUpperInvariant()), "fr-small"));
+                card.Add(UiKit.Text(UiText.Get("ranks.era.next", ContentText.EraName(era + 1).ToUpperInvariant()), "fr-small"));
                 foreach (var requirement in EraRules.NextRequirements(era, gs.EraProgress))
                 {
                     var row = UiKit.Div("fr-row");
@@ -346,7 +347,7 @@ namespace Frontier
                         requirement.Complete ? UiKit.Lime : UiKit.Muted, UiKit.Size.IconSm);
                     requirementIcon.style.marginRight = UiKit.Space.S12;
                     row.Add(requirementIcon);
-                    row.Add(UiKit.Text(requirement.Label, "fr-small"));
+                    row.Add(UiKit.Text(ContentText.Get("era-requirement", requirement.Id, "label", requirement.Label), "fr-small"));
                     card.Add(row);
                 }
                 Action action;
@@ -367,7 +368,15 @@ namespace Frontier
         }
 
         IReadOnlyList<LeaderboardEntry> onlineLeaderboardEntries;
-        string leaderboardStatus;
+        string leaderboardStatusValue;
+        ServiceMessage? leaderboardFailure;
+        ServiceStatus leaderboardFailureStatus;
+        string leaderboardStatus
+        {
+            get { return leaderboardFailure.HasValue
+                ? LeaderboardError(leaderboardFailureStatus, leaderboardFailure.Value.Resolve(UiText.Get)) : leaderboardStatusValue; }
+            set { leaderboardStatusValue = value; leaderboardFailure = null; }
+        }
         bool leaderboardLoading;
 
         async void LoadOnlineLeaderboard()
@@ -381,7 +390,9 @@ namespace Frontier
             if (this == null) return;
             if (!signIn.succeeded)
             {
-                leaderboardStatus = LeaderboardError(signIn.status, signIn.message);
+                leaderboardStatus = LeaderboardError(signIn.status, signIn.text.Resolve(UiText.Get));
+                leaderboardFailure = signIn.text;
+                leaderboardFailureStatus = signIn.status;
                 leaderboardLoading = false;
                 RefreshModal();
                 return;
@@ -393,7 +404,9 @@ namespace Frontier
             leaderboardLoading = false;
             if (!scores.succeeded)
             {
-                leaderboardStatus = LeaderboardError(scores.status, scores.message);
+                leaderboardStatus = LeaderboardError(scores.status, scores.text.Resolve(UiText.Get));
+                leaderboardFailure = scores.text;
+                leaderboardFailureStatus = scores.status;
                 RefreshModal();
                 return;
             }
@@ -500,7 +513,8 @@ namespace Frontier
                 body.Add(UiKit.Text(UiText.Get("notifications.error",
                     NotificationPreferences.LastError), "fr-small", UiKit.Amber));
             var preset = PresentationQuality.Preset;
-            var quality = IconBtn(UiText.Get("settings.quality", preset.ToString().ToUpperInvariant()), "gear", UiKit.Cyan, () =>
+            var quality = IconBtn(UiText.Get("settings.quality",
+                UiText.Get("settings.quality-preset." + preset.ToString().ToLowerInvariant())), "gear", UiKit.Cyan, () =>
             {
                 PresentationQuality.Preset = (QualityPreset)(((int)PresentationQuality.Preset + 1) % 4);
                 RefreshModal();
@@ -508,7 +522,7 @@ namespace Frontier
             quality.name = "settings-quality";
             body.Add(quality);
             body.Add(UiKit.Text(UiText.Get("settings.quality.help",
-                PresentationQuality.Budget.Tier.ToString().ToLowerInvariant()), "fr-tiny"));
+                UiText.Get("settings.quality-tier." + PresentationQuality.Budget.Tier.ToString().ToLowerInvariant())), "fr-tiny"));
             var fps = IconBtn(UiText.Get("settings.frame-rate", PresentationQuality.FrameRate == 0
                 ? UiText.Get("settings.automatic") : UiText.Get("settings.fps", PresentationQuality.FrameRate)),
                 "bolt", UiKit.Cyan, () =>
@@ -666,7 +680,14 @@ namespace Frontier
         }
 
         bool accountRecoveryBusy;
-        string accountDeletionPlayerId, accountDeletionStatus;
+        string accountDeletionPlayerId, accountDeletionStatusValue;
+        ServiceMessage? accountDeletionFailure;
+        string accountDeletionStatus
+        {
+            get { return accountDeletionFailure.HasValue
+                ? accountDeletionFailure.Value.Resolve(UiText.Get) : accountDeletionStatusValue; }
+            set { accountDeletionStatusValue = value; accountDeletionFailure = null; }
+        }
         bool accountDeletionIsError;
 
         void BuildAccountDeletionSettings(VisualElement body)
@@ -729,7 +750,8 @@ namespace Frontier
             accountRecoveryBusy = false;
             cloudSaveBusy = false;
             accountDeletionIsError = !result.succeeded;
-            accountDeletionStatus = result.succeeded ? UiText.Get("deletion.done") : result.message;
+            accountDeletionStatus = result.succeeded ? UiText.Get("deletion.done") : result.text.Resolve(UiText.Get);
+            if (!result.succeeded) accountDeletionFailure = result.text;
             cloudSaveChecked = false;
             cloudBackupConfirm = cloudRestoreConfirm = localRestoreConfirm = false;
             cloudSnapshot = localCloudSnapshot = null;
@@ -740,14 +762,27 @@ namespace Frontier
             RefreshModal();
         }
 
-        string accountRecoveryStatus;
+        string accountRecoveryStatusValue;
+        ServiceMessage? accountRecoveryFailure;
+        string accountRecoveryStatus
+        {
+            get { return accountRecoveryFailure.HasValue
+                ? accountRecoveryFailure.Value.Resolve(UiText.Get) : accountRecoveryStatusValue; }
+            set { accountRecoveryStatusValue = value; accountRecoveryFailure = null; }
+        }
         bool cloudSaveBusy;
         bool cloudSaveChecked;
         bool cloudBackupConfirm;
         bool cloudRestoreConfirm;
         bool localRestoreConfirm;
         bool cloudSaveStatusIsError;
-        string cloudSaveStatus;
+        string cloudSaveStatusValue;
+        ServiceMessage? cloudSaveFailure;
+        string cloudSaveStatus
+        {
+            get { return cloudSaveFailure.HasValue ? cloudSaveFailure.Value.Resolve(UiText.Get) : cloudSaveStatusValue; }
+            set { cloudSaveStatusValue = value; cloudSaveFailure = null; }
+        }
         CloudSaveRecord cloudRecord;
         SaveV2 localCloudSnapshot;
         SaveV2 cloudSnapshot;
@@ -799,7 +834,7 @@ namespace Frontier
             if (this == null) return;
             if (!current.succeeded)
             {
-                FinishAccountRecovery(current.message);
+                FinishAccountRecovery(current.text);
                 return;
             }
             if (!current.value.isAnonymous)
@@ -812,9 +847,9 @@ namespace Frontier
             RefreshModal();
             ServiceResult<AuthIdentity> linked = await services.Authentication.LinkRecoveryAccountAsync();
             if (this == null) return;
-            FinishAccountRecovery(linked.succeeded
-                ? UiText.Get("recovery.protected", services.Authentication.RecoveryProviderName)
-                : linked.message);
+            if (linked.succeeded)
+                FinishAccountRecovery(UiText.Get("recovery.protected", services.Authentication.RecoveryProviderName));
+            else FinishAccountRecovery(linked.text);
         }
 
         async void SignInToRecoverSave()
@@ -827,15 +862,27 @@ namespace Frontier
             ServiceResult<AuthIdentity> recovered =
                 await services.Authentication.SignInWithRecoveryAccountAsync();
             if (this == null) return;
-            FinishAccountRecovery(recovered.succeeded
-                ? UiText.Get("recovery.signed-in", services.Authentication.RecoveryProviderName)
-                : recovered.message);
+            if (recovered.succeeded)
+                FinishAccountRecovery(UiText.Get("recovery.signed-in", services.Authentication.RecoveryProviderName));
+            else FinishAccountRecovery(recovered.text);
         }
 
         void FinishAccountRecovery(string message)
         {
-            accountRecoveryBusy = false;
             accountRecoveryStatus = message;
+            CompleteAccountRecovery();
+        }
+
+        void FinishAccountRecovery(ServiceMessage message)
+        {
+            accountRecoveryStatus = message.Resolve(UiText.Get);
+            accountRecoveryFailure = message;
+            CompleteAccountRecovery();
+        }
+
+        void CompleteAccountRecovery()
+        {
+            accountRecoveryBusy = false;
             cloudSaveChecked = false;
             cloudBackupConfirm = false;
             cloudRestoreConfirm = false;
@@ -963,7 +1010,7 @@ namespace Frontier
                 if (this == null) return;
                 if (!result.succeeded)
                 {
-                    FinishCloudSaveAction(result.message, true);
+                    FinishCloudSaveAction(result.text);
                     return;
                 }
 
@@ -1049,7 +1096,7 @@ namespace Frontier
                 if (this == null) return;
                 if (!current.succeeded)
                 {
-                    FinishCloudSaveAction(current.message, true);
+                    FinishCloudSaveAction(current.text);
                     return;
                 }
                 if (!SameCloudRecord(cloudRecord, current.value))
@@ -1067,7 +1114,7 @@ namespace Frontier
                 if (this == null) return;
                 if (!written.succeeded)
                 {
-                    FinishCloudSaveAction(written.message, true);
+                    FinishCloudSaveAction(written.text);
                     return;
                 }
 
@@ -1111,7 +1158,7 @@ namespace Frontier
                 if (this == null) return;
                 if (!current.succeeded)
                 {
-                    FinishCloudSaveAction(current.message, true);
+                    FinishCloudSaveAction(current.text);
                     return;
                 }
                 if (!SameCloudRecord(cloudRecord, current.value))
@@ -1167,6 +1214,15 @@ namespace Frontier
             cloudSaveBusy = false;
             cloudSaveStatus = message;
             cloudSaveStatusIsError = isError;
+            RefreshModal();
+        }
+
+        void FinishCloudSaveAction(ServiceMessage message)
+        {
+            cloudSaveBusy = false;
+            cloudSaveStatus = message.Resolve(UiText.Get);
+            cloudSaveFailure = message;
+            cloudSaveStatusIsError = true;
             RefreshModal();
         }
 

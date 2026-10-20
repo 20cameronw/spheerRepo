@@ -71,11 +71,11 @@ namespace Frontier.Services
         {
             if (!IsConfigured) return ServiceResult<RewardedAdResult>.NotConfigured("Rewarded ads");
             if (placementId == null || !placements.TryGetValue(placementId, out var placement))
-                return ServiceResult<RewardedAdResult>.InvalidRequest("Unknown rewarded-ad placement.");
+                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.unknown"));
             if (showing)
-                return ServiceResult<RewardedAdResult>.InvalidRequest("A rewarded ad is already in progress.");
+                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.busy"));
             if (placement.dailyCap == 0)
-                return ServiceResult<RewardedAdResult>.InvalidRequest("This rewarded-ad placement is disabled.");
+                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.disabled"));
 
             showing = true;
             try
@@ -85,14 +85,14 @@ namespace Frontier.Services
                 long now = time.UtcNow.UtcDateTime.Ticks;
                 if (!ValidUsage(usage) || now < usage.lastObservedUtcTicks)
                     return ServiceResult<RewardedAdResult>.InvalidRequest(
-                        "Rewarded-ad usage or device time is invalid. Retry after the device clock is corrected.");
+                        ServiceMessage.Get("service.ads.invalid-time"));
                 long day = new DateTime(now, DateTimeKind.Utc).Date.Ticks;
                 int rewards = day == usage.dayUtcTicks ? usage.rewards : 0;
                 if (rewards >= placement.dailyCap)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest("The daily limit for this rewarded-ad placement has been reached.");
+                    return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.limit"));
                 if (usage.lastRewardUtcTicks > 0 &&
                     now - usage.lastRewardUtcTicks < (long)placement.cooldownSeconds * TimeSpan.TicksPerSecond)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest("This rewarded-ad placement is cooling down.");
+                    return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.cooldown"));
 
                 var observed = new RewardedAdUsage
                 {
@@ -105,11 +105,11 @@ namespace Frontier.Services
                 var result = await inner.ShowRewardedAsync(placementId);
                 if (!result.succeeded) return result;
                 if (result.value.placementId != placementId)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest("The ad provider returned a different reward placement.");
+                    return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.mismatch"));
                 if (!result.value.rewardEarned) return result;
                 long completed = time.UtcNow.UtcDateTime.Ticks;
                 if (completed < now)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest("The device clock moved backwards during the rewarded ad.");
+                    return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.rewound"));
                 long completedDay = new DateTime(completed, DateTimeKind.Utc).Date.Ticks;
                 var earned = new RewardedAdUsage
                 {

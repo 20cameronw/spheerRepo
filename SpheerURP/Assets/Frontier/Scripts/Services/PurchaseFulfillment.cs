@@ -65,33 +65,32 @@ namespace Frontier.Services
         {
             if (string.IsNullOrWhiteSpace(receipt.productId) || string.IsNullOrWhiteSpace(receipt.transactionId) ||
                 string.IsNullOrWhiteSpace(receipt.receiptPayload))
-                return ServiceResult.InvalidRequest("A purchase product, transaction ID and receipt payload are required.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.receipt"));
             if (processing)
-                return ServiceResult.InvalidRequest("A purchase is already being processed. Keep this purchase pending and retry.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.busy"));
             string contextId = grants.ContextId;
             if (string.IsNullOrWhiteSpace(contextId))
-                return ServiceResult.InvalidRequest("A persistent purchase destination is required.");
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.destination"));
 
             processing = true;
             try
             {
                 var verified = await verifier.VerifyAsync(receipt);
                 if (!verified.succeeded)
-                    return ServiceResult.Failed("Purchase verification did not complete: " + verified.message);
+                    return ServiceResult.Failed(ServiceMessage.Get("service.purchase.verification", verified.text));
                 var purchase = verified.value;
                 if (string.IsNullOrWhiteSpace(purchase.store) ||
                     !string.Equals(receipt.productId, purchase.productId, StringComparison.Ordinal) ||
                     !string.Equals(receipt.transactionId, purchase.transactionId, StringComparison.Ordinal))
-                    return ServiceResult.InvalidRequest("The verified purchase does not match the pending store transaction.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.mismatch"));
                 if (!string.Equals(contextId, grants.ContextId, StringComparison.Ordinal))
-                    return ServiceResult.InvalidRequest("The purchase destination changed. Keep this purchase pending and retry.");
+                    return ServiceResult.InvalidRequest(ServiceMessage.Get("service.purchase.destination-changed"));
 
                 var committed = grants.CommitVerifiedPurchase(contextId, purchase);
                 if (!committed.succeeded) return committed;
                 var confirmed = await acknowledger.ConfirmAsync(purchase);
                 if (!confirmed.succeeded)
-                    return ServiceResult.Failed("The purchase reward is saved, but store confirmation is pending. Retry without granting again. " +
-                        confirmed.message);
+                    return ServiceResult.Failed(ServiceMessage.Get("service.purchase.confirmation", confirmed.text));
                 return ServiceResult.Success();
             }
             finally { processing = false; }

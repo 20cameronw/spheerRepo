@@ -143,6 +143,13 @@ the authored fields live; other installed locales must provide every nonempty so
 Wave modifiers and authored gather-spot keys use their existing list index: preserve ordering when maintaining
 translations. Planet and player proper names are not translated.
 
+Service copy lives in the engine-free `ServiceMessage.EnglishEntries` catalog. Use `ServiceMessage.Get` for authored
+service messages and retain `ServiceResult.text` when wrapping a failure; `message` remains English for diagnostics.
+Nested message arguments resolve in the current UI locale, while literal SDK diagnostics are never interpreted as
+format strings. Catalog sync updates these authoritative English templates, and the build guard rejects missing or
+stale service source entries. Keep `EraRequirement.Id` stable when editing requirement labels; era names/requirements
+are exported through `ContentText.EnglishEntries` without changing simulator wording or progression rules.
+
 Each original SO keeps its legacy fields and fallback methods. New `ToDef`/`ToCatalog` adapters normalize Unity's
 empty-string representation of optional ids back to null, without mutating saved assets. Structure kinds and
 upgrade effects are appended, never reordered, preserving old serialized enum integers. `StructureKindMap` is

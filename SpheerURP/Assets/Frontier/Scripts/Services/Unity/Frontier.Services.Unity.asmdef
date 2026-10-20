@@ -3,6 +3,7 @@
     "rootNamespace": "Frontier.Services.Unity",
     "references": [
         "Frontier.Services",
+        "Frontier.Data",
         "Unity.Services.Core",
         "Unity.Services.Authentication",
         "Unity.Services.CloudSave",
