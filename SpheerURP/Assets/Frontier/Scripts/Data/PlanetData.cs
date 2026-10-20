@@ -28,7 +28,6 @@ namespace Frontier
         /// <summary>Stable 64 bit seed for everything procedural about the look (surface pattern, rings, moons, mood): never a string hash.</summary>
         public readonly ulong Seed;
 
-        readonly string description;
         readonly ulong universeSeed;
         readonly Color primary, secondary, rim;
         readonly float generatedGroundRadius;
@@ -46,7 +45,6 @@ namespace Frontier
             Authored = authored;
             Seed = PlanetSeeds.VisualSeed(descriptor, universeSeed);
             this.universeSeed = universeSeed;
-            description = authored != null ? authored.description : null;
             primary = ToColor(descriptor.Primary);
             secondary = ToColor(descriptor.Secondary);
             rim = ToColor(descriptor.Rim);
@@ -88,7 +86,7 @@ namespace Frontier
         public static string SpotLabel(ResourceSO resource, HarvestMethod method)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            return UiText.Get("planet.spot." + method.ToString().ToLowerInvariant(), resource.displayName);
+            return UiText.Get("planet.spot." + method.ToString().ToLowerInvariant(), resource.LocalizedName);
         }
 
         // ---- identity --------------------------------------------------------------------------------------------------
@@ -100,7 +98,7 @@ namespace Frontier
         public string AuthoredId { get { return Descriptor.AuthoredId; } }
         public bool IsAuthored { get { return Authored != null; } }
         public string Name { get { return Authored != null ? Authored.displayName : Descriptor.Name; } }
-        public string Description { get { return Authored != null ? description
+        public string Description { get { return Authored != null ? ContentText.Get("planet", Authored.id, "description", Authored.description)
             : PlanetBlurb.Describe(Descriptor, universeSeed, LocalizeBlurb); } }
         static string LocalizeBlurb(string key, string english) { return UiText.Template(key); }
         public string SystemName { get { return Star.Name; } }

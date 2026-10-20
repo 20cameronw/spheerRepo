@@ -77,7 +77,7 @@ namespace Frontier
                 (string.IsNullOrEmpty(researchBranch) || node.data.branch == researchBranch))
                 .OrderBy(node => node.data.tier)
                 .ThenBy(node => node.data.branch, StringComparer.Ordinal)
-                .ThenBy(node => node.data.displayName, StringComparer.Ordinal);
+                .ThenBy(node => node.LocalizedName, StringComparer.Ordinal);
             foreach (var node in nodes) BuildResearchCard(body, node);
         }
 
@@ -87,13 +87,13 @@ namespace Frontier
             string lockReason = complete ? null : gs.ResearchLockReason(node);
             var card = Card(UiKit.Magenta, complete);
             var head = UiKit.Div("fr-row");
-            head.Add(UiKit.Text(node.data.displayName.ToUpper(), "fr-h2"));
+            head.Add(UiKit.Text(node.LocalizedName.ToUpper(), "fr-h2"));
             head.Add(UiKit.Div("fr-spacer"));
             head.Add(new FrontierBadge { text = UiText.Get(complete ? "research.complete" : "research.tier", node.data.tier),
                 Tint = complete ? UiKit.Lime : UiKit.Muted });
             card.Add(head);
             card.Add(UiKit.Text(UiText.Get("research.lab", PrettyName(node.data.branch), node.data.labLevel), "fr-tiny"));
-            card.Add(UiKit.Text(node.data.description, "fr-muted"));
+            card.Add(UiKit.Text(node.LocalizedDescription, "fr-muted"));
             if (node.data.prereqs != null && node.data.prereqs.Length > 0)
                 card.Add(UiKit.Text(UiText.Get("research.prerequisites", string.Join(", ", node.data.prereqs.Select(PrettyName))), "fr-small"));
             if (!complete) card.Add(UiKit.CostRow(CatalogCost(node.data.cost), gs, true, OpenAtlasResource));
@@ -103,7 +103,7 @@ namespace Frontier
             {
                 var buy = IconBtn(UiText.Get("research.buy"), "research", UiKit.Magenta, () =>
                 {
-                    if (gs.Research(node)) { Sfx.Good(); Toast(UiText.Get("research.purchased", node.data.displayName), UiKit.Magenta); }
+                    if (gs.Research(node)) { Sfx.Good(); Toast(UiText.Get("research.purchased", node.LocalizedName), UiKit.Magenta); }
                     else Sfx.Bad();
                 });
                 UiKit.SetEnabledLook(buy, true);
@@ -130,27 +130,27 @@ namespace Frontier
                 var color = ladder.color == default(Color) ? UiKit.Magenta : UiKit.Ui(ladder.color);
                 var card = Card(color, nextRow == null);
                 var head = UiKit.Div("fr-row");
-                head.Add(UiKit.Text(ladder.data.displayName.ToUpper(), "fr-h2"));
+                head.Add(UiKit.Text(ladder.LocalizedName.ToUpper(), "fr-h2"));
                 head.Add(UiKit.Div("fr-spacer"));
                 head.Add(UiKit.Text(nextRow == null ? UiText.Get("tools.max")
                     : UiText.Get("tools.tier", current, ladder.data.tiers.Where(row => row != null).Max(row => row.tier)), "fr-tiny"));
                 card.Add(head);
                 if (currentRow != null)
-                    card.Add(UiKit.Text(UiText.Get("tools.yield", currentRow.displayName, currentRow.yieldMult), "fr-small"));
+                    card.Add(UiKit.Text(UiText.Get("tools.yield", ladder.TierName(currentRow), currentRow.yieldMult), "fr-small"));
                 if (nextRow == null)
                 {
                     card.Add(Note(UiText.Get("tools.max-help"), UiKit.Lime));
                 }
                 else
                 {
-                    card.Add(UiKit.Text(UiText.Get("tools.next", nextRow.displayName, nextRow.yieldMult), "fr-small"));
+                    card.Add(UiKit.Text(UiText.Get("tools.next", ladder.TierName(nextRow), nextRow.yieldMult), "fr-small"));
                     card.Add(UiKit.CostRow(CatalogCost(nextRow.cost), gs, true, OpenAtlasResource));
                     if (lockReason != null) card.Add(Note(lockReason, UiKit.Amber));
                     else
                     {
                         var buy = IconBtn(UiText.Get("tools.upgrade"), "up", color, () =>
                         {
-                            if (gs.BuyToolTier(ladder)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", nextRow.displayName), color); }
+                            if (gs.BuyToolTier(ladder)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", ladder.TierName(nextRow)), color); }
                             else Sfx.Bad();
                         });
                         UiKit.SetEnabledLook(buy, true);

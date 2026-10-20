@@ -146,8 +146,8 @@ namespace Frontier
                 var top = UiKit.Div("fr-card-head");
                 top.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconXl));
                 var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
-                col.Add(UiKit.Text(def.displayName.ToUpper(), "fr-h2"));
-                col.Add(UiKit.Text(def.description, "fr-tiny"));
+                col.Add(UiKit.Text(def.LocalizedName.ToUpper(), "fr-h2"));
+                col.Add(UiKit.Text(def.LocalizedDescription, "fr-tiny"));
                 top.Add(col);
                 int have = gs.CountOnPlanet(gs.planet, def);
                 var count = UiKit.Text(def.maxPerPlanet > 0 ? have + "/" + def.maxPerPlanet : "x" + have, "fr-small");
@@ -1240,7 +1240,7 @@ namespace Frontier
                         continue;
                     }
                     var card = Card(UiKit.Cyan);
-                    card.Add(UiKit.Text(UiText.Get("builders.structure", job.def.displayName, planet.Name), "fr-h2"));
+                    card.Add(UiKit.Text(UiText.Get("builders.structure", job.def.LocalizedName, planet.Name), "fr-h2"));
                     var status = UiKit.Text(gs.BuilderJobStatus(job), "fr-small");
                     card.Add(status);
                     int cost = gs.BuilderSkipCost(job);
@@ -1381,13 +1381,13 @@ namespace Frontier
             for (int i = 0; i < tools.Count; i++)
             {
                 int idx = i;
-                sub.Add(TabButton(Icons.ForTool(tools[i].tool), tools[i].displayName.ToUpper(), toolTab == i, UiKit.Magenta, () => toolTab = idx));
+                sub.Add(TabButton(Icons.ForTool(tools[i].tool), tools[i].LocalizedName.ToUpper(), toolTab == i, UiKit.Magenta, () => toolTab = idx));
             }
             body.Add(sub);
 
             var u2 = tools[toolTab];
             int lvl = gs.Level(u2);
-            body.Add(UiKit.Text(u2.description, "fr-muted"));
+            body.Add(UiKit.Text(u2.LocalizedDescription, "fr-muted"));
             var equipped = UiKit.Text(UiText.Get("tools.equipped-summary", gs.ToolName(u2.tool),
                 gs.ToolDamage(u2.tool), gs.ToolMultiplier(u2.tool)), "fr-small");
             equipped.style.marginTop = UiKit.Space.S8; equipped.style.marginBottom = UiKit.Space.S12;
@@ -1464,7 +1464,7 @@ namespace Frontier
                     var top = UiKit.Div("fr-card-head");
                     top.Add(Icons.Make(StructureIcon(s.def.kind), c, UiKit.Size.IconLg));
                     var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
-                    col.Add(UiKit.Text(UiText.Get("command.structure-level", s.def.displayName.ToUpper(), s.level, s.def.maxLevel), "fr-h2"));
+                    col.Add(UiKit.Text(UiText.Get("command.structure-level", s.def.LocalizedName.ToUpper(), s.level, s.def.maxLevel), "fr-h2"));
                     bool max = s.level >= s.def.maxLevel;
                     col.Add(UiKit.Text(StructureEffect(s.def, s.level) + (max ? "" : "  >  " + StructureEffect(s.def, s.level + 1)), "fr-tiny"));
                     top.Add(col);
@@ -1480,7 +1480,7 @@ namespace Frontier
                             {
                                 Sfx.Good();
                                 Toast(gs.IsUpgradeInProgress(s) ? UiText.Get("command.upgrade-started", gs.BuilderJobStatus(s)) :
-                                    UiText.Get("command.upgraded", s.def.displayName, s.level), c);
+                                    UiText.Get("command.upgraded", s.def.LocalizedName, s.level), c);
                             }
                             else Sfx.Bad();
                         });
@@ -1510,7 +1510,7 @@ namespace Frontier
                     top.Add(UiKit.Div("fr-spacer"));
                     top.Add(UiKit.Text(UiText.Get("command.level", lvl, u.maxLevel), "fr-small"));
                     card.Add(top);
-                    card.Add(UiKit.Text(u.description, "fr-muted"));
+                    card.Add(UiKit.Text(u.LocalizedDescription, "fr-muted"));
                     card.Add(UiKit.Text(UiText.Get(max ? "command.effect.current" : "command.effect.next",
                         UpgradeEffectText(u, lvl), max ? "" : UpgradeEffectText(u, lvl + 1)), "fr-tiny"));
                     if (!max)
@@ -1545,7 +1545,7 @@ namespace Frontier
                 body.Add(UiKit.Text(UiText.Get("pack.empty.title"), "fr-h2"));
                 body.Add(UiKit.Text(UiText.Get("pack.empty.help"), "fr-muted"));
                 var harvest = AvailableLocalGatherer();
-                var gather = IconBtn(harvest != null ? UiText.Get("pack.open-gatherer", harvest.def.displayName.ToUpperInvariant())
+                var gather = IconBtn(harvest != null ? UiText.Get("pack.open-gatherer", harvest.def.LocalizedName.ToUpperInvariant())
                     : UiText.Get("guide.action.gather-shop"),
                     harvest != null ? StructureIcon(harvest.def.kind) : "build", UiKit.Lime, RunEmptyPackAction);
                 gather.name = "empty-pack-action";
@@ -1575,14 +1575,14 @@ namespace Frontier
                 var row = UiKit.Div("fr-card-head");
                 row.Add(Icons.Make(Icons.ForResource(r), c, UiKit.Size.IconXl));
                 var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
-                col.Add(UiKit.Text(r.displayName.ToUpper(), "fr-h2"));
+                col.Add(UiKit.Text(r.LocalizedName.ToUpper(), "fr-h2"));
                 col.Add(UiKit.Text(UiText.Get("pack.slot-count", packCnt[packSel], r.stackSize), "fr-small"));
                 col.Add(UiKit.Text(UiText.Get("pack.total-count", gs.Count(r)), "fr-small"));
                 row.Add(col);
                 detail.Add(row);
-                if (!string.IsNullOrEmpty(r.description))
+                if (!string.IsNullOrEmpty(r.LocalizedDescription))
                 {
-                    var desc = UiKit.Text(r.description, "fr-muted");
+                    var desc = UiKit.Text(r.LocalizedDescription, "fr-muted");
                     desc.style.marginTop = UiKit.Space.S8;
                     detail.Add(desc);
                 }
@@ -1601,7 +1601,7 @@ namespace Frontier
                     row.AddToClassList("fr-popup-line");
                     row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconLg));
                     var text = UiKit.Div("fr-card-text");
-                    text.Add(UiKit.Text(resource.displayName, "fr-small"));
+                    text.Add(UiKit.Text(resource.LocalizedName, "fr-small"));
                     text.Add(UiKit.Text(UiText.Get("pack.salvage.waiting", reward.amount, gs.planet.Name), "fr-tiny"));
                     row.Add(text);
                     int pad = reward.pad;
@@ -1727,7 +1727,7 @@ namespace Frontier
             foreach (var r in gs.db.resources)
             {
                 var rr = r;
-                var b = IconBtn(r.displayName.ToUpper(), Icons.ForResource(r), UiKit.Ui(r.color), () => { gs.Add(rr, debugAmount); Sfx.Good(); RefreshModal(); });
+                var b = IconBtn(r.LocalizedName.ToUpper(), Icons.ForResource(r), UiKit.Ui(r.color), () => { gs.Add(rr, debugAmount); Sfx.Good(); RefreshModal(); });
                 b.AddToClassList("fr-btn-mini");
                 b.style.marginBottom = UiKit.Space.S8;
                 res.Add(b);

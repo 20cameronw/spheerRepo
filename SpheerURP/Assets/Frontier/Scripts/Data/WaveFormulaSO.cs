@@ -41,6 +41,16 @@ namespace Frontier
         [Min(1)] public int modifiersFromWave = 4;
         public List<WaveModifier> modifiers = new List<WaveModifier>();
 
+        public string ModifierName(WaveModifier modifier) { return ModifierText(modifier, "name", modifier.name); }
+        public string ModifierDescription(WaveModifier modifier) { return ModifierText(modifier, "description", modifier.description); }
+
+        string ModifierText(WaveModifier modifier, string field, string english)
+        {
+            int index = modifiers.IndexOf(modifier);
+            if (index < 0) throw new System.ArgumentException("Modifier does not belong to this wave formula.", nameof(modifier));
+            return ContentText.Get("wave-modifier", index.ToString(System.Globalization.CultureInfo.InvariantCulture), field, english);
+        }
+
         public WaveModifier Modifier(int wave)
         {
             if (wave < modifiersFromWave || modifiers.Count == 0) return null;

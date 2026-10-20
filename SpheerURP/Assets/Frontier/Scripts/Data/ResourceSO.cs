@@ -14,6 +14,8 @@ namespace Frontier
     {
         public string id;
         public string displayName;
+        public string LocalizedName { get { return ContentText.Get("resource", id, "name", displayName); } }
+        public string LocalizedDescription { get { return ContentText.Get("resource", id, "description", description); } }
         [ColorUsage(false, true)] public Color color = Color.white;
         [Tooltip("How many of this resource fit in one backpack slot.")]
         public int stackSize = 20;
@@ -49,7 +51,8 @@ namespace Frontier
         public string IconName { get { return string.IsNullOrEmpty(icon) ? id : icon; } }
 
         /// <summary>The text shown in the backpack and the Atlas: the catalog text, or the legacy blurb when none was imported.</summary>
-        public string DetailText { get { return !string.IsNullOrEmpty(atlasDescription) ? atlasDescription : description; } }
+        public string DetailTextEnglish { get { return !string.IsNullOrEmpty(atlasDescription) ? atlasDescription : description; } }
+        public string DetailText { get { return ContentText.Get("resource", id, "detail", DetailTextEnglish); } }
 
         public ResourceDef ToDef()
         {

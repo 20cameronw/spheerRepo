@@ -110,7 +110,7 @@ namespace Frontier
                     var resource = gs.db.FindResource(deposit.ResourceId);
                     if (resource == null) continue;
                     var row = UiKit.Div("fr-row-wrap");
-                    row.Add(ResourceIconChip(resource, resource.displayName));
+                    row.Add(ResourceIconChip(resource, resource.LocalizedName));
                     row.Add(UiKit.Text(UiText.Get("map.deposit", deposit.Method, deposit.Richness, deposit.BaseYield), "fr-tiny", UiKit.Muted));
                     scroll.Add(row);
                 }

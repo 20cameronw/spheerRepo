@@ -339,7 +339,7 @@ namespace Frontier
             if (s.def.kind == StructureKind.Drill) DrillDust(it.t, c);
             string label = UiText.Get(gs.IsUnderConstruction(s) ? "world.label.building"
                 : gs.IsUpgradeInProgress(s) ? "world.label.upgrading" : "world.label.level",
-                s.def.displayName.ToUpper(), s.level);
+                s.def.LocalizedName.ToUpper(), s.level);
             it.label = MakeLabel(it.t, label, Fx.Displayable(c), 1.0f, false, out it.labelElement);
             it.phase = s.slot * 0.4f;
             it.orbit = s.def.kind == StructureKind.Satellite || s.def.kind == StructureKind.WarpGate ||
@@ -606,7 +606,7 @@ namespace Frontier
                 if (caption != null)
                     caption.text = UiText.Get(gs.IsUnderConstruction(structure) ? "world.label.building"
                         : gs.IsUpgradeInProgress(structure) ? "world.label.upgrading" : "world.label.level",
-                        structure.def.displayName.ToUpper(), structure.level);
+                        structure.def.LocalizedName.ToUpper(), structure.level);
             }
         }
 

@@ -192,7 +192,8 @@ namespace Frontier
 
         static string DisplayId(string id)
         {
-            return string.IsNullOrEmpty(id) ? "unknown research" : id.Replace('_', ' ');
+            return string.IsNullOrEmpty(id) ? UiText.Get("common.unknown")
+                : ContentText.Get("label", id, "name", id.Replace('_', ' '));
         }
     }
 }

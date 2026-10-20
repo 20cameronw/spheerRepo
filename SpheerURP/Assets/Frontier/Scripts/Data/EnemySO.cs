@@ -10,6 +10,7 @@ namespace Frontier
     {
         public string id;
         public string displayName;
+        public string LocalizedName { get { return ContentText.Get("enemy", id, "name", displayName); } }
         [ColorUsage(false, true)] public Color color = Color.magenta;
         public PrimitiveType shape = PrimitiveType.Sphere;
         public float scale = 0.5f;

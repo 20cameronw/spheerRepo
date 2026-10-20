@@ -4263,6 +4263,3322 @@ MonoBehaviour:
     m_Key: planet.blurb.hazard.void
     m_Metadata:
       m_Items: []
+  - m_Id: 1502514418638848
+    m_Key: content.resource.wood.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719232
+    m_Key: content.resource.wood.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719233
+    m_Key: content.resource.wood.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719234
+    m_Key: content.resource.stone.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719235
+    m_Key: content.resource.stone.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719236
+    m_Key: content.resource.stone.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719237
+    m_Key: content.resource.scrap.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719238
+    m_Key: content.resource.scrap.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719239
+    m_Key: content.resource.scrap.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719240
+    m_Key: content.resource.biomass.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719241
+    m_Key: content.resource.biomass.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719242
+    m_Key: content.resource.biomass.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719243
+    m_Key: content.resource.iron.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719244
+    m_Key: content.resource.iron.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719245
+    m_Key: content.resource.iron.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719246
+    m_Key: content.resource.copper_ore.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719247
+    m_Key: content.resource.copper_ore.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719248
+    m_Key: content.resource.copper_ore.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719249
+    m_Key: content.resource.silica.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719250
+    m_Key: content.resource.silica.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719251
+    m_Key: content.resource.silica.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719252
+    m_Key: content.resource.ice.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719253
+    m_Key: content.resource.ice.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719254
+    m_Key: content.resource.ice.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719255
+    m_Key: content.resource.titanium_ore.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719256
+    m_Key: content.resource.titanium_ore.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719257
+    m_Key: content.resource.titanium_ore.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719258
+    m_Key: content.resource.crystal.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719259
+    m_Key: content.resource.crystal.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719260
+    m_Key: content.resource.crystal.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719261
+    m_Key: content.resource.methane.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719262
+    m_Key: content.resource.methane.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719263
+    m_Key: content.resource.methane.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719264
+    m_Key: content.resource.helium3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719265
+    m_Key: content.resource.helium3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719266
+    m_Key: content.resource.helium3.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719267
+    m_Key: content.resource.core.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719268
+    m_Key: content.resource.core.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719269
+    m_Key: content.resource.core.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719270
+    m_Key: content.resource.radium.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913536
+    m_Key: content.resource.radium.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913537
+    m_Key: content.resource.radium.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913538
+    m_Key: content.resource.dark_matter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913539
+    m_Key: content.resource.dark_matter.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913540
+    m_Key: content.resource.dark_matter.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913541
+    m_Key: content.resource.fuel.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913542
+    m_Key: content.resource.fuel.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913543
+    m_Key: content.resource.fuel.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913544
+    m_Key: content.resource.planks.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913545
+    m_Key: content.resource.planks.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913546
+    m_Key: content.resource.planks.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913547
+    m_Key: content.resource.iron_plate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913548
+    m_Key: content.resource.iron_plate.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913549
+    m_Key: content.resource.iron_plate.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913550
+    m_Key: content.resource.copper_wire.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913551
+    m_Key: content.resource.copper_wire.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913552
+    m_Key: content.resource.copper_wire.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913553
+    m_Key: content.resource.glass.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913554
+    m_Key: content.resource.glass.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913555
+    m_Key: content.resource.glass.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913556
+    m_Key: content.resource.titanium_plate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913557
+    m_Key: content.resource.titanium_plate.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913558
+    m_Key: content.resource.titanium_plate.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913559
+    m_Key: content.resource.steel.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913560
+    m_Key: content.resource.steel.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913561
+    m_Key: content.resource.steel.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913562
+    m_Key: content.resource.biocomposite.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913563
+    m_Key: content.resource.biocomposite.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913564
+    m_Key: content.resource.biocomposite.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913565
+    m_Key: content.resource.thermal_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913566
+    m_Key: content.resource.thermal_alloy.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913567
+    m_Key: content.resource.thermal_alloy.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913568
+    m_Key: content.resource.cryo_composite.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913569
+    m_Key: content.resource.cryo_composite.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913570
+    m_Key: content.resource.cryo_composite.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913571
+    m_Key: content.resource.rad_shield_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913572
+    m_Key: content.resource.rad_shield_alloy.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913573
+    m_Key: content.resource.rad_shield_alloy.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913574
+    m_Key: content.resource.void_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913575
+    m_Key: content.resource.void_alloy.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913576
+    m_Key: content.resource.void_alloy.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913577
+    m_Key: content.resource.circuit_board.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913578
+    m_Key: content.resource.circuit_board.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913579
+    m_Key: content.resource.circuit_board.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913580
+    m_Key: content.resource.servo_motor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913581
+    m_Key: content.resource.servo_motor.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913582
+    m_Key: content.resource.servo_motor.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913583
+    m_Key: content.resource.optic_lens.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913584
+    m_Key: content.resource.optic_lens.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913585
+    m_Key: content.resource.optic_lens.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913586
+    m_Key: content.resource.quantum_chip.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913587
+    m_Key: content.resource.quantum_chip.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913588
+    m_Key: content.resource.quantum_chip.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913589
+    m_Key: content.resource.warp_coil.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913590
+    m_Key: content.resource.warp_coil.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913591
+    m_Key: content.resource.warp_coil.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913592
+    m_Key: content.resource.plasma.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913593
+    m_Key: content.resource.plasma.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913594
+    m_Key: content.resource.plasma.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913595
+    m_Key: content.resource.antimatter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913596
+    m_Key: content.resource.antimatter.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913597
+    m_Key: content.resource.antimatter.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913598
+    m_Key: content.structure.lumber.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913599
+    m_Key: content.structure.lumber.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913600
+    m_Key: content.structure.mine.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913601
+    m_Key: content.structure.mine.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913602
+    m_Key: content.structure.driller.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913603
+    m_Key: content.structure.driller.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913604
+    m_Key: content.structure.biodome.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913605
+    m_Key: content.structure.biodome.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913606
+    m_Key: content.structure.siphon_rig.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913607
+    m_Key: content.structure.siphon_rig.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913608
+    m_Key: content.structure.excavator.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913609
+    m_Key: content.structure.excavator.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913610
+    m_Key: content.structure.salvage_yard.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913611
+    m_Key: content.structure.salvage_yard.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913612
+    m_Key: content.structure.refinery.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913613
+    m_Key: content.structure.refinery.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913614
+    m_Key: content.structure.fabricator.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913615
+    m_Key: content.structure.fabricator.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913616
+    m_Key: content.structure.foundry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913617
+    m_Key: content.structure.foundry.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913618
+    m_Key: content.structure.chem_reactor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107840
+    m_Key: content.structure.chem_reactor.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107841
+    m_Key: content.structure.quantum_lab.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107842
+    m_Key: content.structure.quantum_lab.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107843
+    m_Key: content.structure.warehouse.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107844
+    m_Key: content.structure.warehouse.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107845
+    m_Key: content.structure.fuel_depot.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107846
+    m_Key: content.structure.fuel_depot.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107847
+    m_Key: content.structure.cargo_depot.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107848
+    m_Key: content.structure.cargo_depot.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107849
+    m_Key: content.structure.orbital_relay.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107850
+    m_Key: content.structure.orbital_relay.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107851
+    m_Key: content.structure.gunner.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107852
+    m_Key: content.structure.gunner.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107853
+    m_Key: content.structure.laser.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107854
+    m_Key: content.structure.laser.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107855
+    m_Key: content.structure.shield_pylon.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107856
+    m_Key: content.structure.shield_pylon.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107857
+    m_Key: content.structure.missile_silo.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107858
+    m_Key: content.structure.missile_silo.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107859
+    m_Key: content.structure.tesla_coil.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107860
+    m_Key: content.structure.tesla_coil.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107861
+    m_Key: content.structure.repair_bay.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107862
+    m_Key: content.structure.repair_bay.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107863
+    m_Key: content.structure.alarm.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107864
+    m_Key: content.structure.alarm.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107865
+    m_Key: content.structure.research_lab.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107866
+    m_Key: content.structure.research_lab.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107867
+    m_Key: content.structure.radar_tower.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107868
+    m_Key: content.structure.radar_tower.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107869
+    m_Key: content.structure.colony_hub.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107870
+    m_Key: content.structure.colony_hub.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107871
+    m_Key: content.structure.hangar.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107872
+    m_Key: content.structure.hangar.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107873
+    m_Key: content.structure.auto_harvester.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107874
+    m_Key: content.structure.auto_harvester.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107875
+    m_Key: content.structure.terraformer.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107876
+    m_Key: content.structure.terraformer.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107877
+    m_Key: content.structure.warp_gate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107878
+    m_Key: content.structure.warp_gate.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107879
+    m_Key: content.structure.dyson_collector.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107880
+    m_Key: content.structure.dyson_collector.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107881
+    m_Key: content.recipe.distill_wood.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107882
+    m_Key: content.recipe.burn_scrap.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107883
+    m_Key: content.recipe.saw_planks.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107884
+    m_Key: content.recipe.press_scrap.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107885
+    m_Key: content.recipe.ferment_biomass.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107886
+    m_Key: content.recipe.crystal_cell.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107887
+    m_Key: content.recipe.condense_methane.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107888
+    m_Key: content.recipe.smelt_iron_plate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107889
+    m_Key: content.recipe.smelt_glass.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107890
+    m_Key: content.recipe.smelt_steel.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107891
+    m_Key: content.recipe.smelt_titanium_plate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107892
+    m_Key: content.recipe.forge_thermal_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107893
+    m_Key: content.recipe.forge_rad_shield.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107894
+    m_Key: content.recipe.draw_copper_wire.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107895
+    m_Key: content.recipe.press_biocomposite.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107896
+    m_Key: content.recipe.etch_circuit_board.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107897
+    m_Key: content.recipe.assemble_servo_motor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107898
+    m_Key: content.recipe.grind_optic_lens.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107899
+    m_Key: content.recipe.mix_cryo_composite.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107900
+    m_Key: content.recipe.charge_plasma_cell.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107901
+    m_Key: content.recipe.etch_quantum_chip.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107902
+    m_Key: content.recipe.grow_void_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107903
+    m_Key: content.recipe.wind_warp_coil.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107904
+    m_Key: content.recipe.synthesize_antimatter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107905
+    m_Key: content.enemy.scout.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107906
+    m_Key: content.enemy.swarmer.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107907
+    m_Key: content.enemy.raider.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107908
+    m_Key: content.enemy.brute.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107909
+    m_Key: content.enemy.titan.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107910
+    m_Key: content.upgrade.pack.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107911
+    m_Key: content.upgrade.pack.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107912
+    m_Key: content.upgrade.pack.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107913
+    m_Key: content.upgrade.pack.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107914
+    m_Key: content.upgrade.pack.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107915
+    m_Key: content.upgrade.pack.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107916
+    m_Key: content.upgrade.pack.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107917
+    m_Key: content.upgrade.pack.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107918
+    m_Key: content.upgrade.pack.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107919
+    m_Key: content.upgrade.pack.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107920
+    m_Key: content.upgrade.engine.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107921
+    m_Key: content.upgrade.engine.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107922
+    m_Key: content.upgrade.engine.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107923
+    m_Key: content.upgrade.engine.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107924
+    m_Key: content.upgrade.engine.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107925
+    m_Key: content.upgrade.engine.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107926
+    m_Key: content.upgrade.engine.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107927
+    m_Key: content.upgrade.engine.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107928
+    m_Key: content.upgrade.engine.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107929
+    m_Key: content.upgrade.engine.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107930
+    m_Key: content.upgrade.engine.level-9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107931
+    m_Key: content.upgrade.engine.level-10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107932
+    m_Key: content.upgrade.jump.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107933
+    m_Key: content.upgrade.jump.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107934
+    m_Key: content.upgrade.jump.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107935
+    m_Key: content.upgrade.jump.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107936
+    m_Key: content.upgrade.jump.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107937
+    m_Key: content.upgrade.jump.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107938
+    m_Key: content.upgrade.jump.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107939
+    m_Key: content.upgrade.jump.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107940
+    m_Key: content.upgrade.jump.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107941
+    m_Key: content.upgrade.jump.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107942
+    m_Key: content.upgrade.jump.level-9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107943
+    m_Key: content.upgrade.jump.level-10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107944
+    m_Key: content.upgrade.scanner_range.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107945
+    m_Key: content.upgrade.scanner_range.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107946
+    m_Key: content.upgrade.scanner_range.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107947
+    m_Key: content.upgrade.scanner_range.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107948
+    m_Key: content.upgrade.scanner_range.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107949
+    m_Key: content.upgrade.scanner_range.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107950
+    m_Key: content.upgrade.scanner_range.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107951
+    m_Key: content.upgrade.scanner_range.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107952
+    m_Key: content.upgrade.scanner_range.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107953
+    m_Key: content.upgrade.scanner_range.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107954
+    m_Key: content.upgrade.fuel_tank.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107955
+    m_Key: content.upgrade.fuel_tank.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107956
+    m_Key: content.upgrade.fuel_tank.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107957
+    m_Key: content.upgrade.fuel_tank.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107958
+    m_Key: content.upgrade.fuel_tank.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107959
+    m_Key: content.upgrade.fuel_tank.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107960
+    m_Key: content.upgrade.fuel_tank.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107961
+    m_Key: content.upgrade.fuel_tank.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302144
+    m_Key: content.upgrade.hull_toxic.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302145
+    m_Key: content.upgrade.hull_toxic.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302146
+    m_Key: content.upgrade.hull_toxic.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302147
+    m_Key: content.upgrade.hull_toxic.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302148
+    m_Key: content.upgrade.hull_toxic.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302149
+    m_Key: content.upgrade.hull_heat.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302150
+    m_Key: content.upgrade.hull_heat.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302151
+    m_Key: content.upgrade.hull_heat.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302152
+    m_Key: content.upgrade.hull_heat.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302153
+    m_Key: content.upgrade.hull_heat.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302154
+    m_Key: content.upgrade.hull_cold.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302155
+    m_Key: content.upgrade.hull_cold.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302156
+    m_Key: content.upgrade.hull_cold.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302157
+    m_Key: content.upgrade.hull_cold.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302158
+    m_Key: content.upgrade.hull_cold.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302159
+    m_Key: content.upgrade.hull_rad.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302160
+    m_Key: content.upgrade.hull_rad.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302161
+    m_Key: content.upgrade.hull_rad.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302162
+    m_Key: content.upgrade.hull_rad.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302163
+    m_Key: content.upgrade.hull_rad.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302164
+    m_Key: content.upgrade.hull_void.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302165
+    m_Key: content.upgrade.hull_void.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302166
+    m_Key: content.upgrade.hull_void.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302167
+    m_Key: content.upgrade.hull_void.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302168
+    m_Key: content.upgrade.hull_void.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302169
+    m_Key: content.upgrade.turret.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302170
+    m_Key: content.upgrade.turret.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302171
+    m_Key: content.upgrade.turret.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302172
+    m_Key: content.upgrade.turret.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302173
+    m_Key: content.upgrade.turret.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302174
+    m_Key: content.upgrade.turret.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302175
+    m_Key: content.upgrade.turret.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302176
+    m_Key: content.upgrade.turret.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302177
+    m_Key: content.upgrade.turretdmg.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302178
+    m_Key: content.upgrade.turretdmg.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302179
+    m_Key: content.upgrade.turretdmg.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302180
+    m_Key: content.upgrade.turretdmg.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302181
+    m_Key: content.upgrade.turretdmg.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302182
+    m_Key: content.upgrade.turretdmg.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302183
+    m_Key: content.upgrade.turretdmg.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302184
+    m_Key: content.upgrade.turretdmg.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302185
+    m_Key: content.upgrade.turretdmg.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302186
+    m_Key: content.upgrade.turretdmg.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302187
+    m_Key: content.upgrade.turretdmg.level-9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302188
+    m_Key: content.upgrade.turretdmg.level-10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302189
+    m_Key: content.upgrade.pulse.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302190
+    m_Key: content.upgrade.pulse.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302191
+    m_Key: content.upgrade.pulse.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302192
+    m_Key: content.upgrade.pulse.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302193
+    m_Key: content.upgrade.pulse.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302194
+    m_Key: content.upgrade.pulse.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496448
+    m_Key: content.upgrade.pulse.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496449
+    m_Key: content.upgrade.pulse.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496450
+    m_Key: content.upgrade.pulse.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496451
+    m_Key: content.upgrade.pulse.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496452
+    m_Key: content.upgrade.pulse.level-9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496453
+    m_Key: content.upgrade.pulse.level-10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496454
+    m_Key: content.upgrade.shield.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496455
+    m_Key: content.upgrade.shield.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496456
+    m_Key: content.upgrade.shield.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496457
+    m_Key: content.upgrade.shield.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496458
+    m_Key: content.upgrade.shield.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496459
+    m_Key: content.upgrade.shield.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496460
+    m_Key: content.upgrade.shield.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496461
+    m_Key: content.upgrade.shield.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496462
+    m_Key: content.upgrade.shield.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496463
+    m_Key: content.upgrade.shield.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496464
+    m_Key: content.upgrade.shield.level-9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496465
+    m_Key: content.upgrade.shield.level-10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496466
+    m_Key: content.upgrade.salvage.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496467
+    m_Key: content.upgrade.salvage.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496468
+    m_Key: content.upgrade.salvage.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496469
+    m_Key: content.upgrade.salvage.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496470
+    m_Key: content.upgrade.salvage.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496471
+    m_Key: content.upgrade.salvage.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496472
+    m_Key: content.upgrade.salvage.level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496473
+    m_Key: content.upgrade.salvage.level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496474
+    m_Key: content.upgrade.salvage.level-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496475
+    m_Key: content.upgrade.salvage.level-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496476
+    m_Key: content.upgrade.salvage.level-9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496477
+    m_Key: content.upgrade.salvage.level-10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496478
+    m_Key: content.upgrade.compression.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496479
+    m_Key: content.upgrade.compression.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496480
+    m_Key: content.upgrade.compression.level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496481
+    m_Key: content.upgrade.compression.level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496482
+    m_Key: content.upgrade.compression.level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496483
+    m_Key: content.upgrade.compression.level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496484
+    m_Key: content.upgrade.axe.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496485
+    m_Key: content.upgrade.axe.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496486
+    m_Key: content.upgrade.axe.legacy-level-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496487
+    m_Key: content.upgrade.axe.legacy-level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496488
+    m_Key: content.upgrade.axe.legacy-level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496489
+    m_Key: content.upgrade.axe.legacy-level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496490
+    m_Key: content.upgrade.axe.legacy-level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496491
+    m_Key: content.upgrade.axe.legacy-level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496492
+    m_Key: content.upgrade.axe.legacy-level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496493
+    m_Key: content.upgrade.pick.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496494
+    m_Key: content.upgrade.pick.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496495
+    m_Key: content.upgrade.pick.legacy-level-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496496
+    m_Key: content.upgrade.pick.legacy-level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496497
+    m_Key: content.upgrade.pick.legacy-level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496498
+    m_Key: content.upgrade.pick.legacy-level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496499
+    m_Key: content.upgrade.pick.legacy-level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496500
+    m_Key: content.upgrade.pick.legacy-level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496501
+    m_Key: content.upgrade.pick.legacy-level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496502
+    m_Key: content.upgrade.drill.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496503
+    m_Key: content.upgrade.drill.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496504
+    m_Key: content.upgrade.drill.legacy-level-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496505
+    m_Key: content.upgrade.drill.legacy-level-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496506
+    m_Key: content.upgrade.drill.legacy-level-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496507
+    m_Key: content.upgrade.drill.legacy-level-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496508
+    m_Key: content.upgrade.drill.legacy-level-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496509
+    m_Key: content.upgrade.drill.legacy-level-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690752
+    m_Key: content.upgrade.drill.legacy-level-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690753
+    m_Key: content.research.survey_basics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690754
+    m_Key: content.research.survey_basics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690755
+    m_Key: content.research.smelting.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690756
+    m_Key: content.research.smelting.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690757
+    m_Key: content.research.fabrication.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690758
+    m_Key: content.research.fabrication.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690759
+    m_Key: content.research.deep_drilling.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690760
+    m_Key: content.research.deep_drilling.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690761
+    m_Key: content.research.bio_cultivation.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690762
+    m_Key: content.research.bio_cultivation.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690763
+    m_Key: content.research.jump_drive_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690764
+    m_Key: content.research.jump_drive_1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690765
+    m_Key: content.research.steelmaking.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690766
+    m_Key: content.research.steelmaking.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690767
+    m_Key: content.research.composites.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690768
+    m_Key: content.research.composites.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690769
+    m_Key: content.research.circuitry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690770
+    m_Key: content.research.circuitry.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690771
+    m_Key: content.research.titanium_working.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690772
+    m_Key: content.research.titanium_working.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690773
+    m_Key: content.research.gas_extraction.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690774
+    m_Key: content.research.gas_extraction.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690775
+    m_Key: content.research.geo_survey.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690776
+    m_Key: content.research.geo_survey.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690777
+    m_Key: content.research.salvage_ops.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690778
+    m_Key: content.research.salvage_ops.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690779
+    m_Key: content.research.fuel_logistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690780
+    m_Key: content.research.fuel_logistics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885056
+    m_Key: content.research.cargo_logistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885057
+    m_Key: content.research.cargo_logistics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885058
+    m_Key: content.research.ballistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885059
+    m_Key: content.research.ballistics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885060
+    m_Key: content.research.shield_tech.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885061
+    m_Key: content.research.shield_tech.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885062
+    m_Key: content.research.hazmat_toxic.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885063
+    m_Key: content.research.hazmat_toxic.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885064
+    m_Key: content.research.jump_drive_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885065
+    m_Key: content.research.jump_drive_2.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885066
+    m_Key: content.research.field_engineering.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885067
+    m_Key: content.research.field_engineering.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885068
+    m_Key: content.research.long_range_scanning_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885069
+    m_Key: content.research.long_range_scanning_1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885070
+    m_Key: content.research.toolsmithing_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885071
+    m_Key: content.research.toolsmithing_1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885072
+    m_Key: content.research.chemistry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885073
+    m_Key: content.research.chemistry.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885074
+    m_Key: content.research.thermal_metallurgy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885075
+    m_Key: content.research.thermal_metallurgy.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885076
+    m_Key: content.research.cryo_chemistry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079360
+    m_Key: content.research.cryo_chemistry.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079361
+    m_Key: content.research.robotics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079362
+    m_Key: content.research.robotics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079363
+    m_Key: content.research.optics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079364
+    m_Key: content.research.optics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079365
+    m_Key: content.research.hazmat_heat.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079366
+    m_Key: content.research.hazmat_heat.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079367
+    m_Key: content.research.hazmat_cold.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079368
+    m_Key: content.research.hazmat_cold.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079369
+    m_Key: content.research.missile_tech.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079370
+    m_Key: content.research.missile_tech.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079371
+    m_Key: content.research.tesla_tech.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079372
+    m_Key: content.research.tesla_tech.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079373
+    m_Key: content.research.field_repair.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079374
+    m_Key: content.research.field_repair.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079375
+    m_Key: content.research.colony_charter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079376
+    m_Key: content.research.colony_charter.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079377
+    m_Key: content.research.jump_drive_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079378
+    m_Key: content.research.jump_drive_3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079379
+    m_Key: content.research.nav_autopilot.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079380
+    m_Key: content.research.nav_autopilot.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079381
+    m_Key: content.research.toolsmithing_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079382
+    m_Key: content.research.toolsmithing_2.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079383
+    m_Key: content.research.long_range_scanning_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079384
+    m_Key: content.research.long_range_scanning_2.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079385
+    m_Key: content.research.plasma_physics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079386
+    m_Key: content.research.plasma_physics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079387
+    m_Key: content.research.radiation_shielding.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079388
+    m_Key: content.research.radiation_shielding.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079389
+    m_Key: content.research.quantum_computing.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079390
+    m_Key: content.research.quantum_computing.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079391
+    m_Key: content.research.hazmat_rad.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079392
+    m_Key: content.research.hazmat_rad.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079393
+    m_Key: content.research.orbital_logistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079394
+    m_Key: content.research.orbital_logistics.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079395
+    m_Key: content.research.automation.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079396
+    m_Key: content.research.automation.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079397
+    m_Key: content.research.hangar_ops.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079398
+    m_Key: content.research.hangar_ops.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079399
+    m_Key: content.research.toolsmithing_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079400
+    m_Key: content.research.toolsmithing_3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079401
+    m_Key: content.research.jump_drive_4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079402
+    m_Key: content.research.jump_drive_4.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079403
+    m_Key: content.research.compression_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079404
+    m_Key: content.research.compression_1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079405
+    m_Key: content.research.terraforming.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079406
+    m_Key: content.research.terraforming.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079407
+    m_Key: content.research.long_range_scanning_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079408
+    m_Key: content.research.long_range_scanning_3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079409
+    m_Key: content.research.compression_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079410
+    m_Key: content.research.compression_2.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273664
+    m_Key: content.research.void_forging.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273665
+    m_Key: content.research.void_forging.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273666
+    m_Key: content.research.warp_theory.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273667
+    m_Key: content.research.warp_theory.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273668
+    m_Key: content.research.antimatter_synthesis.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273669
+    m_Key: content.research.antimatter_synthesis.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273670
+    m_Key: content.research.hazmat_void.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273671
+    m_Key: content.research.hazmat_void.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273672
+    m_Key: content.research.warp_gate_engineering.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273673
+    m_Key: content.research.warp_gate_engineering.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273674
+    m_Key: content.research.jump_drive_5.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273675
+    m_Key: content.research.jump_drive_5.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273676
+    m_Key: content.research.toolsmithing_4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273677
+    m_Key: content.research.toolsmithing_4.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273678
+    m_Key: content.research.stellar_engineering.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273679
+    m_Key: content.research.stellar_engineering.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273680
+    m_Key: content.research.compression_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273681
+    m_Key: content.research.compression_3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273682
+    m_Key: content.research.ascension_protocol.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273683
+    m_Key: content.research.ascension_protocol.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273684
+    m_Key: content.tool.axe.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273685
+    m_Key: content.tool.axe.tier-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273686
+    m_Key: content.tool.axe.tier-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273687
+    m_Key: content.tool.axe.tier-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273688
+    m_Key: content.tool.axe.tier-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273689
+    m_Key: content.tool.axe.tier-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273690
+    m_Key: content.tool.axe.tier-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273691
+    m_Key: content.tool.axe.tier-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273692
+    m_Key: content.tool.pick.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273693
+    m_Key: content.tool.pick.tier-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273694
+    m_Key: content.tool.pick.tier-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273695
+    m_Key: content.tool.pick.tier-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273696
+    m_Key: content.tool.pick.tier-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273697
+    m_Key: content.tool.pick.tier-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273698
+    m_Key: content.tool.pick.tier-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273699
+    m_Key: content.tool.pick.tier-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273700
+    m_Key: content.tool.claw.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273701
+    m_Key: content.tool.claw.tier-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273702
+    m_Key: content.tool.claw.tier-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273703
+    m_Key: content.tool.claw.tier-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273704
+    m_Key: content.tool.claw.tier-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273705
+    m_Key: content.tool.claw.tier-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273706
+    m_Key: content.tool.claw.tier-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273707
+    m_Key: content.tool.claw.tier-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273708
+    m_Key: content.tool.drill.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273709
+    m_Key: content.tool.drill.tier-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467968
+    m_Key: content.tool.drill.tier-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467969
+    m_Key: content.tool.drill.tier-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467970
+    m_Key: content.tool.drill.tier-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467971
+    m_Key: content.tool.drill.tier-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467972
+    m_Key: content.tool.drill.tier-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467973
+    m_Key: content.tool.drill.tier-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467974
+    m_Key: content.tool.siphon.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467975
+    m_Key: content.tool.siphon.tier-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467976
+    m_Key: content.tool.siphon.tier-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467977
+    m_Key: content.tool.siphon.tier-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467978
+    m_Key: content.tool.siphon.tier-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467979
+    m_Key: content.tool.siphon.tier-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467980
+    m_Key: content.tool.siphon.tier-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467981
+    m_Key: content.tool.siphon.tier-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467982
+    m_Key: content.tool.scanner.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467983
+    m_Key: content.tool.scanner.tier-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467984
+    m_Key: content.tool.scanner.tier-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467985
+    m_Key: content.tool.scanner.tier-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467986
+    m_Key: content.tool.scanner.tier-4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467987
+    m_Key: content.tool.scanner.tier-5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467988
+    m_Key: content.tool.scanner.tier-6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467989
+    m_Key: content.tool.scanner.tier-7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467990
+    m_Key: content.obstacle.boulder.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467991
+    m_Key: content.obstacle.boulder.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467992
+    m_Key: content.obstacle.dead_tree.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467993
+    m_Key: content.obstacle.dead_tree.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467994
+    m_Key: content.obstacle.wreckage.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467995
+    m_Key: content.obstacle.wreckage.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467996
+    m_Key: content.obstacle.fungal_growth.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467997
+    m_Key: content.obstacle.fungal_growth.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467998
+    m_Key: content.obstacle.ice_spire.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467999
+    m_Key: content.obstacle.ice_spire.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662272
+    m_Key: content.obstacle.crystal_cluster.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662273
+    m_Key: content.obstacle.crystal_cluster.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662274
+    m_Key: content.obstacle.magma_crust.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662275
+    m_Key: content.obstacle.magma_crust.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662276
+    m_Key: content.obstacle.void_scar.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662277
+    m_Key: content.obstacle.void_scar.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662278
+    m_Key: content.planet.sylva.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662279
+    m_Key: content.planet.sylva.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662280
+    m_Key: content.planet.sylva.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662281
+    m_Key: content.planet.ferrum.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856576
+    m_Key: content.planet.ferrum.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856577
+    m_Key: content.planet.ferrum.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856578
+    m_Key: content.planet.ferrum.spot-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856579
+    m_Key: content.planet.glacia.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856580
+    m_Key: content.planet.glacia.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856581
+    m_Key: content.planet.cinder.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856582
+    m_Key: content.planet.cinder.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050880
+    m_Key: content.planet.cinder.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050881
+    m_Key: content.planet.cinder.spot-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050882
+    m_Key: content.planet.arbor.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050883
+    m_Key: content.planet.arbor.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050884
+    m_Key: content.planet.arbor.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050885
+    m_Key: content.planet.nyx.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050886
+    m_Key: content.planet.nyx.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050887
+    m_Key: content.planet.nyx.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050888
+    m_Key: content.planet.nyx.spot-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050889
+    m_Key: content.planet.aurum.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050890
+    m_Key: content.planet.aurum.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050891
+    m_Key: content.planet.aurum.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050892
+    m_Key: content.planet.tide.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050893
+    m_Key: content.planet.tide.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050894
+    m_Key: content.planet.zephyr.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050895
+    m_Key: content.planet.zephyr.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050896
+    m_Key: content.planet.pyre.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050897
+    m_Key: content.planet.pyre.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245184
+    m_Key: content.planet.pyre.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245185
+    m_Key: content.planet.halcyon.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245186
+    m_Key: content.planet.halcyon.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245187
+    m_Key: content.planet.mire.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245188
+    m_Key: content.planet.mire.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245189
+    m_Key: content.planet.mire.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439488
+    m_Key: content.planet.obsidian.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439489
+    m_Key: content.planet.obsidian.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439490
+    m_Key: content.planet.obsidian.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439491
+    m_Key: content.planet.vesper.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439492
+    m_Key: content.planet.vesper.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439493
+    m_Key: content.planet.vesper.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439494
+    m_Key: content.planet.prism.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439495
+    m_Key: content.planet.prism.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439496
+    m_Key: content.planet.kaos.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439497
+    m_Key: content.planet.kaos.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439498
+    m_Key: content.planet.kaos.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439499
+    m_Key: content.planet.tundra.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439500
+    m_Key: content.planet.tundra.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439501
+    m_Key: content.planet.tundra.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439502
+    m_Key: content.planet.coral.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439503
+    m_Key: content.planet.coral.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439504
+    m_Key: content.planet.coral.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439505
+    m_Key: content.planet.veridian.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439506
+    m_Key: content.planet.veridian.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633792
+    m_Key: content.planet.veridian.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633793
+    m_Key: content.planet.calcite.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633794
+    m_Key: content.planet.calcite.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633795
+    m_Key: content.planet.calcite.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633796
+    m_Key: content.planet.sulfur.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633797
+    m_Key: content.planet.sulfur.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633798
+    m_Key: content.planet.magma.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633799
+    m_Key: content.planet.magma.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633800
+    m_Key: content.planet.magma.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828096
+    m_Key: content.planet.lotus.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828097
+    m_Key: content.planet.lotus.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828098
+    m_Key: content.planet.lotus.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828099
+    m_Key: content.planet.spore.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828100
+    m_Key: content.planet.spore.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828101
+    m_Key: content.planet.spore.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828102
+    m_Key: content.planet.eclipse.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828103
+    m_Key: content.planet.eclipse.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828104
+    m_Key: content.planet.eclipse.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828105
+    m_Key: content.planet.eclipse.spot-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828106
+    m_Key: content.planet.phantom.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828107
+    m_Key: content.planet.phantom.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828108
+    m_Key: content.planet.phantom.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828109
+    m_Key: content.planet.phantom.spot-2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828110
+    m_Key: content.planet.borealis.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828111
+    m_Key: content.planet.borealis.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828112
+    m_Key: content.planet.borealis.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828113
+    m_Key: content.planet.cryo.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828114
+    m_Key: content.planet.cryo.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828115
+    m_Key: content.planet.aether.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828116
+    m_Key: content.planet.aether.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828117
+    m_Key: content.planet.aether.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828118
+    m_Key: content.planet.genesis.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828119
+    m_Key: content.planet.genesis.spot-0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022400
+    m_Key: content.planet.genesis.spot-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022401
+    m_Key: content.wave-modifier.0.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022402
+    m_Key: content.wave-modifier.0.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022403
+    m_Key: content.wave-modifier.1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022404
+    m_Key: content.wave-modifier.1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022405
+    m_Key: content.wave-modifier.2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022406
+    m_Key: content.wave-modifier.2.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022407
+    m_Key: content.objective.first_structure.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022408
+    m_Key: content.objective.first_structure.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022409
+    m_Key: content.objective.first_harvest.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022410
+    m_Key: content.objective.first_harvest.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022411
+    m_Key: content.objective.first_warehouse.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022412
+    m_Key: content.objective.first_warehouse.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022413
+    m_Key: content.objective.first_fuel.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022414
+    m_Key: content.objective.first_fuel.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022415
+    m_Key: content.objective.first_hop.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022416
+    m_Key: content.objective.first_hop.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022417
+    m_Key: content.objective.first_wave.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022418
+    m_Key: content.objective.first_wave.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022419
+    m_Key: content.objective.research_lab.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022420
+    m_Key: content.objective.research_lab.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022421
+    m_Key: content.objective.jump_range_1.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022422
+    m_Key: content.objective.jump_range_1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022423
+    m_Key: content.objective.first_steel.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022424
+    m_Key: content.objective.first_steel.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022425
+    m_Key: content.objective.first_hazard_plating.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022426
+    m_Key: content.objective.first_hazard_plating.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022427
+    m_Key: content.objective.mega_first_stage.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022428
+    m_Key: content.objective.mega_first_stage.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022429
+    m_Key: content.objective.mega_stage_3.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216704
+    m_Key: content.objective.mega_stage_3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216705
+    m_Key: content.objective.era_foothold.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216706
+    m_Key: content.objective.era_foothold.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216707
+    m_Key: content.objective.era_settlement.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216708
+    m_Key: content.objective.era_settlement.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216709
+    m_Key: content.objective.era_industry.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216710
+    m_Key: content.objective.era_industry.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216711
+    m_Key: content.objective.era_interstellar.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216712
+    m_Key: content.objective.era_interstellar.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216713
+    m_Key: content.objective.era_ascension.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216714
+    m_Key: content.objective.era_ascension.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216715
+    m_Key: content.objective.reach_tier_1.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216716
+    m_Key: content.objective.reach_tier_1.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216717
+    m_Key: content.objective.reach_tier_2.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216718
+    m_Key: content.objective.reach_tier_2.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216719
+    m_Key: content.objective.reach_tier_3.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216720
+    m_Key: content.objective.reach_tier_3.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216721
+    m_Key: content.objective.reach_tier_4.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216722
+    m_Key: content.objective.reach_tier_4.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216723
+    m_Key: content.objective.reach_tier_5.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216724
+    m_Key: content.objective.reach_tier_5.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216725
+    m_Key: content.objective.reach_tier_6.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216726
+    m_Key: content.objective.reach_tier_6.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216727
+    m_Key: content.objective.reach_tier_7.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216728
+    m_Key: content.objective.reach_tier_7.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411008
+    m_Key: content.objective.reach_tier_8.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411009
+    m_Key: content.objective.reach_tier_8.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411010
+    m_Key: content.objective.reach_tier_9.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411011
+    m_Key: content.objective.reach_tier_9.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338150584320
+    m_Key: content.label.Alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859008
+    m_Key: content.label.Component.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859009
+    m_Key: content.label.Defense.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859010
+    m_Key: content.label.Energy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859011
+    m_Key: content.label.Harvest.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859012
+    m_Key: content.label.Industry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859013
+    m_Key: content.label.Logistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859014
+    m_Key: content.label.Megaprojects.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859015
+    m_Key: content.label.Navigation.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859016
+    m_Key: content.label.Processing.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859017
+    m_Key: content.label.antimatter_synthesis.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859018
+    m_Key: content.label.automation.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859019
+    m_Key: content.label.ballistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859020
+    m_Key: content.label.bio_cultivation.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859021
+    m_Key: content.label.cargo_logistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859022
+    m_Key: content.label.chem_reactor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859023
+    m_Key: content.label.chemistry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859024
+    m_Key: content.label.circuitry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859025
+    m_Key: content.label.colony_charter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859026
+    m_Key: content.label.composites.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859027
+    m_Key: content.label.compression_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859028
+    m_Key: content.label.compression_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859029
+    m_Key: content.label.cryo_chemistry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859030
+    m_Key: content.label.deep_drilling.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859031
+    m_Key: content.label.fabrication.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859032
+    m_Key: content.label.fabricator.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859033
+    m_Key: content.label.feature:ascension.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859034
+    m_Key: content.label.feature:autopilot.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859035
+    m_Key: content.label.feature:builder_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859036
+    m_Key: content.label.feature:builder_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859037
+    m_Key: content.label.field_engineering.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859038
+    m_Key: content.label.foundry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859039
+    m_Key: content.label.gas_extraction.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859040
+    m_Key: content.label.geo_survey.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859041
+    m_Key: content.label.hazmat_rad.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859042
+    m_Key: content.label.hazmat_toxic.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859043
+    m_Key: content.label.jump_drive_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859044
+    m_Key: content.label.jump_drive_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859045
+    m_Key: content.label.jump_drive_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859046
+    m_Key: content.label.jump_drive_4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859047
+    m_Key: content.label.long_range_scanning_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859048
+    m_Key: content.label.long_range_scanning_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859049
+    m_Key: content.label.optics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859050
+    m_Key: content.label.orbital_logistics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859051
+    m_Key: content.label.plasma_physics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859052
+    m_Key: content.label.quantum_computing.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859053
+    m_Key: content.label.quantum_lab.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859054
+    m_Key: content.label.radiation_shielding.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859055
+    m_Key: content.label.recipe:assemble_servo_motor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859056
+    m_Key: content.label.recipe:charge_plasma_cell.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859057
+    m_Key: content.label.recipe:crystal_cell.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859058
+    m_Key: content.label.recipe:draw_copper_wire.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859059
+    m_Key: content.label.recipe:etch_circuit_board.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859060
+    m_Key: content.label.recipe:etch_quantum_chip.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859061
+    m_Key: content.label.recipe:forge_rad_shield.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859062
+    m_Key: content.label.recipe:forge_thermal_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859063
+    m_Key: content.label.recipe:grind_optic_lens.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859064
+    m_Key: content.label.recipe:grow_void_alloy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859065
+    m_Key: content.label.recipe:mix_cryo_composite.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859066
+    m_Key: content.label.recipe:press_biocomposite.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859067
+    m_Key: content.label.recipe:smelt_glass.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859068
+    m_Key: content.label.recipe:smelt_iron_plate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859069
+    m_Key: content.label.recipe:smelt_steel.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859070
+    m_Key: content.label.recipe:smelt_titanium_plate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859071
+    m_Key: content.label.recipe:synthesize_antimatter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859072
+    m_Key: content.label.recipe:wind_warp_coil.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859073
+    m_Key: content.label.refinery.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859074
+    m_Key: content.label.robotics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859075
+    m_Key: content.label.smelting.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859076
+    m_Key: content.label.steelmaking.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859077
+    m_Key: content.label.stellar_engineering.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859078
+    m_Key: content.label.structure:auto_harvester.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859079
+    m_Key: content.label.structure:biodome.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859080
+    m_Key: content.label.structure:cargo_depot.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859081
+    m_Key: content.label.structure:chem_reactor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859082
+    m_Key: content.label.structure:colony_hub.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859083
+    m_Key: content.label.structure:driller.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859084
+    m_Key: content.label.structure:dyson_collector.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859085
+    m_Key: content.label.structure:excavator.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859086
+    m_Key: content.label.structure:fabricator.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859087
+    m_Key: content.label.structure:foundry.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859088
+    m_Key: content.label.structure:fuel_depot.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859089
+    m_Key: content.label.structure:hangar.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859090
+    m_Key: content.label.structure:laser.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859091
+    m_Key: content.label.structure:missile_silo.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859092
+    m_Key: content.label.structure:orbital_relay.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859093
+    m_Key: content.label.structure:quantum_lab.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859094
+    m_Key: content.label.structure:radar_tower.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859095
+    m_Key: content.label.structure:repair_bay.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859096
+    m_Key: content.label.structure:salvage_yard.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859097
+    m_Key: content.label.structure:shield_pylon.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859098
+    m_Key: content.label.structure:siphon_rig.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859099
+    m_Key: content.label.structure:terraformer.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859100
+    m_Key: content.label.structure:tesla_coil.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859101
+    m_Key: content.label.structure:warp_gate.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859102
+    m_Key: content.label.survey_basics.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859103
+    m_Key: content.label.terraforming.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859104
+    m_Key: content.label.thermal_metallurgy.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859105
+    m_Key: content.label.titanium_working.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859106
+    m_Key: content.label.tool:*:4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859107
+    m_Key: content.label.tool:*:5.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859108
+    m_Key: content.label.tool:*:6.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859109
+    m_Key: content.label.tool:*:7.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859110
+    m_Key: content.label.tool:drill:2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859111
+    m_Key: content.label.tool:scanner:2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859112
+    m_Key: content.label.tool:siphon:2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859113
+    m_Key: content.label.toolsmithing_1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859114
+    m_Key: content.label.toolsmithing_2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859115
+    m_Key: content.label.toolsmithing_3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859116
+    m_Key: content.label.toolsmithing_4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859117
+    m_Key: content.label.upgrade:compression:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859118
+    m_Key: content.label.upgrade:compression:2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859119
+    m_Key: content.label.upgrade:compression:3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859120
+    m_Key: content.label.upgrade:compression:4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859121
+    m_Key: content.label.upgrade:hull_cold:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859122
+    m_Key: content.label.upgrade:hull_heat:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859123
+    m_Key: content.label.upgrade:hull_rad:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859124
+    m_Key: content.label.upgrade:hull_toxic:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859125
+    m_Key: content.label.upgrade:hull_void:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859126
+    m_Key: content.label.upgrade:jump:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859127
+    m_Key: content.label.upgrade:jump:10.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859128
+    m_Key: content.label.upgrade:jump:2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859129
+    m_Key: content.label.upgrade:jump:3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859130
+    m_Key: content.label.upgrade:jump:4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859131
+    m_Key: content.label.upgrade:jump:5.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859132
+    m_Key: content.label.upgrade:jump:6.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859133
+    m_Key: content.label.upgrade:jump:7.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859134
+    m_Key: content.label.upgrade:jump:8.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859135
+    m_Key: content.label.upgrade:jump:9.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859136
+    m_Key: content.label.upgrade:scanner_range:1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859137
+    m_Key: content.label.upgrade:scanner_range:2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859138
+    m_Key: content.label.upgrade:scanner_range:3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859139
+    m_Key: content.label.upgrade:scanner_range:4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859140
+    m_Key: content.label.upgrade:scanner_range:5.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859141
+    m_Key: content.label.upgrade:scanner_range:6.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859142
+    m_Key: content.label.upgrade:scanner_range:7.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859143
+    m_Key: content.label.upgrade:scanner_range:8.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859144
+    m_Key: content.label.void_forging.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859145
+    m_Key: content.label.warp_gate_engineering.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859146
+    m_Key: content.label.warp_theory.name
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

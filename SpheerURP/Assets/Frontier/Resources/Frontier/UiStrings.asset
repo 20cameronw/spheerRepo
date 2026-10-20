@@ -2259,3 +2259,1758 @@ MonoBehaviour:
     text: hard radiation
   - key: planet.blurb.hazard.void
     text: void exposure
+  - key: content.resource.wood.name
+    text: Wood
+  - key: content.resource.wood.description
+    text: Timber from the lush worlds, cut green and stacked by the cartload. Every
+      settlement begins with it, and every great project comes back to it.
+  - key: content.resource.wood.detail
+    text: Timber from the lush worlds, cut green and stacked by the cartload. Every
+      settlement begins with it, and every great project comes back to it.
+  - key: content.resource.stone.name
+    text: Stone
+  - key: content.resource.stone.description
+    text: Dense grey rock that rings when struck. It holds the foundations of everything
+      and never runs out.
+  - key: content.resource.stone.detail
+    text: Dense grey rock that rings when struck. It holds the foundations of everything
+      and never runs out.
+  - key: content.resource.scrap.name
+    text: Scrap
+  - key: content.resource.scrap.description
+    text: Wreckage and worn-out machinery lie on every world, because someone always
+      got there first. Pressed, burned or melted, none of it is ever wasted.
+  - key: content.resource.scrap.detail
+    text: Wreckage and worn-out machinery lie on every world, because someone always
+      got there first. Pressed, burned or melted, none of it is ever wasted.
+  - key: content.resource.biomass.name
+    text: Biomass
+  - key: content.resource.biomass.description
+    text: Fast-growing fibrous growth, thick with sap and spores. It ferments into
+      clean fuel and weaves into seals that shrug off poison.
+  - key: content.resource.biomass.detail
+    text: Fast-growing fibrous growth, thick with sap and spores. It ferments into
+      clean fuel and weaves into seals that shrug off poison.
+  - key: content.resource.iron.name
+    text: Iron Ore
+  - key: content.resource.iron.description
+    text: Rust-red ore heavy with metal, found in veins under volcanic crust and
+      dry plains. Smelted, it becomes the skeleton of everything you build.
+  - key: content.resource.iron.detail
+    text: Rust-red ore heavy with metal, found in veins under volcanic crust and
+      dry plains. Smelted, it becomes the skeleton of everything you build.
+  - key: content.resource.copper_ore.name
+    text: Copper Ore
+  - key: content.resource.copper_ore.description
+    text: Green-streaked ore that conducts better than anything else you can dig
+      up. Drawn into wire, it carries every signal and every current.
+  - key: content.resource.copper_ore.detail
+    text: Green-streaked ore that conducts better than anything else you can dig
+      up. Drawn into wire, it carries every signal and every current.
+  - key: content.resource.silica.name
+    text: Silica
+  - key: content.resource.silica.description
+    text: Fine quartz sand from the dry basins and crystal flats. Melted it turns
+      to glass, and ground it polishes lenses.
+  - key: content.resource.silica.detail
+    text: Fine quartz sand from the dry basins and crystal flats. Melted it turns
+      to glass, and ground it polishes lenses.
+  - key: content.resource.ice.name
+    text: Ice
+  - key: content.resource.ice.description
+    text: Hard blue ice cut from glaciers, comet shells and shadowed craters. It
+      holds the cold that cryogenic hulls and quantum lattices depend on.
+  - key: content.resource.ice.detail
+    text: Hard blue ice cut from glaciers, comet shells and shadowed craters. It
+      holds the cold that cryogenic hulls and quantum lattices depend on.
+  - key: content.resource.titanium_ore.name
+    text: Titanium Ore
+  - key: content.resource.titanium_ore.description
+    text: Grey ore so dense it blunts ordinary drills. Refined, it turns light, strong
+      and unbothered by fire or vacuum.
+  - key: content.resource.titanium_ore.detail
+    text: Grey ore so dense it blunts ordinary drills. Refined, it turns light, strong
+      and unbothered by fire or vacuum.
+  - key: content.resource.crystal.name
+    text: Crystal
+  - key: content.resource.crystal.description
+    text: Resonant crystal that hums when struck and glows when worked. It sharpens
+      tools, focuses beams and stores more energy than it should.
+  - key: content.resource.crystal.detail
+    text: Resonant crystal that hums when struck and glows when worked. It sharpens
+      tools, focuses beams and stores more energy than it should.
+  - key: content.resource.methane.name
+    text: Methane
+  - key: content.resource.methane.description
+    text: Pale gas siphoned from swamps, oceans and giant worlds. A little of it
+      burns hotter than a hold full of wood.
+  - key: content.resource.methane.detail
+    text: Pale gas siphoned from swamps, oceans and giant worlds. A little of it
+      burns hotter than a hold full of wood.
+  - key: content.resource.helium3.name
+    text: Helium-3
+  - key: content.resource.helium3.description
+    text: A rare light gas drifting in the storm bands of the giants. Ships crave
+      it, and so does every quantum machine.
+  - key: content.resource.helium3.detail
+    text: A rare light gas drifting in the storm bands of the giants. Ships crave
+      it, and so does every quantum machine.
+  - key: content.resource.core.name
+    text: Xeno Core
+  - key: content.resource.core.description
+    text: A pulsing organic knot torn from alien hives and fallen raiders. Nobody
+      agrees what it is, but every advanced machine runs better with one inside.
+  - key: content.resource.core.detail
+    text: A pulsing organic knot torn from alien hives and fallen raiders. Nobody
+      agrees what it is, but every advanced machine runs better with one inside.
+  - key: content.resource.radium.name
+    text: Radium
+  - key: content.resource.radium.description
+    text: A faintly glowing salt that ticks in the dark. Dangerous to carry, essential
+      for shielding, and priceless to anyone who knows how to contain it.
+  - key: content.resource.radium.detail
+    text: A faintly glowing salt that ticks in the dark. Dangerous to carry, essential
+      for shielding, and priceless to anyone who knows how to contain it.
+  - key: content.resource.dark_matter.name
+    text: Dark Matter
+  - key: content.resource.dark_matter.description
+    text: A pocket of nothing that pulls on everything. Dug from the deepest shattered
+      worlds, it is the last ingredient of the last machines.
+  - key: content.resource.dark_matter.detail
+    text: A pocket of nothing that pulls on everything. Dug from the deepest shattered
+      worlds, it is the last ingredient of the last machines.
+  - key: content.resource.fuel.name
+    text: Fuel Cell
+  - key: content.resource.fuel.description
+    text: 'Compact cells of refined energy that power every jump. Cooked from whatever
+      burns: wood in the first days, gas and ice when the ship is bigger.'
+  - key: content.resource.fuel.detail
+    text: 'Compact cells of refined energy that power every jump. Cooked from whatever
+      burns: wood in the first days, gas and ice when the ship is bigger.'
+  - key: content.resource.planks.name
+    text: Planks
+  - key: content.resource.planks.description
+    text: Sawn timber cut to length. It frames the buildings of every era, and the
+      late projects eat it by the thousand.
+  - key: content.resource.planks.detail
+    text: Sawn timber cut to length. It frames the buildings of every era, and the
+      late projects eat it by the thousand.
+  - key: content.resource.iron_plate.name
+    text: Iron Plate
+  - key: content.resource.iron_plate.description
+    text: Rolled sheets of smelted iron, still warm from the foundry. The first real
+      building material of any colony.
+  - key: content.resource.iron_plate.detail
+    text: Rolled sheets of smelted iron, still warm from the foundry. The first real
+      building material of any colony.
+  - key: content.resource.copper_wire.name
+    text: Copper Wire
+  - key: content.resource.copper_wire.description
+    text: Copper drawn thin and wound on spools. Everything with a pulse, from a
+      lamp to a reactor, needs a length of it.
+  - key: content.resource.copper_wire.detail
+    text: Copper drawn thin and wound on spools. Everything with a pulse, from a
+      lamp to a reactor, needs a length of it.
+  - key: content.resource.glass.name
+    text: Glass
+  - key: content.resource.glass.description
+    text: Clear, hard panes melted from silica. They keep out the weather, hold the
+      vacuum and become lenses when polished.
+  - key: content.resource.glass.detail
+    text: Clear, hard panes melted from silica. They keep out the weather, hold the
+      vacuum and become lenses when polished.
+  - key: content.resource.titanium_plate.name
+    text: Titanium Plate
+  - key: content.resource.titanium_plate.description
+    text: Pressed titanium cut into light, stubborn armor panels. It survives heat
+      that melts steel and cold that shatters it.
+  - key: content.resource.titanium_plate.detail
+    text: Pressed titanium cut into light, stubborn armor panels. It survives heat
+      that melts steel and cold that shatters it.
+  - key: content.resource.steel.name
+    text: Steel
+  - key: content.resource.steel.description
+    text: Iron hardened with the carbon of burnt timber. The backbone of tools, turrets
+      and hulls.
+  - key: content.resource.steel.detail
+    text: Iron hardened with the carbon of burnt timber. The backbone of tools, turrets
+      and hulls.
+  - key: content.resource.biocomposite.name
+    text: Biocomposite
+  - key: content.resource.biocomposite.description
+    text: Plant fibre pressed with resin into a flexible, self-sealing skin. Toxic
+      air eats steel but slides off this.
+  - key: content.resource.biocomposite.detail
+    text: Plant fibre pressed with resin into a flexible, self-sealing skin. Toxic
+      air eats steel but slides off this.
+  - key: content.resource.thermal_alloy.name
+    text: Thermal Alloy
+  - key: content.resource.thermal_alloy.description
+    text: Titanium and glass fused into a ceramic-bright metal that glows without
+      failing. Hulls plated with it can land where rock still flows.
+  - key: content.resource.thermal_alloy.detail
+    text: Titanium and glass fused into a ceramic-bright metal that glows without
+      failing. Hulls plated with it can land where rock still flows.
+  - key: content.resource.cryo_composite.name
+    text: Cryo Composite
+  - key: content.resource.cryo_composite.description
+    text: A foam-cored laminate that keeps its strength far below freezing. It lets
+      a ship set down where the air itself is ice.
+  - key: content.resource.cryo_composite.detail
+    text: A foam-cored laminate that keeps its strength far below freezing. It lets
+      a ship set down where the air itself is ice.
+  - key: content.resource.rad_shield_alloy.name
+    text: Rad-Shield Alloy
+  - key: content.resource.rad_shield_alloy.description
+    text: Layered steel and radium-laced glass that drinks hard radiation. Shielding
+      like this opens the worlds that glow in the dark.
+  - key: content.resource.rad_shield_alloy.detail
+    text: Layered steel and radium-laced glass that drinks hard radiation. Shielding
+      like this opens the worlds that glow in the dark.
+  - key: content.resource.void_alloy.name
+    text: Void Alloy
+  - key: content.resource.void_alloy.description
+    text: A black metal grown around a seed of dark matter. It bends light and survives
+      where space itself is thin.
+  - key: content.resource.void_alloy.detail
+    text: A black metal grown around a seed of dark matter. It bends light and survives
+      where space itself is thin.
+  - key: content.resource.circuit_board.name
+    text: Circuit Board
+  - key: content.resource.circuit_board.description
+    text: Etched copper on a glass-fibre sheet. Every control, sensor and drone starts
+      with one.
+  - key: content.resource.circuit_board.detail
+    text: Etched copper on a glass-fibre sheet. Every control, sensor and drone starts
+      with one.
+  - key: content.resource.servo_motor.name
+    text: Servo Motor
+  - key: content.resource.servo_motor.description
+    text: A sealed motor with a precision gearhead. It moves every arm, drill carriage
+      and turret in the colony.
+  - key: content.resource.servo_motor.detail
+    text: A sealed motor with a precision gearhead. It moves every arm, drill carriage
+      and turret in the colony.
+  - key: content.resource.optic_lens.name
+    text: Optic Lens
+  - key: content.resource.optic_lens.description
+    text: A ground and polished lens, flawless enough to focus a laser or read a
+      star. Scanners and turrets are blind without it.
+  - key: content.resource.optic_lens.detail
+    text: A ground and polished lens, flawless enough to focus a laser or read a
+      star. Scanners and turrets are blind without it.
+  - key: content.resource.quantum_chip.name
+    text: Quantum Chip
+  - key: content.resource.quantum_chip.description
+    text: A lattice of cooled helium and etched crystal that computes in more than
+      one state at once. Navigation and research run on it.
+  - key: content.resource.quantum_chip.detail
+    text: A lattice of cooled helium and etched crystal that computes in more than
+      one state at once. Navigation and research run on it.
+  - key: content.resource.warp_coil.name
+    text: Warp Coil
+  - key: content.resource.warp_coil.description
+    text: A superconducting coil wound around a speck of dark matter. Charge it and
+      space folds; it is the last part of every great ship.
+  - key: content.resource.warp_coil.detail
+    text: A superconducting coil wound around a speck of dark matter. Charge it and
+      space folds; it is the last part of every great ship.
+  - key: content.resource.plasma.name
+    text: Plasma Cell
+  - key: content.resource.plasma.description
+    text: A magnetic bottle of superheated gas that carries eight times the energy
+      of a fuel cell. It lets a deep run fit in a few slots.
+  - key: content.resource.plasma.detail
+    text: A magnetic bottle of superheated gas that carries eight times the energy
+      of a fuel cell. It lets a deep run fit in a few slots.
+  - key: content.resource.antimatter.name
+    text: Antimatter Pod
+  - key: content.resource.antimatter.description
+    text: A pod of trapped antiparticles in a mirrored field. Sixty-four cells of
+      energy in a package you can hold, and a carelessness you cannot survive.
+  - key: content.resource.antimatter.detail
+    text: A pod of trapped antiparticles in a mirrored field. Sixty-four cells of
+      energy in a package you can hold, and a carelessness you cannot survive.
+  - key: content.structure.lumber.name
+    text: Lumber Camp
+  - key: content.structure.lumber.description
+    text: Tap it to chop the trees on this planet. Higher levels yield more.
+  - key: content.structure.mine.name
+    text: Mining Rig
+  - key: content.structure.mine.description
+    text: Tap it to mine stone and ore on this planet. Free to build. Higher levels
+      yield more.
+  - key: content.structure.driller.name
+    text: Deep Driller
+  - key: content.structure.driller.description
+    text: Tap it to drill ore, crystal and xeno cores. Higher levels yield more.
+  - key: content.structure.biodome.name
+    text: Biodome Harvester
+  - key: content.structure.biodome.description
+    text: Tap it to harvest the plant growth on this planet. Higher levels yield
+      more.
+  - key: content.structure.siphon_rig.name
+    text: Gas Siphon Rig
+  - key: content.structure.siphon_rig.description
+    text: Tap it to siphon gas from the atmosphere. Higher levels yield more.
+  - key: content.structure.excavator.name
+    text: Excavation Rig
+  - key: content.structure.excavator.description
+    text: Tap it to excavate buried ice, sand and rare salts. Higher levels yield
+      more.
+  - key: content.structure.salvage_yard.name
+    text: Salvage Yard
+  - key: content.structure.salvage_yard.description
+    text: Sorts wreckage into scrap and the occasional cache. Higher levels yield
+      more.
+  - key: content.structure.refinery.name
+    text: Refinery
+  - key: content.structure.refinery.description
+    text: Converts raw materials into fuel and planks. Higher levels unlock better
+      recipes and larger craft batches.
+  - key: content.structure.fabricator.name
+    text: Fabricator
+  - key: content.structure.fabricator.description
+    text: Draws wire and assembles components. Higher levels unlock better recipes
+      and larger craft batches.
+  - key: content.structure.foundry.name
+    text: Foundry
+  - key: content.structure.foundry.description
+    text: Smelts ore into plates and alloys. Higher levels unlock tougher alloys
+      and larger craft batches.
+  - key: content.structure.chem_reactor.name
+    text: Chem Reactor
+  - key: content.structure.chem_reactor.description
+    text: Mixes composites and charges plasma cells.
+  - key: content.structure.quantum_lab.name
+    text: Quantum Lab
+  - key: content.structure.quantum_lab.description
+    text: Etches quantum chips and grows void alloy, warp coils and antimatter.
+  - key: content.structure.warehouse.name
+    text: Warehouse
+  - key: content.structure.warehouse.description
+    text: Stores resources on this planet. Drag stacks between your backpack and
+      storage. The first upgrades add 9 slots each; the late ones add far more.
+  - key: content.structure.fuel_depot.name
+    text: Fuel Depot
+  - key: content.structure.fuel_depot.description
+    text: Holds fuel cells, plasma and antimatter in dense racks that do not use
+      backpack slots.
+  - key: content.structure.cargo_depot.name
+    text: Cargo Depot
+  - key: content.structure.cargo_depot.description
+    text: Pools every warehouse on this planet, so crafting and building draw from
+      all of them at once.
+  - key: content.structure.orbital_relay.name
+    text: Orbital Relay
+  - key: content.structure.orbital_relay.description
+    text: Withdraw from operational warehouses on visited worlds in this system;
+      upgrades extend its beam and reduce transfer energy.
+  - key: content.structure.gunner.name
+    text: Gunner Turret
+  - key: content.structure.gunner.description
+    text: Rapid fire kinetic turret. Fires during waves.
+  - key: content.structure.laser.name
+    text: Laser Turret
+  - key: content.structure.laser.description
+    text: Slow, heavy beam with long range. Fires during waves.
+  - key: content.structure.shield_pylon.name
+    text: Shield Pylon
+  - key: content.structure.shield_pylon.description
+    text: Projects a field that raises reactor health.
+  - key: content.structure.missile_silo.name
+    text: Missile Silo
+  - key: content.structure.missile_silo.description
+    text: Launches a splash missile that clears clustered raiders. Fires during waves.
+  - key: content.structure.tesla_coil.name
+    text: Tesla Coil
+  - key: content.structure.tesla_coil.description
+    text: Arcs lightning between nearby aliens. Fires during waves.
+  - key: content.structure.repair_bay.name
+    text: Repair Bay
+  - key: content.structure.repair_bay.description
+    text: Slowly repairs the reactor during a wave.
+  - key: content.structure.alarm.name
+    text: Alarm Beacon
+  - key: content.structure.alarm.description
+    text: Tap it to burn fuel and call a wave. More fuel means a longer fight and
+      bigger rewards.
+  - key: content.structure.research_lab.name
+    text: Research Lab
+  - key: content.structure.research_lab.description
+    text: Unlocks research. Higher levels open deeper research nodes and tool tiers.
+  - key: content.structure.radar_tower.name
+    text: Radar Tower
+  - key: content.structure.radar_tower.description
+    text: 'Extends the survey radius: see more worlds around you before you jump.'
+  - key: content.structure.colony_hub.name
+    text: Colony Hub
+  - key: content.structure.colony_hub.description
+    text: Adds builder crews at levels 3 and 7 and discounts planetary obstacle clearance.
+  - key: content.structure.hangar.name
+    text: Hangar
+  - key: content.structure.hangar.description
+    text: 'A spaceport hangar: cuts the fuel cost of every trip.'
+  - key: content.structure.auto_harvester.name
+    text: Auto-Harvester
+  - key: content.structure.auto_harvester.description
+    text: Slowly gathers raw bulk materials while you are away. Active harvesting
+      stays far better.
+  - key: content.structure.terraformer.name
+    text: Terraformer
+  - key: content.structure.terraformer.description
+    text: Megaproject. Reshapes the planet in five stages; each stage permanently
+      raises harvest yield everywhere.
+  - key: content.structure.warp_gate.name
+    text: Warp Gate
+  - key: content.structure.warp_gate.description
+    text: 'Megaproject. A ring gate in orbit: each stage cuts fuel costs and extends
+      jump range.'
+  - key: content.structure.dyson_collector.name
+    text: Dyson Collector
+  - key: content.structure.dyson_collector.description
+    text: Megaproject. A swarm of collectors around the star feeds your ships fuel
+      while you sleep.
+  - key: content.recipe.distill_wood.name
+    text: Wood Distillate
+  - key: content.recipe.burn_scrap.name
+    text: Scrap Burner
+  - key: content.recipe.saw_planks.name
+    text: Saw Planks
+  - key: content.recipe.press_scrap.name
+    text: Scrap Press
+  - key: content.recipe.ferment_biomass.name
+    text: Biomass Ferment
+  - key: content.recipe.crystal_cell.name
+    text: Crystal Cell
+  - key: content.recipe.condense_methane.name
+    text: Methane Condenser
+  - key: content.recipe.smelt_iron_plate.name
+    text: Smelt Iron Plate
+  - key: content.recipe.smelt_glass.name
+    text: Smelt Glass
+  - key: content.recipe.smelt_steel.name
+    text: Smelt Steel
+  - key: content.recipe.smelt_titanium_plate.name
+    text: Press Titanium Plate
+  - key: content.recipe.forge_thermal_alloy.name
+    text: Forge Thermal Alloy
+  - key: content.recipe.forge_rad_shield.name
+    text: Forge Rad-Shield
+  - key: content.recipe.draw_copper_wire.name
+    text: Draw Copper Wire
+  - key: content.recipe.press_biocomposite.name
+    text: Press Biocomposite
+  - key: content.recipe.etch_circuit_board.name
+    text: Etch Circuit Board
+  - key: content.recipe.assemble_servo_motor.name
+    text: Assemble Servo Motor
+  - key: content.recipe.grind_optic_lens.name
+    text: Grind Optic Lens
+  - key: content.recipe.mix_cryo_composite.name
+    text: Mix Cryo Composite
+  - key: content.recipe.charge_plasma_cell.name
+    text: Charge Plasma Cell
+  - key: content.recipe.etch_quantum_chip.name
+    text: Etch Quantum Chip
+  - key: content.recipe.grow_void_alloy.name
+    text: Grow Void Alloy
+  - key: content.recipe.wind_warp_coil.name
+    text: Wind Warp Coil
+  - key: content.recipe.synthesize_antimatter.name
+    text: Synthesize Antimatter
+  - key: content.enemy.scout.name
+    text: Scout
+  - key: content.enemy.swarmer.name
+    text: Swarmer
+  - key: content.enemy.raider.name
+    text: Raider
+  - key: content.enemy.brute.name
+    text: Brute
+  - key: content.enemy.titan.name
+    text: Titan
+  - key: content.upgrade.pack.name
+    text: Backpack
+  - key: content.upgrade.pack.description
+    text: +9 slots (one more row). Carry more before you turn back.
+  - key: content.upgrade.pack.level-1
+    text: Satchel
+  - key: content.upgrade.pack.level-2
+    text: Rucksack
+  - key: content.upgrade.pack.level-3
+    text: Field Pack
+  - key: content.upgrade.pack.level-4
+    text: Expedition Pack
+  - key: content.upgrade.pack.level-5
+    text: Cargo Harness
+  - key: content.upgrade.pack.level-6
+    text: Hauler Rig
+  - key: content.upgrade.pack.level-7
+    text: Titan Frame
+  - key: content.upgrade.pack.level-8
+    text: Exo-Hauler
+  - key: content.upgrade.engine.name
+    text: Engine Efficiency
+  - key: content.upgrade.engine.description
+    text: Every trip burns less fuel.
+  - key: content.upgrade.engine.level-1
+    text: Tuned Injectors
+  - key: content.upgrade.engine.level-2
+    text: Flow Manifold
+  - key: content.upgrade.engine.level-3
+    text: Ion Nozzles
+  - key: content.upgrade.engine.level-4
+    text: Cryo Intake
+  - key: content.upgrade.engine.level-5
+    text: Plasma Lens
+  - key: content.upgrade.engine.level-6
+    text: Phase Vents
+  - key: content.upgrade.engine.level-7
+    text: Zero-Point Taps
+  - key: content.upgrade.engine.level-8
+    text: Gradient Drive
+  - key: content.upgrade.engine.level-9
+    text: Resonant Core
+  - key: content.upgrade.engine.level-10
+    text: Quiet Singularity
+  - key: content.upgrade.jump.name
+    text: Jump Range
+  - key: content.upgrade.jump.description
+    text: A single jump reaches farther, so depth is earned.
+  - key: content.upgrade.jump.level-1
+    text: Jump Coils
+  - key: content.upgrade.jump.level-2
+    text: Capacitor Bank
+  - key: content.upgrade.jump.level-3
+    text: Resonance Array
+  - key: content.upgrade.jump.level-4
+    text: Folded Lattice
+  - key: content.upgrade.jump.level-5
+    text: Deep Coils
+  - key: content.upgrade.jump.level-6
+    text: Rift Anchors
+  - key: content.upgrade.jump.level-7
+    text: Tunnel Drive
+  - key: content.upgrade.jump.level-8
+    text: Gate Harmonics
+  - key: content.upgrade.jump.level-9
+    text: Fold Engine
+  - key: content.upgrade.jump.level-10
+    text: Boundless Drive
+  - key: content.upgrade.scanner_range.name
+    text: Scanner Range
+  - key: content.upgrade.scanner_range.description
+    text: Worlds within range of any world you have visited show their resources.
+  - key: content.upgrade.scanner_range.level-1
+    text: Long Lens
+  - key: content.upgrade.scanner_range.level-2
+    text: Sweep Array
+  - key: content.upgrade.scanner_range.level-3
+    text: Deep Survey
+  - key: content.upgrade.scanner_range.level-4
+    text: Parallax Net
+  - key: content.upgrade.scanner_range.level-5
+    text: Galactic Atlas
+  - key: content.upgrade.scanner_range.level-6
+    text: Dark Survey
+  - key: content.upgrade.scanner_range.level-7
+    text: Lattice Scan
+  - key: content.upgrade.scanner_range.level-8
+    text: Cosmic Ear
+  - key: content.upgrade.fuel_tank.name
+    text: Fuel Tank
+  - key: content.upgrade.fuel_tank.description
+    text: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops eating
+      backpack space.
+  - key: content.upgrade.fuel_tank.level-1
+    text: Auxiliary Cell
+  - key: content.upgrade.fuel_tank.level-2
+    text: Reserve Tank
+  - key: content.upgrade.fuel_tank.level-3
+    text: Baffled Tank
+  - key: content.upgrade.fuel_tank.level-4
+    text: Cryo Tank
+  - key: content.upgrade.fuel_tank.level-5
+    text: Plasma Tank
+  - key: content.upgrade.fuel_tank.level-6
+    text: Containment Vault
+  - key: content.upgrade.hull_toxic.name
+    text: Toxic Seal
+  - key: content.upgrade.hull_toxic.description
+    text: Biocomposite plating that lets the hull set down on toxic worlds.
+  - key: content.upgrade.hull_toxic.level-1
+    text: Biocomposite Seal
+  - key: content.upgrade.hull_toxic.level-2
+    text: Triple Seal
+  - key: content.upgrade.hull_toxic.level-3
+    text: Sealed Hull
+  - key: content.upgrade.hull_heat.name
+    text: Thermal Plating
+  - key: content.upgrade.hull_heat.description
+    text: Thermal alloy plating for volcanic and desert worlds.
+  - key: content.upgrade.hull_heat.level-1
+    text: Thermal Plating
+  - key: content.upgrade.hull_heat.level-2
+    text: Ceramic Shell
+  - key: content.upgrade.hull_heat.level-3
+    text: Magma Shell
+  - key: content.upgrade.hull_cold.name
+    text: Cryo Plating
+  - key: content.upgrade.hull_cold.description
+    text: Cryo composite plating for glacial worlds.
+  - key: content.upgrade.hull_cold.level-1
+    text: Cryo Plating
+  - key: content.upgrade.hull_cold.level-2
+    text: Thermal Break
+  - key: content.upgrade.hull_cold.level-3
+    text: Polar Shell
+  - key: content.upgrade.hull_rad.name
+    text: Rad-Shield Plating
+  - key: content.upgrade.hull_rad.description
+    text: Rad-Shield alloy plating for irradiated worlds and hostile stars.
+  - key: content.upgrade.hull_rad.level-1
+    text: Rad-Shield Plating
+  - key: content.upgrade.hull_rad.level-2
+    text: Lead Lattice
+  - key: content.upgrade.hull_rad.level-3
+    text: Pulsar Shell
+  - key: content.upgrade.hull_void.name
+    text: Void Shell
+  - key: content.upgrade.hull_void.description
+    text: Void alloy shell for worlds where space itself is thin.
+  - key: content.upgrade.hull_void.level-1
+    text: Void Shell
+  - key: content.upgrade.hull_void.level-2
+    text: Event Shell
+  - key: content.upgrade.hull_void.level-3
+    text: Null Shell
+  - key: content.upgrade.turret.name
+    text: Turret Actuators
+  - key: content.upgrade.turret.description
+    text: +15% firing speed for placed turrets. Does not spawn turrets.
+  - key: content.upgrade.turret.level-1
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-2
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-3
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-4
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-5
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-6
+    text: Turret Actuators
+  - key: content.upgrade.turretdmg.name
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.description
+    text: +35% turret damage.
+  - key: content.upgrade.turretdmg.level-1
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-2
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-3
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-4
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-5
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-6
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-7
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-8
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-9
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-10
+    text: Turret Damage
+  - key: content.upgrade.pulse.name
+    text: Ion Pulse
+  - key: content.upgrade.pulse.description
+    text: +40% tap damage.
+  - key: content.upgrade.pulse.level-1
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-2
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-3
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-4
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-5
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-6
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-7
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-8
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-9
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-10
+    text: Ion Pulse
+  - key: content.upgrade.shield.name
+    text: Reactor Shield
+  - key: content.upgrade.shield.description
+    text: +25 reactor health.
+  - key: content.upgrade.shield.level-1
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-2
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-3
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-4
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-5
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-6
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-7
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-8
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-9
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-10
+    text: Reactor Shield
+  - key: content.upgrade.salvage.name
+    text: Salvage Rig
+  - key: content.upgrade.salvage.description
+    text: +10% wave rewards.
+  - key: content.upgrade.salvage.level-1
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-2
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-3
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-4
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-5
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-6
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-7
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-8
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-9
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-10
+    text: Salvage Rig
+  - key: content.upgrade.compression.name
+    text: Cargo Compression
+  - key: content.upgrade.compression.description
+    text: 'Every stack in your backpack and warehouses holds more: the end-game answer
+      to storage.'
+  - key: content.upgrade.compression.level-1
+    text: Vacuum Packing
+  - key: content.upgrade.compression.level-2
+    text: Dense Racking
+  - key: content.upgrade.compression.level-3
+    text: Pressure Stacks
+  - key: content.upgrade.compression.level-4
+    text: Quantum Compression
+  - key: content.upgrade.axe.name
+    text: Axe
+  - key: content.upgrade.axe.description
+    text: Hit the glowing weak spot to fell trees. Better axes deal more damage and
+      swing faster.
+  - key: content.upgrade.axe.legacy-level-0
+    text: Bare Hands
+  - key: content.upgrade.axe.legacy-level-1
+    text: Stone Axe
+  - key: content.upgrade.axe.legacy-level-2
+    text: Iron Axe
+  - key: content.upgrade.axe.legacy-level-3
+    text: Steel Axe
+  - key: content.upgrade.axe.legacy-level-4
+    text: Crystal Axe
+  - key: content.upgrade.axe.legacy-level-5
+    text: Plasma Chainsaw
+  - key: content.upgrade.axe.legacy-level-6
+    text: Singularity Saw
+  - key: content.upgrade.pick.name
+    text: Pickaxe
+  - key: content.upgrade.pick.description
+    text: Strike the shiny spot to break nodes through stages. Better picks crack
+      them faster.
+  - key: content.upgrade.pick.legacy-level-0
+    text: Bare Hands
+  - key: content.upgrade.pick.legacy-level-1
+    text: Stone Pick
+  - key: content.upgrade.pick.legacy-level-2
+    text: Iron Pick
+  - key: content.upgrade.pick.legacy-level-3
+    text: Steel Pick
+  - key: content.upgrade.pick.legacy-level-4
+    text: Pneumatic Pick
+  - key: content.upgrade.pick.legacy-level-5
+    text: Jackhammer
+  - key: content.upgrade.pick.legacy-level-6
+    text: Plasma Jackhammer
+  - key: content.upgrade.drill.name
+    text: Drill
+  - key: content.upgrade.drill.description
+    text: Hold to bore through rock. Better drills fill the progress gauge faster.
+  - key: content.upgrade.drill.legacy-level-0
+    text: Hand Auger
+  - key: content.upgrade.drill.legacy-level-1
+    text: Pneumatic Drill
+  - key: content.upgrade.drill.legacy-level-2
+    text: Crystal Bore
+  - key: content.upgrade.drill.legacy-level-3
+    text: Plasma Bore
+  - key: content.upgrade.drill.legacy-level-4
+    text: Quantum Bore
+  - key: content.upgrade.drill.legacy-level-5
+    text: Singularity Bore
+  - key: content.upgrade.drill.legacy-level-6
+    text: Void Bore
+  - key: content.research.survey_basics.name
+    text: Survey Basics
+  - key: content.research.survey_basics.description
+    text: Calibrate the ship's sensors and raise a radar tower.
+  - key: content.research.smelting.name
+    text: Smelting
+  - key: content.research.smelting.description
+    text: Hot enough furnaces turn ore into plate and sand into glass.
+  - key: content.research.fabrication.name
+    text: Fabrication
+  - key: content.research.fabrication.description
+    text: Wire drawing and bench assembly.
+  - key: content.research.deep_drilling.name
+    text: Deep Drilling
+  - key: content.research.deep_drilling.description
+    text: Bores deep enough to reach ore under the crust.
+  - key: content.research.bio_cultivation.name
+    text: Bio-Cultivation
+  - key: content.research.bio_cultivation.description
+    text: Tended domes harvest the fast growth of green worlds.
+  - key: content.research.jump_drive_1.name
+    text: Jump Drive I
+  - key: content.research.jump_drive_1.description
+    text: 'The first jump coils: leave the home system.'
+  - key: content.research.steelmaking.name
+    text: Steelmaking
+  - key: content.research.steelmaking.description
+    text: Burn timber into carbon and fold it into iron.
+  - key: content.research.composites.name
+    text: Composites
+  - key: content.research.composites.description
+    text: Press plant fibre and resin into a poison-proof skin.
+  - key: content.research.circuitry.name
+    text: Circuitry
+  - key: content.research.circuitry.description
+    text: Etched copper traces on a glass-fibre sheet.
+  - key: content.research.titanium_working.name
+    text: Titanium Working
+  - key: content.research.titanium_working.description
+    text: A furnace hot enough for the stubborn grey ore.
+  - key: content.research.gas_extraction.name
+    text: Gas Extraction
+  - key: content.research.gas_extraction.description
+    text: Pumps and turbines for the storm bands.
+  - key: content.research.geo_survey.name
+    text: Geo-Survey
+  - key: content.research.geo_survey.description
+    text: Sonar and trowel work for buried deposits.
+  - key: content.research.salvage_ops.name
+    text: Salvage Operations
+  - key: content.research.salvage_ops.description
+    text: A yard to sort the wreckage of the galaxy.
+  - key: content.research.fuel_logistics.name
+    text: Fuel Logistics
+  - key: content.research.fuel_logistics.description
+    text: Dense racks for fuel cells.
+  - key: content.research.cargo_logistics.name
+    text: Cargo Logistics
+  - key: content.research.cargo_logistics.description
+    text: One pool for every warehouse on a world.
+  - key: content.research.ballistics.name
+    text: Ballistics
+  - key: content.research.ballistics.description
+    text: Focused beams for long range.
+  - key: content.research.shield_tech.name
+    text: Shield Tech
+  - key: content.research.shield_tech.description
+    text: Fields that blunt incoming fire.
+  - key: content.research.hazmat_toxic.name
+    text: 'Hazmat: Toxic'
+  - key: content.research.hazmat_toxic.description
+    text: Seal the hull against toxic air.
+  - key: content.research.jump_drive_2.name
+    text: Jump Drive II
+  - key: content.research.jump_drive_2.description
+    text: 'More stable coils: a longer first leap.'
+  - key: content.research.field_engineering.name
+    text: Field Engineering
+  - key: content.research.field_engineering.description
+    text: A second crew works your sites.
+  - key: content.research.long_range_scanning_1.name
+    text: Long-Range Scanning I
+  - key: content.research.long_range_scanning_1.description
+    text: Wider survey sweeps.
+  - key: content.research.toolsmithing_1.name
+    text: Toolsmithing I
+  - key: content.research.toolsmithing_1.description
+    text: Steel heads on every handle.
+  - key: content.research.chemistry.name
+    text: Chemistry
+  - key: content.research.chemistry.description
+    text: Reactors for resins, cryogels and charged gas.
+  - key: content.research.thermal_metallurgy.name
+    text: Thermal Metallurgy
+  - key: content.research.thermal_metallurgy.description
+    text: Alloys that glow without failing.
+  - key: content.research.cryo_chemistry.name
+    text: Cryo-Chemistry
+  - key: content.research.cryo_chemistry.description
+    text: Foam-cored laminates for deep cold.
+  - key: content.research.robotics.name
+    text: Robotics
+  - key: content.research.robotics.description
+    text: Sealed motors with precision gearheads.
+  - key: content.research.optics.name
+    text: Optics
+  - key: content.research.optics.description
+    text: Lenses ground flawless enough for lasers.
+  - key: content.research.hazmat_heat.name
+    text: 'Hazmat: Heat'
+  - key: content.research.hazmat_heat.description
+    text: Plating for worlds where rock flows.
+  - key: content.research.hazmat_cold.name
+    text: 'Hazmat: Cold'
+  - key: content.research.hazmat_cold.description
+    text: Plating for worlds where air freezes.
+  - key: content.research.missile_tech.name
+    text: Missile Tech
+  - key: content.research.missile_tech.description
+    text: Splash missiles for the thick of a wave.
+  - key: content.research.tesla_tech.name
+    text: Tesla Tech
+  - key: content.research.tesla_tech.description
+    text: Chain lightning between aliens.
+  - key: content.research.field_repair.name
+    text: Field Repair
+  - key: content.research.field_repair.description
+    text: Repair drones for the reactor.
+  - key: content.research.colony_charter.name
+    text: Colony Charter
+  - key: content.research.colony_charter.description
+    text: A hub that runs the settlement.
+  - key: content.research.jump_drive_3.name
+    text: Jump Drive III
+  - key: content.research.jump_drive_3.description
+    text: Folded lattices for deep hops.
+  - key: content.research.nav_autopilot.name
+    text: Autopilot Navigation
+  - key: content.research.nav_autopilot.description
+    text: Skip the flight at a fuel premium.
+  - key: content.research.toolsmithing_2.name
+    text: Toolsmithing II
+  - key: content.research.toolsmithing_2.description
+    text: Crystal-edged tools.
+  - key: content.research.long_range_scanning_2.name
+    text: Long-Range Scanning II
+  - key: content.research.long_range_scanning_2.description
+    text: Parallax surveys of whole sectors.
+  - key: content.research.plasma_physics.name
+    text: Plasma Physics
+  - key: content.research.plasma_physics.description
+    text: Bottle a star in a flask.
+  - key: content.research.radiation_shielding.name
+    text: Radiation Shielding
+  - key: content.research.radiation_shielding.description
+    text: Layered alloys that drink hard radiation.
+  - key: content.research.quantum_computing.name
+    text: Quantum Computing
+  - key: content.research.quantum_computing.description
+    text: Machines that think in more than one state.
+  - key: content.research.hazmat_rad.name
+    text: 'Hazmat: Radiation'
+  - key: content.research.hazmat_rad.description
+    text: Plating for worlds that glow in the dark.
+  - key: content.research.orbital_logistics.name
+    text: Orbital Logistics
+  - key: content.research.orbital_logistics.description
+    text: Withdraw from any warehouse the beam can see.
+  - key: content.research.automation.name
+    text: Automation
+  - key: content.research.automation.description
+    text: Machines that gather bulk goods while you sleep.
+  - key: content.research.hangar_ops.name
+    text: Hangar Operations
+  - key: content.research.hangar_ops.description
+    text: Ground crews that shave fuel off every launch.
+  - key: content.research.toolsmithing_3.name
+    text: Toolsmithing III
+  - key: content.research.toolsmithing_3.description
+    text: Plasma-edged tools.
+  - key: content.research.jump_drive_4.name
+    text: Jump Drive IV
+  - key: content.research.jump_drive_4.description
+    text: 'Anchors in the rift: long, safe jumps.'
+  - key: content.research.compression_1.name
+    text: Cargo Compression I
+  - key: content.research.compression_1.description
+    text: Vacuum-packed stacks.
+  - key: content.research.terraforming.name
+    text: Terraforming
+  - key: content.research.terraforming.description
+    text: Reshape a world's climate in five stages.
+  - key: content.research.long_range_scanning_3.name
+    text: Long-Range Scanning III
+  - key: content.research.long_range_scanning_3.description
+    text: A survey net that spans galaxies.
+  - key: content.research.compression_2.name
+    text: Cargo Compression II
+  - key: content.research.compression_2.description
+    text: Dense racking.
+  - key: content.research.void_forging.name
+    text: Void Forging
+  - key: content.research.void_forging.description
+    text: Grow metal around a seed of nothing.
+  - key: content.research.warp_theory.name
+    text: Warp Theory
+  - key: content.research.warp_theory.description
+    text: Fold space inside a coil.
+  - key: content.research.antimatter_synthesis.name
+    text: Antimatter Synthesis
+  - key: content.research.antimatter_synthesis.description
+    text: 'Mirror-bottled energy: sixty-four cells in a pod.'
+  - key: content.research.hazmat_void.name
+    text: 'Hazmat: Void'
+  - key: content.research.hazmat_void.description
+    text: Plating for the places between places.
+  - key: content.research.warp_gate_engineering.name
+    text: Warp Gate Engineering
+  - key: content.research.warp_gate_engineering.description
+    text: A ring in orbit that makes distance negotiable.
+  - key: content.research.jump_drive_5.name
+    text: Jump Drive V
+  - key: content.research.jump_drive_5.description
+    text: Tunnel drives and gate harmonics.
+  - key: content.research.toolsmithing_4.name
+    text: Toolsmithing IV
+  - key: content.research.toolsmithing_4.description
+    text: Singularity-edged tools.
+  - key: content.research.stellar_engineering.name
+    text: Stellar Engineering
+  - key: content.research.stellar_engineering.description
+    text: Harness a star.
+  - key: content.research.compression_3.name
+    text: Cargo Compression III
+  - key: content.research.compression_3.description
+    text: 'Quantum compression: a hold inside a speck.'
+  - key: content.research.ascension_protocol.name
+    text: Ascension Protocol
+  - key: content.research.ascension_protocol.description
+    text: Begin again in a new seeded universe, keeping what you learned.
+  - key: content.tool.axe.name
+    text: Axe
+  - key: content.tool.axe.tier-1
+    text: Bare Hands
+  - key: content.tool.axe.tier-2
+    text: Stone Axe
+  - key: content.tool.axe.tier-3
+    text: Iron Axe
+  - key: content.tool.axe.tier-4
+    text: Steel Axe
+  - key: content.tool.axe.tier-5
+    text: Crystal Axe
+  - key: content.tool.axe.tier-6
+    text: Plasma Chainsaw
+  - key: content.tool.axe.tier-7
+    text: Singularity Saw
+  - key: content.tool.pick.name
+    text: Pickaxe
+  - key: content.tool.pick.tier-1
+    text: Bare Hands
+  - key: content.tool.pick.tier-2
+    text: Stone Pick
+  - key: content.tool.pick.tier-3
+    text: Iron Pick
+  - key: content.tool.pick.tier-4
+    text: Steel Pick
+  - key: content.tool.pick.tier-5
+    text: Pneumatic Pick
+  - key: content.tool.pick.tier-6
+    text: Jackhammer
+  - key: content.tool.pick.tier-7
+    text: Plasma Jackhammer
+  - key: content.tool.claw.name
+    text: Salvage Claw
+  - key: content.tool.claw.tier-1
+    text: Grabber
+  - key: content.tool.claw.tier-2
+    text: Magnet Claw
+  - key: content.tool.claw.tier-3
+    text: Servo Claw
+  - key: content.tool.claw.tier-4
+    text: Titan Claw
+  - key: content.tool.claw.tier-5
+    text: Plasma Claw
+  - key: content.tool.claw.tier-6
+    text: Gravity Claw
+  - key: content.tool.claw.tier-7
+    text: Singularity Claw
+  - key: content.tool.drill.name
+    text: Drill
+  - key: content.tool.drill.tier-1
+    text: Hand Auger
+  - key: content.tool.drill.tier-2
+    text: Pneumatic Drill
+  - key: content.tool.drill.tier-3
+    text: Crystal Bore
+  - key: content.tool.drill.tier-4
+    text: Plasma Bore
+  - key: content.tool.drill.tier-5
+    text: Quantum Bore
+  - key: content.tool.drill.tier-6
+    text: Singularity Bore
+  - key: content.tool.drill.tier-7
+    text: Void Bore
+  - key: content.tool.siphon.name
+    text: Siphon
+  - key: content.tool.siphon.tier-1
+    text: Hand Pump
+  - key: content.tool.siphon.tier-2
+    text: Vacuum Pump
+  - key: content.tool.siphon.tier-3
+    text: Cryo Siphon
+  - key: content.tool.siphon.tier-4
+    text: Turbine Siphon
+  - key: content.tool.siphon.tier-5
+    text: Plasma Siphon
+  - key: content.tool.siphon.tier-6
+    text: Vortex Siphon
+  - key: content.tool.siphon.tier-7
+    text: Singularity Siphon
+  - key: content.tool.scanner.name
+    text: Excavator
+  - key: content.tool.scanner.tier-1
+    text: Trowel
+  - key: content.tool.scanner.tier-2
+    text: Sonar Scanner
+  - key: content.tool.scanner.tier-3
+    text: Resonance Probe
+  - key: content.tool.scanner.tier-4
+    text: Seismic Excavator
+  - key: content.tool.scanner.tier-5
+    text: Plasma Excavator
+  - key: content.tool.scanner.tier-6
+    text: Quantum Excavator
+  - key: content.tool.scanner.tier-7
+    text: Void Excavator
+  - key: content.obstacle.boulder.name
+    text: Boulder
+  - key: content.obstacle.boulder.description
+    text: A weathered lump of rock sits where a pad should be. Break it up with picks
+      and haul the pieces away.
+  - key: content.obstacle.dead_tree.name
+    text: Dead Tree
+  - key: content.obstacle.dead_tree.description
+    text: The trunk is long dead and the roots still grip the pad. Fell it, split
+      it, and the wood is yours.
+  - key: content.obstacle.wreckage.name
+    text: Wreckage
+  - key: content.obstacle.wreckage.description
+    text: Someone else's landing ended here. Cut the hull apart for scrap before
+      it blocks anything else.
+  - key: content.obstacle.fungal_growth.name
+    text: Fungal Growth
+  - key: content.obstacle.fungal_growth.description
+    text: A shelf of spore-heavy fungus has taken the pad. Burn it back and collect
+      what the rot left behind.
+  - key: content.obstacle.ice_spire.name
+    text: Ice Spire
+  - key: content.obstacle.ice_spire.description
+    text: A spear of old ice has grown through the pad. Melt it carefully; the water
+      is worth keeping.
+  - key: content.obstacle.crystal_cluster.name
+    text: Crystal Cluster
+  - key: content.obstacle.crystal_cluster.description
+    text: Raw crystal has burst through the ground. Cut it free before the whole
+      pad starts to hum.
+  - key: content.obstacle.magma_crust.name
+    text: Magma Crust
+  - key: content.obstacle.magma_crust.description
+    text: A plate of cooled magma has fused over the pad, still ticking as it shrinks.
+      Break the crust and clear the slag.
+  - key: content.obstacle.void_scar.name
+    text: Void Scar
+  - key: content.obstacle.void_scar.description
+    text: Space itself is torn here. Seal the scar with shielding alloy before it
+      spreads under the next pad.
+  - key: content.planet.sylva.description
+    text: A gentle forest world. Perfect for a first axe swing.
+  - key: content.planet.sylva.spot-0
+    text: Ironbark Grove
+  - key: content.planet.sylva.spot-1
+    text: Mossy Outcrop
+  - key: content.planet.ferrum.description
+    text: Rust-red plains laced with ore veins. Few trees.
+  - key: content.planet.ferrum.spot-0
+    text: Scrub Trees
+  - key: content.planet.ferrum.spot-1
+    text: Quarry
+  - key: content.planet.ferrum.spot-2
+    text: Ore Seam
+  - key: content.planet.glacia.description
+    text: Frozen world with cryo-vents full of fuel.
+  - key: content.planet.glacia.spot-0
+    text: Ice Crystals
+  - key: content.planet.cinder.description
+    text: Volcanic and hostile. Metal-rich, crystal-poor.
+  - key: content.planet.cinder.spot-0
+    text: Magma Vent
+  - key: content.planet.cinder.spot-1
+    text: Slag Field
+  - key: content.planet.cinder.spot-2
+    text: Deep Bore
+  - key: content.planet.arbor.description
+    text: A planet-sized jungle. Titanic trees, dense crystal roots.
+  - key: content.planet.arbor.spot-0
+    text: Titan Grove
+  - key: content.planet.arbor.spot-1
+    text: Root Crystals
+  - key: content.planet.nyx.description
+    text: A dark hive world. Dangerous, valuable.
+  - key: content.planet.nyx.spot-0
+    text: Crystal Heart
+  - key: content.planet.nyx.spot-1
+    text: Hive Breach
+  - key: content.planet.nyx.spot-2
+    text: Void Ore
+  - key: content.planet.aurum.description
+    text: Endless golden dunes hiding dense mineral beds.
+  - key: content.planet.aurum.spot-0
+    text: Dune Quarry
+  - key: content.planet.aurum.spot-1
+    text: Gilded Seam
+  - key: content.planet.tide.description
+    text: An ocean world of floating kelp forests and fuel-rich brine.
+  - key: content.planet.tide.spot-0
+    text: Kelp Forest
+  - key: content.planet.zephyr.description
+    text: A pastel gas giant with floating platforms in the storm bands.
+  - key: content.planet.zephyr.spot-0
+    text: Cloud Crystals
+  - key: content.planet.pyre.description
+    text: A molten shell cracked open by rivers of lava.
+  - key: content.planet.pyre.spot-0
+    text: Lava Tap
+  - key: content.planet.pyre.spot-1
+    text: Cinder Vein
+  - key: content.planet.halcyon.description
+    text: A serene teal ice world, still and deceptively rich.
+  - key: content.planet.halcyon.spot-0
+    text: Frost Geodes
+  - key: content.planet.mire.description
+    text: A rotting swamp world. Spore storms and enormous fungal trees.
+  - key: content.planet.mire.spot-0
+    text: Fungal Giants
+  - key: content.planet.mire.spot-1
+    text: Husk Nest
+  - key: content.planet.obsidian.description
+    text: Black glass plains threaded with violet crystal.
+  - key: content.planet.obsidian.spot-0
+    text: Glass Shelf
+  - key: content.planet.obsidian.spot-1
+    text: Violet Spires
+  - key: content.planet.vesper.description
+    text: Twilight world of endless dusk and warring hives.
+  - key: content.planet.vesper.spot-0
+    text: Dusk Ore
+  - key: content.planet.vesper.spot-1
+    text: Hive Heart
+  - key: content.planet.prism.description
+    text: A crystalline world that fractures light into rainbows. Rare.
+  - key: content.planet.prism.spot-0
+    text: Prism Fields
+  - key: content.planet.kaos.description
+    text: A shattered world orbiting nothing. The end of the map.
+  - key: content.planet.kaos.spot-0
+    text: Null Seam
+  - key: content.planet.kaos.spot-1
+    text: Singular Ore
+  - key: content.planet.tundra.description
+    text: A windswept frozen steppe on the outer ring.
+  - key: content.planet.tundra.spot-0
+    text: Frozen Pines
+  - key: content.planet.tundra.spot-1
+    text: Permafrost Pit
+  - key: content.planet.coral.description
+    text: A living reef world with bioluminescent forests.
+  - key: content.planet.coral.spot-0
+    text: Glow Reef
+  - key: content.planet.coral.spot-1
+    text: Pearl Beds
+  - key: content.planet.veridian.description
+    text: Lush emerald moon dense with ancient mossy canopy.
+  - key: content.planet.veridian.spot-0
+    text: Ancient Canopy
+  - key: content.planet.veridian.spot-1
+    text: River Bed
+  - key: content.planet.calcite.description
+    text: Chalk-white world with deep stone quarries and iron deposits.
+  - key: content.planet.calcite.spot-0
+    text: Hematite Ridge
+  - key: content.planet.calcite.spot-1
+    text: Basalt Quarry
+  - key: content.planet.sulfur.description
+    text: Yellow brimstone plains erupting with pressurized vapor.
+  - key: content.planet.sulfur.spot-0
+    text: Molten Lode
+  - key: content.planet.magma.description
+    text: Churning rivers of liquid rock and rich titanium deposits.
+  - key: content.planet.magma.spot-0
+    text: Molten Lode
+  - key: content.planet.magma.spot-1
+    text: Caldera Nexus
+  - key: content.planet.lotus.description
+    text: Oceanic world of giant bioluminescent floating flora.
+  - key: content.planet.lotus.spot-0
+    text: Ancient Canopy
+  - key: content.planet.lotus.spot-1
+    text: River Bed
+  - key: content.planet.spore.description
+    text: Subterranean fungal hive where massive caps pierce the crust.
+  - key: content.planet.spore.spot-0
+    text: Titan Fungi
+  - key: content.planet.spore.spot-1
+    text: Spore Hive
+  - key: content.planet.eclipse.description
+    text: A dark world locked in permanent transit. Violet lightning storms.
+  - key: content.planet.eclipse.spot-0
+    text: Black Glass Shelf
+  - key: content.planet.eclipse.spot-1
+    text: Violet Vein
+  - key: content.planet.eclipse.spot-2
+    text: Void Rift
+  - key: content.planet.phantom.description
+    text: Eerie gravitational void world threaded with alien wreckage.
+  - key: content.planet.phantom.spot-0
+    text: Black Glass Shelf
+  - key: content.planet.phantom.spot-1
+    text: Violet Vein
+  - key: content.planet.phantom.spot-2
+    text: Void Rift
+  - key: content.planet.borealis.description
+    text: Atmosphere glows with shifting auroras above frozen seas.
+  - key: content.planet.borealis.spot-0
+    text: Frost Geodes
+  - key: content.planet.borealis.spot-1
+    text: Frozen Timber
+  - key: content.planet.cryo.description
+    text: Sub-zero glacial rift where geothermal vents spew concentrated fuel.
+  - key: content.planet.cryo.spot-0
+    text: Frost Geodes
+  - key: content.planet.aether.description
+    text: Floating crystalline fragments trapped in an ion field.
+  - key: content.planet.aether.spot-0
+    text: Prismatic Spire
+  - key: content.planet.aether.spot-1
+    text: Quartz Seam
+  - key: content.planet.genesis.description
+    text: A primordial anomaly pulsating with raw energy. The deepest world.
+  - key: content.planet.genesis.spot-0
+    text: Fracture Core
+  - key: content.planet.genesis.spot-1
+    text: Null Bore
+  - key: content.wave-modifier.0.name
+    text: Swift
+  - key: content.wave-modifier.0.description
+    text: Faster approach. Victory rewards +10%.
+  - key: content.wave-modifier.1.name
+    text: Fortified
+  - key: content.wave-modifier.1.description
+    text: Tougher aliens. Victory rewards +10%.
+  - key: content.wave-modifier.2.name
+    text: Overcharged
+  - key: content.wave-modifier.2.description
+    text: Harder reactor impacts. Victory rewards +10%.
+  - key: content.objective.first_structure.title
+    text: Make landfall yours
+  - key: content.objective.first_structure.description
+    text: Complete your first structure. Construction must finish before it counts.
+  - key: content.objective.first_harvest.title
+    text: First haul
+  - key: content.objective.first_harvest.description
+    text: Complete and collect a harvest run. Abandoned runs do not count.
+  - key: content.objective.first_warehouse.title
+    text: Room to grow
+  - key: content.objective.first_warehouse.description
+    text: Complete a Warehouse to store resources beyond your backpack.
+  - key: content.objective.first_fuel.title
+    text: Fuel the frontier
+  - key: content.objective.first_fuel.description
+    text: Craft fuel at a processing station. Found or starting fuel does not count.
+  - key: content.objective.first_hop.title
+    text: Leave the cradle
+  - key: content.objective.first_hop.description
+    text: Land on a second distinct world.
+  - key: content.objective.first_wave.title
+    text: Hold your ground
+  - key: content.objective.first_wave.description
+    text: Call and clear an alien wave on your planet.
+  - key: content.objective.research_lab.title
+    text: A place for discovery
+  - key: content.objective.research_lab.description
+    text: Complete a Research Lab to unlock advanced technology.
+  - key: content.objective.jump_range_1.title
+    text: A longer reach
+  - key: content.objective.jump_range_1.description
+    text: Purchase the first Jump Range upgrade. Temporary debug settings do not
+      count.
+  - key: content.objective.first_steel.title
+    text: Stronger foundations
+  - key: content.objective.first_steel.description
+    text: Craft steel at a Foundry.
+  - key: content.objective.first_hazard_plating.title
+    text: Beyond safe skies
+  - key: content.objective.first_hazard_plating.description
+    text: Purchase any hazard plating to prepare for hostile worlds.
+  - key: content.objective.mega_first_stage.title
+    text: Think on a planetary scale
+  - key: content.objective.mega_first_stage.description
+    text: Complete the first stage of a megaproject.
+  - key: content.objective.mega_stage_3.title
+    text: Megaproject mastery
+  - key: content.objective.mega_stage_3.description
+    text: Complete stage three of any one megaproject.
+  - key: content.objective.era_foothold.title
+    text: Foothold
+  - key: content.objective.era_foothold.description
+    text: Reach the Foothold era by landing on a second world.
+  - key: content.objective.era_settlement.title
+    text: Settlement
+  - key: content.objective.era_settlement.description
+    text: Complete a Research Lab and purchase Jump Range level one.
+  - key: content.objective.era_industry.title
+    text: Industry
+  - key: content.objective.era_industry.description
+    text: Purchase hazard plating and enter the Industry era.
+  - key: content.objective.era_interstellar.title
+    text: Interstellar
+  - key: content.objective.era_interstellar.description
+    text: Purchase Rad-Shield Plating and craft an Antimatter Pod.
+  - key: content.objective.era_ascension.title
+    text: Ready for the unknown
+  - key: content.objective.era_ascension.description
+    text: Reach the Ascension era by completing stage three of a megaproject.
+  - key: content.objective.reach_tier_1.title
+    text: Tier one explorer
+  - key: content.objective.reach_tier_1.description
+    text: Land on a tier one or deeper world.
+  - key: content.objective.reach_tier_2.title
+    text: Tier two explorer
+  - key: content.objective.reach_tier_2.description
+    text: Land on a tier two or deeper world.
+  - key: content.objective.reach_tier_3.title
+    text: Tier three explorer
+  - key: content.objective.reach_tier_3.description
+    text: Land on a tier three or deeper world.
+  - key: content.objective.reach_tier_4.title
+    text: Tier four explorer
+  - key: content.objective.reach_tier_4.description
+    text: Land on a tier four or deeper world.
+  - key: content.objective.reach_tier_5.title
+    text: Tier five explorer
+  - key: content.objective.reach_tier_5.description
+    text: Land on a tier five or deeper world.
+  - key: content.objective.reach_tier_6.title
+    text: Tier six explorer
+  - key: content.objective.reach_tier_6.description
+    text: Land on a tier six or deeper world.
+  - key: content.objective.reach_tier_7.title
+    text: Tier seven explorer
+  - key: content.objective.reach_tier_7.description
+    text: Land on a tier seven or deeper world.
+  - key: content.objective.reach_tier_8.title
+    text: Tier eight explorer
+  - key: content.objective.reach_tier_8.description
+    text: Land on a tier eight or deeper world.
+  - key: content.objective.reach_tier_9.title
+    text: Deep frontier explorer
+  - key: content.objective.reach_tier_9.description
+    text: Land on a tier nine or deeper world.
+  - key: content.label.Alloy.name
+    text: Alloy
+  - key: content.label.Component.name
+    text: Component
+  - key: content.label.Defense.name
+    text: Defense
+  - key: content.label.Energy.name
+    text: Energy
+  - key: content.label.Harvest.name
+    text: Harvest
+  - key: content.label.Industry.name
+    text: Industry
+  - key: content.label.Logistics.name
+    text: Logistics
+  - key: content.label.Megaprojects.name
+    text: Megaprojects
+  - key: content.label.Navigation.name
+    text: Navigation
+  - key: content.label.Processing.name
+    text: Processing
+  - key: content.label.antimatter_synthesis.name
+    text: Antimatter Synthesis
+  - key: content.label.automation.name
+    text: Automation
+  - key: content.label.ballistics.name
+    text: Ballistics
+  - key: content.label.bio_cultivation.name
+    text: Bio Cultivation
+  - key: content.label.cargo_logistics.name
+    text: Cargo Logistics
+  - key: content.label.chem_reactor.name
+    text: Chem Reactor
+  - key: content.label.chemistry.name
+    text: Chemistry
+  - key: content.label.circuitry.name
+    text: Circuitry
+  - key: content.label.colony_charter.name
+    text: Colony Charter
+  - key: content.label.composites.name
+    text: Composites
+  - key: content.label.compression_1.name
+    text: Compression 1
+  - key: content.label.compression_2.name
+    text: Compression 2
+  - key: content.label.cryo_chemistry.name
+    text: Cryo Chemistry
+  - key: content.label.deep_drilling.name
+    text: Deep Drilling
+  - key: content.label.fabrication.name
+    text: Fabrication
+  - key: content.label.fabricator.name
+    text: Fabricator
+  - key: content.label.feature:ascension.name
+    text: Feature:ascension
+  - key: content.label.feature:autopilot.name
+    text: Feature:autopilot
+  - key: content.label.feature:builder_2.name
+    text: Feature:builder 2
+  - key: content.label.feature:builder_3.name
+    text: Feature:builder 3
+  - key: content.label.field_engineering.name
+    text: Field Engineering
+  - key: content.label.foundry.name
+    text: Foundry
+  - key: content.label.gas_extraction.name
+    text: Gas Extraction
+  - key: content.label.geo_survey.name
+    text: Geo Survey
+  - key: content.label.hazmat_rad.name
+    text: Hazmat Rad
+  - key: content.label.hazmat_toxic.name
+    text: Hazmat Toxic
+  - key: content.label.jump_drive_1.name
+    text: Jump Drive 1
+  - key: content.label.jump_drive_2.name
+    text: Jump Drive 2
+  - key: content.label.jump_drive_3.name
+    text: Jump Drive 3
+  - key: content.label.jump_drive_4.name
+    text: Jump Drive 4
+  - key: content.label.long_range_scanning_1.name
+    text: Long Range Scanning 1
+  - key: content.label.long_range_scanning_2.name
+    text: Long Range Scanning 2
+  - key: content.label.optics.name
+    text: Optics
+  - key: content.label.orbital_logistics.name
+    text: Orbital Logistics
+  - key: content.label.plasma_physics.name
+    text: Plasma Physics
+  - key: content.label.quantum_computing.name
+    text: Quantum Computing
+  - key: content.label.quantum_lab.name
+    text: Quantum Lab
+  - key: content.label.radiation_shielding.name
+    text: Radiation Shielding
+  - key: content.label.recipe:assemble_servo_motor.name
+    text: Recipe:assemble Servo Motor
+  - key: content.label.recipe:charge_plasma_cell.name
+    text: Recipe:charge Plasma Cell
+  - key: content.label.recipe:crystal_cell.name
+    text: Recipe:crystal Cell
+  - key: content.label.recipe:draw_copper_wire.name
+    text: Recipe:draw Copper Wire
+  - key: content.label.recipe:etch_circuit_board.name
+    text: Recipe:etch Circuit Board
+  - key: content.label.recipe:etch_quantum_chip.name
+    text: Recipe:etch Quantum Chip
+  - key: content.label.recipe:forge_rad_shield.name
+    text: Recipe:forge Rad Shield
+  - key: content.label.recipe:forge_thermal_alloy.name
+    text: Recipe:forge Thermal Alloy
+  - key: content.label.recipe:grind_optic_lens.name
+    text: Recipe:grind Optic Lens
+  - key: content.label.recipe:grow_void_alloy.name
+    text: Recipe:grow Void Alloy
+  - key: content.label.recipe:mix_cryo_composite.name
+    text: Recipe:mix Cryo Composite
+  - key: content.label.recipe:press_biocomposite.name
+    text: Recipe:press Biocomposite
+  - key: content.label.recipe:smelt_glass.name
+    text: Recipe:smelt Glass
+  - key: content.label.recipe:smelt_iron_plate.name
+    text: Recipe:smelt Iron Plate
+  - key: content.label.recipe:smelt_steel.name
+    text: Recipe:smelt Steel
+  - key: content.label.recipe:smelt_titanium_plate.name
+    text: Recipe:smelt Titanium Plate
+  - key: content.label.recipe:synthesize_antimatter.name
+    text: Recipe:synthesize Antimatter
+  - key: content.label.recipe:wind_warp_coil.name
+    text: Recipe:wind Warp Coil
+  - key: content.label.refinery.name
+    text: Refinery
+  - key: content.label.robotics.name
+    text: Robotics
+  - key: content.label.smelting.name
+    text: Smelting
+  - key: content.label.steelmaking.name
+    text: Steelmaking
+  - key: content.label.stellar_engineering.name
+    text: Stellar Engineering
+  - key: content.label.structure:auto_harvester.name
+    text: Structure:auto Harvester
+  - key: content.label.structure:biodome.name
+    text: Structure:biodome
+  - key: content.label.structure:cargo_depot.name
+    text: Structure:cargo Depot
+  - key: content.label.structure:chem_reactor.name
+    text: Structure:chem Reactor
+  - key: content.label.structure:colony_hub.name
+    text: Structure:colony Hub
+  - key: content.label.structure:driller.name
+    text: Structure:driller
+  - key: content.label.structure:dyson_collector.name
+    text: Structure:dyson Collector
+  - key: content.label.structure:excavator.name
+    text: Structure:excavator
+  - key: content.label.structure:fabricator.name
+    text: Structure:fabricator
+  - key: content.label.structure:foundry.name
+    text: Structure:foundry
+  - key: content.label.structure:fuel_depot.name
+    text: Structure:fuel Depot
+  - key: content.label.structure:hangar.name
+    text: Structure:hangar
+  - key: content.label.structure:laser.name
+    text: Structure:laser
+  - key: content.label.structure:missile_silo.name
+    text: Structure:missile Silo
+  - key: content.label.structure:orbital_relay.name
+    text: Structure:orbital Relay
+  - key: content.label.structure:quantum_lab.name
+    text: Structure:quantum Lab
+  - key: content.label.structure:radar_tower.name
+    text: Structure:radar Tower
+  - key: content.label.structure:repair_bay.name
+    text: Structure:repair Bay
+  - key: content.label.structure:salvage_yard.name
+    text: Structure:salvage Yard
+  - key: content.label.structure:shield_pylon.name
+    text: Structure:shield Pylon
+  - key: content.label.structure:siphon_rig.name
+    text: Structure:siphon Rig
+  - key: content.label.structure:terraformer.name
+    text: Structure:terraformer
+  - key: content.label.structure:tesla_coil.name
+    text: Structure:tesla Coil
+  - key: content.label.structure:warp_gate.name
+    text: Structure:warp Gate
+  - key: content.label.survey_basics.name
+    text: Survey Basics
+  - key: content.label.terraforming.name
+    text: Terraforming
+  - key: content.label.thermal_metallurgy.name
+    text: Thermal Metallurgy
+  - key: content.label.titanium_working.name
+    text: Titanium Working
+  - key: content.label.tool:*:4.name
+    text: Tool:*:4
+  - key: content.label.tool:*:5.name
+    text: Tool:*:5
+  - key: content.label.tool:*:6.name
+    text: Tool:*:6
+  - key: content.label.tool:*:7.name
+    text: Tool:*:7
+  - key: content.label.tool:drill:2.name
+    text: Tool:drill:2
+  - key: content.label.tool:scanner:2.name
+    text: Tool:scanner:2
+  - key: content.label.tool:siphon:2.name
+    text: Tool:siphon:2
+  - key: content.label.toolsmithing_1.name
+    text: Toolsmithing 1
+  - key: content.label.toolsmithing_2.name
+    text: Toolsmithing 2
+  - key: content.label.toolsmithing_3.name
+    text: Toolsmithing 3
+  - key: content.label.toolsmithing_4.name
+    text: Toolsmithing 4
+  - key: content.label.upgrade:compression:1.name
+    text: Upgrade:compression:1
+  - key: content.label.upgrade:compression:2.name
+    text: Upgrade:compression:2
+  - key: content.label.upgrade:compression:3.name
+    text: Upgrade:compression:3
+  - key: content.label.upgrade:compression:4.name
+    text: Upgrade:compression:4
+  - key: content.label.upgrade:hull_cold:1.name
+    text: Upgrade:hull Cold:1
+  - key: content.label.upgrade:hull_heat:1.name
+    text: Upgrade:hull Heat:1
+  - key: content.label.upgrade:hull_rad:1.name
+    text: Upgrade:hull Rad:1
+  - key: content.label.upgrade:hull_toxic:1.name
+    text: Upgrade:hull Toxic:1
+  - key: content.label.upgrade:hull_void:1.name
+    text: Upgrade:hull Void:1
+  - key: content.label.upgrade:jump:1.name
+    text: Upgrade:jump:1
+  - key: content.label.upgrade:jump:10.name
+    text: Upgrade:jump:10
+  - key: content.label.upgrade:jump:2.name
+    text: Upgrade:jump:2
+  - key: content.label.upgrade:jump:3.name
+    text: Upgrade:jump:3
+  - key: content.label.upgrade:jump:4.name
+    text: Upgrade:jump:4
+  - key: content.label.upgrade:jump:5.name
+    text: Upgrade:jump:5
+  - key: content.label.upgrade:jump:6.name
+    text: Upgrade:jump:6
+  - key: content.label.upgrade:jump:7.name
+    text: Upgrade:jump:7
+  - key: content.label.upgrade:jump:8.name
+    text: Upgrade:jump:8
+  - key: content.label.upgrade:jump:9.name
+    text: Upgrade:jump:9
+  - key: content.label.upgrade:scanner_range:1.name
+    text: Upgrade:scanner Range:1
+  - key: content.label.upgrade:scanner_range:2.name
+    text: Upgrade:scanner Range:2
+  - key: content.label.upgrade:scanner_range:3.name
+    text: Upgrade:scanner Range:3
+  - key: content.label.upgrade:scanner_range:4.name
+    text: Upgrade:scanner Range:4
+  - key: content.label.upgrade:scanner_range:5.name
+    text: Upgrade:scanner Range:5
+  - key: content.label.upgrade:scanner_range:6.name
+    text: Upgrade:scanner Range:6
+  - key: content.label.upgrade:scanner_range:7.name
+    text: Upgrade:scanner Range:7
+  - key: content.label.upgrade:scanner_range:8.name
+    text: Upgrade:scanner Range:8
+  - key: content.label.void_forging.name
+    text: Void Forging
+  - key: content.label.warp_gate_engineering.name
+    text: Warp Gate Engineering
+  - key: content.label.warp_theory.name
+    text: Warp Theory

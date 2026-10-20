@@ -54,7 +54,7 @@ namespace Frontier
             if (gs.db.resources == null) return resources;
             foreach (var resource in gs.db.resources)
                 if (resource != null && resource.category == category) resources.Add(resource);
-            resources.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.Ordinal));
+            resources.Sort((a, b) => string.Compare(a.LocalizedName, b.LocalizedName, StringComparison.Ordinal));
             return resources;
         }
 
@@ -92,7 +92,7 @@ namespace Frontier
             resourceLabel.style.marginTop = UiKit.Space.S12;
             body.Add(resourceLabel);
             var resourcePicker = new DropdownField();
-            resourcePicker.choices = resources.Select(r => r.displayName).ToList();
+            resourcePicker.choices = resources.Select(r => r.LocalizedName).ToList();
             resourcePicker.index = selectedIndex;
             resourcePicker.RegisterValueChangedCallback(e =>
             {
@@ -111,7 +111,7 @@ namespace Frontier
             var header = UiKit.Div("fr-card-head");
             header.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconXl));
             var heading = UiKit.Div("fr-card-text");
-            heading.Add(UiKit.Text(resource.displayName.ToUpper(), "fr-h2"));
+            heading.Add(UiKit.Text(resource.LocalizedName.ToUpper(), "fr-h2"));
             heading.Add(UiKit.Text(UiText.Get("atlas.resource.summary",
                 UiText.Get("resource.category." + resource.category.ToString().ToLowerInvariant()), resource.tier, resource.stackSize), "fr-tiny"));
             header.Add(heading);
@@ -199,7 +199,7 @@ namespace Frontier
                 foreach (var structure in gs.db.structures)
                     if (structure != null && structure.buildCost != null &&
                         structure.buildCost.Exists(item => item.resource == resource))
-                        uses.Add(UiText.Get("atlas.resource.use-structure", structure.displayName));
+                        uses.Add(UiText.Get("atlas.resource.use-structure", structure.LocalizedName));
             }
             if (gs.db.upgrades != null)
             {
@@ -247,14 +247,14 @@ namespace Frontier
             }
             body.Add(UiKit.Text(UiText.Get("atlas.recipes.help"), "fr-muted"));
             var recipes = gs.db.recipes.Where(r => r != null)
-                .OrderBy(r => r.tier).ThenBy(r => r.kind).ThenBy(r => r.displayName, StringComparer.Ordinal);
+                .OrderBy(r => r.tier).ThenBy(r => r.kind).ThenBy(r => r.LocalizedName, StringComparer.Ordinal);
             foreach (var recipe in recipes) AddAtlasRecipeCard(body, recipe);
         }
 
         void AddAtlasRecipeCard(VisualElement body, RecipeSO recipe)
         {
             var card = Card(UiKit.Cyan);
-            card.Add(UiKit.Text(recipe.displayName.ToUpper(), "fr-h2"));
+            card.Add(UiKit.Text(recipe.LocalizedName.ToUpper(), "fr-h2"));
             string gate = UiText.Get(string.IsNullOrEmpty(recipe.unlockResearch) ? "atlas.recipe.gate" : "atlas.recipe.gate-research",
                 PrettyName(recipe.kind.ToString()), recipe.tier, PrettyName(recipe.stationId),
                 recipe.stationLevel, PrettyName(recipe.unlockResearch));
@@ -348,7 +348,7 @@ namespace Frontier
                 var action = new Button();
                 action.AddToClassList("fr-btn");
                 action.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconMd));
-                action.Add(UiKit.Text(resource.displayName, "fr-btn-label"));
+                action.Add(UiKit.Text(resource.LocalizedName, "fr-btn-label"));
                 action.clicked += () =>
                 {
                     atlasCategory = resource.category;
@@ -374,7 +374,7 @@ namespace Frontier
                     header.Add(Icons.Make(discovered ? StructureIcon(structure.kind) : "lock",
                         discovered ? UiKit.Ui(structure.color) : UiKit.Muted, UiKit.Size.IconLg));
                     var text = UiKit.Div("fr-card-text");
-                    text.Add(UiKit.Text(discovered ? structure.displayName.ToUpper() : UiText.Get("atlas.structure.unknown"), "fr-h2"));
+                    text.Add(UiKit.Text(discovered ? structure.LocalizedName.ToUpper() : UiText.Get("atlas.structure.unknown"), "fr-h2"));
                     text.Add(UiKit.Text(discovered ? UiText.Get("atlas.structure.summary", structure.role, structure.tier,
                         UiText.Get(structure.Implemented ? "atlas.structure.active" : "atlas.structure.catalog-only"))
                         : UiText.Get("atlas.structure.identify"), "fr-tiny"));
@@ -383,7 +383,7 @@ namespace Frontier
                     if (structure.Implemented)
                         card.Add(UiKit.Text(UiText.Get(discovered ? "atlas.structure.built" : "atlas.structure.unbuilt"),
                             "fr-tiny", discovered ? UiKit.Lime : UiKit.Muted));
-                    if (discovered) card.Add(UiKit.Text(structure.description, "fr-muted"));
+                    if (discovered) card.Add(UiKit.Text(structure.LocalizedDescription, "fr-muted"));
                     if (!structure.Implemented)
                         card.Add(Note(UiText.Get("atlas.structure.unimplemented"), UiKit.Amber));
                     body.Add(card);
@@ -423,7 +423,7 @@ namespace Frontier
                 header.Add(Icons.Make("alien",
                     discovered ? UiKit.Ui(enemy.color) : new Color(0.16f, 0.2f, 0.27f), UiKit.Size.IconLg));
                 var text = UiKit.Div("fr-card-text");
-                text.Add(UiKit.Text(discovered ? enemy.displayName.ToUpper() : UiText.Get("atlas.enemy.unknown"), "fr-h2"));
+                text.Add(UiKit.Text(discovered ? enemy.LocalizedName.ToUpper() : UiText.Get("atlas.enemy.unknown"), "fr-h2"));
                 text.Add(UiKit.Text(discovered ? UiText.Get("atlas.enemy.summary", enemy.minWave, enemy.threat)
                     : UiText.Get("atlas.enemy.reveal"), "fr-tiny"));
                 header.Add(text);
@@ -451,28 +451,7 @@ namespace Frontier
 
         static string PrettyName(string value)
         {
-            if (string.IsNullOrEmpty(value)) return UiText.Get("common.unknown");
-            var words = new List<string>();
-            var word = new System.Text.StringBuilder();
-            for (int i = 0; i < value.Length; i++)
-            {
-                char current = value[i];
-                if (current == '_')
-                {
-                    if (word.Length > 0) { words.Add(word.ToString()); word.Length = 0; }
-                    continue;
-                }
-                bool newWord = i > 0 && char.IsUpper(current) &&
-                    (char.IsLower(value[i - 1]) || char.IsDigit(value[i - 1]));
-                if (newWord && word.Length > 0) { words.Add(word.ToString()); word.Length = 0; }
-                word.Append(current);
-            }
-            if (word.Length > 0) words.Add(word.ToString());
-            var parts = words.ToArray();
-            for (int i = 0; i < parts.Length; i++)
-                if (parts[i].Length > 0)
-                    parts[i] = char.ToUpperInvariant(parts[i][0]) + parts[i].Substring(1).ToLowerInvariant();
-            return string.Join(" ", parts);
+            return ContentText.Label(value);
         }
     }
 }

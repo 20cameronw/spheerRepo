@@ -7,6 +7,8 @@ namespace Frontier
     public sealed class ResearchNodeSO : ContentSO
     {
         public ResearchNodeDef data;
+        public string LocalizedName { get { return ContentText.Get("research", data.id, "name", data.displayName); } }
+        public string LocalizedDescription { get { return ContentText.Get("research", data.id, "description", data.description); } }
         public string icon = "research";
     }
 }

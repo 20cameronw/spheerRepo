@@ -66,8 +66,8 @@ namespace Frontier
             var accent = claimed ? UiKit.Lime : UiKit.Amber;
             var card = Card(accent);
             card.name = "objective-" + objective.id;
-            card.Add(UiKit.Text(objective.title, "fr-h2"));
-            card.Add(UiKit.Text(objective.description, "fr-muted"));
+            card.Add(UiKit.Text(objective.LocalizedTitle, "fr-h2"));
+            card.Add(UiKit.Text(objective.LocalizedDescription, "fr-muted"));
             if (claimed)
             {
                 card.Add(Note(UiText.Get("goals.recorded"), UiKit.Lime));

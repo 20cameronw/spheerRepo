@@ -14,6 +14,7 @@ namespace Frontier
         [Tooltip("lower_snake id of the catalog (distill_wood, smelt_steel ...). Never rename once saves can refer to it.")]
         public string id;
         public string displayName;
+        public string LocalizedName { get { return ContentText.Get("recipe", id, "name", displayName); } }
         public List<ItemAmount> inputs = new List<ItemAmount>();
         public List<ItemAmount> outputs = new List<ItemAmount>();
         [Tooltip("Legacy flag: crafted at a Fabricator instead of a Refinery. The importer derives it from the station.")]

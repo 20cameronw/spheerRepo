@@ -93,7 +93,7 @@ namespace Frontier
 
         void OpenWarehouse(PlacedStructure warehouse, Transform anchor)
         {
-            OpenModal("warehouse", "warehouse", warehouse.def.displayName.ToUpper(), UiKit.Cyan,
+            OpenModal("warehouse", "warehouse", warehouse.def.LocalizedName.ToUpper(), UiKit.Cyan,
                 body => BuildWarehouse(body, warehouse), true);
             planetView.Frozen = true;
             world.Selected = anchor;
@@ -101,7 +101,7 @@ namespace Frontier
 
         void OpenRelay(PlacedStructure relay, Transform anchor)
         {
-            OpenModal("orbital-relay", "satellite", relay.def.displayName.ToUpper(), UiKit.Cyan,
+            OpenModal("orbital-relay", "satellite", relay.def.LocalizedName.ToUpper(), UiKit.Cyan,
                 body => BuildRelay(body, relay), true);
             planetView.Frozen = true;
             world.Selected = anchor;
@@ -130,7 +130,7 @@ namespace Frontier
                 double distance = gs.RelayDistanceLy(relay, source);
                 string range = UiText.Get(distance <= 0.0 ? "relay.range.system" : "relay.range.distance", distance);
                 var card = Card(UiKit.Cyan);
-                card.Add(UiKit.Text(sourcePlanet.Name + " · " + source.def.displayName.ToUpperInvariant(), "fr-h2"));
+                card.Add(UiKit.Text(sourcePlanet.Name + " · " + source.def.LocalizedName.ToUpperInvariant(), "fr-h2"));
                 card.Add(UiKit.Text(sourcePlanet.SystemName + " · " + range, "fr-tiny"));
                 var storage = gs.StorageFor(source);
                 bool hasStacks = false;
@@ -144,12 +144,12 @@ namespace Frontier
                     int amount = Math.Min(stack.count, gs.FreeSpace(resource));
                     int energy = amount > 0 ? gs.RelayTransferEnergyCost(relay, source, amount) : 0;
                     var row = UiKit.Div("fr-row-wrap");
-                    row.Add(ResourceIconChip(resource, resource.displayName + " ×" + stack.count));
+                    row.Add(ResourceIconChip(resource, resource.LocalizedName + " ×" + stack.count));
                     string action = UiText.Get(amount > 0 ? "relay.pull" : "storage.pack-full", amount, energy);
                     var pull = IconBtn(action, "pack", UiKit.Cyan, () =>
                     {
                         int moved = gs.WithdrawThroughRelay(relay, source, slotIndex, amount);
-                        if (moved > 0) { Sfx.Good(); Toast(UiText.Get("relay.transferred", moved, resource.displayName), UiKit.Cyan); }
+                        if (moved > 0) { Sfx.Good(); Toast(UiText.Get("relay.transferred", moved, resource.LocalizedName), UiKit.Cyan); }
                         else Toast(UiText.Get("relay.blocked"), UiKit.Amber);
                         RefreshModal();
                     });
@@ -222,7 +222,7 @@ namespace Frontier
                 if (resource != null && !PassWarehouseFilter(resource)) slot.style.display = DisplayStyle.None;
                 BindInventoryDrag(slot, resource, stack.count, () =>
                 {
-                    if (resource != null) Toast(UiText.Get("storage.stored-count", resource.displayName, stack.count), UiKit.Ui(resource.color));
+                    if (resource != null) Toast(UiText.Get("storage.stored-count", resource.LocalizedName, stack.count), UiKit.Ui(resource.color));
                 }, position =>
                 {
                     int target = SlotAt(storageSlots, position);
@@ -276,7 +276,7 @@ namespace Frontier
                 if (resource != null && !PassWarehouseFilter(resource)) slot.style.display = DisplayStyle.None;
                 BindInventoryDrag(slot, resource, packCnt[index], () =>
                 {
-                    if (resource != null) Toast(UiText.Get("storage.carried-count", resource.displayName, packCnt[index]), UiKit.Ui(resource.color));
+                    if (resource != null) Toast(UiText.Get("storage.carried-count", resource.LocalizedName, packCnt[index]), UiKit.Ui(resource.color));
                 }, position =>
                 {
                     int target = SlotAt(storageSlots, position);

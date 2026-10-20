@@ -34,7 +34,7 @@ code that depends on the listed prerequisite; this is not a claim that only test
 
 | Remaining work | Execution state / prerequisite |
 | --- | --- |
-| Generated gameplay/provider/content localization | Pending local implementation; language selection and live switching are implemented. Only English is shipped. |
+| Remaining generated/provider localization | Pending local implementation; generated-world and authored-content presentation, language selection and live switching are implemented. Only English is shipped. |
 | Durable Hyperspace process-restart restoration | Pending local implementation; pause/focus-loss handling is implemented, but terminating the process does not preserve an in-flight run. |
 | Map renderer decision, harvest/Hyperspace touch/audio/haptics, cinematics/VFX/FTUE, quality/memory/thermal budgets and release QA | Blocked on physical-device measurements/acceptance. No Android device was attached when checked. The existing debug APK is not device or release certification. |
 | Ascension and endgame | Blocked on an approved permanent-bonus design; keep Ascension disabled. Weekly boards also need server authority. |
@@ -810,6 +810,18 @@ templates and the Map/Atlas biome, kind, harvesting and hazard labels are catalo
 entries. Focused catalog/runtime-world/seeded-flavor checks passed 29/29; the live language regression verifies
 translated cached-world text and exact English restoration. Authored content names/descriptions and provider text
 still require catalog migration; no additional shipping language or RTL/font acceptance is claimed.
+
+**Authored-content presentation (§7.1):** resources, structures, recipes, enemies, research, tool/upgrade levels,
+objectives, obstacles, wave modifiers and authored-world descriptions now resolve stable content keys at presentation
+time. Shops, pack/storage/relay, Atlas/Map, research/tools, goal cards, harvest feedback and world-space captions
+use localized names and descriptions without rewriting ScriptableObject fields, gameplay ids or economy numbers.
+Research branch/prerequisite/unlock labels also use catalog entries. English inspector edits remain live; sync appends
+missing source keys without overwriting existing wording. Planet/player proper names remain identities, not translated
+content. The source and preloaded English table contain 1891 entries. Focused catalog/runtime/progression checks
+passed 26/26; live alternate-language coverage verifies authored UI/captions, unchanged gameplay catalog data and exact
+English restoration. Remaining provider/generated-status copy, production translations and device font/RTL acceptance
+are not claimed complete.
+
 **Harvest mini-game catalog slice:** tree/rock, drill, siphon, excavation, salvage and asteroid-field titles, tools,
 instructions, metrics, feedback states, controls and live progress now use the catalog. The player-level HUD and
 travel settings heading also use catalog entries. Four focused catalog/build-guard checks and 12 live mini-game

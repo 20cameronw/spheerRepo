@@ -8,6 +8,8 @@ namespace Frontier
     public sealed class ToolLadderSO : ContentSO
     {
         public ToolLadderDef data;
+        public string LocalizedName { get { return ContentText.Get("tool", data.id, "name", data.displayName); } }
+        public string TierName(ToolTierDef tier) { return ContentText.Get("tool", data.id, "tier-" + tier.tier, tier.displayName); }
         public string icon;
         public Color color = Color.white;
 

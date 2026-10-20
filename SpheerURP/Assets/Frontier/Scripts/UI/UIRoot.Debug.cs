@@ -235,9 +235,9 @@ namespace Frontier
             {
                 var grid = SheetGrid();
                 foreach (var r in gs.db.resources)
-                    if (r != null) grid.Add(IconCell(Icons.ForResource(r), r.displayName, UiKit.Ui(r.color), new[] { 32f, 48f }, scale));
+                    if (r != null) grid.Add(IconCell(Icons.ForResource(r), r.LocalizedName, UiKit.Ui(r.color), new[] { 32f, 48f }, scale));
                 foreach (var s in gs.db.structures)
-                    if (s != null) grid.Add(IconCell(Icons.ForStructure(s.kind), s.displayName, UiKit.Ui(s.color), new[] { 32f, 48f }, scale));
+                    if (s != null) grid.Add(IconCell(Icons.ForStructure(s.kind), s.LocalizedName, UiKit.Ui(s.color), new[] { 32f, 48f }, scale));
                 sheet.Add(grid);
             }
             else if (page >= 3)

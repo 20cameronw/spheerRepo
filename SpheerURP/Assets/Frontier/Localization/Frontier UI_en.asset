@@ -4403,6 +4403,3427 @@ MonoBehaviour:
     m_Localized: void exposure
     m_Metadata:
       m_Items: []
+  - m_Id: 1502514418638848
+    m_Localized: Wood
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719232
+    m_Localized: Timber from the lush worlds, cut green and stacked by the cartload.
+      Every settlement begins with it, and every great project comes back to it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719233
+    m_Localized: Timber from the lush worlds, cut green and stacked by the cartload.
+      Every settlement begins with it, and every great project comes back to it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719234
+    m_Localized: Stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719235
+    m_Localized: Dense grey rock that rings when struck. It holds the foundations
+      of everything and never runs out.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719236
+    m_Localized: Dense grey rock that rings when struck. It holds the foundations
+      of everything and never runs out.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719237
+    m_Localized: Scrap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719238
+    m_Localized: Wreckage and worn-out machinery lie on every world, because someone
+      always got there first. Pressed, burned or melted, none of it is ever wasted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719239
+    m_Localized: Wreckage and worn-out machinery lie on every world, because someone
+      always got there first. Pressed, burned or melted, none of it is ever wasted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719240
+    m_Localized: Biomass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719241
+    m_Localized: Fast-growing fibrous growth, thick with sap and spores. It ferments
+      into clean fuel and weaves into seals that shrug off poison.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719242
+    m_Localized: Fast-growing fibrous growth, thick with sap and spores. It ferments
+      into clean fuel and weaves into seals that shrug off poison.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719243
+    m_Localized: Iron Ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719244
+    m_Localized: Rust-red ore heavy with metal, found in veins under volcanic crust
+      and dry plains. Smelted, it becomes the skeleton of everything you build.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719245
+    m_Localized: Rust-red ore heavy with metal, found in veins under volcanic crust
+      and dry plains. Smelted, it becomes the skeleton of everything you build.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719246
+    m_Localized: Copper Ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719247
+    m_Localized: Green-streaked ore that conducts better than anything else you can
+      dig up. Drawn into wire, it carries every signal and every current.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719248
+    m_Localized: Green-streaked ore that conducts better than anything else you can
+      dig up. Drawn into wire, it carries every signal and every current.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719249
+    m_Localized: Silica
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719250
+    m_Localized: Fine quartz sand from the dry basins and crystal flats. Melted it
+      turns to glass, and ground it polishes lenses.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719251
+    m_Localized: Fine quartz sand from the dry basins and crystal flats. Melted it
+      turns to glass, and ground it polishes lenses.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719252
+    m_Localized: Ice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719253
+    m_Localized: Hard blue ice cut from glaciers, comet shells and shadowed craters.
+      It holds the cold that cryogenic hulls and quantum lattices depend on.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719254
+    m_Localized: Hard blue ice cut from glaciers, comet shells and shadowed craters.
+      It holds the cold that cryogenic hulls and quantum lattices depend on.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719255
+    m_Localized: Titanium Ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719256
+    m_Localized: Grey ore so dense it blunts ordinary drills. Refined, it turns light,
+      strong and unbothered by fire or vacuum.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719257
+    m_Localized: Grey ore so dense it blunts ordinary drills. Refined, it turns light,
+      strong and unbothered by fire or vacuum.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719258
+    m_Localized: Crystal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719259
+    m_Localized: Resonant crystal that hums when struck and glows when worked. It
+      sharpens tools, focuses beams and stores more energy than it should.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719260
+    m_Localized: Resonant crystal that hums when struck and glows when worked. It
+      sharpens tools, focuses beams and stores more energy than it should.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719261
+    m_Localized: Methane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719262
+    m_Localized: Pale gas siphoned from swamps, oceans and giant worlds. A little
+      of it burns hotter than a hold full of wood.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719263
+    m_Localized: Pale gas siphoned from swamps, oceans and giant worlds. A little
+      of it burns hotter than a hold full of wood.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719264
+    m_Localized: Helium-3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719265
+    m_Localized: A rare light gas drifting in the storm bands of the giants. Ships
+      crave it, and so does every quantum machine.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719266
+    m_Localized: A rare light gas drifting in the storm bands of the giants. Ships
+      crave it, and so does every quantum machine.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719267
+    m_Localized: Xeno Core
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719268
+    m_Localized: A pulsing organic knot torn from alien hives and fallen raiders.
+      Nobody agrees what it is, but every advanced machine runs better with one inside.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719269
+    m_Localized: A pulsing organic knot torn from alien hives and fallen raiders.
+      Nobody agrees what it is, but every advanced machine runs better with one inside.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514506719270
+    m_Localized: Radium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913536
+    m_Localized: A faintly glowing salt that ticks in the dark. Dangerous to carry,
+      essential for shielding, and priceless to anyone who knows how to contain it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913537
+    m_Localized: A faintly glowing salt that ticks in the dark. Dangerous to carry,
+      essential for shielding, and priceless to anyone who knows how to contain it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913538
+    m_Localized: Dark Matter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913539
+    m_Localized: A pocket of nothing that pulls on everything. Dug from the deepest
+      shattered worlds, it is the last ingredient of the last machines.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913540
+    m_Localized: A pocket of nothing that pulls on everything. Dug from the deepest
+      shattered worlds, it is the last ingredient of the last machines.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913541
+    m_Localized: Fuel Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913542
+    m_Localized: 'Compact cells of refined energy that power every jump. Cooked from
+      whatever burns: wood in the first days, gas and ice when the ship is bigger.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913543
+    m_Localized: 'Compact cells of refined energy that power every jump. Cooked from
+      whatever burns: wood in the first days, gas and ice when the ship is bigger.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913544
+    m_Localized: Planks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913545
+    m_Localized: Sawn timber cut to length. It frames the buildings of every era,
+      and the late projects eat it by the thousand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913546
+    m_Localized: Sawn timber cut to length. It frames the buildings of every era,
+      and the late projects eat it by the thousand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913547
+    m_Localized: Iron Plate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913548
+    m_Localized: Rolled sheets of smelted iron, still warm from the foundry. The
+      first real building material of any colony.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913549
+    m_Localized: Rolled sheets of smelted iron, still warm from the foundry. The
+      first real building material of any colony.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913550
+    m_Localized: Copper Wire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913551
+    m_Localized: Copper drawn thin and wound on spools. Everything with a pulse,
+      from a lamp to a reactor, needs a length of it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913552
+    m_Localized: Copper drawn thin and wound on spools. Everything with a pulse,
+      from a lamp to a reactor, needs a length of it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913553
+    m_Localized: Glass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913554
+    m_Localized: Clear, hard panes melted from silica. They keep out the weather,
+      hold the vacuum and become lenses when polished.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913555
+    m_Localized: Clear, hard panes melted from silica. They keep out the weather,
+      hold the vacuum and become lenses when polished.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913556
+    m_Localized: Titanium Plate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913557
+    m_Localized: Pressed titanium cut into light, stubborn armor panels. It survives
+      heat that melts steel and cold that shatters it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913558
+    m_Localized: Pressed titanium cut into light, stubborn armor panels. It survives
+      heat that melts steel and cold that shatters it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913559
+    m_Localized: Steel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913560
+    m_Localized: Iron hardened with the carbon of burnt timber. The backbone of tools,
+      turrets and hulls.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913561
+    m_Localized: Iron hardened with the carbon of burnt timber. The backbone of tools,
+      turrets and hulls.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913562
+    m_Localized: Biocomposite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913563
+    m_Localized: Plant fibre pressed with resin into a flexible, self-sealing skin.
+      Toxic air eats steel but slides off this.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913564
+    m_Localized: Plant fibre pressed with resin into a flexible, self-sealing skin.
+      Toxic air eats steel but slides off this.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913565
+    m_Localized: Thermal Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913566
+    m_Localized: Titanium and glass fused into a ceramic-bright metal that glows
+      without failing. Hulls plated with it can land where rock still flows.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913567
+    m_Localized: Titanium and glass fused into a ceramic-bright metal that glows
+      without failing. Hulls plated with it can land where rock still flows.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913568
+    m_Localized: Cryo Composite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913569
+    m_Localized: A foam-cored laminate that keeps its strength far below freezing.
+      It lets a ship set down where the air itself is ice.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913570
+    m_Localized: A foam-cored laminate that keeps its strength far below freezing.
+      It lets a ship set down where the air itself is ice.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913571
+    m_Localized: Rad-Shield Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913572
+    m_Localized: Layered steel and radium-laced glass that drinks hard radiation.
+      Shielding like this opens the worlds that glow in the dark.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913573
+    m_Localized: Layered steel and radium-laced glass that drinks hard radiation.
+      Shielding like this opens the worlds that glow in the dark.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913574
+    m_Localized: Void Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913575
+    m_Localized: A black metal grown around a seed of dark matter. It bends light
+      and survives where space itself is thin.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913576
+    m_Localized: A black metal grown around a seed of dark matter. It bends light
+      and survives where space itself is thin.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913577
+    m_Localized: Circuit Board
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913578
+    m_Localized: Etched copper on a glass-fibre sheet. Every control, sensor and
+      drone starts with one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913579
+    m_Localized: Etched copper on a glass-fibre sheet. Every control, sensor and
+      drone starts with one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913580
+    m_Localized: Servo Motor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913581
+    m_Localized: A sealed motor with a precision gearhead. It moves every arm, drill
+      carriage and turret in the colony.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913582
+    m_Localized: A sealed motor with a precision gearhead. It moves every arm, drill
+      carriage and turret in the colony.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913583
+    m_Localized: Optic Lens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913584
+    m_Localized: A ground and polished lens, flawless enough to focus a laser or
+      read a star. Scanners and turrets are blind without it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913585
+    m_Localized: A ground and polished lens, flawless enough to focus a laser or
+      read a star. Scanners and turrets are blind without it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913586
+    m_Localized: Quantum Chip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913587
+    m_Localized: A lattice of cooled helium and etched crystal that computes in more
+      than one state at once. Navigation and research run on it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913588
+    m_Localized: A lattice of cooled helium and etched crystal that computes in more
+      than one state at once. Navigation and research run on it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913589
+    m_Localized: Warp Coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913590
+    m_Localized: A superconducting coil wound around a speck of dark matter. Charge
+      it and space folds; it is the last part of every great ship.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913591
+    m_Localized: A superconducting coil wound around a speck of dark matter. Charge
+      it and space folds; it is the last part of every great ship.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913592
+    m_Localized: Plasma Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913593
+    m_Localized: A magnetic bottle of superheated gas that carries eight times the
+      energy of a fuel cell. It lets a deep run fit in a few slots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913594
+    m_Localized: A magnetic bottle of superheated gas that carries eight times the
+      energy of a fuel cell. It lets a deep run fit in a few slots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913595
+    m_Localized: Antimatter Pod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913596
+    m_Localized: A pod of trapped antiparticles in a mirrored field. Sixty-four cells
+      of energy in a package you can hold, and a carelessness you cannot survive.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913597
+    m_Localized: A pod of trapped antiparticles in a mirrored field. Sixty-four cells
+      of energy in a package you can hold, and a carelessness you cannot survive.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913598
+    m_Localized: Lumber Camp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913599
+    m_Localized: Tap it to chop the trees on this planet. Higher levels yield more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913600
+    m_Localized: Mining Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913601
+    m_Localized: Tap it to mine stone and ore on this planet. Free to build. Higher
+      levels yield more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913602
+    m_Localized: Deep Driller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913603
+    m_Localized: Tap it to drill ore, crystal and xeno cores. Higher levels yield
+      more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913604
+    m_Localized: Biodome Harvester
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913605
+    m_Localized: Tap it to harvest the plant growth on this planet. Higher levels
+      yield more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913606
+    m_Localized: Gas Siphon Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913607
+    m_Localized: Tap it to siphon gas from the atmosphere. Higher levels yield more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913608
+    m_Localized: Excavation Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913609
+    m_Localized: Tap it to excavate buried ice, sand and rare salts. Higher levels
+      yield more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913610
+    m_Localized: Salvage Yard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913611
+    m_Localized: Sorts wreckage into scrap and the occasional cache. Higher levels
+      yield more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913612
+    m_Localized: Refinery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913613
+    m_Localized: Converts raw materials into fuel and planks. Higher levels unlock
+      better recipes and larger craft batches.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913614
+    m_Localized: Fabricator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913615
+    m_Localized: Draws wire and assembles components. Higher levels unlock better
+      recipes and larger craft batches.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913616
+    m_Localized: Foundry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913617
+    m_Localized: Smelts ore into plates and alloys. Higher levels unlock tougher
+      alloys and larger craft batches.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514510913618
+    m_Localized: Chem Reactor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107840
+    m_Localized: Mixes composites and charges plasma cells.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107841
+    m_Localized: Quantum Lab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107842
+    m_Localized: Etches quantum chips and grows void alloy, warp coils and antimatter.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107843
+    m_Localized: Warehouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107844
+    m_Localized: Stores resources on this planet. Drag stacks between your backpack
+      and storage. The first upgrades add 9 slots each; the late ones add far more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107845
+    m_Localized: Fuel Depot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107846
+    m_Localized: Holds fuel cells, plasma and antimatter in dense racks that do not
+      use backpack slots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107847
+    m_Localized: Cargo Depot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107848
+    m_Localized: Pools every warehouse on this planet, so crafting and building draw
+      from all of them at once.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107849
+    m_Localized: Orbital Relay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107850
+    m_Localized: Withdraw from operational warehouses on visited worlds in this system;
+      upgrades extend its beam and reduce transfer energy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107851
+    m_Localized: Gunner Turret
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107852
+    m_Localized: Rapid fire kinetic turret. Fires during waves.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107853
+    m_Localized: Laser Turret
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107854
+    m_Localized: Slow, heavy beam with long range. Fires during waves.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107855
+    m_Localized: Shield Pylon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107856
+    m_Localized: Projects a field that raises reactor health.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107857
+    m_Localized: Missile Silo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107858
+    m_Localized: Launches a splash missile that clears clustered raiders. Fires during
+      waves.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107859
+    m_Localized: Tesla Coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107860
+    m_Localized: Arcs lightning between nearby aliens. Fires during waves.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107861
+    m_Localized: Repair Bay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107862
+    m_Localized: Slowly repairs the reactor during a wave.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107863
+    m_Localized: Alarm Beacon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107864
+    m_Localized: Tap it to burn fuel and call a wave. More fuel means a longer fight
+      and bigger rewards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107865
+    m_Localized: Research Lab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107866
+    m_Localized: Unlocks research. Higher levels open deeper research nodes and tool
+      tiers.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107867
+    m_Localized: Radar Tower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107868
+    m_Localized: 'Extends the survey radius: see more worlds around you before you
+      jump.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107869
+    m_Localized: Colony Hub
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107870
+    m_Localized: Adds builder crews at levels 3 and 7 and discounts planetary obstacle
+      clearance.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107871
+    m_Localized: Hangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107872
+    m_Localized: 'A spaceport hangar: cuts the fuel cost of every trip.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107873
+    m_Localized: Auto-Harvester
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107874
+    m_Localized: Slowly gathers raw bulk materials while you are away. Active harvesting
+      stays far better.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107875
+    m_Localized: Terraformer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107876
+    m_Localized: Megaproject. Reshapes the planet in five stages; each stage permanently
+      raises harvest yield everywhere.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107877
+    m_Localized: Warp Gate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107878
+    m_Localized: 'Megaproject. A ring gate in orbit: each stage cuts fuel costs and
+      extends jump range.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107879
+    m_Localized: Dyson Collector
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107880
+    m_Localized: Megaproject. A swarm of collectors around the star feeds your ships
+      fuel while you sleep.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107881
+    m_Localized: Wood Distillate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107882
+    m_Localized: Scrap Burner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107883
+    m_Localized: Saw Planks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107884
+    m_Localized: Scrap Press
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107885
+    m_Localized: Biomass Ferment
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107886
+    m_Localized: Crystal Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107887
+    m_Localized: Methane Condenser
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107888
+    m_Localized: Smelt Iron Plate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107889
+    m_Localized: Smelt Glass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107890
+    m_Localized: Smelt Steel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107891
+    m_Localized: Press Titanium Plate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107892
+    m_Localized: Forge Thermal Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107893
+    m_Localized: Forge Rad-Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107894
+    m_Localized: Draw Copper Wire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107895
+    m_Localized: Press Biocomposite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107896
+    m_Localized: Etch Circuit Board
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107897
+    m_Localized: Assemble Servo Motor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107898
+    m_Localized: Grind Optic Lens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107899
+    m_Localized: Mix Cryo Composite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107900
+    m_Localized: Charge Plasma Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107901
+    m_Localized: Etch Quantum Chip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107902
+    m_Localized: Grow Void Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107903
+    m_Localized: Wind Warp Coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107904
+    m_Localized: Synthesize Antimatter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107905
+    m_Localized: Scout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107906
+    m_Localized: Swarmer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107907
+    m_Localized: Raider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107908
+    m_Localized: Brute
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107909
+    m_Localized: Titan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107910
+    m_Localized: Backpack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107911
+    m_Localized: +9 slots (one more row). Carry more before you turn back.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107912
+    m_Localized: Satchel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107913
+    m_Localized: Rucksack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107914
+    m_Localized: Field Pack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107915
+    m_Localized: Expedition Pack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107916
+    m_Localized: Cargo Harness
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107917
+    m_Localized: Hauler Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107918
+    m_Localized: Titan Frame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107919
+    m_Localized: Exo-Hauler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107920
+    m_Localized: Engine Efficiency
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107921
+    m_Localized: Every trip burns less fuel.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107922
+    m_Localized: Tuned Injectors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107923
+    m_Localized: Flow Manifold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107924
+    m_Localized: Ion Nozzles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107925
+    m_Localized: Cryo Intake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107926
+    m_Localized: Plasma Lens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107927
+    m_Localized: Phase Vents
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107928
+    m_Localized: Zero-Point Taps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107929
+    m_Localized: Gradient Drive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107930
+    m_Localized: Resonant Core
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107931
+    m_Localized: Quiet Singularity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107932
+    m_Localized: Jump Range
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107933
+    m_Localized: A single jump reaches farther, so depth is earned.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107934
+    m_Localized: Jump Coils
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107935
+    m_Localized: Capacitor Bank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107936
+    m_Localized: Resonance Array
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107937
+    m_Localized: Folded Lattice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107938
+    m_Localized: Deep Coils
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107939
+    m_Localized: Rift Anchors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107940
+    m_Localized: Tunnel Drive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107941
+    m_Localized: Gate Harmonics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107942
+    m_Localized: Fold Engine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107943
+    m_Localized: Boundless Drive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107944
+    m_Localized: Scanner Range
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107945
+    m_Localized: Worlds within range of any world you have visited show their resources.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107946
+    m_Localized: Long Lens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107947
+    m_Localized: Sweep Array
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107948
+    m_Localized: Deep Survey
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107949
+    m_Localized: Parallax Net
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107950
+    m_Localized: Galactic Atlas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107951
+    m_Localized: Dark Survey
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107952
+    m_Localized: Lattice Scan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107953
+    m_Localized: Cosmic Ear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107954
+    m_Localized: Fuel Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107955
+    m_Localized: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops
+      eating backpack space.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107956
+    m_Localized: Auxiliary Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107957
+    m_Localized: Reserve Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107958
+    m_Localized: Baffled Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107959
+    m_Localized: Cryo Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107960
+    m_Localized: Plasma Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514515107961
+    m_Localized: Containment Vault
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302144
+    m_Localized: Toxic Seal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302145
+    m_Localized: Biocomposite plating that lets the hull set down on toxic worlds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302146
+    m_Localized: Biocomposite Seal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302147
+    m_Localized: Triple Seal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302148
+    m_Localized: Sealed Hull
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302149
+    m_Localized: Thermal Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302150
+    m_Localized: Thermal alloy plating for volcanic and desert worlds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302151
+    m_Localized: Thermal Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302152
+    m_Localized: Ceramic Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302153
+    m_Localized: Magma Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302154
+    m_Localized: Cryo Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302155
+    m_Localized: Cryo composite plating for glacial worlds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302156
+    m_Localized: Cryo Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302157
+    m_Localized: Thermal Break
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302158
+    m_Localized: Polar Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302159
+    m_Localized: Rad-Shield Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302160
+    m_Localized: Rad-Shield alloy plating for irradiated worlds and hostile stars.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302161
+    m_Localized: Rad-Shield Plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302162
+    m_Localized: Lead Lattice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302163
+    m_Localized: Pulsar Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302164
+    m_Localized: Void Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302165
+    m_Localized: Void alloy shell for worlds where space itself is thin.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302166
+    m_Localized: Void Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302167
+    m_Localized: Event Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302168
+    m_Localized: Null Shell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302169
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302170
+    m_Localized: +15% firing speed for placed turrets. Does not spawn turrets.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302171
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302172
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302173
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302174
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302175
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302176
+    m_Localized: Turret Actuators
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302177
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302178
+    m_Localized: +35% turret damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302179
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302180
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302181
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302182
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302183
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302184
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302185
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302186
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302187
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302188
+    m_Localized: Turret Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302189
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302190
+    m_Localized: +40% tap damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302191
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302192
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302193
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514519302194
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496448
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496449
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496450
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496451
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496452
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496453
+    m_Localized: Ion Pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496454
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496455
+    m_Localized: +25 reactor health.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496456
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496457
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496458
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496459
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496460
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496461
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496462
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496463
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496464
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496465
+    m_Localized: Reactor Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496466
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496467
+    m_Localized: +10% wave rewards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496468
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496469
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496470
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496471
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496472
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496473
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496474
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496475
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496476
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496477
+    m_Localized: Salvage Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496478
+    m_Localized: Cargo Compression
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496479
+    m_Localized: 'Every stack in your backpack and warehouses holds more: the end-game
+      answer to storage.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496480
+    m_Localized: Vacuum Packing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496481
+    m_Localized: Dense Racking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496482
+    m_Localized: Pressure Stacks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496483
+    m_Localized: Quantum Compression
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496484
+    m_Localized: Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496485
+    m_Localized: Hit the glowing weak spot to fell trees. Better axes deal more damage
+      and swing faster.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496486
+    m_Localized: Bare Hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496487
+    m_Localized: Stone Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496488
+    m_Localized: Iron Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496489
+    m_Localized: Steel Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496490
+    m_Localized: Crystal Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496491
+    m_Localized: Plasma Chainsaw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496492
+    m_Localized: Singularity Saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496493
+    m_Localized: Pickaxe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496494
+    m_Localized: Strike the shiny spot to break nodes through stages. Better picks
+      crack them faster.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496495
+    m_Localized: Bare Hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496496
+    m_Localized: Stone Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496497
+    m_Localized: Iron Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496498
+    m_Localized: Steel Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496499
+    m_Localized: Pneumatic Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496500
+    m_Localized: Jackhammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496501
+    m_Localized: Plasma Jackhammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496502
+    m_Localized: Drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496503
+    m_Localized: Hold to bore through rock. Better drills fill the progress gauge
+      faster.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496504
+    m_Localized: Hand Auger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496505
+    m_Localized: Pneumatic Drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496506
+    m_Localized: Crystal Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496507
+    m_Localized: Plasma Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496508
+    m_Localized: Quantum Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514523496509
+    m_Localized: Singularity Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690752
+    m_Localized: Void Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690753
+    m_Localized: Survey Basics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690754
+    m_Localized: Calibrate the ship's sensors and raise a radar tower.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690755
+    m_Localized: Smelting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690756
+    m_Localized: Hot enough furnaces turn ore into plate and sand into glass.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690757
+    m_Localized: Fabrication
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690758
+    m_Localized: Wire drawing and bench assembly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690759
+    m_Localized: Deep Drilling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690760
+    m_Localized: Bores deep enough to reach ore under the crust.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690761
+    m_Localized: Bio-Cultivation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690762
+    m_Localized: Tended domes harvest the fast growth of green worlds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690763
+    m_Localized: Jump Drive I
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690764
+    m_Localized: 'The first jump coils: leave the home system.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690765
+    m_Localized: Steelmaking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690766
+    m_Localized: Burn timber into carbon and fold it into iron.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690767
+    m_Localized: Composites
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690768
+    m_Localized: Press plant fibre and resin into a poison-proof skin.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690769
+    m_Localized: Circuitry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690770
+    m_Localized: Etched copper traces on a glass-fibre sheet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690771
+    m_Localized: Titanium Working
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690772
+    m_Localized: A furnace hot enough for the stubborn grey ore.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690773
+    m_Localized: Gas Extraction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690774
+    m_Localized: Pumps and turbines for the storm bands.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690775
+    m_Localized: Geo-Survey
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690776
+    m_Localized: Sonar and trowel work for buried deposits.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690777
+    m_Localized: Salvage Operations
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690778
+    m_Localized: A yard to sort the wreckage of the galaxy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690779
+    m_Localized: Fuel Logistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514527690780
+    m_Localized: Dense racks for fuel cells.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885056
+    m_Localized: Cargo Logistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885057
+    m_Localized: One pool for every warehouse on a world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885058
+    m_Localized: Ballistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885059
+    m_Localized: Focused beams for long range.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885060
+    m_Localized: Shield Tech
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885061
+    m_Localized: Fields that blunt incoming fire.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885062
+    m_Localized: 'Hazmat: Toxic'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885063
+    m_Localized: Seal the hull against toxic air.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885064
+    m_Localized: Jump Drive II
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885065
+    m_Localized: 'More stable coils: a longer first leap.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885066
+    m_Localized: Field Engineering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885067
+    m_Localized: A second crew works your sites.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885068
+    m_Localized: Long-Range Scanning I
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885069
+    m_Localized: Wider survey sweeps.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885070
+    m_Localized: Toolsmithing I
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885071
+    m_Localized: Steel heads on every handle.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885072
+    m_Localized: Chemistry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885073
+    m_Localized: Reactors for resins, cryogels and charged gas.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885074
+    m_Localized: Thermal Metallurgy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885075
+    m_Localized: Alloys that glow without failing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514531885076
+    m_Localized: Cryo-Chemistry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079360
+    m_Localized: Foam-cored laminates for deep cold.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079361
+    m_Localized: Robotics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079362
+    m_Localized: Sealed motors with precision gearheads.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079363
+    m_Localized: Optics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079364
+    m_Localized: Lenses ground flawless enough for lasers.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079365
+    m_Localized: 'Hazmat: Heat'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079366
+    m_Localized: Plating for worlds where rock flows.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079367
+    m_Localized: 'Hazmat: Cold'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079368
+    m_Localized: Plating for worlds where air freezes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079369
+    m_Localized: Missile Tech
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079370
+    m_Localized: Splash missiles for the thick of a wave.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079371
+    m_Localized: Tesla Tech
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079372
+    m_Localized: Chain lightning between aliens.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079373
+    m_Localized: Field Repair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079374
+    m_Localized: Repair drones for the reactor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079375
+    m_Localized: Colony Charter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079376
+    m_Localized: A hub that runs the settlement.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079377
+    m_Localized: Jump Drive III
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079378
+    m_Localized: Folded lattices for deep hops.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079379
+    m_Localized: Autopilot Navigation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079380
+    m_Localized: Skip the flight at a fuel premium.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079381
+    m_Localized: Toolsmithing II
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079382
+    m_Localized: Crystal-edged tools.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079383
+    m_Localized: Long-Range Scanning II
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079384
+    m_Localized: Parallax surveys of whole sectors.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079385
+    m_Localized: Plasma Physics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079386
+    m_Localized: Bottle a star in a flask.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079387
+    m_Localized: Radiation Shielding
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079388
+    m_Localized: Layered alloys that drink hard radiation.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079389
+    m_Localized: Quantum Computing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079390
+    m_Localized: Machines that think in more than one state.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079391
+    m_Localized: 'Hazmat: Radiation'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079392
+    m_Localized: Plating for worlds that glow in the dark.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079393
+    m_Localized: Orbital Logistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079394
+    m_Localized: Withdraw from any warehouse the beam can see.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079395
+    m_Localized: Automation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079396
+    m_Localized: Machines that gather bulk goods while you sleep.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079397
+    m_Localized: Hangar Operations
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079398
+    m_Localized: Ground crews that shave fuel off every launch.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079399
+    m_Localized: Toolsmithing III
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079400
+    m_Localized: Plasma-edged tools.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079401
+    m_Localized: Jump Drive IV
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079402
+    m_Localized: 'Anchors in the rift: long, safe jumps.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079403
+    m_Localized: Cargo Compression I
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079404
+    m_Localized: Vacuum-packed stacks.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079405
+    m_Localized: Terraforming
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079406
+    m_Localized: Reshape a world's climate in five stages.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079407
+    m_Localized: Long-Range Scanning III
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079408
+    m_Localized: A survey net that spans galaxies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079409
+    m_Localized: Cargo Compression II
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514536079410
+    m_Localized: Dense racking.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273664
+    m_Localized: Void Forging
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273665
+    m_Localized: Grow metal around a seed of nothing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273666
+    m_Localized: Warp Theory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273667
+    m_Localized: Fold space inside a coil.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273668
+    m_Localized: Antimatter Synthesis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273669
+    m_Localized: 'Mirror-bottled energy: sixty-four cells in a pod.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273670
+    m_Localized: 'Hazmat: Void'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273671
+    m_Localized: Plating for the places between places.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273672
+    m_Localized: Warp Gate Engineering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273673
+    m_Localized: A ring in orbit that makes distance negotiable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273674
+    m_Localized: Jump Drive V
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273675
+    m_Localized: Tunnel drives and gate harmonics.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273676
+    m_Localized: Toolsmithing IV
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273677
+    m_Localized: Singularity-edged tools.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273678
+    m_Localized: Stellar Engineering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273679
+    m_Localized: Harness a star.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273680
+    m_Localized: Cargo Compression III
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273681
+    m_Localized: 'Quantum compression: a hold inside a speck.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273682
+    m_Localized: Ascension Protocol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273683
+    m_Localized: Begin again in a new seeded universe, keeping what you learned.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273684
+    m_Localized: Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273685
+    m_Localized: Bare Hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273686
+    m_Localized: Stone Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273687
+    m_Localized: Iron Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273688
+    m_Localized: Steel Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273689
+    m_Localized: Crystal Axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273690
+    m_Localized: Plasma Chainsaw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273691
+    m_Localized: Singularity Saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273692
+    m_Localized: Pickaxe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273693
+    m_Localized: Bare Hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273694
+    m_Localized: Stone Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273695
+    m_Localized: Iron Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273696
+    m_Localized: Steel Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273697
+    m_Localized: Pneumatic Pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273698
+    m_Localized: Jackhammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273699
+    m_Localized: Plasma Jackhammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273700
+    m_Localized: Salvage Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273701
+    m_Localized: Grabber
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273702
+    m_Localized: Magnet Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273703
+    m_Localized: Servo Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273704
+    m_Localized: Titan Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273705
+    m_Localized: Plasma Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273706
+    m_Localized: Gravity Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273707
+    m_Localized: Singularity Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273708
+    m_Localized: Drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514540273709
+    m_Localized: Hand Auger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467968
+    m_Localized: Pneumatic Drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467969
+    m_Localized: Crystal Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467970
+    m_Localized: Plasma Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467971
+    m_Localized: Quantum Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467972
+    m_Localized: Singularity Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467973
+    m_Localized: Void Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467974
+    m_Localized: Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467975
+    m_Localized: Hand Pump
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467976
+    m_Localized: Vacuum Pump
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467977
+    m_Localized: Cryo Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467978
+    m_Localized: Turbine Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467979
+    m_Localized: Plasma Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467980
+    m_Localized: Vortex Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467981
+    m_Localized: Singularity Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467982
+    m_Localized: Excavator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467983
+    m_Localized: Trowel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467984
+    m_Localized: Sonar Scanner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467985
+    m_Localized: Resonance Probe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467986
+    m_Localized: Seismic Excavator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467987
+    m_Localized: Plasma Excavator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467988
+    m_Localized: Quantum Excavator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467989
+    m_Localized: Void Excavator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467990
+    m_Localized: Boulder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467991
+    m_Localized: A weathered lump of rock sits where a pad should be. Break it up
+      with picks and haul the pieces away.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467992
+    m_Localized: Dead Tree
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467993
+    m_Localized: The trunk is long dead and the roots still grip the pad. Fell it,
+      split it, and the wood is yours.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467994
+    m_Localized: Wreckage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467995
+    m_Localized: Someone else's landing ended here. Cut the hull apart for scrap
+      before it blocks anything else.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467996
+    m_Localized: Fungal Growth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467997
+    m_Localized: A shelf of spore-heavy fungus has taken the pad. Burn it back and
+      collect what the rot left behind.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467998
+    m_Localized: Ice Spire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514544467999
+    m_Localized: A spear of old ice has grown through the pad. Melt it carefully;
+      the water is worth keeping.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662272
+    m_Localized: Crystal Cluster
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662273
+    m_Localized: Raw crystal has burst through the ground. Cut it free before the
+      whole pad starts to hum.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662274
+    m_Localized: Magma Crust
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662275
+    m_Localized: A plate of cooled magma has fused over the pad, still ticking as
+      it shrinks. Break the crust and clear the slag.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662276
+    m_Localized: Void Scar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662277
+    m_Localized: Space itself is torn here. Seal the scar with shielding alloy before
+      it spreads under the next pad.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662278
+    m_Localized: A gentle forest world. Perfect for a first axe swing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662279
+    m_Localized: Ironbark Grove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662280
+    m_Localized: Mossy Outcrop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514548662281
+    m_Localized: Rust-red plains laced with ore veins. Few trees.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856576
+    m_Localized: Scrub Trees
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856577
+    m_Localized: Quarry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856578
+    m_Localized: Ore Seam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856579
+    m_Localized: Frozen world with cryo-vents full of fuel.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856580
+    m_Localized: Ice Crystals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856581
+    m_Localized: Volcanic and hostile. Metal-rich, crystal-poor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514552856582
+    m_Localized: Magma Vent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050880
+    m_Localized: Slag Field
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050881
+    m_Localized: Deep Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050882
+    m_Localized: A planet-sized jungle. Titanic trees, dense crystal roots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050883
+    m_Localized: Titan Grove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050884
+    m_Localized: Root Crystals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050885
+    m_Localized: A dark hive world. Dangerous, valuable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050886
+    m_Localized: Crystal Heart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050887
+    m_Localized: Hive Breach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050888
+    m_Localized: Void Ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050889
+    m_Localized: Endless golden dunes hiding dense mineral beds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050890
+    m_Localized: Dune Quarry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050891
+    m_Localized: Gilded Seam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050892
+    m_Localized: An ocean world of floating kelp forests and fuel-rich brine.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050893
+    m_Localized: Kelp Forest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050894
+    m_Localized: A pastel gas giant with floating platforms in the storm bands.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050895
+    m_Localized: Cloud Crystals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050896
+    m_Localized: A molten shell cracked open by rivers of lava.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514557050897
+    m_Localized: Lava Tap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245184
+    m_Localized: Cinder Vein
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245185
+    m_Localized: A serene teal ice world, still and deceptively rich.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245186
+    m_Localized: Frost Geodes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245187
+    m_Localized: A rotting swamp world. Spore storms and enormous fungal trees.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245188
+    m_Localized: Fungal Giants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514561245189
+    m_Localized: Husk Nest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439488
+    m_Localized: Black glass plains threaded with violet crystal.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439489
+    m_Localized: Glass Shelf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439490
+    m_Localized: Violet Spires
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439491
+    m_Localized: Twilight world of endless dusk and warring hives.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439492
+    m_Localized: Dusk Ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439493
+    m_Localized: Hive Heart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439494
+    m_Localized: A crystalline world that fractures light into rainbows. Rare.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439495
+    m_Localized: Prism Fields
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439496
+    m_Localized: A shattered world orbiting nothing. The end of the map.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439497
+    m_Localized: Null Seam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439498
+    m_Localized: Singular Ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439499
+    m_Localized: A windswept frozen steppe on the outer ring.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439500
+    m_Localized: Frozen Pines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439501
+    m_Localized: Permafrost Pit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439502
+    m_Localized: A living reef world with bioluminescent forests.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439503
+    m_Localized: Glow Reef
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439504
+    m_Localized: Pearl Beds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439505
+    m_Localized: Lush emerald moon dense with ancient mossy canopy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514565439506
+    m_Localized: Ancient Canopy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633792
+    m_Localized: River Bed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633793
+    m_Localized: Chalk-white world with deep stone quarries and iron deposits.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633794
+    m_Localized: Hematite Ridge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633795
+    m_Localized: Basalt Quarry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633796
+    m_Localized: Yellow brimstone plains erupting with pressurized vapor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633797
+    m_Localized: Molten Lode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633798
+    m_Localized: Churning rivers of liquid rock and rich titanium deposits.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633799
+    m_Localized: Molten Lode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514569633800
+    m_Localized: Caldera Nexus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828096
+    m_Localized: Oceanic world of giant bioluminescent floating flora.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828097
+    m_Localized: Ancient Canopy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828098
+    m_Localized: River Bed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828099
+    m_Localized: Subterranean fungal hive where massive caps pierce the crust.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828100
+    m_Localized: Titan Fungi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828101
+    m_Localized: Spore Hive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828102
+    m_Localized: A dark world locked in permanent transit. Violet lightning storms.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828103
+    m_Localized: Black Glass Shelf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828104
+    m_Localized: Violet Vein
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828105
+    m_Localized: Void Rift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828106
+    m_Localized: Eerie gravitational void world threaded with alien wreckage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828107
+    m_Localized: Black Glass Shelf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828108
+    m_Localized: Violet Vein
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828109
+    m_Localized: Void Rift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828110
+    m_Localized: Atmosphere glows with shifting auroras above frozen seas.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828111
+    m_Localized: Frost Geodes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828112
+    m_Localized: Frozen Timber
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828113
+    m_Localized: Sub-zero glacial rift where geothermal vents spew concentrated fuel.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828114
+    m_Localized: Frost Geodes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828115
+    m_Localized: Floating crystalline fragments trapped in an ion field.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828116
+    m_Localized: Prismatic Spire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828117
+    m_Localized: Quartz Seam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828118
+    m_Localized: A primordial anomaly pulsating with raw energy. The deepest world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514573828119
+    m_Localized: Fracture Core
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022400
+    m_Localized: Null Bore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022401
+    m_Localized: Swift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022402
+    m_Localized: Faster approach. Victory rewards +10%.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022403
+    m_Localized: Fortified
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022404
+    m_Localized: Tougher aliens. Victory rewards +10%.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022405
+    m_Localized: Overcharged
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022406
+    m_Localized: Harder reactor impacts. Victory rewards +10%.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022407
+    m_Localized: Make landfall yours
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022408
+    m_Localized: Complete your first structure. Construction must finish before it
+      counts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022409
+    m_Localized: First haul
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022410
+    m_Localized: Complete and collect a harvest run. Abandoned runs do not count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022411
+    m_Localized: Room to grow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022412
+    m_Localized: Complete a Warehouse to store resources beyond your backpack.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022413
+    m_Localized: Fuel the frontier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022414
+    m_Localized: Craft fuel at a processing station. Found or starting fuel does
+      not count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022415
+    m_Localized: Leave the cradle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022416
+    m_Localized: Land on a second distinct world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022417
+    m_Localized: Hold your ground
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022418
+    m_Localized: Call and clear an alien wave on your planet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022419
+    m_Localized: A place for discovery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022420
+    m_Localized: Complete a Research Lab to unlock advanced technology.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022421
+    m_Localized: A longer reach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022422
+    m_Localized: Purchase the first Jump Range upgrade. Temporary debug settings
+      do not count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022423
+    m_Localized: Stronger foundations
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022424
+    m_Localized: Craft steel at a Foundry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022425
+    m_Localized: Beyond safe skies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022426
+    m_Localized: Purchase any hazard plating to prepare for hostile worlds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022427
+    m_Localized: Think on a planetary scale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022428
+    m_Localized: Complete the first stage of a megaproject.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514578022429
+    m_Localized: Megaproject mastery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216704
+    m_Localized: Complete stage three of any one megaproject.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216705
+    m_Localized: Foothold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216706
+    m_Localized: Reach the Foothold era by landing on a second world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216707
+    m_Localized: Settlement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216708
+    m_Localized: Complete a Research Lab and purchase Jump Range level one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216709
+    m_Localized: Industry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216710
+    m_Localized: Purchase hazard plating and enter the Industry era.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216711
+    m_Localized: Interstellar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216712
+    m_Localized: Purchase Rad-Shield Plating and craft an Antimatter Pod.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216713
+    m_Localized: Ready for the unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216714
+    m_Localized: Reach the Ascension era by completing stage three of a megaproject.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216715
+    m_Localized: Tier one explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216716
+    m_Localized: Land on a tier one or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216717
+    m_Localized: Tier two explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216718
+    m_Localized: Land on a tier two or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216719
+    m_Localized: Tier three explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216720
+    m_Localized: Land on a tier three or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216721
+    m_Localized: Tier four explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216722
+    m_Localized: Land on a tier four or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216723
+    m_Localized: Tier five explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216724
+    m_Localized: Land on a tier five or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216725
+    m_Localized: Tier six explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216726
+    m_Localized: Land on a tier six or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216727
+    m_Localized: Tier seven explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514582216728
+    m_Localized: Land on a tier seven or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411008
+    m_Localized: Tier eight explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411009
+    m_Localized: Land on a tier eight or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411010
+    m_Localized: Deep frontier explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1502514586411011
+    m_Localized: Land on a tier nine or deeper world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338150584320
+    m_Localized: Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859008
+    m_Localized: Component
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859009
+    m_Localized: Defense
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859010
+    m_Localized: Energy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859011
+    m_Localized: Harvest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859012
+    m_Localized: Industry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859013
+    m_Localized: Logistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859014
+    m_Localized: Megaprojects
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859015
+    m_Localized: Navigation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859016
+    m_Localized: Processing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859017
+    m_Localized: Antimatter Synthesis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859018
+    m_Localized: Automation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859019
+    m_Localized: Ballistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859020
+    m_Localized: Bio Cultivation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859021
+    m_Localized: Cargo Logistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859022
+    m_Localized: Chem Reactor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859023
+    m_Localized: Chemistry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859024
+    m_Localized: Circuitry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859025
+    m_Localized: Colony Charter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859026
+    m_Localized: Composites
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859027
+    m_Localized: Compression 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859028
+    m_Localized: Compression 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859029
+    m_Localized: Cryo Chemistry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859030
+    m_Localized: Deep Drilling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859031
+    m_Localized: Fabrication
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859032
+    m_Localized: Fabricator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859033
+    m_Localized: Feature:ascension
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859034
+    m_Localized: Feature:autopilot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859035
+    m_Localized: Feature:builder 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859036
+    m_Localized: Feature:builder 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859037
+    m_Localized: Field Engineering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859038
+    m_Localized: Foundry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859039
+    m_Localized: Gas Extraction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859040
+    m_Localized: Geo Survey
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859041
+    m_Localized: Hazmat Rad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859042
+    m_Localized: Hazmat Toxic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859043
+    m_Localized: Jump Drive 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859044
+    m_Localized: Jump Drive 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859045
+    m_Localized: Jump Drive 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859046
+    m_Localized: Jump Drive 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859047
+    m_Localized: Long Range Scanning 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859048
+    m_Localized: Long Range Scanning 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859049
+    m_Localized: Optics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859050
+    m_Localized: Orbital Logistics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859051
+    m_Localized: Plasma Physics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859052
+    m_Localized: Quantum Computing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859053
+    m_Localized: Quantum Lab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859054
+    m_Localized: Radiation Shielding
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859055
+    m_Localized: Recipe:assemble Servo Motor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859056
+    m_Localized: Recipe:charge Plasma Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859057
+    m_Localized: Recipe:crystal Cell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859058
+    m_Localized: Recipe:draw Copper Wire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859059
+    m_Localized: Recipe:etch Circuit Board
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859060
+    m_Localized: Recipe:etch Quantum Chip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859061
+    m_Localized: Recipe:forge Rad Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859062
+    m_Localized: Recipe:forge Thermal Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859063
+    m_Localized: Recipe:grind Optic Lens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859064
+    m_Localized: Recipe:grow Void Alloy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859065
+    m_Localized: Recipe:mix Cryo Composite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859066
+    m_Localized: Recipe:press Biocomposite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859067
+    m_Localized: Recipe:smelt Glass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859068
+    m_Localized: Recipe:smelt Iron Plate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859069
+    m_Localized: Recipe:smelt Steel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859070
+    m_Localized: Recipe:smelt Titanium Plate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859071
+    m_Localized: Recipe:synthesize Antimatter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859072
+    m_Localized: Recipe:wind Warp Coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859073
+    m_Localized: Refinery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859074
+    m_Localized: Robotics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859075
+    m_Localized: Smelting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859076
+    m_Localized: Steelmaking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859077
+    m_Localized: Stellar Engineering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859078
+    m_Localized: Structure:auto Harvester
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859079
+    m_Localized: Structure:biodome
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859080
+    m_Localized: Structure:cargo Depot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859081
+    m_Localized: Structure:chem Reactor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859082
+    m_Localized: Structure:colony Hub
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859083
+    m_Localized: Structure:driller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859084
+    m_Localized: Structure:dyson Collector
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859085
+    m_Localized: Structure:excavator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859086
+    m_Localized: Structure:fabricator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859087
+    m_Localized: Structure:foundry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859088
+    m_Localized: Structure:fuel Depot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859089
+    m_Localized: Structure:hangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859090
+    m_Localized: Structure:laser
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859091
+    m_Localized: Structure:missile Silo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859092
+    m_Localized: Structure:orbital Relay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859093
+    m_Localized: Structure:quantum Lab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859094
+    m_Localized: Structure:radar Tower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859095
+    m_Localized: Structure:repair Bay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859096
+    m_Localized: Structure:salvage Yard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859097
+    m_Localized: Structure:shield Pylon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859098
+    m_Localized: Structure:siphon Rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859099
+    m_Localized: Structure:terraformer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859100
+    m_Localized: Structure:tesla Coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859101
+    m_Localized: Structure:warp Gate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859102
+    m_Localized: Survey Basics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859103
+    m_Localized: Terraforming
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859104
+    m_Localized: Thermal Metallurgy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859105
+    m_Localized: Titanium Working
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859106
+    m_Localized: Tool:*:4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859107
+    m_Localized: Tool:*:5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859108
+    m_Localized: Tool:*:6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859109
+    m_Localized: Tool:*:7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859110
+    m_Localized: Tool:drill:2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859111
+    m_Localized: Tool:scanner:2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859112
+    m_Localized: Tool:siphon:2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859113
+    m_Localized: Toolsmithing 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859114
+    m_Localized: Toolsmithing 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859115
+    m_Localized: Toolsmithing 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859116
+    m_Localized: Toolsmithing 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859117
+    m_Localized: Upgrade:compression:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859118
+    m_Localized: Upgrade:compression:2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859119
+    m_Localized: Upgrade:compression:3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859120
+    m_Localized: Upgrade:compression:4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859121
+    m_Localized: Upgrade:hull Cold:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859122
+    m_Localized: Upgrade:hull Heat:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859123
+    m_Localized: Upgrade:hull Rad:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859124
+    m_Localized: Upgrade:hull Toxic:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859125
+    m_Localized: Upgrade:hull Void:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859126
+    m_Localized: Upgrade:jump:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859127
+    m_Localized: Upgrade:jump:10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859128
+    m_Localized: Upgrade:jump:2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859129
+    m_Localized: Upgrade:jump:3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859130
+    m_Localized: Upgrade:jump:4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859131
+    m_Localized: Upgrade:jump:5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859132
+    m_Localized: Upgrade:jump:6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859133
+    m_Localized: Upgrade:jump:7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859134
+    m_Localized: Upgrade:jump:8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859135
+    m_Localized: Upgrade:jump:9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859136
+    m_Localized: Upgrade:scanner Range:1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859137
+    m_Localized: Upgrade:scanner Range:2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859138
+    m_Localized: Upgrade:scanner Range:3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859139
+    m_Localized: Upgrade:scanner Range:4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859140
+    m_Localized: Upgrade:scanner Range:5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859141
+    m_Localized: Upgrade:scanner Range:6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859142
+    m_Localized: Upgrade:scanner Range:7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859143
+    m_Localized: Upgrade:scanner Range:8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859144
+    m_Localized: Void Forging
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859145
+    m_Localized: Warp Gate Engineering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1503338242859146
+    m_Localized: Warp Theory
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

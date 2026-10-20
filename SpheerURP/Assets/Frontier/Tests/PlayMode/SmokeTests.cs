@@ -344,6 +344,8 @@ namespace Frontier.Tests
             while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
             var runtime = FrontierRuntime.Current;
             Assert.IsNotNull(runtime);
+            runtime.State.DebugPlace(runtime.State.db.FindStructure("warehouse"), 0);
+            yield return null;
             var database = UnityEngine.Localization.Settings.LocalizationSettings.StringDatabase;
             var locales = UnityEngine.Localization.Settings.LocalizationSettings.AvailableLocales;
             var previousProvider = database.TableProvider;
@@ -362,6 +364,9 @@ namespace Frontier.Tests
             incomplete.LocaleIdentifier = german.Identifier;
             foreach (var entry in source.entries) complete.AddEntry(entry.key, entry.text);
             foreach (var entry in source.entries)
+                if (entry.key.StartsWith("content.", StringComparison.Ordinal))
+                    complete.GetEntry(entry.key).Value = "LOCALIZED " + entry.key;
+            foreach (var entry in source.entries)
                 if (entry.key.StartsWith("planet.blurb.opener.", StringComparison.Ordinal)
                     || entry.key.StartsWith("planet.blurb.belt.", StringComparison.Ordinal))
                     complete.GetEntry(entry.key).Value = "LOCALIZED TERRAIN";
@@ -376,6 +381,13 @@ namespace Frontier.Tests
             database.TableProvider = provider;
             int structures = runtime.State.structures.Count, shards = runtime.State.ShardBalance;
             string planet = runtime.State.planet.Id;
+            var contentDb = runtime.State.db;
+            string catalogEnglish = JsonUtility.ToJson(contentDb.ToCatalog());
+            var existingStructure = runtime.State.structures[0].def;
+            string structureEnglish = existingStructure.displayName;
+            var research = contentDb.research[0];
+            var ladder = contentDb.toolLadders[0];
+            var objective = runtime.State.Objectives[0];
             var generated = runtime.State.universe.FindGenerated(Frontier.Universe.Biome.Lush, null);
             string generatedEnglish = generated.Description;
             ulong generatedSeed = generated.Seed;
@@ -401,6 +413,28 @@ namespace Frontier.Tests
                 Assert.AreEqual("LOCALIZED BIOME", generated.BiomeName);
                 Assert.AreEqual(generatedSeed, generated.Seed, "Language must not regenerate the planet.");
                 Assert.IsTrue(runtime.Ui.DebugRoot.enabledSelf);
+                foreach (var resource in contentDb.resources)
+                    Assert.AreEqual("LOCALIZED content.resource." + resource.id + ".name", resource.LocalizedName);
+                Assert.AreEqual("LOCALIZED content.structure." + existingStructure.id + ".name", existingStructure.LocalizedName);
+                Assert.AreEqual("LOCALIZED content.research." + research.data.id + ".name", research.LocalizedName);
+                Assert.AreEqual("LOCALIZED content.tool." + ladder.data.id + ".tier-" + ladder.data.tiers[0].tier,
+                    ladder.TierName(ladder.data.tiers[0]));
+                Assert.AreEqual("LOCALIZED content.objective." + objective.id + ".title", objective.LocalizedTitle);
+                var modifier = contentDb.formula.modifiers[0];
+                Assert.AreEqual("LOCALIZED content.wave-modifier.0.name", contentDb.formula.ModifierName(modifier));
+                Assert.AreEqual(structureEnglish, existingStructure.displayName, "Translations must not rewrite authored fields.");
+                Assert.AreEqual(catalogEnglish, JsonUtility.ToJson(contentDb.ToCatalog()), "Localization must not change gameplay catalog data.");
+                var captions = runtime.Planet.Spin.GetComponentsInChildren<UIDocument>();
+                Assert.IsTrue(Array.Exists(captions, caption => caption.rootVisualElement.Query<Label>().ToList()
+                    .Exists(label => label.text != null && label.text.Contains(existingStructure.LocalizedName.ToUpper()))));
+                runtime.Ui.DebugResearch(2);
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                    .Exists(label => label.text == research.LocalizedName.ToUpper()));
+                runtime.Ui.DebugResearch(1);
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                    .Exists(label => label.text == ladder.LocalizedName.ToUpper()));
+                runtime.Ui.DebugMenu("goals");
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == objective.LocalizedTitle));
 
                 string failure = null;
                 LogAssert.Expect(LogType.Warning, "Frontier UI localization is missing a plain-text entry: " + source.entries[0].key);
@@ -421,6 +455,8 @@ namespace Frontier.Tests
                 Assert.AreEqual(planet, runtime.State.planet.Id);
                 yield return UiText.SelectLocale("en", message => Assert.IsNull(message));
                 Assert.AreEqual(generatedEnglish, generated.Description);
+                Assert.AreEqual(structureEnglish, existingStructure.LocalizedName);
+                Assert.AreEqual(catalogEnglish, JsonUtility.ToJson(contentDb.ToCatalog()));
             }
             finally
             {

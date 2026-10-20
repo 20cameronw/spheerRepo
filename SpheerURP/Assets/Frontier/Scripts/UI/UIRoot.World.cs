@@ -181,7 +181,7 @@ namespace Frontier
             else if (k == StructureKind.Alarm) OpenAlarm(s, t);
             else if (k.IsGather()) OpenGatherer(s, t);
             else if (k.IsTurret()) OpenTurret(s, t);
-            else OpenSimple(s, t, UiText.Get("structure.offline"), UiText.Get("structure.planned", s.def.displayName));
+            else OpenSimple(s, t, UiText.Get("structure.offline"), UiText.Get("structure.planned", s.def.LocalizedName));
         }
 
         void OnObstacleTapped(int pad, Transform t)
@@ -195,9 +195,9 @@ namespace Frontier
             Color accent = UiKit.Amber;
             OpenPopup("obstacle-" + gs.planet.Id + "-" + pad, t, accent, body =>
             {
-                body.Add(UiKit.Text(kind != null ? kind.displayName.ToUpperInvariant() : UiText.Get("obstacle.title"), "fr-h2"));
+                body.Add(UiKit.Text(kind != null ? ContentText.Get("obstacle", kind.id, "name", kind.displayName).ToUpperInvariant() : UiText.Get("obstacle.title"), "fr-h2"));
                 if (kind != null && !string.IsNullOrEmpty(kind.description))
-                    body.Add(UiKit.Text(kind.description, "fr-tiny"));
+                    body.Add(UiKit.Text(ContentText.Get("obstacle", kind.id, "description", kind.description), "fr-tiny"));
                 body.Add(SectionLabel(UiText.Get("obstacle.cost")));
                 var cost = gs.ObstacleClearCost(gs.planet, pad);
                 body.Add(cost.Count == 0 ? UiKit.Text(UiText.Get("obstacle.free"), "fr-small") : UiKit.CostRow(cost, gs, true, OpenAtlasResource));
@@ -205,7 +205,7 @@ namespace Frontier
                 body.Add(SectionLabel(UiText.Get("obstacle.salvage")));
                 ResourceSO salvage = gs.db.FindResource(obstacle.Value.reward.resourceId);
                 var rewards = UiKit.Div("fr-row-wrap");
-                if (salvage != null) rewards.Add(ResourceIconChip(salvage, obstacle.Value.reward.amount + " " + salvage.displayName));
+                if (salvage != null) rewards.Add(ResourceIconChip(salvage, obstacle.Value.reward.amount + " " + salvage.LocalizedName));
                 rewards.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("common.xp", obstacle.Value.xp)));
                 if (obstacle.Value.podShards > 0)
                     rewards.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("obstacle.shards", obstacle.Value.podShards)));
@@ -261,7 +261,7 @@ namespace Frontier
             head.AddToClassList("fr-popup-head");
             head.Add(Icons.Make(StructureIcon(s.def.kind), c, UiKit.Size.IconXl));
             var col = UiKit.Div("fr-card-text");
-            col.Add(UiKit.Text(UiText.Get("structure.header", s.def.displayName.ToUpper(), s.level), "fr-h2"));
+            col.Add(UiKit.Text(UiText.Get("structure.header", s.def.LocalizedName.ToUpper(), s.level), "fr-h2"));
             if (!string.IsNullOrEmpty(subtitle)) col.Add(UiKit.Text(subtitle, "fr-tiny"));
             head.Add(col);
             body.Add(head);
@@ -295,7 +295,7 @@ namespace Frontier
                 {
                     Sfx.Good();
                     Toast(gs.IsUpgradeInProgress(s) ? UiText.Get("command.upgrade-started", gs.BuilderJobStatus(s)) :
-                        UiText.Get("command.upgraded", s.def.displayName, s.level), c);
+                        UiText.Get("command.upgraded", s.def.LocalizedName, s.level), c);
                 }
                 else Sfx.Bad();
             });
@@ -320,7 +320,7 @@ namespace Frontier
             OpenPopup("terraformer" + s.slot, t, c, body =>
             {
                 StructureHeader(body, s, c, UiText.Get("structure.terraformer.subtitle"));
-                body.Add(UiKit.Text(s.def.description, "fr-tiny"));
+                body.Add(UiKit.Text(s.def.LocalizedDescription, "fr-tiny"));
                 body.Add(SectionLabel(UiText.Get("structure.terraformer.bonus")));
                 body.Add(UiKit.Text(UiText.Get("structure.terraformer.yield", Mathf.RoundToInt(gs.TerraformerHarvestBonus * 100f)),
                     "fr-small", UiKit.Lime));
@@ -492,7 +492,7 @@ namespace Frontier
                         (1f + bonus + gs.TerraformerHarvestBonus)));
                     row.Add(Icons.Make(Icons.ForResource(sp.resource), rc, UiKit.Size.IconLg));
                     var txt = UiKit.Div("fr-card-text");
-                    txt.Add(UiKit.Text(sp.resource.displayName, "fr-small"));
+                    txt.Add(UiKit.Text(sp.resource.LocalizedName, "fr-small"));
                     txt.Add(UiKit.Text(UiText.Get("gather.estimate", est), "fr-tiny"));
                     row.Add(txt);
                     var go = IconBtn(verb, "play", c, () => { ClosePopup(); StartGather(sp, t, bonus); });
@@ -521,7 +521,7 @@ namespace Frontier
         {
             var row = UiKit.Div("fr-recipe-resource");
             row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
-            row.Add(UiKit.Text(amount + " " + resource.displayName, "fr-small", lack ? UiKit.Red : (Color?)null));
+            row.Add(UiKit.Text(amount + " " + resource.LocalizedName, "fr-small", lack ? UiKit.Red : (Color?)null));
             return row;
         }
 
@@ -530,7 +530,7 @@ namespace Frontier
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("station" + s.slot, t, c, body =>
             {
-                StructureHeader(body, s, c, s.def.description);
+                StructureHeader(body, s, c, s.def.LocalizedDescription);
                 float bonus = gs.StructureBonus(s);
                 int batchSize = gs.StationBatchSize(s);
                 body.Add(UiKit.Text(UiText.Get(batchSize == 1 ? "craft.capacity.one" : "craft.capacity.many", batchSize), "fr-small"));
@@ -577,7 +577,7 @@ namespace Frontier
                     {
                         if (i.resource == null) continue;
                         if (!first) haveText.Append(",  ");
-                        haveText.Append(gs.PlanetCount(i.resource)).Append(' ').Append(i.resource.displayName);
+                        haveText.Append(gs.PlanetCount(i.resource)).Append(' ').Append(i.resource.LocalizedName);
                         first = false;
                     }
                     have.Add(UiKit.Text(UiText.Get("craft.have", haveText.ToString()), "fr-tiny"));
@@ -667,7 +667,8 @@ namespace Frontier
                 body.Add(UiKit.Text(UiText.Get("wave.scaling", info.healthMult, info.damageMult, info.speedMult), "fr-tiny"));
                 if (info.modifier != null)
                 {
-                    var modifier = UiKit.Text(UiText.Get("wave.modifier", info.modifier.name.ToUpperInvariant(), info.modifier.description), "fr-small", UiKit.Amber);
+                    var modifier = UiKit.Text(UiText.Get("wave.modifier", gs.db.formula.ModifierName(info.modifier).ToUpperInvariant(),
+                        gs.db.formula.ModifierDescription(info.modifier)), "fr-small", UiKit.Amber);
                     modifier.style.whiteSpace = WhiteSpace.Normal;
                     body.Add(modifier);
                 }
@@ -683,7 +684,7 @@ namespace Frontier
                     string rank = kv.Key.rank == AlienRank.Standard ? "" : UiText.Get("wave.rank." + kv.Key.rank.ToString().ToLowerInvariant());
                     var identity = UiKit.Div();
                     identity.Add(UiKit.Text(UiText.Get(kv.Key.rank == AlienRank.Standard ? "wave.alien" : "wave.ranked-alien",
-                        kv.Key.displayName, kv.Value, rank), "fr-small"));
+                        kv.Key.LocalizedName, kv.Value, rank), "fr-small"));
                     if (kv.Key.armor > 0f)
                         identity.Add(UiKit.Text(UiText.Get("wave.armor", Mathf.RoundToInt(kv.Key.armor * 100f)), "fr-tiny", UiKit.Amber));
                     chip.Add(identity);
@@ -694,7 +695,7 @@ namespace Frontier
                 body.Add(SectionLabel(UiText.Get("wave.rewards")));
                 var rr = UiKit.Div("fr-row-wrap"); rr.style.marginTop = UiKit.Space.S4;
                 foreach (var i in info.reward)
-                    if (i.resource != null) rr.Add(ResourceIconChip(i.resource, i.amount + " " + i.resource.displayName));
+                    if (i.resource != null) rr.Add(ResourceIconChip(i.resource, i.amount + " " + i.resource.LocalizedName));
                 rr.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("common.xp", info.xp)));
                 body.Add(rr);
 
@@ -751,7 +752,7 @@ namespace Frontier
                 Fx.Burst(t.position, def.color, 50, 5f, 0.25f);
                 planetView.Punch();
                 Toast(UiText.Get(gs.IsUnderConstruction(placed) ? "build.started" : "build.completed",
-                    def.displayName), UiKit.Ui(def.color));
+                    def.LocalizedName), UiKit.Ui(def.color));
                 ExitBuild();
                 return;
             }

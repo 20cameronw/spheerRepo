@@ -135,6 +135,14 @@ database's bytes. Paths are identity: don't rename generated asset files.
 * Import logs each created/updated path, retired paths, content version, tuning digest and total changed count.
   A clean reimport reports `changed=0`.
 
+Authored presentation uses `ContentText` and the SO `LocalizedName`/`LocalizedDescription` accessors; serialized
+English fields and `ToDef`/`ToCatalog` remain untranslated. Run **Frontier > Localization > Sync English Catalog**
+after adding content to append its `content.<category>.<id>.<field>` keys and rebuild the preloaded English table.
+Existing source wording is retained, so edit existing translations in the string catalog as needed. English reads
+the authored fields live; other installed locales must provide every nonempty source entry before selection/build.
+Wave modifiers and authored gather-spot keys use their existing list index: preserve ordering when maintaining
+translations. Planet and player proper names are not translated.
+
 Each original SO keeps its legacy fields and fallback methods. New `ToDef`/`ToCatalog` adapters normalize Unity's
 empty-string representation of optional ids back to null, without mutating saved assets. Structure kinds and
 upgrade effects are appended, never reordered, preserving old serialized enum integers. `StructureKindMap` is

@@ -35,6 +35,8 @@ namespace Frontier
     {
         public string id;
         public string displayName;
+        public string LocalizedName { get { return ContentText.Get("upgrade", id, "name", displayName); } }
+        public string LocalizedDescription { get { return ContentText.Get("upgrade", id, "description", description); } }
         [TextArea] public string description;
         public UpgradeCategory category;
         public UpgradeEffect effect;
@@ -112,13 +114,17 @@ namespace Frontier
         {
             if (HasLevelRows)
             {
-                if (level <= 0) return displayName;
-                string n = levels[Mathf.Min(level, levels.Count) - 1].displayName;
-                return string.IsNullOrEmpty(n) ? displayName : n;
+                if (level <= 0) return LocalizedName;
+                var row = levels[Mathf.Min(level, levels.Count) - 1];
+                return string.IsNullOrEmpty(row.displayName) ? LocalizedName
+                    : ContentText.Get("upgrade", id, "level-" + row.level, row.displayName);
             }
             if (levelNames != null && levelNames.Length > 0)
-                return levelNames[Mathf.Clamp(level, 0, levelNames.Length - 1)];
-            return displayName;
+            {
+                int index = Mathf.Clamp(level, 0, levelNames.Length - 1);
+                return ContentText.Get("upgrade", id, "legacy-level-" + index, levelNames[index]);
+            }
+            return LocalizedName;
         }
 
         public UpgradeDef ToDef()

@@ -28,6 +28,8 @@ namespace Frontier
     {
         public string id;
         public string displayName;
+        public string LocalizedName { get { return ContentText.Get("structure", id, "name", displayName); } }
+        public string LocalizedDescription { get { return ContentText.Get("structure", id, "description", description); } }
         [TextArea] public string description;
         [Tooltip("Behaviour of the structure; the importer derives it from the id (StructureKindMap).")]
         public StructureKind kind;

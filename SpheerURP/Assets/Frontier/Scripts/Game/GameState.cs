@@ -346,7 +346,7 @@ namespace Frontier
                     int tier = ToolTier(ladder);
                     if (ladder.data.tiers == null) break;
                     foreach (var row in ladder.data.tiers)
-                        if (row != null && row.tier == tier) return row.displayName;
+                        if (row != null && row.tier == tier) return ladder.TierName(row);
                 }
             }
             foreach (var u in db.upgrades)

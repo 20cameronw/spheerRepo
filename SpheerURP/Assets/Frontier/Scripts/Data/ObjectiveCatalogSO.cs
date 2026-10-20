@@ -12,6 +12,8 @@ namespace Frontier
     public sealed class ObjectiveDefinition
     {
         public string id, title;
+        public string LocalizedTitle { get { return ContentText.Get("objective", id, "title", title); } }
+        public string LocalizedDescription { get { return ContentText.Get("objective", id, "description", description); } }
         [TextArea] public string description;
         public ObjectiveMetric metric;
         public string targetId;

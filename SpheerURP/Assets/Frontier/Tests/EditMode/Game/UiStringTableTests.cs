@@ -15,6 +15,36 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void AuthoredContentKeysAreUniqueCoveredAndKeepEnglishAuthoringLive()
+        {
+            var db = GameDatabase.Load();
+            var objectives = Resources.Load<ObjectiveCatalogSO>("Frontier/ObjectiveCatalog");
+            var table = Resources.Load<UiStringTableSO>("Frontier/UiStrings");
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var entry in ContentText.EnglishEntries(db, objectives))
+            {
+                Assert.IsTrue(keys.Add(entry.Key), "Duplicate authored-content key: " + entry.Key);
+                if (!string.IsNullOrWhiteSpace(entry.Value))
+                    Assert.DoesNotThrow(() => table.Template(entry.Key), entry.Key);
+            }
+            Assert.Greater(keys.Count, 600);
+            var resource = ScriptableObject.CreateInstance<ResourceSO>();
+            try
+            {
+                resource.id = "authoring-test";
+                resource.displayName = "Original";
+                resource.description = "Original description";
+                Assert.AreEqual("Original", resource.LocalizedName);
+                resource.displayName = "Edited in inspector";
+                resource.description = "Edited description";
+                Assert.AreEqual(resource.displayName, resource.LocalizedName);
+                Assert.AreEqual(resource.description, resource.LocalizedDescription);
+                Assert.AreEqual("authoring-test", resource.id);
+            }
+            finally { Object.DestroyImmediate(resource); }
+        }
+
+        [Test]
         public void LocalizationBuildGuardRejectsStaleEnglish()
         {
             var source = Resources.Load<UiStringTableSO>("Frontier/UiStrings");

@@ -453,7 +453,7 @@ namespace Frontier
             filter.AddToClassList("fr-map-filter");
             filter.tooltip = UiText.Get("map.filter.tooltip");
             filter.choices = new List<string> { UiText.Get("map.filter.all") }; mapResourceIds.Clear(); mapResourceIds.Add("");
-            foreach (var r in gs.db.resources) { filter.choices.Add(r.displayName); mapResourceIds.Add(r.id); }
+            foreach (var r in gs.db.resources) { filter.choices.Add(r.LocalizedName); mapResourceIds.Add(r.id); }
             filter.index = 0;
             filter.RegisterValueChangedCallback(e => { mapResource = mapResourceIds[filter.index]; mapVersion++; mapQueryAt = 0; });
             filter.style.position = Position.Absolute; filter.style.left = 16 + inset.x; filter.style.top = 260 + inset.y; filter.style.width = 260;

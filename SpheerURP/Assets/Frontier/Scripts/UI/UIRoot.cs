@@ -320,7 +320,8 @@ namespace Frontier
                     {
                         waveHudInfo = defense.Current;
                         waveModifierLabel.text = waveHudInfo.modifier == null ? "" :
-                            UiText.Get("wave.modifier", waveHudInfo.modifier.name.ToUpperInvariant(), waveHudInfo.modifier.description);
+                            UiText.Get("wave.modifier", gs.db.formula.ModifierName(waveHudInfo.modifier).ToUpperInvariant(),
+                                gs.db.formula.ModifierDescription(waveHudInfo.modifier));
                         waveModifierLabel.style.display = waveHudInfo.modifier == null ? DisplayStyle.None : DisplayStyle.Flex;
                     }
                     int total = defense.Current.aliens.Count;
@@ -482,7 +483,7 @@ namespace Frontier
                 Color ui = UiKit.Ui(spot.resource.color);
                 if (got > 0)
                 {
-                    Toast(UiText.Get("harvest.reward", got, spot.resource.displayName), ui);
+                    Toast(UiText.Get("harvest.reward", got, spot.resource.LocalizedName), ui);
                     Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
                     planetView.Punch();
                     Sfx.Good();
@@ -495,7 +496,7 @@ namespace Frontier
                     {
                         if (bonusGot > 0)
                         {
-                            Toast(UiText.Get("harvest.reward", bonusGot, spot.resource.displayName), ui);
+                            Toast(UiText.Get("harvest.reward", bonusGot, spot.resource.LocalizedName), ui);
                             Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
                             planetView.Punch();
                             Sfx.Good();
