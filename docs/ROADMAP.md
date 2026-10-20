@@ -800,6 +800,16 @@ tables for every installed locale. A complete test-only alternate table verifies
 startup; no translated language is shipped or claimed. Harvest-bonus refusal messages and the Atlas unknown label
 are also catalog-backed. Physical-device language/font/RTL acceptance and authored translations remain open.
 Focused catalog/save checks passed 17/17; live language selection, Back navigation and menu/guide checks passed 3/3.
+
+**Generated-world text (§7.1):** seeded biome/terrain, weather, size, rings/moons and hazard descriptions now resolve
+stable catalog keys without changing generator data or the original English variant-selection rules. The existing
+sync command appends missing procedural templates while preserving edited source text; build validation requires
+every generated-world template. Cached PlanetData objects resolve descriptions and biome/size names in the current
+language, so switching languages does not regenerate a world or retain its previous-language blurb. Gather-spot
+templates and the Map/Atlas biome, kind, harvesting and hazard labels are catalog-backed. The catalog now has 1062
+entries. Focused catalog/runtime-world/seeded-flavor checks passed 29/29; the live language regression verifies
+translated cached-world text and exact English restoration. Authored content names/descriptions and provider text
+still require catalog migration; no additional shipping language or RTL/font acceptance is claimed.
 **Harvest mini-game catalog slice:** tree/rock, drill, siphon, excavation, salvage and asteroid-field titles, tools,
 instructions, metrics, feedback states, controls and live progress now use the catalog. The player-level HUD and
 travel settings heading also use catalog entries. Four focused catalog/build-guard checks and 12 live mini-game

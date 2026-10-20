@@ -131,14 +131,14 @@ namespace Frontier
                 foreach (var habitat in gs.db.habitats.rows)
                 {
                     if (habitat == null || habitat.resourceId != resource.id) continue;
-                    string area = habitat.belt ? UiText.Get("atlas.resource.belt") : PrettyName(habitat.biome.ToString());
-                    card.Add(UiKit.Text(UiText.Get("atlas.resource.habitat", area, PrettyName(habitat.method.ToString()), habitat.minTier), "fr-small"));
+                    string area = habitat.belt ? UiText.Get("atlas.resource.belt") : PlanetData.EnumText(habitat.biome);
+                    card.Add(UiKit.Text(UiText.Get("atlas.resource.habitat", area, PlanetData.EnumText(habitat.method), habitat.minTier), "fr-small"));
                     habitatCount++;
                 }
             }
             if (habitatCount == 0 && resource.harvestMethods != null)
                 foreach (var method in resource.harvestMethods)
-                    card.Add(UiKit.Text(UiText.Get("atlas.resource.harvest", PrettyName(method.ToString())), "fr-small"));
+                    card.Add(UiKit.Text(UiText.Get("atlas.resource.harvest", PlanetData.EnumText(method)), "fr-small"));
             if (habitatCount == 0 && (resource.harvestMethods == null || resource.harvestMethods.Length == 0))
                 card.Add(UiKit.Text(UiText.Get("atlas.resource.processed"), "fr-small"));
 
@@ -338,9 +338,9 @@ namespace Frontier
         {
             var card = Card(UiKit.Cyan, true);
             card.Add(UiKit.Text(planet.Name.ToUpper(), "fr-h2"));
-            card.Add(UiKit.Text(UiText.Get("atlas.world.summary", planet.SystemName, planet.BiomeName, planet.Tier, planet.Descriptor.Kind), "fr-small"));
+            card.Add(UiKit.Text(UiText.Get("atlas.world.summary", planet.SystemName, planet.BiomeName, planet.Tier, PlanetData.EnumText(planet.Descriptor.Kind)), "fr-small"));
             card.Add(UiKit.Text(UiText.Get("atlas.world.hazards", planet.Danger,
-                planet.Hazards == Hazards.None ? UiText.Get("atlas.world.hazards.none") : planet.Hazards.ToString()), "fr-tiny"));
+                planet.Hazards == Hazards.None ? UiText.Get("atlas.world.hazards.none") : PlanetData.HazardText(planet.Hazards)), "fr-tiny"));
             card.Add(SectionLabel(UiText.Get("atlas.world.resources")));
             foreach (var resource in planet.Resources)
             {

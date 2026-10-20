@@ -118,6 +118,36 @@ namespace Frontier.Universe.Tests
         }
 
         [Test]
+        public void BlurbLocalizationResolvesOnlyStableRegisteredKeysAndPreservesSeededChoices()
+        {
+            var english = new Dictionary<string, string>();
+            foreach (var entry in PlanetBlurb.EnglishEntries()) english.Add(entry.Key, entry.Value);
+            var calls = new List<string>();
+            foreach (var planet in SomePlanets(20))
+            {
+                string original = PlanetBlurb.Describe(planet, 99UL);
+                calls.Clear();
+                string localized = PlanetBlurb.Describe(planet, 99UL, (key, fallback) =>
+                {
+                    Assert.IsTrue(english.ContainsKey(key), key);
+                    Assert.AreEqual(english[key], fallback, key);
+                    calls.Add(key);
+                    return english[key];
+                });
+                Assert.AreEqual(original, localized);
+                var firstCalls = calls.ToArray();
+                calls.Clear();
+                PlanetBlurb.Describe(planet, 99UL, (key, fallback) =>
+                {
+                    calls.Add(key);
+                    return key.StartsWith("planet.blurb.opener.") || key.StartsWith("planet.blurb.belt.")
+                        ? "Translated opener" : fallback;
+                });
+                CollectionAssert.AreEqual(firstCalls, calls, "Language must not change the weather/terrain variant picks.");
+            }
+        }
+
+        [Test]
         public void Blurb_ReflectsTheDescriptor()
         {
             var planets = SomePlanets(1500);

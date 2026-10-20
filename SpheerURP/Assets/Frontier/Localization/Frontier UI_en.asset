@@ -3803,6 +3803,606 @@ MonoBehaviour:
     m_Localized: The harvest bonus could not be saved.
     m_Metadata:
       m_Items: []
+  - m_Id: 1500709316026368
+    m_Localized: Surface Scrap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272576
+    m_Localized: '{0} Grove'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272577
+    m_Localized: '{0} Seam'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272578
+    m_Localized: '{0} Bore'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272579
+    m_Localized: '{0} Siphon'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272580
+    m_Localized: '{0} Dig'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272581
+    m_Localized: '{0} Heap'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272582
+    m_Localized: '{0} Beds'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272583
+    m_Localized: '{0}, {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272584
+    m_Localized: Lush
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272585
+    m_Localized: Mineral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272586
+    m_Localized: Glacial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466880
+    m_Localized: Volcanic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466881
+    m_Localized: Fungal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466882
+    m_Localized: Crystal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466883
+    m_Localized: Obsidian
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466884
+    m_Localized: Shattered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466885
+    m_Localized: Desert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466886
+    m_Localized: Oceanic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466887
+    m_Localized: Gas giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466888
+    m_Localized: Barren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466889
+    m_Localized: Dwarf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466890
+    m_Localized: Small
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466891
+    m_Localized: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466892
+    m_Localized: Large
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466893
+    m_Localized: Giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466894
+    m_Localized: Colossal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466895
+    m_Localized: Rocky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466896
+    m_Localized: Gas Giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466897
+    m_Localized: Asteroid Belt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466898
+    m_Localized: None
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466899
+    m_Localized: Heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466900
+    m_Localized: Cold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466901
+    m_Localized: Toxic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466902
+    m_Localized: Radiation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466903
+    m_Localized: Void
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466904
+    m_Localized: Chop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466905
+    m_Localized: Mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466906
+    m_Localized: Drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466907
+    m_Localized: Siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466908
+    m_Localized: Excavate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466909
+    m_Localized: Salvage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466910
+    m_Localized: Harvest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661184
+    m_Localized: A verdant world blanketed in deep forest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661185
+    m_Localized: A green world of rolling meadows and ancient groves
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661186
+    m_Localized: A humid world of jungle canopies and winding rivers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661187
+    m_Localized: A temperate world of mossy hills and tall timber
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661188
+    m_Localized: A fertile world of open grassland and dense woods
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661189
+    m_Localized: A rugged world of exposed ore seams and rust-red cliffs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661190
+    m_Localized: A stony world laced with mineral veins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661191
+    m_Localized: A rocky world of broken ridges and deep quarries
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661192
+    m_Localized: A metal-rich world of terraced mesas and bare stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661193
+    m_Localized: A frozen world of glaciers and wind-scoured ice sheets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661194
+    m_Localized: An icebound world of crevassed ice fields
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661195
+    m_Localized: A pale world of frozen seas and drifting snow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661196
+    m_Localized: A cold world buried under blue ice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661197
+    m_Localized: A volcanic world of lava rivers and smoking calderas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661198
+    m_Localized: A molten world scarred by fissures and ash plains
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661199
+    m_Localized: A burning world of black basalt and glowing vents
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661200
+    m_Localized: A hostile world cracked open by magma flows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661201
+    m_Localized: A spongy world of towering fungal forests
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661202
+    m_Localized: A damp world carpeted in glowing spore beds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661203
+    m_Localized: A strange world where giant mushrooms pierce the mist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661204
+    m_Localized: A murky world of fungal groves and rotting bogs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661205
+    m_Localized: A glittering world of faceted crystal spires
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661206
+    m_Localized: A brilliant world of shimmering crystal fields
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661207
+    m_Localized: A prismatic world of jagged crystalline ridges
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661208
+    m_Localized: A resonant world grown over with glassy crystal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661209
+    m_Localized: A dark world of black glass plains and violet veins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661210
+    m_Localized: A shadowed world of polished obsidian shelves
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661211
+    m_Localized: A grim world of volcanic glass and deep ravines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661212
+    m_Localized: A dusky world of dark stone and cold lightning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661213
+    m_Localized: A broken world of drifting fragments and open voids
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661214
+    m_Localized: A shattered world torn apart by ancient forces
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661215
+    m_Localized: A fractured world of floating crags and bright rifts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661216
+    m_Localized: A ruined world split by glowing fault lines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661217
+    m_Localized: A scorched world of endless dunes and wind-carved rock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661218
+    m_Localized: A sun-baked world of golden sand seas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661219
+    m_Localized: A dry world of salt flats and shifting dunes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661220
+    m_Localized: An arid world of cracked basins and red mesas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661221
+    m_Localized: A water world of open seas and scattered islets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661222
+    m_Localized: An ocean world of rolling swells and floating kelp forests
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661223
+    m_Localized: A blue world of deep seas and tidal archipelagos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661224
+    m_Localized: A flooded world with only thin ribbons of land
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661225
+    m_Localized: A towering gas giant of banded clouds and storm vortices
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661226
+    m_Localized: A vast gas giant wrapped in swirling cloud bands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661227
+    m_Localized: A gas giant of churning storm bands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661228
+    m_Localized: A hazy gas giant crossed by slow, enormous storms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661229
+    m_Localized: A bare, cratered rock with almost no atmosphere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661230
+    m_Localized: A lifeless world of dust and impact craters
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661231
+    m_Localized: A barren world of grey regolith and long shadows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661232
+    m_Localized: A silent, airless world of pitted stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661233
+    m_Localized: A drifting belt of rubble and tumbling rock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661234
+    m_Localized: A dense ring of asteroids and salvageable wreckage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661235
+    m_Localized: A scattered belt of rock and metal debris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661236
+    m_Localized: beneath clear skies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661237
+    m_Localized: under calm, open skies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661238
+    m_Localized: beneath a quiet sky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661239
+    m_Localized: under steady rain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661240
+    m_Localized: beneath endless grey rain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661241
+    m_Localized: lashed by warm rain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661242
+    m_Localized: under falling snow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661243
+    m_Localized: beneath drifting snowfall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661244
+    m_Localized: shrouded in a snowy haze
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661245
+    m_Localized: under a slow drift of embers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661246
+    m_Localized: beneath showers of embers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661247
+    m_Localized: with ash and embers on the wind
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661248
+    m_Localized: wreathed in drifting spores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661249
+    m_Localized: under clouds of luminous spores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661250
+    m_Localized: with spores hanging in the air
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661251
+    m_Localized: under dust-laden winds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661252
+    m_Localized: beneath a veil of dust
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661253
+    m_Localized: swept by dry, gritty winds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661254
+    m_Localized: wracked by violent storms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661255
+    m_Localized: under constant lightning storms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661256
+    m_Localized: battered by howling storms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661257
+    m_Localized: Its small size leaves room for only a few structures.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661258
+    m_Localized: A tiny world with tight building room.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661259
+    m_Localized: A compact world with modest building room.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661260
+    m_Localized: Compact, with space for a small outpost.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661261
+    m_Localized: There is room for a respectable base.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661262
+    m_Localized: A mid-sized world with decent building room.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661263
+    m_Localized: A large world with plenty of ground to build on.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661264
+    m_Localized: Wide plains and ridges leave generous building room.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661265
+    m_Localized: A giant world with sprawling building room.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661266
+    m_Localized: Its sheer size offers sprawling room for bases.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661267
+    m_Localized: A colossal world with vast tracts of buildable ground.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661268
+    m_Localized: Colossal in scale, with room for a whole network of bases.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661269
+    m_Localized: Landing conditions are mild.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661270
+    m_Localized: A forgiving place to touch down.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661271
+    m_Localized: The ground is stable and the air is kind.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661272
+    m_Localized: '{0} {1}.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661273
+    m_Localized: '{0}.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661274
+    m_Localized: '{0} {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661275
+    m_Localized: Pale rings circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661276
+    m_Localized: A single moon circles it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661277
+    m_Localized: Two moons circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661278
+    m_Localized: Three moons circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661279
+    m_Localized: Four moons circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661280
+    m_Localized: Five moons circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661281
+    m_Localized: Six moons circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661282
+    m_Localized: Seven moons circle it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661283
+    m_Localized: Expect {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661284
+    m_Localized: '{0}, {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661285
+    m_Localized: '{0} and {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661286
+    m_Localized: extreme heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661287
+    m_Localized: bitter cold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661288
+    m_Localized: toxic air
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661289
+    m_Localized: hard radiation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661290
+    m_Localized: void exposure
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

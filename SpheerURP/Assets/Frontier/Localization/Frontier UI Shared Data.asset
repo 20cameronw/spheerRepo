@@ -3663,6 +3663,606 @@ MonoBehaviour:
     m_Key: harvest.bonus.save-failed
     m_Metadata:
       m_Items: []
+  - m_Id: 1500709316026368
+    m_Key: planet.spot.surface-scrap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272576
+    m_Key: planet.spot.chop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272577
+    m_Key: planet.spot.mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272578
+    m_Key: planet.spot.drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272579
+    m_Key: planet.spot.siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272580
+    m_Key: planet.spot.excavate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272581
+    m_Key: planet.spot.salvage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272582
+    m_Key: planet.spot.harvest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272583
+    m_Key: planet.list
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272584
+    m_Key: planet.enum.biome.lush
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272585
+    m_Key: planet.enum.biome.mineral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709429272586
+    m_Key: planet.enum.biome.glacial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466880
+    m_Key: planet.enum.biome.volcanic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466881
+    m_Key: planet.enum.biome.fungal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466882
+    m_Key: planet.enum.biome.crystal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466883
+    m_Key: planet.enum.biome.obsidian
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466884
+    m_Key: planet.enum.biome.shattered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466885
+    m_Key: planet.enum.biome.desert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466886
+    m_Key: planet.enum.biome.oceanic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466887
+    m_Key: planet.enum.biome.gasgiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466888
+    m_Key: planet.enum.biome.barren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466889
+    m_Key: planet.enum.sizeclass.dwarf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466890
+    m_Key: planet.enum.sizeclass.small
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466891
+    m_Key: planet.enum.sizeclass.medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466892
+    m_Key: planet.enum.sizeclass.large
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466893
+    m_Key: planet.enum.sizeclass.giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466894
+    m_Key: planet.enum.sizeclass.colossal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466895
+    m_Key: planet.enum.planetkind.rocky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466896
+    m_Key: planet.enum.planetkind.gasgiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466897
+    m_Key: planet.enum.planetkind.asteroidbelt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466898
+    m_Key: planet.enum.hazards.none
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466899
+    m_Key: planet.enum.hazards.heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466900
+    m_Key: planet.enum.hazards.cold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466901
+    m_Key: planet.enum.hazards.toxic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466902
+    m_Key: planet.enum.hazards.radiation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466903
+    m_Key: planet.enum.hazards.void
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466904
+    m_Key: planet.enum.harvestmethod.chop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466905
+    m_Key: planet.enum.harvestmethod.mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466906
+    m_Key: planet.enum.harvestmethod.drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466907
+    m_Key: planet.enum.harvestmethod.siphon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466908
+    m_Key: planet.enum.harvestmethod.excavate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466909
+    m_Key: planet.enum.harvestmethod.salvage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709433466910
+    m_Key: planet.enum.harvestmethod.harvest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661184
+    m_Key: planet.blurb.opener.lush.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661185
+    m_Key: planet.blurb.opener.lush.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661186
+    m_Key: planet.blurb.opener.lush.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661187
+    m_Key: planet.blurb.opener.lush.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661188
+    m_Key: planet.blurb.opener.lush.4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661189
+    m_Key: planet.blurb.opener.mineral.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661190
+    m_Key: planet.blurb.opener.mineral.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661191
+    m_Key: planet.blurb.opener.mineral.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661192
+    m_Key: planet.blurb.opener.mineral.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661193
+    m_Key: planet.blurb.opener.glacial.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661194
+    m_Key: planet.blurb.opener.glacial.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661195
+    m_Key: planet.blurb.opener.glacial.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661196
+    m_Key: planet.blurb.opener.glacial.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661197
+    m_Key: planet.blurb.opener.volcanic.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661198
+    m_Key: planet.blurb.opener.volcanic.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661199
+    m_Key: planet.blurb.opener.volcanic.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661200
+    m_Key: planet.blurb.opener.volcanic.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661201
+    m_Key: planet.blurb.opener.fungal.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661202
+    m_Key: planet.blurb.opener.fungal.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661203
+    m_Key: planet.blurb.opener.fungal.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661204
+    m_Key: planet.blurb.opener.fungal.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661205
+    m_Key: planet.blurb.opener.crystal.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661206
+    m_Key: planet.blurb.opener.crystal.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661207
+    m_Key: planet.blurb.opener.crystal.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661208
+    m_Key: planet.blurb.opener.crystal.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661209
+    m_Key: planet.blurb.opener.obsidian.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661210
+    m_Key: planet.blurb.opener.obsidian.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661211
+    m_Key: planet.blurb.opener.obsidian.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661212
+    m_Key: planet.blurb.opener.obsidian.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661213
+    m_Key: planet.blurb.opener.shattered.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661214
+    m_Key: planet.blurb.opener.shattered.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661215
+    m_Key: planet.blurb.opener.shattered.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661216
+    m_Key: planet.blurb.opener.shattered.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661217
+    m_Key: planet.blurb.opener.desert.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661218
+    m_Key: planet.blurb.opener.desert.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661219
+    m_Key: planet.blurb.opener.desert.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661220
+    m_Key: planet.blurb.opener.desert.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661221
+    m_Key: planet.blurb.opener.oceanic.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661222
+    m_Key: planet.blurb.opener.oceanic.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661223
+    m_Key: planet.blurb.opener.oceanic.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661224
+    m_Key: planet.blurb.opener.oceanic.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661225
+    m_Key: planet.blurb.opener.gasgiant.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661226
+    m_Key: planet.blurb.opener.gasgiant.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661227
+    m_Key: planet.blurb.opener.gasgiant.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661228
+    m_Key: planet.blurb.opener.gasgiant.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661229
+    m_Key: planet.blurb.opener.barren.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661230
+    m_Key: planet.blurb.opener.barren.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661231
+    m_Key: planet.blurb.opener.barren.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661232
+    m_Key: planet.blurb.opener.barren.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661233
+    m_Key: planet.blurb.belt.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661234
+    m_Key: planet.blurb.belt.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661235
+    m_Key: planet.blurb.belt.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661236
+    m_Key: planet.blurb.sky.clear.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661237
+    m_Key: planet.blurb.sky.clear.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661238
+    m_Key: planet.blurb.sky.clear.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661239
+    m_Key: planet.blurb.sky.rain.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661240
+    m_Key: planet.blurb.sky.rain.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661241
+    m_Key: planet.blurb.sky.rain.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661242
+    m_Key: planet.blurb.sky.snow.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661243
+    m_Key: planet.blurb.sky.snow.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661244
+    m_Key: planet.blurb.sky.snow.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661245
+    m_Key: planet.blurb.sky.embers.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661246
+    m_Key: planet.blurb.sky.embers.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661247
+    m_Key: planet.blurb.sky.embers.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661248
+    m_Key: planet.blurb.sky.spores.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661249
+    m_Key: planet.blurb.sky.spores.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661250
+    m_Key: planet.blurb.sky.spores.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661251
+    m_Key: planet.blurb.sky.dust.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661252
+    m_Key: planet.blurb.sky.dust.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661253
+    m_Key: planet.blurb.sky.dust.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661254
+    m_Key: planet.blurb.sky.storm.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661255
+    m_Key: planet.blurb.sky.storm.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661256
+    m_Key: planet.blurb.sky.storm.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661257
+    m_Key: planet.blurb.size.dwarf.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661258
+    m_Key: planet.blurb.size.dwarf.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661259
+    m_Key: planet.blurb.size.small.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661260
+    m_Key: planet.blurb.size.small.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661261
+    m_Key: planet.blurb.size.medium.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661262
+    m_Key: planet.blurb.size.medium.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661263
+    m_Key: planet.blurb.size.large.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661264
+    m_Key: planet.blurb.size.large.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661265
+    m_Key: planet.blurb.size.giant.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661266
+    m_Key: planet.blurb.size.giant.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661267
+    m_Key: planet.blurb.size.colossal.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661268
+    m_Key: planet.blurb.size.colossal.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661269
+    m_Key: planet.blurb.calm.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661270
+    m_Key: planet.blurb.calm.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661271
+    m_Key: planet.blurb.calm.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661272
+    m_Key: planet.blurb.opening
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661273
+    m_Key: planet.blurb.opening-no-sky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661274
+    m_Key: planet.blurb.join
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661275
+    m_Key: planet.blurb.rings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661276
+    m_Key: planet.blurb.moon.one
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661277
+    m_Key: planet.blurb.moon.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661278
+    m_Key: planet.blurb.moon.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661279
+    m_Key: planet.blurb.moon.4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661280
+    m_Key: planet.blurb.moon.5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661281
+    m_Key: planet.blurb.moon.6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661282
+    m_Key: planet.blurb.moon.7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661283
+    m_Key: planet.blurb.hazards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661284
+    m_Key: planet.blurb.list.more
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661285
+    m_Key: planet.blurb.list.last
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661286
+    m_Key: planet.blurb.hazard.heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661287
+    m_Key: planet.blurb.hazard.cold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661288
+    m_Key: planet.blurb.hazard.toxic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661289
+    m_Key: planet.blurb.hazard.radiation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500709437661290
+    m_Key: planet.blurb.hazard.void
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

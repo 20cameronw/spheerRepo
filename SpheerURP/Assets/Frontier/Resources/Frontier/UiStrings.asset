@@ -14,6 +14,92 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   locale: en
   entries:
+  - key: planet.spot.surface-scrap
+    text: Surface Scrap
+  - key: planet.spot.chop
+    text: '{0} Grove'
+  - key: planet.spot.mine
+    text: '{0} Seam'
+  - key: planet.spot.drill
+    text: '{0} Bore'
+  - key: planet.spot.siphon
+    text: '{0} Siphon'
+  - key: planet.spot.excavate
+    text: '{0} Dig'
+  - key: planet.spot.salvage
+    text: '{0} Heap'
+  - key: planet.spot.harvest
+    text: '{0} Beds'
+  - key: planet.list
+    text: '{0}, {1}'
+  - key: planet.enum.biome.lush
+    text: Lush
+  - key: planet.enum.biome.mineral
+    text: Mineral
+  - key: planet.enum.biome.glacial
+    text: Glacial
+  - key: planet.enum.biome.volcanic
+    text: Volcanic
+  - key: planet.enum.biome.fungal
+    text: Fungal
+  - key: planet.enum.biome.crystal
+    text: Crystal
+  - key: planet.enum.biome.obsidian
+    text: Obsidian
+  - key: planet.enum.biome.shattered
+    text: Shattered
+  - key: planet.enum.biome.desert
+    text: Desert
+  - key: planet.enum.biome.oceanic
+    text: Oceanic
+  - key: planet.enum.biome.gasgiant
+    text: Gas giant
+  - key: planet.enum.biome.barren
+    text: Barren
+  - key: planet.enum.sizeclass.dwarf
+    text: Dwarf
+  - key: planet.enum.sizeclass.small
+    text: Small
+  - key: planet.enum.sizeclass.medium
+    text: Medium
+  - key: planet.enum.sizeclass.large
+    text: Large
+  - key: planet.enum.sizeclass.giant
+    text: Giant
+  - key: planet.enum.sizeclass.colossal
+    text: Colossal
+  - key: planet.enum.planetkind.rocky
+    text: Rocky
+  - key: planet.enum.planetkind.gasgiant
+    text: Gas Giant
+  - key: planet.enum.planetkind.asteroidbelt
+    text: Asteroid Belt
+  - key: planet.enum.hazards.none
+    text: None
+  - key: planet.enum.hazards.heat
+    text: Heat
+  - key: planet.enum.hazards.cold
+    text: Cold
+  - key: planet.enum.hazards.toxic
+    text: Toxic
+  - key: planet.enum.hazards.radiation
+    text: Radiation
+  - key: planet.enum.hazards.void
+    text: Void
+  - key: planet.enum.harvestmethod.chop
+    text: Chop
+  - key: planet.enum.harvestmethod.mine
+    text: Mine
+  - key: planet.enum.harvestmethod.drill
+    text: Drill
+  - key: planet.enum.harvestmethod.siphon
+    text: Siphon
+  - key: planet.enum.harvestmethod.excavate
+    text: Excavate
+  - key: planet.enum.harvestmethod.salvage
+    text: Salvage
+  - key: planet.enum.harvestmethod.harvest
+    text: Harvest
   - key: common.unknown
     text: Unknown
   - key: harvest.bonus.collect-first
@@ -35,25 +121,31 @@ MonoBehaviour:
   - key: settings.language.unavailable
     text: That language is not installed. Your current language is unchanged.
   - key: settings.language.failed
-    text: Could not load a complete language table. Your current language is unchanged. Try again.
+    text: Could not load a complete language table. Your current language is unchanged.
+      Try again.
   - key: clock.history-invalid
-    text: Saved clock history is unreadable. This save is protected from writes; restore a valid backup.
+    text: Saved clock history is unreadable. This save is protected from writes;
+      restore a valid backup.
   - key: clock.rewind-detected
-    text: The device clock is earlier than this save's recorded time. Offline production will resume only after that recorded time is reached. Check your device date and time.
+    text: The device clock is earlier than this save's recorded time. Offline production
+      will resume only after that recorded time is reached. Check your device date
+      and time.
   - key: purchase.recovery-required
-    text: This save contains store purchase history. Reset and restore are unavailable until purchase recovery is configured, to protect your purchases. Your current save has not been replaced.
+    text: This save contains store purchase history. Reset and restore are unavailable
+      until purchase recovery is configured, to protect your purchases. Your current
+      save has not been replaced.
   - key: debug.header
     text: DEBUG TOOLS - FOR TESTING ONLY
   - key: debug.items
     text: GIVE ITEMS
   - key: debug.amount
-    text: 'x{0}'
+    text: x{0}
   - key: debug.give-each
-    text: 'GIVE ONE OF EACH x{0}'
+    text: GIVE ONE OF EACH x{0}
   - key: debug.progress
     text: PROGRESS
   - key: debug.player-level
-    text: 'Player level {0}'
+    text: Player level {0}
   - key: debug.level-one
     text: LEVEL +1
   - key: debug.level-ten
@@ -67,7 +159,8 @@ MonoBehaviour:
   - key: debug.generated-world
     text: GENERATED WORLD (FREE)
   - key: debug.generated-help
-    text: Teleport to the first matching world found outwards from home. NEXT cycles through matches.
+    text: Teleport to the first matching world found outwards from home. NEXT cycles
+      through matches.
   - key: debug.biome.label
     text: BIOME
   - key: debug.size.label
@@ -157,7 +250,8 @@ MonoBehaviour:
   - key: settings.quality
     text: 'QUALITY: {0}'
   - key: settings.quality.help
-    text: 'Using {0} quality. Lower settings reduce effects and mini-game resolution, not gameplay.'
+    text: Using {0} quality. Lower settings reduce effects and mini-game resolution,
+      not gameplay.
   - key: settings.frame-rate
     text: 'FRAME RATE: {0}'
   - key: settings.automatic
@@ -165,7 +259,8 @@ MonoBehaviour:
   - key: settings.fps
     text: '{0} FPS'
   - key: settings.frame-rate.help
-    text: 'Target: {0} fps. 30 saves battery; 60 favours smoother motion. Device limits still apply.'
+    text: 'Target: {0} fps. 30 saves battery; 60 favours smoother motion. Device
+      limits still apply.'
   - key: settings.labels.always
     text: 'STRUCTURE LABELS: ALWAYS'
   - key: settings.labels.selected
@@ -175,7 +270,7 @@ MonoBehaviour:
   - key: settings.reset
     text: RESET PROGRESS
   - key: about.version
-    text: 'Version {0}'
+    text: Version {0}
   - key: harvest.pause
     text: PAUSE
   - key: harvest.getting-ready
@@ -225,7 +320,7 @@ MonoBehaviour:
   - key: harvest.complete
     text: RUN COMPLETE
   - key: harvest.grade
-    text: 'GRADE {0}'
+    text: GRADE {0}
   - key: harvest.performance
     text: '{0} performance'
   - key: harvest.result.metric
@@ -251,11 +346,13 @@ MonoBehaviour:
   - key: harvest.node.title.rock
     text: BREAK THE NODE
   - key: harvest.node.hint
-    text: 'Hit the glowing weak spot. It keeps moving, and every swing needs a moment to recover'
+    text: Hit the glowing weak spot. It keeps moving, and every swing needs a moment
+      to recover
   - key: harvest.drill.title
     text: BORE
   - key: harvest.drill.hint
-    text: Press to drive the drill into the ore. Keep the pressure needle inside the green band
+    text: Press to drive the drill into the ore. Keep the pressure needle inside
+      the green band
   - key: harvest.drill.metric
     text: Seconds on target
   - key: harvest.drill.hold-control
@@ -271,7 +368,8 @@ MonoBehaviour:
   - key: harvest.siphon.metric
     text: Perfect pumps
   - key: harvest.siphon.hint
-    text: Tap PUMP when the needle crosses the capture window. Clean pulses keep the gas flowing
+    text: Tap PUMP when the needle crosses the capture window. Clean pulses keep
+      the gas flowing
   - key: harvest.siphon.pump
     text: PUMP
   - key: harvest.siphon.watch
@@ -285,7 +383,7 @@ MonoBehaviour:
   - key: harvest.siphon.lost
     text: Pressure lost
   - key: harvest.siphon.status
-    text: 'PULSES {0}/{1}   ·   {2}'
+    text: "PULSES {0}/{1}   \xB7   {2}"
   - key: harvest.excavate.title
     text: SONAR EXCAVATION
   - key: harvest.excavate.metric
@@ -295,7 +393,7 @@ MonoBehaviour:
   - key: harvest.excavate.ping
     text: PING
   - key: harvest.excavate.progress
-    text: 'SEAM {0}/{1}  ·  {2} SCANS'
+    text: "SEAM {0}/{1}  \xB7  {2} SCANS"
   - key: harvest.excavate.new-seam
     text: NEW SEAM
   - key: harvest.excavate.near
@@ -315,9 +413,9 @@ MonoBehaviour:
   - key: harvest.excavate.weak-return
     text: WEAK RETURN
   - key: harvest.excavate.echo-status
-    text: '{0}  ·  SEAM {1}/{2}  ·  {3} SCANS'
+    text: "{0}  \xB7  SEAM {1}/{2}  \xB7  {3} SCANS"
   - key: harvest.excavate.located
-    text: 'SEAMS LOCATED {0}/{1}'
+    text: SEAMS LOCATED {0}/{1}
   - key: harvest.salvage.title
     text: WRECKAGE SALVAGE
   - key: harvest.salvage.metric
@@ -325,19 +423,19 @@ MonoBehaviour:
   - key: harvest.salvage.hint
     text: Tap tumbling wreckage to catch it with your claw. Misses cost a cast
   - key: harvest.salvage.help
-    text: 'RECOVER {0} FRAGMENTS  ·  TAP A TARGET'
+    text: "RECOVER {0} FRAGMENTS  \xB7  TAP A TARGET"
   - key: harvest.salvage.locked
-    text: 'FRAGMENT LOCKED  ·  {0}/{1}  ·  {2} CASTS'
+    text: "FRAGMENT LOCKED  \xB7  {0}/{1}  \xB7  {2} CASTS"
   - key: harvest.salvage.recovered-target
     text: TARGET RECOVERED
   - key: harvest.salvage.missed
-    text: 'CLAW MISSED  ·  {0}/{1}  ·  {2} CASTS'
+    text: "CLAW MISSED  \xB7  {0}/{1}  \xB7  {2} CASTS"
   - key: harvest.salvage.aim
     text: AIM AT WRECKAGE
   - key: harvest.salvage.complete
-    text: 'RECOVERED {0}/{1} FRAGMENTS'
+    text: RECOVERED {0}/{1} FRAGMENTS
   - key: harvest.salvage.status
-    text: 'CASTS {0}/{1}  ·  {2}'
+    text: "CASTS {0}/{1}  \xB7  {2}"
   - key: harvest.travel.title
     text: ASTEROID FIELD
   - key: harvest.travel.metric
@@ -345,9 +443,9 @@ MonoBehaviour:
   - key: harvest.travel.hint
     text: Tap a lane to steer. Dodge rocks, grab orbs. Clean flying refunds fuel
   - key: harvest.travel.status
-    text: 'Orbs {0}     Hits {1}'
+    text: Orbs {0}     Hits {1}
   - key: hud.player-level
-    text: 'LV {0}'
+    text: LV {0}
   - key: travel.game.title
     text: TRAVEL GAME
   - key: travel.debug.legacy
@@ -365,41 +463,41 @@ MonoBehaviour:
   - key: world.label.upgrading
     text: '{0}  UPGRADING'
   - key: travel.leg-progress
-    text: 'Leg {0} / {1} · {2}s'
+    text: "Leg {0} / {1} \xB7 {2}s"
   - key: travel.route-changed
     text: Travel changed. Check your route and fuel, then try again.
   - key: travel.arrived
-    text: 'Arrived at {0}'
+    text: Arrived at {0}
   - key: travel.arrived.refund
-    text: 'Arrived at {0} · +{1} fuel back'
+    text: "Arrived at {0} \xB7 +{1} fuel back"
   - key: travel.autopilot
     text: AUTOPILOT
   - key: travel.autopilot.help
-    text: Fuel x1.6 · no piloting refund
+    text: "Fuel x1.6 \xB7 no piloting refund"
   - key: route.calculating
-    text: Calculating route…
+    text: "Calculating route\u2026"
   - key: route.already-here
     text: You are here
   - key: route.unknown
     text: Destination unavailable
   - key: route.no-drive
-    text: Jump drive required · upgrade your ship
+    text: "Jump drive required \xB7 upgrade your ship"
   - key: route.search-limit
-    text: Route search limit · choose a nearer stop
+    text: "Route search limit \xB7 choose a nearer stop"
   - key: route.out-of-range
-    text: No route in jump range · upgrade your drive
+    text: "No route in jump range \xB7 upgrade your drive"
   - key: route.hazard
-    text: Hull plating required · see hazards below
+    text: "Hull plating required \xB7 see hazards below"
   - key: route.fuel-short
-    text: 'Need {0} more energy · craft fuel'
+    text: "Need {0} more energy \xB7 craft fuel"
   - key: route.orbital
-    text: '{0} orbital hop · {1} ly'
+    text: "{0} orbital hop \xB7 {1} ly"
   - key: route.single-jump
-    text: '{0} jump · {1} ly'
+    text: "{0} jump \xB7 {1} ly"
   - key: route.multiple-jumps
-    text: '{0} jumps · {1} ly'
+    text: "{0} jumps \xB7 {1} ly"
   - key: travel.legacy-leg-title
-    text: '{0} · LEG {1} / {2}'
+    text: "{0} \xB7 LEG {1} / {2}"
   - key: nav.backpack
     text: BACKPACK
   - key: common.back
@@ -429,7 +527,8 @@ MonoBehaviour:
   - key: shop.utility
     text: UTILITY
   - key: shop.summary
-    text: 'Build on {0}  -  {1} / {2} free slots  ·  CREWS {3}/{4} busy. Tap a structure on the planet to use it.'
+    text: "Build on {0}  -  {1} / {2} free slots  \xB7  CREWS {3}/{4} busy. Tap a
+      structure on the planet to use it."
   - key: shop.empty
     text: Nothing here yet.
   - key: shop.built
@@ -441,15 +540,18 @@ MonoBehaviour:
   - key: tutorial.build.title
     text: 1. Build
   - key: tutorial.build.body
-    text: Open Build on the bottom dock and place a Lumber Camp, then a Refinery and a Warehouse.
+    text: Open Build on the bottom dock and place a Lumber Camp, then a Refinery
+      and a Warehouse.
   - key: tutorial.storage.title
     text: 2. Storage
   - key: tutorial.storage.body
-    text: Your starter backpack has only 9 slots. Build a Warehouse early to store extra resources and drag stacks between grids.
+    text: Your starter backpack has only 9 slots. Build a Warehouse early to store
+      extra resources and drag stacks between grids.
   - key: tutorial.gather.title
     text: 3. Gather
   - key: tutorial.gather.body
-    text: Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and collect resources.
+    text: Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and
+      collect resources.
   - key: tutorial.refine.title
     text: 4. Refine
   - key: tutorial.refine.body
@@ -457,27 +559,31 @@ MonoBehaviour:
   - key: tutorial.defend.title
     text: 5. Defend
   - key: tutorial.defend.body
-    text: Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight and bigger rewards. Gunners and Lasers defend automatically.
+    text: Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight
+      and bigger rewards. Gunners and Lasers defend automatically.
   - key: tutorial.travel.title
     text: 6. Travel
   - key: tutorial.travel.body
-    text: Open Map on the bottom dock and spend fuel to visit new planets. Your bases stay where you built them.
+    text: Open Map on the bottom dock and spend fuel to visit new planets. Your bases
+      stay where you built them.
   - key: tutorial.upgrade.title
     text: 7. Upgrade
   - key: tutorial.upgrade.body
-    text: Open Command on the bottom dock to manage your bases and unlock upgrades, including more backpack space.
+    text: Open Command on the bottom dock to manage your bases and unlock upgrades,
+      including more backpack space.
   - key: about.title
     text: FRONTIER
   - key: about.body
-    text: Build bases across the stars. Gather, refine, travel, and defend your worlds from alien waves.
+    text: Build bases across the stars. Gather, refine, travel, and defend your worlds
+      from alien waves.
   - key: harvest.reward
-    text: '+{0} {1}'
+    text: +{0} {1}
   - key: harvest.backpack-full
     text: Backpack full!
   - key: harvest.missed
     text: Missed everything...
   - key: harvest.overflow
-    text: 'Lost {0} (backpack full)'
+    text: Lost {0} (backpack full)
   - key: wave.victory
     text: WAVE CLEARED
   - key: wave.defeat
@@ -485,7 +591,7 @@ MonoBehaviour:
   - key: wave.salvage
     text: Salvage recovered
   - key: wave.xp
-    text: '+{0} XP'
+    text: +{0} XP
   - key: wave.overflow
     text: 'Backpack full - lost:'
   - key: wave.defeat.help
@@ -497,19 +603,22 @@ MonoBehaviour:
   - key: hyperspace.bomb
     text: BOMB
   - key: hyperspace.status
-    text: 'HULL {0}   SHIELD {1}/{2}'
+    text: HULL {0}   SHIELD {1}/{2}
   - key: hyperspace.score
     text: '{0:N0} PTS   {1} KILLS   x{2}   {3:P0}'
   - key: hyperspace.boss
-    text: 'GUARDIAN  /  PHASE {0}  /  {1:P0}'
+    text: GUARDIAN  /  PHASE {0}  /  {1:P0}
   - key: hyperspace.bombs
-    text: 'BOMB  {0}/{1}'
+    text: BOMB  {0}/{1}
   - key: hyperspace.overdrive-time
-    text: 'OVERDRIVE  {0:0.0}s'
+    text: OVERDRIVE  {0:0.0}s
   - key: hyperspace.shield-time
-    text: 'SHIELD RECHARGING  {0:0.0}s'
+    text: SHIELD RECHARGING  {0:0.0}s
   - key: hyperspace.tip
-    text: "Drag anywhere to steer. Auto-fire is on.\nDodge the warning shapes. Tap BOMB to clear danger."
+    text: 'Drag anywhere to steer. Auto-fire is on.
+
+      Dodge the warning shapes.
+      Tap BOMB to clear danger.'
   - key: hyperspace.notice.boss
     text: GUARDIAN APPROACHING
   - key: hyperspace.notice.bomb
@@ -523,33 +632,39 @@ MonoBehaviour:
   - key: hyperspace.pause.title
     text: RUN PAUSED
   - key: hyperspace.pause.help
-    text: Your route is frozen. Finishing early completes the trip without loot or a fuel refund.
+    text: Your route is frozen. Finishing early completes the trip without loot or
+      a fuel refund.
   - key: hyperspace.finish
     text: FINISH TRIP
   - key: hyperspace.downed.title
     text: HULL LOST
   - key: hyperspace.downed.revive-help
-    text: Revive with half hull and 3 seconds of protection. Each revive reduces your grade.
+    text: Revive with half hull and 3 seconds of protection. Each revive reduces
+      your grade.
   - key: hyperspace.downed.finish-help
-    text: No revives remain. You can still finish the trip, without loot or a fuel refund.
+    text: No revives remain. You can still finish the trip, without loot or a fuel
+      refund.
   - key: hyperspace.revive.free
-    text: REVIVE · FREE
+    text: "REVIVE \xB7 FREE"
   - key: hyperspace.revive.offer
-    text: REVIVE · VIEW OFFER
+    text: "REVIVE \xB7 VIEW OFFER"
   - key: hyperspace.offer.pending
-    text: WAITING FOR OFFER…
+    text: "WAITING FOR OFFER\u2026"
   - key: hyperspace.result.grade
-    text: 'GRADE {0}'
+    text: GRADE {0}
   - key: hyperspace.result.title
     text: TRIP COMPLETE
   - key: hyperspace.result.summary
-    text: "{0} kills  ·  best combo x{1}\n{2} hits  ·  {3} revives"
+    text: "{0} kills  \xB7  best combo x{1}\n{2} hits  \xB7  {3} revives"
   - key: hyperspace.result.clean
     text: Clean run!
   - key: hyperspace.result.rewards
-    text: '+{0} fuel refunded  ·  +{1} XP'
+    text: "+{0} fuel refunded  \xB7  +{1} XP"
   - key: hyperspace.result.unfinished
-    text: "You reached your destination.\nNo loot or fuel refund for an unfinished run."
+    text: 'You reached your destination.
+
+      No loot or fuel refund for an unfinished
+      run.'
   - key: hyperspace.result.continue
     text: CONTINUE TO DESTINATION
   - key: guide.build.title
@@ -565,15 +680,20 @@ MonoBehaviour:
   - key: guide.travel.title
     text: Land on a new world
   - key: guide.build.help
-    text: Open BUILD > GATHER and place a Lumber Camp on this resource-rich home world.
+    text: Open BUILD > GATHER and place a Lumber Camp on this resource-rich home
+      world.
   - key: guide.gather.help
-    text: Tap the Lumber Camp and complete its wood mini-game. Better runs fill your pack faster.
+    text: Tap the Lumber Camp and complete its wood mini-game. Better runs fill your
+      pack faster.
   - key: guide.store.help
-    text: Your backpack is small by design. Store extra resources in a Warehouse before expanding your haul.
+    text: Your backpack is small by design. Store extra resources in a Warehouse
+      before expanding your haul.
   - key: guide.craft.help
-    text: Build a Refinery, tap it, and craft a recipe from gathered materials. Each recipe is recorded in the Atlas.
+    text: Build a Refinery, tap it, and craft a recipe from gathered materials. Each
+      recipe is recorded in the Atlas.
   - key: guide.defend.help
-    text: Build an Alarm if needed, tap it, and call a wave when you are ready. Defend your base; planets cannot be attacked.
+    text: Build an Alarm if needed, tap it, and call a wave when you are ready. Defend
+      your base; planets cannot be attacked.
   - key: guide.travel.help
     text: Open the map, choose a reachable world, and spend fuel to land there.
   - key: guide.skip
@@ -583,7 +703,8 @@ MonoBehaviour:
   - key: guide.complete.title
     text: Your frontier is open
   - key: guide.complete.help
-    text: You have built, gathered, crafted, defended, and traveled. Follow the Atlas and grow outward at your own pace.
+    text: You have built, gathered, crafted, defended, and traveled. Follow the Atlas
+      and grow outward at your own pace.
   - key: guide.action.atlas
     text: OPEN ATLAS
   - key: guide.action.gather-shop
@@ -611,9 +732,10 @@ MonoBehaviour:
   - key: pack.empty.title
     text: Your backpack is empty
   - key: pack.empty.help
-    text: Resources from harvest runs go here. Use a gatherer on this world, then collect the result to bring materials back.
+    text: Resources from harvest runs go here. Use a gatherer on this world, then
+      collect the result to bring materials back.
   - key: pack.open-gatherer
-    text: 'OPEN {0}'
+    text: OPEN {0}
   - key: pack.slot-count
     text: 'In this slot: {0} / {1}'
   - key: pack.total-count
@@ -633,41 +755,51 @@ MonoBehaviour:
   - key: pack.upgrade-help
     text: Upgrade the backpack in Command > Research for more slots.
   - key: relay.summary
-    text: '{0} · LV {1} · {2}'
+    text: "{0} \xB7 LV {1} \xB7 {2}"
   - key: relay.beam.range
     text: '{0} LY beam'
   - key: relay.beam.system
     text: system beam
   - key: relay.help
-    text: Pull stacks from operational storage on other visited worlds. Each pull costs energy based on stack size and distance; only fuel in your backpack can pay. Fuel Depot reserves stay isolated.
+    text: Pull stacks from operational storage on other visited worlds. Each pull
+      costs energy based on stack size and distance; only fuel in your backpack can
+      pay. Fuel Depot reserves stay isolated.
   - key: relay.empty
-    text: No remote warehouses are in range. Build storage on another visited world, or upgrade the relay to extend its beam.
+    text: No remote warehouses are in range. Build storage on another visited world,
+      or upgrade the relay to extend its beam.
   - key: relay.range.system
     text: SAME SYSTEM
   - key: relay.range.distance
     text: '{0:0.#} LY'
   - key: relay.pull
-    text: 'PULL {0} · {1} ENERGY'
+    text: "PULL {0} \xB7 {1} ENERGY"
   - key: relay.transferred
-    text: 'Relayed {0} {1}'
+    text: Relayed {0} {1}
   - key: relay.blocked
     text: 'Transfer blocked: check backpack space and carried fuel.'
   - key: relay.storage-empty
-    text: This storage is empty. Visit {0} and deposit resources there before pulling them through the relay.
+    text: This storage is empty. Visit {0} and deposit resources there before pulling
+      them through the relay.
   - key: storage.summary
     text: '{0}  -  LV {1}  -  {2} / {3} storage slots'
   - key: storage.help.fuel
-    text: Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger fuel stacks; reserves stay on this planet and never pay travel costs.
+    text: Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger
+      fuel stacks; reserves stay on this planet and never pay travel costs.
   - key: storage.help.harvester
-    text: This hopper stores the Auto-Harvester's offline output. A local Cargo Depot connects its materials to this planet's shared build and craft pool.
+    text: This hopper stores the Auto-Harvester's offline output. A local Cargo Depot
+      connects its materials to this planet's shared build and craft pool.
   - key: storage.help.cargo
-    text: This shared buffer joins operational Warehouses and Auto-Harvester hoppers on this planet. Build and craft costs draw from the pool automatically; travel still uses your backpack.
+    text: This shared buffer joins operational Warehouses and Auto-Harvester hoppers
+      on this planet. Build and craft costs draw from the pool automatically; travel
+      still uses your backpack.
   - key: storage.help.connected
-    text: Connected to this planet's Cargo Depot. Build and craft costs can draw from this storage automatically.
+    text: Connected to this planet's Cargo Depot. Build and craft costs can draw
+      from this storage automatically.
   - key: storage.help.warehouse
-    text: Drag a stack between the grids. Resources stay on this planet. Costs use the backpack until a Cargo Depot connects its storage.
+    text: Drag a stack between the grids. Resources stay on this planet. Costs use
+      the backpack until a Cargo Depot connects its storage.
   - key: storage.offline
-    text: 'OFFLINE {0:0.#} run-eq/hr  ·  {1}h cap'
+    text: "OFFLINE {0:0.#} run-eq/hr  \xB7  {1}h cap"
   - key: storage.filter.all
     text: ALL RESOURCES
   - key: storage.filter.help
@@ -703,17 +835,21 @@ MonoBehaviour:
   - key: storage.pack-slot-full
     text: Backpack slot is full.
   - key: storage.empty.harvester
-    text: No offline output yet. Leave this operational harvester on a world with compatible deposits and return later.
+    text: No offline output yet. Leave this operational harvester on a world with
+      compatible deposits and return later.
   - key: storage.empty.both
-    text: Storage and backpack are empty. Gather local resources first, then return here to deposit them.
+    text: Storage and backpack are empty. Gather local resources first, then return
+      here to deposit them.
   - key: storage.empty.fuel
-    text: No fuel is reserved here. Drag a carried ship-fuel stack from the backpack below into an empty reserve slot.
+    text: No fuel is reserved here. Drag a carried ship-fuel stack from the backpack
+      below into an empty reserve slot.
   - key: storage.empty.warehouse
-    text: No resources stored yet. Drag a carried stack from the backpack below into an empty storage slot.
+    text: No resources stored yet. Drag a carried stack from the backpack below into
+      an empty storage slot.
   - key: storage.find-resources
     text: FIND LOCAL RESOURCES
   - key: storage.pack-capacity
-    text: 'BACKPACK  -  {0} / {1}'
+    text: BACKPACK  -  {0} / {1}
   - key: storage.carried-count
     text: '{0}: {1} carried'
   - key: storage.fuel-only
@@ -745,13 +881,16 @@ MonoBehaviour:
   - key: goals.title
     text: YOUR NEXT FRONTIER
   - key: goals.help
-    text: One-time rewards for real progress. Older completed milestones are recorded without a payout.
+    text: One-time rewards for real progress. Older completed milestones are recorded
+      without a payout.
   - key: goals.unavailable
-    text: Goals are unavailable because the content catalogue could not be loaded. Your progression is unchanged; restart after repairing or updating the game.
+    text: Goals are unavailable because the content catalogue could not be loaded.
+      Your progression is unchanged; restart after repairing or updating the game.
   - key: goals.summary
     text: '{0} / {1} collected  |  {2} ready'
   - key: goals.read-only
-    text: This save is read-only. Rewards cannot be collected until a compatible build can save it.
+    text: This save is read-only. Rewards cannot be collected until a compatible
+      build can save it.
   - key: goals.ready
     text: READY TO COLLECT
   - key: goals.next
@@ -795,9 +934,9 @@ MonoBehaviour:
   - key: research.tier
     text: T{0}
   - key: research.lab
-    text: '{0}  ·  LAB {1}'
+    text: "{0}  \xB7  LAB {1}"
   - key: research.prerequisites
-    text: PREREQUISITES  ·  {0}
+    text: "PREREQUISITES  \xB7  {0}"
   - key: research.complete-help
     text: 'Research complete. Unlocks: {0}'
   - key: research.buy
@@ -805,23 +944,24 @@ MonoBehaviour:
   - key: research.purchased
     text: '{0} researched'
   - key: research.unlocks
-    text: UNLOCKS  ·  {0}
+    text: "UNLOCKS  \xB7  {0}"
   - key: research.progression
     text: Progression
   - key: tools.title
     text: CATALOG TOOL TIERS
   - key: tools.help
-    text: Higher tiers improve harvest yield. Research and material costs determine when each tier becomes available.
+    text: Higher tiers improve harvest yield. Research and material costs determine
+      when each tier becomes available.
   - key: tools.max
     text: MAX TIER
   - key: tools.tier
     text: TIER {0}/{1}
   - key: tools.yield
-    text: '{0}  ·  YIELD x{1:0.0}'
+    text: "{0}  \xB7  YIELD x{1:0.0}"
   - key: tools.max-help
     text: Maximum tool tier reached.
   - key: tools.next
-    text: 'NEXT  ·  {0}  ·  YIELD x{1:0.0}'
+    text: "NEXT  \xB7  {0}  \xB7  YIELD x{1:0.0}"
   - key: tools.upgrade
     text: UPGRADE TOOL
   - key: tools.purchased
@@ -835,7 +975,7 @@ MonoBehaviour:
   - key: tools.equipped-summary
     text: 'Equipped: {0}   DMG x{1:0.0}   Yield x{2:0.0}'
   - key: tools.level-summary
-    text: 'DMG x{0:0.0}   Yield x{1:0.0}   Faster swing'
+    text: DMG x{0:0.0}   Yield x{1:0.0}   Faster swing
   - key: tools.equipped
     text: EQUIPPED
   - key: tools.owned
@@ -849,11 +989,12 @@ MonoBehaviour:
   - key: command.here
     text: YOU ARE HERE
   - key: command.empty-base
-    text: Start a base on {0} with a local resource gatherer. Store extra materials in a Warehouse, then add a Refinery.
+    text: Start a base on {0} with a local resource gatherer. Store extra materials
+      in a Warehouse, then add a Refinery.
   - key: command.structure-level
     text: '{0}  LV {1}/{2}'
   - key: command.upgrade-started
-    text: Upgrade started · {0}
+    text: "Upgrade started \xB7 {0}"
   - key: command.upgraded
     text: '{0} LV {1}'
   - key: command.maxed
@@ -865,7 +1006,7 @@ MonoBehaviour:
   - key: command.effect.current
     text: Now {0}
   - key: command.effect.next
-    text: 'Now {0}  >  {1}'
+    text: Now {0}  >  {1}
   - key: effect.damage
     text: dmg {0}
   - key: effect.storage
@@ -873,45 +1014,45 @@ MonoBehaviour:
   - key: effect.fuel-storage
     text: '{0} fuel slots'
   - key: effect.fuel-storage-stack
-    text: '{0} fuel slots · +{1}% fuel stack'
+    text: "{0} fuel slots \xB7 +{1}% fuel stack"
   - key: effect.offline-harvest
-    text: '{0:0.#} runs/hr · {1}h offline · {2} output slots'
+    text: "{0:0.#} runs/hr \xB7 {1}h offline \xB7 {2} output slots"
   - key: effect.beam.range
-    text: '{0} ly beam · {1}% energy'
+    text: "{0} ly beam \xB7 {1}% energy"
   - key: effect.beam.system
-    text: system beam · {1}% energy
+    text: "system beam \xB7 {1}% energy"
   - key: effect.lab
     text: Research Lab level {0}
   - key: effect.survey
-    text: '+{0} ly local survey'
+    text: +{0} ly local survey
   - key: effect.builders
-    text: '+{0} builder crews'
+    text: +{0} builder crews
   - key: effect.warp-gate
-    text: '-{0}% fuel · +{0}% jump range'
+    text: "-{0}% fuel \xB7 +{0}% jump range"
   - key: effect.dyson
-    text: '{0:0} energy/hr · {1}h reserve'
+    text: "{0:0} energy/hr \xB7 {1}h reserve"
   - key: effect.terraformer
-    text: '+{0}% global harvest'
+    text: +{0}% global harvest
   - key: effect.batch
     text: Batch size {0} (level bonus planned)
   - key: effect.output
-    text: '+{0}% output'
+    text: +{0}% output
   - key: effect.yield
-    text: '+{0}% yield'
+    text: +{0}% yield
   - key: effect.rewards
-    text: '+{0}% rewards, XP'
+    text: +{0}% rewards, XP
   - key: effect.tool-power
     text: x{0:0.0} yield
   - key: effect.pack-slots
-    text: '+{0} slots'
+    text: +{0} slots
   - key: effect.fire-rate
-    text: '+{0}% firing speed'
+    text: +{0}% firing speed
   - key: effect.health
-    text: '+{0} HP'
+    text: +{0} HP
   - key: effect.range
     text: '{0:0} ly'
   - key: effect.fuel-use
-    text: '-{0}% fuel use'
+    text: -{0}% fuel use
   - key: effect.tank-slots
     text: '{0:0} tank slots (coming later)'
   - key: effect.plating
@@ -919,11 +1060,11 @@ MonoBehaviour:
   - key: effect.stack-multiplier
     text: x{0:0.00} stacks (coming later)
   - key: effect.percent
-    text: '+{0}%'
+    text: +{0}%
   - key: wave.tap-help
     text: Tap aliens to zap them
   - key: wave.progress
-    text: 'WAVE {0}   {1} / {2}'
+    text: WAVE {0}   {1} / {2}
   - key: wave.reactor
     text: REACTOR {0}
   - key: structure.ready
@@ -931,13 +1072,15 @@ MonoBehaviour:
   - key: structure.builder
     text: Builder crew assigned
   - key: structure.stage
-    text: STAGE {0} / {1}  ·  {2}
+    text: "STAGE {0} / {1}  \xB7  {2}"
   - key: structure.terraformer.pending
     text: The global harvest bonus activates when this timer completes.
   - key: structure.warp.pending
-    text: Range and fuel effects activate when complete and apply only to trips leaving this world.
+    text: Range and fuel effects activate when complete and apply only to trips leaving
+      this world.
   - key: structure.dyson.pending
-    text: Fuel production starts when complete; collected fuel stays in this world's reserve.
+    text: Fuel production starts when complete; collected fuel stays in this world's
+      reserve.
   - key: structure.offline-time
     text: Jobs use local device time in this offline build.
   - key: structure.offline
@@ -945,17 +1088,17 @@ MonoBehaviour:
   - key: structure.planned
     text: '{0} gameplay is planned for a future update.'
   - key: structure.header
-    text: "{0}  LV\u00A0{1}"
+    text: "{0}  LV\_{1}"
   - key: structure.max
     text: MAX LEVEL
   - key: structure.upgrade-preview
     text: UPGRADE TO LV {0}  ({1})
   - key: obstacle.clearing
-    text: CLEARING  ·  {0}
+    text: "CLEARING  \xB7  {0}"
   - key: obstacle.completing
     text: CLEARANCE COMPLETING
   - key: obstacle.skip
-    text: SKIP  ·  {0} SHARDS
+    text: "SKIP  \xB7  {0} SHARDS"
   - key: obstacle.title
     text: SURFACE OBSTRUCTION
   - key: obstacle.cost
@@ -965,7 +1108,7 @@ MonoBehaviour:
   - key: obstacle.salvage
     text: RECOVERABLE SALVAGE
   - key: obstacle.shards
-    text: '+{0} shards'
+    text: +{0} shards
   - key: obstacle.timer-help
     text: Clearance continues while you explore. Timers use local device time.
   - key: obstacle.cleared
@@ -1003,19 +1146,20 @@ MonoBehaviour:
   - key: gather.estimate
     text: about {0} per run
   - key: craft.capacity.one
-    text: BATCH CAPACITY  ·  {0} CRAFT PER TAP
+    text: "BATCH CAPACITY  \xB7  {0} CRAFT PER TAP"
   - key: craft.capacity.many
-    text: BATCH CAPACITY  ·  {0} CRAFTS PER TAP
+    text: "BATCH CAPACITY  \xB7  {0} CRAFTS PER TAP"
   - key: craft.pooled-help
-    text: Recipe inputs draw from this planet's backpack and pooled Warehouses. Outputs go to the backpack.
+    text: Recipe inputs draw from this planet's backpack and pooled Warehouses. Outputs
+      go to the backpack.
   - key: craft.pack-help
     text: Recipe inputs and outputs use the backpack.
   - key: craft.recipes
     text: RECIPES  -  you give  >  you get
   - key: craft.inputs
-    text: INPUT · BATCH x{0}
+    text: "INPUT \xB7 BATCH x{0}"
   - key: craft.outputs
-    text: OUTPUT · BATCH x{0}
+    text: "OUTPUT \xB7 BATCH x{0}"
   - key: craft.have
     text: 'You have: {0}'
   - key: craft.make-batch
@@ -1059,7 +1203,7 @@ MonoBehaviour:
   - key: structure.terraformer.bonus
     text: GLOBAL HARVEST BONUS
   - key: structure.terraformer.yield
-    text: '+{0}% harvest yield on all worlds'
+    text: +{0}% harvest yield on all worlds
   - key: structure.megaproject-stages
     text: 'Megaproject stages completed: {0}'
   - key: structure.warp.subtitle
@@ -1069,15 +1213,17 @@ MonoBehaviour:
   - key: structure.warp.range
     text: 'Jump range from this world: {0:0} ly  ->  {1:0} ly'
   - key: structure.warp.discount
-    text: 'Combined departure fuel discount: {0:0.#}% (local Hangar + Warp Gate). Applies only when leaving this world.'
+    text: 'Combined departure fuel discount: {0:0.#}% (local Hangar + Warp Gate).
+      Applies only when leaving this world.'
   - key: structure.dyson.subtitle
     text: Offline fuel generation
   - key: structure.dyson.production
-    text: 'Production: {0:0} energy / hour  ·  {1:0}h reserve'
+    text: "Production: {0:0} energy / hour  \xB7  {1:0}h reserve"
   - key: structure.dyson.reserve
     text: 'Stored reserve: {0:0} / {1:0} energy'
   - key: structure.dyson.help
-    text: Unclaimed energy stays here if your backpack is full. A full reserve pauses production.
+    text: Unclaimed energy stays here if your backpack is full. A full reserve pauses
+      production.
   - key: structure.dyson.collect
     text: COLLECT {0} FUEL
   - key: structure.dyson.full
@@ -1089,13 +1235,15 @@ MonoBehaviour:
   - key: structure.lab.subtitle
     text: Research and tool upgrades
   - key: structure.lab.help
-    text: Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced research.
+    text: Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced
+      research.
   - key: structure.hub.subtitle
     text: Builder crew capacity
   - key: structure.hub.capacity
-    text: 'Hub bonus: +{0} crew  ·  Colony total: {1}/{2}'
+    text: "Hub bonus: +{0} crew  \xB7  Colony total: {1}/{2}"
   - key: structure.hub.help
-    text: 'Hub upgrades add crews at levels 3 and 7. This Hub reduces local obstacle-clearance material costs by {0:0.#}%.'
+    text: Hub upgrades add crews at levels 3 and 7. This Hub reduces local obstacle-clearance
+      material costs by {0:0.#}%.
   - key: structure.radar.subtitle
     text: Expands local survey coverage
   - key: structure.radar.coverage
@@ -1107,13 +1255,15 @@ MonoBehaviour:
   - key: structure.hangar.discount
     text: 'Departure discount: {0:0.#}%'
   - key: structure.hangar.help
-    text: This combines local Hangar and Warp Gate discounts for manual and autopilot routes. Other planets use their own structures.
+    text: This combines local Hangar and Warp Gate discounts for manual and autopilot
+      routes. Other planets use their own structures.
   - key: structure.shield.subtitle
     text: Reinforces this planet's reactor during called waves
   - key: structure.shield.maximum
-    text: 'Reactor maximum: {0:0.#}  ·  +{1:0.#}% shield field'
+    text: "Reactor maximum: {0:0.#}  \xB7  +{1:0.#}% shield field"
   - key: structure.shield.help
-    text: Only the planet with this operational Pylon receives the extra reactor health.
+    text: Only the planet with this operational Pylon receives the extra reactor
+      health.
   - key: structure.repair.subtitle
     text: Repairs reactor damage during called waves
   - key: structure.repair.rate
@@ -1139,7 +1289,7 @@ MonoBehaviour:
   - key: wave.ranked-alien
     text: '{2} {0} x{1}'
   - key: effect.builders-discount
-    text: '+{0} crews · -{1:0.#}% clearance cost'
+    text: "+{0} crews \xB7 -{1:0.#}% clearance cost"
   - key: builders.view
     text: VIEW CREW JOBS
   - key: command.tech
@@ -1147,21 +1297,23 @@ MonoBehaviour:
   - key: builders.tab
     text: CREWS
   - key: builders.help
-    text: Construction, upgrades and clearance use your shared builder crews. Timers use local device time. Finish a structure job with Nova Shards or for free near completion; review and confirm before spending.
+    text: Construction, upgrades and clearance use your shared builder crews. Timers
+      use local device time. Finish a structure job with Nova Shards or for free
+      near completion; review and confirm before spending.
   - key: builders.summary
-    text: '{0} / {1} crews busy  ·  {2} Nova Shards'
+    text: "{0} / {1} crews busy  \xB7  {2} Nova Shards"
   - key: builders.structure
-    text: '{0}  ·  {1}'
+    text: "{0}  \xB7  {1}"
   - key: builders.finish-free
     text: FINISH FREE
   - key: builders.confirm-free
     text: TAP AGAIN TO FINISH FREE
   - key: builders.finish-paid
-    text: FINISH  ·  {0} SHARDS
+    text: "FINISH  \xB7  {0} SHARDS"
   - key: builders.confirm-paid
-    text: CONFIRM  ·  {0} SHARDS
+    text: "CONFIRM  \xB7  {0} SHARDS"
   - key: builders.clearance
-    text: 'Clearance  ·  {0}  ·  Pad {1}'
+    text: "Clearance  \xB7  {0}  \xB7  Pad {1}"
   - key: builders.manage-clearance
     text: MANAGE CLEARANCE
   - key: builders.view-world
@@ -1169,21 +1321,25 @@ MonoBehaviour:
   - key: builders.clearance-unavailable
     text: This clearance is no longer available on the surface.
   - key: builders.empty
-    text: All crews are available. Build a structure, start an upgrade or assign obstacle clearance to give them a job.
+    text: All crews are available. Build a structure, start an upgrade or assign
+      obstacle clearance to give them a job.
   - key: builders.read-only
     text: This save is read-only. Shard and free finishing are disabled.
   - key: builders.unknown-world
-    text: 'This job references an unavailable world: {0}. Reload the save to recover its crew assignment.'
+    text: 'This job references an unavailable world: {0}. Reload the save to recover
+      its crew assignment.'
   - key: builders.recruit-title
     text: EXPAND YOUR CREWS
   - key: builders.recruit-help
-    text: Earn your second crew through Field Engineering. Additional crews can be recruited with shards or earned from Colony Hub upgrades. All sources share the crew cap.
+    text: Earn your second crew through Field Engineering. Additional crews can be
+      recruited with shards or earned from Colony Hub upgrades. All sources share
+      the crew cap.
   - key: builders.recruit-offer
-    text: 'Recruit crew {0} of {1}'
+    text: Recruit crew {0} of {1}
   - key: builders.recruit
-    text: RECRUIT  ·  {0} SHARDS
+    text: "RECRUIT  \xB7  {0} SHARDS"
   - key: builders.recruit-confirm
-    text: CONFIRM RECRUIT  ·  {0} SHARDS
+    text: "CONFIRM RECRUIT  \xB7  {0} SHARDS"
   - key: builders.cap-reached
     text: Shared crew cap reached. No purchase is needed.
   - key: builders.earn-second
@@ -1191,9 +1347,9 @@ MonoBehaviour:
   - key: hyperspace.revive.balance
     text: '{0} Nova Shards available'
   - key: hyperspace.revive.shards
-    text: REVIVE  ·  {0} SHARDS
+    text: "REVIVE  \xB7  {0} SHARDS"
   - key: hyperspace.revive.shards-confirm
-    text: CONFIRM REVIVE  ·  {0} SHARDS
+    text: "CONFIRM REVIVE  \xB7  {0} SHARDS"
   - key: hyperspace.revive.read-only
     text: This save is read-only. Shard revives are disabled.
   - key: map.recenter
@@ -1201,9 +1357,10 @@ MonoBehaviour:
   - key: map.search.tooltip
     text: Known system/world name, canonical id, or x,y light-years
   - key: ascension.title
-    text: 'ASCENSION {0}'
+    text: ASCENSION {0}
   - key: ascension.disabled
-    text: Ascension is not enabled in this build. Your current universe and progression are unchanged.
+    text: Ascension is not enabled in this build. Your current universe and progression
+      are unchanged.
   - key: ascension.legacy-points
     text: Legacy points
   - key: ascension.harvest-yield
@@ -1211,15 +1368,21 @@ MonoBehaviour:
   - key: ascension.score-multiplier
     text: Score multiplier
   - key: ascension.summary
-    text: Optional. Stay in this universe as long as you like. Ascension begins a new seeded frontier with a permanent Legacy harvest bonus and the rank score multiplier.
+    text: Optional. Stay in this universe as long as you like. Ascension begins a
+      new seeded frontier with a permanent Legacy harvest bonus and the rank score
+      multiplier.
   - key: ascension.keeps
-    text: 'KEEP: Nova Shards, Atlas knowledge, researched blueprints, saved cosmetic/settings records and one-time achievement history.'
+    text: 'KEEP: Nova Shards, Atlas knowledge, researched blueprints, saved cosmetic/settings
+      records and one-time achievement history.'
   - key: ascension.resets
-    text: 'RESTART: worlds, structures, cargo, storage, tools, purchased upgrades, XP, waves and active builder jobs. Megaproject bonuses must be built again.'
+    text: 'RESTART: worlds, structures, cargo, storage, tools, purchased upgrades,
+      XP, waves and active builder jobs. Megaproject bonuses must be built again.'
   - key: ascension.next-yield
-    text: 'Next Legacy harvest yield: x{0:0.00}. The authored bonus caps at +{1:0}%; one-time rewards cannot be farmed again.'
+    text: 'Next Legacy harvest yield: x{0:0.00}. The authored bonus caps at +{1:0}%;
+      one-time rewards cannot be farmed again.'
   - key: ascension.recovery
-    text: A local recovery copy retains the previous universe. This replaces any earlier recovery copy; it is not a cloud backup.
+    text: A local recovery copy retains the previous universe. This replaces any
+      earlier recovery copy; it is not a cloud backup.
   - key: ascension.open-command
     text: OPEN COMMAND
   - key: ascension.open-build
@@ -1227,7 +1390,8 @@ MonoBehaviour:
   - key: ascension.review
     text: REVIEW NEW UNIVERSE
   - key: ascension.confirm-prompt
-    text: Replace this universe and restart with the retained progress listed above? You will return to the home world.
+    text: Replace this universe and restart with the retained progress listed above?
+      You will return to the home world.
   - key: ascension.confirm
     text: CONFIRM NEW UNIVERSE
   - key: ascension.stay
@@ -1245,9 +1409,11 @@ MonoBehaviour:
   - key: ascension.lock.project
     text: Complete stage {0} of a megaproject in this universe.
   - key: ascension.save-retry
-    text: 'Ascension completed, but the updated local save needs a retry. Keep the game open. {0}'
+    text: Ascension completed, but the updated local save needs a retry. Keep the
+      game open. {0}
   - key: ascension.completed
-    text: 'Ascension {0} complete. Your previous universe is retained in the local recovery copy.'
+    text: Ascension {0} complete. Your previous universe is retained in the local
+      recovery copy.
   - key: map.search.placeholder
     text: World / system name or x,y
   - key: map.search.find
@@ -1257,77 +1423,77 @@ MonoBehaviour:
   - key: map.filter.all
     text: All deposits
   - key: map.help
-    text: "STAR MAP\nDrag · pinch to zoom"
+    text: "STAR MAP\nDrag \xB7 pinch to zoom"
   - key: map.search.empty
     text: Enter a world name or x,y
   - key: map.search.coordinates
-    text: Coordinates in light-years · zoom out to explore
+    text: "Coordinates in light-years \xB7 zoom out to explore"
   - key: map.search.not-found
-    text: Not found · search an exact surveyed world/system name or x,y
+    text: "Not found \xB7 search an exact surveyed world/system name or x,y"
   - key: map.unavailable
-    text: Map unavailable · pan or zoom to retry
+    text: "Map unavailable \xB7 pan or zoom to retry"
   - key: map.view.galaxy
-    text: Galaxy · zoom in for stars
+    text: "Galaxy \xB7 zoom in for stars"
   - key: map.view.system
-    text: System · orbits schematic
+    text: "System \xB7 orbits schematic"
   - key: map.view.sector
-    text: Sector · {0} stars
+    text: "Sector \xB7 {0} stars"
   - key: map.view.truncated
-    text: '{0} · zoom in for more'
+    text: "{0} \xB7 zoom in for more"
   - key: map.here
     text: YOU ARE HERE
   - key: map.tier
     text: TIER {0}
   - key: map.world.subtitle
-    text: '{0} · {1} · {2}'
+    text: "{0} \xB7 {1} \xB7 {2}"
   - key: map.unpin
     text: UNPIN LOCATION
   - key: map.pin
     text: PIN LOCATION
   - key: map.next-stop
-    text: NO DIRECT ROUTE · SUGGESTED NEXT STOP
+    text: "NO DIRECT ROUTE \xB7 SUGGESTED NEXT STOP"
   - key: map.next-stop.tooltip
     text: Set {0} as the next stop toward {1}
   - key: map.autopilot.help
-    text: Autopilot · fuel x1.6, no refund
+    text: "Autopilot \xB7 fuel x1.6, no refund"
   - key: map.calculating
-    text: Calculating…
+    text: "Calculating\u2026"
   - key: map.price.autopilot
-    text: '{0} / {1} energy aboard · {2}s'
+    text: "{0} / {1} energy aboard \xB7 {2}s"
   - key: map.price.manual
-    text: '{0} / {1} energy aboard · {2}s estimate'
+    text: "{0} / {1} energy aboard \xB7 {2}s estimate"
   - key: map.action.calculating
-    text: CALCULATING…
+    text: "CALCULATING\u2026"
   - key: map.action.autopilot
-    text: AUTOPILOT · {0} ENERGY
+    text: "AUTOPILOT \xB7 {0} ENERGY"
   - key: map.action.pilot
-    text: PILOT · {0} ENERGY
+    text: "PILOT \xB7 {0} ENERGY"
   - key: map.action.unavailable
     text: ROUTE UNAVAILABLE
   - key: map.travel.tooltip
     text: Travel to {0}
   - key: map.world.summary
-    text: '{0} building slots · danger {1:0.0}'
+    text: "{0} building slots \xB7 danger {1:0.0}"
   - key: map.world.summary-base
-    text: '{0} building slots · danger {1:0.0} · BASE'
+    text: "{0} building slots \xB7 danger {1:0.0} \xB7 BASE"
   - key: map.hazards.none
     text: No environmental hazards
   - key: map.hazards.required
-    text: 'Hazards: {0} · hull level {1} per hazard'
+    text: "Hazards: {0} \xB7 hull level {1} per hazard"
   - key: map.hazards.ready
-    text: HULL READY · SAFE TO LAND
+    text: "HULL READY \xB7 SAFE TO LAND"
   - key: map.hazards.gap
     text: '{0} plating {1} / {2}'
   - key: map.hazards.disabled
     text: Landing protection is disabled in development settings
   - key: map.resources
-    text: RESOURCES · HOW TO HARVEST
+    text: "RESOURCES \xB7 HOW TO HARVEST"
   - key: map.unsurveyed
     text: UNSURVEYED
   - key: map.survey.help
     text: Fly within {0:0} ly of this system to reveal its deposits.
   - key: map.deposit
-    text: '{0} · richness x{1:0.00} · yield {2}'
+    text: "{0} \xB7 richness x{1:0.00} \xB7 yield {2}"
   - key: map.worlds-in
     text: WORLDS IN {0}
   - key: map.pins
@@ -1335,7 +1501,7 @@ MonoBehaviour:
   - key: map.pins.empty
     text: Pin a world to keep its destination handy.
   - key: map.pinned-world
-    text: '{0} · {1}'
+    text: "{0} \xB7 {1}"
   - key: atlas.resources
     text: RESOURCES
   - key: atlas.recipes
@@ -1349,13 +1515,14 @@ MonoBehaviour:
   - key: atlas.notes
     text: FIELD NOTES  /  CATALOG DATA
   - key: atlas.summary.resources-recipes
-    text: RESOURCES  {0}/{1}  ·  RECIPES  {2}/{3}
+    text: "RESOURCES  {0}/{1}  \xB7  RECIPES  {2}/{3}"
   - key: atlas.summary.structures
     text: STRUCTURES  {0}/{1}
   - key: atlas.summary.aliens
     text: ALIENS  {0}/{1}
   - key: atlas.help
-    text: Find resources, craft recipes and complete builds to discover entries and earn one-time Nova Shards. World visits are tracked separately.
+    text: Find resources, craft recipes and complete builds to discover entries and
+      earn one-time Nova Shards. World visits are tracked separately.
   - key: atlas.resource.family
     text: RESOURCE FAMILY
   - key: atlas.resource.empty
@@ -1367,13 +1534,13 @@ MonoBehaviour:
   - key: atlas.resource.discovered
     text: DISCOVERED
   - key: atlas.resource.undiscovered
-    text: NOT DISCOVERED  ·  FIRST FIND EARNS SHARDS
+    text: "NOT DISCOVERED  \xB7  FIRST FIND EARNS SHARDS"
   - key: atlas.resource.where
     text: WHERE TO FIND IT
   - key: atlas.resource.belt
     text: Asteroid belt
   - key: atlas.resource.habitat
-    text: '{0}  ·  {1}  ·  tier {2}+'
+    text: "{0}  \xB7  {1}  \xB7  tier {2}+"
   - key: atlas.resource.harvest
     text: '{0} harvest'
   - key: atlas.resource.processed
@@ -1383,13 +1550,13 @@ MonoBehaviour:
   - key: atlas.resource.samples.empty
     text: No visited surveyed worlds with this resource yet.
   - key: atlas.resource.sample
-    text: '{0}  ·  {1:0.#} LY FROM HOME'
+    text: "{0}  \xB7  {1:0.#} LY FROM HOME"
   - key: atlas.resource.find
     text: FIND SURVEYED DEPOSITS
   - key: atlas.resource.use-structure
-    text: '{0}  ·  Structure'
+    text: "{0}  \xB7  Structure"
   - key: atlas.resource.use-upgrade
-    text: '{0}  ·  Upgrade'
+    text: "{0}  \xB7  Upgrade"
   - key: atlas.resource.uses
     text: ALSO USED TO BUILD / UPGRADE
   - key: atlas.resource.related
@@ -1399,15 +1566,16 @@ MonoBehaviour:
   - key: atlas.recipes.empty
     text: No recipes are configured.
   - key: atlas.recipes.help
-    text: Follow the input-to-output flow. Station, tier and research gates are shown on each recipe.
+    text: Follow the input-to-output flow. Station, tier and research gates are shown
+      on each recipe.
   - key: atlas.recipe.gate
-    text: '{0}  ·  TIER {1}  ·  {2} LV {3}'
+    text: "{0}  \xB7  TIER {1}  \xB7  {2} LV {3}"
   - key: atlas.recipe.gate-research
-    text: '{0}  ·  TIER {1}  ·  {2} LV {3}  ·  RESEARCH: {4}'
+    text: "{0}  \xB7  TIER {1}  \xB7  {2} LV {3}  \xB7  RESEARCH: {4}"
   - key: atlas.recipe.crafted
     text: CRAFTED
   - key: atlas.recipe.uncrafted
-    text: NOT CRAFTED  ·  FIRST CRAFT EARNS SHARDS
+    text: "NOT CRAFTED  \xB7  FIRST CRAFT EARNS SHARDS"
   - key: atlas.recipe.input
     text: INPUT
   - key: atlas.recipe.output
@@ -1415,11 +1583,11 @@ MonoBehaviour:
   - key: atlas.worlds.empty
     text: No visited worlds are recorded yet.
   - key: atlas.worlds.help
-    text: VISITED WORLDS  ·  TRACKED SEPARATELY FROM CATALOG DISCOVERIES
+    text: "VISITED WORLDS  \xB7  TRACKED SEPARATELY FROM CATALOG DISCOVERIES"
   - key: atlas.world.summary
-    text: '{0}  ·  {1}  ·  TIER {2}  ·  {3}'
+    text: "{0}  \xB7  {1}  \xB7  TIER {2}  \xB7  {3}"
   - key: atlas.world.hazards
-    text: DANGER {0:0.0}  ·  HAZARDS {1}
+    text: "DANGER {0:0.0}  \xB7  HAZARDS {1}"
   - key: atlas.world.hazards.none
     text: NONE
   - key: atlas.world.resources
@@ -1427,7 +1595,7 @@ MonoBehaviour:
   - key: atlas.structure.unknown
     text: UNKNOWN STRUCTURE
   - key: atlas.structure.summary
-    text: '{0}  ·  TIER {1}  ·  {2}'
+    text: "{0}  \xB7  TIER {1}  \xB7  {2}"
   - key: atlas.structure.active
     text: GAMEPLAY ACTIVE
   - key: atlas.structure.catalog-only
@@ -1437,15 +1605,16 @@ MonoBehaviour:
   - key: atlas.structure.built
     text: BUILT
   - key: atlas.structure.unbuilt
-    text: NOT BUILT  ·  BUILD TO REVEAL
+    text: "NOT BUILT  \xB7  BUILD TO REVEAL"
   - key: atlas.structure.unimplemented
-    text: This definition is in the content catalog; its gameplay behavior is not implemented.
+    text: This definition is in the content catalog; its gameplay behavior is not
+      implemented.
   - key: atlas.bestiary.empty
     text: No alien entries are configured.
   - key: atlas.enemy.unknown
     text: UNKNOWN LIFEFORM
   - key: atlas.enemy.summary
-    text: FIRST WAVE {0}  ·  THREAT {1:0.0}
+    text: "FIRST WAVE {0}  \xB7  THREAT {1:0.0}"
   - key: atlas.enemy.reveal
     text: SURVIVE A WAVE TO REVEAL
   - key: atlas.enemy.health
@@ -1461,7 +1630,10 @@ MonoBehaviour:
   - key: privacy.title
     text: PRIVACY
   - key: privacy.help
-    text: Controls gameplay analytics, rewarded ads, and online account, leaderboard and cloud-save features. Choices save locally and online services stay opt-in. Online services require legal, audience and account-deletion setup. Cloud copies are compared and moved only when you choose; no progress is uploaded automatically.
+    text: Controls gameplay analytics, rewarded ads, and online account, leaderboard
+      and cloud-save features. Choices save locally and online services stay opt-in.
+      Online services require legal, audience and account-deletion setup. Cloud copies
+      are compared and moved only when you choose; no progress is uploaded automatically.
   - key: privacy.policy
     text: VIEW PRIVACY POLICY
   - key: privacy.analytics
@@ -1471,15 +1643,17 @@ MonoBehaviour:
   - key: privacy.online
     text: Online account, leaderboard and cloud features
   - key: privacy.on
-    text: 'ON'
+    text: ON
   - key: privacy.off
-    text: 'OFF'
+    text: OFF
   - key: privacy.saved
     text: Privacy choice saved on this device
   - key: recovery.title
     text: SAVE RECOVERY
   - key: recovery.help
-    text: Protect this device's save with Apple Sign-In on iPhone or Google Play Games on Android. Signing in never replaces local progress; cloud copies are compared and moved only when you choose.
+    text: Protect this device's save with Apple Sign-In on iPhone or Google Play
+      Games on Android. Signing in never replaces local progress; cloud copies are
+      compared and moved only when you choose.
   - key: recovery.enable
     text: Enable online account features above to manage save recovery.
   - key: recovery.provider
@@ -1499,15 +1673,19 @@ MonoBehaviour:
   - key: recovery.link-prompt
     text: Complete the sign-in prompt to link this save...
   - key: recovery.protected
-    text: Save protected with {0}. Local progress remains on this device; cloud sync is still off.
+    text: Save protected with {0}. Local progress remains on this device; cloud sync
+      is still off.
   - key: recovery.sign-in-prompt
     text: Complete the sign-in prompt for your recovery account...
   - key: recovery.signed-in
-    text: Signed in with {0}. This device's local save was not replaced; cloud restore remains a separate step.
+    text: Signed in with {0}. This device's local save was not replaced; cloud restore
+      remains a separate step.
   - key: cloud.title
     text: CLOUD SAVE
   - key: cloud.help
-    text: No automatic upload or restore. Compare both snapshots, then choose which direction to move data. Replacing a save requires a second confirmation; the local snapshot replaced by a restore stays on this device for undo.
+    text: No automatic upload or restore. Compare both snapshots, then choose which
+      direction to move data. Replacing a save requires a second confirmation; the
+      local snapshot replaced by a restore stays on this device for undo.
   - key: cloud.unavailable
     text: Cloud Save is disabled or not configured for this build.
   - key: cloud.checking
@@ -1515,9 +1693,9 @@ MonoBehaviour:
   - key: cloud.compare
     text: COMPARE DEVICE AND CLOUD
   - key: cloud.device-summary
-    text: THIS DEVICE  ·  {0}
+    text: "THIS DEVICE  \xB7  {0}"
   - key: cloud.empty
-    text: CLOUD  ·  No save exists for this account yet.
+    text: "CLOUD  \xB7  No save exists for this account yet."
   - key: cloud.saving
     text: SAVING...
   - key: cloud.create.confirm
@@ -1525,13 +1703,14 @@ MonoBehaviour:
   - key: cloud.create
     text: CREATE CLOUD COPY
   - key: cloud.invalid
-    text: CLOUD  ·  The stored copy could not be validated and was not changed.
+    text: "CLOUD  \xB7  The stored copy could not be validated and was not changed."
   - key: cloud.cloud-summary
-    text: CLOUD  ·  {0}
+    text: "CLOUD  \xB7  {0}"
   - key: cloud.same
     text: These snapshots have the same save ID and revision.
   - key: cloud.different
-    text: These are different snapshots. Revision alone cannot determine which has the right progress.
+    text: These are different snapshots. Revision alone cannot determine which has
+      the right progress.
   - key: cloud.backup.confirm
     text: TAP AGAIN TO REPLACE CLOUD SAVE
   - key: cloud.backup
@@ -1547,7 +1726,7 @@ MonoBehaviour:
   - key: cloud.undo
     text: UNDO CLOUD RESTORE
   - key: cloud.snapshot
-    text: XP {0}  ·  {1} worlds  ·  revision {2}  ·  current world {3}
+    text: "XP {0}  \xB7  {1} worlds  \xB7  revision {2}  \xB7  current world {3}"
   - key: cloud.world.unknown
     text: unknown
   - key: cloud.comparing
@@ -1565,19 +1744,22 @@ MonoBehaviour:
   - key: cloud.validation-failed
     text: 'The cloud save could not be validated: {0}'
   - key: cloud.backup.warning
-    text: This will replace the current cloud copy with this device's save. Tap again to confirm.
+    text: This will replace the current cloud copy with this device's save. Tap again
+      to confirm.
   - key: cloud.create.warning
     text: This will create a cloud copy of this device's save. Tap again to confirm.
   - key: cloud.backing-up
     text: Securing the device save and checking the cloud write lock...
   - key: cloud.backup.changed
-    text: The cloud copy changed since comparison. Compare again before choosing an action.
+    text: The cloud copy changed since comparison. Compare again before choosing
+      an action.
   - key: cloud.backed-up
     text: This device's save was backed up to the cloud. No local progress was replaced.
   - key: cloud.backup-failed
     text: 'Cloud backup failed: {0}'
   - key: cloud.restore.warning
-    text: This replaces device progress with the shown cloud save. The current device save will be retained for undo. Tap again to confirm.
+    text: This replaces device progress with the shown cloud save. The current device
+      save will be retained for undo. Tap again to confirm.
   - key: cloud.restoring
     text: Verifying the cloud copy has not changed...
   - key: cloud.restore.changed
@@ -1585,7 +1767,8 @@ MonoBehaviour:
   - key: cloud.restore-failed
     text: 'Cloud restore failed: {0}'
   - key: cloud.undo.warning
-    text: This swaps the current save with the retained device save. Tap again to confirm.
+    text: This swaps the current save with the retained device save. Tap again to
+      confirm.
   - key: ranks.ascension
     text: VIEW ASCENSION
   - key: ranks.goals
@@ -1619,11 +1802,15 @@ MonoBehaviour:
   - key: ranks.bases
     text: Bases
   - key: ranks.unavailable
-    text: Online ranks are unavailable until Unity services, a leaderboard and an HTTPS privacy policy are configured and approved. Your local record remains available above.
+    text: Online ranks are unavailable until Unity services, a leaderboard and an
+      HTTPS privacy policy are configured and approved. Your local record remains
+      available above.
   - key: ranks.enable
-    text: Enable online account and leaderboard access in Settings to load online ranks. Nothing is sent before you opt in and request the list.
+    text: Enable online account and leaderboard access in Settings to load online
+      ranks. Nothing is sent before you opt in and request the list.
   - key: ranks.online.help
-    text: Online ranks load only when requested. Score submissions stay disabled until a server-validated path is available.
+    text: Online ranks load only when requested. Score submissions stay disabled
+      until a server-validated path is available.
   - key: ranks.entry
     text: '#{0}  {1}'
   - key: ranks.empty
@@ -1635,9 +1822,11 @@ MonoBehaviour:
   - key: ranks.era
     text: 'YOUR FRONTIER: {0}'
   - key: ranks.era.help
-    text: Reached eras stay with this save. Earn them through exploration and technology, not XP or premium spending.
+    text: Reached eras stay with this save. Earn them through exploration and technology,
+      not XP or premium spending.
   - key: ranks.era.mastery
-    text: Megaproject mastery reached. Explore deeper worlds, complete the Atlas and expand your projects.
+    text: Megaproject mastery reached. Explore deeper worlds, complete the Atlas
+      and expand your projects.
   - key: ranks.era.next
     text: 'NEXT: {0}'
   - key: ranks.era.command
@@ -1663,23 +1852,31 @@ MonoBehaviour:
   - key: deletion.title
     text: ONLINE SAVE & ACCOUNT DELETION
   - key: deletion.help
-    text: Delete this signed-in account's Frontier cloud save and online account. Local progress and the local restore backup are kept; use Reset Progress separately to erase those. This does not claim to remove store purchase history, leaderboard or analytics records.
+    text: Delete this signed-in account's Frontier cloud save and online account.
+      Local progress and the local restore backup are kept; use Reset Progress separately
+      to erase those. This does not claim to remove store purchase history, leaderboard
+      or analytics records.
   - key: deletion.unavailable
-    text: Online deletion is unavailable until account and cloud-save services are configured. No online data has been deleted.
+    text: Online deletion is unavailable until account and cloud-save services are
+      configured. No online data has been deleted.
   - key: deletion.sign-in
-    text: Sign in to the account you want to delete using Save Recovery above, then return here. Deletion never creates or signs in to an account automatically.
+    text: Sign in to the account you want to delete using Save Recovery above, then
+      return here. Deletion never creates or signs in to an account automatically.
   - key: deletion.action
     text: DELETE ONLINE SAVE & ACCOUNT
   - key: deletion.confirm
     text: CONFIRM PERMANENT ONLINE DELETION
   - key: deletion.warning
-    text: This cannot be undone. Your Frontier cloud save is removed first; only then is the signed-in account deleted. If account deletion fails afterward, the cloud save remains deleted and you must retry. Local progress is kept.
+    text: This cannot be undone. Your Frontier cloud save is removed first; only
+      then is the signed-in account deleted. If account deletion fails afterward,
+      the cloud save remains deleted and you must retry. Local progress is kept.
   - key: deletion.cancel
     text: CANCEL DELETION
   - key: deletion.busy
     text: DELETING ONLINE SAVE & ACCOUNT...
   - key: deletion.done
-    text: Frontier cloud save and online account deleted. Local progress and the local restore backup were not changed.
+    text: Frontier cloud save and online account deleted. Local progress and the
+      local restore backup were not changed.
   - key: revive.read-only
     text: Shard revives are disabled while this save is read-only.
   - key: revive.unavailable
@@ -1691,7 +1888,8 @@ MonoBehaviour:
   - key: revive.rejected
     text: This run could not be revived. No shards were spent.
   - key: revive.pending-save
-    text: 'Revived for this session, but saving failed. Keep the game open while saving retries. {0}'
+    text: Revived for this session, but saving failed. Keep the game open while saving
+      retries. {0}
   - key: revive.done
     text: Run revived.
   - key: clearance.unavailable
@@ -1703,13 +1901,15 @@ MonoBehaviour:
   - key: crew.purchase.read-only
     text: Builder crews cannot be purchased while this save is read-only.
   - key: crew.purchase.unavailable
-    text: No additional builder crew is available. Earn your second crew through progression first; crews cannot exceed the shared cap.
+    text: No additional builder crew is available. Earn your second crew through
+      progression first; crews cannot exceed the shared cap.
   - key: crew.purchase.changed
     text: Your crew count or price changed. Review the current offer before confirming.
   - key: crew.purchase.shards-missing
     text: Not enough Nova Shards to recruit this crew.
   - key: crew.purchase.pending-save
-    text: 'Crew recruited for this session, but saving failed. Keep the game open while saving retries. {0}'
+    text: Crew recruited for this session, but saving failed. Keep the game open
+      while saving retries. {0}
   - key: crew.purchase.done
     text: Builder crew recruited.
   - key: crew.finish.read-only
@@ -1723,21 +1923,22 @@ MonoBehaviour:
   - key: crew.finish.assignment-missing
     text: This job has no matching crew assignment. Reload the save to recover it.
   - key: crew.finish.pending-save
-    text: 'Job finished for this session, but saving failed. Keep the game open while saving retries. {0}'
+    text: Job finished for this session, but saving failed. Keep the game open while
+      saving retries. {0}
   - key: crew.finish.done
     text: Builder job finished.
   - key: crew.status.construction
-    text: 'UNDER CONSTRUCTION  ·  {0}'
+    text: "UNDER CONSTRUCTION  \xB7  {0}"
   - key: crew.status.upgrade
-    text: 'UPGRADING TO LV {0}  ·  {1}'
+    text: "UPGRADING TO LV {0}  \xB7  {1}"
   - key: crew.busy
     text: All builder crews are busy
   - key: gate.research
     text: 'Requires research: {0}'
   - key: gate.reach-tier
-    text: 'Reach planet tier {0}'
+    text: Reach planet tier {0}
   - key: gate.lab-level
-    text: 'Requires Research Lab level {0}'
+    text: Requires Research Lab level {0}
   - key: gate.structure.unknown
     text: Unknown structure
   - key: gate.structure.future
@@ -1757,7 +1958,7 @@ MonoBehaviour:
   - key: gate.recipe.station
     text: Requires its crafting station
   - key: gate.recipe.station-level
-    text: 'Requires station level {0}'
+    text: Requires station level {0}
   - key: gate.research.unknown
     text: Unknown research
   - key: gate.research.unavailable
@@ -1765,9 +1966,9 @@ MonoBehaviour:
   - key: gate.research.complete
     text: Already researched
   - key: gate.lab-world
-    text: 'Requires Research Lab level {0} on this world'
+    text: Requires Research Lab level {0} on this world
   - key: gate.requires
-    text: 'Requires {0}'
+    text: Requires {0}
   - key: gate.research.invalid-cost
     text: Invalid research cost
   - key: gate.research.materials
@@ -1791,9 +1992,10 @@ MonoBehaviour:
   - key: claim.wallet-full
     text: Your shard balance is full. Spend shards before collecting this reward.
   - key: claim.pending-save
-    text: 'Reward collected for this session, but the save failed. Keep the game open while saving retries. {0}'
+    text: Reward collected for this session, but the save failed. Keep the game open
+      while saving retries. {0}
   - key: claim.shards
-    text: '+{0} Nova Shards'
+    text: +{0} Nova Shards
   - key: claim.done
     text: Achievement collected.
   - key: snapshot.write-failed
@@ -1809,9 +2011,10 @@ MonoBehaviour:
   - key: restore.empty
     text: The selected save is empty.
   - key: restore.schema
-    text: 'This save uses schema {0}; this build can restore only schema {1}.'
+    text: This save uses schema {0}; this build can restore only schema {1}.
   - key: restore.generator-newer
-    text: This save was created with a newer universe generator and cannot be restored by this build.
+    text: This save was created with a newer universe generator and cannot be restored
+      by this build.
   - key: restore.invalid-seed
     text: This save has an invalid universe seed and cannot be restored safely.
   - key: restore.secure-failed
@@ -1821,15 +2024,18 @@ MonoBehaviour:
   - key: restore.write-failed
     text: 'The selected save was not restored: {0}'
   - key: restore.pending-save
-    text: 'The {0} save was restored, but its updated local snapshot could not be written: {1}. The previous save is still retained.'
+    text: 'The {0} save was restored, but its updated local snapshot could not be
+      written: {1}. The previous save is still retained.'
   - key: restore.done
-    text: 'The {0} save was restored. The save it replaced is retained on this device for undo.'
+    text: The {0} save was restored. The save it replaced is retained on this device
+      for undo.
   - key: notifications.on
     text: 'JOB NOTIFICATIONS: ON'
   - key: notifications.off
     text: 'JOB NOTIFICATIONS: OFF'
   - key: notifications.help
-    text: Get an alert when construction, an upgrade or clearance finishes. Device permission is requested only when a timer is active.
+    text: Get an alert when construction, an upgrade or clearance finishes. Device
+      permission is requested only when a timer is active.
   - key: notifications.unavailable
     text: Job notifications are not enabled on this build or device.
   - key: notifications.error
@@ -1837,4 +2043,219 @@ MonoBehaviour:
   - key: notifications.job.title
     text: Crew job complete
   - key: notifications.job.body
-    text: A construction, upgrade or clearance timer has finished. Return to check your crews.
+    text: A construction, upgrade or clearance timer has finished. Return to check
+      your crews.
+  - key: planet.blurb.opener.lush.0
+    text: A verdant world blanketed in deep forest
+  - key: planet.blurb.opener.lush.1
+    text: A green world of rolling meadows and ancient groves
+  - key: planet.blurb.opener.lush.2
+    text: A humid world of jungle canopies and winding rivers
+  - key: planet.blurb.opener.lush.3
+    text: A temperate world of mossy hills and tall timber
+  - key: planet.blurb.opener.lush.4
+    text: A fertile world of open grassland and dense woods
+  - key: planet.blurb.opener.mineral.0
+    text: A rugged world of exposed ore seams and rust-red cliffs
+  - key: planet.blurb.opener.mineral.1
+    text: A stony world laced with mineral veins
+  - key: planet.blurb.opener.mineral.2
+    text: A rocky world of broken ridges and deep quarries
+  - key: planet.blurb.opener.mineral.3
+    text: A metal-rich world of terraced mesas and bare stone
+  - key: planet.blurb.opener.glacial.0
+    text: A frozen world of glaciers and wind-scoured ice sheets
+  - key: planet.blurb.opener.glacial.1
+    text: An icebound world of crevassed ice fields
+  - key: planet.blurb.opener.glacial.2
+    text: A pale world of frozen seas and drifting snow
+  - key: planet.blurb.opener.glacial.3
+    text: A cold world buried under blue ice
+  - key: planet.blurb.opener.volcanic.0
+    text: A volcanic world of lava rivers and smoking calderas
+  - key: planet.blurb.opener.volcanic.1
+    text: A molten world scarred by fissures and ash plains
+  - key: planet.blurb.opener.volcanic.2
+    text: A burning world of black basalt and glowing vents
+  - key: planet.blurb.opener.volcanic.3
+    text: A hostile world cracked open by magma flows
+  - key: planet.blurb.opener.fungal.0
+    text: A spongy world of towering fungal forests
+  - key: planet.blurb.opener.fungal.1
+    text: A damp world carpeted in glowing spore beds
+  - key: planet.blurb.opener.fungal.2
+    text: A strange world where giant mushrooms pierce the mist
+  - key: planet.blurb.opener.fungal.3
+    text: A murky world of fungal groves and rotting bogs
+  - key: planet.blurb.opener.crystal.0
+    text: A glittering world of faceted crystal spires
+  - key: planet.blurb.opener.crystal.1
+    text: A brilliant world of shimmering crystal fields
+  - key: planet.blurb.opener.crystal.2
+    text: A prismatic world of jagged crystalline ridges
+  - key: planet.blurb.opener.crystal.3
+    text: A resonant world grown over with glassy crystal
+  - key: planet.blurb.opener.obsidian.0
+    text: A dark world of black glass plains and violet veins
+  - key: planet.blurb.opener.obsidian.1
+    text: A shadowed world of polished obsidian shelves
+  - key: planet.blurb.opener.obsidian.2
+    text: A grim world of volcanic glass and deep ravines
+  - key: planet.blurb.opener.obsidian.3
+    text: A dusky world of dark stone and cold lightning
+  - key: planet.blurb.opener.shattered.0
+    text: A broken world of drifting fragments and open voids
+  - key: planet.blurb.opener.shattered.1
+    text: A shattered world torn apart by ancient forces
+  - key: planet.blurb.opener.shattered.2
+    text: A fractured world of floating crags and bright rifts
+  - key: planet.blurb.opener.shattered.3
+    text: A ruined world split by glowing fault lines
+  - key: planet.blurb.opener.desert.0
+    text: A scorched world of endless dunes and wind-carved rock
+  - key: planet.blurb.opener.desert.1
+    text: A sun-baked world of golden sand seas
+  - key: planet.blurb.opener.desert.2
+    text: A dry world of salt flats and shifting dunes
+  - key: planet.blurb.opener.desert.3
+    text: An arid world of cracked basins and red mesas
+  - key: planet.blurb.opener.oceanic.0
+    text: A water world of open seas and scattered islets
+  - key: planet.blurb.opener.oceanic.1
+    text: An ocean world of rolling swells and floating kelp forests
+  - key: planet.blurb.opener.oceanic.2
+    text: A blue world of deep seas and tidal archipelagos
+  - key: planet.blurb.opener.oceanic.3
+    text: A flooded world with only thin ribbons of land
+  - key: planet.blurb.opener.gasgiant.0
+    text: A towering gas giant of banded clouds and storm vortices
+  - key: planet.blurb.opener.gasgiant.1
+    text: A vast gas giant wrapped in swirling cloud bands
+  - key: planet.blurb.opener.gasgiant.2
+    text: A gas giant of churning storm bands
+  - key: planet.blurb.opener.gasgiant.3
+    text: A hazy gas giant crossed by slow, enormous storms
+  - key: planet.blurb.opener.barren.0
+    text: A bare, cratered rock with almost no atmosphere
+  - key: planet.blurb.opener.barren.1
+    text: A lifeless world of dust and impact craters
+  - key: planet.blurb.opener.barren.2
+    text: A barren world of grey regolith and long shadows
+  - key: planet.blurb.opener.barren.3
+    text: A silent, airless world of pitted stone
+  - key: planet.blurb.belt.0
+    text: A drifting belt of rubble and tumbling rock
+  - key: planet.blurb.belt.1
+    text: A dense ring of asteroids and salvageable wreckage
+  - key: planet.blurb.belt.2
+    text: A scattered belt of rock and metal debris
+  - key: planet.blurb.sky.clear.0
+    text: beneath clear skies
+  - key: planet.blurb.sky.clear.1
+    text: under calm, open skies
+  - key: planet.blurb.sky.clear.2
+    text: beneath a quiet sky
+  - key: planet.blurb.sky.rain.0
+    text: under steady rain
+  - key: planet.blurb.sky.rain.1
+    text: beneath endless grey rain
+  - key: planet.blurb.sky.rain.2
+    text: lashed by warm rain
+  - key: planet.blurb.sky.snow.0
+    text: under falling snow
+  - key: planet.blurb.sky.snow.1
+    text: beneath drifting snowfall
+  - key: planet.blurb.sky.snow.2
+    text: shrouded in a snowy haze
+  - key: planet.blurb.sky.embers.0
+    text: under a slow drift of embers
+  - key: planet.blurb.sky.embers.1
+    text: beneath showers of embers
+  - key: planet.blurb.sky.embers.2
+    text: with ash and embers on the wind
+  - key: planet.blurb.sky.spores.0
+    text: wreathed in drifting spores
+  - key: planet.blurb.sky.spores.1
+    text: under clouds of luminous spores
+  - key: planet.blurb.sky.spores.2
+    text: with spores hanging in the air
+  - key: planet.blurb.sky.dust.0
+    text: under dust-laden winds
+  - key: planet.blurb.sky.dust.1
+    text: beneath a veil of dust
+  - key: planet.blurb.sky.dust.2
+    text: swept by dry, gritty winds
+  - key: planet.blurb.sky.storm.0
+    text: wracked by violent storms
+  - key: planet.blurb.sky.storm.1
+    text: under constant lightning storms
+  - key: planet.blurb.sky.storm.2
+    text: battered by howling storms
+  - key: planet.blurb.size.dwarf.0
+    text: Its small size leaves room for only a few structures.
+  - key: planet.blurb.size.dwarf.1
+    text: A tiny world with tight building room.
+  - key: planet.blurb.size.small.0
+    text: A compact world with modest building room.
+  - key: planet.blurb.size.small.1
+    text: Compact, with space for a small outpost.
+  - key: planet.blurb.size.medium.0
+    text: There is room for a respectable base.
+  - key: planet.blurb.size.medium.1
+    text: A mid-sized world with decent building room.
+  - key: planet.blurb.size.large.0
+    text: A large world with plenty of ground to build on.
+  - key: planet.blurb.size.large.1
+    text: Wide plains and ridges leave generous building room.
+  - key: planet.blurb.size.giant.0
+    text: A giant world with sprawling building room.
+  - key: planet.blurb.size.giant.1
+    text: Its sheer size offers sprawling room for bases.
+  - key: planet.blurb.size.colossal.0
+    text: A colossal world with vast tracts of buildable ground.
+  - key: planet.blurb.size.colossal.1
+    text: Colossal in scale, with room for a whole network of bases.
+  - key: planet.blurb.calm.0
+    text: Landing conditions are mild.
+  - key: planet.blurb.calm.1
+    text: A forgiving place to touch down.
+  - key: planet.blurb.calm.2
+    text: The ground is stable and the air is kind.
+  - key: planet.blurb.opening
+    text: '{0} {1}.'
+  - key: planet.blurb.opening-no-sky
+    text: '{0}.'
+  - key: planet.blurb.join
+    text: '{0} {1}'
+  - key: planet.blurb.rings
+    text: Pale rings circle it.
+  - key: planet.blurb.moon.one
+    text: A single moon circles it.
+  - key: planet.blurb.moon.2
+    text: Two moons circle it.
+  - key: planet.blurb.moon.3
+    text: Three moons circle it.
+  - key: planet.blurb.moon.4
+    text: Four moons circle it.
+  - key: planet.blurb.moon.5
+    text: Five moons circle it.
+  - key: planet.blurb.moon.6
+    text: Six moons circle it.
+  - key: planet.blurb.moon.7
+    text: Seven moons circle it.
+  - key: planet.blurb.hazards
+    text: Expect {0}.
+  - key: planet.blurb.list.more
+    text: '{0}, {1}'
+  - key: planet.blurb.list.last
+    text: '{0} and {1}'
+  - key: planet.blurb.hazard.heat
+    text: extreme heat
+  - key: planet.blurb.hazard.cold
+    text: bitter cold
+  - key: planet.blurb.hazard.toxic
+    text: toxic air
+  - key: planet.blurb.hazard.radiation
+    text: hard radiation
+  - key: planet.blurb.hazard.void
+    text: void exposure

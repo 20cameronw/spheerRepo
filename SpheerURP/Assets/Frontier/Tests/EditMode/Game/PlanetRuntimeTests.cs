@@ -49,6 +49,26 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void GeneratedWorldCopyUsesCatalogWithoutChangingSeededEnglishDescriptions()
+        {
+            foreach (Biome biome in Enum.GetValues(typeof(Biome)))
+            {
+                var planet = service.FindGenerated(biome, null);
+                Assert.IsNotNull(planet, biome.ToString());
+                Assert.AreEqual(PlanetBlurb.Describe(planet.Descriptor, service.Universe.Config.Seed), planet.Description);
+                Assert.AreEqual(UiText.Get("planet.enum.biome." + biome.ToString().ToLowerInvariant()), planet.BiomeName);
+                Assert.IsNotEmpty(planet.SizeName);
+            }
+            foreach (HarvestMethod method in Enum.GetValues(typeof(HarvestMethod)))
+            {
+                string text = PlanetData.SpotLabel(db.resources[0], method);
+                StringAssert.Contains(db.resources[0].displayName, text);
+            }
+            Assert.AreEqual("Heat, Cold, Toxic, Radiation, Void",
+                PlanetData.HazardText(Hazards.Heat | Hazards.Cold | Hazards.Toxic | Hazards.Radiation | Hazards.Void));
+        }
+
+        [Test]
         public void NeonPlanetShader_ExposesDescriptorDrivenCloudAndCapControls()
         {
             var shader = Shader.Find("Frontier/NeonPlanet");

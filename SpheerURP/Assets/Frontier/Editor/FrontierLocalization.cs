@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
@@ -26,6 +27,15 @@ namespace Frontier.EditorTools
             if (source == null) throw new InvalidOperationException("Frontier UI catalog is missing.");
             source.Validate();
             if (source.locale != "en") throw new InvalidOperationException("The source UI catalog must remain English.");
+            var entries = new List<UiStringTableSO.Entry>(source.entries);
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var entry in entries) keys.Add(entry.key);
+            foreach (var entry in Frontier.Universe.PlanetBlurb.EnglishEntries())
+                if (keys.Add(entry.Key))
+                    entries.Add(new UiStringTableSO.Entry { key = entry.Key, text = entry.Value });
+            source.entries = entries.ToArray();
+            source.Validate();
+            EditorUtility.SetDirty(source);
 
             Directory.CreateDirectory(DirectoryPath);
             AssetDatabase.Refresh();
@@ -83,6 +93,14 @@ namespace Frontier.EditorTools
             var source = Resources.Load<UiStringTableSO>("Frontier/UiStrings");
             if (source == null) throw new BuildFailedException("Frontier UI catalog is missing.");
             source.Validate();
+            var sourceKeys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var entry in source.entries) sourceKeys.Add(entry.key);
+            foreach (var entry in Frontier.Universe.PlanetBlurb.EnglishEntries())
+            {
+                if (!sourceKeys.Contains(entry.Key))
+                    throw new BuildFailedException("Generated-world localization is missing: " + entry.Key +
+                        ". Run Frontier > Localization > Sync English Catalog.");
+            }
             if (LocalizationEditorSettings.ActiveLocalizationSettings == null)
                 throw new BuildFailedException("Frontier localization settings are missing.");
             var addressables = AddressableAssetSettingsDefaultObject.Settings;

@@ -90,7 +90,7 @@ namespace Frontier
             if (planet.Hazards == Hazards.None) scroll.Add(UiKit.Text(UiText.Get("map.hazards.none"), "fr-tiny", UiKit.Lime));
             else
             {
-                scroll.Add(UiKit.Text(UiText.Get("map.hazards.required", planet.Hazards, gs.Rules.RequiredPlatingLevel(planet.Tier)), "fr-tiny", UiKit.Amber));
+                scroll.Add(UiKit.Text(UiText.Get("map.hazards.required", PlanetData.HazardText(planet.Hazards), gs.Rules.RequiredPlatingLevel(planet.Tier)), "fr-tiny", UiKit.Amber));
                 var gaps = gs.Rules.LandingGaps(gs.Ship, planet.Hazards, planet.Tier);
                 if (gaps.Length == 0)
                     scroll.Add(UiKit.Text(UiText.Get("map.hazards.ready"), "fr-tiny", UiKit.Lime));

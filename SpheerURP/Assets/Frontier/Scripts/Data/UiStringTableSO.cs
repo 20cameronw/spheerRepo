@@ -43,10 +43,15 @@ namespace Frontier
 
         public string Get(string key, params object[] arguments)
         {
+            return string.Format(CultureInfo.CurrentCulture, Template(key), arguments);
+        }
+
+        public string Template(string key)
+        {
             if (index == null) Validate();
             if (key == null || !index.TryGetValue(key, out var text))
                 throw new KeyNotFoundException("Missing UI string: " + key);
-            return string.Format(CultureInfo.CurrentCulture, text, arguments);
+            return text;
         }
 
         void OnEnable() { index = null; }
@@ -165,14 +170,19 @@ namespace Frontier
 
         public static string Get(string key, params object[] arguments)
         {
+            return string.Format(CultureInfo.CurrentCulture, Template(key), arguments);
+        }
+
+        public static string Template(string key)
+        {
             if (localizedTable != null)
             {
                 var entry = key == null ? null : localizedTable.GetEntry(key);
                 if (entry == null || string.IsNullOrWhiteSpace(entry.Value))
                     throw new KeyNotFoundException("Missing localized UI string: " + key);
-                return string.Format(CultureInfo.CurrentCulture, entry.Value, arguments);
+                return entry.Value;
             }
-            return Source.Get(key, arguments);
+            return Source.Template(key);
         }
     }
 }

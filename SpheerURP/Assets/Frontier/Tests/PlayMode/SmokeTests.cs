@@ -361,6 +361,11 @@ namespace Frontier.Tests
             complete.LocaleIdentifier = french.Identifier;
             incomplete.LocaleIdentifier = german.Identifier;
             foreach (var entry in source.entries) complete.AddEntry(entry.key, entry.text);
+            foreach (var entry in source.entries)
+                if (entry.key.StartsWith("planet.blurb.opener.", StringComparison.Ordinal)
+                    || entry.key.StartsWith("planet.blurb.belt.", StringComparison.Ordinal))
+                    complete.GetEntry(entry.key).Value = "LOCALIZED TERRAIN";
+            complete.GetEntry("planet.enum.biome.lush").Value = "LOCALIZED BIOME";
             complete.GetEntry("nav.command").Value = "LOCALIZED COMMAND";
             complete.GetEntry("nav.menu").Value = "LOCALIZED MENU";
             complete.GetEntry("settings.language").Value = "LOCALIZED LANGUAGE";
@@ -371,6 +376,9 @@ namespace Frontier.Tests
             database.TableProvider = provider;
             int structures = runtime.State.structures.Count, shards = runtime.State.ShardBalance;
             string planet = runtime.State.planet.Id;
+            var generated = runtime.State.universe.FindGenerated(Frontier.Universe.Biome.Lush, null);
+            string generatedEnglish = generated.Description;
+            ulong generatedSeed = generated.Seed;
             try
             {
                 runtime.Ui.DebugMenu("settings");
@@ -389,6 +397,9 @@ namespace Frontier.Tests
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED MENU"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED LANGUAGE"));
                 Assert.AreEqual("LOCALIZED SKIP", runtime.Ui.DebugRoot.Q("first-session-guide-skip").tooltip);
+                StringAssert.Contains("LOCALIZED TERRAIN", generated.Description);
+                Assert.AreEqual("LOCALIZED BIOME", generated.BiomeName);
+                Assert.AreEqual(generatedSeed, generated.Seed, "Language must not regenerate the planet.");
                 Assert.IsTrue(runtime.Ui.DebugRoot.enabledSelf);
 
                 string failure = null;
@@ -409,6 +420,7 @@ namespace Frontier.Tests
                 Assert.AreEqual(shards, runtime.State.ShardBalance);
                 Assert.AreEqual(planet, runtime.State.planet.Id);
                 yield return UiText.SelectLocale("en", message => Assert.IsNull(message));
+                Assert.AreEqual(generatedEnglish, generated.Description);
             }
             finally
             {
