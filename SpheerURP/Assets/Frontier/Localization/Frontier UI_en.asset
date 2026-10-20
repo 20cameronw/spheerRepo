@@ -7824,6 +7824,57 @@ MonoBehaviour:
     m_Localized: Warp Theory
     m_Metadata:
       m_Items: []
+  - m_Id: 1506674056716288
+    m_Localized: Cannot start a journey while another trip is pending or this save
+      is read-only.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962496
+    m_Localized: 'Journey progress could not be saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962497
+    m_Localized: This interrupted journey no longer matches this save or its route.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962498
+    m_Localized: Journey progress has not been saved. Keep the game open while saving
+      retries.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962499
+    m_Localized: Finish or discard the interrupted journey before restoring a different
+      save. In-flight cloud snapshots cannot be restored in this build.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962500
+    m_Localized: The travel recovery provider is unavailable. The saved journey has
+      been preserved.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962501
+    m_Localized: Saved run data is incompatible or damaged. It has been preserved;
+      no fuel charge or trip rewards have been applied.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962502
+    m_Localized: INTERRUPTED JOURNEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962503
+    m_Localized: Discard returns you to the departure world without a fuel charge
+      or trip rewards. Already used revive shards are not refunded.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962504
+    m_Localized: DISCARD JOURNEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962505
+    m_Localized: Returned to the departure world for this read-only session. The
+      saved journey on disk is unchanged.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

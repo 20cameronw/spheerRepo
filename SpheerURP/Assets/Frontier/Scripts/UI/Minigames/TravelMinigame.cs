@@ -24,6 +24,7 @@ namespace Frontier
         public PlanetData from, to;
         /// <summary>Fuel spent on this leg (the refund shown by a results screen is floor(fuelCost x travelRefundMax x quality), exactly what the flow credits).</summary>
         public int fuelCost;
+        public TravelLegCheckpoint checkpoint;
         /// <summary>A full-bleed layer above the whole UI (no safe-area inset) for games that draw edge to edge; null when the caller has none. The legacy game ignores it.</summary>
         public VisualElement fullscreenHost;
         /// <summary>Safe-area insets (left, top, right, bottom) in UI units for HUD placed inside <see cref="fullscreenHost"/>.</summary>
@@ -63,6 +64,7 @@ namespace Frontier
     public static class TravelMinigames
     {
         public static Func<ITravelMinigame> Create = () => new LegacyTravelMinigame();
+        public static Func<TravelCheckpoint, PlanetData, PlanetData, string> PrepareRecovery;
 
         /// <summary>
         /// Called when the player's hull is destroyed and a revive is possible. The host shows its own offer (shards, rewarded ad) and answers

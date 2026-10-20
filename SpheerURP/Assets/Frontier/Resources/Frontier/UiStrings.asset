@@ -14,6 +14,33 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   locale: en
   entries:
+  - key: travel.recovery.cannot-start
+    text: Cannot start a journey while another trip is pending or this save is read-only.
+  - key: travel.recovery.save-failed
+    text: 'Journey progress could not be saved: {0}'
+  - key: travel.recovery.invalid
+    text: This interrupted journey no longer matches this save or its route.
+  - key: travel.recovery.pending-save
+    text: Journey progress has not been saved. Keep the game open while saving retries.
+  - key: travel.recovery.restore-busy
+    text: Finish or discard the interrupted journey before restoring a different
+      save. In-flight cloud snapshots cannot be restored in this build.
+  - key: travel.recovery.unavailable
+    text: The travel recovery provider is unavailable. The saved journey has been
+      preserved.
+  - key: travel.recovery.incompatible
+    text: Saved run data is incompatible or damaged. It has been preserved; no fuel
+      charge or trip rewards have been applied.
+  - key: travel.recovery.title
+    text: INTERRUPTED JOURNEY
+  - key: travel.recovery.discard-help
+    text: Discard returns you to the departure world without a fuel charge or trip
+      rewards. Already used revive shards are not refunded.
+  - key: travel.recovery.discard
+    text: DISCARD JOURNEY
+  - key: travel.recovery.read-only
+    text: Returned to the departure world for this read-only session. The saved journey
+      on disk is unchanged.
   - key: planet.spot.surface-scrap
     text: Surface Scrap
   - key: planet.spot.chop

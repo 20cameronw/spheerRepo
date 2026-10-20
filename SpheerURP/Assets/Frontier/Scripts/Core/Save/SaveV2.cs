@@ -206,10 +206,18 @@ namespace Frontier
         public bool objectivesInitialized;
         public List<ObjectiveRecord> objectives = new List<ObjectiveRecord>();
         public AscensionProgress ascension = new AscensionProgress();
+        public TravelCheckpoint travel;
+        public bool travelPending;
 
         /// <summary>Repairs nulls a hand-edited or truncated file can leave behind, so the rest of the game never null-checks.</summary>
         public SaveV2 Normalize()
         {
+            if (!travelPending) travel = null;
+            else
+            {
+                if (travel == null) travel = new TravelCheckpoint { version = 0 };
+                travel.Normalize();
+            }
             if (saveId == null) saveId = "";
             if (revision < 0) revision = 0;
             if (createdWith == null) createdWith = new CreatedWithInfo();

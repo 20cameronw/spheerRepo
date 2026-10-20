@@ -142,6 +142,7 @@ namespace Frontier.Hyperspace
         public bool Revive()
         {
             if (!CanRevive) return false;
+            Replay?.RecordAction(1);
             RevivesUsed++;
             ref PlayerState p = ref Player;
             p.hull = (float)((double)p.maxHull * Tuning.reviveHullFraction);
@@ -166,6 +167,7 @@ namespace Frontier.Hyperspace
         public void Abandon()
         {
             if (State == RunState.Ended) return;
+            Replay?.RecordAction(2);
             Abandoned = true;
             Defeated = true;
             FinishRun(false);

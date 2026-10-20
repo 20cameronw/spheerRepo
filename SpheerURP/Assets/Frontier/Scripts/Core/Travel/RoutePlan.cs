@@ -24,6 +24,7 @@ namespace Frontier
     }
 
     /// <summary>One flight of a route: a hop inside a system or one jump between two systems (one travel mini-game run).</summary>
+    [Serializable]
     public struct RouteLeg
     {
         /// <summary>Compact ids of the systems at the start and the end of the leg ("s:X:Y:I").</summary>
@@ -45,6 +46,7 @@ namespace Frontier
     /// A planned trip. Always safe to read: an unreachable plan has no legs, <see cref="reachable"/> false and at least one reason.
     /// Built by the route planner, drawn by the map (see <see cref="RouteCurve"/>), paid and flown by the travel flow.
     /// </summary>
+    [Serializable]
     public sealed class RoutePlan
     {
         public static readonly RouteLeg[] NoLegs = new RouteLeg[0];
@@ -83,6 +85,7 @@ namespace Frontier
     }
 
     /// <summary>A hazard the destination has and the hull plating level the ship lacks for it.</summary>
+    [Serializable]
     public struct HazardGap
     {
         /// <summary>The single hazard flag.</summary>

@@ -1626,6 +1626,108 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator ColdStartupResumesTheExactHyperspaceRunPausedAndSettlesOnce()
+        {
+            var db = GameDatabase.Load();
+            var state = new GameState(db, false);
+            foreach (var upgrade in db.upgrades) state.DebugSetUpgrade(upgrade, upgrade.MaxLevel);
+            state.backpack.Set(db.fuel.id, 100);
+            var target = state.universe.Get("glacia");
+            var plan = state.PlanRoute(target);
+            Assert.IsTrue(plan.reachable);
+            Assert.AreEqual(1, plan.LegCount);
+            Assert.IsTrue(state.BeginTravelCheckpoint(plan, out string error), error);
+            var checkpoint = state.PendingTravel.legs[0];
+            Assert.IsTrue(SeedText.TryParse(checkpoint.seed, out ulong seed));
+            var request = new TravelRunRequest { seed = seed, distanceLy = plan.legs[0].lengthLy,
+                seconds = plan.legs[0].seconds, danger = target.Danger, tier = target.Tier };
+            var tuning = new Frontier.Hyperspace.HyperspaceTuning();
+            var ship = Frontier.Hyperspace.View.ShipStatsMapper.Map(Frontier.Hyperspace.View.ShipFamiliesFromGame.Read(state));
+            var run = Frontier.Hyperspace.View.HyperspaceSetup.CreateRun(request, ship, tuning, false);
+            checkpoint.replay = Frontier.Hyperspace.RunReplay.Attach(run, JsonUtility.ToJson(tuning));
+            checkpoint.hasReplay = true;
+            checkpoint.freeRevives = Mathf.Max(0, FrontierSettings.I.freeRevivesPerRun);
+            for (int i = 0; i < 300; i++) run.Step(new Frontier.Hyperspace.PlayerInput(1.25f, -0.5f, false));
+            Assert.AreEqual(Frontier.Hyperspace.RunState.Running, run.State);
+            ulong digest = run.StateDigest();
+            int fuel = state.Count(db.fuel), xp = state.xp, shards = state.ShardBalance;
+            string origin = state.planet.Id;
+            Assert.IsTrue(state.Save());
+            new GameObject("ColdTravelBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            Frontier.Hyperspace.View.HyperspaceSession session = null;
+            while (Time.realtimeSinceStartup < deadline && session == null)
+            {
+                session = Object.FindFirstObjectByType<Frontier.Hyperspace.View.HyperspaceSession>();
+                yield return null;
+            }
+            var runtime = FrontierRuntime.Current;
+            Assert.IsNotNull(runtime);
+            Assert.IsNotNull(session, "Startup must reopen the saved leg through the real UI travel flow.");
+            session.DebugFrozen = true;
+            Assert.IsTrue(session.Paused, "Restoration must not restart combat before the player resumes.");
+            Assert.AreEqual(digest, session.Run.StateDigest());
+            Assert.AreEqual(origin, runtime.State.planet.Id);
+            Assert.AreEqual(fuel, runtime.State.Count(db.fuel));
+            Assert.AreEqual(xp, runtime.State.xp);
+            Assert.AreEqual(shards, runtime.State.ShardBalance);
+            Assert.IsTrue(runtime.Ui.IsTravelling);
+            session.Resume();
+            session.FinishTrip();
+            yield return null;
+            session.Close();
+            deadline = Time.realtimeSinceStartup + 15;
+            while (runtime.Ui.DebugBusy && Time.realtimeSinceStartup < deadline)
+            {
+                runtime.Ui.HandleBack();
+                yield return null;
+            }
+            Assert.IsFalse(runtime.Ui.DebugBusy);
+            Assert.AreEqual(target.Id, runtime.State.planet.Id);
+            Assert.IsNull(runtime.State.PendingTravel);
+            Assert.AreEqual(fuel - plan.totalFuel, runtime.State.Count(db.fuel));
+            var restarted = new GameState(db, true);
+            Assert.IsNull(restarted.PendingTravel);
+            Assert.AreEqual(target.Id, restarted.planet.Id);
+            Assert.AreEqual(runtime.State.Count(db.fuel), restarted.Count(db.fuel));
+            Assert.AreEqual(xp, restarted.xp, "Finishing an unfinished leg must not grant run XP.");
+        }
+
+        [UnityTest]
+        public IEnumerator InvalidInterruptedJourneyBlocksPlayUntilExplicitDiscard()
+        {
+            var db = GameDatabase.Load();
+            var seedState = new GameState(db, false);
+            foreach (var upgrade in db.upgrades) seedState.DebugSetUpgrade(upgrade, upgrade.MaxLevel);
+            seedState.backpack.Set(db.fuel.id, 100);
+            Assert.IsTrue(seedState.BeginTravelCheckpoint(seedState.PlanRoute(seedState.universe.Get("glacia")), out _));
+            seedState.PendingTravel.version++;
+            string origin = seedState.planet.Id;
+            int fuel = seedState.Count(db.fuel), xp = seedState.xp;
+            Assert.IsTrue(seedState.Save());
+            new GameObject("InvalidTravelBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var runtime = FrontierRuntime.Current;
+            Assert.IsNotNull(runtime);
+            Assert.IsNotNull(runtime.State.PendingTravel);
+            Assert.IsTrue(runtime.Ui.DebugBusy);
+            var discard = runtime.Ui.DebugRoot.Q<Button>("travel-recovery-discard");
+            Assert.IsNotNull(discard);
+            Assert.IsNotNull(runtime.Ui.DebugRoot.Q("travel-recovery-error"));
+            Assert.IsNull(Object.FindFirstObjectByType<Frontier.Hyperspace.View.HyperspaceSession>());
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = discard; discard.SendEvent(submit); }
+            Assert.IsNull(runtime.Ui.DebugRoot.Q("travel-recovery-error"));
+            Assert.IsFalse(runtime.Ui.DebugBusy);
+            Assert.IsNull(runtime.State.PendingTravel);
+            var restarted = new GameState(db, true);
+            Assert.IsNull(restarted.PendingTravel);
+            Assert.AreEqual(origin, restarted.planet.Id);
+            Assert.AreEqual(fuel, restarted.Count(db.fuel));
+            Assert.AreEqual(xp, restarted.xp);
+        }
+
+        [UnityTest]
         public IEnumerator TravelFlow_FliesEachLeg_PaysOnce_AndRefundsOnlyCompletedManualLegs()
         {
             new GameObject("TravelTestBootstrap").AddComponent<FrontierBootstrap>();

@@ -47,9 +47,14 @@ namespace Frontier.Tests
 
         HyperspaceSession Begin(int tier = 0, ulong seed = 1, GameState state = null)
         {
+            return BeginRequest(state, new TravelRunRequest { seed = seed, tier = tier, distanceLy = tier == 0 ? 5 : 3000,
+                danger = 0.6f + 1.1f * tier, fuelCost = 20 });
+        }
+
+        HyperspaceSession BeginRequest(GameState state, TravelRunRequest request)
+        {
             game = new HyperspaceGame(state);
-            game.Run(root, new TravelRunRequest { seed = seed, tier = tier, distanceLy = tier == 0 ? 5 : 3000,
-                danger = 0.6f + 1.1f * tier, fuelCost = 20 }, r => { callbacks++; result = r; });
+            game.Run(root, request, r => { callbacks++; result = r; });
             game.Session.DebugFrozen = true;
             return game.Session;
         }
@@ -76,6 +81,57 @@ namespace Frontier.Tests
             save.wallet.Add(new WalletEntry { currency = "shards", amount = shards });
             File.WriteAllText(path, SaveSerializer.Instance.Serialize(save));
             return new GameState(db, true);
+        }
+
+        [UnityTest]
+        public IEnumerator PaidReviveAndJournalPersistTogetherWithoutRechargingOnRecovery()
+        {
+            var state = FundedState(1000);
+            foreach (var upgrade in state.db.upgrades)
+                if (upgrade.id == "pack" || upgrade.id == "jump" || upgrade.id == "engine" || upgrade.id.StartsWith("hull_", StringComparison.Ordinal))
+                    state.DebugSetUpgrade(upgrade, upgrade.MaxLevel);
+            state.backpack.Set(state.db.fuel.id, 100000);
+            PlanetData target = null;
+            foreach (var planet in state.universe.AuthoredPlanets)
+                if (target == null || planet.Tier > target.Tier) target = planet;
+            var plan = state.PlanRoute(target);
+            Assert.IsTrue(plan.reachable);
+            Assert.IsTrue(state.BeginTravelCheckpoint(plan, out string error), error);
+            var checkpoint = state.PendingTravel.legs[0];
+            checkpoint.seed = SeedText.Format(3);
+            var leg = plan.legs[0];
+            var request = new TravelRunRequest { seed = 3, tier = target.Tier, danger = target.Danger,
+                distanceLy = leg.lengthLy, seconds = leg.seconds, fuelCost = leg.fuel, checkpoint = checkpoint };
+            var session = BeginRequest(state, request);
+            session.DebugAdvance(20000, false);
+            Assert.AreEqual(RunState.Downed, session.Run.State);
+            yield return null;
+            int balance = state.ShardBalance, price = state.HyperspaceReviveCost;
+            session.ReviveWithShards();
+            string blockedTemp = Path.Combine(saveDirectory, SaveSchema.FileName + SaveSchema.TempSuffix);
+            Directory.CreateDirectory(blockedTemp);
+            LogAssert.Expect(LogType.Warning, new Regex("Frontier save failed:"));
+            try { session.ReviveWithShards(); }
+            finally { Directory.Delete(blockedTemp); }
+            Assert.AreEqual(balance - price, state.ShardBalance);
+            ulong digest = session.Run.StateDigest();
+            var uncommitted = new GameState(state.db, true);
+            Assert.AreEqual(balance, uncommitted.ShardBalance, "Failed writes must preserve both the old debit and old run state on disk.");
+            Assert.IsTrue(uncommitted.ValidatePendingTravel(out var uncommittedTarget, out error), error);
+            Assert.IsNull(HyperspaceGame.PrepareRecovery(uncommitted, uncommitted.PendingTravel, uncommitted.planet, uncommittedTarget));
+            Assert.AreEqual(RunState.Downed, uncommitted.PendingTravel.legs[0].replay.LiveRun.State);
+            Assert.AreEqual(0, uncommitted.PendingTravel.legs[0].replay.LiveRun.RevivesUsed);
+            Assert.IsTrue(state.Save(), "The pending payment and journal should persist together on retry.");
+            var restarted = new GameState(state.db, true);
+            Assert.AreEqual(balance - price, restarted.ShardBalance);
+            Assert.IsTrue(restarted.ValidatePendingTravel(out var recoveredTarget, out error), error);
+            Assert.IsNull(HyperspaceGame.PrepareRecovery(restarted, restarted.PendingTravel, restarted.planet, recoveredTarget));
+            var recoveredCheckpoint = restarted.PendingTravel.legs[0];
+            Assert.AreEqual(digest, recoveredCheckpoint.replay.LiveRun.StateDigest());
+            Assert.AreEqual(1, recoveredCheckpoint.replay.LiveRun.RevivesUsed);
+            Assert.AreEqual(checkpoint.freeRevives, recoveredCheckpoint.freeRevives);
+            Assert.AreEqual(balance - price, restarted.ShardBalance, "Replay must never invoke a purchase again.");
+            Assert.AreEqual(0, callbacks);
         }
 
         [UnityTest]

@@ -4,7 +4,8 @@ namespace Frontier.Hyperspace
 {
     /// <summary>
     /// The Hyperspace Run simulation. Deterministic, fixed step (1/60 s), allocation-free after construction. Drive it with Step(PlayerInput) from a fixed-step accumulator,
-    /// drain Events after each step, and read the public state arrays (Player, Enemies, Bullets, Bolts, Pickups) to render. Never write to the public state.
+    /// drain Events after each step, and read the public state arrays (Player, Enemies, Bullets, Bolts, Pickups) to render. Optional replay journaling allocates its input history.
+    /// Never write to the public state.
     /// Coordinates: the ship is at z = 0 and flies toward +z; the world scrolls toward -z. x right, y up. The play area is [-W, W] x [-H, H] (see HyperspaceTuning).
     /// </summary>
     public sealed partial class HyperspaceRun
@@ -16,6 +17,7 @@ namespace Frontier.Hyperspace
         public readonly Schedule Plan;
         public readonly ShipStats Ship;
         public readonly EventRing Events = new EventRing();
+        public RunReplay Replay;
 
         /// <summary>Running until the hull hits 0 (Downed: world frozen until Revive() or Abandon()) or the route ends (Ended).</summary>
         public RunState State;
@@ -102,6 +104,7 @@ namespace Frontier.Hyperspace
         /// <summary>Restarts the same route from step 0 (same plan, same seed): the result of a fresh run with identical input.</summary>
         public void Reset()
         {
+            Replay = null;
             State = RunState.Running;
             StepIndex = 0;
             Speed = Route.speed[0];
@@ -166,6 +169,7 @@ namespace Frontier.Hyperspace
         public void Step(in PlayerInput input)
         {
             if (State != RunState.Running) return;
+            Replay?.RecordStep(input);
             int k = StepIndex;
             Speed = Route.speed[k < Route.speed.Length ? k : Route.speed.Length - 1];
             Scroll = (float)(Scroll + ((double)Speed * Dt));

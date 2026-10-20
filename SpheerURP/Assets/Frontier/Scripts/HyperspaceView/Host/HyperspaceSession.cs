@@ -20,6 +20,7 @@ namespace Frontier.Hyperspace.View
         HyperspaceAudio sound;
         HyperspaceInput input;
         float accumulator, hudClock;
+        float saveClock;
         bool background, unfocused, downedShown, resultShown, offerPending;
         int freeRevives;
         int confirmedShardCost = -1;
@@ -29,8 +30,20 @@ namespace Frontier.Hyperspace.View
             game = state; request = req; done = callback;
             tuning = new HyperspaceTuning();
             var ship = state != null ? ShipStatsMapper.Map(ShipFamiliesFromGame.Read(state)) : ShipStats.Starter();
-            Run = HyperspaceSetup.CreateRun(req, ship, tuning, TravelPrefs.AssistMode);
-            freeRevives = Mathf.Max(0, FrontierSettings.I.freeRevivesPerRun);
+            bool restoring = req.checkpoint != null && req.checkpoint.replay != null;
+            Run = restoring ? req.checkpoint.replay.LiveRun ??
+                req.checkpoint.replay.Restore(tuning, HyperspaceSetup.Library, JsonUtility.ToJson(tuning))
+                : HyperspaceSetup.CreateRun(req, ship, tuning, TravelPrefs.AssistMode);
+            freeRevives = restoring ? req.checkpoint.freeRevives : Mathf.Max(0, FrontierSettings.I.freeRevivesPerRun);
+            if (req.checkpoint != null)
+            {
+                if (!restoring)
+                {
+                    req.checkpoint.replay = RunReplay.Attach(Run, JsonUtility.ToJson(tuning));
+                    req.checkpoint.hasReplay = true;
+                }
+                req.checkpoint.freeRevives = freeRevives;
+            }
             scene = new HyperspaceScene(transform, state != null ? state.AscensionRank : 0);
             hud = new HyperspaceHud(host, req.safeInsets, scene.Texture, Pause, Resume, FinishTrip, Revive, Close, ReviveWithShards);
             hud.BuildRoute(Run);
@@ -39,6 +52,8 @@ namespace Frontier.Hyperspace.View
             sound = new HyperspaceAudio();
             if (TravelPrefs.ShowTutorial) { hud.ShowTip(); TravelPrefs.MarkTutorialRunShown(); }
             hud.Refresh(Run);
+            if (restoring && Run.State == RunState.Running) Pause();
+            else Persist();
         }
 
         void Update()
@@ -68,6 +83,7 @@ namespace Frontier.Hyperspace.View
                 downedShown = true; accumulator = 0; input.Cancel();
                 sound.Stop();
                 ShowDowned();
+                Persist();
             }
             if (Run.State == RunState.Ended && !resultShown)
             {
@@ -76,6 +92,7 @@ namespace Frontier.Hyperspace.View
                 var travel = HyperspaceResults.ToTravelResult(result, FindResource);
                 hud.ShowResult(result, travel, HyperspaceResults.FuelRefund(request.fuelCost, FrontierSettings.I.travelRefundMax, travel));
                 sound.Stop();
+                Persist();
             }
             scene.Present(Run, Paused ? 0 : Mathf.Clamp01(accumulator / HyperspaceTuning.Dt));
             hudClock += Time.unscaledDeltaTime;
@@ -87,6 +104,20 @@ namespace Frontier.Hyperspace.View
 #endif
             }
             if (!Paused && Run.State == RunState.Running) sound.Engine(Run.Speed);
+            if (!Paused && Run.State == RunState.Running) saveClock += Time.unscaledDeltaTime;
+            if (saveClock >= 1f)
+            {
+                saveClock = 0;
+                if (request.checkpoint != null) game?.MarkTravelDirty();
+            }
+        }
+
+        void Persist()
+        {
+            if (request.checkpoint == null || game == null) return;
+            request.checkpoint.freeRevives = freeRevives;
+            game.MarkTravelDirty();
+            if (!game.Save() && hud != null) hud.ShowPaymentNotice(UiText.Get("travel.recovery.pending-save"));
         }
 
         ResourceSO FindResource(string id) { return game == null || id == null ? null : game.db.ResolveResource(id); }
@@ -136,7 +167,7 @@ namespace Frontier.Hyperspace.View
                 ShowDowned(message);
                 return;
             }
-            Revived();
+            Revived(false);
             if (result == PaidReviveResult.PendingSave) hud.ShowPaymentNotice(message);
         }
 
@@ -144,6 +175,7 @@ namespace Frontier.Hyperspace.View
         {
             if (Closed || Run.State != RunState.Running) return;
             Paused = true; accumulator = 0; input.Cancel(); sound.Stop(); hud.ShowPause();
+            Persist();
         }
 
         public bool HandleBack()
@@ -193,11 +225,12 @@ namespace Frontier.Hyperspace.View
             }
         }
 
-        void Revived()
+        void Revived(bool persist = true)
         {
             confirmedShardCost = -1;
             downedShown = false; Paused |= background || unfocused; accumulator = 0;
             input.Cancel(); Drain();
+            if (persist) Persist();
             if (Paused) hud.ShowPause();
             else hud.HideDialog();
         }
@@ -206,12 +239,14 @@ namespace Frontier.Hyperspace.View
         {
             if (Closed) return;
             Run.Abandon(); Paused = false; offerPending = false; confirmedShardCost = -1; Drain();
+            Persist();
         }
 
         public void Close()
         {
             if (Closed) return;
             if (Run.State != RunState.Ended) Run.Abandon();
+            request.checkpoint?.replay?.Capture();
             var result = HyperspaceResults.ToTravelResult(Run.BuildResult(), FindResource);
             Closed = true;
             Cleanup();
@@ -235,15 +270,21 @@ namespace Frontier.Hyperspace.View
         void PauseForInterruption()
         {
             if (Closed || Run == null) return;
-            if (Run.State == RunState.Running) Pause();
+            if (Run.State == RunState.Running) { Pause(); return; }
             else if (Run.State == RunState.Downed)
             {
                 // A revive callback may arrive after an ad or OS interruption.
                 Paused = true; accumulator = 0; input.Cancel(); sound.Stop();
             }
+            Persist();
         }
 
-        void OnApplicationQuit() { if (Run != null && !Closed) Run.Abandon(); }
+        void OnApplicationQuit()
+        {
+            if (Run == null || Closed) return;
+            if (request.checkpoint != null) Persist();
+            else Run.Abandon();
+        }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public bool DebugFrozen;
@@ -274,6 +315,14 @@ namespace Frontier.Hyperspace.View
         void OnDestroy()
         {
             if (Closed) return;
+            if (request.checkpoint != null)
+            {
+                Persist();
+                Closed = true;
+                done = null;
+                Cleanup();
+                return;
+            }
             if (Run != null && Run.State != RunState.Ended) Run.Abandon();
             Closed = true; Cleanup();
             var callback = done; done = null;

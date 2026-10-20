@@ -3,6 +3,7 @@ using System;
 namespace Frontier.Hyperspace
 {
     /// <summary>The player's ship as the host derives it from upgrades (see the integration guide for the mapping).</summary>
+    [Serializable]
     public struct ShipStats
     {
         /// <summary>Hull hit points. Enemy hits cost 8-60 hull depending on type and tier.</summary>
@@ -65,6 +66,7 @@ namespace Frontier.Hyperspace
     /// (x right, y up; the area is [-W, W] x [-H, H], see HyperspaceTuning.areaHalfWidth/areaHalfHeight). Values outside the area are clamped; NaN/Inf are ignored.
     /// bomb is a level: the bomb fires on the step it is true and a charge is available (a held button does not retrigger inside the bomb cooldown).
     /// </summary>
+    [Serializable]
     public struct PlayerInput
     {
         public float targetX;
@@ -80,6 +82,7 @@ namespace Frontier.Hyperspace
     }
 
     /// <summary>Everything the host supplies to start a run. The whole encounter schedule is a pure function of this struct, the ship stats and the tuning.</summary>
+    [Serializable]
     public struct RunParams
     {
         public ulong seed;

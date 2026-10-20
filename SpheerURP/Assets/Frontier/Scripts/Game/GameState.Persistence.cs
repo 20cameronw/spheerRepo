@@ -179,6 +179,11 @@ namespace Frontier
             }
 
             snapshot.Normalize();
+            if (PendingTravel != null || snapshot.travel != null)
+            {
+                message = UiText.Get("travel.recovery.restore-busy");
+                return false;
+            }
             if (!string.IsNullOrEmpty(snapshot.clock.highWaterUtc) &&
                 !UtcText.TryParse(snapshot.clock.highWaterUtc, out _))
             {
@@ -290,6 +295,7 @@ namespace Frontier
 
         void ClearState()
         {
+            PendingTravel = null;
             purchaseContextId = Guid.NewGuid().ToString("N");
             purchaseGrants = new List<PurchaseGrantRecord>();
             eraReached = Frontier.Economy.FrontierEra.Landfall;
@@ -348,6 +354,7 @@ namespace Frontier
             createdWith = save.createdWith;
             wallet = save.wallet; builders = save.builders; atlas = save.atlas; mapPins = save.mapPins;
             purchaseGrants = save.purchaseGrants;
+            PendingTravel = save.travel;
             mapDiscoveries = new List<string>(MapDiscoveryBits.Decode(save.mapDiscoverySectors)); settings = save.settings;
             mapDiscoverySet.Clear();
             mapDiscoverySet.UnionWith(mapDiscoveries);
@@ -430,6 +437,7 @@ namespace Frontier
 
         SaveV2 BuildSave()
         {
+            PendingTravel?.Capture();
             ObserveObjectives();
             if (saveRevision < long.MaxValue) saveRevision++;
             var save = new SaveV2
@@ -446,6 +454,8 @@ namespace Frontier
                 settings = settings,
                 stats = stats
             };
+            save.travel = PendingTravel;
+            save.travelPending = PendingTravel != null;
             save.objectivesInitialized = objectivesInitialized;
             save.objectives = objectiveLedger.Export();
             save.ascension = new AscensionProgress { rank = AscensionRank, legacyPoints = LegacyPoints };

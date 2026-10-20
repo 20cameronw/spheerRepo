@@ -7,6 +7,7 @@ namespace Frontier.Hyperspace
     /// via <see cref="TrySet"/>; a run copies nothing, so create one instance per run (or per session) and do not change it while a run is in progress.
     /// Per-type arrays are indexed by (int)EntityType and addressed by key as "enemyHp.Drone".
     /// </summary>
+    [Serializable]
     public sealed partial class HyperspaceTuning
     {
         /// <summary>Fixed simulation step. The host runs Step() this often with an accumulator; never use the frame delta inside the simulation.</summary>

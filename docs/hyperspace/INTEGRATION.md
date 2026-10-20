@@ -12,7 +12,7 @@ The simulation source and its golden constants are unchanged.
 
 * **Driver/input:** `HyperspaceSession` owns the fixed-step accumulator, drains every step, freezes on downed/pause/background, and resets catch-up time on resume. Relative pointer drag uses **panel units** and inverted y, retains the target on lift, and captures one pointer. Bomb taps stay latched until an actual simulation step consumes them.
 * **Presentation:** an isolated URP camera explicitly renders into a full-bleed UI Toolkit texture. One reusable vertex-colour mesh batches ships, hazards, bullets, pickups, star streaks and bounded event bursts. There are no per-entity GameObjects or per-step instantiate/destroy calls. Laser gate geometry comes directly from `Hazards.Gate`; turret and Guardian fan markers use the simulation's spread/count. Safe-area HUD shows hull, shields, bomb recharge, combo, score, route/encounter progress, overdrive and Guardian phase/health.
-* **Results/arrival:** results stay visible until Continue. The adapter returns `fuelRefundFraction` in the existing travel result's `quality` field, scales raw loot once, and leaves currency/XP crediting to `UIRoot.TravelSequence`. Abandoning still permits arrival but grants no refund, loot or XP. Removing the overlay or destroying the session abandons an unfinished run and completes the callback once.
+* **Results/arrival:** results stay visible until Continue. The adapter returns `fuelRefundFraction` in the existing travel result's `quality` field and scales raw loot once. `UIRoot.TravelSequence` records each leg in `GameState.PendingTravel`; GameState settles arrival, fuel, completed-leg refunds/loot/XP and checkpoint removal together. Abandoning still permits arrival but grants no refund, loot or XP for that leg. Standalone sessions without a checkpoint still abandon on teardown and complete the callback once; checkpointed session teardown preserves the journal without invoking an arrival callback.
 * **Revives:** absent a wallet/ad provider, `FrontierSettings.freeRevivesPerRun` defaults to one. Set it to zero when monetized revives ship. A non-null `TravelMinigames.ReviveOffer` replaces the free offer; it must answer on the Unity main thread. Duplicate/late callbacks cannot revive a finished or disposed session. Finish trip remains available while an offer is pending.
 * **Audio/debug:** travel event cues reuse the preloaded authored audio library; starting a run creates no event clips. `AudioService` owns ten reusable one-shot voices shared with UI/combat cues plus an engine bed and music source (twelve sources total). The authored `FrontierAudio` mixer routes Music/SFX/UI separately; `Sfx` forwards legacy callers, and mute immediately stops active playback. Legacy synthesized cues use a bounded 64-clip numeric cache; eviction preserves clips still playing. Unseen randomized parameters still allocate when rendering a new clip, so the cache is not a zero-GC guarantee. Settings preserve assist and drag sensitivity; Debug exposes the performance overlay and an on-device comparison of all nine golden digests.
 
@@ -27,7 +27,37 @@ There is no premium-wallet, rewarded-ad or Remote Config implementation on this 
 
 The mobile baseline uses flat neon/faceted geometry and a texture capped at 1280 pixels high, without bloom, realtime shadows,
 chromatic post-processing or native haptics. Phone GPU/audio latency, touch feel and IL2CPP/ARM64 determinism still require device validation.
-No cross-device replay sharing is enabled. The game pauses rather than simulating time spent backgrounded; it does not persist/resume an in-flight run across process termination.
+No cross-device replay sharing is enabled. The game pauses rather than simulating time spent backgrounded.
+Local cold-start recovery reopens the saved run paused, or restores its downed/result dialog. Autopilot resumes its
+saved remaining leg time; completed legs are not replayed for gameplay rewards.
+
+### Durable local journeys
+
+`SaveV2.travelPending` and `travel` hold a versioned `TravelCheckpoint` without changing the v2 schema. The
+checkpoint preserves the original route, seeds, next-leg index, free-revive allowance and id-based leg rewards.
+`TravelLegCheckpoint.hasReplay` distinguishes a real journal from Unity JSON's materialized null inline objects.
+Old saves with no presence flags load without an active journey.
+
+`RunReplay` records exact fixed-step input plus successful revive/abandon actions; repeated identical input is
+run-length encoded. It freezes the original `RunParams` and `ShipStats`, checks the tuning fingerprint and
+schedule digest, then verifies the reconstructed state digest before attaching the restored simulation. Historical
+events are discarded rather than replaying audio/FX. Journals are bounded to 36,000 ticks per leg and the existing
+route planner's maximum search depth, and allocate input history when enabled; the unrecorded Core simulation retains its pooled,
+allocation-free step path. Bump `RunReplay.CurrentVersion` whenever simulation behavior changes incompatibly,
+even if the schedule is unchanged.
+
+The normal ten-second maximum save debounce covers active input; pause/focus/quit, downed/result, leg boundaries
+and purchases flush immediately. Process termination can lose input since the last successful checkpoint. Paid
+revive saves capture both the mutated run journal and wallet debit, so replay never purchases again. Final
+settlement clears the checkpoint in the same snapshot as fuel and rewards. A failed write keeps the in-memory
+transaction dirty and reports it; the previous durable checkpoint remains recoverable without duplicate grants.
+
+`TravelMinigames.PrepareRecovery` is registered by the bootstrap before the UI resumes an interrupted journey.
+It validates journal compatibility and completed-leg results using the live resource resolver. Incompatible,
+damaged or no-longer-valid routes remain preserved until explicit discard, which returns to the origin without
+a fuel charge or trip rewards; already consumed revive shards are not refunded. Read-only discard affects only
+the current session. In-flight cloud snapshots cannot be manually restored in this build. Real Android/iOS
+kill/relaunch, storage-pressure, save-size and frame-time acceptance remain device gates.
 
 ### Reproducible verification
 

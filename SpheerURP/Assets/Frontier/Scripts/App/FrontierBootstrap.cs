@@ -44,10 +44,13 @@ namespace Frontier
             TravelMinigames.Create = () =>
             {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                if (TravelPrefs.UseLegacyGame) return new LegacyTravelMinigame();
+                if (TravelPrefs.UseLegacyGame && (gs.PendingTravel == null ||
+                    gs.PendingTravel.nextLeg >= gs.PendingTravel.legs.Count ||
+                    gs.PendingTravel.legs[gs.PendingTravel.nextLeg].replay == null)) return new LegacyTravelMinigame();
 #endif
                 return new Hyperspace.View.HyperspaceGame(gs);
             };
+            TravelMinigames.PrepareRecovery = (trip, from, to) => Hyperspace.View.HyperspaceGame.PrepareRecovery(gs, trip, from, to);
             TravelDebug.Actions.Clear();
             TravelDebug.Register("Hyperspace determinism self-check", () =>
             {
@@ -134,7 +137,7 @@ namespace Frontier
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             playIntro = !HarnessRunner.Requested;
 #endif
-            if (playIntro)
+            if (playIntro && gs.PendingTravel == null)
             {
                 bool firstLaunch = !TravelPrefs.IntroSeen;
                 yield return ui.PlayArrivalIntro(firstLaunch);
@@ -146,6 +149,7 @@ namespace Frontier
                 Db = db, State = gs, Camera = cam, Backdrop = backdrop, Planet = planet,
                 Defense = defense, Surface = surface, Ui = ui, Document = doc, Services = services
             });
+            if (gs.PendingTravel != null) ui.ResumeInterruptedTravel();
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (HarnessRunner.Requested) new GameObject("Harness").AddComponent<HarnessRunner>().Begin(FrontierRuntime.Current);
 #endif

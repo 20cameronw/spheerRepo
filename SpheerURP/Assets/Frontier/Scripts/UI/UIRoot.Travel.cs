@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -90,6 +89,7 @@ namespace Frontier
             if (busy || defense.Active || backdrop.Warping) return;
             RoutePlan plan = gs.PlanRoute(target, autopilot);
             if (!plan.reachable) { Sfx.Bad(); Toast(RouteStatus(plan), UiKit.Red); return; }
+            if (!gs.BeginTravelCheckpoint(plan, out string error)) { Sfx.Bad(); Toast(error, UiKit.Red); return; }
             busy = true;
             CloseAll();
             StartCoroutine(TravelSequence(target, plan));
@@ -102,7 +102,7 @@ namespace Frontier
             StartCoroutine(backdrop.DoWarp(null));
             yield return planetView.Depart();
             while (backdrop.Warping) yield return null;
-            var results = new List<TravelRunResult>();
+            var trip = gs.PendingTravel;
             var from = gs.planet;
             VisualElement autoOverlay = null;
             Label progress = null;
@@ -111,12 +111,13 @@ namespace Frontier
                 autoOverlay = CreateAutopilotOverlay(out progress);
             }
 
-            for (int i = 0; i < plan.LegCount; i++)
+            for (int i = trip.nextLeg; i < plan.LegCount; i++)
             {
                 RouteLeg leg = plan.legs[i];
+                var checkpoint = trip.legs[i];
                 if (plan.autopilot)
                 {
-                    float remaining = leg.seconds;
+                    float remaining = checkpoint.autopilotRemaining;
                     int shownSeconds = -1;
                     while (remaining > 0)
                     {
@@ -125,16 +126,21 @@ namespace Frontier
                         {
                             shownSeconds = seconds;
                             progress.text = UiText.Get("travel.leg-progress", i + 1, plan.LegCount, seconds);
+                            gs.MarkTravelDirty();
                         }
-                        remaining -= Time.unscaledDeltaTime;
+                        remaining = Mathf.Max(0, remaining - Time.unscaledDeltaTime);
+                        checkpoint.autopilotRemaining = remaining;
                         yield return null;
                     }
-                    results.Add(default);
+                    if (!gs.CompleteTravelLeg(false, 0, 0, null))
+                        Toast(UiText.Get("travel.recovery.pending-save"), UiKit.Amber);
                     continue;
                 }
+                if (!SeedText.TryParse(checkpoint.seed, out ulong seed))
+                    throw new System.InvalidOperationException("The active travel leg has an invalid seed.");
                 var request = new TravelRunRequest
                 {
-                    seed = Frontier.Universe.Hash.Fnv1a64(leg.fromSystemId + ">" + leg.toSystemId) ^ (ulong)(uint)UnityEngine.Random.Range(int.MinValue, int.MaxValue),
+                    seed = seed, checkpoint = checkpoint,
                     distanceLy = leg.lengthLy, danger = target.Danger, tier = target.Tier,
                     legIndex = i, legCount = plan.LegCount, from = from, to = target,
                     seconds = leg.seconds, fuelCost = leg.fuel,
@@ -146,36 +152,85 @@ namespace Frontier
                 activeTravelMinigame.Run(overlayLayer, request, r => { result = r; completed = true; });
                 while (!completed) yield return null;
                 activeTravelMinigame = null;
-                results.Add(result);
+                if (!gs.CompleteTravelLeg(result.completed, result.quality, result.xp, result.loot))
+                    Toast(UiText.Get("travel.recovery.pending-save"), UiKit.Amber);
             }
             if (autoOverlay != null) autoOverlay.RemoveFromHierarchy();
-            if (!gs.Travel(plan, target))
+            if (!gs.SettlePendingTravel(out int refund, out string message))
             {
                 yield return planetView.Approach(gs.planet, gs.TerraformerStageOn(gs.planet));
-                yield return ShipMoment(true);
-                busy = false;
                 IsTravelling = false;
-                Toast(UiText.Get("travel.route-changed"), UiKit.Red);
+                ShowTravelRecoveryFailure(message);
                 yield break;
             }
-            int refund = 0;
-            for (int i = 0; i < results.Count; i++)
-            {
-                var result = results[i];
-                if (!result.completed) continue;
-                refund += gs.RefundLeg(plan.legs[i], result.quality, plan.autopilot);
-                if (result.loot != null)
-                    foreach (var item in result.loot) if (item.resource != null && item.amount > 0) gs.Add(item.resource, item.amount);
-                if (result.xp > 0) gs.AddXp(result.xp);
-            }
-            gs.Flush();
             backdrop.Apply(target);
             selected = target;
             yield return planetView.Approach(target, gs.TerraformerStageOn(target));
             yield return ShipMoment(true);
             busy = false;
             IsTravelling = false;
-            Toast(UiText.Get(refund > 0 ? "travel.arrived.refund" : "travel.arrived", target.Name, refund), UiKit.Cyan);
+            Toast(string.IsNullOrEmpty(message)
+                ? UiText.Get(refund > 0 ? "travel.arrived.refund" : "travel.arrived", target.Name, refund) : message,
+                string.IsNullOrEmpty(message) ? UiKit.Cyan : UiKit.Amber);
+        }
+
+        public void ResumeInterruptedTravel()
+        {
+            if (gs.PendingTravel == null || busy) return;
+            busy = true;
+            CloseAll();
+            if (!gs.ValidatePendingTravel(out var target, out string error))
+            {
+                ShowTravelRecoveryFailure(error);
+                return;
+            }
+            if (TravelMinigames.PrepareRecovery == null)
+            {
+                ShowTravelRecoveryFailure(UiText.Get("travel.recovery.unavailable"));
+                return;
+            }
+            error = TravelMinigames.PrepareRecovery(gs.PendingTravel, gs.planet, target);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Debug.LogWarning("Frontier travel recovery refused: " + error);
+                ShowTravelRecoveryFailure(UiText.Get("travel.recovery.incompatible"));
+                return;
+            }
+            StartCoroutine(TravelSequence(target, gs.PendingTravel.plan));
+        }
+
+        void ShowTravelRecoveryFailure(string message)
+        {
+            var overlay = Layer();
+            overlay.name = "travel-recovery-error";
+            overlay.pickingMode = PickingMode.Position;
+            overlay.style.justifyContent = Justify.Center;
+            overlay.style.alignItems = Align.Center;
+            var card = Card(UiKit.Amber);
+            card.style.width = Length.Percent(90);
+            card.style.maxWidth = 680;
+            card.style.maxHeight = Length.Percent(90);
+            card.Add(UiKit.Text(UiText.Get("travel.recovery.title"), "fr-h2"));
+            var scroll = new ScrollView(ScrollViewMode.Vertical);
+            scroll.style.flexShrink = 1;
+            scroll.style.minHeight = 0;
+            var detail = UiKit.Text(message, "fr-muted");
+            scroll.Add(detail);
+            scroll.Add(UiKit.Text(UiText.Get("travel.recovery.discard-help"), "fr-small"));
+            card.Add(scroll);
+            var discard = UiKit.Btn(UiText.Get("travel.recovery.discard"), UiKit.Amber, () =>
+            {
+                if (!gs.DiscardPendingTravel(out string error)) { detail.text = error; return; }
+                overlay.RemoveFromHierarchy();
+                busy = false;
+                IsTravelling = false;
+                OnStateChanged();
+                if (!string.IsNullOrEmpty(error)) Toast(error, UiKit.Amber);
+            });
+            discard.name = "travel-recovery-discard";
+            card.Add(discard);
+            overlay.Add(card);
+            root.Add(overlay);
         }
 
         IEnumerator ShipMoment(bool arriving, float duration = 0.7f)

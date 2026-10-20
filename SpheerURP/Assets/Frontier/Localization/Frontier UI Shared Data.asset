@@ -7579,6 +7579,50 @@ MonoBehaviour:
     m_Key: content.label.warp_theory.name
     m_Metadata:
       m_Items: []
+  - m_Id: 1506674056716288
+    m_Key: travel.recovery.cannot-start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962496
+    m_Key: travel.recovery.save-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962497
+    m_Key: travel.recovery.invalid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962498
+    m_Key: travel.recovery.pending-save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962499
+    m_Key: travel.recovery.restore-busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962500
+    m_Key: travel.recovery.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962501
+    m_Key: travel.recovery.incompatible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962502
+    m_Key: travel.recovery.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962503
+    m_Key: travel.recovery.discard-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962504
+    m_Key: travel.recovery.discard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1506674169962505
+    m_Key: travel.recovery.read-only
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

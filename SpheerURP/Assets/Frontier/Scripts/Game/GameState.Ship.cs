@@ -110,6 +110,12 @@ namespace Frontier
         /// </summary>
         public bool Travel(RoutePlan plan, PlanetData to)
         {
+            if (PendingTravel != null) return false;
+            return TravelInternal(plan, to, true);
+        }
+
+        bool TravelInternal(RoutePlan plan, PlanetData to, bool persist)
+        {
             if (plan == null || to == null || !plan.reachable || to.Id == planet.Id) return false;
             if (plan.fromPlanetId != planet.Id || plan.toPlanetId != to.Id) return false;
             // A preview is not authority: inventory, hull and upgrades may have changed while the player was flying.
@@ -123,7 +129,7 @@ namespace Frontier
             planet = to;
             RecordArrival(to);
             Notify();
-            Flush();
+            if (persist) Flush();
             return true;
         }
 

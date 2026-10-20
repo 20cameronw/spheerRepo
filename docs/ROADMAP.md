@@ -35,7 +35,7 @@ code that depends on the listed prerequisite; this is not a claim that only test
 | Remaining work | Execution state / prerequisite |
 | --- | --- |
 | Remaining generated/provider localization | Pending local implementation; generated-world and authored-content presentation, language selection and live switching are implemented. Only English is shipped. |
-| Durable Hyperspace process-restart restoration | Pending local implementation; pause/focus-loss handling is implemented, but terminating the process does not preserve an in-flight run. |
+| Hyperspace recovery device acceptance | Local process-restart recovery is implemented; physical Android/iOS kill/relaunch, storage-pressure and performance acceptance remain gated on devices. |
 | Map renderer decision, harvest/Hyperspace touch/audio/haptics, cinematics/VFX/FTUE, quality/memory/thermal budgets and release QA | Blocked on physical-device measurements/acceptance. No Android device was attached when checked. The existing debug APK is not device or release certification. |
 | Ascension and endgame | Blocked on an approved permanent-bonus design; keep Ascension disabled. Weekly boards also need server authority. |
 | Production audio | Blocked on approved music/stems and biome direction plus device listening/mix acceptance. Existing original/CC0 material is not final approval. |
@@ -722,6 +722,22 @@ remain open; this uses earned Nova Shards, not an IAP/provider implementation. E
 revive callback arriving while the app/ad is interrupted. Resume cannot run in the background or without focus.
 Six focused interruption/revive/cleanup/travel checks passed. Finish/defeat still reaches the destination with
 no reward/refund for that unfinished leg. This does not introduce durable process-restart resume.
+
+**Durable Hyperspace recovery (§6.1):** a versioned in-flight route now persists its exact leg seeds, run inputs,
+original ship stats, remaining free revives, completed-leg outcomes and autopilot time. An optional bounded,
+run-length-encoded input/revive/finish journal reconstructs simulation pools, loot RNG and boss state; schedule,
+tuning, version and state digests reject incompatible or damaged runs without granting arrival/rewards. Cold startup
+reopens a valid run paused. Snapshots use the normal debounce (at most ten seconds while playing) plus immediate
+pause/focus/quit, downed/result, leg-completion and paid-revive saves. A hard kill may lose unsaved input since the
+last checkpoint; it does not reroll the route or re-charge a persisted revive. A paid revive's journal and wallet
+debit are captured in the same write. Final arrival, fuel payment, completed-leg refund/loot/XP and checkpoint
+removal are now one durable transaction, including retry after a failed write. Invalid journeys require explicit
+discard back to the origin; previously spent revive shards are not refunded. Read-only files remain untouched.
+Unity JSON presence flags prevent cleared checkpoints from reappearing. Manual restoration of in-flight cloud
+snapshots fails explicitly rather than replacing a live route. Focused replay/save/catalog/travel checks passed
+17/17, including multi-leg reward retention, autopilot time and JSON double round-trip tolerance. Four live
+cold-start/discard/paid-revive checks passed, including failed writes. Physical-device
+kill/relaunch and allocation/frame-time acceptance remain open; this is not server authority or cross-device replay.
 
 **Shard revive (§6.1 / §8.2):** the downed dialog displays the authored price/balance and requires a second
 press to spend earned shards. Payment rejects stale quotes, read-only saves, insufficient balance and
