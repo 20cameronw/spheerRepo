@@ -137,20 +137,20 @@ namespace Frontier.Tests
             Assert.AreEqual("Refinery  LV3", UiText.Get("world.label.level", "Refinery", 3));
             Assert.AreEqual("Version 1.0", UiText.Get("about.version", "1.0"));
             Assert.AreEqual("Arrived at Sylva", UiText.Get("travel.arrived", "Sylva"));
-            Assert.AreEqual("Need 3 more energy · craft fuel", UiText.Get("route.fuel-short", 3));
+            Assert.AreEqual("Need 3,000 more gal · craft fuel", UiText.Get("route.fuel-short", 3000));
             Assert.AreEqual("Build on Sylva  -  2 / 12 free slots  ·  CREWS 1/2 busy. Tap a structure on the planet to use it.",
                 UiText.Get("shop.summary", "Sylva", 2, 12, 1, 2));
             Assert.AreEqual("HULL 85   SHIELD 1/2", UiText.Get("hyperspace.status", 85, 1, 2));
             Assert.AreEqual("9 kills  ·  best combo x3\n2 hits  ·  1 revives",
                 UiText.Get("hyperspace.result.summary", 9, 3, 2, 1));
-            Assert.AreEqual("+5 fuel refunded  ·  +12 XP", UiText.Get("hyperspace.result.rewards", 5, 12));
+            Assert.AreEqual("+5,000 gal refunded  ·  +12 XP", UiText.Get("hyperspace.result.rewards", 5000, 12));
             Assert.AreEqual("1 / 6", UiText.Get("guide.progress", 1, 6));
             StringAssert.Contains("planets cannot be attacked", UiText.Get("guide.defend.help"));
             Assert.AreEqual("2 / 9 slots used  -  drag to rearrange", UiText.Get("pack.capacity.rearrange", 2, 9));
             Assert.AreEqual("In this slot: 4 / 20", UiText.Get("pack.slot-count", 4, 20));
             Assert.AreEqual("8 waiting on Sylva", UiText.Get("pack.salvage.waiting", 8, "Sylva"));
             Assert.AreEqual("Sylva  -  LV 2  -  3 / 12 storage slots", UiText.Get("storage.summary", "Sylva", 2, 3, 12));
-            Assert.AreEqual("PULL 8 · 2 ENERGY", UiText.Get("relay.pull", 8, 2));
+            Assert.AreEqual("PULL 8 · 2,000 GAL", UiText.Get("relay.pull", 8, 2000));
             Assert.AreEqual("Stored 8 items.", UiText.Get("storage.quick-stored", 8));
             Assert.AreEqual("Withdrew 8 items.", UiText.Get("storage.quick-withdrew", 8));
             Assert.AreEqual("2 / 26 collected  |  1 ready", UiText.Get("goals.summary", 2, 26, 1));
@@ -176,8 +176,8 @@ namespace Frontier.Tests
             Assert.AreEqual("50 Nova Shards available", UiText.Get("hyperspace.revive.balance", 50));
             Assert.AreEqual("REVIVE  ·  10 SHARDS", UiText.Get("hyperspace.revive.shards", 10));
             Assert.AreEqual("CONFIRM REVIVE  ·  10 SHARDS", UiText.Get("hyperspace.revive.shards-confirm", 10));
-            Assert.AreEqual("4 / 20 energy aboard · 12s estimate", UiText.Get("map.price.manual", 4, 20, 12));
-            Assert.AreEqual("4 / 20 energy aboard · 12s", UiText.Get("map.price.autopilot", 4, 20, 12));
+            Assert.AreEqual("4,000 / 20,000 gal aboard · 12s estimate", UiText.Get("map.price.manual", 4000, 20000, 12));
+            Assert.AreEqual("4,000 / 20,000 gal aboard · 12s", UiText.Get("map.price.autopilot", 4000, 20000, 12));
             Assert.AreEqual($"12 building slots · danger {1.5f:0.0} · BASE", UiText.Get("map.world.summary-base", 12, 1.5f));
             Assert.AreEqual($"Mine · richness x{1.25f:0.00} · yield 3", UiText.Get("map.deposit", "Mine", 1.25f, 3));
             Assert.AreEqual("Set Glacia as the next stop toward Nyx", UiText.Get("map.next-stop.tooltip", "Glacia", "Nyx"));

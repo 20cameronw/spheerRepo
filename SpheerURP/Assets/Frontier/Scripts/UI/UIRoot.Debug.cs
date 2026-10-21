@@ -73,6 +73,9 @@ namespace Frontier
             OpenResearch();
         }
         public void DebugBuilders() { DebugReset(); OpenBuilders(); }
+        public void DebugNetwork() { DebugReset(); OpenNetwork(); }
+        public void DebugFuelTanks() { DebugReset(); OpenFuelTanks(); }
+        public void DebugNetworkFinale() { DebugReset(); PlayNetworkFinale(); }
         public void DebugPack(int select) { DebugReset(); packSel = select; OpenPack(); }
         public void DebugEmptyPackAction() { RunEmptyPackAction(); }
         public void DebugEmptyPack()

@@ -28,17 +28,34 @@ namespace Frontier
         readonly Dictionary<string, int> items = new Dictionary<string, int>(StringComparer.Ordinal);
         readonly Func<int> capacity;
         readonly Func<string, int> stackSizes;
+        readonly Func<string, bool> separateStorage;
+        readonly Func<int> separateCapacity;
 
-        public Inventory(Func<int> capacity, Func<string, int> stackSizes)
+        public Inventory(Func<int> capacity, Func<string, int> stackSizes,
+            Func<string, bool> separateStorage = null, Func<int> separateCapacity = null)
         {
             if (capacity == null) throw new ArgumentNullException("capacity");
             if (stackSizes == null) throw new ArgumentNullException("stackSizes");
             this.capacity = capacity;
             this.stackSizes = stackSizes;
+            if ((separateStorage == null) != (separateCapacity == null))
+                throw new ArgumentException("Separate storage requires both a selector and a capacity.");
+            this.separateStorage = separateStorage;
+            this.separateCapacity = separateCapacity;
         }
 
         /// <summary>Number of backpack slots right now (base slots plus upgrades).</summary>
         public int Capacity { get { return capacity(); } }
+        public bool IsSeparate(string id) { return separateStorage != null && separateStorage(id); }
+        public int SeparateSlotsUsed
+        {
+            get
+            {
+                int used = 0;
+                foreach (var item in items) if (IsSeparate(item.Key)) used += SlotsFor(item.Key, item.Value);
+                return used;
+            }
+        }
 
         /// <summary>Resource ids that currently have a non-zero count, with their counts (live view, do not modify the inventory while iterating).</summary>
         public IEnumerable<KeyValuePair<string, int>> Stacks { get { return items; } }
@@ -74,7 +91,7 @@ namespace Frontier
             get
             {
                 int n = 0;
-                foreach (var kv in items) n += SlotsFor(kv.Key, kv.Value);
+                foreach (var kv in items) if (!IsSeparate(kv.Key)) n += SlotsFor(kv.Key, kv.Value);
                 return n;
             }
         }
@@ -83,9 +100,11 @@ namespace Frontier
         public int FreeSpace(string id)
         {
             int usedByOthers = 0;
-            foreach (var kv in items) if (kv.Key != id) usedByOthers += SlotsFor(kv.Key, kv.Value);
-            int freeSlots = Math.Max(0, Capacity - usedByOthers);
-            return Math.Max(0, freeSlots * StackSizeOf(id) - Count(id));
+            bool separate = IsSeparate(id);
+            foreach (var kv in items)
+                if (kv.Key != id && IsSeparate(kv.Key) == separate) usedByOthers += SlotsFor(kv.Key, kv.Value);
+            int freeSlots = Math.Max(0, (separate ? separateCapacity() : Capacity) - usedByOthers);
+            return (int)Math.Min(int.MaxValue - (long)Count(id), Math.Max(0L, (long)freeSlots * StackSizeOf(id) - Count(id)));
         }
 
         /// <summary>Adds items and returns how many actually fit. Unknown resources are refused.</summary>
@@ -135,10 +154,14 @@ namespace Frontier
         /// </summary>
         public bool CanCraft(IList<IdAmount> inputs, IList<IdAmount> outputs)
         {
-            if (!Has(inputs)) return false;
-            for (int i = 0; i < outputs.Count; i++)
-                if (FreeSpace(outputs[i].Id) < outputs[i].Amount && !CanFitAfter(inputs, outputs, outputs[i].Id)) return false;
-            return true;
+            if (separateStorage == null)
+            {
+                if (!Has(inputs)) return false;
+                for (int i = 0; i < outputs.Count; i++)
+                    if (FreeSpace(outputs[i].Id) < outputs[i].Amount && !CanFitAfter(inputs, outputs, outputs[i].Id)) return false;
+                return true;
+            }
+            return Has(inputs) && CanFitAfterSpending(inputs, outputs);
         }
 
         /// <summary>
@@ -157,14 +180,18 @@ namespace Frontier
                 spent[item.Id] = amount + item.Amount;
             }
 
-            int usedSlots = 0;
+            long usedSlots = 0, usedSeparate = 0;
             foreach (var item in items)
             {
                 long removed;
                 spent.TryGetValue(item.Key, out removed);
                 if (removed > item.Value) return false;
                 long remaining = item.Value - removed;
-                if (remaining > 0) usedSlots += SlotsFor(item.Key, (int)remaining);
+                if (remaining > 0)
+                {
+                    if (IsSeparate(item.Key)) usedSeparate += SlotsFor(item.Key, (int)remaining);
+                    else usedSlots += SlotsFor(item.Key, (int)remaining);
+                }
             }
             foreach (var item in spent)
                 if (!items.ContainsKey(item.Key) && item.Value > 0) return false;
@@ -178,6 +205,7 @@ namespace Frontier
                 added.TryGetValue(item.Id, out amount);
                 added[item.Id] = amount + item.Amount;
             }
+            bool separateOutputs = false;
             foreach (var item in added)
             {
                 long removed;
@@ -186,10 +214,19 @@ namespace Frontier
                 long stackSize = StackSizeOf(item.Key);
                 long before = remaining <= 0 ? 0 : (remaining + stackSize - 1) / stackSize;
                 long afterCount = remaining + item.Value;
+                if (afterCount > int.MaxValue) return false;
                 long after = afterCount <= 0 ? 0 : (afterCount + stackSize - 1) / stackSize;
-                usedSlots += (int)(after - before);
+                if (IsSeparate(item.Key))
+                {
+                    usedSeparate += after - before;
+                    separateOutputs |= item.Value > 0;
+                }
+                else usedSlots += after - before;
             }
-            return usedSlots <= Capacity;
+            // Legacy over-capacity reserves remain usable; unrelated crafting must not destroy or strand them.
+            return usedSlots <= Capacity &&
+                (usedSeparate <= (separateCapacity == null ? 0 : separateCapacity()) ||
+                    !separateOutputs && usedSeparate <= SeparateSlotsUsed);
         }
 
         bool CanFitAfter(IList<IdAmount> inputs, IList<IdAmount> outputs, string id)

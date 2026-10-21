@@ -302,6 +302,7 @@ namespace Frontier
             objectiveLedger = new ObjectiveLedger();
             objectivesInitialized = false;
             ascension = new AscensionProgress();
+            network = new NetworkProgress();
             backpack.Clear();
             progression.Clear();
             world.Clear();
@@ -354,6 +355,7 @@ namespace Frontier
             createdWith = save.createdWith;
             wallet = save.wallet; builders = save.builders; atlas = save.atlas; mapPins = save.mapPins;
             purchaseGrants = save.purchaseGrants;
+            network = save.network;
             PendingTravel = save.travel;
             mapDiscoveries = new List<string>(MapDiscoveryBits.Decode(save.mapDiscoverySectors)); settings = save.settings;
             mapDiscoverySet.Clear();
@@ -393,6 +395,38 @@ namespace Frontier
                 if (!backpack.IsKnown(stack.resourceId)) { warnings.Add("dropped " + stack.count + " of the unknown resource '" + stack.resourceId + "'"); continue; }
                 backpack.Set(stack.resourceId, stack.count);
             }
+            foreach (var stack in save.player.fuelTank)
+            {
+                if (!backpack.IsKnown(stack.resourceId) || !IsTankFuel(stack.resourceId))
+                {
+                    warnings.Add("unrecognized ship fuel '" + stack.resourceId + "'; the save is read-only to preserve it");
+                    saves.Store.MarkReadOnly(warnings[warnings.Count - 1]);
+                    report.readOnly = true;
+                    continue;
+                }
+                long count = (long)backpack.Count(stack.resourceId) + stack.count;
+                if (count > int.MaxValue)
+                {
+                    warnings.Add("ship fuel exceeds the supported count; the save is read-only to preserve it");
+                    saves.Store.MarkReadOnly(warnings[warnings.Count - 1]);
+                    report.readOnly = true;
+                }
+                backpack.Set(stack.resourceId, (int)Math.Min(int.MaxValue, count));
+            }
+            bool fuelMigrated = save.player.fuelStorageVersion == 0;
+            if (save.player.fuelStorageVersion > 1)
+            {
+                string error = "ship fuel uses a newer storage version; the save is read-only to preserve it";
+                warnings.Add(error);
+                saves.Store.MarkReadOnly(error);
+                report.readOnly = true;
+            }
+            if (fuelMigrated && PendingTravel != null)
+            {
+                int legacySlots = SlotsUsed + FuelTankUsed;
+                PendingTravel.departureCargoFill = Slots > 0 ? Math.Min(1.0, legacySlots / (double)Slots) : 0;
+                PendingTravel.hasDepartureCargoFill = true;
+            }
             foreach (var delta in save.worlds)
             {
                 if (delta == null || delta.structures == null) continue;
@@ -409,6 +443,17 @@ namespace Frontier
                 });
             }
             world.Import(save.worlds);
+            foreach (var link in network.links)
+                if (link == null || link.fromPlanetId == link.toPlanetId ||
+                    universe.Get(link.fromPlanetId) == null || universe.Get(link.toPlanetId) == null)
+                {
+                    string error = "the planet network contains an invalid link; the save is read-only to preserve it";
+                    warnings.Add(error);
+                    saves.Store.MarkReadOnly(error);
+                    report.readOnly = true;
+                    network = new NetworkProgress();
+                    break;
+                }
             stats = save.stats ?? new PlayerStats();
             objectiveLedger = new ObjectiveLedger(save.objectives);
             objectivesInitialized = save.objectivesInitialized;
@@ -432,7 +477,7 @@ namespace Frontier
                 if (!string.IsNullOrEmpty(save.location.currentPlanetId)) warnings.Add("the world '" + save.location.currentPlanetId + "' does not exist; returning home");
                 planet = universe.Home;
             }
-            return offlineChanged || builderJobsChanged || objectivesChanged;
+            return offlineChanged || builderJobsChanged || objectivesChanged || fuelMigrated;
         }
 
         SaveV2 BuildSave()
@@ -459,6 +504,8 @@ namespace Frontier
             save.objectivesInitialized = objectivesInitialized;
             save.objectives = objectiveLedger.Export();
             save.ascension = new AscensionProgress { rank = AscensionRank, legacyPoints = LegacyPoints };
+            save.network = network;
+            save.player.fuelStorageVersion = 1;
             save.player.xp = progression.Xp;
             foreach (var kv in progression.Upgrades) save.player.upgrades.Add(new IdLevel { id = kv.Key, level = kv.Value });
             save.player.upgrades.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
@@ -466,8 +513,13 @@ namespace Frontier
             save.player.researched.Sort(StringComparer.Ordinal);
             foreach (var kv in ToolTiers) save.player.toolTiers.Add(new IdLevel { id = kv.Key, level = kv.Value });
             save.player.toolTiers.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
-            foreach (var kv in backpack.Stacks) save.player.inventory.Add(new StackRecord { resourceId = kv.Key, count = kv.Value });
+            foreach (var kv in backpack.Stacks)
+            {
+                var inventory = IsTankFuel(kv.Key) ? save.player.fuelTank : save.player.inventory;
+                inventory.Add(new StackRecord { resourceId = kv.Key, count = kv.Value });
+            }
             save.player.inventory.Sort((a, b) => string.CompareOrdinal(a.resourceId, b.resourceId));
+            save.player.fuelTank.Sort((a, b) => string.CompareOrdinal(a.resourceId, b.resourceId));
             save.location.currentPlanetId = planet.Id;
             save.worlds = world.Export();
             save.clock.lastSavedUtc = UtcText.Format(clock.UtcNow);

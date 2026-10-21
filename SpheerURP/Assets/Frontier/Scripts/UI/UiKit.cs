@@ -176,8 +176,22 @@ namespace Frontier
         public static VisualElement ItemChip(ResourceSO r, int amount, int have = -1)
         {
             bool short_ = have >= 0 && have < amount;
-            string label = have >= 0 ? have + "/" + amount : amount.ToString();
+            string label = have >= 0 ? Amount(r, have) + "/" + Amount(r, amount) : Amount(r, amount);
             return Chip(Icons.ForResource(r), Ui(r.color), label, short_);
+        }
+
+        public static string Amount(ResourceSO resource, int amount)
+        {
+            return resource != null && resource.fuelEnergy > 0
+                ? UiText.Get("fuel.gallons", ((long)amount * resource.fuelEnergy * GameState.GallonsPerEnergy).ToString("N0"))
+                : amount.ToString();
+        }
+
+        public static string FuelLabel(long gallons)
+        {
+            if (gallons < 1000000) return UiText.Get("fuel.gallons", gallons.ToString("N0"));
+            return UiText.Get(gallons < 1000000000 ? "fuel.millions" : "fuel.billions",
+                (gallons / (gallons < 1000000000 ? 1000000.0 : 1000000000.0)).ToString("0.#"));
         }
 
         public static VisualElement CostRow(System.Collections.Generic.List<ItemAmount> items, GameState gs, bool showHave,

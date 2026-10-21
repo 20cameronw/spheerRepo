@@ -46,13 +46,14 @@ namespace Frontier
             I = this;
             foreach (var r in db.resources) if (r != null && !string.IsNullOrEmpty(r.id)) resourceById[r.id] = r;
             universe = UniverseService.For(db);
-            backpack = new Inventory(() => Slots, StackSizeOf);
+            backpack = new Inventory(() => Slots, StackSizeOf, IsTankFuel, () => FuelTankSlots);
             progression = new Progression(() => FrontierSettings.I.xpPerLevelBase);
             world = new WorldStore();
             stats = new PlayerStats();
             saves = new SaveService(SaveDirectory(), this.clock, BuildSave);
             InitializeObjectiveCatalog();
             InitializeAscensionRules();
+            InitializeNetworkRules();
             lastTickAt = this.clock.MonotonicSeconds;
             LoadReport = new SaveLoadReport { source = SaveSource.NewGame };
             if (loadExistingSave) LoadOrStart();
@@ -112,7 +113,8 @@ namespace Frontier
 
             var candidate = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(BuildSave())).Normalize();
             StackRecord stack = null;
-            foreach (var entry in candidate.player.inventory)
+            var inventory = IsTankFuel(resource.id) ? candidate.player.fuelTank : candidate.player.inventory;
+            foreach (var entry in inventory)
             {
                 if (entry.resourceId != resource.id) continue;
                 stack = entry;
@@ -125,9 +127,9 @@ namespace Frontier
                 return false;
             }
             if (stack == null)
-                candidate.player.inventory.Add(new StackRecord { resourceId = resource.id, count = accepted });
+                inventory.Add(new StackRecord { resourceId = resource.id, count = accepted });
             else stack.count += accepted;
-            candidate.player.inventory.Sort((a, b) => string.CompareOrdinal(a.resourceId, b.resourceId));
+            inventory.Sort((a, b) => string.CompareOrdinal(a.resourceId, b.resourceId));
 
             if (!saves.CommitSnapshot(candidate))
             {
@@ -686,6 +688,7 @@ namespace Frontier
             foreach (var resource in db.resources)
             {
                 if (resource == null || (category.HasValue && resource.category != category.Value) ||
+                    IsTankFuel(resource.id) && warehouse.def.kind != StructureKind.FuelDepot ||
                     !CanStore(warehouse, resource)) continue;
                 int remaining = Count(resource);
                 for (int slot = 0; slot < capacity && remaining > 0; slot++)

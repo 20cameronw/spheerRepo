@@ -185,7 +185,7 @@ namespace Frontier.Tests
             {
                 var row = upgrade.NextRow(0);
                 if (string.IsNullOrEmpty(row.researchPrereq) && row.requiresReachTier <= state.ReachTier &&
-                    upgrade.effect != UpgradeEffect.StackMultiplier && upgrade.effect != UpgradeEffect.FuelTankSlots) continue;
+                    upgrade.effect != UpgradeEffect.StackMultiplier) continue;
                 Assert.IsNotNull(state.UpgradeLockReason(upgrade), upgrade.id);
                 Assert.IsFalse(state.Buy(upgrade), upgrade.id);
                 Assert.AreEqual(0, state.Level(upgrade));

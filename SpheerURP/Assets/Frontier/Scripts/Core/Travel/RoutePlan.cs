@@ -53,6 +53,7 @@ namespace Frontier
 
         public RouteLeg[] legs = NoLegs;
         public bool reachable;
+        public bool instant;
         public RouteReasons reasons;
         public bool autopilot;
         public string fromPlanetId, toPlanetId;

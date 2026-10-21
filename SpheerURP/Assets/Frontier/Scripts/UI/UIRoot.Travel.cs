@@ -89,10 +89,34 @@ namespace Frontier
             if (busy || defense.Active || backdrop.Warping) return;
             RoutePlan plan = gs.PlanRoute(target, autopilot);
             if (!plan.reachable) { Sfx.Bad(); Toast(RouteStatus(plan), UiKit.Red); return; }
+            if (plan.instant)
+            {
+                if (!gs.TryInstantTravel(target, out string instantError)) { Toast(instantError, UiKit.Amber); return; }
+                busy = true;
+                CloseAll();
+                StartCoroutine(InstantArrival());
+                return;
+            }
             if (!gs.BeginTravelCheckpoint(plan, out string error)) { Sfx.Bad(); Toast(error, UiKit.Red); return; }
             busy = true;
             CloseAll();
             StartCoroutine(TravelSequence(target, plan));
+        }
+
+        IEnumerator InstantArrival()
+        {
+            try
+            {
+                IsTravelling = true;
+                yield return backdrop.DoWarp(() => planetView.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet)));
+                yield return ShipMoment(true, 0.45f);
+                Toast(UiText.Get("travel.arrived", gs.planet.Name), UiKit.Cyan);
+            }
+            finally
+            {
+                IsTravelling = false;
+                busy = false;
+            }
         }
 
         IEnumerator TravelSequence(PlanetData target, RoutePlan plan)
@@ -170,7 +194,8 @@ namespace Frontier
             busy = false;
             IsTravelling = false;
             Toast(string.IsNullOrEmpty(message)
-                ? UiText.Get(refund > 0 ? "travel.arrived.refund" : "travel.arrived", target.Name, refund) : message,
+                ? UiText.Get(refund > 0 ? "travel.arrived.refund" : "travel.arrived",
+                    target.Name, (long)refund * GameState.GallonsPerEnergy) : message,
                 string.IsNullOrEmpty(message) ? UiKit.Cyan : UiKit.Amber);
         }
 
@@ -321,7 +346,8 @@ namespace Frontier
             if (p.Has(RouteReasons.SearchLimit)) return UiText.Get("route.search-limit");
             if (p.Has(RouteReasons.OutOfRange)) return UiText.Get("route.out-of-range");
             if (p.Has(RouteReasons.Hazard)) return UiText.Get("route.hazard");
-            if (p.Has(RouteReasons.NotEnoughFuel)) return UiText.Get("route.fuel-short", p.fuelShort);
+            if (p.Has(RouteReasons.NotEnoughFuel)) return UiText.Get("route.fuel-short", (long)p.fuelShort * GameState.GallonsPerEnergy);
+            if (p.instant) return UiText.Get("network.route.free");
             return UiText.Get(p.intraSystem ? "route.orbital" : p.LegCount == 1 ? "route.single-jump" : "route.multiple-jumps",
                 p.LegCount, p.totalLengthLy.ToString("0.#"));
         }

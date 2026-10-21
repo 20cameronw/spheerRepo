@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfd463c1add8497db275f17f394f6801, type: 3}
+  m_Name: NetworkRules
+  linkResearch: warp_gate_engineering
+  finaleResearch: stellar_engineering
+  gateLevel: 1
+  minimumWarehouses: 12
+  minimumStorageSlots: 4600
+  resourceWorlds:
+  - wood
+  - ice
+  - titanium_ore
+  - radium
+  - dark_matter
+  linkCost:
+  - resourceId: steel
+    amount: 1000
+  - resourceId: quantum_chip
+    amount: 400
+  - resourceId: warp_coil
+    amount: 200
+  finaleCost:
+  - resourceId: wood
+    amount: 60000
+  - resourceId: ice
+    amount: 12000
+  - resourceId: titanium_ore
+    amount: 16000
+  - resourceId: radium
+    amount: 8000
+  - resourceId: dark_matter
+    amount: 2000
+  - resourceId: titanium_plate
+    amount: 12000
+  - resourceId: quantum_chip
+    amount: 4000
+  - resourceId: warp_coil
+    amount: 2000
+  - resourceId: void_alloy
+    amount: 2000

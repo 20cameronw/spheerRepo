@@ -1264,7 +1264,16 @@ namespace Frontier
             body.Add(tabs);
             if (researchTab == 1) BuildTools(body);
             else if (progressionTab == 0) BuildTech(body);
-            else BuildUpgrades(body, progressionTab == 1 ? UpgradeCategory.Ship : UpgradeCategory.Defense);
+            else
+            {
+                if (progressionTab == 1)
+                {
+                    var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Cyan, OpenNetwork);
+                    network.name = "command-open-network";
+                    body.Add(network);
+                }
+                BuildUpgrades(body, progressionTab == 1 ? UpgradeCategory.Ship : UpgradeCategory.Defense);
+            }
         }
 
         void BuildBuilders(VisualElement body)
@@ -1519,6 +1528,9 @@ namespace Frontier
         void BuildPack(VisualElement body)
         {
             SyncPack();
+            var fuel = IconBtn(UiText.Get("fuel.open"), "fuel", UiKit.Amber, OpenFuelTanks);
+            fuel.name = "pack-open-tanks";
+            body.Add(fuel);
             bool empty = gs.SlotsUsed == 0;
             body.Add(UiKit.Text(UiText.Get(empty ? "pack.capacity" : "pack.capacity.rearrange", gs.SlotsUsed, gs.Slots), "fr-muted"));
             if (empty)
@@ -1622,7 +1634,7 @@ namespace Frontier
             }
             foreach (var r in gs.db.resources)
             {
-                int total = gs.Count(r), sum = 0;
+                int total = gs.IsTankFuel(r.id) ? 0 : gs.Count(r), sum = 0;
                 for (int i = 0; i < n; i++) if (packRes[i] == r) sum += packCnt[i];
                 for (int i = n - 1; i >= 0 && sum > total; i--)
                 {
@@ -1852,7 +1864,9 @@ namespace Frontier
             if (r != null)
             {
                 s.Add(Icons.Make(Icons.ForResource(r), UiKit.Ui(r.color)));
-                s.Add(UiKit.Text(count.ToString(), "fr-slot-count"));
+                s.Add(UiKit.Text(r.fuelEnergy > 0
+                    ? UiText.Get("fuel.slot-thousands", (long)count * r.fuelEnergy) : count.ToString(), "fr-slot-count"));
+                s.tooltip = r.LocalizedName + " " + UiKit.Amount(r, count);
             }
             return s;
         }

@@ -47,7 +47,10 @@ namespace Frontier
             if (!here)
             {
                 var row = UiKit.Div("fr-row");
-                row.Add(UiKit.Text(RouteStatus(mapPreview), "fr-small", mapPreview != null && !mapPreview.reachable ? UiKit.Amber : UiKit.Cyan));
+                var status = UiKit.Text(RouteStatus(mapPreview), "fr-small", mapPreview != null && !mapPreview.reachable ? UiKit.Amber : UiKit.Cyan);
+                status.style.whiteSpace = WhiteSpace.Normal;
+                status.style.flexShrink = 1;
+                row.Add(status);
                 mapCard.Add(row);
                 if (!string.IsNullOrEmpty(mapNextStopPlanetId))
                 {
@@ -65,16 +68,22 @@ namespace Frontier
                         mapCard.Add(nextStopButton);
                     }
                 }
-                var mode = new Toggle(UiText.Get("map.autopilot.help")) { value = mapAutopilot };
-                mode.RegisterValueChangedCallback(e => { mapAutopilot = e.newValue; InvalidateMapPreview(); BuildMapCard(); });
-                mapCard.Add(mode);
                 bool can = mapPreview != null && mapPreview.reachable;
-                string price = mapPreview == null ? UiText.Get("map.calculating")
-                    : UiText.Get(mapAutopilot ? "map.price.autopilot" : "map.price.manual",
-                        mapPreview.totalFuel, gs.FuelOnBoard.Energy, mapPreview.totalSeconds);
-                mapCard.Add(UiKit.Text(price, "fr-tiny", UiKit.Muted));
+                if (mapPreview == null || !mapPreview.instant)
+                {
+                    var mode = new Toggle(UiText.Get("map.autopilot.help")) { value = mapAutopilot };
+                    mode.RegisterValueChangedCallback(e => { mapAutopilot = e.newValue; InvalidateMapPreview(); BuildMapCard(); });
+                    mapCard.Add(mode);
+                    string price = mapPreview == null ? UiText.Get("map.calculating")
+                        : UiText.Get(mapAutopilot ? "map.price.autopilot" : "map.price.manual",
+                            (long)mapPreview.totalFuel * GameState.GallonsPerEnergy, gs.FuelGallons, mapPreview.totalSeconds);
+                    var priceLabel = UiKit.Text(price, "fr-tiny", UiKit.Muted);
+                    priceLabel.style.whiteSpace = WhiteSpace.Normal;
+                    mapCard.Add(priceLabel);
+                }
                 string action = mapPreview == null ? UiText.Get("map.action.calculating")
-                    : can ? UiText.Get(mapAutopilot ? "map.action.autopilot" : "map.action.pilot", mapPreview.totalFuel)
+                    : can && mapPreview.instant ? UiText.Get(gs.HasPlanetLink(gs.planet, planet) ? "network.travel" : "network.lightspeed")
+                    : can ? UiText.Get(mapAutopilot ? "map.action.autopilot" : "map.action.pilot", (long)mapPreview.totalFuel * GameState.GallonsPerEnergy)
                     : UiText.Get("map.action.unavailable");
                 var fly = IconBtn(action, "warp", can ? UiKit.Magenta : UiKit.Muted, () => StartTravel(planet, mapAutopilot), false, can);
                 UiKit.SetEnabledLook(fly, can);
@@ -82,9 +91,32 @@ namespace Frontier
                 mapCard.Add(fly);
             }
             foreach (var child in mapCard.Children()) child.style.flexShrink = 0;
-            var scroll = new ScrollView(ScrollViewMode.Vertical);
+            var scroll = UiKit.VerticalScroll("fr-map-details");
             scroll.style.minHeight = 0; scroll.style.flexShrink = 1;
             mapCard.Add(scroll);
+            if (planet.Id != gs.planet.Id && gs.NetworkRules != null &&
+                gs.StructureOfKind(gs.planet, StructureKind.WarpGate) != null)
+            {
+                if (gs.HasPlanetLink(gs.planet, planet))
+                    scroll.Add(UiKit.Text(UiText.Get("network.link.active"), "fr-small", UiKit.Lime));
+                else
+                {
+                    string reason = gs.PlanetLinkLockReason(planet);
+                    scroll.Add(NetworkCostRow(gs.NetworkCosts(false)));
+                    var link = IconBtn(UiText.Get("network.link", planet.Name), "warp", UiKit.Cyan, () =>
+                    {
+                        bool ok = gs.TryLinkPlanet(planet, out string message);
+                        Toast(message, ok ? UiKit.Lime : UiKit.Amber);
+                    });
+                    link.name = "map-link-world";
+                    UiKit.SetEnabledLook(link, reason == null);
+                    scroll.Add(link);
+                    if (reason != null) scroll.Add(Note(reason, UiKit.Amber));
+                }
+                var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Cyan, OpenNetwork);
+                network.name = "map-open-network";
+                scroll.Add(network);
+            }
             scroll.Add(UiKit.Text(UiText.Get(gs.HasBase(planet) ? "map.world.summary-base" : "map.world.summary",
                 planet.BuildingSlots, planet.Danger), "fr-small"));
             if (planet.Hazards == Hazards.None) scroll.Add(UiKit.Text(UiText.Get("map.hazards.none"), "fr-tiny", UiKit.Lime));

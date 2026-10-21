@@ -376,6 +376,9 @@ namespace Frontier
                 double baseRange = gs.Rules.Model.JumpRangeLy(ship.jumpLevel);
                 body.Add(UiKit.Text(UiText.Get("structure.warp.range", baseRange, gs.Rules.JumpRangeLy(ship)), "fr-small"));
                 body.Add(UiKit.Text(UiText.Get("structure.warp.discount", gs.TravelFuelDiscount(gs.planet) * 100f), "fr-tiny"));
+                var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Lime, OpenNetwork);
+                network.name = "gate-open-network";
+                body.Add(network);
                 UpgradeButton(body, s, c);
             });
         }
@@ -391,19 +394,20 @@ namespace Frontier
                 double capacity = gs.DysonFuelBufferCapacity(s);
                 double stored = gs.DysonFuelReserveEnergy(s);
                 int ready = gs.DysonFuelReady(s);
-                body.Add(UiKit.Text(UiText.Get("structure.dyson.production", rate, capHours), "fr-small", UiKit.Cyan));
-                body.Add(UiKit.Text(UiText.Get("structure.dyson.reserve", stored, capacity), "fr-small"));
+                body.Add(UiKit.Text(UiText.Get("structure.dyson.production", rate * GameState.GallonsPerEnergy, capHours), "fr-small", UiKit.Cyan));
+                body.Add(UiKit.Text(UiText.Get("structure.dyson.reserve",
+                    stored * GameState.GallonsPerEnergy, capacity * GameState.GallonsPerEnergy), "fr-small"));
                 body.Add(UiKit.Text(UiText.Get("structure.dyson.help"), "fr-tiny"));
                 double fuelPerCell = gs.db.fuel == null ? 1.0 : Math.Max(0.0, gs.db.fuel.fuelEnergy);
                 string action = UiText.Get(ready > 0 ? "structure.dyson.collect" :
-                    stored >= fuelPerCell ? "structure.dyson.full" : "structure.dyson.empty", ready);
+                    stored >= fuelPerCell ? "structure.dyson.full" : "structure.dyson.empty", (long)ready * GameState.GallonsPerEnergy);
                 var collect = IconBtn(action, "pack", UiKit.Cyan, () =>
                 {
                     int amount = gs.ClaimDysonFuel(s);
                     if (amount > 0)
                     {
                         Sfx.Good();
-                        Toast(UiText.Get("structure.dyson.collected", amount), UiKit.Cyan);
+                        Toast(UiText.Get("structure.dyson.collected", (long)amount * GameState.GallonsPerEnergy), UiKit.Cyan);
                         RefreshModal();
                     }
                     else Sfx.Bad();
@@ -556,7 +560,7 @@ namespace Frontier
         {
             var row = UiKit.Div("fr-recipe-resource");
             row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
-            row.Add(UiKit.Text(amount + " " + resource.LocalizedName, "fr-small", lack ? UiKit.Red : (Color?)null));
+            row.Add(UiKit.Text(UiKit.Amount(resource, amount) + " " + resource.LocalizedName, "fr-small", lack ? UiKit.Red : (Color?)null));
             return row;
         }
 
@@ -693,7 +697,7 @@ namespace Frontier
                 var fuelIcon = Icons.Make("fuel", UiKit.Amber, UiKit.Size.IconMd);
                 fuelIcon.style.marginRight = UiKit.Space.S8;
                 val.Add(fuelIcon);
-                val.Add(UiKit.Text(alarmFuel.ToString(), "fr-stepper-val", have >= alarmFuel ? (Color?)null : UiKit.Red));
+                val.Add(UiKit.Text(UiKit.Amount(gs.db.fuel, alarmFuel), "fr-stepper-val", have >= alarmFuel ? (Color?)null : UiKit.Red));
                 stepper.Add(minus); stepper.Add(val); stepper.Add(plus);
                 body.Add(stepper);
 

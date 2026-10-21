@@ -1681,7 +1681,8 @@ namespace Frontier.Tests
             Assert.AreEqual(target.Id, preview.toPlanetId, "a stale Nyx result must not overwrite Glacia");
             Assert.IsTrue(preview.intraSystem);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
-                .Exists(label => label.text == UiText.Get("map.price.manual", preview.totalFuel, originalFuel, preview.totalSeconds)));
+                .Exists(label => label.text == UiText.Get("map.price.manual",
+                    (long)preview.totalFuel * GameState.GallonsPerEnergy, originalFuel * GameState.GallonsPerEnergy, preview.totalSeconds)));
             Assert.AreEqual(UiText.Get("map.pin"), rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle").label);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Toggle>().ToList()
                 .Exists(toggle => toggle.label == UiText.Get("map.autopilot.help")));
@@ -1693,7 +1694,8 @@ namespace Frontier.Tests
             Assert.AreEqual(12, rt.Ui.DebugMapPreview.totalSeconds);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
                 .Exists(label => label.text == UiText.Get("map.price.autopilot",
-                    rt.Ui.DebugMapPreview.totalFuel, originalFuel, rt.Ui.DebugMapPreview.totalSeconds)));
+                    (long)rt.Ui.DebugMapPreview.totalFuel * GameState.GallonsPerEnergy,
+                    originalFuel * GameState.GallonsPerEnergy, rt.Ui.DebugMapPreview.totalSeconds)));
             Assert.AreEqual(originalFuel, rt.State.FuelOnBoard.Energy);
             Assert.AreEqual(originalShards, rt.State.ShardBalance);
             Assert.AreEqual(originalPlanet, rt.State.planet.Id, "Previewing a destination cannot travel there.");
@@ -1715,6 +1717,66 @@ namespace Frontier.Tests
             Assert.AreEqual(12000, rt.Ui.DebugMapCenterX, 0.001, "Failed searches cannot move the map.");
             rt.Ui.DebugReset();
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator PlanetNetwork_PreviewsFreeTravel_SkipsFlight_AndReplaysASkippableFinaleWithoutReset()
+        {
+            new GameObject("PlanetNetworkBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            for (int i = 0; i < 10; i++) yield return null;
+            Assert.IsTrue(rt.State.TryCreateCloudSaveSnapshot(out var save, out string error), error);
+            var target = rt.State.universe.Get("glacia");
+            save.network.links.Add(new PlanetLink { fromPlanetId = rt.State.planet.Id, toPlanetId = target.Id });
+            save.player.upgrades.Add(new IdLevel { id = "hull_cold", level = 3 });
+            Assert.IsTrue(rt.State.TryRestoreCloudSave(save, out error), error);
+            rt.Ui.DebugFuelTanks();
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("fuel-open-upgrades"));
+            rt.Ui.DebugMap(target, 12);
+            deadline = Time.realtimeSinceStartup + 10;
+            while (rt.Ui.DebugMapPreview == null && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsNotNull(rt.Ui.DebugMapPreview);
+            Assert.IsTrue(rt.Ui.DebugMapPreview.instant);
+            Assert.IsTrue(rt.Ui.DebugMapPreview.reachable);
+            Assert.AreEqual(0, rt.Ui.DebugMapPreview.totalFuel);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("network.route.free")));
+            Assert.IsFalse(rt.Ui.DebugRoot.Query<Toggle>().ToList().Exists(t => t.label == UiText.Get("map.autopilot.help")),
+                "Free gate travel cannot show an irrelevant fuel-multiplier control.");
+            long fuel = rt.State.FuelGallons;
+            rt.Ui.DebugStartTravel(target, true);
+            Assert.AreEqual(target.Id, rt.State.planet.Id, "Linked arrival is durable immediately, before its presentation.");
+            Assert.IsNull(rt.State.PendingTravel);
+            deadline = Time.realtimeSinceStartup + 8;
+            while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            Assert.IsFalse(rt.Ui.IsTravelling);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("hyperspace-hud"));
+            Assert.AreEqual(fuel, rt.State.FuelGallons);
+            Assert.IsTrue(rt.State.TryCreateCloudSaveSnapshot(out save, out error), error);
+            save.network.completed = true;
+            save.network.archivePlanetId = target.Id;
+            Assert.IsTrue(rt.State.TryRestoreCloudSave(save, out error), error);
+            ulong seed = rt.State.universe.Seed;
+            rt.Ui.DebugNetworkFinale();
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("network-finale-skip");
+            Assert.IsNotNull(skip);
+            Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-topbar").parent.resolvedStyle.display);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            yield return null;
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("network-finale-explore"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("network-finale-prestige"));
+            Assert.IsTrue(rt.Ui.HandleBack());
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q("network-finale"));
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            Assert.IsTrue(rt.State.NetworkComplete);
+            Assert.AreEqual(seed, rt.State.universe.Seed, "Watching/skipping the ending cannot trigger prestige.");
+            Assert.AreEqual(fuel, rt.State.FuelGallons);
         }
 
         [UnityTest]
@@ -1965,7 +2027,9 @@ namespace Frontier.Tests
             for (int i = 0; i < 10; i++) yield return null;
             GiveFullHazardPlating(rt.State);
             rt.State.DebugSetUpgrade(rt.Db.FindUpgrade("pack"), 2);
+            rt.State.DebugSetUpgrade(rt.Db.FindUpgrade("fuel_tank"), 3);
             rt.State.backpack.Set(rt.Db.fuel.id, 200);
+            Assert.LessOrEqual(rt.State.FuelTankUsed, rt.State.FuelTankSlots);
             var target = rt.State.universe.Get("cinder");
             var plan = rt.State.PlanRoute(target);
             Assert.IsTrue(plan.reachable);

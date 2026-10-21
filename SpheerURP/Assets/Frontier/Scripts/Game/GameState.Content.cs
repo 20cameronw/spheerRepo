@@ -50,7 +50,7 @@ namespace Frontier
             int level = Level(upgrade);
             if (level >= upgrade.MaxLevel) return UiText.Get("gate.max-level");
             if (!db.UsesImportedEconomy || !upgrade.HasLevelRows) return null;
-            if (upgrade.effect == UpgradeEffect.StackMultiplier || upgrade.effect == UpgradeEffect.FuelTankSlots)
+            if (upgrade.effect == UpgradeEffect.StackMultiplier)
                 return UiText.Get("gate.upgrade.future");
             var row = upgrade.NextRow(level);
             return GateReason(row.researchPrereq, row.requiresReachTier);

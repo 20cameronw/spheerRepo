@@ -433,6 +433,7 @@ namespace Frontier
         void DrawMapBackground(MeshGenerationContext ctx)
         {
             var p = ctx.painter2D;
+            DrawPlanetLinks(p);
             if (mapSnapshot != null && !SystemMapView)
             {
                 if (mapSnapshot.densityOnly) DrawMapDensity(p);
@@ -492,6 +493,30 @@ namespace Frontier
         {
             p.fillColor = color;
             p.BeginPath(); p.Arc(at, radius, Angle.Degrees(0), Angle.Degrees(360)); p.Fill();
+        }
+
+        void DrawPlanetLinks(Painter2D p)
+        {
+            p.strokeColor = UiKit.Lime;
+            p.lineWidth = 3;
+            foreach (var link in gs.PlanetLinks)
+            {
+                var from = gs.universe.Get(link.fromPlanetId);
+                var to = gs.universe.Get(link.toPlanetId);
+                if (from == null || to == null) continue;
+                Vector2 a, b;
+                if (SystemMapView)
+                {
+                    if (selected == null || from.Star.Key != selected.Star.Key || to.Star.Key != selected.Star.Key) continue;
+                    a = PlanetPoint(from); b = PlanetPoint(to);
+                }
+                else
+                {
+                    if (from.Star.Key == to.Star.Key) continue;
+                    a = Project(from.Star.X, from.Star.Y); b = Project(to.Star.X, to.Star.Y);
+                }
+                p.BeginPath(); p.MoveTo(a); p.LineTo(b); p.Stroke();
+            }
         }
 
         void DrawMapPlanet(Painter2D p, PlanetData planet)

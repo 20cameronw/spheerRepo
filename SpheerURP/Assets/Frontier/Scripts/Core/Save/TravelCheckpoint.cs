@@ -26,6 +26,8 @@ namespace Frontier
         public int version = CurrentVersion;
         public RoutePlan plan;
         public int nextLeg;
+        public bool hasDepartureCargoFill;
+        public double departureCargoFill;
         public List<TravelLegCheckpoint> legs = new List<TravelLegCheckpoint>();
 
         public void Capture()

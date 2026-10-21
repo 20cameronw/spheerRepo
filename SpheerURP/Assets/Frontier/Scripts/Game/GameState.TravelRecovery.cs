@@ -16,7 +16,7 @@ namespace Frontier
                 message = UiText.Get("travel.recovery.cannot-start");
                 return false;
             }
-            var checkpoint = new TravelCheckpoint { plan = plan };
+            var checkpoint = new TravelCheckpoint { plan = plan, hasDepartureCargoFill = true, departureCargoFill = CargoFill };
             foreach (var leg in plan.legs)
                 checkpoint.legs.Add(new TravelLegCheckpoint
                 {
@@ -47,6 +47,8 @@ namespace Frontier
                 trip.plan == null || trip.plan.legs == null || trip.plan.LegCount < 1 ||
                 trip.plan.LegCount > Frontier.Economy.RoutePlanner.MaxExpansions ||
                 trip.legs == null || trip.legs.Count != trip.plan.LegCount || trip.nextLeg < 0 || trip.nextLeg > trip.legs.Count ||
+                trip.hasDepartureCargoFill && (double.IsNaN(trip.departureCargoFill) || double.IsInfinity(trip.departureCargoFill) ||
+                    trip.departureCargoFill < 0 || trip.departureCargoFill > 1) ||
                 trip.plan.fromPlanetId != planet.Id || string.IsNullOrEmpty(trip.plan.toPlanetId)) return false;
             target = universe.Get(trip.plan.toPlanetId);
             if (target == null || !SameTravelPlan(trip.plan, PlanRoute(target, trip.plan.autopilot))) return false;
@@ -71,6 +73,7 @@ namespace Frontier
         {
             if (!a.reachable || !b.reachable || a.fromPlanetId != b.fromPlanetId || a.toPlanetId != b.toPlanetId ||
                 a.totalFuel != b.totalFuel || a.totalSeconds != b.totalSeconds || a.LegCount != b.LegCount) return false;
+            if (a.instant != b.instant || a.autopilot != b.autopilot) return false;
             for (int i = 0; i < a.LegCount; i++)
             {
                 var x = a.legs[i]; var y = b.legs[i];

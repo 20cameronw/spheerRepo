@@ -11,10 +11,10 @@ namespace Frontier
         AscensionRulesSO ascensionRules;
         public int AscensionRank { get { return ascension.rank; } }
         public int LegacyPoints { get { return ascension.legacyPoints; } }
-        public bool AscensionAvailable { get { return ascensionRules != null && ascensionRules.enableAscension; } }
+        public bool AscensionAvailable { get { return ascensionRules != null && (ascensionRules.enableAscension || NetworkComplete || AscensionRank > 0); } }
         public bool AscensionNeedsResearch
         {
-            get { return ascensionRules != null && !IsResearched(ascensionRules.data.requiredResearch); }
+            get { return ascensionRules != null && !NetworkComplete && !IsResearched(ascensionRules.data.requiredResearch); }
         }
         public float MaximumLegacyHarvestBonus
         {
@@ -58,8 +58,8 @@ namespace Frontier
             if (!AscensionAvailable) return UiText.Get("ascension.lock.disabled");
             if (AscensionRank == int.MaxValue || (long)LegacyPoints + ascensionRules.data.legacyPointsPerRank > int.MaxValue)
                 return UiText.Get("ascension.lock.maximum");
-            if (!IsResearched(ascensionRules.data.requiredResearch)) return UiText.Get("ascension.lock.research");
-            if (EraProgress.highestMegaprojectStage < ascensionRules.data.requiredProjectStage)
+            if (!NetworkComplete && !IsResearched(ascensionRules.data.requiredResearch)) return UiText.Get("ascension.lock.research");
+            if (!NetworkComplete && EraProgress.highestMegaprojectStage < ascensionRules.data.requiredProjectStage)
                 return UiText.Get("ascension.lock.project", ascensionRules.data.requiredProjectStage);
             return null;
         }
@@ -86,11 +86,14 @@ namespace Frontier
             candidate.player.upgrades.Clear();
             candidate.player.toolTiers.Clear();
             candidate.player.inventory.Clear();
+            candidate.player.fuelTank.Clear();
+            candidate.network = new NetworkProgress();
             var starting = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var item in db.startingItems)
                 if (item.resource != null && item.amount > 0) starting[item.resource.id] = item.amount;
             foreach (var item in starting)
-                candidate.player.inventory.Add(new StackRecord { resourceId = item.Key, count = item.Value });
+                (IsTankFuel(item.Key) ? candidate.player.fuelTank : candidate.player.inventory)
+                    .Add(new StackRecord { resourceId = item.Key, count = item.Value });
             candidate.builders.Clear();
             candidate.worlds.Clear();
             var newWorld = new WorldStore();

@@ -27,6 +27,8 @@ namespace Frontier
                 else inventory.Add(stack.resourceId, stack);
             }
             save.player.inventory = new List<StackRecord>(inventory.Values);
+            foreach (var stack in save.player.fuelTank)
+                stack.resourceId = resolve(stack.resourceId, db.ResolveResourceId);
             var upgrades = new Dictionary<string, IdLevel>(StringComparer.Ordinal);
             foreach (var level in save.player.upgrades)
             {

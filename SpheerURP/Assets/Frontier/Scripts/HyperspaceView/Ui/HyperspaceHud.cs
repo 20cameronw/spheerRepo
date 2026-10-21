@@ -186,7 +186,7 @@ namespace Frontier.Hyperspace.View
             Dialog(title, travel.completed
                 ? UiText.Get("hyperspace.result.summary", result.killCount, result.maxCombo, result.hitsTaken, result.revivesUsed)
                     + "\n" + (result.cleanRun ? UiText.Get("hyperspace.result.clean") + "\n" : "")
-                    + UiText.Get("hyperspace.result.rewards", fuel, travel.xp)
+                    + UiText.Get("hyperspace.result.rewards", (long)fuel * GameState.GallonsPerEnergy, travel.xp)
                 : UiText.Get("hyperspace.result.unfinished"));
             if (travel.loot != null) foreach (var drop in travel.loot) panel.Add(UiKit.ItemChip(drop.resource, drop.amount));
             Button(UiText.Get("hyperspace.result.continue"), UiKit.Cyan, close).name = "hyperspace-continue";

@@ -10,6 +10,11 @@ namespace Frontier
     {
         /// <summary>Resource ids of the dense fuels (fuel cell = the database's fuel, plasma cell = 8 energy, antimatter pod = 64 energy).</summary>
         public const string PlasmaId = "plasma", AntimatterId = "antimatter";
+        public const int GallonsPerEnergy = 1000;
+        public bool IsTankFuel(string id) { return db.fuel != null && id == db.fuel.id || id == PlasmaId || id == AntimatterId; }
+        public int FuelTankSlots { get { return 4 + Mathf.RoundToInt(EffectSum(UpgradeEffect.FuelTankSlots)); } }
+        public int FuelTankUsed { get { return backpack.SeparateSlotsUsed; } }
+        public long FuelGallons { get { return FuelOnBoard.Energy * GallonsPerEnergy; } }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         // Development only: upgrade levels the catalog will own once the content package imports them. Never saved.
@@ -34,7 +39,8 @@ namespace Frontier
         }
 
         /// <summary>How full the backpack is, 0 to 1 (a full hold burns up to 20% more fuel).</summary>
-        public double CargoFill { get { return Slots <= 0 ? 0.0 : Math.Min(1.0, SlotsUsed / (double)Slots); } }
+        public double CargoFill { get { return PendingTravel != null && PendingTravel.hasDepartureCargoFill
+            ? PendingTravel.departureCargoFill : Slots <= 0 ? 0.0 : Math.Min(1.0, SlotsUsed / (double)Slots); } }
 
         /// <summary>The ship's capabilities right now, computed from the upgrade levels, the hold and the interim settings.</summary>
         public ShipCapabilities Ship
@@ -73,7 +79,7 @@ namespace Frontier
         /// <summary>Radius around every visited system inside which worlds are discovered and surveyed.</summary>
         public double ScannerRangeLy { get { return Rules.ScannerRangeLy(Ship); } }
 
-        /// <summary>The energy items in the backpack (fuel cells, plasma cells, antimatter pods when the game has them).</summary>
+        /// <summary>The separately stored ship reserves, in unchanged economy energy units.</summary>
         public FuelStock FuelOnBoard
         {
             get
@@ -97,6 +103,8 @@ namespace Frontier
         public RoutePlan PlanRoute(PlanetData from, PlanetData to, bool autopilot)
         {
             if (from == null || to == null) return RoutePlan.Blocked(RouteReasons.Unknown);
+            RoutePlan instant = NetworkRoute(from, to, autopilot);
+            if (instant != null) return instant;
             return Planner.Plan(universe.EndpointOf(from), universe.EndpointOf(to), ShipFor(from), autopilot, FuelOnBoard);
         }
 
@@ -111,6 +119,9 @@ namespace Frontier
         public bool Travel(RoutePlan plan, PlanetData to)
         {
             if (PendingTravel != null) return false;
+            if (plan != null && plan.instant)
+                return plan.reachable && plan.fromPlanetId == planet.Id && to != null && plan.toPlanetId == to.Id &&
+                    TryInstantTravel(to, out _);
             return TravelInternal(plan, to, true);
         }
 
@@ -120,7 +131,7 @@ namespace Frontier
             if (plan.fromPlanetId != planet.Id || plan.toPlanetId != to.Id) return false;
             // A preview is not authority: inventory, hull and upgrades may have changed while the player was flying.
             RoutePlan current = PlanRoute(to, plan.autopilot);
-            if (!current.reachable || current.totalFuel != plan.totalFuel || current.LegCount != plan.LegCount) return false;
+            if (!current.reachable || current.instant != plan.instant || current.totalFuel != plan.totalFuel || current.LegCount != plan.LegCount) return false;
             for (int i = 0; i < current.LegCount; i++)
                 if (current.legs[i].toSystemId != plan.legs[i].toSystemId || current.legs[i].fuel != plan.legs[i].fuel) return false;
             FuelPayment pay = Rules.Pay(plan.totalFuel, FuelOnBoard);
@@ -150,7 +161,7 @@ namespace Frontier
             SpendQuietly(cost);
         }
 
-        /// <summary>Energy units given back for a leg flown with a given mini-game quality, added to the backpack as fuel cells. Returns what was added.</summary>
+        /// <summary>Energy units returned to available ship-tank space for a completed leg. Returns what was added.</summary>
         public int RefundLeg(RouteLeg leg, double quality, bool autopilot)
         {
             int refund = Rules.Refund(leg.fuel, quality, autopilot);

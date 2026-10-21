@@ -475,6 +475,50 @@ namespace Frontier
             gs.backpack.Set(GameState.PlasmaId, savedMapPlasma); gs.backpack.Set(GameState.AntimatterId, savedMapAntimatter);
             yield return new Shot("map-flight-autopilot", ui.DebugAutopilotScreen);
 
+            SaveV2 networkBaseline = null;
+            void PrepareNetworkFixture(bool complete = false)
+            {
+                ResetView();
+                if (networkBaseline == null && !gs.TryCreateCloudSaveSnapshot(out networkBaseline, out var error))
+                    throw new InvalidOperationException(error);
+                var candidate = JsonUtility.FromJson<SaveV2>(JsonUtility.ToJson(networkBaseline)).Normalize();
+                candidate.network = new NetworkProgress { completed = complete,
+                    archivePlanetId = complete ? candidate.location.currentPlanetId : "" };
+                foreach (string id in new[] { "glacia", "ferrum" })
+                    candidate.network.links.Add(new PlanetLink { fromPlanetId = candidate.location.currentPlanetId,
+                        toPlanetId = gs.universe.Get(id).Id });
+                candidate.player.researched.Add("warp_gate_engineering");
+                candidate.player.upgrades.Add(new IdLevel { id = "hull_cold", level = 3 });
+                candidate.player.fuelTank = new List<StackRecord>
+                {
+                    new StackRecord { resourceId = db.fuel.id, count = 42 },
+                    new StackRecord { resourceId = "plasma", count = 9 },
+                    new StackRecord { resourceId = "antimatter", count = 1 }
+                };
+                var home = candidate.worlds.Find(delta => delta.planetId == candidate.location.currentPlanetId);
+                if (home == null) throw new InvalidOperationException("Network fixture requires a visited home world.");
+                home.structures.RemoveAll(s => s.slot == 0);
+                home.structures.Add(new StructureRecord { defId = "warp_gate", slot = 0, level = 1 });
+                if (!gs.TryRestoreCloudSave(candidate, out string problem)) throw new InvalidOperationException(problem);
+            }
+            try
+            {
+                yield return new Shot("network-tanks", () => { PrepareNetworkFixture(); ui.DebugFuelTanks(); });
+                yield return new Shot("network-project", () => { PrepareNetworkFixture(); ui.DebugNetwork(); });
+                yield return new Shot("network-links", () => { PrepareNetworkFixture(); ui.DebugMap(gs.universe.Get("glacia"), 12); }, 0.8f);
+                yield return new Shot("network-finale", () => { PrepareNetworkFixture(true); ui.DebugNetworkFinale(); }, 14.2f);
+            }
+            finally
+            {
+                if (networkBaseline != null)
+                {
+                    if (ui.DebugRoot.Q("network-finale") != null) ui.HandleBack();
+                    ResetView();
+                    if (!gs.TryRestoreCloudSave(networkBaseline, out string problem))
+                        throw new InvalidOperationException("Network fixture restoration failed: " + problem);
+                }
+            }
+
             foreach (var kind in new[] { StructureKind.Lumber, StructureKind.Mine, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Satellite, StructureKind.Gunner, StructureKind.Warehouse, StructureKind.FuelDepot, StructureKind.CargoDepot, StructureKind.Hangar, StructureKind.ShieldPylon, StructureKind.AutoHarvester })
             {
                 var k = kind;

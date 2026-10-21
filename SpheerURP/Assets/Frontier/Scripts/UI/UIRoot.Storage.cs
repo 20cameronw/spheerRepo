@@ -145,7 +145,8 @@ namespace Frontier
                     int energy = amount > 0 ? gs.RelayTransferEnergyCost(relay, source, amount) : 0;
                     var row = UiKit.Div("fr-row-wrap");
                     row.Add(ResourceIconChip(resource, resource.LocalizedName + " ×" + stack.count));
-                    string action = UiText.Get(amount > 0 ? "relay.pull" : "storage.pack-full", amount, energy);
+                    string action = UiText.Get(amount > 0 ? "relay.pull" : "storage.pack-full",
+                        amount, (long)energy * GameState.GallonsPerEnergy);
                     var pull = IconBtn(action, "pack", UiKit.Cyan, () =>
                     {
                         int moved = gs.WithdrawThroughRelay(relay, source, slotIndex, amount);
@@ -170,6 +171,7 @@ namespace Frontier
             int used = storage.slots.FindAll(s => s.count > 0).Count;
             body.Add(UiKit.Text(UiText.Get("storage.summary", gs.planet.Name, warehouse.level, used, capacity), "fr-muted"));
             bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
+            if (fuelOnly) BuildFuelReserves(body);
             bool cargoDepot = warehouse.def.kind == StructureKind.CargoDepot;
             bool autoHarvester = warehouse.def.kind == StructureKind.AutoHarvester;
             bool cargoPoolActive = gs.StructureOfKind(gs.planet, StructureKind.CargoDepot) != null;
@@ -222,7 +224,7 @@ namespace Frontier
                 if (resource != null && !PassWarehouseFilter(resource)) slot.style.display = DisplayStyle.None;
                 BindInventoryDrag(slot, resource, stack.count, () =>
                 {
-                    if (resource != null) Toast(UiText.Get("storage.stored-count", resource.LocalizedName, stack.count), UiKit.Ui(resource.color));
+                    if (resource != null) Toast(UiText.Get("storage.stored-count", resource.LocalizedName, UiKit.Amount(resource, stack.count)), UiKit.Ui(resource.color));
                 }, position =>
                 {
                     int target = SlotAt(storageSlots, position);
@@ -241,7 +243,7 @@ namespace Frontier
                     int room = Mathf.Max(0, resource.stackSize - packCnt[target]);
                     int moved = gs.Withdraw(warehouse, index, room, false);
                     if (moved == 0) { Toast(UiText.Get("storage.pack-slot-full"), UiKit.Red); return; }
-                    packRes[target] = resource; packCnt[target] += moved;
+                    if (!gs.IsTankFuel(resource.id)) { packRes[target] = resource; packCnt[target] += moved; }
                     Sfx.Click(); gs.Notify();
                 });
                 storageSlots.Add(slot); storageGrid.Add(slot);
@@ -250,21 +252,27 @@ namespace Frontier
             body.Add(storageGrid);
             if (used == 0)
             {
+                bool carriedEmpty = fuelOnly ? gs.FuelTankUsed == 0 : gs.SlotsUsed == 0;
                 var hint = UiKit.Text(UiText.Get(autoHarvester
                     ? "storage.empty.harvester"
-                    : gs.SlotsUsed == 0
-                        ? "storage.empty.both"
-                        : fuelOnly
-                            ? "storage.empty.fuel"
+                    : fuelOnly
+                        ? "storage.empty.fuel"
+                        : carriedEmpty
+                            ? "storage.empty.both"
                             : "storage.empty.warehouse"), "fr-tiny");
                 hint.name = "empty-storage-hint";
                 body.Add(hint);
-                if (!autoHarvester && gs.SlotsUsed == 0)
+                if (!autoHarvester && !fuelOnly && carriedEmpty)
                 {
                     var gather = IconBtn(UiText.Get("storage.find-resources"), "mine", UiKit.Lime, RunEmptyPackAction);
                     gather.name = "empty-storage-action";
                     body.Add(gather);
                 }
+            }
+            if (fuelOnly)
+            {
+                UpgradeButton(body, warehouse, UiKit.Cyan);
+                return;
             }
             body.Add(SectionLabel(UiText.Get("storage.pack-capacity", gs.SlotsUsed, gs.Slots)));
             var packGrid = UiKit.Div("fr-grid");
@@ -312,17 +320,25 @@ namespace Frontier
 
         void QuickStore(PlacedStructure warehouse)
         {
+            bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
+            long before = gs.FuelGallons;
             int moved = gs.QuickStore(warehouse, warehouseCategoryFilter, false);
-            FinishQuickTransfer(moved, "storage.quick-stored", "storage.quick-store-empty");
+            FinishQuickTransfer(fuelOnly ? before - gs.FuelGallons : moved,
+                fuelOnly ? "fuel.stored" : "storage.quick-stored",
+                fuelOnly ? "fuel.store-empty" : "storage.quick-store-empty");
         }
 
         void QuickWithdraw(PlacedStructure warehouse)
         {
+            bool fuelOnly = warehouse.def.kind == StructureKind.FuelDepot;
+            long before = gs.FuelGallons;
             int moved = gs.QuickWithdraw(warehouse, warehouseCategoryFilter, false);
-            FinishQuickTransfer(moved, "storage.quick-withdrew", "storage.quick-withdraw-empty");
+            FinishQuickTransfer(fuelOnly ? gs.FuelGallons - before : moved,
+                fuelOnly ? "fuel.withdrew" : "storage.quick-withdrew",
+                fuelOnly ? "fuel.withdraw-empty" : "storage.quick-withdraw-empty");
         }
 
-        void FinishQuickTransfer(int moved, string successKey, string emptyKey)
+        void FinishQuickTransfer(long moved, string successKey, string emptyKey)
         {
             if (moved > 0)
             {

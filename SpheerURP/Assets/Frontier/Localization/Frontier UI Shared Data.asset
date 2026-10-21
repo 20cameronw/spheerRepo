@@ -8131,6 +8131,234 @@ MonoBehaviour:
     m_Key: builders.jobs-title
     m_Metadata:
       m_Items: []
+  - m_Id: 2188116801708032
+    m_Key: fuel.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428288
+    m_Key: fuel.open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428289
+    m_Key: fuel.gallons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428290
+    m_Key: fuel.millions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428291
+    m_Key: fuel.billions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428292
+    m_Key: fuel.summary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428293
+    m_Key: fuel.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428294
+    m_Key: fuel.overflow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428295
+    m_Key: fuel.upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428296
+    m_Key: network.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428297
+    m_Key: network.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428298
+    m_Key: network.lock.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428299
+    m_Key: network.lock.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428300
+    m_Key: network.lock.destination
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428301
+    m_Key: network.lock.connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428302
+    m_Key: network.lock.visit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428303
+    m_Key: network.lock.gates
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428304
+    m_Key: network.lock.plating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428305
+    m_Key: network.lock.resources
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428306
+    m_Key: network.lock.complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428307
+    m_Key: network.lock.archive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428308
+    m_Key: network.lock.worlds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428309
+    m_Key: network.lock.warehouses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428310
+    m_Key: network.link
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428311
+    m_Key: network.linked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428312
+    m_Key: network.link.active
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428313
+    m_Key: network.route.free
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428314
+    m_Key: network.travel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428315
+    m_Key: network.lightspeed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428316
+    m_Key: network.project.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428317
+    m_Key: network.project.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428318
+    m_Key: network.world.missing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428319
+    m_Key: network.find
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428320
+    m_Key: network.archive.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428321
+    m_Key: network.archive.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428322
+    m_Key: network.complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428323
+    m_Key: network.complete.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428324
+    m_Key: network.complete.reward
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428325
+    m_Key: network.destinations
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428326
+    m_Key: network.destinations.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428327
+    m_Key: network.open-map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428328
+    m_Key: network.replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428329
+    m_Key: network.prestige
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428330
+    m_Key: network.save-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428331
+    m_Key: network.film.assembly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428332
+    m_Key: network.film.assembly-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428333
+    m_Key: network.film.connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428334
+    m_Key: network.film.connected-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428335
+    m_Key: network.film.lightspeed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428336
+    m_Key: network.film.thanks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428337
+    m_Key: network.film.thanks-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428338
+    m_Key: network.keep-playing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2190335747907584
+    m_Key: fuel.slot-thousands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813945802752
+    m_Key: fuel.stored
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813979357184
+    m_Key: fuel.withdrew
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813979357185
+    m_Key: fuel.store-empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813979357186
+    m_Key: fuel.withdraw-empty
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

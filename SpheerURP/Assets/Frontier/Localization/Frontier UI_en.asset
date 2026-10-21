@@ -207,7 +207,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991335980
-    m_Localized: "Arrived at {0} \xB7 +{1} fuel back"
+    m_Localized: "Arrived at {0} \xB7 +{1:N0} gal back"
     m_Metadata:
       m_Items: []
   - m_Id: 1991335981
@@ -247,7 +247,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991335990
-    m_Localized: "Need {0} more energy \xB7 craft fuel"
+    m_Localized: "Need {0:N0} more gal \xB7 craft fuel"
     m_Metadata:
       m_Items: []
   - m_Id: 1991335991
@@ -573,7 +573,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336068
-    m_Localized: "+{0} fuel refunded  \xB7  +{1} XP"
+    m_Localized: "+{0:N0} gal refunded  \xB7  +{1} XP"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336069
@@ -786,7 +786,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336118
-    m_Localized: "PULL {0} \xB7 {1} ENERGY"
+    m_Localized: "PULL {0} \xB7 {1:N0} GAL"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336119
@@ -916,8 +916,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336148
-    m_Localized: No fuel is reserved here. Drag a carried ship-fuel stack from the
-      backpack below into an empty reserve slot.
+    m_Localized: No fuel is reserved here. Quick Store transfers fuel from ship tanks
+      to this depot; Quick Withdraw refills the tanks. Craft fuel first if your tanks
+      are empty.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336149
@@ -1336,7 +1337,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336251
-    m_Localized: '{0:0} tank slots (coming later)'
+    m_Localized: +{0:0} dedicated fuel tank racks
     m_Metadata:
       m_Items: []
   - m_Id: 1991336252
@@ -1660,24 +1661,24 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336331
-    m_Localized: "Production: {0:0} energy / hour  \xB7  {1:0}h reserve"
+    m_Localized: "Production: {0:N0} gal / hour  \xB7  {1:0}h reserve"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336332
-    m_Localized: 'Stored reserve: {0:0} / {1:0} energy'
+    m_Localized: 'Stored reserve: {0:N0} / {1:N0} gal'
     m_Metadata:
       m_Items: []
   - m_Id: 1991336333
-    m_Localized: Unclaimed energy stays here if your backpack is full. A full reserve
+    m_Localized: Unclaimed fuel stays here if your ship tanks are full. A full reserve
       pauses production.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336334
-    m_Localized: COLLECT {0} FUEL
+    m_Localized: COLLECT {0:N0} GAL
     m_Metadata:
       m_Items: []
   - m_Id: 1991336335
-    m_Localized: BACKPACK FULL
+    m_Localized: SHIP TANKS FULL
     m_Metadata:
       m_Items: []
   - m_Id: 1991336336
@@ -1685,7 +1686,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336337
-    m_Localized: Collected {0} fuel
+    m_Localized: Collected {0:N0} gal
     m_Metadata:
       m_Items: []
   - m_Id: 1991336338
@@ -2017,11 +2018,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336417
-    m_Localized: "{0} / {1} energy aboard \xB7 {2}s"
+    m_Localized: "{0:N0} / {1:N0} gal aboard \xB7 {2}s"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336418
-    m_Localized: "{0} / {1} energy aboard \xB7 {2}s estimate"
+    m_Localized: "{0:N0} / {1:N0} gal aboard \xB7 {2}s estimate"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336419
@@ -2029,11 +2030,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336420
-    m_Localized: "AUTOPILOT \xB7 {0} ENERGY"
+    m_Localized: "AUTOPILOT \xB7 {0:N0} GAL"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336421
-    m_Localized: "PILOT \xB7 {0} ENERGY"
+    m_Localized: "PILOT \xB7 {0:N0} GAL"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336422
@@ -3421,8 +3422,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1399931771379718
-    m_Localized: 'RESTART: worlds, structures, cargo, storage, tools, purchased upgrades,
-      XP, waves and active builder jobs. Megaproject bonuses must be built again.'
+    m_Localized: 'RESTART: worlds, structures, cargo, fuel, storage, planet links,
+      lightspeed, the archive, tools, purchased upgrades, XP, waves and active builder
+      jobs. Megaproject bonuses must be built again.'
     m_Metadata:
       m_Items: []
   - m_Id: 1399931771379719
@@ -8398,6 +8400,255 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2181497602793472
     m_Localized: CONSTRUCTION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116801708032
+    m_Localized: SHIP FUEL TANKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428288
+    m_Localized: FUEL TANKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428289
+    m_Localized: '{0} gal'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428290
+    m_Localized: '{0}M gal'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428291
+    m_Localized: '{0}B gal'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428292
+    m_Localized: '{0} / {1} tank racks occupied'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428293
+    m_Localized: Fuel uses ship tanks, not backpack space. Amounts are shown in equivalent
+      gallons; plasma and antimatter carry more energy per rack. Craft fuel to refill,
+      or transfer reserves at a Fuel Depot.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428294
+    m_Localized: Your previous reserves are safe, even above capacity. Burn or store
+      some fuel, or upgrade the tanks, before refilling.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428295
+    m_Localized: UPGRADE TANKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428296
+    m_Localized: PLANET NETWORK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428297
+    m_Localized: Build a Warp Gate on each visited world, then permanently link them.
+      Connected worlds cost no fuel and have no flight mini-game. Hull protection
+      still applies. Solid green map lines show your links.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428298
+    m_Localized: Finish the current journey or resolve the read-only save before
+      changing the network.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428299
+    m_Localized: Planet network content is unavailable in this build.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428300
+    m_Localized: Select another valid world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428301
+    m_Localized: These worlds already share a permanent connection.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428302
+    m_Localized: Visit this world and build its Warp Gate first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428303
+    m_Localized: Both worlds need a completed level {0} Warp Gate.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428304
+    m_Localized: Upgrade your hull protection before landing on this world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428305
+    m_Localized: Bring the required resources to this world or its pooled warehouses.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428306
+    m_Localized: The Grand Archive is already online.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428307
+    m_Localized: Build a Warp Gate and Cargo Depot on your archive world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428308
+    m_Localized: Link a different supply world for each resource shown above.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428309
+    m_Localized: Dedicate this world to storage with at least {0} warehouses and
+      {1:N0} warehouse slots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428310
+    m_Localized: LINK {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428311
+    m_Localized: '{0} permanently linked. Free network travel is ready.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428312
+    m_Localized: PERMANENT LINK ACTIVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428313
+    m_Localized: Free passage - no fuel, no flight mini-game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428314
+    m_Localized: GATE TRANSIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428315
+    m_Localized: LIGHTSPEED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428316
+    m_Localized: THE GRAND ARCHIVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428317
+    m_Localized: Unite five different supply worlds, then build a warehouse world
+      to hold the final shipment. Your archive world is the hub, not one of the five
+      suppliers.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428318
+    m_Localized: Supply world needed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428319
+    m_Localized: FIND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428320
+    m_Localized: 'Archive world: {0}/{1} warehouses - {2:N0}/{3:N0} storage slots'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428321
+    m_Localized: Choose a large world. Reserve five pads of capacity for its Warp
+      Gate and Cargo Depot, and devote the rest to warehouses. Upgrade them, fill
+      the pooled storage, then commission the archive here. This consumes the shipment
+      once.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428322
+    m_Localized: COMMISSION GRAND ARCHIVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428323
+    m_Localized: YOUR WORLDS, UNITED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428324
+    m_Localized: Lightspeed unlocked. Travel instantly to any previously visited
+      world, even without a gate link. No fuel. No flight mini-game. Your worlds
+      and progress are yours to keep.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428325
+    m_Localized: LINK FROM THIS WORLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428326
+    m_Localized: No other visited world has a completed Warp Gate yet. Build one
+      there, return here, then link it on the map or in this list.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428327
+    m_Localized: OPEN PLANET MAP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428328
+    m_Localized: REPLAY FINALE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428329
+    m_Localized: REVIEW OPTIONAL PRESTIGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428330
+    m_Localized: 'Could not save the network change. Nothing was spent. Retry after
+      fixing storage: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428331
+    m_Localized: FROM ONE SMALL WORLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428332
+    m_Localized: Every harvest, every expedition, every world you returned to brought
+      you here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428333
+    m_Localized: A GALAXY WITHIN REACH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428334
+    m_Localized: Five supply worlds. One great archive. Your frontier is finally
+      connected.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428335
+    m_Localized: DISTANCE IS NO LONGER A LIMIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428336
+    m_Localized: THANK YOU FOR PLAYING SPHEER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428337
+    m_Localized: Keep exploring with lightspeed, or review a fresh universe with
+      a permanent harvest bonus. Prestige is optional and always asks before resetting
+      anything.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2188116860428338
+    m_Localized: KEEP EXPLORING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2190335747907584
+    m_Localized: '{0}k'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813945802752
+    m_Localized: Stored {0:N0} gal in the Fuel Depot.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813979357184
+    m_Localized: Transferred {0:N0} gal to ship tanks.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813979357185
+    m_Localized: No matching ship fuel fits in this depot.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2193813979357186
+    m_Localized: No matching reserve fuel fits in the ship tanks. Spend fuel or upgrade
+      tanks.
     m_Metadata:
       m_Items: []
   references:

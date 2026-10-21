@@ -14,6 +14,137 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   locale: en
   entries:
+  - key: fuel.title
+    text: SHIP FUEL TANKS
+  - key: fuel.open
+    text: FUEL TANKS
+  - key: fuel.gallons
+    text: '{0} gal'
+  - key: fuel.millions
+    text: '{0}M gal'
+  - key: fuel.billions
+    text: '{0}B gal'
+  - key: fuel.slot-thousands
+    text: '{0}k'
+  - key: fuel.summary
+    text: '{0} / {1} tank racks occupied'
+  - key: fuel.help
+    text: Fuel uses ship tanks, not backpack space. Amounts are shown in equivalent
+      gallons; plasma and antimatter carry more energy per rack. Craft fuel to refill,
+      or transfer reserves at a Fuel Depot.
+  - key: fuel.stored
+    text: Stored {0:N0} gal in the Fuel Depot.
+  - key: fuel.withdrew
+    text: Transferred {0:N0} gal to ship tanks.
+  - key: fuel.store-empty
+    text: No matching ship fuel fits in this depot.
+  - key: fuel.withdraw-empty
+    text: No matching reserve fuel fits in the ship tanks. Spend fuel or upgrade
+      tanks.
+  - key: fuel.overflow
+    text: Your previous reserves are safe, even above capacity. Burn or store some
+      fuel, or upgrade the tanks, before refilling.
+  - key: fuel.upgrade
+    text: UPGRADE TANKS
+  - key: network.title
+    text: PLANET NETWORK
+  - key: network.help
+    text: Build a Warp Gate on each visited world, then permanently link them. Connected
+      worlds cost no fuel and have no flight mini-game. Hull protection still applies.
+      Solid green map lines show your links.
+  - key: network.lock.busy
+    text: Finish the current journey or resolve the read-only save before changing
+      the network.
+  - key: network.lock.unavailable
+    text: Planet network content is unavailable in this build.
+  - key: network.lock.destination
+    text: Select another valid world.
+  - key: network.lock.connected
+    text: These worlds already share a permanent connection.
+  - key: network.lock.visit
+    text: Visit this world and build its Warp Gate first.
+  - key: network.lock.gates
+    text: Both worlds need a completed level {0} Warp Gate.
+  - key: network.lock.plating
+    text: Upgrade your hull protection before landing on this world.
+  - key: network.lock.resources
+    text: Bring the required resources to this world or its pooled warehouses.
+  - key: network.lock.complete
+    text: The Grand Archive is already online.
+  - key: network.lock.archive
+    text: Build a Warp Gate and Cargo Depot on your archive world.
+  - key: network.lock.worlds
+    text: Link a different supply world for each resource shown above.
+  - key: network.lock.warehouses
+    text: Dedicate this world to storage with at least {0} warehouses and {1:N0}
+      warehouse slots.
+  - key: network.link
+    text: LINK {0}
+  - key: network.linked
+    text: '{0} permanently linked. Free network travel is ready.'
+  - key: network.link.active
+    text: PERMANENT LINK ACTIVE
+  - key: network.route.free
+    text: Free passage - no fuel, no flight mini-game
+  - key: network.travel
+    text: GATE TRANSIT
+  - key: network.lightspeed
+    text: LIGHTSPEED
+  - key: network.project.title
+    text: THE GRAND ARCHIVE
+  - key: network.project.help
+    text: Unite five different supply worlds, then build a warehouse world to hold
+      the final shipment. Your archive world is the hub, not one of the five suppliers.
+  - key: network.world.missing
+    text: Supply world needed
+  - key: network.find
+    text: FIND
+  - key: network.archive.status
+    text: 'Archive world: {0}/{1} warehouses - {2:N0}/{3:N0} storage slots'
+  - key: network.archive.help
+    text: Choose a large world. Reserve five pads of capacity for its Warp Gate and
+      Cargo Depot, and devote the rest to warehouses. Upgrade them, fill the pooled
+      storage, then commission the archive here. This consumes the shipment once.
+  - key: network.complete
+    text: COMMISSION GRAND ARCHIVE
+  - key: network.complete.title
+    text: YOUR WORLDS, UNITED
+  - key: network.complete.reward
+    text: Lightspeed unlocked. Travel instantly to any previously visited world,
+      even without a gate link. No fuel. No flight mini-game. Your worlds and progress
+      are yours to keep.
+  - key: network.destinations
+    text: LINK FROM THIS WORLD
+  - key: network.destinations.empty
+    text: No other visited world has a completed Warp Gate yet. Build one there,
+      return here, then link it on the map or in this list.
+  - key: network.open-map
+    text: OPEN PLANET MAP
+  - key: network.replay
+    text: REPLAY FINALE
+  - key: network.prestige
+    text: REVIEW OPTIONAL PRESTIGE
+  - key: network.save-failed
+    text: 'Could not save the network change. Nothing was spent. Retry after fixing
+      storage: {0}'
+  - key: network.film.assembly
+    text: FROM ONE SMALL WORLD
+  - key: network.film.assembly-help
+    text: Every harvest, every expedition, every world you returned to brought you
+      here.
+  - key: network.film.connected
+    text: A GALAXY WITHIN REACH
+  - key: network.film.connected-help
+    text: Five supply worlds. One great archive. Your frontier is finally connected.
+  - key: network.film.lightspeed
+    text: DISTANCE IS NO LONGER A LIMIT
+  - key: network.film.thanks
+    text: THANK YOU FOR PLAYING SPHEER
+  - key: network.film.thanks-help
+    text: Keep exploring with lightspeed, or review a fresh universe with a permanent
+      harvest bonus. Prestige is optional and always asks before resetting anything.
+  - key: network.keep-playing
+    text: KEEP EXPLORING
   - key: resource.find
     text: Find {0}
   - key: tools.mining
@@ -542,7 +673,7 @@ MonoBehaviour:
   - key: travel.arrived
     text: Arrived at {0}
   - key: travel.arrived.refund
-    text: "Arrived at {0} \xB7 +{1} fuel back"
+    text: "Arrived at {0} \xB7 +{1:N0} gal back"
   - key: travel.autopilot
     text: AUTOPILOT
   - key: travel.autopilot.help
@@ -562,7 +693,7 @@ MonoBehaviour:
   - key: route.hazard
     text: "Hull plating required \xB7 see hazards below"
   - key: route.fuel-short
-    text: "Need {0} more energy \xB7 craft fuel"
+    text: "Need {0:N0} more gal \xB7 craft fuel"
   - key: route.orbital
     text: "{0} orbital hop \xB7 {1} ly"
   - key: route.single-jump
@@ -732,7 +863,7 @@ MonoBehaviour:
   - key: hyperspace.result.clean
     text: Clean run!
   - key: hyperspace.result.rewards
-    text: "+{0} fuel refunded  \xB7  +{1} XP"
+    text: "+{0:N0} gal refunded  \xB7  +{1} XP"
   - key: hyperspace.result.unfinished
     text: 'You reached your destination.
 
@@ -845,7 +976,7 @@ MonoBehaviour:
   - key: relay.range.distance
     text: '{0:0.#} LY'
   - key: relay.pull
-    text: "PULL {0} \xB7 {1} ENERGY"
+    text: "PULL {0} \xB7 {1:N0} GAL"
   - key: relay.transferred
     text: Relayed {0} {1}
   - key: relay.blocked
@@ -914,8 +1045,9 @@ MonoBehaviour:
     text: Storage and backpack are empty. Gather local resources first, then return
       here to deposit them.
   - key: storage.empty.fuel
-    text: No fuel is reserved here. Drag a carried ship-fuel stack from the backpack
-      below into an empty reserve slot.
+    text: No fuel is reserved here. Quick Store transfers fuel from ship tanks to
+      this depot; Quick Withdraw refills the tanks. Craft fuel first if your tanks
+      are empty.
   - key: storage.empty.warehouse
     text: No resources stored yet. Drag a carried stack from the backpack below into
       an empty storage slot.
@@ -1127,7 +1259,7 @@ MonoBehaviour:
   - key: effect.fuel-use
     text: -{0}% fuel use
   - key: effect.tank-slots
-    text: '{0:0} tank slots (coming later)'
+    text: +{0:0} dedicated fuel tank racks
   - key: effect.plating
     text: Protection level {0}
   - key: effect.stack-multiplier
@@ -1291,20 +1423,20 @@ MonoBehaviour:
   - key: structure.dyson.subtitle
     text: Offline fuel generation
   - key: structure.dyson.production
-    text: "Production: {0:0} energy / hour  \xB7  {1:0}h reserve"
+    text: "Production: {0:N0} gal / hour  \xB7  {1:0}h reserve"
   - key: structure.dyson.reserve
-    text: 'Stored reserve: {0:0} / {1:0} energy'
+    text: 'Stored reserve: {0:N0} / {1:N0} gal'
   - key: structure.dyson.help
-    text: Unclaimed energy stays here if your backpack is full. A full reserve pauses
+    text: Unclaimed fuel stays here if your ship tanks are full. A full reserve pauses
       production.
   - key: structure.dyson.collect
-    text: COLLECT {0} FUEL
+    text: COLLECT {0:N0} GAL
   - key: structure.dyson.full
-    text: BACKPACK FULL
+    text: SHIP TANKS FULL
   - key: structure.dyson.empty
     text: NO FUEL READY
   - key: structure.dyson.collected
-    text: Collected {0} fuel
+    text: Collected {0:N0} gal
   - key: structure.lab.subtitle
     text: Research and tool upgrades
   - key: structure.lab.help
@@ -1450,8 +1582,9 @@ MonoBehaviour:
     text: 'KEEP: Nova Shards, Atlas knowledge, researched blueprints, saved cosmetic/settings
       records and one-time achievement history.'
   - key: ascension.resets
-    text: 'RESTART: worlds, structures, cargo, storage, tools, purchased upgrades,
-      XP, waves and active builder jobs. Megaproject bonuses must be built again.'
+    text: 'RESTART: worlds, structures, cargo, fuel, storage, planet links, lightspeed,
+      the archive, tools, purchased upgrades, XP, waves and active builder jobs.
+      Megaproject bonuses must be built again.'
   - key: ascension.next-yield
     text: 'Next Legacy harvest yield: x{0:0.00}. The authored bonus caps at +{1:0}%;
       one-time rewards cannot be farmed again.'
@@ -1538,15 +1671,15 @@ MonoBehaviour:
   - key: map.calculating
     text: "Calculating\u2026"
   - key: map.price.autopilot
-    text: "{0} / {1} energy aboard \xB7 {2}s"
+    text: "{0:N0} / {1:N0} gal aboard \xB7 {2}s"
   - key: map.price.manual
-    text: "{0} / {1} energy aboard \xB7 {2}s estimate"
+    text: "{0:N0} / {1:N0} gal aboard \xB7 {2}s estimate"
   - key: map.action.calculating
     text: "CALCULATING\u2026"
   - key: map.action.autopilot
-    text: "AUTOPILOT \xB7 {0} ENERGY"
+    text: "AUTOPILOT \xB7 {0:N0} GAL"
   - key: map.action.pilot
-    text: "PILOT \xB7 {0} ENERGY"
+    text: "PILOT \xB7 {0:N0} GAL"
   - key: map.action.unavailable
     text: ROUTE UNAVAILABLE
   - key: map.travel.tooltip

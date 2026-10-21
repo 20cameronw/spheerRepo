@@ -66,6 +66,14 @@ namespace Frontier
             }
             if (mapPreviewTask == null && mapPreview == null && selected != null)
             {
+                if (gs.CanInstantTravel(selected))
+                {
+                    mapPreview = gs.PlanRoute(selected, mapAutopilot);
+                    mapNextStopPlanetId = null;
+                    BuildMapCard();
+                    mapWorld.MarkDirtyRepaint();
+                    return;
+                }
                 runningPreviewVersion = previewVersion;
                 var planner = gs.universe.NewPlanner();
                 var from = gs.universe.EndpointOf(gs.planet); var to = gs.universe.EndpointOf(selected);

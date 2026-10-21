@@ -1,5 +1,64 @@
 # Economy content pipeline
 
+## Planet network and the Grand Archive
+
+`Resources/Frontier/NetworkRules.asset` is the editable, validated ScriptableObject for the new
+network progression; it sits alongside, and does not rewrite, the imported economy catalog.
+After Warp Gate Engineering, visit and build an operational gate on each endpoint, then pay
+the local link cost through a gate, Command > Ship > Planet Network, or a selected map world.
+Links are permanent, undirected, transitive and saved as canonical planet ids. They remain
+after dismantling a gate. Solid green lines connect worlds on the local orbital chart and
+systems on the universe chart. Connected worlds use zero fuel and have no flight legs,
+mini-game or autopilot surcharge; a short warp/arrival effect presents the already-durable
+arrival. Landing protection still applies. Unlinked travel is unchanged.
+
+The Grand Archive requires Stellar Engineering and five *different* connected supply worlds
+with Wood, Ice, Titanium Ore, Radium and Dark Matter deposits. A maximum matching assigns
+one world to each deposit requirement; the archive hub cannot also supply a role. The hub
+needs an operational gate and Cargo Depot, at least twelve warehouses, enough warehouses
+to use every remaining pad of capacity after the gate/depot footprints, and 4,600 warehouse
+slots. A 48-pad Giant world with 43 fully upgraded warehouses can hold the authored final
+shipment; even the maximum backpack cannot hold it. The shipment includes each raw supply
+resource plus titanium plates, quantum chips, warp coils and void alloy. Costs come only
+from carried materials and that world's operational pooled storage, never other planets.
+Gate-link purchases and archive commissioning persist detached paid snapshots before
+changing live resources; failed writes spend nothing, and repeating commissioning cannot
+consume another shipment or grant another reward.
+
+Commissioning saves completion before playing a skippable, replayable neon network finale.
+It unlocks free lightspeed to any **visited** world, including worlds outside the gate network;
+new destinations still require ordinary exploration and hull safety is never bypassed.
+Players may keep all their progress. Optional Ascension is now available after this ending,
+using the existing explicit review/confirmation and pre-reset recovery copy. It retains
+knowledge/currency/claims and the existing capped legacy harvest bonus, but starts a new
+seed, clears the network/archive/lightspeed and resets ship fuel to starting reserves.
+Watching, replaying or skipping the finale never triggers a reset.
+
+## Dedicated fuel tanks and gallons
+
+Fuel, Plasma and Antimatter use ship tank capacity instead of backpack slots. Four base tank
+racks are extended by the existing Fuel Tank upgrade's authored cumulative effect; that upgrade
+is now purchasable through the normal research/reach/cost checks. Tank racks use each fuel's
+existing stack size, keeping density meaningful. Fuel Depots remain local reserves: quick
+store/withdraw transfers between them and ship tanks, not the backpack. Ordinary quick-store
+leaves ship fuel aboard; old fuel in regular warehouses can still be withdrawn. Crafting, rewards,
+wave calls, relay payments, travel, refunds and offline fuel collection use the same tank-aware
+inventory facade, so none can refill past capacity or consume cargo space.
+
+The HUD, route prices, crafting, wave controls, depot stacks and travel rewards display
+**1,000 equivalent gallons per existing energy unit**. Plasma and Antimatter still carry 8
+and 64 energy per unit. No reserves or prices are multiplied internally: this avoids rounding,
+overflow and accidental economy inflation. The tank panel shows an exact gallon total and
+the breakdown; the HUD abbreviates millions/billions and depot grid numbers use `k`.
+Resource types and counts are unchanged.
+
+V2 saves add `player.fuelTank`, `player.fuelStorageVersion` and `network`. Loading an older
+save moves carried fuel into tanks without truncating over-capacity reserves; new fuel is
+blocked until space is available, while existing reserves can still be spent or deposited.
+Unknown/newer tank data loads read-only rather than being overwritten. Existing interrupted
+travel retains its original departure cargo surcharge across the fuel migration so its saved
+route and replay remain valid. Fresh travel checkpoints also freeze that departure value.
+
 ## Schematic orbital map
 
 The map opens on the current system's orbital chart rather than the wide star field. Planets use

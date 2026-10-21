@@ -347,7 +347,8 @@ namespace Frontier
             }
             if (planetView.Current != null && planetView.Current.Id == gs.planet.Id)
                 planetView.SetTerraformingStage(gs.TerraformerStageOn(gs.planet));
-            fuelLabel.text = gs.Count(gs.db.fuel).ToString();
+            fuelLabel.text = UiKit.FuelLabel(gs.FuelGallons);
+            fuelLabel.tooltip = UiText.Get("fuel.summary", gs.FuelTankUsed, gs.FuelTankSlots);
             RefreshPackCapacity();
             levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
             planetLabel.text = gs.planet.Name.ToUpper();
@@ -397,7 +398,7 @@ namespace Frontier
                     reactorFill.style.backgroundColor = Color.Lerp(UiKit.Red, UiKit.Lime, hp);
                 }
             }
-            hud.style.display = wave || introActive ? DisplayStyle.None : DisplayStyle.Flex;
+            hud.style.display = wave || introActive || networkFinaleActive ? DisplayStyle.None : DisplayStyle.Flex;
             if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
 
             UpdatePopupPosition();

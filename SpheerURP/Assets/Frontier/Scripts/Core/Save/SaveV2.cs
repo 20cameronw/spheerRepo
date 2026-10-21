@@ -46,6 +46,8 @@ namespace Frontier
         public List<IdLevel> toolTiers = new List<IdLevel>();
         /// <summary>The backpack as stacks per resource (a count, not slot positions).</summary>
         public List<StackRecord> inventory = new List<StackRecord>();
+        public List<StackRecord> fuelTank = new List<StackRecord>();
+        public int fuelStorageVersion;
     }
 
     [Serializable]
@@ -206,6 +208,7 @@ namespace Frontier
         public bool objectivesInitialized;
         public List<ObjectiveRecord> objectives = new List<ObjectiveRecord>();
         public AscensionProgress ascension = new AscensionProgress();
+        public NetworkProgress network = new NetworkProgress();
         public TravelCheckpoint travel;
         public bool travelPending;
 
@@ -228,6 +231,9 @@ namespace Frontier
             if (player.researched == null) player.researched = new List<string>();
             if (player.toolTiers == null) player.toolTiers = new List<IdLevel>();
             if (player.inventory == null) player.inventory = new List<StackRecord>();
+            if (player.fuelTank == null) player.fuelTank = new List<StackRecord>();
+            if (network == null) network = new NetworkProgress();
+            if (network.links == null) network.links = new List<PlanetLink>();
             if (location == null) location = new LocationSave();
             if (location.currentPlanetId == null) location.currentPlanetId = "";
             if (worlds == null) worlds = new List<PlanetDelta>();
@@ -258,6 +264,7 @@ namespace Frontier
             player.researched.RemoveAll(id => string.IsNullOrEmpty(id));
             player.toolTiers.RemoveAll(t => t == null || string.IsNullOrEmpty(t.id) || t.level <= 0);
             player.inventory.RemoveAll(s => s == null || string.IsNullOrEmpty(s.resourceId) || s.count <= 0);
+            player.fuelTank.RemoveAll(s => s == null || string.IsNullOrEmpty(s.resourceId) || s.count <= 0);
             if (player.xp < 0) player.xp = 0;
             return this;
         }
