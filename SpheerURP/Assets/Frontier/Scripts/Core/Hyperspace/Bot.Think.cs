@@ -17,6 +17,8 @@ namespace Frontier.Hyperspace
         int threatCount;
         readonly PickupTarget[] pickupsBuf;
         int pickupCount;
+        bool hasAimTarget;
+        float aimTargetX, aimTargetY, aimTargetTime;
         int curUid;
         int decisionTag;
 
@@ -76,6 +78,7 @@ namespace Frontier.Hyperspace
             decisionTag = run.StepIndex / 8;
             BuildThreats(run);
             PruneThreats();
+            FindAimTarget(run);
             double px = run.Player.x, py = run.Player.y;
             double vmax = (double)run.Player.maxSpeed * Skill.speedFraction;
             double w = t.areaHalfWidth, h = t.areaHalfHeight;
@@ -107,6 +110,46 @@ namespace Frontier.Hyperspace
             by = HMath.Clamp(by, -h, h);
             int delay = (int)((double)Skill.reactionDelay * HyperspaceTuning.StepsPerSecond + 0.5);
             Push(run.StepIndex + delay, (float)bx, (float)by);
+        }
+
+        void FindAimTarget(HyperspaceRun run)
+        {
+            hasAimTarget = false;
+            double bestScore = double.MaxValue;
+            double speed = (double)run.Speed + t.bulletSpeed;
+            double maxMoveSpeed = (double)run.Player.maxSpeed * Skill.speedFraction;
+            for (int i = 0; i < run.EnemyHigh; i++)
+            {
+                ref Enemy e = ref run.Enemies[i];
+                if (!e.active || (e.flags & (EnemyFlags.Invulnerable | EnemyFlags.Hidden | EnemyFlags.Spent)) != 0 || e.z <= 0f)
+                    continue;
+
+                double closing = speed + e.vzOwn;
+                if (closing <= 0.0) continue;
+                double hitTime = (double)e.z / closing;
+                if (hitTime > Skill.horizon || (double)t.bulletSpeed * hitTime > t.bulletRange)
+                    continue;
+
+                double x, y;
+                if (e.type == EntityType.Guardian && (e.flags & EnemyFlags.WeakPointExposed) != 0)
+                {
+                    x = e.aimX;
+                    y = e.aimY;
+                }
+                else
+                {
+                    Paths.Position(e, e.age + hitTime - e.tArrive, out x, out y);
+                }
+
+                double distance = HMath.Length(x - run.Player.x, y - run.Player.y);
+                double score = hitTime + distance / (maxMoveSpeed > 0.0 ? maxMoveSpeed : 1.0);
+                if (score >= bestScore) continue;
+                bestScore = score;
+                hasAimTarget = true;
+                aimTargetX = (float)x;
+                aimTargetY = (float)y;
+                aimTargetTime = (float)hitTime;
+            }
         }
 
         float Evaluate(float cx, float cy, float px, float py, float vmax)
@@ -144,6 +187,18 @@ namespace Frontier.Hyperspace
                     double dist = HMath.Length(qx, qy);
                     if (dist < 1.0f) cost -= (double)Skill.pickupGreed * pickupsBuf[k].value * 6.0 * (1.0 - dist);
                 }
+            }
+            if (hasAimTarget)
+            {
+                double tAim = (double)aimTargetTime - delay;
+                if (tAim < 0.0) tAim = 0.0;
+                double travelled = vmax * tAim;
+                if (travelled > d) travelled = d;
+                double qx = px + ux * travelled - aimTargetX;
+                double qy = py + uy * travelled - aimTargetY;
+                double error = HMath.Length(qx, qy);
+                if (error > 2.5) error = 2.5;
+                cost += (float)(Skill.aimPriority * error);
             }
             return (float)cost;
         }

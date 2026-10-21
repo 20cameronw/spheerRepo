@@ -32,20 +32,22 @@ namespace Frontier.Hyperspace
         /// <summary>Attention lapses: expected number per second, and how long (s) the bot keeps its old goal without looking at new threats.</summary>
         public float lapsePerSecond;
         public float lapseSeconds;
+        /// <summary>How strongly the bot prioritizes lining up shots when choosing a safe position.</summary>
+        public float aimPriority;
 
         public static BotSkill Novice()
         {
-            return new BotSkill { name = "novice", reactionDelay = 0.40f, speedFraction = 0.55f, padding = 0.35f, comfort = 0.55f, horizon = 1.1f, noise = 0.35f, exactPrediction = false, thinkEvery = 6, pickupGreed = 0.3f, usesBomb = false, bombHull = 0f, maxThreats = 4, perceptionNoise = 0.30f, lapsePerSecond = 0.30f, lapseSeconds = 0.45f };
+            return new BotSkill { name = "novice", reactionDelay = 0.40f, speedFraction = 0.55f, padding = 0.35f, comfort = 0.55f, horizon = 1.1f, noise = 0.35f, exactPrediction = false, thinkEvery = 6, pickupGreed = 0.3f, usesBomb = false, bombHull = 0f, maxThreats = 4, perceptionNoise = 0.30f, lapsePerSecond = 0.30f, lapseSeconds = 0.45f, aimPriority = 1.0f };
         }
 
         public static BotSkill Average()
         {
-            return new BotSkill { name = "average", reactionDelay = 0.30f, speedFraction = 0.80f, padding = 0.25f, comfort = 0.45f, horizon = 1.4f, noise = 0.18f, exactPrediction = true, thinkEvery = 4, pickupGreed = 0.6f, usesBomb = true, bombHull = 0.5f, maxThreats = 6, perceptionNoise = 0.14f, lapsePerSecond = 0.12f, lapseSeconds = 0.40f };
+            return new BotSkill { name = "average", reactionDelay = 0.30f, speedFraction = 0.80f, padding = 0.25f, comfort = 0.45f, horizon = 1.4f, noise = 0.18f, exactPrediction = true, thinkEvery = 4, pickupGreed = 0.6f, usesBomb = true, bombHull = 0.5f, maxThreats = 6, perceptionNoise = 0.14f, lapsePerSecond = 0.12f, lapseSeconds = 0.40f, aimPriority = 2.0f };
         }
 
         public static BotSkill Expert()
         {
-            return new BotSkill { name = "expert", reactionDelay = 0.20f, speedFraction = 1.0f, padding = 0.14f, comfort = 0.35f, horizon = 1.7f, noise = 0.08f, exactPrediction = true, thinkEvery = 3, pickupGreed = 1.0f, usesBomb = true, bombHull = 0.7f, maxThreats = 8, perceptionNoise = 0.09f, lapsePerSecond = 0.05f, lapseSeconds = 0.35f };
+            return new BotSkill { name = "expert", reactionDelay = 0.20f, speedFraction = 1.0f, padding = 0.14f, comfort = 0.35f, horizon = 1.7f, noise = 0.08f, exactPrediction = true, thinkEvery = 3, pickupGreed = 1.0f, usesBomb = true, bombHull = 0.7f, maxThreats = 8, perceptionNoise = 0.09f, lapsePerSecond = 0.05f, lapseSeconds = 0.35f, aimPriority = 3.0f };
         }
 
         public static BotSkill ByName(string n)
