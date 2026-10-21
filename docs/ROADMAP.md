@@ -404,7 +404,7 @@ Megaprojects (visible, expensive, with permanent global bonuses), weekly boards 
 
 ### 6.1 Hyperspace Run (replaces `TravelGame`)
 
-Forward-moving 3D rail shooter on a chase camera. Drag to fly across a bounded plane; auto-fire with lock-assist; **Bomb** (clears projectiles, recharged by kills), **Shield** and **Overdrive** pickups.
+Forward-moving 3D rail shooter on a chase camera. Drag to fly across a bounded plane; auto-fire straight ahead; line up with targets to hit them. **Bomb** (clears projectiles, recharged by kills), **Shield** and **Overdrive** pickups.
 
 - **Threats:** Drone (straight), Zigzag (sine), Swooper (curved entry), Turret Pod (telegraphed shots), Minefield (proximity), Asteroid (multi-hit, splits), Laser Gate (timed gap), Seeker Missile (homing, shootable), Shielded Elite, **Guardian mini-boss** with a weak point on long or deep routes.
 - **Difficulty:** an encounter **budget** from distance, destination danger and ship power, filled from data-driven `EncounterSO` templates (formations + paths). First trips are gentle; tier 3+ demands skill.

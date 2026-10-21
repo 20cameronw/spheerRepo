@@ -197,7 +197,6 @@ namespace Frontier.Hyperspace
                 double qx = px + ux * travelled - aimTargetX;
                 double qy = py + uy * travelled - aimTargetY;
                 double error = HMath.Length(qx, qy);
-                if (error > 2.5) error = 2.5;
                 cost += (float)(Skill.aimPriority * error);
             }
             return (float)cost;

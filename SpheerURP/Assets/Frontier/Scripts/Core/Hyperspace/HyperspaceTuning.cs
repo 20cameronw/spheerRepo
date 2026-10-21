@@ -56,7 +56,7 @@ namespace Frontier.Hyperspace
 
         // ---------------------------------------------------------------- weapons
         public float bulletSpeed = 110f;
-        public float bulletRadius = 0.16f;
+        public float bulletRadius = 0.64f;
         public float bulletRange = 135f;
         public float bombDamageBase = 40f;
         public float bombDamagePerShipDamage = 6f;
