@@ -197,6 +197,49 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void MiningPurchaseUpgradesBothGamesAndKeepsTheBestLegacyTier()
+        {
+            var state = new GameState(db, false);
+            var pick = db.toolLadders.First(l => l.data.kind == Economy.ToolKind.Pick);
+            var drill = db.toolLadders.First(l => l.data.kind == Economy.ToolKind.Drill);
+            var legacyDrill = db.upgrades.First(u => u.effect == UpgradeEffect.ToolPower && u.tool == MinigameKind.Drill);
+            state.DebugSetUpgrade(legacyDrill, 2);
+            Assert.AreEqual(state.ToolMultiplier(MinigameKind.Mine), state.ToolMultiplier(MinigameKind.Drill));
+            Assert.AreEqual(2, state.ToolLevel(MinigameKind.Mine));
+            ReachHighestAuthoredTier(state);
+            PlaceResearchLab(state);
+            GiveMaterials(state);
+            Assert.AreSame(pick, state.ToolUpgradeLadder(drill));
+            var unknown = UnityEngine.Object.Instantiate(drill);
+            try
+            {
+                Assert.AreSame(unknown, state.ToolUpgradeLadder(unknown), "an unregistered tool must not alias the real Mining purchase");
+                Assert.IsFalse(state.BuyToolTier(unknown));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(unknown); }
+            Assert.AreEqual(state.ToolTierLockReason(pick), state.ToolTierLockReason(drill));
+            var costs = pick.data.tiers.First(t => t.tier == 2).cost;
+            int before = state.Count(db.ResolveResource(costs[0].resourceId));
+            Assert.IsTrue(state.BuyToolTier(drill), state.ToolTierLockReason(drill));
+            Assert.AreEqual(before - costs[0].amount, state.Count(db.ResolveResource(costs[0].resourceId)));
+            Assert.AreEqual(2, state.ToolTier(pick));
+            Assert.AreEqual(2, state.ToolTier(drill));
+            Assert.AreEqual(state.CatalogToolYieldMultiplier(MinigameKind.Mine), state.CatalogToolYieldMultiplier(MinigameKind.Drill));
+            Assert.IsTrue(state.Save());
+            var save = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(sandbox.SaveFile)).Normalize();
+            save.player.toolTiers.RemoveAll(t => t.id == drill.data.id);
+            save.player.toolTiers.Add(new IdLevel { id = drill.data.id, level = 4 });
+            File.WriteAllText(sandbox.SaveFile, JsonUtility.ToJson(save));
+            var loaded = new GameState(db, true);
+            Assert.AreEqual(4, loaded.ToolTier(pick));
+            Assert.AreEqual(4, loaded.ToolTier(drill));
+            Assert.AreEqual(3, loaded.ToolLevel(MinigameKind.Mine));
+            Assert.AreEqual(3, loaded.ToolLevel(MinigameKind.Drill));
+            Assert.IsTrue(loaded.Save());
+            Assert.AreEqual(4, new GameState(db, true).ToolTier(pick));
+        }
+
+        [Test]
         public void LoadingProgression_DropsUnknownEntriesAndClampsOutOfRangeTiers()
         {
             if (!db.UsesImportedEconomy || db.toolLadders == null || db.toolLadders.Length == 0)

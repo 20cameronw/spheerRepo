@@ -1,5 +1,26 @@
 # Economy content pipeline
 
+## World interaction and shared mining
+
+Command > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed
+legacy shop. The Mining entry uses the existing Pick ladder's costs, research and reach gates;
+both Mine and Drill receive its tier. The highest previously owned Pick or Drill tier is retained
+without deleting either saved entry. Old legacy pick/drill power bonuses remain effective for both
+games; new purchases use the catalog rather than requiring two parallel upgrade tracks.
+
+Mine now runs a five-lane descending vein cutter: read six upcoming rows, steer into bright elongated
+rich seams, and avoid dark flattened unstable rock. Four hull points and eighteen rows bound a run.
+Rich seams yield three ore versus one from ordinary rock; accumulated ore determines quality.
+Stronger tools preserve existing yield benefits and add reaction time. Pressure-band drilling stays unchanged.
+
+Natural trees and mineral seams are tappable on the planet. Their resource panels launch the existing
+gather/reward flow through an operational matching structure, preserving method restrictions, hazard
+gates and structure bonuses. Sites do not consume or move persisted building pads. Surface View crops
+into the upper hemisphere for rotation and selection; Orbit View restores the overview. Called waves
+return to the overview so enemies remain visible. Missing-resource
+cost chips are native buttons with localized find tooltips, not separate FIND actions. Debris has no
+decorative circle/glow; fallback structures use recognizable storage, dome, gantry and machinery silhouettes.
+
 ## Licensed audio cues
 
 The editable `Resources/Frontier/AudioCueLibrary.asset` maps click/confirm/error, weapon shot, explosion,

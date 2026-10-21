@@ -150,10 +150,13 @@ namespace Frontier
         {
             if (finished || IsPaused || cleaned || overlay == null) return;
             IsPaused = true;
+            ResetInput();
             confirmingAbandon = false;
             lastMs = (long)(Time.realtimeSinceStartup * 1000f);
             ShowPauseDialog(false);
         }
+
+        protected virtual void ResetInput() { }
 
         public void Resume()
         {

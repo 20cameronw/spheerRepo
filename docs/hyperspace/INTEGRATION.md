@@ -46,6 +46,10 @@ route planner's maximum search depth, and allocate input history when enabled; t
 allocation-free step path. Bump `RunReplay.CurrentVersion` whenever simulation behavior changes incompatibly,
 even if the schedule is unchanged.
 
+The straight-shot/forward-bomb change uses replay version 2. Version-1 in-flight journals are deliberately
+incompatible and use the existing interrupted-journey recovery/discard UI; they are never silently replayed
+under different combat rules. New journals reconstruct the in-flight bomb position and spent charge.
+
 The normal ten-second maximum save debounce covers active input; pause/focus/quit, downed/result, leg boundaries
 and purchases flush immediately. Process termination can lose input since the last successful checkpoint. Paid
 revive saves capture both the mutated run journal and wallet debit, so replay never purchases again. Final
@@ -179,8 +183,13 @@ float unitsPerPixel = 5.4f / (Screen.width * 0.8f);           // 80 % of screen 
 Vector2 target = shipAtTouch + (screenPos - anchorScreen) * unitsPerPixel * sensitivity;   // sensitivity 1.0-1.6, expose in settings
 input = new PlayerInput(target.x, target.y, bombButtonHeld);  // sim clamps and smooths (critically damped, followOmega 15, max speed 9.5 x handling)
 ```
-  Absolute mode (finger = target via `Plane(z=0).Raycast`) is also valid. Keep the last target when the finger lifts. Optional bomb: a thumb-reachable button (or double-tap); it is a level, send `true` while pressed. Auto-fire is always on with aim assist: the skill is dodging and positioning.
-* Accessibility: `RunMode.Assist` (budget x0.65, damage x0.6, quality cap 0.85); sensitivity slider; colour-blind-safe telegraph shapes (section 5).
+  Absolute mode (finger = target via `Plane(z=0).Raycast`) is also valid. Keep the last target when the finger lifts.
+  Auto-fire remains on, but bullets travel straight along +z without target selection or steering: line up the ship to hit.
+  Bomb input launches one projectile from the ship's current x/y at 70 u/s to `bossZ` (62 u), then detonates with a 7 u
+  spherical blast. It deals the greater of normal bomb damage or 18% of guardian max hull, respects invulnerability,
+  and only clears enemy bolts inside the blast. A charge is spent at launch; only one bomb may be in flight.
+* Accessibility: drag sensitivity and colour-blind-safe telegraph shapes (section 5). New player journeys always use
+  `RunMode.Normal`; no Assist toggle is exposed, and old stored preferences are ignored. The Core enum retains Assist for analysis tooling.
 
 ## 5. Entity types -> suggested visual language (neon, additive glow)
 
@@ -219,7 +228,7 @@ Drain after every step. `x,y,z` are in the ship frame (same as the pools).
 | PlayerHit | a=source type (0 bolt), v=damage, c=hull left | red vignette, camera shake, hull bar flash | heavy hit + haptic |
 | ShieldBreak / ShieldRecharged | c=charges | blue ring burst / ring refill | glass break / chime |
 | Revived / PlayerDowned | c=revives used | time-freeze desaturate (downed), blue pulse (revive) | alarm / power-up |
-| BombUsed / BombCharged | c=bombs left, v=damage | screen-wide shockwave, flash | boom / ready ping |
+| BombUsed / BombCharged | c=bombs left, v=damage | distant local blast at event x/y/z / ready marker | boom / ready ping |
 | PickupSpawned / PickupCollected | a=type, b=uid, c=loot count, v=loot kind | sparkle / fly-to-HUD burst | pick-up jingle per type |
 | OverdriveStart / OverdriveEnd | v=seconds | aura, FOV punch | rev up / down |
 | ComboBreak | c=combo lost | combo counter shatters | low blip |
@@ -260,9 +269,9 @@ Same `(RunParams, ShipStats, HyperspaceTuning, EncounterLibrary)` + same `Player
 
 | Scenario (SelfCheck) | plan | events | final state |
 |---|---|---|---|
-| first hop, average bot | `0xEF8CE0688767BECE` | `0x028F0E874BE49031` | `0x67F9B6E19D5AAD44` |
-| tier 6, 800 ly, Guardian, expert bot | `0x552FE83D957EBFF6` | `0xA1CF849613F13291` | `0xE13DDE9D6F9F8CB4` |
-| tier 12, 3000 ly, revives, novice bot | `0xAF6249FCE21DA302` | `0x60F9F4B94E18EC86` | `0x0A007E8631244178` |
+| first hop, average bot | `0xEF8CE0688767BECE` | `0x3BDCF5892839ADB0` | `0xD4FD5ECD0922B0E3` |
+| tier 6, 800 ly, Guardian, expert bot | `0x552FE83D957EBFF6` | `0xB0E94E1CACA52569` | `0x97F345A4A76DEC70` |
+| tier 12, 3000 ly, revives, novice bot | `0xAF6249FCE21DA302` | `0x455BB62538A230B7` | `0xC2FDE4538AA019F1` |
 
 Rules the code obeys (enforced by `tools\FloatLint`, run with `lint.ps1`; 0 findings):
 1. **All simulation arithmetic is `double`; stored state stays `float`, rounded once with an explicit `(float)` cast.** Reason found during this work: Unity's Mono evaluates float expressions and float locals at double precision (CoreCLR and IL2CPP round every operation), so any multi-step float expression differs in the last bit between runtimes. + - * / sqrt in double are identical everywhere.
@@ -278,7 +287,7 @@ Rules the code obeys (enforced by `tools\FloatLint`, run with `lint.ps1`; 0 find
 | `PlanetData.danger` / destination tier | `RunParams.danger` (~0.6 + 1.1 x tier) / `RunParams.tier` 0..12 |
 | ship upgrades | `ShipStats`: hull = armour/hull stat, shield = shield charges, shieldRecharge = shield regen seconds per charge, damage/fireRate/pierce = weapon stats, magnet = pickup radius, handling = thruster/agility multiplier (1 = starter), bombCapacity = bay size. `RunParams.shipPower = tuning.ShipPower(ship)` |
 | seed | `Hash.Combine(saveSeed, tripIndex)` so a trip is reproducible (daily/weekly boards: fixed seed + `RunMode.Challenge`) |
-| accessibility | `RunMode.Assist` (quality capped at 0.85 so it cannot out-earn Normal) |
+| accessibility | Drag sensitivity; no player-facing difficulty override. Core Assist is analysis-only. |
 
 After the run (`RunResult r`):
 * **Fuel refund**: `refund = floor(fuelCost * travelRefundMax * r.fuelRefundFraction)` (`travelRefundMax` = the existing 0.4; the fraction is `quality^refundQualityPower + fuelCanisterBonus`, 0 after an abandoned/defeated run).

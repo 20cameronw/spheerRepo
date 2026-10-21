@@ -138,39 +138,88 @@ namespace Frontier.Hyperspace.Tests
         }
 
         [Test]
-        public void BombClearsBoltsDamagesEnemiesAndConsumesACharge()
+        public void BombTravelsToGuardianDepthBeforeDealingMeaningfulDamage()
         {
             HyperspaceTuning t = TestEnv.Tuning();
             ShipStats ship = Scenarios.Pacifist(1000f, 3);
             ship.bombCapacity = 3;
             HyperspaceRun run = Scenarios.MakeRun(t, ship, 6, 30f, route => new[]
             {
-                TurretRec(route, t, 2.0f, 1.0f, 200),
-                Scenarios.Rec(route, t, EntityType.Drone, -1.5f, 0.5f, 215, PathType.Static),
-                Scenarios.Rec(route, t, EntityType.Drone, 1.5f, -0.5f, 220, PathType.Static),
-                Scenarios.Rec(route, t, EntityType.Drone, 0f, -2.0f, 225, PathType.Static),
+                new SpawnRecord { step = 0, type = EntityType.Guardian, path = PathType.Hold }
             });
             int bombs = run.Player.bombs;
             Assert.AreEqual(3, bombs);
-            var away = new PlayerInput(-2.5f, -3f, false);
-            StepUntil(run, () => run.ActiveBolts > 0, 600, away);
-            Assert.Greater(run.ActiveBolts, 0, "the turret must have fired for this test to mean something");
+            StepUntil(run, () => run.BossPhase == 1, 600, Hold);
+            Assert.AreEqual(1, run.BossPhase);
+            float hp = run.Enemies[0].hp;
             run.Events.Clear();
-            run.Step(new PlayerInput(-2.5f, -3f, true));
+            run.Step(new PlayerInput(0, 0, true));
             Assert.AreEqual(bombs - 1, run.Player.bombs, "a charge is consumed");
-            Assert.AreEqual(0, run.ActiveBolts, "bombs clear every enemy projectile");
-            Assert.AreEqual(1, Scenarios.Count(run, EventType.BombUsed));
-            Assert.Greater(Scenarios.Count(run, EventType.EnemyHit) + Scenarios.Count(run, EventType.EnemyKilled), 0, "enemies on screen take bomb damage");
-            run.Events.Clear();
-            run.Step(new PlayerInput(-2.5f, -3f, true));
-            Assert.AreEqual(bombs - 1, run.Player.bombs, "the bomb cooldown swallows a held button");
+            Assert.IsTrue(run.BombActive);
+            Assert.Less(run.BombZ, t.bossZ);
+            Assert.AreEqual(hp, run.Enemies[0].hp, 0.01f, "no explosion near the ship");
             Assert.AreEqual(0, Scenarios.Count(run, EventType.BombUsed));
+            run.Events.Clear();
+            run.Step(new PlayerInput(0, 0, true));
+            Assert.AreEqual(bombs - 1, run.Player.bombs, "an in-flight bomb cannot be launched twice");
+            Assert.AreEqual(0, Scenarios.Count(run, EventType.BombUsed));
+            StepUntil(run, () => !run.BombActive, 120, Hold);
+            Assert.IsFalse(run.BombActive);
+            Assert.AreEqual(t.bossZ, run.BombZ);
+            Assert.AreEqual(1, Scenarios.Count(run, EventType.BombUsed));
+            float expected = Math.Max(t.bombDamageBase + t.bombDamagePerShipDamage * ship.damage,
+                run.Enemies[0].maxHp * t.bombBossFraction);
+            Assert.AreEqual(expected, hp - run.Enemies[0].hp, 0.1f);
+            Assert.GreaterOrEqual(hp - run.Enemies[0].hp, run.Enemies[0].maxHp * 0.18f);
             ShipStats empty = ShipStats.Starter();
             HyperspaceTuning t2 = TestEnv.Tuning();
             t2.startBombFraction = 0f;
             HyperspaceRun dry = Scenarios.MakeRun(t2, empty, 0, 10f, route => new SpawnRecord[0]);
             dry.Step(new PlayerInput(0f, 0f, true));
             Assert.AreEqual(0, Scenarios.Count(dry, EventType.BombUsed), "no charge, no bomb");
+        }
+
+        [Test]
+        public void PlayerBulletsNeverTurnTowardAnOffAxisEnemy()
+        {
+            var t = TestEnv.Tuning();
+            var run = Scenarios.MakeRun(t, ShipStats.Starter(), 0, 20, route => new[]
+            {
+                new SpawnRecord { step = 0, z0 = 100, type = EntityType.Drone, x = 3, y = 2, path = PathType.Static }
+            });
+            Scenarios.RunSteps(run, 20, Hold);
+            Assert.Greater(run.EnemyHigh, 0);
+            Assert.Greater(run.ActiveBullets, 0);
+            foreach (var bullet in run.Bullets)
+                if (bullet.active)
+                {
+                    Assert.AreEqual(0, bullet.x);
+                    Assert.AreEqual(0, bullet.y);
+                    Assert.AreEqual(0, bullet.vx);
+                    Assert.AreEqual(0, bullet.vy);
+                    Assert.AreEqual(-1, bullet.targetSlot);
+                }
+        }
+
+        [Test]
+        public void InFlightBombSurvivesReplayWithoutSpendingAnotherCharge()
+        {
+            var t = TestEnv.Tuning();
+            var library = EncounterLibrary.CreateDefault();
+            var run = HyperspaceRun.Create(TestEnv.Route(91, 100, 2, 1), ShipStats.Starter(), t, library);
+            var replay = RunReplay.Attach(run, "bomb-flight-test");
+            run.Step(new PlayerInput(1, 1, true));
+            Scenarios.RunSteps(run, 15, Hold);
+            replay.Capture();
+            var restored = replay.Restore(t, library, "bomb-flight-test");
+            Assert.IsTrue(restored.BombActive);
+            Assert.AreEqual(run.BombZ, restored.BombZ);
+            Assert.AreEqual(run.Player.bombs, restored.Player.bombs);
+            Assert.AreEqual(run.StateDigest(), restored.StateDigest());
+            Scenarios.RunSteps(run, 60, Hold);
+            Scenarios.RunSteps(restored, 60, Hold);
+            Assert.IsFalse(restored.BombActive);
+            Assert.AreEqual(run.StateDigest(), restored.StateDigest());
         }
 
         [Test]
@@ -213,7 +262,7 @@ namespace Frontier.Hyperspace.Tests
             HyperspaceRun good = TestEnv.PlayOut(TestEnv.Route(2UL, 20f, 1, t.ShipPower(ship)), ship, BotSkill.Expert(), t);
             RunResult g = good.BuildResult();
             Assert.IsTrue(g.reachedEnd);
-            Assert.AreEqual(Grade.S, g.grade, "a clean first hop is an S");
+            Assert.AreEqual(HyperspaceRun.GradeFor(g.quality, t), g.grade, "manual alignment affects kills and therefore quality");
             Assert.IsTrue(g.cleanRun);
             Assert.AreEqual(0.4 + 1.1 * g.quality, g.yieldMultiplier, 1e-4, "yield = 0.4 + 1.1 x quality");
             Assert.Greater(g.fuelRefundFraction, 0.8f);

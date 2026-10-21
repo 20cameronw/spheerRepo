@@ -187,14 +187,19 @@ namespace Frontier
             foreach (var i in items)
             {
                 if (i.resource == null) continue;
-                row.Add(ItemChip(i.resource, i.amount, showHave ? gs.Count(i.resource) : -1));
+                var chip = ItemChip(i.resource, i.amount, showHave ? gs.Count(i.resource) : -1);
                 if (onFind != null && gs.PlanetCount(i.resource) < i.amount)
                 {
                     ResourceSO resource = i.resource;
-                    var find = Btn("FIND", Cyan, () => onFind(resource));
-                    find.AddToClassList("fr-cost-find");
+                    var find = new Button(() => onFind(resource));
+                    find.name = "find-resource-" + resource.id;
+                    find.tooltip = UiText.Get("resource.find", resource.LocalizedName);
+                    find.AddToClassList("fr-cost-resource");
+                    chip.pickingMode = PickingMode.Ignore;
+                    find.Add(chip);
                     row.Add(find);
                 }
+                else row.Add(chip);
             }
             return row;
         }

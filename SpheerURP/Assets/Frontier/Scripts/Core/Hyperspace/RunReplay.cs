@@ -16,7 +16,7 @@ namespace Frontier.Hyperspace
     public sealed class RunReplay
     {
         // Bump when simulation behavior changes incompatibly, even if the schedule is unchanged.
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
         public const int MaximumTicks = 60 * 600;
         public int version = CurrentVersion;
         public RunParams parameters;

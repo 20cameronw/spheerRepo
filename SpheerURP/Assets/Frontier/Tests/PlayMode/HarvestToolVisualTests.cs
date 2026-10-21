@@ -13,7 +13,7 @@ namespace Frontier.Tests
             var stage = MinigameStage.Create(Color.black);
             try
             {
-                foreach (var kind in new[] { MinigameKind.Siphon, MinigameKind.Excavate, MinigameKind.Salvage })
+                foreach (var kind in new[] { MinigameKind.Mine, MinigameKind.Siphon, MinigameKind.Excavate, MinigameKind.Salvage })
                     for (int tier = 0; tier <= 6; tier++)
                     {
                         Vector3 mount = new Vector3(2f, 1f, -0.5f);

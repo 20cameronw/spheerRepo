@@ -8055,6 +8055,70 @@ MonoBehaviour:
     m_Key: content.era.ascension.name
     m_Metadata:
       m_Items: []
+  - m_Id: 2102386586902528
+    m_Key: resource.find
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205696
+    m_Key: tools.mining
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205697
+    m_Key: tools.mining.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205698
+    m_Key: harvest.vein.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205699
+    m_Key: harvest.vein.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205700
+    m_Key: harvest.vein.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205701
+    m_Key: harvest.vein.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205702
+    m_Key: harvest.vein.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205703
+    m_Key: harvest.vein.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205704
+    m_Key: harvest.vein.steer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205705
+    m_Key: world.view.close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205706
+    m_Key: world.view.orbit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205707
+    m_Key: world.view.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205708
+    m_Key: world.site.tool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2102386658205709
+    m_Key: world.site.build
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2104168897667072
+    m_Key: world.site.gather
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

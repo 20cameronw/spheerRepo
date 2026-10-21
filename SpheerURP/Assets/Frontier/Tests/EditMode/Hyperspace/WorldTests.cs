@@ -131,23 +131,19 @@ namespace Frontier.Hyperspace.Tests
         }
 
         [Test]
-        public void AimAssistBendsBulletsTowardTheNearestTargetInsideTheCone()
+        public void PlayerMustLineUpWithAnOffAxisTarget()
         {
-            HyperspaceTuning on = TestEnv.Tuning();
-            HyperspaceTuning off = TestEnv.Tuning();
-            off.assistStrength = 0f;
-            off.assistConeTan = 0f;
+            HyperspaceTuning t = TestEnv.Tuning();
             ShipStats ship = ShipStats.Starter();
             int[] kills = new int[2];
             for (int mode = 0; mode < 2; mode++)
             {
-                HyperspaceTuning t = mode == 0 ? on : off;
                 HyperspaceRun run = Scenarios.MakeRun(t, ship, 0, 25f, route => new[] { Scenarios.Rec(route, t, EntityType.Drone, 1.1f, 0.0f, 300, PathType.Static) });
-                Scenarios.RunSteps(run, 330, Hold);
+                Scenarios.RunSteps(run, 330, mode == 0 ? new PlayerInput(1.1f, 0, false) : Hold);
                 kills[mode] = run.Kills;
             }
-            Assert.AreEqual(1, kills[0], "with the assist the stray drone is hit");
-            Assert.AreEqual(0, kills[1], "without it the bullets fly straight past an enemy 1.1 u off the line of fire");
+            Assert.AreEqual(1, kills[0], "lining up the ship hits the target");
+            Assert.AreEqual(0, kills[1], "straight bullets miss an enemy 1.1 u off the line of fire");
         }
 
         [Test]
@@ -246,7 +242,12 @@ namespace Frontier.Hyperspace.Tests
             while (run.State != RunState.Ended)
             {
                 if (run.State == RunState.Downed) { if (run.CanRevive) run.Revive(); else run.Abandon(); continue; }
-                run.Step(bot.Decide(run));
+                var input = bot.Decide(run);
+                if (run.BossActive && run.BossPhase > 0)
+                    for (int i = 0; i < run.EnemyHigh; i++)
+                        if (run.Enemies[i].active && run.Enemies[i].type == EntityType.Guardian)
+                            input = new PlayerInput(run.Enemies[i].aimX, run.Enemies[i].aimY, run.BossPhase == 3);
+                run.Step(input);
                 int n = run.Events.Drain(buf);
                 for (int k = 0; k < n; k++)
                 {

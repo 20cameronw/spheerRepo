@@ -123,6 +123,7 @@ namespace Frontier
             foreach (var ladder in gs.db.toolLadders)
             {
                 if (ladder == null || ladder.data == null || ladder.data.tiers == null || ladder.data.tiers.Length == 0) continue;
+                if (gs.ToolUpgradeLadder(ladder) != ladder) continue;
                 int current = gs.ToolTier(ladder);
                 var currentRow = FindToolRow(ladder, current);
                 var nextRow = FindToolRow(ladder, current + 1);
@@ -130,11 +131,13 @@ namespace Frontier
                 var color = ladder.color == default(Color) ? UiKit.Magenta : UiKit.Ui(ladder.color);
                 var card = Card(color, nextRow == null);
                 var head = UiKit.Div("fr-row");
-                head.Add(UiKit.Text(ladder.LocalizedName.ToUpper(), "fr-h2"));
+                head.Add(UiKit.Text(ladder.data.kind == ToolKind.Pick ? UiText.Get("tools.mining") : ladder.LocalizedName.ToUpper(), "fr-h2"));
                 head.Add(UiKit.Div("fr-spacer"));
                 head.Add(UiKit.Text(nextRow == null ? UiText.Get("tools.max")
                     : UiText.Get("tools.tier", current, ladder.data.tiers.Where(row => row != null).Max(row => row.tier)), "fr-tiny"));
                 card.Add(head);
+                if (ladder.data.kind == ToolKind.Pick)
+                    card.Add(UiKit.Text(UiText.Get("tools.mining.help"), "fr-muted"));
                 if (currentRow != null)
                     card.Add(UiKit.Text(UiText.Get("tools.yield", ladder.TierName(currentRow), currentRow.yieldMult), "fr-small"));
                 if (nextRow == null)

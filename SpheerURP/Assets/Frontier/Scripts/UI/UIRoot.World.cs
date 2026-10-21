@@ -26,6 +26,41 @@ namespace Frontier
         VisualElement banner;
         int alarmFuel = 3;
 
+        void OnGatherTapped(GatherSpot spot, Transform anchor)
+        {
+            if (busy || defense.Active) return;
+            CloseModal();
+            if (popup != null && popupAnchor == anchor) { ClosePopup(); return; }
+            PlacedStructure gatherer = null;
+            foreach (var structure in gs.structures)
+            {
+                if (structure.planetId != gs.planet.Id || !structure.def.kind.IsGather() || !gs.IsOperational(structure)) continue;
+                foreach (var candidate in gs.SpotsFor(gs.planet, structure.def.kind))
+                    if (candidate.resource == spot.resource && candidate.game == spot.game &&
+                        (gatherer == null || gs.StructureBonus(structure) > gs.StructureBonus(gatherer))) gatherer = structure;
+            }
+            var owner = gatherer;
+            OpenPopup("resource-" + spot.resource.id, anchor, UiKit.Ui(spot.resource.color), body =>
+            {
+                body.Add(UiKit.Text(spot.resource.LocalizedName, "fr-h2"));
+                body.Add(UiKit.Text(spot.resource.LocalizedDescription, "fr-small"));
+                if (owner != null)
+                {
+                    body.Add(UiKit.Text(UiText.Get("world.site.tool", gs.ToolName(spot.game)), "fr-small"));
+                    body.Add(IconBtn(UiText.Get("world.site.gather"), Icons.ForTool(spot.game), UiKit.Lime, () =>
+                    {
+                        ClosePopup();
+                        StartGather(spot, anchor, gs.StructureBonus(owner));
+                    }));
+                }
+                else
+                {
+                    body.Add(UiKit.Text(UiText.Get("world.site.build"), "fr-small"));
+                    body.Add(IconBtn(UiText.Get("nav.build"), "build", UiKit.Lime, OpenShop));
+                }
+            }, true);
+        }
+
         // ------------------------------------------------------------ popup core
         void OpenPopup(string key, Transform anchor, Color accent, Action<VisualElement> build, bool compact = false)
         {

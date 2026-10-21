@@ -310,8 +310,9 @@ namespace Frontier
 
         public int ToolLevel(MinigameKind k)
         {
-            int best = 0;
-            foreach (var u in db.upgrades) if (u != null && u.effect == UpgradeEffect.ToolPower && u.tool == k) best += Level(u);
+            int best = LegacyToolLevel(k);
+            if (k == MinigameKind.Mine || k == MinigameKind.Drill)
+                best = Math.Max(LegacyToolLevel(MinigameKind.Mine), LegacyToolLevel(MinigameKind.Drill));
             if (db.UsesImportedEconomy && db.toolLadders != null)
             {
                 HarvestMethod method = HarvestMapping.FromMinigame(k);
@@ -325,10 +326,28 @@ namespace Frontier
 
         public float ToolMultiplier(MinigameKind k)
         {
-            float m = 1f;
-            foreach (var u in db.upgrades)
-                if (u != null && u.effect == UpgradeEffect.ToolPower && u.tool == k) m += u.valuePerLevel * Level(u);
+            float m = LegacyToolMultiplier(k);
+            if (k == MinigameKind.Mine || k == MinigameKind.Drill)
+                m = Math.Max(LegacyToolMultiplier(MinigameKind.Mine), LegacyToolMultiplier(MinigameKind.Drill));
             return m * CatalogToolYieldMultiplier(k) * LegacyHarvestMultiplier;
+        }
+
+        int LegacyToolLevel(MinigameKind kind)
+        {
+            int level = 0;
+            foreach (var upgrade in db.upgrades)
+                if (upgrade != null && upgrade.effect == UpgradeEffect.ToolPower && upgrade.tool == kind)
+                    level += Level(upgrade);
+            return level;
+        }
+
+        float LegacyToolMultiplier(MinigameKind kind)
+        {
+            float multiplier = 1;
+            foreach (var upgrade in db.upgrades)
+                if (upgrade != null && upgrade.effect == UpgradeEffect.ToolPower && upgrade.tool == kind)
+                    multiplier += upgrade.valuePerLevel * Level(upgrade);
+            return multiplier;
         }
 
         public float ToolTolerance(MinigameKind k) { return Mathf.Min(1.6f, 1f + 0.08f * ToolLevel(k)); }

@@ -144,6 +144,13 @@ namespace Frontier.Hyperspace.View
                     Line(p + new Vector3(-e.radius, e.radius + 0.2f, -0.3f),
                         p + new Vector3(-e.radius + 2 * e.radius * e.hp / e.maxHp, e.radius + 0.2f, -0.3f), 0.06f, c);
             }
+            if (run.BombActive)
+            {
+                var bomb = new Vector3(run.BombX, run.BombY, run.BombZ);
+                Gem(bomb, new Vector3(0.35f, 0.35f, 0.8f), Orange);
+                Line(bomb, bomb + Vector3.back * 4f, 0.15f, Orange);
+                Ring(new Vector3(run.BombX, run.BombY, run.Tuning.bossZ), run.Tuning.bombBlastRadius, 0.04f, Orange * 0.6f);
+            }
             for (int i = 0; i < run.BulletHigh; i++)
             {
                 var b = run.Bullets[i]; if (!b.active) continue;

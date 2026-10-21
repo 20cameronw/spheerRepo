@@ -94,6 +94,7 @@ namespace Frontier
             backdrop.Build(cam);
 
             var planet = new GameObject("Planet").AddComponent<PlanetView>();
+            camGo.GetComponent<CameraFit>().Planet = planet;
             planet.Rebuilt += backdrop.Apply;
             planet.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet));
             planet.gameObject.AddComponent<AscensionAura>().Init(planet, gs);
@@ -161,6 +162,8 @@ namespace Frontier
     {
         Camera cam;
         float lastAspect;
+        bool lastCloseView;
+        public PlanetView Planet;
 
         void Awake() { cam = GetComponent<Camera>(); }
 
@@ -168,12 +171,17 @@ namespace Frontier
         {
             if (cam == null) return;
             float aspect = ScreenMetrics.Aspect;
-            if (Mathf.Approximately(aspect, lastAspect)) return;
+            bool close = Planet != null && Planet.CloseView;
+            if (Mathf.Approximately(aspect, lastAspect) && close == lastCloseView) return;
             lastAspect = aspect;
+            lastCloseView = close;
             const float need = 3.5f;
             float t = Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
             float d = Mathf.Max(need / (t * aspect), need / t);
-            transform.position = new Vector3(0f, 0f, -Mathf.Clamp(d, 8f, 16f));
+            float distance = Mathf.Clamp(d, 8f, 16f);
+            transform.position = close
+                ? new Vector3(0f, 1.6f, -distance * 0.34f)
+                : new Vector3(0f, 0f, -distance);
         }
     }
 }

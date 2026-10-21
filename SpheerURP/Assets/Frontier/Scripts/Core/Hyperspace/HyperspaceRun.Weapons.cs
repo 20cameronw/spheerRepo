@@ -18,17 +18,10 @@ namespace Frontier.Hyperspace
                     if (p.fireCooldown < 0f) p.fireCooldown = 0f;
                 }
             }
-            double k = HMath.Clamp01((double)Tuning.assistStrength * Tuning.assistRate * Dt);
             for (int i = 0; i < BulletHigh; i++)
             {
                 ref Bullet b = ref Bullets[i];
                 if (!b.active) continue;
-                if (b.targetSlot >= 0)
-                {
-                    ref Enemy t = ref Enemies[b.targetSlot];
-                    if (t.active && t.uid == b.targetUid) SteerBullet(ref b, ref t, (float)k);
-                    else b.targetSlot = -1;
-                }
                 b.x = (float)(b.x + ((double)b.vx * Dt));
                 b.y = (float)(b.y + ((double)b.vy * Dt));
                 b.z = (float)(b.z + ((double)b.vz * Dt));
@@ -53,76 +46,11 @@ namespace Frontier.Hyperspace
             b.pierceLeft = Ship.pierce + (od ? Tuning.overdrivePierce : 0);
             b.spawnStep = StepIndex;
             b.targetSlot = -1;
-            int ts = SelectTarget(p.x, p.y);
-            if (ts >= 0)
-            {
-                b.targetSlot = ts;
-                b.targetUid = Enemies[ts].uid;
-                SteerBullet(ref b, ref Enemies[ts], 0.6f);
-            }
             if (StepIndex - lastShotEvent >= 4)
             {
                 lastShotEvent = StepIndex;
                 Emit(EventType.ShotFired, 0, 0, 0, p.x, p.y, 0f, 1f);
             }
-        }
-
-        /// <summary>Where a bullet should aim on an enemy (the exposed weak point of the Guardian, otherwise the centre).</summary>
-        static void AimPoint(ref Enemy e, out double x, out double y)
-        {
-            if (e.type == EntityType.Guardian && (e.flags & EnemyFlags.WeakPointExposed) != 0)
-            {
-                x = e.aimX;
-                y = e.aimY;
-                return;
-            }
-            x = e.x;
-            y = e.y;
-        }
-
-        void SteerBullet(ref Bullet b, ref Enemy e, float k)
-        {
-            double dz = (double)e.z - b.z;
-            if (dz < 0.5f) return;
-            double closing = (double)Speed + e.vzOwn;
-            if (e.type == EntityType.Guardian) closing = 0.0;
-            double t = dz / (b.vz + closing);
-            double ax, ay;
-            AimPoint(ref e, out ax, out ay);
-            ax += e.vx * t;
-            ay += e.vy * t;
-            double lim = Tuning.assistMaxLateral;
-            double dvx = HMath.Clamp((ax - b.x) / t, -lim, lim);
-            double dvy = HMath.Clamp((ay - b.y) / t, -lim, lim);
-            b.vx = (float)(b.vx + ((dvx - b.vx) * k));
-            b.vy = (float)(b.vy + ((dvy - b.vy) * k));
-        }
-
-        /// <summary>Picks the enemy the next bullet should chase: the closest one inside the aim-assist pyramid, preferring centred targets. -1 when none.</summary>
-        int SelectTarget(float px, float py)
-        {
-            int best = -1;
-            double bestScore = float.MaxValue;
-            double cone = Tuning.assistConeTan;
-            for (int i = 0; i < EnemyHigh; i++)
-            {
-                ref Enemy e = ref Enemies[i];
-                if (!e.active || (e.flags & (EnemyFlags.Invulnerable | EnemyFlags.Hidden)) != 0) continue;
-                if (e.z < Tuning.assistMinZ || e.z > Tuning.assistMaxZ) continue;
-                double ax, ay;
-                AimPoint(ref e, out ax, out ay);
-                double dx = ax - px, dy = ay - py;
-                double reach = cone * e.z + e.radius + 0.3;
-                if (HMath.Abs(dx) > reach || HMath.Abs(dy) > reach) continue;
-                double score = e.z + 3.0 * ((double)HMath.Abs(dx) + HMath.Abs(dy));
-                if (e.type == EntityType.Guardian) score += 40.0;
-                if (score < bestScore)
-                {
-                    bestScore = score;
-                    best = i;
-                }
-            }
-            return best;
         }
 
         // ---------------------------------------------------------------- damage, kills, loot

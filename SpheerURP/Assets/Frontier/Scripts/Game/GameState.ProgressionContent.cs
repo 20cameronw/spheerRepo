@@ -55,11 +55,31 @@ namespace Frontier
         {
             if (ladder == null || ladder.data == null) return 0;
             int tier;
-            return toolTiers.TryGetValue(ladder.data.id, out tier) ? tier : 1;
+            int best = toolTiers.TryGetValue(ladder.data.id, out tier) ? tier : 1;
+            if (IsMiningTool(ladder) && db.toolLadders != null)
+                foreach (var other in db.toolLadders)
+                    if (IsMiningTool(other) && toolTiers.TryGetValue(other.data.id, out tier))
+                        best = Math.Max(best, tier);
+            return Math.Min(best, MaxToolTier(ladder));
+        }
+
+        static bool IsMiningTool(ToolLadderSO ladder)
+        {
+            return ladder != null && ladder.data != null &&
+                (ladder.data.kind == ToolKind.Pick || ladder.data.kind == ToolKind.Drill);
+        }
+
+        public ToolLadderSO ToolUpgradeLadder(ToolLadderSO ladder)
+        {
+            if (IsMiningTool(ladder) && db.toolLadders != null && Array.IndexOf(db.toolLadders, ladder) >= 0)
+                foreach (var other in db.toolLadders)
+                    if (other != null && other.data != null && other.data.kind == ToolKind.Pick) return other;
+            return ladder;
         }
 
         public string ToolTierLockReason(ToolLadderSO ladder)
         {
+            ladder = ToolUpgradeLadder(ladder);
             if (!IsSupportedTool(ladder)) return UiText.Get("gate.tool.unavailable");
             int current = ToolTier(ladder);
             var next = FindToolTier(ladder, current + 1);
@@ -79,6 +99,7 @@ namespace Frontier
 
         public bool BuyToolTier(ToolLadderSO ladder)
         {
+            ladder = ToolUpgradeLadder(ladder);
             if (ToolTierLockReason(ladder) != null) return false;
             int nextTier = ToolTier(ladder) + 1;
             var row = FindToolTier(ladder, nextTier);

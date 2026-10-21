@@ -33,7 +33,7 @@ namespace Frontier.Hyperspace.View
             bool restoring = req.checkpoint != null && req.checkpoint.replay != null;
             Run = restoring ? req.checkpoint.replay.LiveRun ??
                 req.checkpoint.replay.Restore(tuning, HyperspaceSetup.Library, JsonUtility.ToJson(tuning))
-                : HyperspaceSetup.CreateRun(req, ship, tuning, TravelPrefs.AssistMode);
+                : HyperspaceSetup.CreateRun(req, ship, tuning, false);
             freeRevives = restoring ? req.checkpoint.freeRevives : Mathf.Max(0, FrontierSettings.I.freeRevivesPerRun);
             if (req.checkpoint != null)
             {

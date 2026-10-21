@@ -116,25 +116,45 @@ namespace Frontier.Hyperspace
         void TryBomb()
         {
             ref PlayerState p = ref Player;
-            if (Ghost || p.bombs <= 0 || p.bombCooldown > 0f) return;
+            if (Ghost || BombActive || p.bombs <= 0 || p.bombCooldown > 0f) return;
             p.bombs--;
             p.bombCooldown = Tuning.bombCooldown;
+            BombActive = true;
+            BombX = p.x;
+            BombY = p.y;
+            BombZ = 0.8f;
+            Emit(EventType.ShotFired, 0, 0, 0, BombX, BombY, BombZ, 1f);
+        }
+
+        void UpdateBomb()
+        {
+            if (!BombActive) return;
+            BombZ = (float)((double)BombZ + (double)Tuning.bombSpeed * Dt);
+            float distance = Tuning.bossZ;
+            if (BombZ < distance) return;
+            BombZ = distance;
+            BombActive = false;
             double dmg = Tuning.bombDamageBase + (double)Tuning.bombDamagePerShipDamage * Ship.damage;
             for (int i = 0; i < EnemyHigh; i++)
             {
                 ref Enemy e = ref Enemies[i];
-                if (!e.active || (e.flags & EnemyFlags.Invulnerable) != 0 || e.z > Tuning.bombRange || e.z < 0f) continue;
+                if (!e.active || (e.flags & EnemyFlags.Invulnerable) != 0) continue;
+                double dx = (double)e.x - BombX, dy = (double)e.y - BombY, dz = (double)e.z - BombZ;
+                double radius = (double)Tuning.bombBlastRadius + e.radius;
+                if (dx * dx + dy * dy + dz * dz > radius * radius) continue;
                 double d = dmg;
                 if (e.type == EntityType.Guardian)
-                {
-                    double cap = (double)e.maxHp * Tuning.bombBossFraction;
-                    if (d > cap) d = cap;
-                }
+                    d = HMath.Max(dmg, (double)e.maxHp * Tuning.bombBossFraction);
                 DamageEnemy(i, (float)d);
             }
             for (int i = 0; i < BoltHigh; i++)
-                if (Bolts[i].active) FreeBolt(i);
-            Emit(EventType.BombUsed, 0, 0, p.bombs, p.x, p.y, 0f, (float)dmg);
+            {
+                ref Bolt bolt = ref Bolts[i];
+                double dx = (double)bolt.x - BombX, dy = (double)bolt.y - BombY, dz = (double)bolt.z - BombZ;
+                if (bolt.active && dx * dx + dy * dy + dz * dz <= (double)Tuning.bombBlastRadius * Tuning.bombBlastRadius)
+                    FreeBolt(i);
+            }
+            Emit(EventType.BombUsed, 0, 0, Player.bombs, BombX, BombY, BombZ, (float)dmg);
         }
 
         // ---------------------------------------------------------------- revive / abandon

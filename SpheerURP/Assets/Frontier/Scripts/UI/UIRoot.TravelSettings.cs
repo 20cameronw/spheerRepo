@@ -7,21 +7,9 @@ namespace Frontier
     /// <summary>Settings and debug controls of the travel mini-game (Hyperspace Run); see <see cref="TravelPrefs"/>.</summary>
     public partial class UIRoot
     {
-        /// <summary>Settings page: assist mode and the drag sensitivity of the travel game.</summary>
+        /// <summary>Settings page: drag sensitivity without gameplay difficulty overrides.</summary>
         void BuildTravelSettings(VisualElement body)
         {
-            bool assist = TravelPrefs.AssistMode;
-            var assistBtn = IconBtn(UiText.Get(assist ? "settings.assist.on" : "settings.assist.off"), "shield", assist ? UiKit.Lime : UiKit.Cyan, () =>
-            {
-                TravelPrefs.AssistMode = !TravelPrefs.AssistMode;
-                RefreshModal();
-            });
-            assistBtn.name = "assist-toggle";
-            body.Add(assistBtn);
-            var hint = UiKit.Text(UiText.Get("settings.assist.help"), "fr-tiny");
-            hint.style.marginTop = UiKit.Space.S4;
-            body.Add(hint);
-
             body.Add(SectionLabel(UiText.Get("settings.drag-sensitivity")));
             var stepper = UiKit.Div("fr-stepper");
             float s = TravelPrefs.DragSensitivity;

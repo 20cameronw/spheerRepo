@@ -10,6 +10,14 @@ Optional Ascension remains unfinished and disabled while its unspecified permane
 checklist work instead of assuming balance values. Prior verified milestones include
 mobile presentation budgets, live eras, harvest feedback, contextual onboarding and actionable empty states.
 Production audio/FX integration, remaining provider integrations and external activation/device/release gates remain open.
+
+The requested gameplay correction pass adds straight, non-homing travel shots and normal-only new journeys
+(no Assist setting). Bombs fly to guardian depth before a local blast, dealing at least 18% of guardian maximum
+hull when in range. Mining shares one catalog upgrade track across pick/drill and replaces Mine's tap clone
+with a descending vein-routing game; pressure drilling remains. Tappable planetary resource sites, a close-up
+Surface/Orbit toggle, recognizable fallback structures, halo-free debris and compact find-resource chips
+improve world-first navigation. Existing production blockers below are unchanged.
+
 Licensed CC0 UI/combat/wood-stone-metal harvest and ship cues now ship in an editable cue library with retained
 Kenney source licenses; the bounded mixer/volume/mute path remains unchanged. Adaptive exploration/combat/travel
 playback, four weather textures and a shared licensed engine loop are implemented through an editable

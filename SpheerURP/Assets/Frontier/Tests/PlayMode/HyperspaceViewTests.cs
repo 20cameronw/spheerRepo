@@ -84,6 +84,16 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator NewJourneyIgnoresPreviouslySavedAssistPreference()
+        {
+            TravelPrefs.AssistMode = true;
+            var session = Begin();
+            yield return null;
+            Assert.AreEqual(RunMode.Normal, session.Run.Route.run.mode);
+            session.Close();
+        }
+
+        [UnityTest]
         public IEnumerator PaidReviveAndJournalPersistTogetherWithoutRechargingOnRecovery()
         {
             var state = FundedState(1000);

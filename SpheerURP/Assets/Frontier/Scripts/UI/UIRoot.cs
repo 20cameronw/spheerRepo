@@ -30,6 +30,7 @@ namespace Frontier
         Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, packLabel, levelLabel, planetLabel;
         WaveInfo waveHudInfo;
         VisualElement planetTag;
+        Button surfaceViewButton;
 
         bool busy, introActive;
         public bool IsTravelling { get; private set; }
@@ -111,6 +112,7 @@ namespace Frontier
             world.StructureTapped += OnStructureTapped;
             world.SlotTapped += OnSlotTapped;
             world.ObstacleTapped += OnObstacleTapped;
+            world.GatherTapped += OnGatherTapped;
             OnStateChanged();
         }
 
@@ -132,6 +134,7 @@ namespace Frontier
                 world.StructureTapped -= OnStructureTapped;
                 world.SlotTapped -= OnSlotTapped;
                 world.ObstacleTapped -= OnObstacleTapped;
+                world.GatherTapped -= OnGatherTapped;
             }
 
         }
@@ -202,6 +205,20 @@ namespace Frontier
             menuBtn.name = "menu-button";
             top.Add(menuBtn);
             hud.Add(top);
+            surfaceViewButton = UiKit.Btn(UiText.Get("world.view.close"), UiKit.Cyan, () =>
+            {
+                if (busy || introActive || defense.Active) return;
+                CloseModal();
+                ClosePopup();
+                planetView.CloseView = !planetView.CloseView;
+                surfaceViewButton.text = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
+            });
+            surfaceViewButton.name = "world-view-toggle";
+            surfaceViewButton.style.position = Position.Absolute;
+            surfaceViewButton.style.right = UiKit.Space.S24;
+            surfaceViewButton.style.bottom = DockInset + UiKit.Space.S16;
+            surfaceViewButton.tooltip = UiText.Get("world.view.help");
+            hud.Add(surfaceViewButton);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
             dock.usageHints = UsageHints.DynamicTransform;
@@ -277,6 +294,11 @@ namespace Frontier
         void OnStateChanged()
         {
             if (batching) return;
+            if (surfaceViewButton != null)
+            {
+                surfaceViewButton.text = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
+                surfaceViewButton.tooltip = UiText.Get("world.view.help");
+            }
             if (observedUniverse != gs.universe)
             {
                 observedUniverse = gs.universe;
@@ -309,6 +331,11 @@ namespace Frontier
             ApplyLayout(false);
 
             bool wave = defense.Active;
+            if (wave && planetView.CloseView)
+            {
+                planetView.CloseView = false;
+                surfaceViewButton.text = UiText.Get("world.view.close");
+            }
             world.Locked = wave || busy;
             UpdateFirstSessionGuideVisibility();
             if (waveHud != null)
@@ -456,7 +483,7 @@ namespace Frontier
             busy = true;
             Vector3 fxPos = at != null ? at.position : Vector3.zero;
             Minigame g = spot.game == MinigameKind.Chop ? (Minigame)new NodeGame(true)
-                       : spot.game == MinigameKind.Mine ? (Minigame)new NodeGame(false)
+                       : spot.game == MinigameKind.Mine ? (Minigame)new VeinGame()
                        : spot.game == MinigameKind.Siphon ? (Minigame)new SiphonGame()
                        : spot.game == MinigameKind.Excavate ? (Minigame)new ExcavationGame()
                        : spot.game == MinigameKind.Salvage ? (Minigame)new SalvageGame() : new DrillGame();

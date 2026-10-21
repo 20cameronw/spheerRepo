@@ -29,7 +29,7 @@ namespace Frontier
             activeTravelMinigame = null;
             debugToolsOverride = null;
             debugFirstSessionGuideOverride = false;
-            menuPage = ""; shopTab = 0; researchTab = 0; toolTab = 0; packSel = -1; confirmReset = false;
+            menuPage = ""; shopTab = 0; researchTab = 0; packSel = -1; confirmReset = false;
             selected = gs.planet;
             RefreshFirstSessionGuide();
         }
@@ -68,7 +68,6 @@ namespace Frontier
         {
             DebugReset();
             researchTab = tab;
-            toolTab = tool;
             progressionTab = progression;
             researchBranch = "";
             OpenResearch();

@@ -38,6 +38,8 @@ namespace Frontier.Hyperspace
         public int BoltHigh;
         public Pickup[] Pickups;
         public int PickupHigh;
+        public bool BombActive;
+        public float BombX, BombY, BombZ;
 
         public int Kills;
         public int HitsTaken;
@@ -122,6 +124,8 @@ namespace Frontier.Hyperspace
             freePickupCount = Pickups.Length;
             for (int i = 0; i < freePickupCount; i++) freePickups[i] = freePickupCount - 1 - i;
             EnemyHigh = BulletHigh = BoltHigh = PickupHigh = 0;
+            BombActive = false;
+            BombX = BombY = BombZ = 0f;
             EnemyCount = 0;
             nextUid = 1;
             cursor = 0;
@@ -178,6 +182,7 @@ namespace Frontier.Hyperspace
             UpdatePlayer(input);
             UpdateBoss();
             UpdateEnemies();
+            UpdateBomb();
             UpdateWeapons();
             UpdateBolts();
             UpdatePickups();

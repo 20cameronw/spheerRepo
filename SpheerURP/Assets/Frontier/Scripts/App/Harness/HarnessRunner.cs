@@ -260,6 +260,7 @@ namespace Frontier
         void ResetView()
         {
             rt.Ui.DebugReset();
+            rt.Planet.CloseView = false;
             if (rt.Planet.Spin != null) rt.Planet.Spin.localRotation = Quaternion.Euler(0f, 25f, 0f);
         }
 
@@ -285,6 +286,12 @@ namespace Frontier
             }
 
             yield return new Shot("hud", ResetView);
+            yield return new Shot("surface-view", () =>
+            {
+                ResetView();
+                rt.Planet.CloseView = true;
+                rt.State.Notify();
+            });
             bool hadQuality = PlayerPrefs.HasKey(PresentationQuality.QualityKey);
             bool hadFrameRate = PlayerPrefs.HasKey(PresentationQuality.FrameRateKey);
             int savedQuality = PlayerPrefs.GetInt(PresentationQuality.QualityKey);

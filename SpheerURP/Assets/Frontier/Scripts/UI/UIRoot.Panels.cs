@@ -85,7 +85,6 @@ namespace Frontier
 
         // ------------------------------------------------------------ build shop
         int shopTab;
-        int toolTab;
 
         VisualElement TabButton(string icon, string label, bool on, Color accent, Action onClick)
         {
@@ -1428,20 +1427,21 @@ namespace Frontier
 
         void BuildTools(VisualElement body)
         {
-            var tools = new List<UpgradeSO>();
-            foreach (var u in gs.db.upgrades)
-                if (u != null && u.category == UpgradeCategory.Tools) tools.Add(u);
-            if (tools.Count == 0) return;
-            toolTab = Mathf.Clamp(toolTab, 0, tools.Count - 1);
-            var sub = UiKit.Div("fr-tabs");
-            for (int i = 0; i < tools.Count; i++)
+            if (gs.db.UsesImportedEconomy)
             {
-                int idx = i;
-                sub.Add(TabButton(Icons.ForTool(tools[i].tool), tools[i].LocalizedName.ToUpper(), toolTab == i, UiKit.Magenta, () => toolTab = idx));
+                BuildCatalogTools(body);
+                return;
             }
-            body.Add(sub);
+            foreach (var upgrade in gs.db.upgrades)
+            {
+                if (upgrade != null && upgrade.category == UpgradeCategory.Tools)
+                    BuildLegacyTool(body, upgrade);
+            }
+        }
 
-            var u2 = tools[toolTab];
+        void BuildLegacyTool(VisualElement body, UpgradeSO u2)
+        {
+            body.Add(SectionLabel(u2.LocalizedName.ToUpper()));
             int lvl = gs.Level(u2);
             body.Add(UiKit.Text(u2.LocalizedDescription, "fr-muted"));
             var equipped = UiKit.Text(UiText.Get("tools.equipped-summary", gs.ToolName(u2.tool),
@@ -1476,7 +1476,6 @@ namespace Frontier
                 }
                 body.Add(card);
             }
-            BuildCatalogTools(body);
         }
 
         void BuildBases(VisualElement body)

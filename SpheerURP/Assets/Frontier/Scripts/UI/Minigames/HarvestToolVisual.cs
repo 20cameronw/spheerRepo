@@ -16,7 +16,7 @@ namespace Frontier
 
         public static Transform Build(MinigameStage stage, MinigameKind kind, int level, Color accent, Vector3 position)
         {
-            if (kind != MinigameKind.Siphon && kind != MinigameKind.Excavate && kind != MinigameKind.Salvage)
+            if (kind != MinigameKind.Mine && kind != MinigameKind.Siphon && kind != MinigameKind.Excavate && kind != MinigameKind.Salvage)
                 throw new ArgumentOutOfRangeException(nameof(kind), "Use the existing striking or drill rig for this tool.");
             var rig = new GameObject(kind + "ToolRig").transform;
             rig.SetParent(stage.root, false);
@@ -24,7 +24,16 @@ namespace Frontier
             Palette(level, accent, out var body, out var rim);
             var casing = stage.Lit(body, rim, 0f, 6f);
             var active = stage.Lit(body * 0.6f, rim * 1.6f, 0f, 3f);
-            if (kind == MinigameKind.Siphon)
+            if (kind == MinigameKind.Mine)
+            {
+                stage.AddMesh(MeshKit.Cyl(0.2f, 0f, 0.55f, 8), active, rig, Vector3.zero);
+                stage.Prim(PrimitiveType.Capsule, rig, new Vector3(0, -0.25f, 0),
+                    new Vector3(0.55f, 0.35f, 0.4f), Vector3.zero, casing);
+                for (int side = -1; side <= 1; side += 2)
+                    stage.Prim(PrimitiveType.Cylinder, rig, new Vector3(side * 0.32f, -0.25f, 0),
+                        new Vector3(0.14f, 0.3f, 0.14f), Vector3.zero, casing);
+            }
+            else if (kind == MinigameKind.Siphon)
             {
                 stage.AddMesh(MeshKit.Cyl(0.3f, 0.18f, 1f, 12), casing, rig, Vector3.zero);
                 stage.Prim(PrimitiveType.Cylinder, rig, new Vector3(0f, 0.24f, 0f),

@@ -14,6 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   locale: en
   entries:
+  - key: resource.find
+    text: Find {0}
+  - key: tools.mining
+    text: MINING
+  - key: tools.mining.help
+    text: One upgrade improves both vein mining and pressure drilling.
+  - key: harvest.vein.title
+    text: FOLLOW THE VEIN
+  - key: harvest.vein.hint
+    text: Steer the cutter through bright ore. Dark unstable rock damages the rig.
+  - key: harvest.vein.metric
+    text: RICH SEAMS
+  - key: harvest.vein.left
+    text: LEFT
+  - key: harvest.vein.right
+    text: RIGHT
+  - key: harvest.vein.status
+    text: DEPTH {0}/{1}   ORE {2}   HULL {3}
+  - key: harvest.vein.steer
+    text: Drag to steer, or use the left and right controls.
+  - key: world.view.close
+    text: SURFACE VIEW
+  - key: world.view.orbit
+    text: ORBIT VIEW
+  - key: world.view.help
+    text: Get closer, rotate the planet and tap a resource or building.
+  - key: world.site.tool
+    text: Ready with {0}
+  - key: world.site.gather
+    text: GATHER
+  - key: world.site.build
+    text: Build or finish a matching gather structure to work this resource.
   - key: travel.recovery.cannot-start
     text: Cannot start a journey while another trip is pending or this save is read-only.
   - key: travel.recovery.save-failed
@@ -656,10 +688,10 @@ MonoBehaviour:
   - key: hyperspace.shield-time
     text: SHIELD RECHARGING  {0:0.0}s
   - key: hyperspace.tip
-    text: 'Drag anywhere to steer. Auto-fire is on.
+    text: 'Drag to steer and line up your shots. Bullets fly straight.
 
-      Dodge the warning shapes.
-      Tap BOMB to clear danger.'
+      Dodge
+      the warning shapes. BOMB launches forward to the guardian line before exploding.'
   - key: hyperspace.notice.boss
     text: GUARDIAN APPROACHING
   - key: hyperspace.notice.bomb

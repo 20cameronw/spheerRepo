@@ -295,6 +295,31 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator VeinMiningSteersPausesAndHandsOffOneReward()
+        {
+            var game = new VeinGame();
+            int callbacks = 0;
+            game.Run(root, UiKit.Cyan, 1f, 0.2f, _ => callbacks++);
+            for (int frame = 0; frame < 120 && !game.DebugReady; frame++) yield return null;
+            Assert.IsTrue(game.DebugReady);
+            var right = root.Q<Button>("vein-right");
+            Assert.IsNotNull(right);
+            int column = game.DebugRun.Column;
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = right; right.SendEvent(submit); }
+            Assert.AreEqual(column + 1, game.DebugRun.Column);
+            game.Pause();
+            int depth = game.DebugRun.Depth;
+            game.DebugAdvance(5);
+            Assert.AreEqual(depth, game.DebugRun.Depth, "pausing freezes the new game");
+            game.Resume();
+            game.DebugAdvance(100);
+            yield return WaitForResult();
+            game.ContinueResult();
+            game.ContinueResult();
+            Assert.AreEqual(1, callbacks);
+        }
+
+        [UnityTest]
         public IEnumerator ChopAndMineBots_UseLiveRulesThroughStageBreaksAndResultHandoff()
         {
             foreach (bool tree in new[] { true, false })

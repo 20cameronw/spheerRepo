@@ -19,6 +19,7 @@ namespace Frontier
         public event Action<PlacedStructure, Transform> StructureTapped;
         public event Action<int, Transform> SlotTapped;
         public event Action<int, Transform> ObstacleTapped;
+        public event Action<GatherSpot, Transform> GatherTapped;
 
         public Func<Vector2, bool> IsOverUi;
         public bool Locked;
@@ -35,6 +36,7 @@ namespace Frontier
         readonly List<Item> items = new List<Item>();
         readonly List<Item> pads = new List<Item>();
         readonly List<Item> obstacles = new List<Item>();
+        readonly List<Item> gatherSites = new List<Item>();
         string signature = "";
         string obstacleSignature = "";
         PanelSettings labelPanel;
@@ -47,6 +49,7 @@ namespace Frontier
             public Transform label;
             public PlacedStructure structure;
             public bool obstacle;
+            public GatherSpot gatherSpot;
             public int slot;
             public float phase;
             public Transform glow;
@@ -106,13 +109,18 @@ namespace Frontier
             int count = p.BuildingSlots;
             foreach (var structure in gs.structures)
                 if (structure.planetId == p.Id) count = Mathf.Max(count, structure.slot + 1);
-            dirs = SlotDirections(count);
+            var spots = new List<GatherSpot>();
+            foreach (MinigameKind game in Enum.GetValues(typeof(MinigameKind)))
+                spots.AddRange(p.SpotsFor(game));
+            dirs = SlotDirections(count + spots.Count);
             signature = null;
             obstacleSignature = null;
             ClearAll();
             RebuildStructures();
             RebuildObstacles();
             RebuildPads();
+            for (int i = 0; i < spots.Count; i++)
+                gatherSites.Add(MakeGatherSite(spots[i], count + i));
         }
 
         public static Vector3[] SlotDirections(int count)
@@ -158,7 +166,8 @@ namespace Frontier
             foreach (var i in items) DestroyItem(i);
             foreach (var i in pads) if (i.t != null) Destroy(i.t.gameObject);
             foreach (var i in obstacles) DestroyItem(i);
-            items.Clear(); pads.Clear(); obstacles.Clear();
+            foreach (var i in gatherSites) DestroyItem(i);
+            items.Clear(); pads.Clear(); obstacles.Clear(); gatherSites.Clear();
             obstacleSignature = null;
         }
 
@@ -303,7 +312,7 @@ namespace Frontier
             if (model == null)
             {
                 var visual = new GameObject("StructureVisual");
-                BuildFallbackStructure(visual.transform, s.def.kind, c);
+                BuildFallbackStructure(visual.transform, s.def.kind, c, it.materials);
                 Bounds bounds;
                 if (ModelLibrary.MeshBounds(visual, out bounds))
                 {
@@ -354,16 +363,36 @@ namespace Frontier
             var kind = gs.ObstacleKind(obstacle);
             Transform model = kind != null ? SpawnModel(gs.db.obstacleKinds[obstacle.kind].modelKey, it.t, 0.72f) : null;
             if (model == null) BuildFallbackObstacle(it.t, obstacle.kind, it.materials);
-            var ring = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroy(ring.GetComponent<Collider>());
-            ring.transform.SetParent(it.t, false);
-            ring.transform.localPosition = new Vector3(0f, 0.16f, 0f);
-            ring.transform.localScale = Vector3.one * 0.86f;
-            ring.GetComponent<MeshRenderer>().sharedMaterial = Fx.AddMat(new Color(2.2f, 0.72f, 0.12f, 1f), Fx.Ring);
-            ring.AddComponent<Billboard>();
-            it.glow = Fx.GlowQuad(it.t, new Color(1f, 0.32f, 0.04f, 0.36f), 1.15f, new Vector3(0f, 0.16f, 0f)).transform;
             it.phase = obstacle.pad * 0.31f;
             return it;
+        }
+
+        Item MakeGatherSite(GatherSpot spot, int slot)
+        {
+            var item = NewItem(slot, "Gather_" + spot.resource.id + "_" + slot);
+            item.gatherSpot = spot;
+            var ground = Lit(new Color(0.25f, 0.3f, 0.34f));
+            var resource = Lit(spot.resource.color, 0.2f);
+            item.materials.Add(ground); item.materials.Add(resource);
+            if (spot.game == MinigameKind.Chop)
+            {
+                var bark = Lit(new Color(0.35f, 0.2f, 0.1f));
+                item.materials.Add(bark);
+                Prim(item.t, PrimitiveType.Cylinder, new Vector3(0, 0.25f, 0), new Vector3(0.13f, 0.25f, 0.13f), bark);
+                Prim(item.t, PrimitiveType.Sphere, new Vector3(0, 0.65f, 0), new Vector3(0.55f, 0.65f, 0.55f), resource);
+            }
+            else
+            {
+                Prim(item.t, PrimitiveType.Sphere, new Vector3(0, 0.12f, 0), new Vector3(0.6f, 0.24f, 0.5f), ground);
+                for (int i = 0; i < 3; i++)
+                {
+                    Prim(item.t, PrimitiveType.Capsule, new Vector3((i - 1) * 0.16f, 0.25f, 0),
+                        new Vector3(0.13f, 0.2f + i * 0.04f, 0.13f), resource,
+                        new Vector3(0, i * 65, (i - 1) * 18)).name = "ResourceSeam";
+                }
+            }
+            item.label = MakeLabel(item.t, spot.resource.LocalizedName, Fx.Displayable(spot.resource.color), 0.7f, false, out item.labelElement);
+            return item;
         }
 
         static void BuildFallbackObstacle(Transform parent, int kind, List<Material> materials)
@@ -384,7 +413,7 @@ namespace Frontier
                 float angle = i * 90f + (kind % 5) * 13f;
                 float x = Mathf.Cos(angle * Mathf.Deg2Rad) * (0.16f + (i % 2) * 0.08f);
                 float z = Mathf.Sin(angle * Mathf.Deg2Rad) * (0.12f + (i % 2) * 0.08f);
-                Transform shard = Prim(parent, i % 2 == 0 ? PrimitiveType.Sphere : PrimitiveType.Cube,
+                Transform shard = Prim(parent, i % 2 == 0 ? PrimitiveType.Sphere : PrimitiveType.Capsule,
                     new Vector3(x, 0.14f + (i % 3) * 0.06f, z),
                     new Vector3(0.25f + (i % 2) * 0.08f, 0.22f + (i % 3) * 0.05f, 0.24f), i % 2 == 0 ? body : trim,
                     new Vector3(i * 17f, angle, i * 29f));
@@ -516,33 +545,121 @@ namespace Frontier
             return g.transform;
         }
 
-        static void BuildFallbackStructure(Transform t, StructureKind kind, Color c)
+        static void BuildFallbackStructure(Transform t, StructureKind kind, Color c, List<Material> materials)
         {
             var metal = Lit(new Color(0.45f, 0.5f, 0.6f), 0.15f);
             var glow = Lit(c, 1.2f);
+            materials.Add(metal); materials.Add(glow);
             if (kind == StructureKind.FuelDepot)
             {
                 Prim(t, PrimitiveType.Cylinder, new Vector3(-0.2f, 0.27f, 0f), new Vector3(0.2f, 0.54f, 0.2f), metal);
                 Prim(t, PrimitiveType.Cylinder, new Vector3(0.2f, 0.27f, 0f), new Vector3(0.2f, 0.54f, 0.2f), metal);
-                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.56f, 0f), new Vector3(0.58f, 0.06f, 0.3f), glow);
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.56f, 0f), new Vector3(0.06f, 0.27f, 0.06f), glow, new Vector3(0, 0, 90));
                 return;
             }
             if (kind == StructureKind.Warehouse)
             {
-                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.25f, 0f), new Vector3(0.65f, 0.5f, 0.55f), metal);
-                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.53f, 0f), new Vector3(0.73f, 0.08f, 0.63f), glow);
-                Prim(t, PrimitiveType.Cube, new Vector3(0f, 0.18f, -0.285f), new Vector3(0.25f, 0.34f, 0.025f), glow);
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.05f, 0f), new Vector3(0.85f, 0.05f, 0.75f), metal);
                 for (int i = 0; i < 3; i++)
-                    Prim(t, PrimitiveType.Cube, new Vector3(-0.2f + i * 0.2f, 0.25f, -0.3f), new Vector3(0.025f, 0.42f, 0.03f), metal);
+                {
+                    Prim(t, PrimitiveType.Capsule, new Vector3(-0.24f + i * 0.24f, 0.24f, 0),
+                        new Vector3(0.2f, 0.3f, 0.2f), metal, new Vector3(90, 0, 0));
+                    Prim(t, PrimitiveType.Cylinder, new Vector3(-0.24f + i * 0.24f, 0.24f, -0.24f),
+                        new Vector3(0.14f, 0.015f, 0.14f), glow, new Vector3(90, 0, 0));
+                }
                 return;
             }
             if (kind == StructureKind.Lumber)
             {
                 var bark = Lit(new Color(0.35f, 0.2f, 0.1f));
                 var leaf = Lit(new Color(0.15f, 0.65f, 0.3f), 0.15f);
+                materials.Add(bark); materials.Add(leaf);
                 Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.16f, 0f), new Vector3(0.1f, 0.16f, 0.1f), bark);
                 Prim(t, PrimitiveType.Sphere, new Vector3(0f, 0.42f, 0f), new Vector3(0.42f, 0.36f, 0.42f), leaf);
                 Prim(t, PrimitiveType.Sphere, new Vector3(0.03f, 0.62f, 0f), new Vector3(0.3f, 0.28f, 0.3f), leaf);
+                return;
+            }
+            if (kind == StructureKind.ResearchLab || kind == StructureKind.RadarTower)
+            {
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.2f, 0), new Vector3(0.35f, 0.2f, 0.35f), metal);
+                Prim(t, PrimitiveType.Sphere, new Vector3(0, 0.45f, 0), new Vector3(0.65f, 0.38f, 0.65f), glow);
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.7f, 0), new Vector3(0.035f, 0.2f, 0.035f), metal);
+                return;
+            }
+            if (kind == StructureKind.Foundry || kind == StructureKind.Fabricator)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    Prim(t, PrimitiveType.Cylinder, new Vector3(-0.18f + i * 0.36f, 0.24f, 0), new Vector3(0.32f, 0.24f, 0.32f), metal);
+                    Prim(t, PrimitiveType.Cylinder, new Vector3(-0.18f + i * 0.36f, 0.5f, 0), new Vector3(0.23f, 0.035f, 0.23f), glow);
+                }
+                return;
+            }
+            if (kind == StructureKind.Hangar || kind == StructureKind.CargoDepot || kind == StructureKind.ColonyHub)
+            {
+                Prim(t, PrimitiveType.Sphere, new Vector3(0, 0.15f, 0), new Vector3(0.85f, 0.55f, 0.7f), metal);
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.12f, -0.32f), new Vector3(0.35f, 0.025f, 0.35f), glow, new Vector3(90, 0, 0));
+                for (int i = -1; i <= 1; i += 2)
+                    Prim(t, PrimitiveType.Cylinder, new Vector3(i * 0.35f, 0.14f, 0), new Vector3(0.15f, 0.14f, 0.15f), metal);
+                return;
+            }
+            if (kind == StructureKind.Biodome || kind == StructureKind.Terraformer)
+            {
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.04f, 0), new Vector3(0.8f, 0.04f, 0.8f), metal);
+                Prim(t, PrimitiveType.Sphere, new Vector3(0, 0.18f, 0), new Vector3(0.66f, 0.5f, 0.66f), glow);
+                for (int i = -1; i <= 1; i += 2)
+                    Prim(t, PrimitiveType.Capsule, new Vector3(i * 0.26f, 0.22f, 0), new Vector3(0.05f, 0.24f, 0.05f), metal, new Vector3(0, 0, i * 25));
+                return;
+            }
+            if (kind == StructureKind.ChemReactor || kind == StructureKind.QuantumLab)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    float angle = i * Mathf.PI * 2 / 3;
+                    Vector3 pos = new Vector3(Mathf.Cos(angle) * 0.24f, 0.28f, Mathf.Sin(angle) * 0.24f);
+                    Prim(t, PrimitiveType.Capsule, pos, new Vector3(0.22f, 0.27f, 0.22f), metal);
+                    Prim(t, PrimitiveType.Sphere, pos + Vector3.up * 0.15f, Vector3.one * 0.18f, glow);
+                }
+                return;
+            }
+            if (kind == StructureKind.WarpGate || kind == StructureKind.DysonCollector)
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    float a = i * Mathf.PI * 2 / 12, b = (i + 1) * Mathf.PI * 2 / 12;
+                    Vector3 start = new Vector3(Mathf.Cos(a) * 0.4f, 0.48f + Mathf.Sin(a) * 0.4f, 0);
+                    Vector3 end = new Vector3(Mathf.Cos(b) * 0.4f, 0.48f + Mathf.Sin(b) * 0.4f, 0);
+                    var segment = Prim(t, PrimitiveType.Cylinder, (start + end) * 0.5f,
+                        new Vector3(0.07f, (end - start).magnitude * 0.5f, 0.07f), i % 3 == 0 ? glow : metal);
+                    segment.localRotation = Quaternion.FromToRotation(Vector3.up, end - start);
+                }
+                return;
+            }
+            if (kind == StructureKind.ShieldPylon || kind == StructureKind.TeslaCoil)
+            {
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.33f, 0), new Vector3(0.12f, 0.33f, 0.12f), metal);
+                for (int i = 0; i < 3; i++)
+                    Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.2f + i * 0.18f, 0), new Vector3(0.42f - i * 0.07f, 0.025f, 0.42f - i * 0.07f), glow);
+                return;
+            }
+            if (kind == StructureKind.Mine || kind == StructureKind.Drill || kind == StructureKind.SiphonRig ||
+                kind == StructureKind.Excavator || kind == StructureKind.SalvageYard || kind == StructureKind.AutoHarvester)
+            {
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.04f, 0), new Vector3(0.7f, 0.04f, 0.65f), metal);
+                for (int i = -1; i <= 1; i += 2)
+                    Prim(t, PrimitiveType.Cylinder, new Vector3(i * 0.24f, 0.35f, 0), new Vector3(0.055f, 0.35f, 0.055f), metal);
+                Prim(t, PrimitiveType.Capsule, new Vector3(0, 0.65f, 0), new Vector3(0.1f, 0.3f, 0.1f), metal, new Vector3(0, 0, 90));
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.34f, 0), new Vector3(0.15f, 0.24f, 0.15f), glow);
+                for (int i = 0; i < 3; i++)
+                    Prim(t, PrimitiveType.Sphere, new Vector3(0, 0.16f + i * 0.12f, 0),
+                        new Vector3(0.28f - i * 0.04f, 0.06f, 0.28f - i * 0.04f), metal);
+                return;
+            }
+            if (kind == StructureKind.RepairBay)
+            {
+                Prim(t, PrimitiveType.Cylinder, new Vector3(0, 0.06f, 0), new Vector3(0.8f, 0.06f, 0.8f), metal);
+                Prim(t, PrimitiveType.Capsule, new Vector3(0, 0.18f, 0), new Vector3(0.1f, 0.28f, 0.1f), glow);
+                Prim(t, PrimitiveType.Capsule, new Vector3(0, 0.18f, 0), new Vector3(0.1f, 0.28f, 0.1f), glow, new Vector3(0, 0, 90));
                 return;
             }
             Prim(t, PrimitiveType.Cylinder, new Vector3(0f, 0.2f, 0f), new Vector3(0.34f, 0.2f, 0.34f), metal);
@@ -598,6 +715,9 @@ namespace Frontier
 
         public void RefreshLocalizedLabels()
         {
+            foreach (var site in gatherSites)
+                if (site.labelElement != null)
+                    site.labelElement.Q<Label>().text = site.gatherSpot.resource.LocalizedName;
             foreach (var item in items)
             {
                 var structure = item.structure;
@@ -656,10 +776,13 @@ namespace Frontier
                 placedRadius = r;
                 foreach (var it in items) if (it.t != null && !it.orbit) it.t.localPosition = dirs[it.slot] * r;
                 foreach (var it in pads) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
+                foreach (var it in obstacles) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
+                foreach (var it in gatherSites) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
             }
             AnimateItems(items);
             AnimateItems(pads);
             AnimateItems(obstacles);
+            AnimateItems(gatherSites);
             HandleInput();
         }
 
@@ -694,7 +817,8 @@ namespace Frontier
                 if (it.label != null)
                 {
                     it.label.localPosition = new Vector3(0f, (it.structure != null ? 1.0f : 0.6f) + bob, 0f);
-                    bool show = facing && !Locked && (it.structure == null || ShowStructureLabels || selected);
+                    bool show = facing && !Locked && (it.structure == null || ShowStructureLabels || selected)
+                        && (it.gatherSpot == null || view.CloseView || selected);
                     it.labelElement.style.visibility = show ? Visibility.Visible : Visibility.Hidden;
                 }
                 if (it.glow != null)
@@ -746,12 +870,13 @@ namespace Frontier
                 foreach (var it in obstacles) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
                 foreach (var it in pads) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
                 foreach (var it in items) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
+                foreach (var it in gatherSites) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
             }
 
             // Generous screen-space fallback: anything visible near the tap counts.
             float best = 95f * Mathf.Max(0.6f, ScreenMetrics.Height / 1080f);
             Item pick = null;
-            foreach (var list in new[] { items, pads, obstacles })
+            foreach (var list in new[] { items, pads, obstacles, gatherSites })
                 foreach (var it in list)
                 {
                     if (it.t == null) continue;
@@ -768,6 +893,7 @@ namespace Frontier
         {
             Sfx.Click();
             if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
+            else if (it.gatherSpot != null) GatherTapped?.Invoke(it.gatherSpot, it.t);
             else if (it.obstacle) { if (ObstacleTapped != null) ObstacleTapped(it.slot, it.t); }
             else if (SlotTapped != null) SlotTapped(it.slot, it.t);
         }
@@ -788,6 +914,14 @@ namespace Frontier
         {
             foreach (var it in obstacles)
                 if (it.slot == pad && it.t != null) { Tap(it); return true; }
+            return false;
+        }
+
+        public bool SelectGatherSite(ResourceSO resource)
+        {
+            if (Locked) return false;
+            foreach (var item in gatherSites)
+                if (item.gatherSpot.resource == resource) { Tap(item); return true; }
             return false;
         }
     }

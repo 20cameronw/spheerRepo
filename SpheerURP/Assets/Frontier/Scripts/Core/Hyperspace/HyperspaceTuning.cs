@@ -58,16 +58,11 @@ namespace Frontier.Hyperspace
         public float bulletSpeed = 110f;
         public float bulletRadius = 0.16f;
         public float bulletRange = 135f;
-        public float assistConeTan = 0.34f;
-        public float assistStrength = 0.65f;
-        public float assistRate = 14f;
-        public float assistMaxLateral = 40f;
-        public float assistMinZ = 3f;
-        public float assistMaxZ = 125f;
-        public float bombRange = 95f;
         public float bombDamageBase = 40f;
         public float bombDamagePerShipDamage = 6f;
-        public float bombBossFraction = 0.04f;
+        public float bombBossFraction = 0.18f;
+        public float bombSpeed = 70f;
+        public float bombBlastRadius = 7f;
         public float bombCooldown = 0.8f;
         public int bombKillsPerCharge = 18;
 

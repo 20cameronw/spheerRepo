@@ -83,6 +83,69 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator SurfaceViewAndResourceObjectsUseLiveActionsWithoutChangingBuildingSlots()
+        {
+            new GameObject("SurfaceInteractionBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("intro-skip");
+            if (skip != null)
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            for (int i = 0; i < 240 && rt.Ui.DebugBusy; i++) yield return null;
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            rt.Ui.DebugReset();
+            yield return null;
+            var lumber = rt.State.StructureOfKind(rt.State.planet, StructureKind.Lumber);
+            var structureAnchor = rt.Planet.Spin.Find("Struct_" + lumber.def.id);
+            Assert.IsNotNull(structureAnchor);
+            Vector3 anchor = structureAnchor.localPosition;
+            Vector3 overview = rt.Camera.transform.position;
+            var toggle = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            yield return null;
+            yield return null;
+            Assert.IsTrue(rt.Planet.CloseView);
+            Assert.Less(Mathf.Abs(rt.Camera.transform.position.z), Mathf.Abs(overview.z) * 0.5f);
+            Assert.AreEqual(anchor, structureAnchor.localPosition, "saved building slots must not move when gathering sites are added");
+            var resource = rt.State.planet.SpotsFor(MinigameKind.Chop)[0].resource;
+            Assert.IsTrue(rt.Surface.SelectGatherSite(resource));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == resource.LocalizedName));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("world.site.gather")));
+            rt.Ui.DebugReset();
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            yield return null;
+            yield return null;
+            Assert.IsFalse(rt.Planet.CloseView);
+            Assert.AreEqual(overview, rt.Camera.transform.position);
+
+            rt.State.backpack.Set(resource.id, 0);
+            bool found = false;
+            var costs = UiKit.CostRow(new List<ItemAmount> { new ItemAmount { resource = resource, amount = 1 } },
+                rt.State, true, r => found = r == resource);
+            rt.Ui.DebugRoot.Add(costs);
+            var find = costs.Q<Button>("find-resource-" + resource.id);
+            Assert.IsNotNull(find);
+            Assert.AreEqual(UiText.Get("resource.find", resource.LocalizedName), find.tooltip);
+            Assert.IsTrue(find.focusable);
+            Assert.IsEmpty(find.text, "the resource chip replaces the separate FIND label");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = find; find.SendEvent(submit); }
+            Assert.IsTrue(found, "native keyboard activation must still find the resource");
+            costs.RemoveFromHierarchy();
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            yield return null;
+            Assert.IsTrue(rt.Planet.CloseView);
+            Assert.IsTrue(rt.Defense.StartWave(1));
+            yield return null;
+            yield return null;
+            Assert.IsFalse(rt.Planet.CloseView, "called waves need the full planet visible");
+            Assert.AreEqual(overview, rt.Camera.transform.position);
+        }
+
+        [UnityTest]
         public IEnumerator RankedAliensUseArmorHealthArcsAndOnlyDieOnce()
         {
             var state = new GameState(GameDatabase.Load(), false);
@@ -766,16 +829,15 @@ namespace Frontier.Tests
                 Assert.IsTrue(state.text == UiText.Get("privacy.on") || state.text == UiText.Get("privacy.off"));
             }
             var assist = rt.Ui.DebugRoot.Q<Button>("assist-toggle");
-            Assert.IsNotNull(assist);
-            Assert.IsTrue(assist.Query<Label>().ToList().Exists(label => label.text == UiText.Get("settings.assist.off")));
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = assist; assist.SendEvent(submit); }
-            Assert.IsTrue(TravelPrefs.AssistMode);
-            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("assist-toggle").Query<Label>().ToList()
-                .Exists(label => label.text == UiText.Get("settings.assist.on")));
+            Assert.IsNull(assist, "travel settings must not expose an easy mode");
             rt.Ui.DebugResearch(2);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.branch")));
             rt.Ui.DebugResearch(1);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("tools.title")));
+            Assert.AreEqual(1, rt.Ui.DebugRoot.Query<Label>().ToList().FindAll(label => label.text == UiText.Get("tools.mining")).Count);
+            Assert.IsFalse(rt.Ui.DebugRoot.Query<Button>().ToList().Exists(button =>
+                button.Query<Label>().ToList().Exists(label => label.text == "PICKAXE" || label.text == "DRILL")),
+                "the legacy pick/drill tab bar must not survive above the shared upgrade list");
             rt.Ui.DebugReset();
             rt.Ui.DebugShop(0);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("shop.summary",

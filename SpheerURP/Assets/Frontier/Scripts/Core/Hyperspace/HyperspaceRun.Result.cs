@@ -88,6 +88,8 @@ namespace Frontier.Hyperspace
             ref PlayerState p = ref Player;
             h = Hash.Combine(h, Bits(p.x), Bits(p.y), Bits(p.hull));
             h = Hash.Combine(h, (ulong)(uint)p.shield, (ulong)(uint)p.bombs, (ulong)(uint)p.combo);
+            h = Hash.Combine(h, BombActive ? 1UL : 0UL, Bits(BombX), Bits(BombY));
+            h = Hash.Combine(h, Bits(BombZ), 0UL);
             h = Hash.Combine(h, (ulong)(uint)Kills, (ulong)(uint)HitsTaken, (ulong)(uint)Score);
             h = Hash.Combine(h, (ulong)(uint)lootCounts[0], (ulong)(uint)lootCounts[1], (ulong)(uint)lootCounts[2]);
             for (int i = 0; i < EnemyHigh; i++)
