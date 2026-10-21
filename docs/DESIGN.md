@@ -16,6 +16,11 @@ Declare `xmlns:frontier="Frontier"` in UXML and use tags such as `<frontier:Fron
 Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to load tokens/fonts.
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
+The top bar includes fuel, live Nova Shards and player level; backpack capacity stays on the Pack dock.
+Missing-material cost and network chips keep their quantity/name as text: only the resource icon is
+the Find control, with a transparent touch target and localized tooltip. The Atlas resource header
+uses that same icon control to reveal raw-resource deposits; do not add a separate FIND button.
+
 Modal, popup and toast shells enter with a 160 ms ease-out translation (16 px, 6 px and -8 px respectively);
 they do not animate layout sizes or delay interaction/dismissal. World structure and build-pad labels use native
 Unity 6.4 `UIDocument` world-space rendering with one shared panel per `WorldSurface`, the same Chakra font,

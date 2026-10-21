@@ -109,7 +109,13 @@ namespace Frontier
         {
             var card = Card(resource.color, true);
             var header = UiKit.Div("fr-card-head");
-            header.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconXl));
+            if (resource.IsRaw)
+                header.Add(UiKit.ResourceFindIcon(resource, r =>
+                {
+                    CloseModal();
+                    OpenMapForResource(r.id);
+                }, "atlas-find-resource-" + resource.id));
+            else header.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconXl));
             var heading = UiKit.Div("fr-card-text");
             heading.Add(UiKit.Text(resource.LocalizedName.ToUpper(), "fr-h2"));
             heading.Add(UiKit.Text(UiText.Get("atlas.resource.summary",
@@ -154,15 +160,6 @@ namespace Frontier
             body.Add(card);
             BuildAtlasRelatedRecipes(body, resource);
             BuildAtlasBuildUses(body, resource);
-            if (resource.IsRaw)
-            {
-                var find = IconBtn(UiText.Get("atlas.resource.find"), "map", UiKit.Cyan, () =>
-                {
-                    CloseModal();
-                    OpenMapForResource(resource.id);
-                });
-                body.Add(find);
-            }
         }
 
         List<(PlanetData planet, double distance)> AtlasSurveyedWorldSamples(ResourceSO resource)

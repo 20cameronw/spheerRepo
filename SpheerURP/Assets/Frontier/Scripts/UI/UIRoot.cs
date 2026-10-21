@@ -27,7 +27,7 @@ namespace Frontier
 
         VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
-        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, packLabel, levelLabel, planetLabel;
+        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, packLabel, levelLabel, planetLabel;
         WaveInfo waveHudInfo;
         VisualElement planetTag;
         Button surfaceViewButton;
@@ -200,6 +200,8 @@ namespace Frontier
             planetLabel = UiKit.Text("", "fr-planet-name");
             planetTag.Add(planetLabel);
             fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
+            shardLabel = Chip(planetTag, "crystal", UiKit.Cyan, null);
+            shardLabel.name = "hud-nova-shards";
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
             var menuBtn = Icons.IconButton("menu", UiKit.Cyan, OpenMenu, 0f, true);
@@ -349,6 +351,8 @@ namespace Frontier
                 planetView.SetTerraformingStage(gs.TerraformerStageOn(gs.planet));
             fuelLabel.text = UiKit.FuelLabel(gs.FuelGallons);
             fuelLabel.tooltip = UiText.Get("fuel.summary", gs.FuelTankUsed, gs.FuelTankSlots);
+            shardLabel.text = gs.ShardBalance.ToString("N0");
+            shardLabel.tooltip = UiText.Get("hyperspace.revive.balance", gs.ShardBalance);
             RefreshPackCapacity();
             levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
             planetLabel.text = gs.planet.Name.ToUpper();

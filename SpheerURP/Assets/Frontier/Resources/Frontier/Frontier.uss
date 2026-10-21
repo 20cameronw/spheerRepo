@@ -87,15 +87,22 @@
     -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-SemiBold-SDF.asset");
     -unity-text-align: middle-left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.fr-cost-resource {
+.fr-resource-find-icon {
     margin: 0; padding: 0; background-color: transparent; border-width: 0;
-    min-width: var(--fr-touch); min-height: var(--fr-touch);
-    justify-content: center;
+    width: var(--fr-touch); height: var(--fr-touch); min-width: var(--fr-touch); min-height: var(--fr-touch);
+    flex-shrink: 0; align-items: center; justify-content: center;
+    border-radius: var(--fr-r-sm);
 }
-.fr-cost-resource:hover .fr-itemchip, .fr-cost-resource:focus .fr-itemchip {
-    border-color: var(--fr-cyan);
+.fr-resource-find-icon:hover, .fr-resource-find-icon:focus {
+    background-color: var(--fr-surface-3); border-width: 2px; border-color: var(--fr-cyan);
 }
-.fr-cost-resource:active { opacity: 0.7; }
+.fr-resource-find-icon:active { opacity: 0.7; }
+.fr-itemchip-find { margin-top: var(--fr-sp-24); margin-bottom: var(--fr-sp-24); }
+.fr-itemchip .fr-resource-find-icon { position: absolute; left: -24px; top: 50%; translate: 0 -50%; }
+.fr-itemchip .fr-resource-find-icon .fr-icon { margin-right: 0; }
+.fr-topbar .fr-chip { margin-left: var(--fr-sp-8); }
+.fr-topbar .fr-chip .fr-icon { width: 32px; height: 32px; margin-right: var(--fr-sp-4); }
+.fr-topbar .fr-chip-text { font-size: var(--fr-fs-caption); }
 .fr-chip { flex-direction: row; align-items: center; margin-left: var(--fr-sp-16); flex-shrink: 0; }
 .fr-chip .fr-icon { margin-right: var(--fr-sp-8); }
 .fr-chip-col { flex-direction: column; justify-content: center; }

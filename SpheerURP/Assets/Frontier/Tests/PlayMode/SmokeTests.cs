@@ -149,10 +149,18 @@ namespace Frontier.Tests
             Assert.IsNotNull(find);
             Assert.AreEqual(UiText.Get("resource.find", resource.LocalizedName), find.tooltip);
             Assert.IsTrue(find.focusable);
-            Assert.IsEmpty(find.text, "the resource chip replaces the separate FIND label");
+            Assert.IsEmpty(find.text, "the resource icon replaces the separate FIND label");
+            Assert.IsNull(find.Q<Label>(), "Only the item icon is clickable, not the quantity or a FIND caption.");
+            Assert.IsTrue(find.parent.ClassListContains("fr-itemchip"));
+            Assert.IsNotNull(find.Q(className: "fr-icon"));
+            Assert.IsTrue(find.parent.ClassListContains("fr-itemchip-find"));
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = find; find.SendEvent(submit); }
             Assert.IsTrue(found, "native keyboard activation must still find the resource");
             costs.RemoveFromHierarchy();
+            rt.State.backpack.Set(resource.id, 1);
+            var affordable = UiKit.CostRow(new List<ItemAmount> { new ItemAmount(resource, 1) },
+                rt.State, true, _ => Assert.Fail("Owned resources must not expose a missing-item action."));
+            Assert.IsNull(affordable.Q<Button>());
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
             yield return null;
             Assert.IsTrue(rt.Planet.CloseView);
@@ -1788,8 +1796,17 @@ namespace Frontier.Tests
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
             var top = rt.Ui.DebugRoot.Q(className: "fr-topbar");
-            Assert.AreEqual(2, top.Query(className: "fr-chip").ToList().Count,
-                "The top bar should contain fuel and level, not a duplicate backpack chip.");
+            Assert.AreEqual(3, top.Query(className: "fr-chip").ToList().Count,
+                "The top bar contains fuel, Nova Shards and level, not a duplicate backpack chip.");
+            var shards = top.Q<Label>("hud-nova-shards");
+            Assert.IsNotNull(shards);
+            Assert.AreEqual(rt.State.ShardBalance.ToString("N0"), shards.text);
+            Assert.IsTrue(rt.State.TryCreateCloudSaveSnapshot(out var shardSave, out string shardError), shardError);
+            shardSave.wallet.Clear();
+            shardSave.wallet.Add(new WalletEntry { currency = "shards", amount = 1234 });
+            Assert.IsTrue(rt.State.TryRestoreCloudSave(shardSave, out shardError), shardError);
+            Assert.AreEqual(1234.ToString("N0"), shards.text, "The HUD reflects wallet changes without reopening a panel.");
+            Assert.AreEqual(UiText.Get("hyperspace.revive.balance", 1234), shards.tooltip);
             var pack = rt.Ui.DebugRoot.Q<Button>("dock-pack");
             var gauge = pack.Q("pack-capacity-gauge");
             Assert.AreEqual(8, gauge.childCount);
@@ -1821,6 +1838,14 @@ namespace Frontier.Tests
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = jobs; jobs.SendEvent(submit); }
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
             Assert.IsNull(rt.Ui.DebugRoot.Q("command-navigation"));
+            rt.Ui.DebugAtlas(0);
+            var atlasFind = rt.Ui.DebugRoot.Q<Button>(className: "fr-resource-find-icon");
+            Assert.IsNotNull(atlasFind);
+            Assert.IsNull(atlasFind.Q<Label>());
+            Assert.IsFalse(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("atlas.resource.find")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = atlasFind; atlasFind.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("map-pin-toggle"), "The Atlas item icon retains deposit-map navigation.");
             rt.Ui.DebugReset();
         }
 

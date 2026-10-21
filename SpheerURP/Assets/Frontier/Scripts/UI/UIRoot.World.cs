@@ -559,7 +559,8 @@ namespace Frontier
         VisualElement RecipeResource(ResourceSO resource, int amount, bool lack = false)
         {
             var row = UiKit.Div("fr-recipe-resource");
-            row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
+            if (lack) row.Add(UiKit.ResourceFindIcon(resource, OpenAtlasResource));
+            else row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
             row.Add(UiKit.Text(UiKit.Amount(resource, amount) + " " + resource.LocalizedName, "fr-small", lack ? UiKit.Red : (Color?)null));
             return row;
         }

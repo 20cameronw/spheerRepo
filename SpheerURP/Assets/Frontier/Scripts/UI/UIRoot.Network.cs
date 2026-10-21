@@ -80,16 +80,8 @@ namespace Frontier
                     row.style.marginBottom = UiKit.Space.S8;
                     var chip = ResourceIconChip(resource, resource.LocalizedName);
                     if (p == null)
-                    {
-                        var find = new Button(() => OpenAtlasResource(resource));
-                        find.AddToClassList("fr-cost-resource");
-                        find.name = "network-find-" + resource.id;
-                        find.tooltip = UiText.Get("resource.find", resource.LocalizedName);
-                        chip.pickingMode = PickingMode.Ignore;
-                        find.Add(chip);
-                        row.Add(find);
-                    }
-                    else row.Add(chip);
+                        UiKit.BindResourceFind(chip, resource, OpenAtlasResource, "network-find-" + resource.id);
+                    row.Add(chip);
                     var status = UiKit.Text(p != null ? p.Name : UiText.Get("network.world.missing"), "fr-small", p != null ? UiKit.Lime : UiKit.Amber);
                     status.style.whiteSpace = WhiteSpace.Normal;
                     status.style.flexShrink = 1;
@@ -165,13 +157,9 @@ namespace Frontier
             {
                 var chip = UiKit.ItemChip(cost.resource, cost.amount, gs.PlanetCount(cost.resource));
                 var resource = cost.resource;
-                if (gs.PlanetCount(resource) >= cost.amount) { row.Add(chip); continue; }
-                var find = new Button(() => OpenAtlasResource(resource));
-                find.AddToClassList("fr-cost-resource");
-                find.tooltip = UiText.Get("resource.find", resource.LocalizedName);
-                chip.pickingMode = PickingMode.Ignore;
-                find.Add(chip);
-                row.Add(find);
+                if (gs.PlanetCount(resource) < cost.amount)
+                    UiKit.BindResourceFind(chip, resource, OpenAtlasResource);
+                row.Add(chip);
             }
             return row;
         }

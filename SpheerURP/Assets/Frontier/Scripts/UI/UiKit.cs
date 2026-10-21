@@ -180,6 +180,24 @@ namespace Frontier
             return Chip(Icons.ForResource(r), Ui(r.color), label, short_);
         }
 
+        public static Button ResourceFindIcon(ResourceSO resource, Action<ResourceSO> onFind, string name = null)
+        {
+            var button = new Button(() => { Sfx.Click(); onFind(resource); });
+            button.name = name ?? "find-resource-" + resource.id;
+            button.tooltip = UiText.Get("resource.find", resource.LocalizedName);
+            button.AddToClassList("fr-resource-find-icon");
+            button.Add(Icons.Make(Icons.ForResource(resource), Ui(resource.color), Size.IconMd));
+            return button;
+        }
+
+        public static void BindResourceFind(VisualElement chip, ResourceSO resource, Action<ResourceSO> onFind,
+            string name = null)
+        {
+            chip.Q(className: "fr-icon").style.visibility = Visibility.Hidden;
+            chip.AddToClassList("fr-itemchip-find");
+            chip.Add(ResourceFindIcon(resource, onFind, name));
+        }
+
         public static string Amount(ResourceSO resource, int amount)
         {
             return resource != null && resource.fuelEnergy > 0
@@ -203,17 +221,8 @@ namespace Frontier
                 if (i.resource == null) continue;
                 var chip = ItemChip(i.resource, i.amount, showHave ? gs.Count(i.resource) : -1);
                 if (onFind != null && gs.PlanetCount(i.resource) < i.amount)
-                {
-                    ResourceSO resource = i.resource;
-                    var find = new Button(() => onFind(resource));
-                    find.name = "find-resource-" + resource.id;
-                    find.tooltip = UiText.Get("resource.find", resource.LocalizedName);
-                    find.AddToClassList("fr-cost-resource");
-                    chip.pickingMode = PickingMode.Ignore;
-                    find.Add(chip);
-                    row.Add(find);
-                }
-                else row.Add(chip);
+                    BindResourceFind(chip, i.resource, onFind);
+                row.Add(chip);
             }
             return row;
         }
