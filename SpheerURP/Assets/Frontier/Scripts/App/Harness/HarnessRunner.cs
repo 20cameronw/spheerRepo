@@ -456,7 +456,10 @@ namespace Frontier
                 int t = tab;
                 yield return new Shot("menu-atlas-" + atlasShots[tab], () => ui.DebugAtlas(t));
             }
-            yield return new Shot("map", () => ui.DebugMap(null, 2f), 0.8f);
+            yield return new Shot("map", () => ui.DebugMap(null), 0.8f);
+            yield return new Shot("orbital-chart-home", () => ui.DebugMap(null), 0.8f);
+            yield return new Shot("orbital-chart-selected", () => ui.DebugMap(gs.universe.Get("glacia")), 0.8f);
+            yield return new Shot("orbital-chart-sector", () => ui.DebugMap(null, 2f), 0.8f);
             yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 1f), 0.8f);
             yield return new Shot("map-autopilot", () => { ui.DebugMap(gs.universe.Get("cinder"), 1f); ui.DebugMapAutopilot(); }, 0.8f);
             yield return new Shot("map-zoom-out", () => ui.DebugMap(gs.universe.Get("glacia"), 0.08f), 0.8f);
@@ -642,7 +645,7 @@ namespace Frontier
                 ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery));
             }, 0.5f);
             yield return new Shot("gen-colossal-popup", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.Gunner)); }, 0.3f);
-            yield return new Shot("map-generated", () => { GoTo(FindWorld(ColossalSpec)); ui.DebugMap(null, 2f); }, 0.8f);
+            yield return new Shot("map-generated", () => { GoTo(FindWorld(ColossalSpec)); ui.DebugMap(null); }, 0.8f);
             yield return new Shot("menu-debug-teleport", () => ui.DebugMenu("debug", true), 0.5f);
             yield return new Shot("popup-radartower", () => { ResetView(); ui.DebugTapStructure(At(StructureKind.RadarTower)); }, 0.3f);
             yield return new Shot("game-siphon", () =>

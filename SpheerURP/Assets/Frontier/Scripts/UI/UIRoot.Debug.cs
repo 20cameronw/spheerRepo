@@ -106,7 +106,7 @@ namespace Frontier
             RefreshModal();
         }
 
-        public void DebugMap(PlanetData pick, float zoom)
+        public void DebugMap(PlanetData pick, float zoom = SystemZoom)
         {
             DebugReset();
             OpenMap();
@@ -123,6 +123,12 @@ namespace Frontier
         public RoutePlan DebugMapPreview { get { return mapPreview; } }
         public int DebugMapSystemCount { get { return mapSnapshot == null ? 0 : mapSnapshot.systems.Length; } }
         public double DebugMapCenterX { get { return viewport.CenterX; } }
+        public bool DebugMapInSystem { get { return SystemMapView; } }
+        public string DebugMapSelectedId { get { return selected == null ? null : selected.Id; } }
+        public float DebugMapOrbitRadius(PlanetData planet)
+        {
+            return PlanetOrbitAxes(planet).y;
+        }
         public void DebugMapSearch(string text) { mapSearch.value = text; SearchMap(); }
         public void DebugMapAutopilot() { mapAutopilot = true; InvalidateMapPreview(); BuildMapCard(); }
         public void DebugStartTravel(PlanetData target, bool autopilot = false) { StartTravel(target, autopilot); }

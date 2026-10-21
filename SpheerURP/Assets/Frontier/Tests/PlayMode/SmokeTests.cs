@@ -1701,6 +1701,69 @@ namespace Frontier.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator Map_OpensOrbitalChart_WithSelectablePlanets_AndKeepsUniverseNavigation()
+        {
+            ScreenMetrics.SetVirtual(1080, 1920);
+            var targetTexture = new RenderTexture(1080, 1920, 0);
+            targetTexture.Create();
+            try
+            {
+                new GameObject("OrbitalMapBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                rt.Document.panelSettings.targetTexture = targetTexture;
+                rt.Ui.DebugMap(null);
+                for (int i = 0; i < 10; i++) yield return null;
+                Assert.IsTrue(rt.Ui.DebugMapInSystem, "The map should start with readable planet orbits, not a star field.");
+                var chart = rt.Ui.DebugRoot.Q("map-viewport");
+                Assert.IsNotNull(chart);
+                var worlds = rt.State.universe.PlanetsOf(rt.State.planet.Star);
+                Assert.Greater(worlds.Count, 1);
+                float previous = 0;
+                foreach (var planet in worlds)
+                {
+                    var node = chart.Q<Button>("map-planet-" + planet.Id);
+                    Assert.IsNotNull(node, planet.Name + " needs a native touch/keyboard target.");
+                    Assert.AreEqual(DisplayStyle.Flex, node.resolvedStyle.display);
+                    Assert.GreaterOrEqual(node.layout.width, 96);
+                    float radius = rt.Ui.DebugMapOrbitRadius(planet);
+                    Assert.Greater(radius, previous, "Orbit lanes must remain distinct.");
+                    Assert.LessOrEqual(radius + 48, Mathf.Min(chart.layout.width, chart.layout.height) * 0.5f);
+                    previous = radius;
+                }
+                var destination = worlds[1];
+                var destinationButton = chart.Q<Button>("map-planet-" + destination.Id);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = destinationButton; destinationButton.SendEvent(submit); }
+                Assert.AreEqual(destination.Id, rt.Ui.DebugMapSelectedId);
+                var mode = rt.Ui.DebugRoot.Q<Button>("map-switch-view");
+                Assert.AreEqual(UiText.Get("map.mode.universe"), mode.text);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
+                yield return null;
+                Assert.IsFalse(rt.Ui.DebugMapInSystem);
+                Assert.AreEqual(UiText.Get("map.mode.orbits"), mode.text);
+                Assert.AreEqual(DisplayStyle.None, chart.Q<Button>("map-planet-" + destination.Id).resolvedStyle.display);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
+                Assert.IsTrue(rt.Ui.DebugMapInSystem);
+                Assert.AreEqual(destination.Id, rt.Ui.DebugMapSelectedId, "Changing chart scale cannot change the destination.");
+                rt.Ui.DebugMapSearch("12000,-3000");
+                Assert.IsFalse(rt.Ui.DebugMapInSystem, "Coordinates should reveal the universe, not leave a detached orbital chart.");
+                rt.Ui.DebugMapSearch("glacia");
+                Assert.IsTrue(rt.Ui.DebugMapInSystem, "Finding a planet should reveal its orbits.");
+                Assert.AreEqual(rt.State.universe.Get("glacia").Id, rt.Ui.DebugMapSelectedId);
+                rt.Ui.DebugReset();
+            }
+            finally
+            {
+                if (FrontierRuntime.Current != null) FrontierRuntime.Current.Document.panelSettings.targetTexture = null;
+                ScreenMetrics.ClearVirtual();
+                targetTexture.Release();
+                Object.Destroy(targetTexture);
+            }
+        }
+
         sealed class ScriptedFlight : ITravelMinigame
         {
             public readonly List<TravelRunRequest> requests = new List<TravelRunRequest>();

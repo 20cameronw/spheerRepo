@@ -403,7 +403,16 @@
 .fr-banner-box .fr-icon { margin-right: var(--fr-sp-12); }
 
 /* ---------- Map ---------- */
-.fr-map { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgb(1, 2, 10); overflow: hidden; }
+.fr-map { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgb(12, 20, 43); overflow: hidden; }
+.fr-map-planet {
+    position: absolute; width: 104px; height: 104px; margin: 0; padding: 0;
+    background-color: transparent; border-width: 0; border-radius: 52px;
+}
+.fr-map-planet:hover, .fr-map-planet:focus {
+    background-color: rgba(160, 220, 255, 0.12);
+    border-width: 2px; border-color: var(--fr-cyan);
+}
+.fr-map-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; -unity-text-align: middle-center; }
 .fr-map-world { position: absolute; left: 0; top: 0; width: 1600px; height: 1600px; transform-origin: 0 0; }
 .fr-map-viewport { position: absolute; left: 0; right: 0; overflow: hidden; }
 .fr-map-search { position: absolute; flex-direction: row; height: var(--fr-touch); }

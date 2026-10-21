@@ -1496,7 +1496,11 @@ MonoBehaviour:
   - key: map.filter.all
     text: All deposits
   - key: map.help
-    text: "STAR MAP\nDrag \xB7 pinch to zoom"
+    text: Tap a planet to choose it. Drag or pinch to explore.
+  - key: map.mode.universe
+    text: Universe Map
+  - key: map.mode.orbits
+    text: Planet Orbits
   - key: map.search.empty
     text: Enter a world name or x,y
   - key: map.search.coordinates

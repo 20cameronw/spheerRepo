@@ -1945,7 +1945,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336399
-    m_Localized: "STAR MAP\nDrag \xB7 pinch to zoom"
+    m_Localized: Tap a planet to choose it. Drag or pinch to explore.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336400
@@ -8386,6 +8386,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2104168897667072
     m_Localized: GATHER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2143526631596032
+    m_Localized: Universe Map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2143526677733376
+    m_Localized: Planet Orbits
     m_Metadata:
       m_Items: []
   references:

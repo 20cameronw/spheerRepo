@@ -1,5 +1,15 @@
 # Economy content pipeline
 
+## Schematic orbital map
+
+The map opens on the current system's orbital chart rather than the wide star field. Planets use
+flat illustrated colours, highlights and ring silhouettes, with evenly spaced visible orbit lanes;
+this spacing is schematic and never changes saved orbits, travel distances or fuel costs.
+Planet targets support touch and keyboard selection, with names, a current-world marker and a
+distinct selected orbit. Universe Map / Planet Orbits switches between the local chart and the
+existing unbounded universe. Selecting another system or finding a named world opens its chart;
+coordinate searches stay in universe view. Search, resource filters, pins and route previews remain.
+
 ## World interaction and shared mining
 
 Command > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed

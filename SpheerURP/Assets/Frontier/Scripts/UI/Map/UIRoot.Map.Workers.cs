@@ -27,8 +27,8 @@ namespace Frontier
                     if (mapNameIndex != null) mapNameIndex.AddSystems(gs.universe.Universe, mapSnapshot.surveyedSystems);
                     PositionMapLabels();
                     mapWorld.MarkDirtyRepaint();
-                    string readout = mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
-                        : viewport.Scale >= 8 ? UiText.Get("map.view.system")
+                    string readout = SystemMapView ? UiText.Get("map.view.system")
+                        : mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
                         : UiText.Get("map.view.sector", mapSnapshot.systems.Length);
                     mapReadout.text = mapSnapshot.truncated ? UiText.Get("map.view.truncated", readout) : readout;
                 }
@@ -89,12 +89,14 @@ namespace Frontier
 
         void DrawMapDensity(Painter2D p)
         {
+            int index = 0;
             foreach (var cell in mapSnapshot.density)
             {
+                if (index++ % 7 != 0) continue;
                 if (cell.density < 0.02f) continue;
                 Vector2 a = Project(cell.x, cell.y), b = Project(cell.x + cell.width, cell.y + cell.height);
-                p.fillColor = new Color(0.12f, 0.3f, 0.55f, Mathf.Min(0.35f, cell.density * 0.3f));
-                p.BeginPath(); p.MoveTo(a); p.LineTo(new Vector2(b.x, a.y)); p.LineTo(b); p.LineTo(new Vector2(a.x, b.y)); p.ClosePath(); p.Fill();
+                MapDisc(p, (a + b) * 0.5f, Mathf.Lerp(1, 2.5f, cell.density),
+                    new Color(0.4f, 0.56f, 0.8f, Mathf.Min(0.4f, cell.density)));
             }
         }
     }
