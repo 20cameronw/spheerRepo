@@ -597,7 +597,8 @@ namespace Frontier.Services.Unity
             var time = new LocalTimeService();
             var adsPolicy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
             if (adsPolicy == null) throw new InvalidOperationException("Frontier rewarded-ad policy is missing.");
-            var ads = adsPolicy.Wrap(unavailable, new PlayerPrefsRewardedAdUsageStore(), time);
+            var ads = adsPolicy.Wrap(new LevelPlayAdsProvider(adsPolicy, config, consent, UnityLevelPlayAdsSdk.Instance),
+                new PlayerPrefsRewardedAdUsageStore(), time);
             return new FrontierServices(consent, ads, unavailable, authentication, leaderboards,
                 cloudSave, analytics, remoteConfig, time, new UnityNotificationProvider(config),
                 config == null ? null : config.leaderboardId,

@@ -760,7 +760,7 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void ResourcesUnityServicesConfig_RemainsDisabledAndUncredentialed()
+        public void ResourcesUnityServicesConfig_HasLeaderboardIdButRemainsDisabled()
         {
             FrontierUnityServicesConfig config =
                 Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
@@ -771,7 +771,7 @@ namespace Frontier.Tests
             Assert.IsFalse(config.enableAccountRecovery);
             Assert.IsFalse(config.enableAnalytics);
             Assert.IsFalse(config.enableRemoteConfig);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(config.leaderboardId));
+            Assert.AreEqual("Lifetime_Earnings_Leaderboard", config.leaderboardId);
             Assert.IsTrue(string.IsNullOrWhiteSpace(config.privacyPolicyUrl));
         }
     }

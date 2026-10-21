@@ -255,15 +255,18 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void AuthoredPolicyKeepsAllSixPlacementsOffUntilExplicitConfiguration()
+        public void AuthoredPolicyHasCappedPlacementsButIosRemainsGated()
         {
             var policy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
             Assert.IsNotNull(policy);
-            Assert.IsFalse(policy.enableRewardedAds);
+            Assert.IsTrue(policy.enableRewardedAds);
+            Assert.IsFalse(policy.iosSetupVerified);
+            Assert.AreEqual("28e95b2f5", policy.iosAppKey);
+            Assert.AreEqual("eurexbly1unznz2g", policy.iosRewardedAdUnitId);
             CollectionAssert.AreEquivalent(new[] { "double-yield", "emergency-fuel", "timer-skip", "revive", "daily-supply", "free-shards" },
                 Array.ConvertAll(policy.placements, row => row.id));
-            foreach (var placement in policy.placements) Assert.AreEqual(0, placement.dailyCap);
-            Assert.IsFalse(policy.Wrap(new Provider(), new Store(), new Clock()).IsConfigured);
+            foreach (var placement in policy.placements) Assert.Greater(placement.dailyCap, 0);
+            Assert.IsFalse(policy.CanUseIos(Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig")));
         }
 
         [Test]

@@ -53,18 +53,49 @@ Do not activate them solely because their adapters compile.
   The native build guard rejects launch authorization, push/APNs capability and exact-alarm permission.
   OS delivery timing is advisory and device-controlled; restarting the device is not configured to reschedule.
   This is local notification functionality, not a push service or server-authoritative timer system.
-- Rewarded ads remain unavailable. The local `RewardedAdsPolicy` asset is default-off with zero daily caps
-  for every planned placement. The service persists per-placement counts/cooldowns in device preferences
+- Rewarded ads use the LevelPlay 9.3.2 package, native LevelPlay 9.3.0 and Unity Ads adapter 5.4.0.0.
+  iOS identifiers are configured in `RewardedAdsPolicy`; Android is not configured. Real ad requests
+  remain disabled until `iosSetupVerified` is explicitly enabled after the release steps below and a
+  valid public HTTPS `FrontierUnityServicesConfig.privacyPolicyUrl` exists. Editor/desktop never
+  initialize the live provider. The service persists per-placement counts/cooldowns in device preferences
   (not the progression save), rejects invalid stored usage and observed clock rewind, and does not deliver
   a provider reward until its usage write succeeds. Withdrawal during playback discards the pending reward,
   including withdrawal followed by re-opt-in. A configured provider exposes the harvest double-yield offer
   only when the result can fit a bonus; the extra inventory is written in the same save transaction before
   it is published to the backpack. Failed bonus writes leave the base harvest intact and report the failure.
+  A fresh SDK ad instance isolates each request. Duplicate callbacks cannot grant again; reward and close
+  can arrive in either order. Initialization/loading time out after 45 seconds, playback after five minutes,
+  and a closed ad waits up to 30 seconds for its reward callback. Missing confirmation explicitly fails
+  without a reward, rather than treating closure as completion. This is not durable server-side
+  settlement: app termination or callbacks after those deadlines need a future server reward journal.
   This cannot undo an SDK request already in progress.
   Device UTC and preferences are not server authority or cross-device anti-cheat; forward clock changes
   and cleared preferences are outside this local protection. The UI remains hidden while the provider is
-  unavailable, and the asset retains its disabled/zero-cap defaults. LevelPlay verification and privacy
-  setup, reviewed limits, other placements, per-job limits and native-device evidence remain required.
+  unavailable. Authored daily caps/cooldowns are double-yield 8/180s, emergency-fuel 3/600s,
+  timer-skip 5/300s, revive 3/0s, daily-supply 1/0s and free-shards 2/14400s.
+  Only harvest double-yield has gameplay reward wiring today. Other placements and the requested
+  missing-resource ad offer are not exposed yet; positive policy caps do not implement their gameplay rewards.
+
+## iOS LevelPlay activation
+
+- The bundle ID is `com.GameDevBois.spheer`. Keep App Keys/ad unit IDs in Frontier's policy asset,
+  not LevelPlay's auto-initialize settings: initialization must remain behind Frontier consent.
+- Native dependencies are pinned in `Assets/LevelPlay/Editor` using the vendor's dependency declarations
+  and bundled network metadata. The existing dependency resolver handles CocoaPods when exporting on a Mac.
+  LevelPlay's postprocessor supplies installed networks' SKAdNetwork entries; check the generated plist,
+  privacy manifests, CocoaPods installation and actual device build rather than assuming export proves success.
+- Configure Unity Ads bidding in LevelPlay and register the iPhone as a dashboard test device before
+  requesting ads. Setting an App Key does not enable test ads. Verify loading, full completion, early close,
+  offline/no fill, consent withdrawal and return-from-background on the iPhone.
+- Publish the real HTTPS privacy policy and complete audience/region-specific consent review before
+  changing `iosSetupVerified`. This adapter deliberately sends GDPR consent false, do-not-sell true and
+  device-ID opt-out true before initialization; an ad opt-in is not tracking consent. No ATT request or
+  personalized tracking is enabled. Any move to personalized ads needs appropriate CMP/ATT handling first.
+- Set the LevelPlay rewarded unit's default reward to `Reward` / `1`, with dashboard pacing/capping off.
+  The provider uses that default placement and returns the requested game placement ID;
+  Frontier applies the game's limits and reward amounts. Dashboard placement-level reporting is not wired.
+- Keep banners and forced interstitials off. Leaderboard reads remain configured with
+  `Lifetime_Earnings_Leaderboard` but gated by online-service/privacy setup; score submission is still absent.
 
 ## Required before enabling providers
 

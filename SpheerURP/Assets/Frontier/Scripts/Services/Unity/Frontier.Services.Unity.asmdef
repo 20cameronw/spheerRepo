@@ -4,6 +4,7 @@
     "references": [
         "Frontier.Services",
         "Frontier.Data",
+        "Unity.LevelPlay",
         "Unity.Services.Core",
         "Unity.Services.Authentication",
         "Unity.Services.CloudSave",

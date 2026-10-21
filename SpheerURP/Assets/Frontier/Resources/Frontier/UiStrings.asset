@@ -4439,3 +4439,15 @@ MonoBehaviour:
     text: Complete stage 3 of any megaproject
   - key: content.era.ascension.name
     text: Ascension
+  - key: service.ads.init-failed
+    text: Ads could not connect. Check your connection and try again.
+  - key: service.ads.load-failed
+    text: No rewarded ad is available right now. You can keep playing without ads.
+  - key: service.ads.display-failed
+    text: The ad could not open. No reward was granted.
+  - key: service.ads.timeout
+    text: The ad service did not respond in time. No reward was granted.
+  - key: service.ads.unconfirmed
+    text: The ad closed without reward confirmation. No reward was granted.
+  - key: service.ads.config-changed
+    text: The ad configuration changed. Restart the game before watching an ad.

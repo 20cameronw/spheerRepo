@@ -8651,6 +8651,32 @@ MonoBehaviour:
       tanks.
     m_Metadata:
       m_Items: []
+  - m_Id: 2215078588932096
+    m_Localized: Ads could not connect. Check your connection and try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401088
+    m_Localized: No rewarded ad is available right now. You can keep playing without
+      ads.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401089
+    m_Localized: The ad could not open. No reward was granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401090
+    m_Localized: The ad service did not respond in time. No reward was granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401091
+    m_Localized: The ad closed without reward confirmation. No reward was granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401092
+    m_Localized: The ad configuration changed. Restart the game before watching an
+      ad.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

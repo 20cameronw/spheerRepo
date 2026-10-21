@@ -8359,6 +8359,30 @@ MonoBehaviour:
     m_Key: fuel.withdraw-empty
     m_Metadata:
       m_Items: []
+  - m_Id: 2215078588932096
+    m_Key: service.ads.init-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401088
+    m_Key: service.ads.load-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401089
+    m_Key: service.ads.display-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401090
+    m_Key: service.ads.timeout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401091
+    m_Key: service.ads.unconfirmed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2215078685401092
+    m_Key: service.ads.config-changed
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -13,6 +13,7 @@
         "Frontier.UI",
         "Frontier.Services",
         "Frontier.Services.Unity",
+        "Unity.LevelPlay",
         "Frontier.App",
         "Frontier.HyperspaceView"
     ],
