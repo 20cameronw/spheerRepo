@@ -16,5 +16,5 @@ MonoBehaviour:
   enableAnalytics: 0
   enableRemoteConfig: 0
   enableNotifications: 0
-  leaderboardId:
+  leaderboardId: Lifetime_Earnings_Leaderboard
   privacyPolicyUrl:
