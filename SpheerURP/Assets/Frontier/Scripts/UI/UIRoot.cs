@@ -31,6 +31,9 @@ namespace Frontier
         WaveInfo waveHudInfo;
         VisualElement planetTag;
         Button surfaceViewButton;
+        VisualElement surfaceViewIcon;
+        Button packDock;
+        readonly List<VisualElement> packSegments = new List<VisualElement>();
 
         bool busy, introActive;
         public bool IsTravelling { get; private set; }
@@ -197,7 +200,6 @@ namespace Frontier
             planetLabel = UiKit.Text("", "fr-planet-name");
             planetTag.Add(planetLabel);
             fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
-            packLabel = Chip(planetTag, "pack", UiKit.Cyan, null);
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
             var menuBtn = Icons.IconButton("menu", UiKit.Cyan, OpenMenu, 0f, true);
@@ -205,28 +207,67 @@ namespace Frontier
             menuBtn.name = "menu-button";
             top.Add(menuBtn);
             hud.Add(top);
-            surfaceViewButton = UiKit.Btn(UiText.Get("world.view.close"), UiKit.Cyan, () =>
+            surfaceViewButton = Icons.IconButton("base", UiKit.Cyan, () =>
             {
                 if (busy || introActive || defense.Active) return;
                 CloseModal();
                 ClosePopup();
                 planetView.CloseView = !planetView.CloseView;
-                surfaceViewButton.text = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
+                RefreshViewButton();
             });
+            surfaceViewIcon = surfaceViewButton.Q(className: "fr-icon");
             surfaceViewButton.name = "world-view-toggle";
             surfaceViewButton.style.position = Position.Absolute;
             surfaceViewButton.style.right = UiKit.Space.S24;
             surfaceViewButton.style.bottom = DockInset + UiKit.Space.S16;
-            surfaceViewButton.tooltip = UiText.Get("world.view.help");
+            RefreshViewButton();
             hud.Add(surfaceViewButton);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
             dock.usageHints = UsageHints.DynamicTransform;
             dock.Add(DockButton("research", UiText.Get("nav.command"), UiKit.Magenta, OpenResearch));
             dock.Add(DockButton("map", UiText.Get("nav.map"), UiKit.Cyan, OpenMap));
-            dock.Add(DockButton("pack", UiText.Get("nav.pack"), UiKit.Amber, OpenPack));
+            packDock = DockButton("pack", UiText.Get("nav.pack"), UiKit.Amber, OpenPack);
+            var capacity = UiKit.Div("fr-pack-capacity");
+            capacity.name = "pack-capacity-gauge";
+            capacity.pickingMode = PickingMode.Ignore;
+            for (int i = 0; i < 8; i++)
+            {
+                var segment = UiKit.Div("fr-pack-segment");
+                segment.pickingMode = PickingMode.Ignore;
+                packSegments.Add(segment);
+                capacity.Add(segment);
+            }
+            packDock.Add(capacity);
+            packLabel = UiKit.Text("", "fr-pack-capacity-text");
+            packLabel.name = "pack-capacity-text";
+            packDock.Add(packLabel);
+            dock.Add(packDock);
             dock.Add(DockButton("build", UiText.Get("nav.build"), UiKit.Lime, OpenShop));
             hud.Add(dock);
+        }
+
+        void RefreshViewButton()
+        {
+            if (surfaceViewButton == null) return;
+            surfaceViewButton.tooltip = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
+            if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, planetView.CloseView ? "map" : "base", UiKit.Cyan);
+        }
+
+        void RefreshPackCapacity()
+        {
+            packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
+            packDock.tooltip = UiText.Get("pack.capacity", gs.SlotsUsed, gs.Slots);
+            float fullness = gs.Slots <= 0 ? 1 : Mathf.Clamp01(gs.SlotsUsed / (float)gs.Slots);
+            int filled = Mathf.CeilToInt(fullness * packSegments.Count);
+            for (int i = 0; i < packSegments.Count; i++)
+            {
+                float fraction = i / (float)(packSegments.Count - 1);
+                Color color = fraction < 0.5f ? Color.Lerp(UiKit.Lime, UiKit.Amber, fraction * 2)
+                    : Color.Lerp(UiKit.Amber, UiKit.Red, (fraction - 0.5f) * 2);
+                packSegments[i].style.backgroundColor = i < filled ? color : UiKit.Tint(UiKit.Muted, 0.18f);
+                packSegments[i].EnableInClassList("fr-pack-segment-filled", i < filled);
+            }
         }
 
         /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>
@@ -294,11 +335,7 @@ namespace Frontier
         void OnStateChanged()
         {
             if (batching) return;
-            if (surfaceViewButton != null)
-            {
-                surfaceViewButton.text = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
-                surfaceViewButton.tooltip = UiText.Get("world.view.help");
-            }
+            RefreshViewButton();
             if (observedUniverse != gs.universe)
             {
                 observedUniverse = gs.universe;
@@ -311,7 +348,7 @@ namespace Frontier
             if (planetView.Current != null && planetView.Current.Id == gs.planet.Id)
                 planetView.SetTerraformingStage(gs.TerraformerStageOn(gs.planet));
             fuelLabel.text = gs.Count(gs.db.fuel).ToString();
-            packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
+            RefreshPackCapacity();
             levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
             planetLabel.text = gs.planet.Name.ToUpper();
             planetLabel.style.color = UiKit.Ui(gs.planet.Rim);
@@ -334,7 +371,7 @@ namespace Frontier
             if (wave && planetView.CloseView)
             {
                 planetView.CloseView = false;
-                surfaceViewButton.text = UiText.Get("world.view.close");
+                RefreshViewButton();
             }
             world.Locked = wave || busy;
             UpdateFirstSessionGuideVisibility();

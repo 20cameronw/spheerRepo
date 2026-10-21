@@ -12,17 +12,6 @@ namespace Frontier
         string researchBranch = "";
         int progressionTab;
 
-        void BuildProgression(VisualElement body)
-        {
-            var tabs = UiKit.Div("fr-tabs");
-            tabs.Add(TabButton("research", UiText.Get("research.tab.tech"), progressionTab == 0, UiKit.Magenta, () => progressionTab = 0));
-            tabs.Add(TabButton("ship", UiText.Get("research.tab.ship"), progressionTab == 1, UiKit.Magenta, () => progressionTab = 1));
-            tabs.Add(TabButton("shield", UiText.Get("research.tab.defense"), progressionTab == 2, UiKit.Magenta, () => progressionTab = 2));
-            body.Add(tabs);
-            if (progressionTab == 0) BuildTech(body);
-            else BuildUpgrades(body, progressionTab == 1 ? UpgradeCategory.Ship : UpgradeCategory.Defense);
-        }
-
         void BuildTech(VisualElement body)
         {
             if (!gs.db.UsesImportedEconomy || gs.db.research == null)

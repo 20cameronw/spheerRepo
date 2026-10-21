@@ -22,7 +22,7 @@ namespace Frontier
             mapCardFor = planet.Id;
             bool surveyed = Surveyed(planet.Star), here = planet.Id == gs.planet.Id;
             mapCard = UiKit.Div("fr-map-card");
-            mapCard.style.maxHeight = Length.Percent(46);
+            mapCard.style.maxHeight = Length.Percent(40);
             UiKit.SetAccent(mapCard, UiKit.Ui(planet.Rim));
             var header = UiKit.Div("fr-row");
             var title = UiKit.Text(planet.Name, "fr-h2", UiKit.Ui(planet.Rim));
@@ -33,13 +33,13 @@ namespace Frontier
             var subtitle = UiKit.Text(UiText.Get("map.world.subtitle", planet.Star.Name, planet.BiomeName, planet.SizeName), "fr-tiny", UiKit.Muted);
             subtitle.style.marginBottom = 8;
             mapCard.Add(subtitle);
-            var pin = UiKit.Btn(UiText.Get(gs.IsMapPinned(planet.Id) ? "map.unpin" : "map.pin"),
-                gs.IsMapPinned(planet.Id) ? UiKit.Cyan : UiKit.Muted,
-                () =>
-                {
-                    gs.ToggleMapPin(planet);
-                    mapWorld.MarkDirtyRepaint();
-                });
+            var pin = new Toggle(UiText.Get("map.pin")) { value = gs.IsMapPinned(planet.Id) };
+            pin.RegisterValueChangedCallback(e =>
+            {
+                if (e.newValue == gs.IsMapPinned(planet.Id)) return;
+                gs.ToggleMapPin(planet);
+                mapWorld.MarkDirtyRepaint();
+            });
             pin.name = "map-pin-toggle";
             pin.SetEnabled(!gs.SaveIsReadOnly);
             mapCard.Add(pin);

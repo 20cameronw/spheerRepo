@@ -1364,7 +1364,9 @@ MonoBehaviour:
   - key: effect.builders-discount
     text: "+{0} crews \xB7 -{1:0.#}% clearance cost"
   - key: builders.view
-    text: VIEW CREW JOBS
+    text: CONSTRUCTION JOBS
+  - key: builders.jobs-title
+    text: CONSTRUCTION
   - key: command.tech
     text: TECH
   - key: builders.tab

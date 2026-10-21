@@ -131,6 +131,19 @@
     transition-property: scale;
     transition-duration: var(--fr-dur-fast);
 }
+.fr-pack-capacity {
+    width: 100%; max-width: 136px; height: 16px; margin-top: 4px;
+    flex-direction: row; align-items: flex-end; flex-shrink: 0;
+}
+.fr-pack-segment {
+    flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0 2px; height: 12px;
+    border-radius: 2px;
+}
+.fr-pack-segment-filled { height: 16px; }
+.fr-pack-capacity-text {
+    font-size: var(--fr-fs-caption); color: var(--fr-text-lo);
+    -unity-text-align: middle-center; white-space: nowrap;
+}
 .fr-dock-btn .fr-icon { width: 64px; height: 64px; }
 .fr-dock-btn:hover { border-color: var(--fr-acc); background-color: var(--fr-surface-3); }
 .fr-dock-btn:active { border-color: var(--fr-acc); background-color: var(--fr-acc-soft); scale: 0.95 0.95; }

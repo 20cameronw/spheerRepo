@@ -1803,7 +1803,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336365
-    m_Localized: VIEW CREW JOBS
+    m_Localized: CONSTRUCTION JOBS
     m_Metadata:
       m_Items: []
   - m_Id: 1991336366
@@ -8394,6 +8394,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2143526677733376
     m_Localized: Planet Orbits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2181497602793472
+    m_Localized: CONSTRUCTION
     m_Metadata:
       m_Items: []
   references:

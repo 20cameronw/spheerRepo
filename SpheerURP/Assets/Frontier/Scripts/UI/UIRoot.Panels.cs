@@ -15,7 +15,7 @@ namespace Frontier
         ScrollView modalScroll;
         Action<VisualElement> modalBuild;
         string modalKey;
-        int researchTab;
+        int researchTab = 1;
         PlacedStructure confirmBuilderFinish;
         int confirmBuilderPurchaseOwned = -1;
 
@@ -81,6 +81,7 @@ namespace Frontier
 
         void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", UiText.Get("nav.build"), UiKit.Lime, BuildShop, true); }
         void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", UiText.Get("nav.command"), UiKit.Magenta, BuildResearch, true); }
+        void OpenBuilders() { if (defense.Active || busy) return; OpenModal("builders", "build", UiText.Get("builders.jobs-title"), UiKit.Cyan, BuildBuilders, true); }
         void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", UiText.Get("nav.backpack"), UiKit.Amber, BuildPack, true); }
 
         // ------------------------------------------------------------ build shop
@@ -105,12 +106,9 @@ namespace Frontier
                 gs.planet.BuildingSlots, gs.BusyBuilderCount, gs.BuilderCount), "fr-muted");
             note.style.marginBottom = UiKit.Space.S12;
             body.Add(note);
-            body.Add(IconBtn(UiText.Get("builders.view"), "build", UiKit.Cyan, () =>
-            {
-                CloseModal();
-                researchTab = 3;
-                OpenResearch();
-            }));
+            var jobs = IconBtn(UiText.Get("builders.view"), "build", UiKit.Cyan, OpenBuilders);
+            jobs.name = "build-jobs";
+            body.Add(jobs);
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Foundry,
@@ -355,7 +353,7 @@ namespace Frontier
                 else if (era == FrontierEra.Interstellar) { action = OpenShop; label = UiText.Get("guide.action.build-shop"); icon = "build"; }
                 else
                 {
-                    action = () => { researchTab = 2; OpenResearch(); };
+                    action = () => { researchTab = 2; progressionTab = 0; OpenResearch(); };
                     label = UiText.Get("ranks.era.command");
                     icon = "research";
                 }
@@ -1251,22 +1249,22 @@ namespace Frontier
             Toast(UiText.Get("privacy.saved"), UiKit.Cyan);
         }
 
-        // ------------------------------------------------------------ command (bases + research)
+        // ------------------------------------------------------------ command
         void BuildResearch(VisualElement body)
         {
             var tabs = UiKit.Div("fr-tabs");
-            tabs.Add(TabButton("base", UiText.Get("command.bases"), researchTab == 0, UiKit.Magenta, () => researchTab = 0));
+            tabs.name = "command-navigation";
             tabs.Add(TabButton("tools", UiText.Get("command.tools"), researchTab == 1, UiKit.Magenta, () => researchTab = 1));
-            tabs.Add(TabButton("research", UiText.Get("command.tech"), researchTab == 2, UiKit.Magenta, () => researchTab = 2));
-            tabs.Add(TabButton("build", UiText.Get("builders.tab"), researchTab == 3, UiKit.Magenta, () => researchTab = 3));
+            tabs.Add(TabButton("research", UiText.Get("research.tab.tech"), researchTab == 2 && progressionTab == 0, UiKit.Magenta,
+                () => { researchTab = 2; progressionTab = 0; }));
+            tabs.Add(TabButton("ship", UiText.Get("research.tab.ship"), researchTab == 2 && progressionTab == 1, UiKit.Magenta,
+                () => { researchTab = 2; progressionTab = 1; }));
+            tabs.Add(TabButton("shield", UiText.Get("research.tab.defense"), researchTab == 2 && progressionTab == 2, UiKit.Magenta,
+                () => { researchTab = 2; progressionTab = 2; }));
             body.Add(tabs);
-            switch (researchTab)
-            {
-                case 0: BuildBases(body); break;
-                case 1: BuildTools(body); break;
-                case 3: BuildBuilders(body); break;
-                default: BuildProgression(body); break;
-            }
+            if (researchTab == 1) BuildTools(body);
+            else if (progressionTab == 0) BuildTech(body);
+            else BuildUpgrades(body, progressionTab == 1 ? UpgradeCategory.Ship : UpgradeCategory.Defense);
         }
 
         void BuildBuilders(VisualElement body)
@@ -1476,78 +1474,6 @@ namespace Frontier
                 }
                 body.Add(card);
             }
-        }
-
-        void BuildBases(VisualElement body)
-        {
-            // The Core Worlds first (in their list order), then any generated world with a base; the current world always leads.
-            var planets = new List<PlanetData>(gs.universe.AuthoredPlanets);
-            var known = new HashSet<string>();
-            foreach (var p in planets) known.Add(p.Id);
-            foreach (var s in gs.structures)
-            {
-                if (!known.Add(s.planetId)) continue;
-                var found = gs.universe.Get(s.planetId);
-                if (found != null) planets.Add(found);
-            }
-            if (known.Add(gs.planet.Id)) planets.Add(gs.planet);
-            planets.Sort((a, b) => (b.Id == gs.planet.Id ? 1 : 0).CompareTo(a.Id == gs.planet.Id ? 1 : 0));
-            bool any = false;
-            foreach (var p in planets)
-            {
-                var here = gs.StructuresOn(p);
-                if (p.Id != gs.planet.Id && here.Count == 0) continue;
-                any = true;
-                var h = UiKit.Div("fr-row"); h.style.marginTop = UiKit.Space.S8; h.style.marginBottom = UiKit.Space.S8;
-                var hn = UiKit.Text(p.Name.ToUpper(), "fr-small", UiKit.Ui(p.Rim));
-                hn.style.marginRight = UiKit.Space.S12;
-                h.Add(hn);
-                if (p.Id == gs.planet.Id) h.Add(UiKit.Text(UiText.Get("command.here"), "fr-tiny"));
-                body.Add(h);
-                if (here.Count == 0)
-                {
-                    body.Add(UiKit.Text(UiText.Get("command.empty-base", p.Name), "fr-muted"));
-                    var build = IconBtn(UiText.Get("guide.action.gather-shop"), "build", UiKit.Lime, OpenGatherShop);
-                    build.name = "empty-base-action";
-                    body.Add(build);
-                }
-                foreach (var st in here)
-                {
-                    var s = st;
-                    Color c = UiKit.Ui(s.def.color);
-                    var card = Card(c);
-                    var top = UiKit.Div("fr-card-head");
-                    top.Add(Icons.Make(StructureIcon(s.def.kind), c, UiKit.Size.IconLg));
-                    var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
-                    col.Add(UiKit.Text(UiText.Get("command.structure-level", s.def.LocalizedName.ToUpper(), s.level, s.def.maxLevel), "fr-h2"));
-                    bool max = s.level >= s.def.maxLevel;
-                    col.Add(UiKit.Text(StructureEffect(s.def, s.level) + (max ? "" : "  >  " + StructureEffect(s.def, s.level + 1)), "fr-tiny"));
-                    top.Add(col);
-                    card.Add(top);
-                    if (gs.IsBuilderBusy(s)) card.Add(Note(gs.BuilderJobStatus(s), UiKit.Cyan));
-                    if (!max && !gs.IsBuilderBusy(s))
-                    {
-                        var cost = s.def.UpgradeCost(s.level);
-                        card.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
-                        var up = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
-                        {
-                            if (gs.UpgradeStructure(s))
-                            {
-                                Sfx.Good();
-                                Toast(gs.IsUpgradeInProgress(s) ? UiText.Get("command.upgrade-started", gs.BuilderJobStatus(s)) :
-                                    UiText.Get("command.upgraded", s.def.LocalizedName, s.level), c);
-                            }
-                            else Sfx.Bad();
-                        });
-                        if (gs.StructureUpgradeLockReason(s) != null) card.Add(Note(gs.StructureUpgradeLockReason(s), UiKit.Amber));
-                        UiKit.SetEnabledLook(up, gs.CanUpgradeStructure(s));
-                        card.Add(up);
-                    }
-                    else if (max) card.Add(Note(UiText.Get("command.maxed"), UiKit.Lime));
-                    body.Add(card);
-                }
-            }
-            if (!any) body.Add(UiKit.Text(UiText.Get("command.no-bases"), "fr-muted"));
         }
 
         void BuildUpgrades(VisualElement body, UpgradeCategory cat)

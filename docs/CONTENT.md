@@ -12,6 +12,14 @@ coordinate searches stay in universe view. Search, resource filters, pins and ro
 
 ## World interaction and shared mining
 
+Orbit/Surface framing uses an interruptible 0.6-second eased camera move and an icon-only
+world-view button with a localized action tooltip. Backpack usage lives on the Pack dock action
+as eight segmented green-to-amber-to-red bars and an exact used/total count, not a second top-bar
+chip. Command has one Tools / Tech / Ship / Defense navigation; Bases and Crews are no longer
+Command tabs. Buildings are managed by tapping them. Existing construction timers, finish
+confirmations and recruitment remain accessible through Build > Construction Jobs, without
+changing saved crews or progression. Map pinning is a compact native checkbox.
+
 Command > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed
 legacy shop. The Mining entry uses the existing Pick ladder's costs, research and reach gates;
 both Mine and Drill receive its tier. The highest previously owned Pick or Drill tier is retained

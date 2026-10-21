@@ -29,7 +29,7 @@ namespace Frontier
             activeTravelMinigame = null;
             debugToolsOverride = null;
             debugFirstSessionGuideOverride = false;
-            menuPage = ""; shopTab = 0; researchTab = 0; packSel = -1; confirmReset = false;
+            menuPage = ""; shopTab = 0; researchTab = 1; packSel = -1; confirmReset = false;
             selected = gs.planet;
             RefreshFirstSessionGuide();
         }
@@ -67,11 +67,12 @@ namespace Frontier
         public void DebugResearch(int tab, int tool = 0, int progression = 0)
         {
             DebugReset();
-            researchTab = tab;
+            researchTab = tab == 1 ? 1 : 2;
             progressionTab = progression;
             researchBranch = "";
             OpenResearch();
         }
+        public void DebugBuilders() { DebugReset(); OpenBuilders(); }
         public void DebugPack(int select) { DebugReset(); packSel = select; OpenPack(); }
         public void DebugEmptyPackAction() { RunEmptyPackAction(); }
         public void DebugEmptyPack()

@@ -50,7 +50,7 @@ namespace Frontier
                 card.Add(AscensionNote(locked, UiKit.Amber));
                 if (!gs.SaveIsReadOnly)
                     card.Add(gs.AscensionNeedsResearch
-                        ? IconBtn(UiText.Get("ascension.open-command"), "research", UiKit.Magenta, () => { researchTab = 2; OpenResearch(); })
+                        ? IconBtn(UiText.Get("ascension.open-command"), "research", UiKit.Magenta, () => { researchTab = 2; progressionTab = 0; OpenResearch(); })
                         : IconBtn(UiText.Get("ascension.open-build"), "build", UiKit.Lime, () => { shopTab = 0; OpenShop(); }));
                 return;
             }

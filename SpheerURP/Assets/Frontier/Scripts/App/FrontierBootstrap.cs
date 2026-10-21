@@ -163,6 +163,10 @@ namespace Frontier
         Camera cam;
         float lastAspect;
         bool lastCloseView;
+        bool initialized, transitioning;
+        float transitionTime;
+        Vector3 transitionStart, transitionEnd;
+        const float ViewTransitionSeconds = 0.6f;
         public PlanetView Planet;
 
         void Awake() { cam = GetComponent<Camera>(); }
@@ -172,16 +176,31 @@ namespace Frontier
             if (cam == null) return;
             float aspect = ScreenMetrics.Aspect;
             bool close = Planet != null && Planet.CloseView;
-            if (Mathf.Approximately(aspect, lastAspect) && close == lastCloseView) return;
-            lastAspect = aspect;
-            lastCloseView = close;
-            const float need = 3.5f;
-            float t = Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
-            float d = Mathf.Max(need / (t * aspect), need / t);
-            float distance = Mathf.Clamp(d, 8f, 16f);
-            transform.position = close
-                ? new Vector3(0f, 1.6f, -distance * 0.34f)
-                : new Vector3(0f, 0f, -distance);
+            if (!initialized || !Mathf.Approximately(aspect, lastAspect) || close != lastCloseView)
+            {
+                bool animate = initialized && close != lastCloseView;
+                lastAspect = aspect;
+                lastCloseView = close;
+                const float need = 3.5f;
+                float t = Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+                float d = Mathf.Max(need / (t * aspect), need / t);
+                float distance = Mathf.Clamp(d, 8f, 16f);
+                transitionStart = transform.position;
+                transitionEnd = close
+                    ? new Vector3(0f, 1.6f, -distance * 0.34f)
+                    : new Vector3(0f, 0f, -distance);
+                transitionTime = 0;
+                transitioning = animate;
+                initialized = true;
+                if (!animate) transform.position = transitionEnd;
+            }
+            if (!transitioning) return;
+            transitionTime += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(transitionTime / ViewTransitionSeconds);
+            // Quintic easing gives the camera a soft departure and arrival without overshooting the surface.
+            float eased = progress * progress * progress * (progress * (progress * 6 - 15) + 10);
+            transform.position = Vector3.LerpUnclamped(transitionStart, transitionEnd, eased);
+            if (progress >= 1) transitioning = false;
         }
     }
 }

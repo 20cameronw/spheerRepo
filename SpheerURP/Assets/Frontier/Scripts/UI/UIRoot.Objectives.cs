@@ -108,7 +108,7 @@ namespace Frontier
                 case ObjectiveRoute.Gather: OpenGatherShop(); break;
                 case ObjectiveRoute.Build: shopTab = 0; OpenShop(); break;
                 case ObjectiveRoute.Map: OpenMap(); break;
-                case ObjectiveRoute.Command: researchTab = 2; OpenResearch(); break;
+                case ObjectiveRoute.Command: researchTab = 2; progressionTab = 0; OpenResearch(); break;
                 case ObjectiveRoute.Atlas: atlasTab = 1; OpenGuideAtlas(); break;
             }
         }

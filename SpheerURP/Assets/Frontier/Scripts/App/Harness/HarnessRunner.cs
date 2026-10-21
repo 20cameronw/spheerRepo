@@ -291,7 +291,7 @@ namespace Frontier
                 ResetView();
                 rt.Planet.CloseView = true;
                 rt.State.Notify();
-            });
+            }, 0.8f);
             bool hadQuality = PlayerPrefs.HasKey(PresentationQuality.QualityKey);
             bool hadFrameRate = PlayerPrefs.HasKey(PresentationQuality.FrameRateKey);
             int savedQuality = PlayerPrefs.GetInt(PresentationQuality.QualityKey);
@@ -349,7 +349,7 @@ namespace Frontier
             });
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
             for (int tab = 0; tab < 4; tab++) { int t = tab; yield return new Shot("shop-tab" + t, () => { ResetView(); ui.DebugShop(t); }); }
-            yield return new Shot("command-bases", () => ui.DebugResearch(0));
+            yield return new Shot("construction-jobs", ui.DebugBuilders);
             yield return new Shot("command-tools-axe", () => ui.DebugResearch(1, 0));
             yield return new Shot("command-tools-pick", () => ui.DebugResearch(1, 1));
             yield return new Shot("command-tools-drill", () => ui.DebugResearch(1, 2));
