@@ -112,6 +112,25 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public async Task DevelopmentTestGateNeverEnablesProductionOrUnsupportedPlatforms()
+        {
+            policy.iosSetupVerified = false;
+            policy.enableIosDevelopmentTests = true;
+            Assert.IsTrue(policy.CanTestIos(config, RuntimePlatform.IPhonePlayer, true));
+            Assert.IsFalse(policy.CanUseIos(config));
+            Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.IPhonePlayer, false));
+            Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.Android, true));
+            Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.WindowsEditor, true));
+            Assert.AreEqual(ServiceStatus.NotConfigured,
+                (await LevelPlayDevelopmentTests.OpenAsync(policy, config, consent)).status);
+            config.privacyPolicyUrl = "";
+            Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.IPhonePlayer, true));
+            config.privacyPolicyUrl = "https://example.com/privacy";
+            policy.enableIosDevelopmentTests = false;
+            Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.IPhonePlayer, true));
+        }
+
+        [Test]
         public void SdkAutoInitializationDoesNotBypassFrontierConsent()
         {
             var settings = Resources.Load<LevelPlayMediationSettings>("LevelPlayMediationSettings");

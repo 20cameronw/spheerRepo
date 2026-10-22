@@ -161,26 +161,33 @@ namespace Frontier.Services.Unity
         public static readonly UnityLevelPlayAdsSdk Instance = new UnityLevelPlayAdsSdk();
         Task<ServiceResult> initialization;
         string initializedKey;
+        bool initializedForTests;
 
         public bool IsSupported { get { return Application.platform == RuntimePlatform.IPhonePlayer; } }
 
         public Task<ServiceResult> InitializeAsync(string appKey)
+        {
+            return InitializeForModeAsync(appKey, false);
+        }
+
+        internal Task<ServiceResult> InitializeForModeAsync(string appKey, bool testSuite)
         {
             if (initialization != null && initialization.Status == TaskStatus.RanToCompletion &&
                 !initialization.Result.succeeded)
                 initialization = null;
             if (initialization != null)
             {
-                if (initializedKey != appKey)
+                if (initializedKey != appKey || initializedForTests != testSuite)
                     return Task.FromResult(ServiceResult.Failed(ServiceMessage.Get("service.ads.config-changed")));
                 return initialization;
             }
             initializedKey = appKey;
-            initialization = InitializeCoreAsync(appKey);
+            initializedForTests = testSuite;
+            initialization = InitializeCoreAsync(appKey, testSuite);
             return initialization;
         }
 
-        async Task<ServiceResult> InitializeCoreAsync(string appKey)
+        async Task<ServiceResult> InitializeCoreAsync(string appKey, bool testSuite)
         {
             var result = new TaskCompletionSource<ServiceResult>();
             void Success(LevelPlayConfiguration configuration) { result.TrySetResult(ServiceResult.Success()); }
@@ -197,6 +204,11 @@ namespace Frontier.Services.Unity
                 LevelPlay.SetConsent(false);
                 LevelPlay.SetMetaData("do_not_sell", "true");
                 LevelPlay.SetMetaData("is_deviceid_optout", "true");
+                if (testSuite)
+                {
+                    LevelPlay.SetMetaData("is_test_suite", "enable");
+                    LevelPlay.SetMetaData("is_child_directed", "true");
+                }
                 LevelPlay.SetPauseGame(true);
                 LevelPlay.Init(appKey);
                 using (var timeout = new CancellationTokenSource())
@@ -217,6 +229,39 @@ namespace Frontier.Services.Unity
         public ILevelPlayRewardedAd CreateRewardedAd(string adUnitId)
         {
             return new LevelPlayRewardedAd(adUnitId);
+        }
+    }
+
+    public static class LevelPlayDevelopmentTests
+    {
+        public static async Task<ServiceResult> OpenAsync(RewardedAdsPolicy policy,
+            FrontierUnityServicesConfig config, IConsentService consent)
+        {
+#if UNITY_IOS && DEVELOPMENT_BUILD
+            if (policy == null || !policy.CanTestIos(config, Application.platform, Debug.isDebugBuild))
+                return ServiceResult.NotConfigured("Rewarded ads");
+            if (consent == null || !consent.Current.hasDecision || !consent.Current.adsAllowed)
+                return ServiceResult.ConsentRequired("advertising");
+            bool withdrawn = false;
+            void Observe(ConsentPreferences preferences)
+            {
+                if (!preferences.hasDecision || !preferences.adsAllowed) withdrawn = true;
+            }
+            consent.PreferencesChanged += Observe;
+            try
+            {
+                var initialized = await UnityLevelPlayAdsSdk.Instance.InitializeForModeAsync(policy.iosAppKey, true);
+                if (!initialized.succeeded) return initialized;
+                if (withdrawn || !consent.Current.hasDecision || !consent.Current.adsAllowed)
+                    return ServiceResult.ConsentRequired("advertising");
+                LevelPlay.LaunchTestSuite();
+                return ServiceResult.Success();
+            }
+            finally { consent.PreferencesChanged -= Observe; }
+#else
+            await Task.CompletedTask;
+            return ServiceResult.NotConfigured("Rewarded ads");
+#endif
         }
     }
 }

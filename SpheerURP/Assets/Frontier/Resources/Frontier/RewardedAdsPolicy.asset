@@ -16,6 +16,7 @@ MonoBehaviour:
   iosAppKey: 28e95b2f5
   iosRewardedAdUnitId: eurexbly1unznz2g
   iosSetupVerified: 0
+  enableIosDevelopmentTests: 1
   placements:
   - id: double-yield
     dailyCap: 8

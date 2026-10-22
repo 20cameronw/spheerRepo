@@ -78,6 +78,19 @@ Do not activate them solely because their adapters compile.
 
 ## iOS LevelPlay activation
 
+- `enableIosDevelopmentTests` enables a separate development-only test-suite action, not gameplay ads.
+  Export an iOS **Development Build**, enable rewarded-ad consent in Settings, then use the developer
+  travel diagnostics action **Open LevelPlay test suite (choose Test, not Live)**. The action is absent
+  in release, Android and Editor builds. After it connects, select the Unity Ads bidder, choose **Test**
+  rather than **Live**, then load/show **Rewarded**. The SDK test suite also offers live ads:
+  the `is_test_suite` flag does not force all traffic to test mode. Do not select live auctions.
+  Register the iPhone as a LevelPlay test device as an additional dashboard safeguard.
+  Development testers must be informed adults; do not distribute this diagnostic build to children.
+  This path sets child-directed treatment, device-ID opt-out, no personalized consent and do-not-sell.
+  Native initialization still requires the local ad opt-in and policy URL. No automatic ad request
+  or reward grant is made by opening the diagnostic action. It does not verify the production setup
+  or enable other online services; `iosSetupVerified` remains false.
+
 - The bundle ID is `com.GameDevBois.spheer`. Keep App Keys/ad unit IDs in Frontier's policy asset,
   not LevelPlay's auto-initialize settings: initialization must remain behind Frontier consent.
 - Native dependencies are pinned in `Assets/LevelPlay/Editor` using the vendor's dependency declarations
