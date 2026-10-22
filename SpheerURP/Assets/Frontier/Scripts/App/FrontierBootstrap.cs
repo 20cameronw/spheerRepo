@@ -52,33 +52,6 @@ namespace Frontier
             };
             TravelMinigames.PrepareRecovery = (trip, from, to) => Hyperspace.View.HyperspaceGame.PrepareRecovery(gs, trip, from, to);
             TravelDebug.Actions.Clear();
-#if UNITY_IOS && DEVELOPMENT_BUILD
-            var adPolicy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
-            if (adPolicy != null && adPolicy.CanTestIos(serviceConfig, Application.platform, Debug.isDebugBuild))
-            {
-                System.Threading.Tasks.Task<ServiceResult> adTestRequest = null;
-                TravelDebug.Register("Open LevelPlay test suite (choose Test, not Live)", () =>
-                {
-                    if (adTestRequest != null)
-                    {
-                        if (!adTestRequest.IsCompleted) return "Connecting to LevelPlay...";
-                        if (adTestRequest.IsFaulted)
-                        {
-                            Debug.LogException(adTestRequest.Exception);
-                            adTestRequest = null;
-                            return "Test suite failed. See device logs; tap to retry.";
-                        }
-                        var result = adTestRequest.Result;
-                        adTestRequest = null;
-                        return result.succeeded
-                            ? "Test suite opened. Select Unity Ads > Test > Rewarded."
-                            : result.message;
-                    }
-                    adTestRequest = LevelPlayDevelopmentTests.OpenAsync(adPolicy, serviceConfig, consent);
-                    return "Opening test suite. Select Unity Ads > Test; tap here again for connection status.";
-                });
-            }
-#endif
             TravelDebug.Register("Hyperspace determinism self-check", () =>
             {
                 return Hyperspace.View.HyperspaceDiagnostics.Check();

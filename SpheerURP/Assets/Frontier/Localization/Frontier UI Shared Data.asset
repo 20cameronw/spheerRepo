@@ -8383,6 +8383,62 @@ MonoBehaviour:
     m_Key: service.ads.config-changed
     m_Metadata:
       m_Items: []
+  - m_Id: 2230690077827072
+    m_Key: resource.source.planet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741632
+    m_Key: resource.source.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741633
+    m_Key: debug.services.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741634
+    m_Key: debug.services.ads-disabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741635
+    m_Key: debug.services.ads-unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741636
+    m_Key: debug.services.open-ads
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741637
+    m_Key: debug.services.connecting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741638
+    m_Key: debug.services.opened
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741639
+    m_Key: debug.services.failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741640
+    m_Key: ranks.setup-required
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741641
+    m_Key: ranks.read-only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741642
+    m_Key: service.ads.test-editor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741643
+    m_Key: service.ads.test-device
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741644
+    m_Key: service.ads.test-ready
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

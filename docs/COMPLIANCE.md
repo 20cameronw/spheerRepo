@@ -80,8 +80,10 @@ Do not activate them solely because their adapters compile.
 
 - `enableIosDevelopmentTests` enables a separate development-only test-suite action, not gameplay ads.
   Export an iOS **Development Build**, enable rewarded-ad consent in Settings, then use the developer
-  travel diagnostics action **Open LevelPlay test suite (choose Test, not Live)**. The action is absent
-  in release, Android and Editor builds. After it connects, select the Unity Ads bidder, choose **Test**
+  **Menu > Debug > Ads & online services > Open LevelPlay test suite** action. Debug now shows
+  availability/status in the Editor too, with the native action disabled and an explanation.
+  The suite can open only on an iOS Development Build; developer menus remain absent in release.
+  Connection results appear inline without needing a second tap. After it connects, select the Unity Ads bidder, choose **Test**
   rather than **Live**, then load/show **Rewarded**. The SDK test suite also offers live ads:
   the `is_test_suite` flag does not force all traffic to test mode. Do not select live auctions.
   Register the iPhone as a LevelPlay test device as an additional dashboard safeguard.

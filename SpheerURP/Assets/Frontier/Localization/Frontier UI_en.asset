@@ -8677,6 +8677,69 @@ MonoBehaviour:
       ad.
     m_Metadata:
       m_Items: []
+  - m_Id: 2230690077827072
+    m_Localized: '{0}: find supplies on {1}.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741632
+    m_Localized: No usable source for {0} is available yet. Check its Atlas requirements.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741633
+    m_Localized: Ads & online services
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741634
+    m_Localized: Gameplay ads remain off pending mixed-age privacy setup and iPhone
+      verification. Test diagnostics do not enable live rewards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741635
+    m_Localized: No ad diagnostics provider is configured for this session.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741636
+    m_Localized: Open LevelPlay test suite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741637
+    m_Localized: Connecting to LevelPlay...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741638
+    m_Localized: Test suite opened. Select Unity Ads > Test > Rewarded. Do not select
+      Live.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741639
+    m_Localized: The test suite could not open. Check device logs and try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741640
+    m_Localized: Online rankings are not enabled in this build. The board ID is configured,
+      but mixed-age online privacy setup and trusted score submission are still pending.
+      Your local record below is not uploaded.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741641
+    m_Localized: Rankings are read-only. This build does not submit your local score.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741642
+    m_Localized: The Editor cannot display real iOS ads. Install an iOS Development
+      Build on your iPhone to use the LevelPlay test suite.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741643
+    m_Localized: LevelPlay tests require an iOS Development Build with test diagnostics
+      enabled. Release builds and Android cannot open this suite.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2230690140741644
+    m_Localized: Register this iPhone as a LevelPlay test device. In the suite choose
+      Unity Ads > Test > Rewarded, not Live. Gameplay ads remain disabled.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

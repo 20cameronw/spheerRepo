@@ -172,6 +172,13 @@ namespace Frontier.Services
         Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId);
     }
 
+    public interface IAdDiagnostics
+    {
+        bool CanOpenTestSuite { get; }
+        ServiceMessage Status { get; }
+        Task<ServiceResult> OpenTestSuiteAsync();
+    }
+
     public interface IPurchaseService : IServiceEndpoint
     {
         Task<ServiceResult<IReadOnlyList<StoreProduct>>> FetchProductsAsync(IReadOnlyList<string> productIds);
@@ -613,6 +620,7 @@ namespace Frontier.Services
     {
         public readonly IConsentService Consent;
         public readonly IAdsService Ads;
+        public readonly IAdDiagnostics AdDiagnostics;
         public readonly IPurchaseService Purchases;
         public readonly IAuthService Authentication;
         public readonly ILeaderboardService Leaderboards;
@@ -657,10 +665,12 @@ namespace Frontier.Services
         public FrontierServices(IConsentService consent, IAdsService ads, IPurchaseService purchases,
             IAuthService authentication, ILeaderboardService leaderboards, ICloudSaveService cloudSave,
             IAnalyticsService analytics, IRemoteConfigService remoteConfig, ITimeService time,
-            INotificationService notifications, string leaderboardId = null, string privacyPolicyUrl = null)
+            INotificationService notifications, string leaderboardId = null, string privacyPolicyUrl = null,
+            IAdDiagnostics adDiagnostics = null)
         {
             Consent = consent ?? throw new ArgumentNullException(nameof(consent));
             Ads = new ConsentGatedAdsService(ads, consent);
+            AdDiagnostics = adDiagnostics;
             Purchases = purchases ?? throw new ArgumentNullException(nameof(purchases));
             Authentication = new ConsentGatedAuthenticationService(authentication, consent);
             Leaderboards = new ConsentGatedLeaderboardService(leaderboards, consent);

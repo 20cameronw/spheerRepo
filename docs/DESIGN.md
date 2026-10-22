@@ -17,9 +17,13 @@ Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to 
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
 The top bar includes fuel, live Nova Shards and player level; backpack capacity stays on the Pack dock.
-Missing-material cost and network chips keep their quantity/name as text: only the resource icon is
-the Find control, with a transparent touch target and localized tooltip. The Atlas resource header
-uses that same icon control to reveal raw-resource deposits; do not add a separate FIND button.
+Missing-material cost and network chips are a single native button containing the existing icon and
+quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
+FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses
+its existing border. Shortages route to an existing local producer and matching recipe, otherwise
+its Build entry, otherwise a supplying planet selected in the map. Locked/in-progress producers
+retain their real upgrade/research/job status; planet guidance never silently teleports or starts a job.
+The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
 Modal, popup and toast shells enter with a 160 ms ease-out translation (16 px, 6 px and -8 px respectively);
 they do not animate layout sizes or delay interaction/dismissal. World structure and build-pad labels use native

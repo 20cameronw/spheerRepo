@@ -94,12 +94,12 @@
     border-radius: var(--fr-r-sm);
 }
 .fr-resource-find-icon:hover, .fr-resource-find-icon:focus {
-    background-color: var(--fr-surface-3); border-width: 2px; border-color: var(--fr-cyan);
+    background-color: transparent; border-width: 0;
 }
 .fr-resource-find-icon:active { opacity: 0.7; }
-.fr-itemchip-find { margin-top: var(--fr-sp-24); margin-bottom: var(--fr-sp-24); }
-.fr-itemchip .fr-resource-find-icon { position: absolute; left: -24px; top: 50%; translate: 0 -50%; }
-.fr-itemchip .fr-resource-find-icon .fr-icon { margin-right: 0; }
+.fr-itemchip-find { min-height: var(--fr-touch); }
+.fr-itemchip-find:hover, .fr-itemchip-find:active { background-color: rgb(5, 8, 22); }
+.fr-itemchip-find:focus { border-color: var(--fr-cyan); }
 .fr-topbar .fr-chip { margin-left: var(--fr-sp-8); }
 .fr-topbar .fr-chip .fr-icon { width: 32px; height: 32px; margin-right: var(--fr-sp-4); }
 .fr-topbar .fr-chip-text { font-size: var(--fr-fs-caption); }

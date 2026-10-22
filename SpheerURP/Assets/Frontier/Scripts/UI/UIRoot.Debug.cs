@@ -56,6 +56,7 @@ namespace Frontier
         }
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
+        public void DebugResourceSource(ResourceSO resource) { DebugReset(); OpenResourceSource(resource); }
         public void DebugAtlas(int tab)
         {
             DebugReset();

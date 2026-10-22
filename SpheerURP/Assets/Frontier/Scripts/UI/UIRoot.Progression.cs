@@ -85,7 +85,7 @@ namespace Frontier
             card.Add(UiKit.Text(node.LocalizedDescription, "fr-muted"));
             if (node.data.prereqs != null && node.data.prereqs.Length > 0)
                 card.Add(UiKit.Text(UiText.Get("research.prerequisites", string.Join(", ", node.data.prereqs.Select(PrettyName))), "fr-small"));
-            if (!complete) card.Add(UiKit.CostRow(CatalogCost(node.data.cost), gs, true, OpenAtlasResource));
+            if (!complete) card.Add(UiKit.CostRow(CatalogCost(node.data.cost), gs, true, OpenResourceSource));
             if (complete)
                 card.Add(Note(UiText.Get("research.complete-help", UnlockSummary(node.data.unlocks)), UiKit.Lime));
             else if (lockReason == null)
@@ -136,7 +136,7 @@ namespace Frontier
                 else
                 {
                     card.Add(UiKit.Text(UiText.Get("tools.next", ladder.TierName(nextRow), nextRow.yieldMult), "fr-small"));
-                    card.Add(UiKit.CostRow(CatalogCost(nextRow.cost), gs, true, OpenAtlasResource));
+                    card.Add(UiKit.CostRow(CatalogCost(nextRow.cost), gs, true, OpenResourceSource));
                     if (lockReason != null) card.Add(Note(lockReason, UiKit.Amber));
                     else
                     {

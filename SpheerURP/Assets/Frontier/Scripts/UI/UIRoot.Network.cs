@@ -80,7 +80,7 @@ namespace Frontier
                     row.style.marginBottom = UiKit.Space.S8;
                     var chip = ResourceIconChip(resource, resource.LocalizedName);
                     if (p == null)
-                        UiKit.BindResourceFind(chip, resource, OpenAtlasResource, "network-find-" + resource.id);
+                        chip = UiKit.BindResourceFind(chip, resource, OpenResourceSource, "network-find-" + resource.id);
                     row.Add(chip);
                     var status = UiKit.Text(p != null ? p.Name : UiText.Get("network.world.missing"), "fr-small", p != null ? UiKit.Lime : UiKit.Amber);
                     status.style.whiteSpace = WhiteSpace.Normal;
@@ -158,7 +158,7 @@ namespace Frontier
                 var chip = UiKit.ItemChip(cost.resource, cost.amount, gs.PlanetCount(cost.resource));
                 var resource = cost.resource;
                 if (gs.PlanetCount(resource) < cost.amount)
-                    UiKit.BindResourceFind(chip, resource, OpenAtlasResource);
+                    chip = UiKit.BindResourceFind(chip, resource, OpenResourceSource);
                 row.Add(chip);
             }
             return row;

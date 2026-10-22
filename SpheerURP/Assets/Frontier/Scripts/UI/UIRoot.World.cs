@@ -235,7 +235,7 @@ namespace Frontier
                     body.Add(UiKit.Text(ContentText.Get("obstacle", kind.id, "description", kind.description), "fr-tiny"));
                 body.Add(SectionLabel(UiText.Get("obstacle.cost")));
                 var cost = gs.ObstacleClearCost(gs.planet, pad);
-                body.Add(cost.Count == 0 ? UiKit.Text(UiText.Get("obstacle.free"), "fr-small") : UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+                body.Add(cost.Count == 0 ? UiKit.Text(UiText.Get("obstacle.free"), "fr-small") : UiKit.CostRow(cost, gs, true, OpenResourceSource));
 
                 body.Add(SectionLabel(UiText.Get("obstacle.salvage")));
                 ResourceSO salvage = gs.db.FindResource(obstacle.Value.reward.resourceId);
@@ -323,7 +323,7 @@ namespace Frontier
             if (s.level >= s.def.maxLevel) { body.Add(Note(UiText.Get("structure.max"), UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
             body.Add(SectionLabel(UiText.Get("structure.upgrade-preview", s.level + 1, StructureEffect(s.def, s.level + 1))));
-            body.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+            body.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
             var up = IconBtn(UiText.Get("command.upgrade"), "up", c, () =>
             {
                 if (gs.UpgradeStructure(s))
@@ -559,10 +559,9 @@ namespace Frontier
         VisualElement RecipeResource(ResourceSO resource, int amount, bool lack = false)
         {
             var row = UiKit.Div("fr-recipe-resource");
-            if (lack) row.Add(UiKit.ResourceFindIcon(resource, OpenAtlasResource));
-            else row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
+            row.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color), UiKit.Size.IconSm));
             row.Add(UiKit.Text(UiKit.Amount(resource, amount) + " " + resource.LocalizedName, "fr-small", lack ? UiKit.Red : (Color?)null));
-            return row;
+            return lack ? UiKit.BindResourceFind(row, resource, OpenResourceSource) : row;
         }
 
         void OpenRefinery(PlacedStructure s, Transform t)
@@ -584,6 +583,7 @@ namespace Frontier
                     string locked = gs.RecipeLockReason(r, s);
                     int can = locked == null ? MaxCrafts(r) : 0;
                     var card = Card(c);
+                    card.name = "recipe-" + r.id;
                     if (locked != null) card.Add(Note(locked, UiKit.Amber));
                     card.AddToClassList("fr-recipe");
                     if (can <= 0) card.AddToClassList("fr-card-dim");

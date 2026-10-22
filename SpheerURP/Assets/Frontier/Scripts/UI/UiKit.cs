@@ -190,12 +190,23 @@ namespace Frontier
             return button;
         }
 
-        public static void BindResourceFind(VisualElement chip, ResourceSO resource, Action<ResourceSO> onFind,
+        public static Button BindResourceFind(VisualElement chip, ResourceSO resource, Action<ResourceSO> onFind,
             string name = null)
         {
-            chip.Q(className: "fr-icon").style.visibility = Visibility.Hidden;
-            chip.AddToClassList("fr-itemchip-find");
-            chip.Add(ResourceFindIcon(resource, onFind, name));
+            var button = new Button(() => { Sfx.Click(); onFind(resource); });
+            button.RemoveFromClassList("unity-button");
+            button.name = name ?? "find-resource-" + resource.id;
+            button.tooltip = UiText.Get("resource.find", resource.LocalizedName);
+            foreach (var className in chip.GetClasses()) button.AddToClassList(className);
+            button.AddToClassList("fr-itemchip-find");
+            while (chip.childCount > 0)
+            {
+                var child = chip[0];
+                child.RemoveFromHierarchy();
+                child.pickingMode = PickingMode.Ignore;
+                button.Add(child);
+            }
+            return button;
         }
 
         public static string Amount(ResourceSO resource, int amount)
@@ -219,9 +230,9 @@ namespace Frontier
             foreach (var i in items)
             {
                 if (i.resource == null) continue;
-                var chip = ItemChip(i.resource, i.amount, showHave ? gs.Count(i.resource) : -1);
+                var chip = ItemChip(i.resource, i.amount, showHave ? gs.PlanetCount(i.resource) : -1);
                 if (onFind != null && gs.PlanetCount(i.resource) < i.amount)
-                    BindResourceFind(chip, i.resource, onFind);
+                    chip = BindResourceFind(chip, i.resource, onFind);
                 row.Add(chip);
             }
             return row;

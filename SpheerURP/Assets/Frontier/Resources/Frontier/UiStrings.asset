@@ -4451,3 +4451,37 @@ MonoBehaviour:
     text: The ad closed without reward confirmation. No reward was granted.
   - key: service.ads.config-changed
     text: The ad configuration changed. Restart the game before watching an ad.
+  - key: resource.source.planet
+    text: '{0}: find supplies on {1}.'
+  - key: resource.source.unavailable
+    text: No usable source for {0} is available yet. Check its Atlas requirements.
+  - key: debug.services.title
+    text: Ads & online services
+  - key: debug.services.ads-disabled
+    text: Gameplay ads remain off pending mixed-age privacy setup and iPhone verification.
+      Test diagnostics do not enable live rewards.
+  - key: debug.services.ads-unavailable
+    text: No ad diagnostics provider is configured for this session.
+  - key: debug.services.open-ads
+    text: Open LevelPlay test suite
+  - key: debug.services.connecting
+    text: Connecting to LevelPlay...
+  - key: debug.services.opened
+    text: Test suite opened. Select Unity Ads > Test > Rewarded. Do not select Live.
+  - key: debug.services.failed
+    text: The test suite could not open. Check device logs and try again.
+  - key: ranks.setup-required
+    text: Online rankings are not enabled in this build. The board ID is configured,
+      but mixed-age online privacy setup and trusted score submission are still pending.
+      Your local record below is not uploaded.
+  - key: ranks.read-only
+    text: Rankings are read-only. This build does not submit your local score.
+  - key: service.ads.test-editor
+    text: The Editor cannot display real iOS ads. Install an iOS Development Build
+      on your iPhone to use the LevelPlay test suite.
+  - key: service.ads.test-device
+    text: LevelPlay tests require an iOS Development Build with test diagnostics
+      enabled. Release builds and Android cannot open this suite.
+  - key: service.ads.test-ready
+    text: Register this iPhone as a LevelPlay test device. In the suite choose Unity
+      Ads > Test > Rewarded, not Live. Gameplay ads remain disabled.

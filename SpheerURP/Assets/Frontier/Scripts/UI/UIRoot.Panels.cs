@@ -140,6 +140,7 @@ namespace Frontier
                 var def = sd;
                 Color c = UiKit.Ui(def.color);
                 var card = Card(c);
+                card.name = "shop-structure-" + def.id;
                 var top = UiKit.Div("fr-card-head");
                 top.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconXl));
                 var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
@@ -161,7 +162,7 @@ namespace Frontier
                 else if (!gs.CanBuildHere(def)) card.Add(Note(UiText.Get("shop.no-harvest"), UiKit.Amber));
                 else
                 {
-                    card.Add(UiKit.CostRow(def.buildCost, gs, true, OpenAtlasResource));
+                    card.Add(UiKit.CostRow(def.buildCost, gs, true, OpenResourceSource));
                     bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
                     if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
                     bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
@@ -288,7 +289,9 @@ namespace Frontier
             body.Add(card);
             if (services == null || !services.Leaderboards.IsConfigured)
             {
-                body.Add(UiKit.Text(UiText.Get("ranks.unavailable"), "fr-muted"));
+                var setup = UiKit.Text(UiText.Get("ranks.setup-required"), "fr-muted");
+                setup.name = "leaderboard-setup-status";
+                body.Add(setup);
                 return;
             }
             if (!services.Consent.Current.hasDecision || !services.Consent.Current.onlineServicesAllowed)
@@ -298,6 +301,7 @@ namespace Frontier
             }
 
             body.Add(UiKit.Text(UiText.Get("ranks.online.help"), "fr-muted"));
+            body.Add(UiKit.Text(UiText.Get("ranks.read-only"), "fr-muted"));
             if (!string.IsNullOrEmpty(leaderboardStatus))
                 body.Add(UiKit.Text(leaderboardStatus, "fr-small"));
 
@@ -1472,7 +1476,7 @@ namespace Frontier
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);
-                    card.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+                    card.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
                     var buy = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                     {
                         if (gs.Buy(u2)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", u2.NameAtLevel(gs.Level(u2))), UiKit.Ui(u2.color)); planetView.Punch(); }
@@ -1506,7 +1510,7 @@ namespace Frontier
                     if (!max)
                     {
                         var cost = u.CostAt(lvl);
-                        card.Add(UiKit.CostRow(cost, gs, true, OpenAtlasResource));
+                        card.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
                         var buy = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                         {
                             if (gs.Buy(u)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", u.NameAtLevel(gs.Level(u))), UiKit.Ui(u.color)); planetView.Punch(); }
@@ -1705,6 +1709,7 @@ namespace Frontier
         void BuildDebug(VisualElement body)
         {
             body.Add(UiKit.Text(UiText.Get("debug.header"), "fr-muted", UiKit.Red));
+            BuildServiceDiagnostics(body);
 
             var give = Card(UiKit.Amber);
             give.Add(UiKit.Text(UiText.Get("debug.items"), "fr-h2"));

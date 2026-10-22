@@ -232,8 +232,42 @@ namespace Frontier.Services.Unity
         }
     }
 
-    public static class LevelPlayDevelopmentTests
+    public sealed class LevelPlayDevelopmentTests : IAdDiagnostics
     {
+        readonly RewardedAdsPolicy policy;
+        readonly FrontierUnityServicesConfig config;
+        readonly IConsentService consent;
+
+        public LevelPlayDevelopmentTests(RewardedAdsPolicy policy, FrontierUnityServicesConfig config, IConsentService consent)
+        {
+            this.policy = policy;
+            this.config = config;
+            this.consent = consent;
+        }
+
+        public bool CanOpenTestSuite
+        {
+            get
+            {
+#if UNITY_IOS && DEVELOPMENT_BUILD
+                return policy != null && policy.CanTestIos(config, Application.platform, Debug.isDebugBuild);
+#else
+                return false;
+#endif
+            }
+        }
+
+        public ServiceMessage Status
+        {
+            get
+            {
+                if (Application.isEditor) return ServiceMessage.Get("service.ads.test-editor");
+                return ServiceMessage.Get(CanOpenTestSuite ? "service.ads.test-ready" : "service.ads.test-device");
+            }
+        }
+
+        public Task<ServiceResult> OpenTestSuiteAsync() { return OpenAsync(policy, config, consent); }
+
         public static async Task<ServiceResult> OpenAsync(RewardedAdsPolicy policy,
             FrontierUnityServicesConfig config, IConsentService consent)
         {

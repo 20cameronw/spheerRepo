@@ -602,7 +602,8 @@ namespace Frontier.Services.Unity
             return new FrontierServices(consent, ads, unavailable, authentication, leaderboards,
                 cloudSave, analytics, remoteConfig, time, new UnityNotificationProvider(config),
                 config == null ? null : config.leaderboardId,
-                config != null && config.HasValidPrivacyPolicy ? config.privacyPolicyUrl : null);
+                config != null && config.HasValidPrivacyPolicy ? config.privacyPolicyUrl : null,
+                new LevelPlayDevelopmentTests(adsPolicy, config, consent));
         }
     }
 }

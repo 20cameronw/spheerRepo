@@ -61,6 +61,87 @@ namespace Frontier.Tests
             try { Directory.Delete(saveDir, true); } catch (IOException) { }
         }
 
+        [UnityTest]
+        public IEnumerator MissingResourceChipsRouteToBuildProducerAndPlanetAndExplainServiceAvailability()
+        {
+            new GameObject("ResourceSourceBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("intro-skip");
+            if (skip != null)
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            for (int i = 0; i < 240 && rt.Ui.DebugBusy; i++) yield return null;
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            var wood = rt.Db.FindResource("wood");
+            rt.State.backpack.Clear();
+            rt.Ui.DebugShop(0);
+            yield return null;
+            var chip = rt.Ui.DebugRoot.Q<Button>("find-resource-" + wood.id);
+            Assert.IsNotNull(chip, "Economy shop costs should expose the real missing-resource control.");
+            Assert.IsNotNull(chip.Q<Label>());
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
+            yield return null;
+            var source = rt.State.FindResourceSource(wood);
+            Assert.AreEqual(ResourceSourceKind.Build, source.kind);
+            var buildCard = rt.Ui.DebugRoot.Q("shop-structure-" + source.build.id);
+            Assert.IsNotNull(buildCard);
+            var shopScroll = buildCard.GetFirstAncestorOfType<ScrollView>();
+            Assert.IsNotNull(shopScroll);
+            yield return null;
+            Assert.LessOrEqual(buildCard.worldBound.yMin, shopScroll.contentViewport.worldBound.yMax,
+                "The required structure's shop card must scroll into view.");
+            rt.State.DebugPlace(source.build, 0);
+            yield return null;
+            rt.Ui.DebugResourceSource(wood);
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("structure.header", source.build.LocalizedName.ToUpper(), 1)));
+            Assert.AreEqual(0, rt.State.PlanetCount(wood), "Finding materials cannot grant them.");
+
+            var station = rt.Db.StructureOfKind(StructureKind.Refinery);
+            rt.State.DebugPlace(station, 1);
+            yield return null;
+            RecipeSO recipe = null;
+            foreach (var candidate in rt.Db.recipes)
+                if (candidate.stationId == station.id) { recipe = candidate; break; }
+            Assert.IsNotNull(recipe);
+            var processed = rt.State.FindResourceSource(recipe.outputs[0].resource);
+            Assert.AreEqual(ResourceSourceKind.Structure, processed.kind);
+            rt.Ui.DebugResourceSource(recipe.outputs[0].resource);
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("recipe-" + processed.recipe.id));
+
+            ResourceSource remote = null;
+            foreach (var resource in rt.Db.resources)
+            {
+                var candidate = rt.State.FindResourceSource(resource);
+                if (candidate.kind == ResourceSourceKind.Planet) { remote = candidate; break; }
+            }
+            Assert.IsNotNull(remote);
+            var home = rt.State.planet.Id;
+            rt.Ui.DebugResourceSource(remote.resource);
+            yield return null;
+            Assert.AreEqual(remote.planet.Id, rt.Ui.DebugMapSelectedId);
+            Assert.AreEqual(home, rt.State.planet.Id, "Guidance cannot teleport the player.");
+
+            rt.Ui.DebugReset();
+            rt.Ui.DebugMenu("debug");
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("service-diagnostics"));
+            var testSuite = rt.Ui.DebugRoot.Q<Button>("debug-ad-test-suite");
+            Assert.IsNotNull(testSuite, "Ad diagnostics must be discoverable even in the Editor.");
+            Assert.IsFalse(testSuite.enabledSelf, "The Editor cannot show native iOS ads.");
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("service.ads.test-editor")));
+            rt.Ui.DebugReset();
+            rt.Ui.DebugMenu("ranks");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-setup-status"));
+        }
+
         static int ActiveRippleCount()
         {
             int count = 0;
@@ -144,16 +225,27 @@ namespace Frontier.Tests
             bool found = false;
             var costs = UiKit.CostRow(new List<ItemAmount> { new ItemAmount { resource = resource, amount = 1 } },
                 rt.State, true, r => found = r == resource);
+            costs.style.position = Position.Absolute;
+            costs.style.left = 200;
+            costs.style.top = 300;
             rt.Ui.DebugRoot.Add(costs);
+            yield return null;
             var find = costs.Q<Button>("find-resource-" + resource.id);
             Assert.IsNotNull(find);
             Assert.AreEqual(UiText.Get("resource.find", resource.LocalizedName), find.tooltip);
             Assert.IsTrue(find.focusable);
             Assert.IsEmpty(find.text, "the resource icon replaces the separate FIND label");
-            Assert.IsNull(find.Q<Label>(), "Only the item icon is clickable, not the quantity or a FIND caption.");
-            Assert.IsTrue(find.parent.ClassListContains("fr-itemchip"));
+            Assert.IsNotNull(find.Q<Label>(), "The complete resource chip includes its balance inside the button.");
+            Assert.IsTrue(find.ClassListContains("fr-itemchip"));
             Assert.IsNotNull(find.Q(className: "fr-icon"));
-            Assert.IsTrue(find.parent.ClassListContains("fr-itemchip-find"));
+            Assert.IsTrue(find.ClassListContains("fr-itemchip-find"));
+            Assert.IsFalse(find.ClassListContains("fr-resource-find-icon"));
+            Assert.AreEqual(1, costs.Query<Button>().ToList().Count);
+            Assert.AreSame(find, find.panel.Pick(find.Q<Label>().worldBound.center),
+                "Tapping the balance must hit the same button as the resource icon.");
+            Assert.AreEqual(UiKit.Size.Touch, find.resolvedStyle.minHeight.value);
+            Assert.That(find.resolvedStyle.height, Is.EqualTo(UiKit.Size.Touch).Within(1f / rt.Ui.DebugPanelScale),
+                "Touch targets may round by at most one rendered pixel at the current panel scale.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = find; find.SendEvent(submit); }
             Assert.IsTrue(found, "native keyboard activation must still find the resource");
             costs.RemoveFromHierarchy();
@@ -711,7 +803,7 @@ namespace Frontier.Tests
             runtime.Ui.DebugMenu("ranks");
             Assert.IsNotNull(runtime.Ui.DebugRoot.Q("era-progress"));
             Assert.AreEqual(Frontier.Economy.FrontierEra.Landfall, runtime.State.Era);
-            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help", "ranks.unavailable" })
+            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help", "ranks.setup-required" })
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get(key)), key);
             var score = runtime.State.FrontierScore;
             foreach (var pair in new Dictionary<string, string>

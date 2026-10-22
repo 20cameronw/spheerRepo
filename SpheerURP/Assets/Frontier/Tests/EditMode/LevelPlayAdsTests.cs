@@ -123,6 +123,10 @@ namespace Frontier.Tests
             Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.WindowsEditor, true));
             Assert.AreEqual(ServiceStatus.NotConfigured,
                 (await LevelPlayDevelopmentTests.OpenAsync(policy, config, consent)).status);
+            var diagnostics = new LevelPlayDevelopmentTests(policy, config, consent);
+            Assert.IsFalse(diagnostics.CanOpenTestSuite);
+            Assert.AreEqual(ServiceMessage.Get("service.ads.test-editor").ToString(), diagnostics.Status.ToString());
+            Assert.AreEqual(ServiceStatus.NotConfigured, (await diagnostics.OpenTestSuiteAsync()).status);
             config.privacyPolicyUrl = "";
             Assert.IsFalse(policy.CanTestIos(config, RuntimePlatform.IPhonePlayer, true));
             config.privacyPolicyUrl = "https://example.com/privacy";
