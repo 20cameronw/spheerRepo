@@ -34,19 +34,30 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Notifications/Validate Android Scripts")]
         public static void ValidateAndroidScripts()
         {
-            string output = Path.Combine(Path.GetTempPath(), "FrontierNotificationAndroidScripts-" + Guid.NewGuid().ToString("N"));
+            ValidateScripts(BuildTarget.Android, BuildTargetGroup.Android);
+        }
+
+        [MenuItem("Frontier/Notifications/Validate iOS Scripts")]
+        public static void ValidateIosScripts()
+        {
+            ValidateScripts(BuildTarget.iOS, BuildTargetGroup.iOS);
+        }
+
+        static void ValidateScripts(BuildTarget target, BuildTargetGroup group)
+        {
+            string output = Path.Combine(Path.GetTempPath(), "FrontierNotification" + target + "Scripts-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(output);
             try
             {
                 var compiled = PlayerBuildInterface.CompilePlayerScripts(new ScriptCompilationSettings
                 {
-                    target = BuildTarget.Android,
-                    group = BuildTargetGroup.Android,
+                    target = target,
+                    group = group,
                     options = ScriptCompilationOptions.None
                 }, output);
                 if (compiled.assemblies == null || compiled.assemblies.Count == 0)
-                    throw new InvalidOperationException("Android player script compilation returned no assemblies.");
-                Debug.Log("Frontier: Android player scripts compiled, including native notification permission and scheduling APIs.");
+                    throw new InvalidOperationException(target + " player script compilation returned no assemblies.");
+                Debug.Log("Frontier: " + target + " player scripts compiled, including native notification permission and scheduling APIs.");
             }
             finally { Directory.Delete(output, true); }
         }

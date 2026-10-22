@@ -156,7 +156,8 @@ The game revalidates the job, assignment, quoted maximum price, wallet and read-
 completion/reward path and saves job/currency changes together. A failed write explicitly reports the completed
 session state and remains dirty for retry; retry cannot spend or award twice. Off-world jobs can finish without
 moving the player or charging travel. Local clearance opens its surface controls; remote clearance links to the
-world's map card rather than teleporting. Ad speed-up, server time and notifications remain separate open work.
+world's map card rather than teleporting. Native local crew reminders are enabled with a separate device
+preference and OS permission; they do not settle jobs or grant rewards. Ad speed-up and server time remain open work.
 Crews also offers the authored third/fourth crew purchases, only once at least two crews are owned and below
 the shared cap. Hub-earned and purchased crews stack only up to that cap; a capped player is never offered an
 unneeded purchase. Recruitment needs two presses, rechecks the quoted crew count/price and wallet, persists

@@ -23,8 +23,11 @@ Kenney source licenses; the bounded mixer/volume/mute path remains unchanged. Ad
 playback, four weather textures and a shared licensed engine loop are implemented through an editable
 soundscape library without adding audio sources. The initial music is original editor-baked material, not
 the planned approved commercial music-pack/stem selection. Final biome direction, music selection and
-physical-device sound sign-off remain open. Consent-gated Analytics and Remote Config adapters are implemented but disabled by default. Automatic cloud sync/upload and
-competitive score writes stay off; Cloud Save/account recovery remain disabled pending platform/legal setup.
+physical-device sound sign-off remain open. Consent-gated Analytics, manual Cloud Save and native local
+crew notifications are enabled in the authored build. Analytics requires its own player opt-in; cloud
+comparison/backup requires online consent and explicit actions; reminders require a device preference
+and OS permission. Automatic cloud sync/upload and trusted competitive settlement stay off.
+Remote Config and native account recovery remain disabled pending platform/legal setup.
 Paid-history saves now refuse gameplay reset and cloud restore/undo until authoritative purchase recovery
 is configured, including equal-journal restores that could roll back spending. Settings explains refusal
 without replacing current data. Purchase-free resets/restores are unchanged; this safety gate does not
@@ -207,7 +210,7 @@ Dependency rule: Core ← Data ← Game ← UI; Services depends on Core only an
 
 - Versioned JSON (`schemaVersion`), atomic write (`.tmp` → replace), rolling `.bak`, debounce (~1.5 s) with forced flush on pause/quit/travel.
 - `SaveMigrator` v1 → v2 with a fixture test built from a real v1 save.
-- Local store + `ICloudSave` (UGS Cloud Save, write locks for conflict detection). The provider is implemented but disabled by default and is not wired to automatic local-save sync. `SaveV2.revision` increments with each local snapshot; older v2 saves default to 0. Revision can order snapshots but cannot prove which divergent save is correct, so differing local/cloud payloads are shown to the player and never silently uploaded or overwritten. Account recovery and explicit restore/undo UX are implemented; before enabling sync, finish provider/legal configuration and native-device conflict/error testing.
+- Local store + `ICloudSave` (UGS Cloud Save, write locks for conflict detection). Manual compare/backup/restore is enabled in the authored build, not automatic local-save sync. `SaveV2.revision` increments with each local snapshot; older v2 saves default to 0. Revision can order snapshots but cannot prove which divergent save is correct, so differing local/cloud payloads are shown to the player and never silently uploaded or overwritten. Native account recovery remains disabled; anonymous backups cannot be advertised as recoverable after reinstall or on another device. Before enabling sync, finish provider/legal configuration and native-device conflict/error testing.
 - Stores deltas only (see §4.6).
 
 ### 2.4 Content pipeline
@@ -613,15 +616,15 @@ Daily login streak, objectives/quests, achievements, weekly Sector Challenge on 
 | Identity | UGS Authentication ≥ 3.8 (project has 3.6.1): anonymous sign-in, later `LinkWithAppleAsync` / `LinkWithGooglePlayGamesAsync` | Free |
 | Leaderboards | UGS Leaderboards 2.3: Dashboard config (`UpdateType` keepBest/cumulative, cron `ResetConfig`, tiers); `AddPlayerScoreAsync`, `GetScoresAsync`, `GetPlayerRangeAsync` | Rate limits unpublished; pricing becomes MAU-based after the free period, so check before launch |
 | Anti-cheat | **Cloud Code** (C# modules or JS) with Access Control so clients cannot write boards directly; server validates progression from server-verifiable evidence and submits via the Leaderboards API. Recomputing a score from client-supplied components is not sufficient | 600 req/min/player; free tier 1M invocations/month |
-| Cloud save | UGS Cloud Save 3.4.2 provider with **write locks** for conflict detection; `enableCloudSave` is off by default and the adapter is not yet wired to local save restore/sync | 5 MiB/2,000 keys per access class; validate current limits before release |
+| Cloud save | UGS Cloud Save 3.4.2 with **write locks**; enabled for explicit Settings comparison/backup/restore/undo, not automatic sync | 5 MiB/2,000 keys per access class; validate current limits before release |
 | Live tuning | UGS Remote Config 4.2 + Game Overrides | Free |
-| Analytics | UGS Analytics 6.3 custom events | Free up to 50 k MAU |
+| Analytics | UGS Analytics 6.3.0, enabled standard session analytics after opt-in; custom gameplay emitters are not wired | Free up to 50 k MAU |
 | Timers | **Cloud Code server-time pattern** (official "Simple server time anti-cheat" + Idle Clicker sample): server recomputes elapsed time from a stored timestamp, client clock never trusted; offline fallback uses monotonic session time + rewind detection (HTTP Date header trick is unverified, not relied on) | |
 | Notifications | `com.unity.mobile.notifications` 2.5.0 (Unity 6+): cross-platform `NotificationCenter`; Android 13 `POST_NOTIFICATIONS` must be requested explicitly (`PermissionRequest`); iOS via `AuthorizationRequest` | Ask at the first timer, not at launch |
 | Cinematics | Cinemachine + Timeline (free) | |
 | Localization | Unity Localization (free) | |
 
-Package updates: Phase A removes `com.unity.ads`; Cloud Save 3.4.2 is installed as a disabled provider foundation. Apple Sign-In 1.5.0 and Google Play Games 2.3.0 are installed for disabled-by-default account recovery. UGS Authentication remains 3.6.1. Unity Localization 1.5.13 supplies preloaded English UI tables through local Addressables bundles; Analytics 6.3 and Remote Config 4.2.5 adapters are consent-gated and feature-flagged off. Mobile Notifications 2.5.0 now supplies the default-off local crew reminder provider. Remaining planned package additions include LevelPlay, IAP 5.4, Cloud Code client and Cinemachine.
+Package updates: Phase A removes `com.unity.ads`; Cloud Save 3.4.2 supports the enabled manual backup flow. Apple Sign-In 1.5.0 and Google Play Games 2.3.0 are installed for disabled-by-default account recovery. UGS Authentication remains 3.6.1. Unity Localization 1.5.13 supplies preloaded English UI tables through local Addressables bundles; Analytics 6.3.0 is enabled behind consent, while Remote Config 4.2.5 remains feature-flagged off. Mobile Notifications 2.5.0 supplies enabled native local crew reminders, with the player's device preference still off by default. Remaining planned package additions include IAP 5.4, Cloud Code client and Cinemachine.
 
 ### 8.8 Compliance
 
@@ -1018,7 +1021,7 @@ and a real map/Command/build/Atlas route. The Ascension era is a progression mil
 optional universe-reset feature. Six focused cases plus the full suites above cover this integration.
 
 1. **Trusted leaderboard writes (deferred):** the current score is computed from mutable client-side save/GameState data; the UGS adapter exposes reads only, and this repo has no Cloud Code package or module. Preserve offline-first play and keep writes disabled until authoritative server progression exists and Access Control denies direct client writes. A server function that merely recalculates client-submitted inputs is not authoritative.
-2. **Provider completion and release readiness:** finish Apple/Google provider setup and native-device recovery tests; configure Analytics event schemas and reviewed Remote Config settings before their consent-gated adapters can be enabled; then address LevelPlay, Unity IAP, trusted cross-device timers, legal review, dashboard setup and release work. UGS auth, leaderboard reads, Cloud Save, Analytics and Remote Config stay disabled until their configuration and compliance prerequisites are ready.
+2. **Provider completion and release readiness:** UGS auth/ranks, manual Cloud Save, opt-in Analytics and permission-gated local reminders are enabled in the authored build. Complete device validation, dashboard retention/deletion, public policy and child-audience privacy review before distribution. Finish Apple/Google provider setup and native-device recovery tests before enabling native account recovery, and reviewed Remote Config settings before enabling live tuning. Custom Analytics gameplay events require reviewed schemas. Unity IAP, trusted cross-device timers and authoritative competitive settlement remain separate work.
 
 This sequence is a delivery plan, not a claim that those systems are implemented. Keep the economy balance simulator and the full regression suites green as each slice lands.
 

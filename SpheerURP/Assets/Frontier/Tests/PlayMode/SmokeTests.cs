@@ -1146,6 +1146,178 @@ namespace Frontier.Tests
             Assert.IsNull(rt.Ui.DebugRoot.Q("leaderboard-player-rank"));
         }
 
+        sealed class AnalyticsFixture : IAnalyticsService
+        {
+            public bool IsConfigured { get { return true; } }
+            public int initializations;
+            public bool allowed, initialized, collecting;
+            public TaskCompletionSource<ServiceResult> pending;
+            public void SetDataCollectionAllowed(bool value)
+            {
+                allowed = value;
+                collecting = initialized && allowed;
+            }
+            public async Task<ServiceResult> InitializeAsync()
+            {
+                initializations++;
+                var result = pending != null ? await pending.Task : ServiceResult.Success();
+                initialized = result.succeeded;
+                collecting = initialized && allowed;
+                return result;
+            }
+            public ServiceResult RecordEvent(string name, IReadOnlyDictionary<string, string> parameters)
+            {
+                throw new InvalidOperationException("Activation must not emit custom gameplay events.");
+            }
+        }
+
+        static FrontierServices AnalyticsServices(ConsentService consent, AnalyticsFixture provider)
+        {
+            var unavailable = new UnavailableFrontierProvider();
+            return new FrontierServices(consent, unavailable, unavailable, unavailable, unavailable,
+                unavailable, provider, unavailable, new LocalTimeService(), unavailable);
+        }
+
+        [UnityTest]
+        public IEnumerator AnalyticsStartsOnlyAfterOptInAndWithdrawalDuringInitializationStopsCollection()
+        {
+            var consent = new ConsentService(new DeletionConsentStore());
+            var provider = new AnalyticsFixture { pending = new TaskCompletionSource<ServiceResult>() };
+            var app = new GameObject("AnalyticsLifecycle").AddComponent<FrontierApp>();
+            app.Init(null, AnalyticsServices(consent, provider));
+            yield return null;
+            Assert.AreEqual(0, provider.initializations);
+            Assert.IsFalse(provider.allowed);
+            consent.SavePreferences(true, false, false);
+            Assert.AreEqual(1, provider.initializations);
+            Assert.IsFalse(consent.Current.onlineServicesAllowed);
+            Assert.IsFalse(provider.collecting);
+            app.SendMessage("OnApplicationFocus", true);
+            Assert.AreEqual(1, provider.initializations, "In-flight initialization must be deduplicated.");
+            consent.SavePreferences(false, false, false);
+            provider.pending.SetResult(ServiceResult.Success());
+            yield return null;
+            Assert.IsFalse(provider.collecting, "Late initialization cannot undo consent withdrawal.");
+            consent.SavePreferences(true, false, false);
+            Assert.IsTrue(provider.collecting);
+            Assert.AreEqual(1, provider.initializations);
+            consent.SavePreferences(false, false, false);
+            Assert.IsFalse(provider.collecting);
+            Object.Destroy(app.gameObject);
+            yield return null;
+            consent.SavePreferences(true, false, false);
+            Assert.AreEqual(1, provider.initializations, "Destroyed app must unsubscribe.");
+        }
+
+        [UnityTest]
+        public IEnumerator AnalyticsStartsFromSavedConsentAndStopsWhenTheAppIsDestroyed()
+        {
+            var store = new DeletionConsentStore();
+            new ConsentService(store).SavePreferences(true, false, false);
+            var provider = new AnalyticsFixture();
+            var app = new GameObject("AnalyticsSavedConsent").AddComponent<FrontierApp>();
+            app.Init(null, AnalyticsServices(new ConsentService(store), provider));
+            yield return null;
+            Assert.AreEqual(1, provider.initializations);
+            Assert.IsTrue(provider.collecting);
+            Object.Destroy(app.gameObject);
+            yield return null;
+            Assert.IsFalse(provider.collecting);
+        }
+
+        [UnityTest]
+        public IEnumerator AnalyticsFailedInitializationCanRetryOnReturningToTheApp()
+        {
+            var consent = new ConsentService(new DeletionConsentStore());
+            consent.SavePreferences(true, false, false);
+            var provider = new AnalyticsFixture { pending = new TaskCompletionSource<ServiceResult>() };
+            var app = new GameObject("AnalyticsRetry").AddComponent<FrontierApp>();
+            app.Init(null, AnalyticsServices(consent, provider));
+            LogAssert.Expect(LogType.Warning, "Frontier: analytics initialization failed: Offline");
+            provider.pending.SetResult(ServiceResult.Failed("Offline"));
+            yield return null;
+            Assert.IsFalse(provider.collecting);
+            provider.pending = null;
+            app.SendMessage("OnApplicationFocus", true);
+            yield return null;
+            Assert.AreEqual(2, provider.initializations);
+            Assert.IsTrue(provider.collecting);
+        }
+
+        sealed class CloudFixture : ICloudSaveService
+        {
+            readonly RanksFixture auth;
+            public int reads, writes;
+            public CloudSaveRecord record = new CloudSaveRecord(false, "", "");
+            public CloudFixture(RanksFixture authentication) { auth = authentication; }
+            public bool IsConfigured { get { return true; } }
+            public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
+            {
+                Assert.Greater(auth.signIns, 0, "Compare must sign in before reading.");
+                reads++;
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.Success(record));
+            }
+            public Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
+            {
+                Assert.AreEqual(record.writeLock, writeLock);
+                writes++;
+                record = new CloudSaveRecord(true, payload, "cloud-test-lock");
+                return Task.FromResult(ServiceResult<CloudSaveRecord>.Success(record));
+            }
+            public Task<ServiceResult> DeleteSaveAsync(string id) { throw new InvalidOperationException(); }
+        }
+
+        [UnityTest]
+        public IEnumerator CloudCompareSignsInWithoutRanksAndBackupRequiresConfirmation()
+        {
+            new GameObject("CloudBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var consent = new ConsentService(new DeletionConsentStore());
+            var auth = new RanksFixture();
+            var cloud = new CloudFixture(auth);
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(consent, unavailable, unavailable, auth, auth, cloud,
+                unavailable, unavailable, new LocalTimeService(), unavailable);
+            rt.Ui.DebugSetServices(services);
+            rt.Ui.DebugMenu("settings");
+            Button Find(string key)
+            {
+                var label = rt.Ui.DebugRoot.Query<Label>().ToList().Find(l => l.text == UiText.Get(key));
+                return label != null ? label.GetFirstAncestorOfType<Button>() : null;
+            }
+            void Press(string key)
+            {
+                var button = Find(key);
+                Assert.IsNotNull(button, key);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = button; button.SendEvent(submit); }
+            }
+            Assert.IsNull(Find("cloud.compare"), "Cloud requests must remain behind online consent.");
+            Assert.AreEqual(0, auth.signIns + cloud.reads + cloud.writes);
+            consent.SavePreferences(false, false, true);
+            rt.Ui.DebugMenu("settings");
+            Press("cloud.compare");
+            yield return null;
+            Assert.AreEqual(1, auth.signIns);
+            Assert.AreEqual(1, cloud.reads);
+            Assert.AreEqual(0, cloud.writes);
+            Assert.AreEqual(0, auth.submissions + auth.reads, "Cloud Save cannot publish ranks.");
+            Assert.IsFalse(consent.Current.analyticsAllowed || consent.Current.adsAllowed);
+            Press("cloud.create");
+            yield return null;
+            Assert.AreEqual(0, cloud.writes, "First click is a warning, not an upload.");
+            Press("cloud.create.confirm");
+            yield return null;
+            Assert.AreEqual(1, cloud.writes);
+            Assert.AreEqual(2, cloud.reads, "Confirm must reread before writing.");
+            Assert.IsNotEmpty(cloud.record.payload);
+            Assert.IsNotNull(Find("cloud.restore"));
+        }
+
         sealed class DeletionFixture : IAuthService, ICloudSaveService
         {
             public string playerId = "deletion-test-player";

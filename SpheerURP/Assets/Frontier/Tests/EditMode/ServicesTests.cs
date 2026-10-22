@@ -809,22 +809,32 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void ResourcesUnityServicesConfig_EnablesRanksWithoutUnrelatedOnlineFeatures()
+        public void ResourcesUnityServicesConfig_EnablesRanksAnalyticsCloudAndLocalNotifications()
         {
             FrontierUnityServicesConfig config =
                 Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
 
             Assert.IsNotNull(config);
             Assert.IsTrue(config.enableOnlineServices);
-            Assert.IsFalse(config.enableCloudSave);
+            Assert.IsTrue(config.enableCloudSave);
             Assert.IsFalse(config.enableAccountRecovery);
-            Assert.IsFalse(config.enableAnalytics);
+            Assert.IsTrue(config.enableAnalytics);
+            Assert.IsTrue(config.enableNotifications);
             Assert.IsFalse(config.enableRemoteConfig);
             Assert.AreEqual("Lifetime_Earnings_Leaderboard", config.leaderboardId);
             Assert.AreEqual("https://20cameronw.github.io/spheer-privacy/", config.privacyPolicyUrl);
             Assert.IsTrue(config.HasValidPrivacyPolicy);
             Assert.IsTrue(config.CanUseAuthentication, "The checked-in project must remain linked to UGS.");
             Assert.IsTrue(config.CanUseLeaderboard);
+            Assert.IsTrue(config.CanUseAnalytics);
+            Assert.IsTrue(config.CanUseCloudSave);
+            var services = FrontierUnityServicesFactory.Create(new ConsentService(new MemoryConsentStore()), config);
+            Assert.IsTrue(services.Analytics.IsConfigured);
+            Assert.IsTrue(services.CloudSave.IsConfigured);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, services.Analytics.InitializeAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.ReadAsync().Result.status);
+            Assert.AreEqual(ServiceStatus.ConsentRequired, services.CloudSave.WriteAsync("not uploaded", null).Result.status);
+            Assert.IsFalse(services.Notifications.IsConfigured, "Editor has no native notification delivery.");
         }
     }
 }

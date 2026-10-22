@@ -9,7 +9,7 @@ namespace Frontier.Services.Unity
         [Tooltip("Enable only after legal/audience review, account-deletion UX, leaderboard policy and Unity Dashboard setup are complete.")]
         public bool enableOnlineServices;
 
-        [Tooltip("Enable only after explicit Analytics consent is implemented and custom event schemas are configured in the Unity Dashboard.")]
+        [Tooltip("Requires explicit Analytics consent and privacy/retention review. Any custom events also need schemas configured in the Unity Dashboard.")]
         public bool enableAnalytics;
 
         [Tooltip("Enable only after online-services consent, an existing signed-in identity and Unity Dashboard settings are ready.")]

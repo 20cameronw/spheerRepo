@@ -57,7 +57,7 @@ namespace Frontier
                 return Hyperspace.View.HyperspaceDiagnostics.Check();
             });
             var app = new GameObject("App");
-            app.AddComponent<FrontierApp>().Init(gs);
+            app.AddComponent<FrontierApp>().Init(gs, services);
             app.AddComponent<FrontierRemoteTravelTuning>().Init(bundledDb, services);
             app.AddComponent<FrontierBuilderNotifications>().Init(gs, services.Notifications);
 

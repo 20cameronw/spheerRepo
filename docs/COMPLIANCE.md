@@ -2,7 +2,9 @@
 
 Status: implementation checklist, not legal approval or a store-compliance certification.
 Anonymous Authentication and Leaderboards are enabled in the authored build at the developer's direction.
-Cloud Save, native account recovery, Analytics and Remote Config remain disabled.
+Cloud Save, Analytics and local notifications are also enabled at the developer's direction.
+Native account recovery and Remote Config remain disabled. Feature availability does not grant
+player consent or OS permission.
 
 ## Current behavior
 
@@ -28,6 +30,12 @@ Cloud Save, native account recovery, Analytics and Remote Config remain disabled
   This protection is not sufficient evidence for competitive progression or trusted live events.
 - Manual cloud comparison, backup, restore and local undo require an explicit player action. Destructive
   backup/restore uses a second confirmation and a fresh cloud record/write lock.
+  Settings > Privacy & Online Services must permit online services before comparing saves.
+  Compare explicitly signs into the installation's anonymous identity if needed; it never
+  requires opening Ranks first, and sign-in itself does not upload a snapshot.
+  Cloud backups belong to the anonymous UGS identity on this installation. Apple/Google account
+  recovery is not enabled, so reinstalling/clearing credentials or switching devices cannot recover
+  that identity through this build. Do not present this as recoverable cross-device backup.
 - Settings offers independent local audio preferences and Reset Progress. Reset starts a new local game and
   removes local progression recovery copies; it is not an account-deletion request or a reset of every device setting.
 - Online Save & Account Deletion is separate from Reset Progress. It requires configured authentication and
@@ -44,7 +52,12 @@ Cloud Save, native account recovery, Analytics and Remote Config remain disabled
   purchase records. Those systems require their own documented deletion/retention paths before activation.
 - The UGS Analytics adapter starts collection only after the separate analytics opt-in and stops it when that
   choice is withdrawn. Events are not queued by Frontier before consent. Activation also requires an explicit
-  feature flag, a linked Unity project and custom event schemas configured in the Unity Dashboard.
+  feature flag and a linked Unity project. Custom event emitters additionally require reviewed schemas
+  configured in the Unity Dashboard.
+  The app now initializes the enabled adapter on saved/new analytics opt-in, without signing into
+  Authentication or opting into cloud/ranks. Failed initialization is logged and retried on explicit
+  preference changes or returning to the app. This enables SDK standard session analytics; no custom
+  gameplay event emitters or dashboard schemas are added by this switch.
 - Remote Config is separately feature-flagged and requires online-services consent, configured online-service
   prerequisites and an already signed-in identity. Fetching never creates or signs into an account. Returned
   setting values are exposed as JSON-formatted strings; responses are discarded if consent is withdrawn while
@@ -59,9 +72,10 @@ Cloud Save, native account recovery, Analytics and Remote Config remain disabled
   cold startup with no initialized identity uses bundled defaults instead of waiting for authentication.
   It is not trusted server data,
   cross-device progression authority, or general catalog/event/score/purchase tuning.
-- Local crew reminders use Mobile Notifications 2.5.0 and are feature-flagged off until native-device
-  permission/delivery/cancellation checks are complete. The separate device preference starts off; Settings
-  can enable it on supported enabled builds. Permission is requested only when an active saved crew timer
+- Local crew reminders use Mobile Notifications 2.5.0 and are enabled for native Android/iOS builds.
+  Native-device permission/delivery/cancellation checks remain release requirements, not verified by
+  the feature flag. The separate device preference starts off; Settings can enable it on supported builds.
+  Permission is requested only when an active saved crew timer
   exists, not on launch. Denial does not repeatedly prompt; off/on permits an explicit retry.
   Construction/upgrade/clearance reminders share eight reserved IDs, are cancelled when their timers disappear
   or reminders are disabled, and never grant rewards or change jobs. Failed save writes suppress new reminders.
@@ -127,7 +141,7 @@ Cloud Save, native account recovery, Analytics and Remote Config remain disabled
 - Keep banners and forced interstitials off. Leaderboards are independent of ad activation:
   anonymous authentication and explicit Frontier Score posting are enabled as described above.
 
-## Required before enabling providers
+## Required before public release or enabling additional providers
 
 - [ ] Publish a real HTTPS privacy policy, in-app link and support contact. Describe actual data categories,
   processors, purposes, retention, opt-out and deletion behavior; do not use placeholder legal text.
@@ -141,10 +155,12 @@ Cloud Save, native account recovery, Analytics and Remote Config remain disabled
   of the cloud key, invalidated account/session, and unchanged local progression/restore backup.
 - [ ] Implement and verify the public web deletion-request route required for Google Play account-enabled apps.
   Define identity verification and support escalation without requesting passwords or tokens.
-- [ ] Define server-side deletion/retention for leaderboard records and any future analytics/ad processors.
+- [ ] Define server-side deletion/retention for leaderboard records, analytics and ad processors.
   Prevent other active devices from recreating deleted data; verify token revocation and backend cleanup.
-- [ ] Before enabling Analytics, configure reviewed event schemas and retention in the Unity Dashboard, document
-  the collected fields and deletion path, and validate consent grant/withdrawal with test identities.
+- [ ] Review Analytics retention in the Unity Dashboard, document standard session-event fields and the
+  deletion path, and validate consent grant/withdrawal with test identities. Configure reviewed event
+  schemas before adding custom gameplay emitters. The child-inclusive audience requires its own
+  appropriate privacy/parental-consent review; the current opt-in toggle is not parental verification.
 - [ ] Before enabling Remote Config, configure the project/environment and reviewed settings; verify the signed-in
   account requirement and ensure each setting has a safe local default and validated bounds.
 - [ ] Verify deletion remains accessible after withdrawing consent and explain any necessary reauthentication.

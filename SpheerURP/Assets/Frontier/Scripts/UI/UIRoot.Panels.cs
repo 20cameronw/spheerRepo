@@ -1060,6 +1060,13 @@ namespace Frontier
                     return;
                 }
 
+                var signedIn = await services.Authentication.SignInAnonymouslyAsync();
+                if (this == null) return;
+                if (!signedIn.succeeded)
+                {
+                    FinishCloudSaveAction(signedIn.text);
+                    return;
+                }
                 ServiceResult<CloudSaveRecord> result = await services.CloudSave.ReadAsync();
                 if (this == null) return;
                 if (!result.succeeded)
