@@ -1,0 +1,162 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: scanner_range
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: scanner_range
+  displayName: Scanner Range
+  description: Worlds within range of any world you have visited show their resources.
+  category: 1
+  effect: 9
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 8
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 0
+  hazard: 0
+  levels:
+  - level: 1
+    displayName: Long Lens
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 90
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 17
+    value: 60
+    researchPrereq: survey_basics
+    requiresReachTier: 0
+    eraTier: 1
+  - level: 2
+    displayName: Sweep Array
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 340
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 65
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 140
+    value: 110
+    researchPrereq: long_range_scanning_1
+    requiresReachTier: 0
+    eraTier: 2
+  - level: 3
+    displayName: Deep Survey
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 820
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 150
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 330
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 55
+    value: 180
+    researchPrereq: long_range_scanning_1
+    requiresReachTier: 0
+    eraTier: 2
+  - level: 4
+    displayName: Parallax Net
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 1200
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 220
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 470
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 80
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 80
+    value: 300
+    researchPrereq: long_range_scanning_2
+    requiresReachTier: 0
+    eraTier: 3
+  - level: 5
+    displayName: Galactic Atlas
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 800
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 1700
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 300
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 290
+    value: 500
+    researchPrereq: long_range_scanning_2
+    requiresReachTier: 0
+    eraTier: 3
+  - level: 6
+    displayName: Dark Survey
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2460
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 1000
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 2200
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 390
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 370
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 35
+    value: 800
+    researchPrereq: long_range_scanning_3
+    requiresReachTier: 0
+    eraTier: 5
+  - level: 7
+    displayName: Lattice Scan
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2460
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 1968
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 3280
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 1700
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 1700
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 150
+    value: 1300
+    researchPrereq: long_range_scanning_3
+    requiresReachTier: 0
+    eraTier: 5
+  - level: 8
+    displayName: Cosmic Ear
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 2460
+    - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+      amount: 1968
+    - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+      amount: 3280
+    - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+      amount: 3280
+    - resource: {fileID: 11400000, guid: 3d2e1d0c660023640ac3da8f4501f8ad, type: 2}
+      amount: 2600
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 1200
+    value: 2200
+    researchPrereq: long_range_scanning_3
+    requiresReachTier: 0
+    eraTier: 5
+  icon: 

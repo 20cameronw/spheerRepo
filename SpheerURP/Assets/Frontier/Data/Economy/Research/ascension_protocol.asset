@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: ascension_protocol
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: ascension_protocol
+    displayName: Ascension Protocol
+    description: Begin again in a new seeded universe, keeping what you learned.
+    branch: Megaprojects
+    tier: 7
+    cost:
+    - resourceId: quantum_chip
+      amount: 3700
+    - resourceId: warp_coil
+      amount: 600
+    - resourceId: void_alloy
+      amount: 2500
+    - resourceId: antimatter
+      amount: 480
+    - resourceId: plasma
+      amount: 4500
+    prereqs:
+    - stellar_engineering
+    labLevel: 7
+    unlocks:
+    - feature:ascension
+  icon: research

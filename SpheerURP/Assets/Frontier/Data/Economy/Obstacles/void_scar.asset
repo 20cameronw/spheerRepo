@@ -1,0 +1,147 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: void_scar
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: void_scar
+    displayName: Void Scar
+    description: Space itself is torn here. Seal the scar with shielding alloy before
+      it spreads under the next pad.
+    biomes: Lush;Mineral;Glacial;Volcanic;Fungal;Crystal;Obsidian;Shattered;Desert;Oceanic;Barren
+    biomeMask: 3071
+    needsVoid: 1
+    minTier: 6
+    weight: 4
+    costMult: 1
+    timeMult: 1.5
+    rewardResource: steel
+    iconConcept: A ragged black rip in the ground with a violet lip and loose pebbles
+      floating above it.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: steel
+        amount: 1
+      reward:
+        resourceId: steel
+        amount: 1
+    - tier: 1
+      cost:
+      - resourceId: steel
+        amount: 2
+      reward:
+        resourceId: steel
+        amount: 1
+    - tier: 2
+      cost:
+      - resourceId: steel
+        amount: 3
+      reward:
+        resourceId: steel
+        amount: 1
+    - tier: 3
+      cost:
+      - resourceId: steel
+        amount: 7
+      reward:
+        resourceId: steel
+        amount: 2
+    - tier: 4
+      cost:
+      - resourceId: steel
+        amount: 14
+      reward:
+        resourceId: steel
+        amount: 5
+    - tier: 5
+      cost:
+      - resourceId: steel
+        amount: 25
+      reward:
+        resourceId: steel
+        amount: 10
+    - tier: 6
+      cost:
+      - resourceId: steel
+        amount: 35
+      - resourceId: rad_shield_alloy
+        amount: 3
+      reward:
+        resourceId: steel
+        amount: 21
+    - tier: 7
+      cost:
+      - resourceId: steel
+        amount: 70
+      - resourceId: rad_shield_alloy
+        amount: 5
+      reward:
+        resourceId: steel
+        amount: 43
+    - tier: 8
+      cost:
+      - resourceId: steel
+        amount: 110
+      - resourceId: rad_shield_alloy
+        amount: 9
+      - resourceId: void_alloy
+        amount: 2
+      reward:
+        resourceId: steel
+        amount: 87
+    - tier: 9
+      cost:
+      - resourceId: steel
+        amount: 230
+      - resourceId: rad_shield_alloy
+        amount: 18
+      - resourceId: void_alloy
+        amount: 3
+      reward:
+        resourceId: steel
+        amount: 174
+    - tier: 10
+      cost:
+      - resourceId: steel
+        amount: 460
+      - resourceId: rad_shield_alloy
+        amount: 35
+      - resourceId: void_alloy
+        amount: 6
+      reward:
+        resourceId: steel
+        amount: 288
+    - tier: 11
+      cost:
+      - resourceId: steel
+        amount: 777
+      - resourceId: rad_shield_alloy
+        amount: 85
+      - resourceId: void_alloy
+        amount: 14
+      reward:
+        resourceId: steel
+        amount: 288
+    - tier: 12
+      cost:
+      - resourceId: steel
+        amount: 835
+      - resourceId: rad_shield_alloy
+        amount: 230
+      - resourceId: void_alloy
+        amount: 40
+      reward:
+        resourceId: steel
+        amount: 288
+  modelKey: 

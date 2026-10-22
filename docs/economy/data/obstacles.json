@@ -1,0 +1,2334 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "obstacles",
+  "items": {
+    "rules": {
+      "density": 0.3,
+      "densityJitter": 0.1,
+      "homeDensity": 0.08,
+      "freePads": 4,
+      "shardPodChance": 0.05,
+      "padsPerSize": [
+        12,
+        16,
+        24,
+        36,
+        48,
+        64
+      ],
+      "sizeCostMult": [
+        0.7,
+        0.85,
+        1,
+        1.25,
+        1.5,
+        1.8
+      ],
+      "rewardShare": 0.4,
+      "xpPerValue": 0.05,
+      "valueBase": 8,
+      "valueGrowth": 2,
+      "maxTier": 12,
+      "clearSeconds": [
+        0,
+        6,
+        20,
+        60,
+        180,
+        480,
+        1200,
+        2400,
+        4200,
+        6300,
+        9000,
+        12600,
+        18000
+      ],
+      "timeCapSeconds": 18000
+    },
+    "kinds": [
+      {
+        "id": "boulder",
+        "displayName": "Boulder",
+        "description": "A weathered lump of rock sits where a pad should be. Break it up with picks and haul the pieces away.",
+        "biomes": "Mineral;Desert;Obsidian;Shattered;Barren;Volcanic",
+        "biomeMask": 2506,
+        "needsVoid": false,
+        "minTier": 0,
+        "weight": 3,
+        "costMult": 1,
+        "timeMult": 1,
+        "rewardResource": "stone",
+        "iconConcept": "A lone rounded boulder with one flat cut face and a chipped notch in its crown.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 5
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 11
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 6
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 21
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 11
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 12
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 45
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 21
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 25
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 50
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 25
+              },
+              {
+                "resourceId": "steel",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 51
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 100
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 50
+              },
+              {
+                "resourceId": "steel",
+                "amount": 11
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 102
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 150
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 75
+              },
+              {
+                "resourceId": "steel",
+                "amount": 16
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 8
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 228
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 160
+              },
+              {
+                "resourceId": "steel",
+                "amount": 35
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 18
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 250
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 360
+              },
+              {
+                "resourceId": "steel",
+                "amount": 75
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 40
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 276
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 410
+              },
+              {
+                "resourceId": "steel",
+                "amount": 180
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 95
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 260
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 390
+              },
+              {
+                "resourceId": "steel",
+                "amount": 346
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 182
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 214
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 325
+              },
+              {
+                "resourceId": "steel",
+                "amount": 520
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 307
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "stone",
+                "amount": 212
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 317
+              },
+              {
+                "resourceId": "steel",
+                "amount": 510
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 425
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          }
+        ]
+      },
+      {
+        "id": "dead_tree",
+        "displayName": "Dead Tree",
+        "description": "The trunk is long dead and the roots still grip the pad. Fell it, split it, and the wood is yours.",
+        "biomes": "Lush;Fungal;Desert;Oceanic",
+        "biomeMask": 785,
+        "needsVoid": false,
+        "minTier": 0,
+        "weight": 3,
+        "costMult": 1,
+        "timeMult": 0.8,
+        "rewardResource": "wood",
+        "iconConcept": "A bare forked trunk with three snapped branches and a pale split at the base.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 5
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 11
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 6
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 21
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 11
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 12
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 25
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 13
+              },
+              {
+                "resourceId": "planks",
+                "amount": 12
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 25
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 50
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 25
+              },
+              {
+                "resourceId": "planks",
+                "amount": 23
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 51
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 75
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 35
+              },
+              {
+                "resourceId": "planks",
+                "amount": 35
+              },
+              {
+                "resourceId": "steel",
+                "amount": 8
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 102
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 150
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 75
+              },
+              {
+                "resourceId": "planks",
+                "amount": 65
+              },
+              {
+                "resourceId": "steel",
+                "amount": 16
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 228
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 120
+              },
+              {
+                "resourceId": "planks",
+                "amount": 110
+              },
+              {
+                "resourceId": "steel",
+                "amount": 25
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 11
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 223
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 241
+              },
+              {
+                "resourceId": "planks",
+                "amount": 223
+              },
+              {
+                "resourceId": "steel",
+                "amount": 53
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 21
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 209
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 311
+              },
+              {
+                "resourceId": "planks",
+                "amount": 209
+              },
+              {
+                "resourceId": "steel",
+                "amount": 129
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 53
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 198
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 297
+              },
+              {
+                "resourceId": "planks",
+                "amount": 198
+              },
+              {
+                "resourceId": "steel",
+                "amount": 264
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 112
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 172
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 261
+              },
+              {
+                "resourceId": "planks",
+                "amount": 172
+              },
+              {
+                "resourceId": "steel",
+                "amount": 418
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 226
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "wood",
+                "amount": 170
+              },
+              {
+                "resourceId": "scrap",
+                "amount": 254
+              },
+              {
+                "resourceId": "planks",
+                "amount": 170
+              },
+              {
+                "resourceId": "steel",
+                "amount": 408
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 340
+              }
+            ],
+            "reward": {
+              "resourceId": "wood",
+              "amount": 120
+            }
+          }
+        ]
+      },
+      {
+        "id": "wreckage",
+        "displayName": "Wreckage",
+        "description": "Someone else's landing ended here. Cut the hull apart for scrap before it blocks anything else.",
+        "biomes": "Lush;Mineral;Glacial;Volcanic;Fungal;Crystal;Obsidian;Shattered;Desert;Oceanic;Barren",
+        "biomeMask": 3071,
+        "needsVoid": false,
+        "minTier": 0,
+        "weight": 2,
+        "costMult": 1.1,
+        "timeMult": 1.2,
+        "rewardResource": "scrap",
+        "iconConcept": "A snapped hull fin canted on the ground, ragged edge up, with two rows of rivets.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 9
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 12
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 1
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 7
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 23
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 14
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 45
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 4
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 28
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 55
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 4
+              },
+              {
+                "resourceId": "steel",
+                "amount": 6
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 56
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 110
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 9
+              },
+              {
+                "resourceId": "steel",
+                "amount": 12
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 112
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 180
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 15
+              },
+              {
+                "resourceId": "steel",
+                "amount": 19
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 8
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 340
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 30
+              },
+              {
+                "resourceId": "steel",
+                "amount": 40
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 16
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 378
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 70
+              },
+              {
+                "resourceId": "steel",
+                "amount": 95
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 35
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 410
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 160
+              },
+              {
+                "resourceId": "steel",
+                "amount": 210
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 80
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 438
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 321
+              },
+              {
+                "resourceId": "steel",
+                "amount": 419
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 165
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 315
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 315
+              },
+              {
+                "resourceId": "steel",
+                "amount": 503
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 324
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "scrap",
+                "amount": 317
+              },
+              {
+                "resourceId": "iron_plate",
+                "amount": 317
+              },
+              {
+                "resourceId": "steel",
+                "amount": 510
+              },
+              {
+                "resourceId": "circuit_board",
+                "amount": 425
+              }
+            ],
+            "reward": {
+              "resourceId": "scrap",
+              "amount": 180
+            }
+          }
+        ]
+      },
+      {
+        "id": "fungal_growth",
+        "displayName": "Fungal Growth",
+        "description": "A shelf of spore-heavy fungus has taken the pad. Burn it back and collect what the rot left behind.",
+        "biomes": "Fungal;Lush;Oceanic",
+        "biomeMask": 529,
+        "needsVoid": false,
+        "minTier": 1,
+        "weight": 2,
+        "costMult": 1,
+        "timeMult": 1,
+        "rewardResource": "biomass",
+        "iconConcept": "A tilted stack of three mushroom shelves, each wider than the last, with spotted caps.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 4
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 8
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 16
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 6
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 21
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 7
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 12
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 45
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 15
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 25
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 55
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 19
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 7
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 51
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 110
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 40
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 14
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 102
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 190
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 65
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 25
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 250
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 150
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 60
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 11
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 276
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 330
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 140
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 25
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 272
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 326
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 317
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 58
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 241
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 292
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 390
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 181
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "biomass",
+                "amount": 221
+              },
+              {
+                "resourceId": "fuel",
+                "amount": 265
+              },
+              {
+                "resourceId": "biocomposite",
+                "amount": 354
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 452
+              }
+            ],
+            "reward": {
+              "resourceId": "biomass",
+              "amount": 120
+            }
+          }
+        ]
+      },
+      {
+        "id": "ice_spire",
+        "displayName": "Ice Spire",
+        "description": "A spear of old ice has grown through the pad. Melt it carefully; the water is worth keeping.",
+        "biomes": "Glacial;Oceanic",
+        "biomeMask": 516,
+        "needsVoid": false,
+        "minTier": 2,
+        "weight": 2.5,
+        "costMult": 1,
+        "timeMult": 1.1,
+        "rewardResource": "ice",
+        "iconConcept": "A jagged ice spear leaning off the vertical, with a split foot and a small frozen splash around it.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 3
+              },
+              {
+                "resourceId": "planks",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 5
+              },
+              {
+                "resourceId": "planks",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 11
+              },
+              {
+                "resourceId": "planks",
+                "amount": 10
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 6
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 14
+              },
+              {
+                "resourceId": "planks",
+                "amount": 13
+              },
+              {
+                "resourceId": "steel",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 12
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 30
+              },
+              {
+                "resourceId": "planks",
+                "amount": 25
+              },
+              {
+                "resourceId": "steel",
+                "amount": 9
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 25
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 45
+              },
+              {
+                "resourceId": "planks",
+                "amount": 40
+              },
+              {
+                "resourceId": "steel",
+                "amount": 16
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 51
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 90
+              },
+              {
+                "resourceId": "planks",
+                "amount": 85
+              },
+              {
+                "resourceId": "steel",
+                "amount": 30
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 6
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 102
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 180
+              },
+              {
+                "resourceId": "planks",
+                "amount": 170
+              },
+              {
+                "resourceId": "steel",
+                "amount": 60
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 12
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 144
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 330
+              },
+              {
+                "resourceId": "planks",
+                "amount": 276
+              },
+              {
+                "resourceId": "steel",
+                "amount": 140
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 25
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 144
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 342
+              },
+              {
+                "resourceId": "planks",
+                "amount": 285
+              },
+              {
+                "resourceId": "steel",
+                "amount": 380
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 71
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 144
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 292
+              },
+              {
+                "resourceId": "planks",
+                "amount": 241
+              },
+              {
+                "resourceId": "steel",
+                "amount": 586
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 158
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 144
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "ice",
+                "amount": 265
+              },
+              {
+                "resourceId": "planks",
+                "amount": 221
+              },
+              {
+                "resourceId": "steel",
+                "amount": 532
+              },
+              {
+                "resourceId": "cryo_composite",
+                "amount": 452
+              }
+            ],
+            "reward": {
+              "resourceId": "ice",
+              "amount": 144
+            }
+          }
+        ]
+      },
+      {
+        "id": "crystal_cluster",
+        "displayName": "Crystal Cluster",
+        "description": "Raw crystal has burst through the ground. Cut it free before the whole pad starts to hum.",
+        "biomes": "Crystal;Shattered",
+        "biomeMask": 160,
+        "needsVoid": false,
+        "minTier": 2,
+        "weight": 2.5,
+        "costMult": 1,
+        "timeMult": 1.1,
+        "rewardResource": "crystal",
+        "iconConcept": "A fan of five crystal shards of unequal height rising from one faceted base.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 1
+              },
+              {
+                "resourceId": "glass",
+                "amount": 1
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 2
+              },
+              {
+                "resourceId": "glass",
+                "amount": 1
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 3
+              },
+              {
+                "resourceId": "glass",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 6
+              },
+              {
+                "resourceId": "glass",
+                "amount": 4
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 13
+              },
+              {
+                "resourceId": "glass",
+                "amount": 9
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 6
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 19
+              },
+              {
+                "resourceId": "glass",
+                "amount": 14
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 4
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 12
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 40
+              },
+              {
+                "resourceId": "glass",
+                "amount": 25
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 8
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 25
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 80
+              },
+              {
+                "resourceId": "glass",
+                "amount": 55
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 16
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 51
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 140
+              },
+              {
+                "resourceId": "glass",
+                "amount": 100
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 30
+              },
+              {
+                "resourceId": "quantum_chip",
+                "amount": 1
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 102
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 280
+              },
+              {
+                "resourceId": "glass",
+                "amount": 200
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 60
+              },
+              {
+                "resourceId": "quantum_chip",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 204
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 450
+              },
+              {
+                "resourceId": "glass",
+                "amount": 360
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 160
+              },
+              {
+                "resourceId": "quantum_chip",
+                "amount": 6
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 288
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 387
+              },
+              {
+                "resourceId": "glass",
+                "amount": 309
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 413
+              },
+              {
+                "resourceId": "quantum_chip",
+                "amount": 16
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 288
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "iron_plate",
+                "amount": 408
+              },
+              {
+                "resourceId": "glass",
+                "amount": 327
+              },
+              {
+                "resourceId": "optic_lens",
+                "amount": 436
+              },
+              {
+                "resourceId": "quantum_chip",
+                "amount": 86
+              }
+            ],
+            "reward": {
+              "resourceId": "crystal",
+              "amount": 288
+            }
+          }
+        ]
+      },
+      {
+        "id": "magma_crust",
+        "displayName": "Magma Crust",
+        "description": "A plate of cooled magma has fused over the pad, still ticking as it shrinks. Break the crust and clear the slag.",
+        "biomes": "Volcanic;Obsidian",
+        "biomeMask": 72,
+        "needsVoid": false,
+        "minTier": 3,
+        "weight": 2.5,
+        "costMult": 1,
+        "timeMult": 1.3,
+        "rewardResource": "stone",
+        "iconConcept": "A cracked dark slab with a glowing seam zigzagging corner to corner.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 1
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 3
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 6
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 12
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 7
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 25
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 9
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 51
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 18
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 102
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 25
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 7
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 4
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 50
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 14
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 9
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 100
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 25
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 17
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 210
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 55
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 35
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 410
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 110
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 70
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 777
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 230
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 150
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 835
+              },
+              {
+                "resourceId": "titanium_plate",
+                "amount": 630
+              },
+              {
+                "resourceId": "thermal_alloy",
+                "amount": 400
+              }
+            ],
+            "reward": {
+              "resourceId": "stone",
+              "amount": 120
+            }
+          }
+        ]
+      },
+      {
+        "id": "void_scar",
+        "displayName": "Void Scar",
+        "description": "Space itself is torn here. Seal the scar with shielding alloy before it spreads under the next pad.",
+        "biomes": "Lush;Mineral;Glacial;Volcanic;Fungal;Crystal;Obsidian;Shattered;Desert;Oceanic;Barren",
+        "biomeMask": 3071,
+        "needsVoid": true,
+        "minTier": 6,
+        "weight": 4,
+        "costMult": 1,
+        "timeMult": 1.5,
+        "rewardResource": "steel",
+        "iconConcept": "A ragged black rip in the ground with a violet lip and loose pebbles floating above it.",
+        "byTier": [
+          {
+            "tier": 0,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 1
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 1,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 2,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 1
+            }
+          },
+          {
+            "tier": 3,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 7
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 2
+            }
+          },
+          {
+            "tier": 4,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 14
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 5
+            }
+          },
+          {
+            "tier": 5,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 25
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 10
+            }
+          },
+          {
+            "tier": 6,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 35
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 21
+            }
+          },
+          {
+            "tier": 7,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 70
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 5
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 43
+            }
+          },
+          {
+            "tier": 8,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 110
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 9
+              },
+              {
+                "resourceId": "void_alloy",
+                "amount": 2
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 87
+            }
+          },
+          {
+            "tier": 9,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 230
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 18
+              },
+              {
+                "resourceId": "void_alloy",
+                "amount": 3
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 174
+            }
+          },
+          {
+            "tier": 10,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 460
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 35
+              },
+              {
+                "resourceId": "void_alloy",
+                "amount": 6
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 288
+            }
+          },
+          {
+            "tier": 11,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 777
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 85
+              },
+              {
+                "resourceId": "void_alloy",
+                "amount": 14
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 288
+            }
+          },
+          {
+            "tier": 12,
+            "cost": [
+              {
+                "resourceId": "steel",
+                "amount": 835
+              },
+              {
+                "resourceId": "rad_shield_alloy",
+                "amount": 230
+              },
+              {
+                "resourceId": "void_alloy",
+                "amount": 40
+              }
+            ],
+            "reward": {
+              "resourceId": "steel",
+              "amount": 288
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: hazmat_cold
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: hazmat_cold
+    displayName: 'Hazmat: Cold'
+    description: Plating for worlds where air freezes.
+    branch: Navigation
+    tier: 3
+    cost:
+    - resourceId: steel
+      amount: 250
+    - resourceId: planks
+      amount: 340
+    - resourceId: glass
+      amount: 260
+    - resourceId: circuit_board
+      amount: 95
+    - resourceId: biocomposite
+      amount: 75
+    - resourceId: cryo_composite
+      amount: 15
+    prereqs:
+    - cryo_chemistry
+    labLevel: 3
+    unlocks:
+    - upgrade:hull_cold:1
+  icon: research

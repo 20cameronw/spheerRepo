@@ -1,0 +1,4859 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "remote_config",
+  "items": {
+    "note": "Remote = client Remote Config; Server = read by the Cloud Code validator (score weights); Content = changes only with a content update; Dev = simulator only.",
+    "keys": [
+      {
+        "key": "value.premium.refinery",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.foundry",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.fabricator",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.chem_reactor",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.premium.quantum_lab",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.35,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "value.max_ratio.base",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 1.25,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "key": "value.max_ratio.per_tier",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.03,
+        "min": 0,
+        "max": 0.2
+      },
+      {
+        "key": "value.min_ratio",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "time.anchor.0",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.1",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.2",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 20,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.3",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.4",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 180,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.5",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.6",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 1800,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.7",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 3600,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.8",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 10800,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.9",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 28800,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.10",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 57600,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.anchor.11",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 86400,
+        "min": 0,
+        "max": 604800
+      },
+      {
+        "key": "time.cap_seconds",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 86400,
+        "min": 3600,
+        "max": 604800
+      },
+      {
+        "key": "time.mega.stage1",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 172800,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage2",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 259200,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage3",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 345600,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage4",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 432000,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega.stage5",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 604800,
+        "min": 3600,
+        "max": 2592000
+      },
+      {
+        "key": "time.mega_cap_seconds",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 864000,
+        "min": 86400,
+        "max": 2592000
+      },
+      {
+        "key": "time.scale",
+        "exposure": "Remote",
+        "group": "time",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "value.raw.wood",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.wood",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 10,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.wood",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.stone",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.stone",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.stone",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.scrap",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.scrap",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 10,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.scrap",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.biomass",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 2,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.biomass",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 9,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.biomass",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.iron",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 2.5,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.iron",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 7,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.iron",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.copper_ore",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 3,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.copper_ore",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 6,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.copper_ore",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.silica",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 2,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.silica",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.silica",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.ice",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 4,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.ice",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.ice",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.titanium_ore",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 8,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.titanium_ore",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 5,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.titanium_ore",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.crystal",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 8,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.crystal",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 5,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.crystal",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.methane",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 8,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.methane",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.methane",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.helium3",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 22,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.helium3",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 4,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.helium3",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.core",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 45,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.core",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 2,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.core",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.radium",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 55,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.radium",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 3,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.radium",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "value.raw.dark_matter",
+        "exposure": "Content",
+        "group": "value",
+        "defaultValue": 130,
+        "min": 0.1,
+        "max": 100000
+      },
+      {
+        "key": "yield.base.dark_matter",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 2,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "yield.per_tier.dark_matter",
+        "exposure": "Content",
+        "group": "yield",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "cost.scale.structure",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.tool",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.ship",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.defense",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.research",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.scale.mega",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.7,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.0",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.1",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1.8,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.2",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 3.2,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.3",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1.8,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.4",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 1.2,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.5",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.9,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.6",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.8,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.7",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.7,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "cost.era.8",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.7,
+        "min": 0.05,
+        "max": 20
+      },
+      {
+        "key": "level.reach_step",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 2
+      },
+      {
+        "key": "cost.cap.base_slots",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 12,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "cost.cap.slots_per_tier",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 14,
+        "min": 0,
+        "max": 200
+      },
+      {
+        "key": "tool.mult.1",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.1",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 1,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.2",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 1.6,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.2",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 0.96,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.3",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 2.4,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.3",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 0.92,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.4",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 3.6,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.4",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 0.88,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.5",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 5.4,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.5",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 0.84,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.6",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 8.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.6",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 0.8,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "tool.mult.7",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 12.5,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "tool.runtime.7",
+        "exposure": "Remote",
+        "group": "tool",
+        "defaultValue": 0.76,
+        "min": 0.3,
+        "max": 1.5
+      },
+      {
+        "key": "cost.v.lumber",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 6,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.lumber",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.lumber",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.lumber",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.mine",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v2.mine",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 8,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.mine",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.mine",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.mine",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.driller",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 33,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.driller",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.driller",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.driller",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.biodome",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.biodome",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.biodome",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.biodome",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.siphon_rig",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.siphon_rig",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.siphon_rig",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.siphon_rig",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.excavator",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.excavator",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.excavator",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.excavator",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.salvage_yard",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.salvage_yard",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.salvage_yard",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.salvage_yard",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.refinery",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 15,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.refinery",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.refinery",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.refinery",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.fabricator",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 70,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.fabricator",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.fabricator",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.fabricator",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.foundry",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 90,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.foundry",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.foundry",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.foundry",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.chem_reactor",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.chem_reactor",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.chem_reactor",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.chem_reactor",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.quantum_lab",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 30000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.quantum_lab",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.68,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.quantum_lab",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.quantum_lab",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.warehouse",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.warehouse",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.6,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.warehouse",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.warehouse",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.fuel_depot",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.fuel_depot",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.65,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.fuel_depot",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.fuel_depot",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.cargo_depot",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.cargo_depot",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.65,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.cargo_depot",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.cargo_depot",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.orbital_relay",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 25000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.orbital_relay",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.orbital_relay",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.orbital_relay",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.gunner",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 29,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.gunner",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.gunner",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.gunner",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.laser",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.laser",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.laser",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.laser",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.shield_pylon",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.shield_pylon",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.shield_pylon",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.shield_pylon",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.missile_silo",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4200,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.missile_silo",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.missile_silo",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.missile_silo",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.tesla_coil",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.tesla_coil",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.tesla_coil",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.tesla_coil",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.repair_bay",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.repair_bay",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.repair_bay",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.repair_bay",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.alarm",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.alarm",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.alarm",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.alarm",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.research_lab",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 80,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.research_lab",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.8,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.research_lab",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.research_lab",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.95,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.radar_tower",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.radar_tower",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.7,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.radar_tower",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.radar_tower",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.colony_hub",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 6000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.colony_hub",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.8,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.colony_hub",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.colony_hub",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.95,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.hangar",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 35000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hangar",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.hangar",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.hangar",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.auto_harvester",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 28000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.auto_harvester",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.75,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.auto_harvester",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 4.5,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.auto_harvester",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.terraformer",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 600000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.terraformer",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.9,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.terraformer",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.terraformer",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.warp_gate",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1500000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.warp_gate",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.9,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.warp_gate",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.warp_gate",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.dyson_collector",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4000000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.dyson_collector",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1.9,
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "time.start.dyson_collector",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 11
+      },
+      {
+        "key": "time.step.dyson_collector",
+        "exposure": "Content",
+        "group": "time",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "cost.v.axe",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 40,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.axe",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.pick",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 40,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.pick",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.claw",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.claw",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.drill",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 80,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.drill",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4.7,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.siphon",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.siphon",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.scanner",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.scanner",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4.6,
+        "min": 1,
+        "max": 20
+      },
+      {
+        "key": "cost.v.pack",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.pack",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.pack.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 18,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 27,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 36,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 54,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 63,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 72,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pack.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 81,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.engine",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.engine",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.engine.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.92,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.85,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.78,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.72,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.66,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.61,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.56,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.52,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.9",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.48,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.engine.10",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.jump",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.jump",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3.1,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.jump.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 36,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 55,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 85,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 130,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 310,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 480,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 750,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.9",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.jump.10",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2000,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.scanner_range",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.scanner_range",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.scanner_range.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 110,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 180,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 300,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 500,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1300,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.scanner_range.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.fuel_tank",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.fuel_tank",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3.3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.fuel_tank.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 7,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 14,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.fuel_tank.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 18,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_toxic",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 900,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_toxic",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 24,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_toxic.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_toxic.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_toxic.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_heat",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 6000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_heat",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 14,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_heat.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_heat.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_heat.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_cold",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 6000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_cold",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 14,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_cold.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_cold.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_cold.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_rad",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 40000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_rad",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 12,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_rad.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_rad.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_rad.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.hull_void",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 500000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.hull_void",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 8,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.hull_void.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_void.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.hull_void.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.turret",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 27,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.turret",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.turret.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.15,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turret.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.turretdmg",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 33,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.turretdmg",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.turretdmg.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.35,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.05,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2.1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2.45,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.9",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3.15,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.turretdmg.10",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3.5,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.pulse",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 28,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.pulse",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.pulse.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 2.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3.2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.9",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 3.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.pulse.10",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.shield",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 27,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.shield",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.shield.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 25,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 125,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 175,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 200,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.9",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 225,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.shield.10",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 250,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.salvage",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 54,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.salvage",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 2.2,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.salvage.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.5",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.6",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.6,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.7",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.8",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.9",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 0.9,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.salvage.10",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.compression",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.g.compression",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 5.5,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "upg.compression.1",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.15,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.compression.2",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.3,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.compression.3",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.5,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "upg.compression.4",
+        "exposure": "Content",
+        "group": "upgrade",
+        "defaultValue": 1.75,
+        "min": 0,
+        "max": 10000000
+      },
+      {
+        "key": "cost.v.survey_basics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.smelting",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 90,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.fabrication",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 90,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.deep_drilling",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 70,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.bio_cultivation",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 70,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_1",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.steelmaking",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.composites",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.circuitry",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.titanium_working",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.gas_extraction",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.geo_survey",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.salvage_ops",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.fuel_logistics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 550,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.cargo_logistics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.ballistics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.shield_tech",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_toxic",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_2",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.field_engineering",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.long_range_scanning_1",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 450,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_1",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 650,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.chemistry",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.thermal_metallurgy",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.cryo_chemistry",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.robotics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3200,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.optics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3200,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_heat",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_cold",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.missile_tech",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.tesla_tech",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3600,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.field_repair",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3400,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.colony_charter",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 4500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_3",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.nav_autopilot",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 2800,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_2",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3500,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.long_range_scanning_2",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.plasma_physics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 20000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.radiation_shielding",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 22000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.quantum_computing",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 25000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_rad",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 26000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.orbital_logistics",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 24000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.automation",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 22000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hangar_ops",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 22000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_3",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 20000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_4",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.compression_1",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.terraforming",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 100000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.long_range_scanning_3",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 80000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.compression_2",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 90000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.void_forging",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 300000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.warp_theory",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 320000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.antimatter_synthesis",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 240000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.hazmat_void",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 350000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.warp_gate_engineering",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 420000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.jump_drive_5",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 220000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.toolsmithing_4",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 250000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.stellar_engineering",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 1500000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.compression_3",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 700000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "cost.v.ascension_protocol",
+        "exposure": "Content",
+        "group": "cost",
+        "defaultValue": 3000000,
+        "min": 0,
+        "max": 1E+09
+      },
+      {
+        "key": "start.wood",
+        "exposure": "Remote",
+        "group": "start",
+        "defaultValue": 24,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "start.scrap",
+        "exposure": "Remote",
+        "group": "start",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "start.fuel",
+        "exposure": "Remote",
+        "group": "start",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "start.backpack_slots",
+        "exposure": "Remote",
+        "group": "start",
+        "defaultValue": 9,
+        "min": 3,
+        "max": 60
+      },
+      {
+        "key": "start.builders",
+        "exposure": "Remote",
+        "group": "start",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 8
+      },
+      {
+        "key": "travel.base_fuel",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 1.5,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "travel.k",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 0.14,
+        "min": 0.01,
+        "max": 2
+      },
+      {
+        "key": "travel.p",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 1.1,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "key": "travel.intra_fuel",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "travel.intra_fuel_per_au",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "travel.cargo_factor",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "travel.autopilot_mult",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 1.6,
+        "min": 1,
+        "max": 4
+      },
+      {
+        "key": "travel.refund_max",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "travel.run_base_seconds",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 25,
+        "min": 5,
+        "max": 120
+      },
+      {
+        "key": "travel.run_log_seconds",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 60
+      },
+      {
+        "key": "travel.run_cap_seconds",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 90,
+        "min": 20,
+        "max": 300
+      },
+      {
+        "key": "travel.autopilot_seconds",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 12,
+        "min": 1,
+        "max": 60
+      },
+      {
+        "key": "travel.hop_fraction",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 0.9,
+        "min": 0.5,
+        "max": 1
+      },
+      {
+        "key": "travel.detour",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 1.15,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "key": "travel.max_discount",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 0.95
+      },
+      {
+        "key": "travel.plating_l2_tier",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 5,
+        "min": 1,
+        "max": 40
+      },
+      {
+        "key": "travel.plating_l3_tier",
+        "exposure": "Remote",
+        "group": "travel",
+        "defaultValue": 9,
+        "min": 1,
+        "max": 40
+      },
+      {
+        "key": "wave.base_budget",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 5,
+        "min": 0.5,
+        "max": 100
+      },
+      {
+        "key": "wave.linear_per_wave",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "wave.growth_per_wave",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 1.12,
+        "min": 1,
+        "max": 1.5
+      },
+      {
+        "key": "wave.danger_weight",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "wave.fuel_budget_base",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "wave.fuel_budget_per",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.25,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "wave.base_eff",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 1.3,
+        "min": 0.5,
+        "max": 5
+      },
+      {
+        "key": "wave.eff_per_wave",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.03,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "wave.eff_cap_waves",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 20,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "wave.eff_per_tier",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.04,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "wave.bonus_cap",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "wave.core_share",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.7,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "wave.refund_share",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "wave.seconds_base",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 40,
+        "min": 5,
+        "max": 600
+      },
+      {
+        "key": "wave.seconds_per_energy",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 0.8,
+        "min": 0,
+        "max": 10
+      },
+      {
+        "key": "wave.seconds_max",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 150,
+        "min": 20,
+        "max": 900
+      },
+      {
+        "key": "wave.xp_per_threat",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 6,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "wave.max_energy",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 400,
+        "min": 1,
+        "max": 100000
+      },
+      {
+        "key": "wave.defense_k",
+        "exposure": "Remote",
+        "group": "wave",
+        "defaultValue": 2,
+        "min": 0.1,
+        "max": 100
+      },
+      {
+        "key": "score.reach_coefficient",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 700,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.reach_divisor_ly",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 10,
+        "min": 0.1,
+        "max": 1000
+      },
+      {
+        "key": "score.world_base",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 130,
+        "min": 0,
+        "max": 10000
+      },
+      {
+        "key": "score.world_full_count",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 500,
+        "min": 1,
+        "max": 100000
+      },
+      {
+        "key": "score.world_excess_share",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 0.2,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "score.industry_base",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 10000
+      },
+      {
+        "key": "score.industry_exponent",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 1.6,
+        "min": 0.5,
+        "max": 3
+      },
+      {
+        "key": "score.tech_per_upgrade_level",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 300,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.tech_per_tool_tier",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 800,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.defense_base",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "score.defense_wave_cap",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 25,
+        "min": 1,
+        "max": 10000
+      },
+      {
+        "key": "score.atlas_per_resource",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 100,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.atlas_per_recipe",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 80,
+        "min": 0,
+        "max": 100000
+      },
+      {
+        "key": "score.atlas_per_mega_stage",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 28000,
+        "min": 0,
+        "max": 1000000
+      },
+      {
+        "key": "score.ascension_step",
+        "exposure": "Server",
+        "group": "score",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "obstacle.density",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.3,
+        "min": 0,
+        "max": 0.8
+      },
+      {
+        "key": "obstacle.density_jitter",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.1,
+        "min": 0,
+        "max": 0.3
+      },
+      {
+        "key": "obstacle.home_density",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.08,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "obstacle.free_pads",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 12
+      },
+      {
+        "key": "obstacle.pod_chance",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.05,
+        "min": 0,
+        "max": 0.5
+      },
+      {
+        "key": "obstacle.value_base",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 8,
+        "min": 0.5,
+        "max": 1000
+      },
+      {
+        "key": "obstacle.value_growth",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 2,
+        "min": 1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.cap_base_slots",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "obstacle.cap_slots_per_tier",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 1.2,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "obstacle.cap_total_base_slots",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 14,
+        "min": 2,
+        "max": 200
+      },
+      {
+        "key": "obstacle.cap_total_slots_per_tier",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 2.5,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "obstacle.reward_share",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 0.9
+      },
+      {
+        "key": "obstacle.xp_per_value",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.05,
+        "min": 0,
+        "max": 5
+      },
+      {
+        "key": "obstacle.time_cap_seconds",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 18000,
+        "min": 60,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.pads.0",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 12,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.0",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.7,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.1",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 16,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.1",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0.85,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.2",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 24,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.2",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 1,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.3",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 36,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.3",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 1.25,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.4",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 48,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.4",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 1.5,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.pads.5",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 64,
+        "min": 4,
+        "max": 200
+      },
+      {
+        "key": "obstacle.size_mult.5",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 1.8,
+        "min": 0.1,
+        "max": 10
+      },
+      {
+        "key": "obstacle.time.t0",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t1",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 6,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t2",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 20,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t3",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 60,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t4",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 180,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t5",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 480,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t6",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 1200,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t7",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 2400,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t8",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 4200,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t9",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 6300,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t10",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 9000,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t11",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 12600,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "obstacle.time.t12",
+        "exposure": "Remote",
+        "group": "obstacle",
+        "defaultValue": 18000,
+        "min": 0,
+        "max": 86400
+      },
+      {
+        "key": "shard.skip.multiplier",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1.2,
+        "min": 0.1,
+        "max": 20
+      },
+      {
+        "key": "shard.skip.exponent",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 0.75,
+        "min": 0.3,
+        "max": 1
+      },
+      {
+        "key": "shard.skip.min_cost",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 50
+      },
+      {
+        "key": "shard.skip.free_finish_seconds",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 600
+      },
+      {
+        "key": "shard.builder.max",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 4,
+        "min": 2,
+        "max": 8
+      },
+      {
+        "key": "shard.builder.third_price",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 250,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "key": "shard.builder.fourth_price",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 600,
+        "min": 0,
+        "max": 10000
+      },
+      {
+        "key": "shard.revive.run",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.revive.wave",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 8,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.cosmetic.min",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 120,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "key": "shard.cosmetic.max",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1200,
+        "min": 0,
+        "max": 50000
+      },
+      {
+        "key": "shard.earn.levelup_base",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.earn.levelup_block",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 15,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.earn.atlas_resource",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.atlas_recipe",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.atlas_structure",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.achievement_small",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.achievement_medium",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.achievement_large",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 25,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.streak_day1",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day2",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day3",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day4",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day5",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day6",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.streak_day7",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 12,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.ad_reward",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 2,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.earn.ads_per_day",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "shard.earn.board_participation",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 20,
+        "min": 0,
+        "max": 500
+      },
+      {
+        "key": "shard.earn.board_top10",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "shard.earn.board_top1",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "key": "shard.earn.weekly_objectives",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 10
+      },
+      {
+        "key": "shard.earn.weekly_objective_reward",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 5,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "shard.earn.pod_base",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.earn.pod_per_3_tiers",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1,
+        "min": 0,
+        "max": 50
+      },
+      {
+        "key": "shard.pack.1.shards",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 80,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.1.price_tier",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.2.shards",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 500,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.2.price_tier",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 5,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.3.shards",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 1100,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.3.price_tier",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 10,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.4.shards",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 2400,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.4.price_tier",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 20,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "shard.pack.5.shards",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 6500,
+        "min": 1,
+        "max": 1000000
+      },
+      {
+        "key": "shard.pack.5.price_tier",
+        "exposure": "Remote",
+        "group": "shard",
+        "defaultValue": 50,
+        "min": 1,
+        "max": 1000
+      },
+      {
+        "key": "sim.growth_payback_hours",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 10,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "sim.growth_urgent_hours",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 1000
+      },
+      {
+        "key": "sim.growth_check_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 60,
+        "min": 5,
+        "max": 3600
+      },
+      {
+        "key": "sim.harvest_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 30,
+        "min": 10,
+        "max": 90
+      },
+      {
+        "key": "sim.harvest_overhead",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 3,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "key": "sim.craft_tap_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 2.5,
+        "min": 0.5,
+        "max": 20
+      },
+      {
+        "key": "sim.deposit_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "key": "sim.buy_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "key": "sim.land_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 8,
+        "min": 0,
+        "max": 60
+      },
+      {
+        "key": "sim.intra_hop_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 22,
+        "min": 5,
+        "max": 120
+      },
+      {
+        "key": "sim.base_scanner_ly",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 40,
+        "min": 5,
+        "max": 500
+      },
+      {
+        "key": "sim.max_runs_per_step",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 6,
+        "min": 1,
+        "max": 50
+      },
+      {
+        "key": "sim.instant_below_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 15,
+        "min": 0,
+        "max": 120
+      },
+      {
+        "key": "sim.fuel_reserve",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 4,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "key": "sim.auto_quality",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 0.5,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "key": "sim.storage_trigger",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 0.9,
+        "min": 0.3,
+        "max": 1
+      },
+      {
+        "key": "sim.mega_chunk_share",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 0.15,
+        "min": 0.02,
+        "max": 1
+      },
+      {
+        "key": "sim.session_jitter_hours",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 0.4,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "key": "sim.pack_deposit_share",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 0.6,
+        "min": 0.1,
+        "max": 1
+      },
+      {
+        "key": "sim.intermediate_share",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 0.12,
+        "min": 0.02,
+        "max": 1
+      },
+      {
+        "key": "sim.max_warehouses",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 6,
+        "min": 1,
+        "max": 12
+      },
+      {
+        "key": "sim.max_wait_seconds",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 120,
+        "min": 0,
+        "max": 3600
+      },
+      {
+        "key": "sim.wave_energy_base",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 6,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "sim.wave_energy_per_wave",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 1.5,
+        "min": 0,
+        "max": 20
+      },
+      {
+        "key": "sim.wave_energy_cap",
+        "exposure": "Dev",
+        "group": "sim",
+        "defaultValue": 60,
+        "min": 1,
+        "max": 1000
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36f14f9cf77243ba98b11bd486835c14, type: 3}
+  m_Name: RewardedAdsPolicy
+  m_EditorClassIdentifier:
+  enableRewardedAds: 1
+  iosAppKey: 28e95b2f5
+  iosRewardedAdUnitId: eurexbly1unznz2g
+  iosSetupVerified: 0
+  enableIosDevelopmentTests: 1
+  placements:
+  - id: double-yield
+    dailyCap: 8
+    cooldownSeconds: 180
+  - id: emergency-fuel
+    dailyCap: 3
+    cooldownSeconds: 600
+  - id: timer-skip
+    dailyCap: 5
+    cooldownSeconds: 300
+  - id: revive
+    dailyCap: 3
+    cooldownSeconds: 0
+  - id: daily-supply
+    dailyCap: 1
+    cooldownSeconds: 0
+  - id: free-shards
+    dailyCap: 2
+    cooldownSeconds: 14400

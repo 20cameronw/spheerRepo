@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: warp_gate_engineering
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: warp_gate_engineering
+    displayName: Warp Gate Engineering
+    description: A ring in orbit that makes distance negotiable.
+    branch: Megaprojects
+    tier: 6
+    cost:
+    - resourceId: quantum_chip
+      amount: 640
+    - resourceId: plasma
+      amount: 1600
+    - resourceId: rad_shield_alloy
+      amount: 1000
+    - resourceId: titanium_plate
+      amount: 3800
+    - resourceId: warp_coil
+      amount: 21
+    prereqs:
+    - warp_theory
+    - terraforming
+    labLevel: 6
+    unlocks:
+    - structure:warp_gate
+  icon: research

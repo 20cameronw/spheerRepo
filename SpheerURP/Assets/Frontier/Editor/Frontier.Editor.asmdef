@@ -1,0 +1,29 @@
+{
+    "name": "Frontier.Editor",
+    "rootNamespace": "Frontier.EditorTools",
+    "references": [
+        "Frontier.Core",
+        "Frontier.Services",
+        "Frontier.Economy",
+        "Frontier.Data",
+        "Frontier.Game",
+        "Frontier.Visual",
+        "Frontier.UI",
+        "Frontier.App",
+        "Unity.Localization",
+        "Unity.Localization.Editor",
+        "Unity.Addressables.Editor",
+        "Unity.Notifications"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

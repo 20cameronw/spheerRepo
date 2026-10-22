@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: assemble_servo_motor
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: assemble_servo_motor
+  displayName: Assemble Servo Motor
+  inputs:
+  - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+    amount: 3
+  - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
+    amount: 1
+  outputs:
+  - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+    amount: 1
+  fabricator: 1
+  kind: 2
+  stationId: fabricator
+  stationLevel: 3
+  tier: 3
+  unlockResearch: robotics
+  bonus: 0

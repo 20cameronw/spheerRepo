@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d34ee26d274254998ef72f3dca111a, type: 3}
+  m_Name: mine_belt
+  m_EditorClassIdentifier: Frontier.Data::Frontier.EncounterSO
+  template:
+    id: mine_belt
+    index: 45
+    minTier: 6
+    maxTier: 12
+    cost: 14
+    role: 2
+    family: 4
+    entries:
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -2
+      y: 0.5
+      zOffset: 0
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 1.8
+      y: -0.5
+      zOffset: 0
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -1.6
+      y: -1
+      zOffset: 27
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 2.2
+      y: 1
+      zOffset: 27
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -2.2
+      y: 1
+      zOffset: 54
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 1.6
+      y: -1
+      zOffset: 54
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -1.8
+      y: -0.5
+      zOffset: 81
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 5
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 2
+      y: 0.5
+      zOffset: 81
+      vzOwn: 0
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    durationZ: 81
+    declaredSpeed: 0.6
+    weight: 1
+    mirrorable: 1
+    notes: Four rows of two mines with big blast rings; the channel between them
+      snakes.

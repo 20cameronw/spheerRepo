@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "legacy_ids",
+  "items": [
+    {
+      "kind": "Resource",
+      "legacyId": "wood",
+      "id": "wood"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "stone",
+      "id": "stone"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "scrap",
+      "id": "scrap"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "iron",
+      "id": "iron"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "crystal",
+      "id": "crystal"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "fuel",
+      "id": "fuel"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "core",
+      "id": "core"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "alloy",
+      "id": "steel"
+    },
+    {
+      "kind": "Resource",
+      "legacyId": "plasma",
+      "id": "plasma"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "refinery",
+      "id": "refinery"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "fabricator",
+      "id": "fabricator"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "alarm",
+      "id": "alarm"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "lumber",
+      "id": "lumber"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "mine",
+      "id": "mine"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "driller",
+      "id": "driller"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "gunner",
+      "id": "gunner"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "laser",
+      "id": "laser"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "satellite",
+      "id": "orbital_relay"
+    },
+    {
+      "kind": "Structure",
+      "legacyId": "warehouse",
+      "id": "warehouse"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "axe",
+      "id": "axe"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "pick",
+      "id": "pick"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "drill",
+      "id": "drill"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "pack",
+      "id": "pack"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "engine",
+      "id": "engine"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "turret",
+      "id": "turret"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "turretdmg",
+      "id": "turretdmg"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "pulse",
+      "id": "pulse"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "shield",
+      "id": "shield"
+    },
+    {
+      "kind": "Upgrade",
+      "legacyId": "salvage",
+      "id": "salvage"
+    }
+  ]
+}

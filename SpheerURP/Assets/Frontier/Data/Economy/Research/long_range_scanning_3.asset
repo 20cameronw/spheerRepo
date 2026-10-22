@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: long_range_scanning_3
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: long_range_scanning_3
+    displayName: Long-Range Scanning III
+    description: A survey net that spans galaxies.
+    branch: Navigation
+    tier: 5
+    cost:
+    - resourceId: titanium_plate
+      amount: 890
+    - resourceId: quantum_chip
+      amount: 120
+    - resourceId: servo_motor
+      amount: 310
+    - resourceId: plasma
+      amount: 260
+    - resourceId: rad_shield_alloy
+      amount: 110
+    prereqs:
+    - long_range_scanning_2
+    - quantum_computing
+    labLevel: 5
+    unlocks:
+    - upgrade:scanner_range:6
+    - upgrade:scanner_range:7
+    - upgrade:scanner_range:8
+  icon: research

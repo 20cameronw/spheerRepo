@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 112870821da7ea44495f6cc2ea450e8c, type: 3}
+  m_Name: SoundscapeLibrary
+  m_EditorClassIdentifier: Frontier.Visual::Frontier.SoundscapeLibrary
+  exploration: {fileID: 8300000, guid: 55c039b69cba6de40aeddba7f9eb899b, type: 3}
+  combat: {fileID: 8300000, guid: bdf2b574cc73b9642ab99b264d317bd0, type: 3}
+  travel: {fileID: 8300000, guid: 2d7e2a3992794f241812211ff76a2675, type: 3}
+  calm: {fileID: 8300000, guid: c6935c76764d495409ff26b94cd56170, type: 3}
+  rain: {fileID: 8300000, guid: 38b899c9cda781a45acbad21f2668473, type: 3}
+  snow: {fileID: 8300000, guid: 39d38b73decff8e468c1f8275b8b0fe9, type: 3}
+  embers: {fileID: 8300000, guid: b85a385337e4430479d514de4e006062, type: 3}
+  engine: {fileID: 8300000, guid: e8ed620bf08eb5948b0625d81ffd77e5, type: 3}
+  musicVolume: 0.18
+  ambienceVolume: 0.12
+  transitionSeconds: 0.6

@@ -1,0 +1,1230 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 729dc78855d69834c9ad82ba348ba316, type: 3}
+  m_Name: tuning
+  m_EditorClassIdentifier: Frontier.Data::Frontier.EconomyTuningSO
+  lockedFields: []
+  schemaVersion: 1
+  digest: f7b3888e49b20760
+  values:
+  - key: value.premium.refinery
+    value: 0.1
+  - key: value.premium.foundry
+    value: 0.2
+  - key: value.premium.fabricator
+    value: 0.25
+  - key: value.premium.chem_reactor
+    value: 0.3
+  - key: value.premium.quantum_lab
+    value: 0.35
+  - key: value.max_ratio.base
+    value: 1.25
+  - key: value.max_ratio.per_tier
+    value: 0.03
+  - key: value.min_ratio
+    value: 0.2
+  - key: time.anchor.0
+    value: 0
+  - key: time.anchor.1
+    value: 5
+  - key: time.anchor.2
+    value: 20
+  - key: time.anchor.3
+    value: 60
+  - key: time.anchor.4
+    value: 180
+  - key: time.anchor.5
+    value: 600
+  - key: time.anchor.6
+    value: 1800
+  - key: time.anchor.7
+    value: 3600
+  - key: time.anchor.8
+    value: 10800
+  - key: time.anchor.9
+    value: 28800
+  - key: time.anchor.10
+    value: 57600
+  - key: time.anchor.11
+    value: 86400
+  - key: time.cap_seconds
+    value: 86400
+  - key: time.mega.stage1
+    value: 172800
+  - key: time.mega.stage2
+    value: 259200
+  - key: time.mega.stage3
+    value: 345600
+  - key: time.mega.stage4
+    value: 432000
+  - key: time.mega.stage5
+    value: 604800
+  - key: time.mega_cap_seconds
+    value: 864000
+  - key: time.scale
+    value: 1
+  - key: value.raw.wood
+    value: 1
+  - key: yield.base.wood
+    value: 10
+  - key: yield.per_tier.wood
+    value: 0
+  - key: value.raw.stone
+    value: 1
+  - key: yield.base.stone
+    value: 8
+  - key: yield.per_tier.stone
+    value: 0
+  - key: value.raw.scrap
+    value: 1
+  - key: yield.base.scrap
+    value: 10
+  - key: yield.per_tier.scrap
+    value: 0
+  - key: value.raw.biomass
+    value: 2
+  - key: yield.base.biomass
+    value: 9
+  - key: yield.per_tier.biomass
+    value: 0.5
+  - key: value.raw.iron
+    value: 2.5
+  - key: yield.base.iron
+    value: 7
+  - key: yield.per_tier.iron
+    value: 1
+  - key: value.raw.copper_ore
+    value: 3
+  - key: yield.base.copper_ore
+    value: 6
+  - key: yield.per_tier.copper_ore
+    value: 0.8
+  - key: value.raw.silica
+    value: 2
+  - key: yield.base.silica
+    value: 8
+  - key: yield.per_tier.silica
+    value: 0.6
+  - key: value.raw.ice
+    value: 4
+  - key: yield.base.ice
+    value: 8
+  - key: yield.per_tier.ice
+    value: 0.8
+  - key: value.raw.titanium_ore
+    value: 8
+  - key: yield.base.titanium_ore
+    value: 5
+  - key: yield.per_tier.titanium_ore
+    value: 0.7
+  - key: value.raw.crystal
+    value: 8
+  - key: yield.base.crystal
+    value: 5
+  - key: yield.per_tier.crystal
+    value: 0.8
+  - key: value.raw.methane
+    value: 8
+  - key: yield.base.methane
+    value: 8
+  - key: yield.per_tier.methane
+    value: 0.8
+  - key: value.raw.helium3
+    value: 22
+  - key: yield.base.helium3
+    value: 4
+  - key: yield.per_tier.helium3
+    value: 0.6
+  - key: value.raw.core
+    value: 45
+  - key: yield.base.core
+    value: 2
+  - key: yield.per_tier.core
+    value: 0.3
+  - key: value.raw.radium
+    value: 55
+  - key: yield.base.radium
+    value: 3
+  - key: yield.per_tier.radium
+    value: 0.4
+  - key: value.raw.dark_matter
+    value: 130
+  - key: yield.base.dark_matter
+    value: 2
+  - key: yield.per_tier.dark_matter
+    value: 0.25
+  - key: cost.scale.structure
+    value: 1
+  - key: cost.scale.tool
+    value: 1
+  - key: cost.scale.ship
+    value: 1
+  - key: cost.scale.defense
+    value: 1
+  - key: cost.scale.research
+    value: 1
+  - key: cost.scale.mega
+    value: 0.7
+  - key: cost.era.0
+    value: 1
+  - key: cost.era.1
+    value: 1.8
+  - key: cost.era.2
+    value: 3.2
+  - key: cost.era.3
+    value: 1.8
+  - key: cost.era.4
+    value: 1.2
+  - key: cost.era.5
+    value: 0.9
+  - key: cost.era.6
+    value: 0.8
+  - key: cost.era.7
+    value: 0.7
+  - key: cost.era.8
+    value: 0.7
+  - key: level.reach_step
+    value: 0.5
+  - key: cost.cap.base_slots
+    value: 12
+  - key: cost.cap.slots_per_tier
+    value: 14
+  - key: tool.mult.1
+    value: 1
+  - key: tool.runtime.1
+    value: 1
+  - key: tool.mult.2
+    value: 1.6
+  - key: tool.runtime.2
+    value: 0.96
+  - key: tool.mult.3
+    value: 2.4
+  - key: tool.runtime.3
+    value: 0.92
+  - key: tool.mult.4
+    value: 3.6
+  - key: tool.runtime.4
+    value: 0.88
+  - key: tool.mult.5
+    value: 5.4
+  - key: tool.runtime.5
+    value: 0.84
+  - key: tool.mult.6
+    value: 8.2
+  - key: tool.runtime.6
+    value: 0.8
+  - key: tool.mult.7
+    value: 12.5
+  - key: tool.runtime.7
+    value: 0.76
+  - key: cost.v.lumber
+    value: 6
+  - key: cost.g.lumber
+    value: 1.7
+  - key: time.start.lumber
+    value: 0
+  - key: time.step.lumber
+    value: 0.8
+  - key: cost.v.mine
+    value: 0
+  - key: cost.v2.mine
+    value: 8
+  - key: cost.g.mine
+    value: 1.7
+  - key: time.start.mine
+    value: 0
+  - key: time.step.mine
+    value: 0.8
+  - key: cost.v.driller
+    value: 33
+  - key: cost.g.driller
+    value: 1.7
+  - key: time.start.driller
+    value: 0.6
+  - key: time.step.driller
+    value: 0.85
+  - key: cost.v.biodome
+    value: 60
+  - key: cost.g.biodome
+    value: 1.7
+  - key: time.start.biodome
+    value: 0.8
+  - key: time.step.biodome
+    value: 0.85
+  - key: cost.v.siphon_rig
+    value: 700
+  - key: cost.g.siphon_rig
+    value: 1.7
+  - key: time.start.siphon_rig
+    value: 2
+  - key: time.step.siphon_rig
+    value: 0.9
+  - key: cost.v.excavator
+    value: 700
+  - key: cost.g.excavator
+    value: 1.7
+  - key: time.start.excavator
+    value: 2
+  - key: time.step.excavator
+    value: 0.9
+  - key: cost.v.salvage_yard
+    value: 650
+  - key: cost.g.salvage_yard
+    value: 1.7
+  - key: time.start.salvage_yard
+    value: 2
+  - key: time.step.salvage_yard
+    value: 0.9
+  - key: cost.v.refinery
+    value: 15
+  - key: cost.g.refinery
+    value: 1.75
+  - key: time.start.refinery
+    value: 0
+  - key: time.step.refinery
+    value: 0.85
+  - key: cost.v.fabricator
+    value: 70
+  - key: cost.g.fabricator
+    value: 1.75
+  - key: time.start.fabricator
+    value: 0.8
+  - key: time.step.fabricator
+    value: 0.9
+  - key: cost.v.foundry
+    value: 90
+  - key: cost.g.foundry
+    value: 1.75
+  - key: time.start.foundry
+    value: 0.8
+  - key: time.step.foundry
+    value: 0.9
+  - key: cost.v.chem_reactor
+    value: 4500
+  - key: cost.g.chem_reactor
+    value: 1.75
+  - key: time.start.chem_reactor
+    value: 3.5
+  - key: time.step.chem_reactor
+    value: 0.9
+  - key: cost.v.quantum_lab
+    value: 30000
+  - key: cost.g.quantum_lab
+    value: 1.68
+  - key: time.start.quantum_lab
+    value: 4.5
+  - key: time.step.quantum_lab
+    value: 0.9
+  - key: cost.v.warehouse
+    value: 30
+  - key: cost.g.warehouse
+    value: 1.6
+  - key: time.start.warehouse
+    value: 0
+  - key: time.step.warehouse
+    value: 0.8
+  - key: cost.v.fuel_depot
+    value: 600
+  - key: cost.g.fuel_depot
+    value: 1.65
+  - key: time.start.fuel_depot
+    value: 2
+  - key: time.step.fuel_depot
+    value: 0.85
+  - key: cost.v.cargo_depot
+    value: 900
+  - key: cost.g.cargo_depot
+    value: 1.65
+  - key: time.start.cargo_depot
+    value: 2.5
+  - key: time.step.cargo_depot
+    value: 0.9
+  - key: cost.v.orbital_relay
+    value: 25000
+  - key: cost.g.orbital_relay
+    value: 1.7
+  - key: time.start.orbital_relay
+    value: 4.5
+  - key: time.step.orbital_relay
+    value: 0.9
+  - key: cost.v.gunner
+    value: 29
+  - key: cost.g.gunner
+    value: 1.75
+  - key: time.start.gunner
+    value: 0
+  - key: time.step.gunner
+    value: 0.8
+  - key: cost.v.laser
+    value: 800
+  - key: cost.g.laser
+    value: 1.75
+  - key: time.start.laser
+    value: 2
+  - key: time.step.laser
+    value: 0.9
+  - key: cost.v.shield_pylon
+    value: 700
+  - key: cost.g.shield_pylon
+    value: 1.75
+  - key: time.start.shield_pylon
+    value: 2
+  - key: time.step.shield_pylon
+    value: 0.9
+  - key: cost.v.missile_silo
+    value: 4200
+  - key: cost.g.missile_silo
+    value: 1.75
+  - key: time.start.missile_silo
+    value: 3.5
+  - key: time.step.missile_silo
+    value: 0.9
+  - key: cost.v.tesla_coil
+    value: 4000
+  - key: cost.g.tesla_coil
+    value: 1.75
+  - key: time.start.tesla_coil
+    value: 3.5
+  - key: time.step.tesla_coil
+    value: 0.9
+  - key: cost.v.repair_bay
+    value: 3800
+  - key: cost.g.repair_bay
+    value: 1.75
+  - key: time.start.repair_bay
+    value: 3.5
+  - key: time.step.repair_bay
+    value: 0.9
+  - key: cost.v.alarm
+    value: 12
+  - key: cost.g.alarm
+    value: 1.7
+  - key: time.start.alarm
+    value: 0
+  - key: time.step.alarm
+    value: 0.8
+  - key: cost.v.research_lab
+    value: 80
+  - key: cost.g.research_lab
+    value: 1.8
+  - key: time.start.research_lab
+    value: 1
+  - key: time.step.research_lab
+    value: 0.95
+  - key: cost.v.radar_tower
+    value: 60
+  - key: cost.g.radar_tower
+    value: 1.7
+  - key: time.start.radar_tower
+    value: 1
+  - key: time.step.radar_tower
+    value: 0.85
+  - key: cost.v.colony_hub
+    value: 6000
+  - key: cost.g.colony_hub
+    value: 1.8
+  - key: time.start.colony_hub
+    value: 3.5
+  - key: time.step.colony_hub
+    value: 0.95
+  - key: cost.v.hangar
+    value: 35000
+  - key: cost.g.hangar
+    value: 1.75
+  - key: time.start.hangar
+    value: 4.5
+  - key: time.step.hangar
+    value: 0.9
+  - key: cost.v.auto_harvester
+    value: 28000
+  - key: cost.g.auto_harvester
+    value: 1.75
+  - key: time.start.auto_harvester
+    value: 4.5
+  - key: time.step.auto_harvester
+    value: 0.9
+  - key: cost.v.terraformer
+    value: 600000
+  - key: cost.g.terraformer
+    value: 1.9
+  - key: time.start.terraformer
+    value: 0
+  - key: time.step.terraformer
+    value: 0.85
+  - key: cost.v.warp_gate
+    value: 1500000
+  - key: cost.g.warp_gate
+    value: 1.9
+  - key: time.start.warp_gate
+    value: 0
+  - key: time.step.warp_gate
+    value: 0.85
+  - key: cost.v.dyson_collector
+    value: 4000000
+  - key: cost.g.dyson_collector
+    value: 1.9
+  - key: time.start.dyson_collector
+    value: 0
+  - key: time.step.dyson_collector
+    value: 0.85
+  - key: cost.v.axe
+    value: 40
+  - key: cost.g.axe
+    value: 4.6
+  - key: cost.v.pick
+    value: 40
+  - key: cost.g.pick
+    value: 4.6
+  - key: cost.v.claw
+    value: 60
+  - key: cost.g.claw
+    value: 4.6
+  - key: cost.v.drill
+    value: 80
+  - key: cost.g.drill
+    value: 4.7
+  - key: cost.v.siphon
+    value: 900
+  - key: cost.g.siphon
+    value: 4.6
+  - key: cost.v.scanner
+    value: 900
+  - key: cost.g.scanner
+    value: 4.6
+  - key: cost.v.pack
+    value: 60
+  - key: cost.g.pack
+    value: 3
+  - key: upg.pack.1
+    value: 18
+  - key: upg.pack.2
+    value: 27
+  - key: upg.pack.3
+    value: 36
+  - key: upg.pack.4
+    value: 45
+  - key: upg.pack.5
+    value: 54
+  - key: upg.pack.6
+    value: 63
+  - key: upg.pack.7
+    value: 72
+  - key: upg.pack.8
+    value: 81
+  - key: cost.v.engine
+    value: 50
+  - key: cost.g.engine
+    value: 3
+  - key: upg.engine.1
+    value: 0.92
+  - key: upg.engine.2
+    value: 0.85
+  - key: upg.engine.3
+    value: 0.78
+  - key: upg.engine.4
+    value: 0.72
+  - key: upg.engine.5
+    value: 0.66
+  - key: upg.engine.6
+    value: 0.61
+  - key: upg.engine.7
+    value: 0.56
+  - key: upg.engine.8
+    value: 0.52
+  - key: upg.engine.9
+    value: 0.48
+  - key: upg.engine.10
+    value: 0.45
+  - key: cost.v.jump
+    value: 150
+  - key: cost.g.jump
+    value: 3.1
+  - key: upg.jump.1
+    value: 36
+  - key: upg.jump.2
+    value: 55
+  - key: upg.jump.3
+    value: 85
+  - key: upg.jump.4
+    value: 130
+  - key: upg.jump.5
+    value: 200
+  - key: upg.jump.6
+    value: 310
+  - key: upg.jump.7
+    value: 480
+  - key: upg.jump.8
+    value: 750
+  - key: upg.jump.9
+    value: 1200
+  - key: upg.jump.10
+    value: 2000
+  - key: cost.v.scanner_range
+    value: 100
+  - key: cost.g.scanner_range
+    value: 3.2
+  - key: upg.scanner_range.1
+    value: 60
+  - key: upg.scanner_range.2
+    value: 110
+  - key: upg.scanner_range.3
+    value: 180
+  - key: upg.scanner_range.4
+    value: 300
+  - key: upg.scanner_range.5
+    value: 500
+  - key: upg.scanner_range.6
+    value: 800
+  - key: upg.scanner_range.7
+    value: 1300
+  - key: upg.scanner_range.8
+    value: 2200
+  - key: cost.v.fuel_tank
+    value: 60
+  - key: cost.g.fuel_tank
+    value: 3.3
+  - key: upg.fuel_tank.1
+    value: 2
+  - key: upg.fuel_tank.2
+    value: 4
+  - key: upg.fuel_tank.3
+    value: 7
+  - key: upg.fuel_tank.4
+    value: 10
+  - key: upg.fuel_tank.5
+    value: 14
+  - key: upg.fuel_tank.6
+    value: 18
+  - key: cost.v.hull_toxic
+    value: 900
+  - key: cost.g.hull_toxic
+    value: 24
+  - key: upg.hull_toxic.1
+    value: 1
+  - key: upg.hull_toxic.2
+    value: 2
+  - key: upg.hull_toxic.3
+    value: 3
+  - key: cost.v.hull_heat
+    value: 6000
+  - key: cost.g.hull_heat
+    value: 14
+  - key: upg.hull_heat.1
+    value: 1
+  - key: upg.hull_heat.2
+    value: 2
+  - key: upg.hull_heat.3
+    value: 3
+  - key: cost.v.hull_cold
+    value: 6000
+  - key: cost.g.hull_cold
+    value: 14
+  - key: upg.hull_cold.1
+    value: 1
+  - key: upg.hull_cold.2
+    value: 2
+  - key: upg.hull_cold.3
+    value: 3
+  - key: cost.v.hull_rad
+    value: 40000
+  - key: cost.g.hull_rad
+    value: 12
+  - key: upg.hull_rad.1
+    value: 1
+  - key: upg.hull_rad.2
+    value: 2
+  - key: upg.hull_rad.3
+    value: 3
+  - key: cost.v.hull_void
+    value: 500000
+  - key: cost.g.hull_void
+    value: 8
+  - key: upg.hull_void.1
+    value: 1
+  - key: upg.hull_void.2
+    value: 2
+  - key: upg.hull_void.3
+    value: 3
+  - key: cost.v.turret
+    value: 27
+  - key: cost.g.turret
+    value: 2.2
+  - key: upg.turret.1
+    value: 0.15
+  - key: upg.turret.2
+    value: 0.3
+  - key: upg.turret.3
+    value: 0.45
+  - key: upg.turret.4
+    value: 0.6
+  - key: upg.turret.5
+    value: 0.75
+  - key: upg.turret.6
+    value: 0.9
+  - key: cost.v.turretdmg
+    value: 33
+  - key: cost.g.turretdmg
+    value: 2.2
+  - key: upg.turretdmg.1
+    value: 0.35
+  - key: upg.turretdmg.2
+    value: 0.7
+  - key: upg.turretdmg.3
+    value: 1.05
+  - key: upg.turretdmg.4
+    value: 1.4
+  - key: upg.turretdmg.5
+    value: 1.75
+  - key: upg.turretdmg.6
+    value: 2.1
+  - key: upg.turretdmg.7
+    value: 2.45
+  - key: upg.turretdmg.8
+    value: 2.8
+  - key: upg.turretdmg.9
+    value: 3.15
+  - key: upg.turretdmg.10
+    value: 3.5
+  - key: cost.v.pulse
+    value: 28
+  - key: cost.g.pulse
+    value: 2.2
+  - key: upg.pulse.1
+    value: 0.4
+  - key: upg.pulse.2
+    value: 0.8
+  - key: upg.pulse.3
+    value: 1.2
+  - key: upg.pulse.4
+    value: 1.6
+  - key: upg.pulse.5
+    value: 2
+  - key: upg.pulse.6
+    value: 2.4
+  - key: upg.pulse.7
+    value: 2.8
+  - key: upg.pulse.8
+    value: 3.2
+  - key: upg.pulse.9
+    value: 3.6
+  - key: upg.pulse.10
+    value: 4
+  - key: cost.v.shield
+    value: 27
+  - key: cost.g.shield
+    value: 2.2
+  - key: upg.shield.1
+    value: 25
+  - key: upg.shield.2
+    value: 50
+  - key: upg.shield.3
+    value: 75
+  - key: upg.shield.4
+    value: 100
+  - key: upg.shield.5
+    value: 125
+  - key: upg.shield.6
+    value: 150
+  - key: upg.shield.7
+    value: 175
+  - key: upg.shield.8
+    value: 200
+  - key: upg.shield.9
+    value: 225
+  - key: upg.shield.10
+    value: 250
+  - key: cost.v.salvage
+    value: 54
+  - key: cost.g.salvage
+    value: 2.2
+  - key: upg.salvage.1
+    value: 0.1
+  - key: upg.salvage.2
+    value: 0.2
+  - key: upg.salvage.3
+    value: 0.3
+  - key: upg.salvage.4
+    value: 0.4
+  - key: upg.salvage.5
+    value: 0.5
+  - key: upg.salvage.6
+    value: 0.6
+  - key: upg.salvage.7
+    value: 0.7
+  - key: upg.salvage.8
+    value: 0.8
+  - key: upg.salvage.9
+    value: 0.9
+  - key: upg.salvage.10
+    value: 1
+  - key: cost.v.compression
+    value: 18000
+  - key: cost.g.compression
+    value: 5.5
+  - key: upg.compression.1
+    value: 1.15
+  - key: upg.compression.2
+    value: 1.3
+  - key: upg.compression.3
+    value: 1.5
+  - key: upg.compression.4
+    value: 1.75
+  - key: cost.v.survey_basics
+    value: 60
+  - key: cost.v.smelting
+    value: 90
+  - key: cost.v.fabrication
+    value: 90
+  - key: cost.v.deep_drilling
+    value: 70
+  - key: cost.v.bio_cultivation
+    value: 70
+  - key: cost.v.jump_drive_1
+    value: 100
+  - key: cost.v.steelmaking
+    value: 500
+  - key: cost.v.composites
+    value: 550
+  - key: cost.v.circuitry
+    value: 550
+  - key: cost.v.titanium_working
+    value: 700
+  - key: cost.v.gas_extraction
+    value: 650
+  - key: cost.v.geo_survey
+    value: 650
+  - key: cost.v.salvage_ops
+    value: 550
+  - key: cost.v.fuel_logistics
+    value: 550
+  - key: cost.v.cargo_logistics
+    value: 700
+  - key: cost.v.ballistics
+    value: 600
+  - key: cost.v.shield_tech
+    value: 600
+  - key: cost.v.hazmat_toxic
+    value: 800
+  - key: cost.v.jump_drive_2
+    value: 500
+  - key: cost.v.field_engineering
+    value: 600
+  - key: cost.v.long_range_scanning_1
+    value: 450
+  - key: cost.v.toolsmithing_1
+    value: 650
+  - key: cost.v.chemistry
+    value: 3500
+  - key: cost.v.thermal_metallurgy
+    value: 3500
+  - key: cost.v.cryo_chemistry
+    value: 3500
+  - key: cost.v.robotics
+    value: 3200
+  - key: cost.v.optics
+    value: 3200
+  - key: cost.v.hazmat_heat
+    value: 4000
+  - key: cost.v.hazmat_cold
+    value: 4000
+  - key: cost.v.missile_tech
+    value: 3600
+  - key: cost.v.tesla_tech
+    value: 3600
+  - key: cost.v.field_repair
+    value: 3400
+  - key: cost.v.colony_charter
+    value: 4500
+  - key: cost.v.jump_drive_3
+    value: 3000
+  - key: cost.v.nav_autopilot
+    value: 2800
+  - key: cost.v.toolsmithing_2
+    value: 3500
+  - key: cost.v.long_range_scanning_2
+    value: 3000
+  - key: cost.v.plasma_physics
+    value: 20000
+  - key: cost.v.radiation_shielding
+    value: 22000
+  - key: cost.v.quantum_computing
+    value: 25000
+  - key: cost.v.hazmat_rad
+    value: 26000
+  - key: cost.v.orbital_logistics
+    value: 24000
+  - key: cost.v.automation
+    value: 22000
+  - key: cost.v.hangar_ops
+    value: 22000
+  - key: cost.v.toolsmithing_3
+    value: 20000
+  - key: cost.v.jump_drive_4
+    value: 18000
+  - key: cost.v.compression_1
+    value: 18000
+  - key: cost.v.terraforming
+    value: 100000
+  - key: cost.v.long_range_scanning_3
+    value: 80000
+  - key: cost.v.compression_2
+    value: 90000
+  - key: cost.v.void_forging
+    value: 300000
+  - key: cost.v.warp_theory
+    value: 320000
+  - key: cost.v.antimatter_synthesis
+    value: 240000
+  - key: cost.v.hazmat_void
+    value: 350000
+  - key: cost.v.warp_gate_engineering
+    value: 420000
+  - key: cost.v.jump_drive_5
+    value: 220000
+  - key: cost.v.toolsmithing_4
+    value: 250000
+  - key: cost.v.stellar_engineering
+    value: 1500000
+  - key: cost.v.compression_3
+    value: 700000
+  - key: cost.v.ascension_protocol
+    value: 3000000
+  - key: start.wood
+    value: 24
+  - key: start.scrap
+    value: 30
+  - key: start.fuel
+    value: 10
+  - key: start.backpack_slots
+    value: 9
+  - key: start.builders
+    value: 1
+  - key: travel.base_fuel
+    value: 1.5
+  - key: travel.k
+    value: 0.14
+  - key: travel.p
+    value: 1.1
+  - key: travel.intra_fuel
+    value: 2
+  - key: travel.intra_fuel_per_au
+    value: 0.25
+  - key: travel.cargo_factor
+    value: 0.2
+  - key: travel.autopilot_mult
+    value: 1.6
+  - key: travel.refund_max
+    value: 0.4
+  - key: travel.run_base_seconds
+    value: 25
+  - key: travel.run_log_seconds
+    value: 12
+  - key: travel.run_cap_seconds
+    value: 90
+  - key: travel.autopilot_seconds
+    value: 12
+  - key: travel.hop_fraction
+    value: 0.9
+  - key: travel.detour
+    value: 1.15
+  - key: travel.max_discount
+    value: 0.7
+  - key: travel.plating_l2_tier
+    value: 5
+  - key: travel.plating_l3_tier
+    value: 9
+  - key: wave.base_budget
+    value: 5
+  - key: wave.linear_per_wave
+    value: 2
+  - key: wave.growth_per_wave
+    value: 1.12
+  - key: wave.danger_weight
+    value: 0.5
+  - key: wave.fuel_budget_base
+    value: 0.5
+  - key: wave.fuel_budget_per
+    value: 0.25
+  - key: wave.base_eff
+    value: 1.3
+  - key: wave.eff_per_wave
+    value: 0.03
+  - key: wave.eff_cap_waves
+    value: 20
+  - key: wave.eff_per_tier
+    value: 0.04
+  - key: wave.bonus_cap
+    value: 1
+  - key: wave.core_share
+    value: 0.7
+  - key: wave.refund_share
+    value: 0.2
+  - key: wave.seconds_base
+    value: 40
+  - key: wave.seconds_per_energy
+    value: 0.8
+  - key: wave.seconds_max
+    value: 150
+  - key: wave.xp_per_threat
+    value: 6
+  - key: wave.max_energy
+    value: 400
+  - key: wave.defense_k
+    value: 2
+  - key: score.reach_coefficient
+    value: 700
+  - key: score.reach_divisor_ly
+    value: 10
+  - key: score.world_base
+    value: 130
+  - key: score.world_full_count
+    value: 500
+  - key: score.world_excess_share
+    value: 0.2
+  - key: score.industry_base
+    value: 50
+  - key: score.industry_exponent
+    value: 1.6
+  - key: score.tech_per_upgrade_level
+    value: 300
+  - key: score.tech_per_tool_tier
+    value: 800
+  - key: score.defense_base
+    value: 12
+  - key: score.defense_wave_cap
+    value: 25
+  - key: score.atlas_per_resource
+    value: 100
+  - key: score.atlas_per_recipe
+    value: 80
+  - key: score.atlas_per_mega_stage
+    value: 28000
+  - key: score.ascension_step
+    value: 0.1
+  - key: obstacle.density
+    value: 0.3
+  - key: obstacle.density_jitter
+    value: 0.1
+  - key: obstacle.home_density
+    value: 0.08
+  - key: obstacle.free_pads
+    value: 4
+  - key: obstacle.pod_chance
+    value: 0.05
+  - key: obstacle.value_base
+    value: 8
+  - key: obstacle.value_growth
+    value: 2
+  - key: obstacle.cap_base_slots
+    value: 3
+  - key: obstacle.cap_slots_per_tier
+    value: 1.2
+  - key: obstacle.cap_total_base_slots
+    value: 14
+  - key: obstacle.cap_total_slots_per_tier
+    value: 2.5
+  - key: obstacle.reward_share
+    value: 0.4
+  - key: obstacle.xp_per_value
+    value: 0.05
+  - key: obstacle.time_cap_seconds
+    value: 18000
+  - key: obstacle.pads.0
+    value: 12
+  - key: obstacle.size_mult.0
+    value: 0.7
+  - key: obstacle.pads.1
+    value: 16
+  - key: obstacle.size_mult.1
+    value: 0.85
+  - key: obstacle.pads.2
+    value: 24
+  - key: obstacle.size_mult.2
+    value: 1
+  - key: obstacle.pads.3
+    value: 36
+  - key: obstacle.size_mult.3
+    value: 1.25
+  - key: obstacle.pads.4
+    value: 48
+  - key: obstacle.size_mult.4
+    value: 1.5
+  - key: obstacle.pads.5
+    value: 64
+  - key: obstacle.size_mult.5
+    value: 1.8
+  - key: obstacle.time.t0
+    value: 0
+  - key: obstacle.time.t1
+    value: 6
+  - key: obstacle.time.t2
+    value: 20
+  - key: obstacle.time.t3
+    value: 60
+  - key: obstacle.time.t4
+    value: 180
+  - key: obstacle.time.t5
+    value: 480
+  - key: obstacle.time.t6
+    value: 1200
+  - key: obstacle.time.t7
+    value: 2400
+  - key: obstacle.time.t8
+    value: 4200
+  - key: obstacle.time.t9
+    value: 6300
+  - key: obstacle.time.t10
+    value: 9000
+  - key: obstacle.time.t11
+    value: 12600
+  - key: obstacle.time.t12
+    value: 18000
+  - key: shard.skip.multiplier
+    value: 1.2
+  - key: shard.skip.exponent
+    value: 0.75
+  - key: shard.skip.min_cost
+    value: 1
+  - key: shard.skip.free_finish_seconds
+    value: 30
+  - key: shard.builder.max
+    value: 4
+  - key: shard.builder.third_price
+    value: 250
+  - key: shard.builder.fourth_price
+    value: 600
+  - key: shard.revive.run
+    value: 5
+  - key: shard.revive.wave
+    value: 8
+  - key: shard.cosmetic.min
+    value: 120
+  - key: shard.cosmetic.max
+    value: 1200
+  - key: shard.earn.levelup_base
+    value: 3
+  - key: shard.earn.levelup_block
+    value: 15
+  - key: shard.earn.atlas_resource
+    value: 3
+  - key: shard.earn.atlas_recipe
+    value: 2
+  - key: shard.earn.atlas_structure
+    value: 1
+  - key: shard.earn.achievement_small
+    value: 5
+  - key: shard.earn.achievement_medium
+    value: 10
+  - key: shard.earn.achievement_large
+    value: 25
+  - key: shard.earn.streak_day1
+    value: 2
+  - key: shard.earn.streak_day2
+    value: 2
+  - key: shard.earn.streak_day3
+    value: 3
+  - key: shard.earn.streak_day4
+    value: 3
+  - key: shard.earn.streak_day5
+    value: 4
+  - key: shard.earn.streak_day6
+    value: 4
+  - key: shard.earn.streak_day7
+    value: 12
+  - key: shard.earn.ad_reward
+    value: 2
+  - key: shard.earn.ads_per_day
+    value: 3
+  - key: shard.earn.board_participation
+    value: 20
+  - key: shard.earn.board_top10
+    value: 50
+  - key: shard.earn.board_top1
+    value: 150
+  - key: shard.earn.weekly_objectives
+    value: 3
+  - key: shard.earn.weekly_objective_reward
+    value: 5
+  - key: shard.earn.pod_base
+    value: 1
+  - key: shard.earn.pod_per_3_tiers
+    value: 1
+  - key: shard.pack.1.shards
+    value: 80
+  - key: shard.pack.1.price_tier
+    value: 1
+  - key: shard.pack.2.shards
+    value: 500
+  - key: shard.pack.2.price_tier
+    value: 5
+  - key: shard.pack.3.shards
+    value: 1100
+  - key: shard.pack.3.price_tier
+    value: 10
+  - key: shard.pack.4.shards
+    value: 2400
+  - key: shard.pack.4.price_tier
+    value: 20
+  - key: shard.pack.5.shards
+    value: 6500
+  - key: shard.pack.5.price_tier
+    value: 50
+  - key: sim.growth_payback_hours
+    value: 10
+  - key: sim.growth_urgent_hours
+    value: 3
+  - key: sim.growth_check_seconds
+    value: 60
+  - key: sim.harvest_seconds
+    value: 30
+  - key: sim.harvest_overhead
+    value: 3
+  - key: sim.craft_tap_seconds
+    value: 2.5
+  - key: sim.deposit_seconds
+    value: 4
+  - key: sim.buy_seconds
+    value: 4
+  - key: sim.land_seconds
+    value: 8
+  - key: sim.intra_hop_seconds
+    value: 22
+  - key: sim.base_scanner_ly
+    value: 40
+  - key: sim.max_runs_per_step
+    value: 6
+  - key: sim.instant_below_seconds
+    value: 15
+  - key: sim.fuel_reserve
+    value: 4
+  - key: sim.auto_quality
+    value: 0.5
+  - key: sim.storage_trigger
+    value: 0.9
+  - key: sim.mega_chunk_share
+    value: 0.15
+  - key: sim.session_jitter_hours
+    value: 0.4
+  - key: sim.pack_deposit_share
+    value: 0.6
+  - key: sim.intermediate_share
+    value: 0.12
+  - key: sim.max_warehouses
+    value: 6
+  - key: sim.max_wait_seconds
+    value: 120
+  - key: sim.wave_energy_base
+    value: 6
+  - key: sim.wave_energy_per_wave
+    value: 1.5
+  - key: sim.wave_energy_cap
+    value: 60

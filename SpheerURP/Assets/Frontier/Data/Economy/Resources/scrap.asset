@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: scrap
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: scrap
+  displayName: Scrap
+  color: {r: 0.68235296, g: 0.7058824, b: 0.74509805, a: 1}
+  stackSize: 30
+  description: Wreckage and worn-out machinery lie on every world, because someone
+    always got there first. Pressed, burned or melted, none of it is ever wasted.
+  category: 0
+  tier: 0
+  harvestMethods: 0501
+  baseValue: 1
+  hazardAffinity: 0
+  fuelEnergy: 0
+  colorHex: '#AEB4BE'
+  accentHex: '#E58A3A'
+  baseYield: 10
+  yieldPerTier: 0
+  difficultyOffset: -0.08
+  atlasDescription: Wreckage and worn-out machinery lie on every world, because someone
+    always got there first. Pressed, burned or melted, none of it is ever wasted.
+  iconConcept: A jagged torn metal plate with a single round bolt hole punched through
+    it.
+  icon: 

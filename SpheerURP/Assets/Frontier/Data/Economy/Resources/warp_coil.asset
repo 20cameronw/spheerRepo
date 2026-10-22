@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: warp_coil
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: warp_coil
+  displayName: Warp Coil
+  color: {r: 0.8784314, g: 0.65882355, b: 1, a: 1}
+  stackSize: 16
+  description: A superconducting coil wound around a speck of dark matter. Charge
+    it and space folds; it is the last part of every great ship.
+  category: 3
+  tier: 6
+  harvestMethods: 
+  baseValue: 699.25
+  hazardAffinity: 0
+  fuelEnergy: 0
+  colorHex: '#E0A8FF'
+  accentHex: '#FFFFFF'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A superconducting coil wound around a speck of dark matter. Charge
+    it and space folds; it is the last part of every great ship.
+  iconConcept: A donut-shaped ring wound from five loops of coil with a bright spark
+    at its centre.
+  icon: 

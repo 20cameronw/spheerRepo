@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: biomass
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: biomass
+  displayName: Biomass
+  color: {r: 0.49803922, g: 0.79607844, b: 0.30980393, a: 1}
+  stackSize: 20
+  description: Fast-growing fibrous growth, thick with sap and spores. It ferments
+    into clean fuel and weaves into seals that shrug off poison.
+  category: 0
+  tier: 1
+  harvestMethods: 06
+  baseValue: 2
+  hazardAffinity: 4
+  fuelEnergy: 0
+  colorHex: '#7FCB4F'
+  accentHex: '#2F6B2A'
+  baseYield: 9
+  yieldPerTier: 0.5
+  difficultyOffset: 0
+  atlasDescription: Fast-growing fibrous growth, thick with sap and spores. It ferments
+    into clean fuel and weaves into seals that shrug off poison.
+  iconConcept: 'A young sprout: two broad leaves flaring from a short curved stem.'
+  icon: 

@@ -1,0 +1,1047 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "tools",
+  "items": [
+    {
+      "id": "axe",
+      "displayName": "Axe",
+      "kind": "Axe",
+      "games": [
+        "Chop",
+        "Harvest"
+      ],
+      "tiers": [
+        {
+          "tier": 1,
+          "displayName": "Bare Hands",
+          "yieldMult": 1,
+          "runTimeMult": 1,
+          "cost": [],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 2,
+          "displayName": "Stone Axe",
+          "yieldMult": 1.6,
+          "runTimeMult": 0.96,
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 30
+            },
+            {
+              "resourceId": "stone",
+              "amount": 11
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 3,
+          "displayName": "Iron Axe",
+          "yieldMult": 2.4,
+          "runTimeMult": 0.92,
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 150
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 30
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "requiresLabLevel": 1,
+          "eraTier": 1
+        },
+        {
+          "tier": 4,
+          "displayName": "Steel Axe",
+          "yieldMult": 3.6,
+          "runTimeMult": 0.88,
+          "cost": [
+            {
+              "resourceId": "planks",
+              "amount": 410
+            },
+            {
+              "resourceId": "steel",
+              "amount": 160
+            },
+            {
+              "resourceId": "wood",
+              "amount": 300
+            }
+          ],
+          "researchPrereq": "toolsmithing_1",
+          "requiresReachTier": 2,
+          "requiresLabLevel": 2,
+          "eraTier": 2
+        },
+        {
+          "tier": 5,
+          "displayName": "Crystal Axe",
+          "yieldMult": 5.4,
+          "runTimeMult": 0.84,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 270
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 400
+            },
+            {
+              "resourceId": "planks",
+              "amount": 580
+            }
+          ],
+          "researchPrereq": "toolsmithing_2",
+          "requiresReachTier": 3,
+          "requiresLabLevel": 3,
+          "eraTier": 3
+        },
+        {
+          "tier": 6,
+          "displayName": "Plasma Chainsaw",
+          "yieldMult": 8.2,
+          "runTimeMult": 0.8,
+          "cost": [
+            {
+              "resourceId": "plasma",
+              "amount": 130
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 120
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 340
+            },
+            {
+              "resourceId": "steel",
+              "amount": 330
+            }
+          ],
+          "researchPrereq": "toolsmithing_3",
+          "requiresReachTier": 4,
+          "requiresLabLevel": 4,
+          "eraTier": 4
+        },
+        {
+          "tier": 7,
+          "displayName": "Singularity Saw",
+          "yieldMult": 12.5,
+          "runTimeMult": 0.76,
+          "cost": [
+            {
+              "resourceId": "warp_coil",
+              "amount": 25
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 110
+            },
+            {
+              "resourceId": "void_alloy",
+              "amount": 90
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 200
+            }
+          ],
+          "researchPrereq": "toolsmithing_4",
+          "requiresReachTier": 6,
+          "requiresLabLevel": 6,
+          "eraTier": 6
+        }
+      ]
+    },
+    {
+      "id": "pick",
+      "displayName": "Pickaxe",
+      "kind": "Pick",
+      "games": [
+        "Mine"
+      ],
+      "tiers": [
+        {
+          "tier": 1,
+          "displayName": "Bare Hands",
+          "yieldMult": 1,
+          "runTimeMult": 1,
+          "cost": [],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 2,
+          "displayName": "Stone Pick",
+          "yieldMult": 1.6,
+          "runTimeMult": 0.96,
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 20
+            },
+            {
+              "resourceId": "stone",
+              "amount": 20
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 3,
+          "displayName": "Iron Pick",
+          "yieldMult": 2.4,
+          "runTimeMult": 0.92,
+          "cost": [
+            {
+              "resourceId": "wood",
+              "amount": 95
+            },
+            {
+              "resourceId": "stone",
+              "amount": 95
+            },
+            {
+              "resourceId": "iron_plate",
+              "amount": 23
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "requiresLabLevel": 1,
+          "eraTier": 1
+        },
+        {
+          "tier": 4,
+          "displayName": "Steel Pick",
+          "yieldMult": 3.6,
+          "runTimeMult": 0.88,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 160
+            },
+            {
+              "resourceId": "stone",
+              "amount": 600
+            },
+            {
+              "resourceId": "planks",
+              "amount": 270
+            }
+          ],
+          "researchPrereq": "toolsmithing_1",
+          "requiresReachTier": 2,
+          "requiresLabLevel": 2,
+          "eraTier": 2
+        },
+        {
+          "tier": 5,
+          "displayName": "Pneumatic Pick",
+          "yieldMult": 5.4,
+          "runTimeMult": 0.84,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 300
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 840
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 150
+            }
+          ],
+          "researchPrereq": "toolsmithing_2",
+          "requiresReachTier": 3,
+          "requiresLabLevel": 3,
+          "eraTier": 3
+        },
+        {
+          "tier": 6,
+          "displayName": "Jackhammer",
+          "yieldMult": 8.2,
+          "runTimeMult": 0.8,
+          "cost": [
+            {
+              "resourceId": "titanium_plate",
+              "amount": 400
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 140
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 75
+            },
+            {
+              "resourceId": "steel",
+              "amount": 380
+            }
+          ],
+          "researchPrereq": "toolsmithing_3",
+          "requiresReachTier": 4,
+          "requiresLabLevel": 4,
+          "eraTier": 4
+        },
+        {
+          "tier": 7,
+          "displayName": "Plasma Jackhammer",
+          "yieldMult": 12.5,
+          "runTimeMult": 0.76,
+          "cost": [
+            {
+              "resourceId": "quantum_chip",
+              "amount": 130
+            },
+            {
+              "resourceId": "void_alloy",
+              "amount": 80
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 350
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 610
+            }
+          ],
+          "researchPrereq": "toolsmithing_4",
+          "requiresReachTier": 6,
+          "requiresLabLevel": 6,
+          "eraTier": 6
+        }
+      ]
+    },
+    {
+      "id": "claw",
+      "displayName": "Salvage Claw",
+      "kind": "Claw",
+      "games": [
+        "Salvage"
+      ],
+      "tiers": [
+        {
+          "tier": 1,
+          "displayName": "Grabber",
+          "yieldMult": 1,
+          "runTimeMult": 1,
+          "cost": [],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 2,
+          "displayName": "Magnet Claw",
+          "yieldMult": 1.6,
+          "runTimeMult": 0.96,
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 4
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 8
+            },
+            {
+              "resourceId": "planks",
+              "amount": 6
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 3,
+          "displayName": "Servo Claw",
+          "yieldMult": 2.4,
+          "runTimeMult": 0.92,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 23
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 65
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 8
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "requiresLabLevel": 1,
+          "eraTier": 1
+        },
+        {
+          "tier": 4,
+          "displayName": "Titan Claw",
+          "yieldMult": 3.6,
+          "runTimeMult": 0.88,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 170
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 30
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 45
+            }
+          ],
+          "researchPrereq": "toolsmithing_1",
+          "requiresReachTier": 2,
+          "requiresLabLevel": 2,
+          "eraTier": 2
+        },
+        {
+          "tier": 5,
+          "displayName": "Plasma Claw",
+          "yieldMult": 5.4,
+          "runTimeMult": 0.84,
+          "cost": [
+            {
+              "resourceId": "plasma",
+              "amount": 80
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 75
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 85
+            }
+          ],
+          "researchPrereq": "toolsmithing_2",
+          "requiresReachTier": 3,
+          "requiresLabLevel": 3,
+          "eraTier": 3
+        },
+        {
+          "tier": 6,
+          "displayName": "Gravity Claw",
+          "yieldMult": 8.2,
+          "runTimeMult": 0.8,
+          "cost": [
+            {
+              "resourceId": "quantum_chip",
+              "amount": 60
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 190
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 420
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 110
+            }
+          ],
+          "researchPrereq": "toolsmithing_3",
+          "requiresReachTier": 4,
+          "requiresLabLevel": 4,
+          "eraTier": 4
+        },
+        {
+          "tier": 7,
+          "displayName": "Singularity Claw",
+          "yieldMult": 12.5,
+          "runTimeMult": 0.76,
+          "cost": [
+            {
+              "resourceId": "warp_coil",
+              "amount": 45
+            },
+            {
+              "resourceId": "void_alloy",
+              "amount": 110
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 180
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 330
+            }
+          ],
+          "researchPrereq": "toolsmithing_4",
+          "requiresReachTier": 6,
+          "requiresLabLevel": 6,
+          "eraTier": 6
+        }
+      ]
+    },
+    {
+      "id": "drill",
+      "displayName": "Drill",
+      "kind": "Drill",
+      "games": [
+        "Drill"
+      ],
+      "tiers": [
+        {
+          "tier": 1,
+          "displayName": "Hand Auger",
+          "yieldMult": 1,
+          "runTimeMult": 1,
+          "cost": [],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 2,
+          "displayName": "Pneumatic Drill",
+          "yieldMult": 1.6,
+          "runTimeMult": 0.96,
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 12
+            },
+            {
+              "resourceId": "stone",
+              "amount": 40
+            },
+            {
+              "resourceId": "planks",
+              "amount": 14
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 1,
+          "requiresLabLevel": 0,
+          "eraTier": 1
+        },
+        {
+          "tier": 3,
+          "displayName": "Crystal Bore",
+          "yieldMult": 2.4,
+          "runTimeMult": 0.92,
+          "cost": [
+            {
+              "resourceId": "iron_plate",
+              "amount": 65
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 65
+            },
+            {
+              "resourceId": "steel",
+              "amount": 30
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "requiresLabLevel": 1,
+          "eraTier": 2
+        },
+        {
+          "tier": 4,
+          "displayName": "Plasma Bore",
+          "yieldMult": 3.6,
+          "runTimeMult": 0.88,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 120
+            },
+            {
+              "resourceId": "crystal",
+              "amount": 140
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 19
+            }
+          ],
+          "researchPrereq": "toolsmithing_1",
+          "requiresReachTier": 3,
+          "requiresLabLevel": 2,
+          "eraTier": 3
+        },
+        {
+          "tier": 5,
+          "displayName": "Quantum Bore",
+          "yieldMult": 5.4,
+          "runTimeMult": 0.84,
+          "cost": [
+            {
+              "resourceId": "plasma",
+              "amount": 70
+            },
+            {
+              "resourceId": "core",
+              "amount": 75
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 10
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 35
+            }
+          ],
+          "researchPrereq": "toolsmithing_2",
+          "requiresReachTier": 4,
+          "requiresLabLevel": 3,
+          "eraTier": 4
+        },
+        {
+          "tier": 6,
+          "displayName": "Singularity Bore",
+          "yieldMult": 8.2,
+          "runTimeMult": 0.8,
+          "cost": [
+            {
+              "resourceId": "plasma",
+              "amount": 190
+            },
+            {
+              "resourceId": "core",
+              "amount": 290
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 50
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 130
+            }
+          ],
+          "researchPrereq": "toolsmithing_3",
+          "requiresReachTier": 5,
+          "requiresLabLevel": 4,
+          "eraTier": 5
+        },
+        {
+          "tier": 7,
+          "displayName": "Void Bore",
+          "yieldMult": 12.5,
+          "runTimeMult": 0.76,
+          "cost": [
+            {
+              "resourceId": "void_alloy",
+              "amount": 160
+            },
+            {
+              "resourceId": "warp_coil",
+              "amount": 35
+            },
+            {
+              "resourceId": "core",
+              "amount": 1100
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 370
+            }
+          ],
+          "researchPrereq": "toolsmithing_4",
+          "requiresReachTier": 7,
+          "requiresLabLevel": 6,
+          "eraTier": 7
+        }
+      ]
+    },
+    {
+      "id": "siphon",
+      "displayName": "Siphon",
+      "kind": "Siphon",
+      "games": [
+        "Siphon"
+      ],
+      "tiers": [
+        {
+          "tier": 1,
+          "displayName": "Hand Pump",
+          "yieldMult": 1,
+          "runTimeMult": 1,
+          "cost": [],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 2,
+          "displayName": "Vacuum Pump",
+          "yieldMult": 1.6,
+          "runTimeMult": 0.96,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 140
+            },
+            {
+              "resourceId": "copper_wire",
+              "amount": 350
+            },
+            {
+              "resourceId": "glass",
+              "amount": 120
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "requiresLabLevel": 0,
+          "eraTier": 2
+        },
+        {
+          "tier": 3,
+          "displayName": "Cryo Siphon",
+          "yieldMult": 2.4,
+          "runTimeMult": 0.92,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 290
+            },
+            {
+              "resourceId": "glass",
+              "amount": 250
+            },
+            {
+              "resourceId": "cryo_composite",
+              "amount": 65
+            },
+            {
+              "resourceId": "methane",
+              "amount": 170
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "requiresLabLevel": 1,
+          "eraTier": 3
+        },
+        {
+          "tier": 4,
+          "displayName": "Turbine Siphon",
+          "yieldMult": 3.6,
+          "runTimeMult": 0.88,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 880
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 160
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 350
+            }
+          ],
+          "researchPrereq": "toolsmithing_1",
+          "requiresReachTier": 4,
+          "requiresLabLevel": 2,
+          "eraTier": 4
+        },
+        {
+          "tier": 5,
+          "displayName": "Plasma Siphon",
+          "yieldMult": 5.4,
+          "runTimeMult": 0.84,
+          "cost": [
+            {
+              "resourceId": "plasma",
+              "amount": 620
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 420
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 950
+            },
+            {
+              "resourceId": "thermal_alloy",
+              "amount": 430
+            }
+          ],
+          "researchPrereq": "toolsmithing_2",
+          "requiresReachTier": 5,
+          "requiresLabLevel": 3,
+          "eraTier": 5
+        },
+        {
+          "tier": 6,
+          "displayName": "Vortex Siphon",
+          "yieldMult": 8.2,
+          "runTimeMult": 0.8,
+          "cost": [
+            {
+              "resourceId": "quantum_chip",
+              "amount": 590
+            },
+            {
+              "resourceId": "plasma",
+              "amount": 2100
+            },
+            {
+              "resourceId": "helium3",
+              "amount": 3400
+            },
+            {
+              "resourceId": "titanium_plate",
+              "amount": 2800
+            }
+          ],
+          "researchPrereq": "toolsmithing_3",
+          "requiresReachTier": 6,
+          "requiresLabLevel": 4,
+          "eraTier": 6
+        },
+        {
+          "tier": 7,
+          "displayName": "Singularity Siphon",
+          "yieldMult": 12.5,
+          "runTimeMult": 0.76,
+          "cost": [
+            {
+              "resourceId": "warp_coil",
+              "amount": 620
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 2600
+            },
+            {
+              "resourceId": "antimatter",
+              "amount": 330
+            },
+            {
+              "resourceId": "void_alloy",
+              "amount": 1000
+            }
+          ],
+          "researchPrereq": "toolsmithing_4",
+          "requiresReachTier": 8,
+          "requiresLabLevel": 6,
+          "eraTier": 8
+        }
+      ]
+    },
+    {
+      "id": "scanner",
+      "displayName": "Excavator",
+      "kind": "Scanner",
+      "games": [
+        "Excavate"
+      ],
+      "tiers": [
+        {
+          "tier": 1,
+          "displayName": "Trowel",
+          "yieldMult": 1,
+          "runTimeMult": 1,
+          "cost": [],
+          "researchPrereq": null,
+          "requiresReachTier": 0,
+          "requiresLabLevel": 0,
+          "eraTier": 0
+        },
+        {
+          "tier": 2,
+          "displayName": "Sonar Scanner",
+          "yieldMult": 1.6,
+          "runTimeMult": 0.96,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 140
+            },
+            {
+              "resourceId": "glass",
+              "amount": 170
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 45
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 2,
+          "requiresLabLevel": 0,
+          "eraTier": 2
+        },
+        {
+          "tier": 3,
+          "displayName": "Resonance Probe",
+          "yieldMult": 2.4,
+          "runTimeMult": 0.92,
+          "cost": [
+            {
+              "resourceId": "optic_lens",
+              "amount": 180
+            },
+            {
+              "resourceId": "circuit_board",
+              "amount": 190
+            },
+            {
+              "resourceId": "steel",
+              "amount": 220
+            }
+          ],
+          "researchPrereq": null,
+          "requiresReachTier": 3,
+          "requiresLabLevel": 1,
+          "eraTier": 3
+        },
+        {
+          "tier": 4,
+          "displayName": "Seismic Excavator",
+          "yieldMult": 3.6,
+          "runTimeMult": 0.88,
+          "cost": [
+            {
+              "resourceId": "steel",
+              "amount": 880
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 160
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 410
+            }
+          ],
+          "researchPrereq": "toolsmithing_1",
+          "requiresReachTier": 4,
+          "requiresLabLevel": 2,
+          "eraTier": 4
+        },
+        {
+          "tier": 5,
+          "displayName": "Plasma Excavator",
+          "yieldMult": 5.4,
+          "runTimeMult": 0.84,
+          "cost": [
+            {
+              "resourceId": "plasma",
+              "amount": 750
+            },
+            {
+              "resourceId": "servo_motor",
+              "amount": 520
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 100
+            }
+          ],
+          "researchPrereq": "toolsmithing_2",
+          "requiresReachTier": 5,
+          "requiresLabLevel": 3,
+          "eraTier": 5
+        },
+        {
+          "tier": 6,
+          "displayName": "Quantum Excavator",
+          "yieldMult": 8.2,
+          "runTimeMult": 0.8,
+          "cost": [
+            {
+              "resourceId": "quantum_chip",
+              "amount": 980
+            },
+            {
+              "resourceId": "optic_lens",
+              "amount": 3072
+            },
+            {
+              "resourceId": "rad_shield_alloy",
+              "amount": 760
+            },
+            {
+              "resourceId": "helium3",
+              "amount": 2500
+            }
+          ],
+          "researchPrereq": "toolsmithing_3",
+          "requiresReachTier": 6,
+          "requiresLabLevel": 4,
+          "eraTier": 6
+        },
+        {
+          "tier": 7,
+          "displayName": "Void Excavator",
+          "yieldMult": 12.5,
+          "runTimeMult": 0.76,
+          "cost": [
+            {
+              "resourceId": "void_alloy",
+              "amount": 1900
+            },
+            {
+              "resourceId": "warp_coil",
+              "amount": 430
+            },
+            {
+              "resourceId": "quantum_chip",
+              "amount": 2400
+            },
+            {
+              "resourceId": "dark_matter",
+              "amount": 1500
+            }
+          ],
+          "researchPrereq": "toolsmithing_4",
+          "requiresReachTier": 8,
+          "requiresLabLevel": 6,
+          "eraTier": 8
+        }
+      ]
+    }
+  ]
+}

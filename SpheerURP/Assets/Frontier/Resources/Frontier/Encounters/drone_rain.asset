@@ -1,0 +1,220 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d34ee26d274254998ef72f3dca111a, type: 3}
+  m_Name: drone_rain
+  m_EditorClassIdentifier: Frontier.Data::Frontier.EncounterSO
+  template:
+    id: drone_rain
+    index: 39
+    minTier: 3
+    maxTier: 9
+    cost: 14
+    role: 1
+    family: 0
+    entries:
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 0.8
+      zOffset: 0
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 2.17649
+      y: 0.8
+      zOffset: 9
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -1.4072732
+      y: 0.8
+      zOffset: 18
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -1.2665768
+      y: 0.8
+      zOffset: 27
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 2.2262151
+      y: 0.8
+      zOffset: 36
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -0.17284757
+      y: 0.8
+      zOffset: 45
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -2.1144555
+      y: 0.8
+      zOffset: 54
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 1.5400105
+      y: 0.8
+      zOffset: 63
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 1.118717
+      y: 0.8
+      zOffset: 72
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -2.2633495
+      y: 0.8
+      zOffset: 81
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0.34471756
+      y: 0.8
+      zOffset: 90
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 2.0404623
+      y: 0.8
+      zOffset: 99
+      vzOwn: 6
+      path: 1
+      p0: 0
+      p1: -1.5
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    durationZ: 99
+    declaredSpeed: 0.5
+    weight: 1
+    mirrorable: 1
+    notes: Twelve drones fall through the play area from above in a scattered stream.

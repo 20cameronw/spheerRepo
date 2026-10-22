@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: toolsmithing_4
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: toolsmithing_4
+    displayName: Toolsmithing IV
+    description: Singularity-edged tools.
+    branch: Harvest
+    tier: 6
+    cost:
+    - resourceId: quantum_chip
+      amount: 370
+    - resourceId: plasma
+      amount: 910
+    - resourceId: rad_shield_alloy
+      amount: 580
+    - resourceId: titanium_plate
+      amount: 2300
+    - resourceId: void_alloy
+      amount: 50
+    prereqs:
+    - toolsmithing_3
+    - void_forging
+    labLevel: 6
+    unlocks:
+    - tool:*:7
+  icon: research

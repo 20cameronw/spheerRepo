@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: automation
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: automation
+    displayName: Automation
+    description: Machines that gather bulk goods while you sleep.
+    branch: Logistics
+    tier: 4
+    cost:
+    - resourceId: steel
+      amount: 590
+    - resourceId: titanium_plate
+      amount: 310
+    - resourceId: circuit_board
+      amount: 390
+    - resourceId: optic_lens
+      amount: 370
+    - resourceId: thermal_alloy
+      amount: 85
+    - resourceId: servo_motor
+      amount: 25
+    prereqs:
+    - robotics
+    - colony_charter
+    labLevel: 4
+    unlocks:
+    - structure:auto_harvester
+  icon: research

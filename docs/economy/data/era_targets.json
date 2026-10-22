@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "era_targets",
+  "items": {
+    "maxActiveMinutesWithoutVisibleProgress": [
+      40,
+      60,
+      150,
+      450,
+      1500,
+      3600
+    ],
+    "archetypes": [
+      {
+        "archetype": "casual",
+        "sessionsPerDay": 3,
+        "minutesPerSession": 5,
+        "quality": 0.62,
+        "efficiency": 0.7,
+        "bands": [
+          {
+            "milestone": "first_warehouse",
+            "label": "first Warehouse",
+            "minDays": 0,
+            "maxDays": 1
+          },
+          {
+            "milestone": "first_fuel",
+            "label": "first fuel",
+            "minDays": 0,
+            "maxDays": 1
+          },
+          {
+            "milestone": "first_hop",
+            "label": "first hop",
+            "minDays": 0,
+            "maxDays": 1
+          },
+          {
+            "milestone": "era_settlement",
+            "label": "Settlement",
+            "minDays": 4,
+            "maxDays": 16
+          },
+          {
+            "milestone": "era_industry",
+            "label": "Industry",
+            "minDays": 25,
+            "maxDays": 70
+          },
+          {
+            "milestone": "era_interstellar",
+            "label": "Interstellar",
+            "minDays": 140,
+            "maxDays": 330
+          },
+          {
+            "milestone": "era_ascension",
+            "label": "Ascension",
+            "minDays": 330,
+            "maxDays": 720
+          }
+        ]
+      },
+      {
+        "archetype": "regular",
+        "sessionsPerDay": 3,
+        "minutesPerSession": 15,
+        "quality": 0.74,
+        "efficiency": 0.78,
+        "bands": [
+          {
+            "milestone": "first_warehouse",
+            "label": "first Warehouse",
+            "minDays": 0,
+            "maxDays": 0.004166666666666667
+          },
+          {
+            "milestone": "first_fuel",
+            "label": "first fuel",
+            "minDays": 0,
+            "maxDays": 0.008333333333333333
+          },
+          {
+            "milestone": "first_hop",
+            "label": "first hop",
+            "minDays": 0,
+            "maxDays": 0.010416666666666668
+          },
+          {
+            "milestone": "era_settlement",
+            "label": "Settlement",
+            "minDays": 1.5,
+            "maxDays": 7
+          },
+          {
+            "milestone": "era_industry",
+            "label": "Industry",
+            "minDays": 8,
+            "maxDays": 30
+          },
+          {
+            "milestone": "era_interstellar",
+            "label": "Interstellar",
+            "minDays": 55,
+            "maxDays": 120
+          },
+          {
+            "milestone": "era_ascension",
+            "label": "Ascension",
+            "minDays": 140,
+            "maxDays": 300
+          }
+        ]
+      },
+      {
+        "archetype": "hardcore",
+        "sessionsPerDay": 5,
+        "minutesPerSession": 30,
+        "quality": 0.86,
+        "efficiency": 0.88,
+        "bands": [
+          {
+            "milestone": "first_warehouse",
+            "label": "first Warehouse",
+            "minDays": 0,
+            "maxDays": 0.004166666666666667
+          },
+          {
+            "milestone": "first_fuel",
+            "label": "first fuel",
+            "minDays": 0,
+            "maxDays": 0.008333333333333333
+          },
+          {
+            "milestone": "first_hop",
+            "label": "first hop",
+            "minDays": 0,
+            "maxDays": 0.010416666666666668
+          },
+          {
+            "milestone": "era_settlement",
+            "label": "Settlement",
+            "minDays": 0.3,
+            "maxDays": 2
+          },
+          {
+            "milestone": "era_industry",
+            "label": "Industry",
+            "minDays": 2,
+            "maxDays": 10
+          },
+          {
+            "milestone": "era_interstellar",
+            "label": "Interstellar",
+            "minDays": 14,
+            "maxDays": 50
+          },
+          {
+            "milestone": "era_ascension",
+            "label": "Ascension",
+            "minDays": 40,
+            "maxDays": 120
+          }
+        ]
+      }
+    ]
+  }
+}

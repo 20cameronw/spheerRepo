@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: Upgrade_pulse
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.UpgradeSO
+  id: pulse
+  displayName: Ion Pulse
+  description: +40% tap damage.
+  category: 2
+  effect: 5
+  tool: 0
+  valuePerLevel: 0.4
+  maxLevel: 10
+  baseCost:
+  - resource: {fileID: 11400000, guid: 4f4d2532363d6c94a836abcfda0b73d9, type: 2}
+    amount: 12
+  - resource: {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+    amount: 6
+  costGrowth: 1.6
+  color: {r: 0.6, g: 1.4, b: 2.4, a: 1}
+  levelNames: []
+  levelCosts: []

@@ -1,613 +1,641 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Frontier.Services;
 
 namespace Frontier
 {
-    public class UIRoot : MonoBehaviour
+    /// <summary>
+    /// Icon-driven, responsive UI Toolkit interface. The panel scale is recomputed whenever the screen size changes so that
+    /// 1 UI unit = 0.5 dp on phones (type and control tokens are authored in these half-dps, see docs/DESIGN.md).
+    /// </summary>
+    public partial class UIRoot : MonoBehaviour
     {
-        enum Tab { None, Explore, Defend, Shop, Map, Pack }
-
         GameState gs;
+        UniverseService observedUniverse;
         DefenseController defense;
         PlanetView planetView;
         SpaceBackdrop backdrop;
+        WorldSurface world;
+        Camera cam;
         UIDocument doc;
+        PanelSettings panelSettings;
+        FrontierServices services;
 
-        VisualElement root, hud, sheet, nav, waveHud, toastLayer, overlayLayer, flash;
-        VisualElement waveFill, reactorFill;
-        Label waveLabel, reactorLabel;
-        Button[] navButtons;
+        VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
+        VisualElement waveFill, reactorFill, xpFill;
+        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, packLabel, levelLabel, planetLabel;
+        WaveInfo waveHudInfo;
         VisualElement planetTag;
+        Button surfaceViewButton;
+        VisualElement surfaceViewIcon;
+        Button packDock;
+        readonly List<VisualElement> packSegments = new List<VisualElement>();
 
-        Tab tab = Tab.Explore;
-        int risk = 1;
-        PlanetSO selected;
-        bool busy;
-        float scrollY;
-        ScrollView scroll;
-        VisualElement mapElement;
-        static readonly Tab[] Tabs = { Tab.Explore, Tab.Defend, Tab.Shop, Tab.Map, Tab.Pack };
+        bool busy, introActive;
+        public bool IsTravelling { get; private set; }
+        Minigame activeGatherMinigame;
+        VisualElement waveResultPanel;
+        /// <summary>UI units per dp (1 unit = 0.5 dp).</summary>
+        public const float UnitsPerDp = 2f;
+        /// <summary>The canvas is never wider than this many units: tablets scale up instead of stretching the layout.</summary>
+        public const float MaxCanvasWidth = 900f;
+        /// <summary>Space reserved at the top of content layers for the top bar (units, below the safe-area inset).</summary>
+        public const float HudTopInset = 132f;
+        /// <summary>Space reserved at the bottom of popup layers for the dock (units, above the safe-area inset).</summary>
+        public const float DockInset = 176f;
+        bool batching;
+        Vector4 inset; // left, top, right, bottom in logical px
+        int lastW, lastH;
+        Rect lastSafe;
+
+        /// <summary>Physical pixels per UI unit: 0.5 dp on phones, capped so the canvas never exceeds <see cref="MaxCanvasWidth"/> units.</summary>
+        public static float ComputeScale(float shortSidePx, float density)
+        {
+            return Mathf.Max(0.2f, Mathf.Max(density / UnitsPerDp, shortSidePx / MaxCanvasWidth));
+        }
 
         public bool IsOverUi(Vector2 screenPos)
         {
             if (root == null || root.panel == null) return false;
-            var p = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screenPos.x, Screen.height - screenPos.y));
+            var p = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screenPos.x, ScreenMetrics.Height - screenPos.y));
             return root.panel.Pick(p) != null;
         }
 
-        public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd)
+        public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd, WorldSurface ws, Camera camera, FrontierServices serviceSet)
         {
-            doc = document; gs = state; defense = def; planetView = pv; backdrop = bd;
+            doc = document; gs = state; defense = def; planetView = pv; backdrop = bd; world = ws; cam = camera;
+            services = serviceSet;
+            observedUniverse = gs.universe;
+            LoadPrefs();
+            panelSettings = doc.panelSettings;
+            PresentationQuality.Changed += ApplyPanelBudget;
+            ApplyPanelBudget();
             selected = gs.planet;
 
             root = doc.rootVisualElement;
             root.Clear();
             root.pickingMode = PickingMode.Ignore;
             root.AddToClassList("fr-root");
-            var uss = Resources.Load<StyleSheet>("Frontier/Frontier");
-            if (uss != null) root.styleSheets.Add(uss);
+            UiKit.ApplyStyles(root);
 
-            hud = UiKit.Div("fr-hud"); hud.pickingMode = PickingMode.Ignore;
-            root.Add(hud);
+            // Full-screen dim under the HUD: modals keep the top bar and dock live while the world behind them is dimmed evenly.
+            scrimLayer = Layer();
+            scrimLayer.AddToClassList("fr-scrim");
+            scrimLayer.pickingMode = PickingMode.Position;
+            scrimLayer.style.display = DisplayStyle.None;
+            scrimLayer.RegisterCallback<PointerDownEvent>(e => CloseModal());
+            root.Add(scrimLayer);
 
-            sheet = UiKit.Div("fr-sheet");
-            root.Add(sheet);
-
-            nav = UiKit.Div("fr-nav");
-            navButtons = new Button[Tabs.Length];
-            for (int i = 0; i < Tabs.Length; i++)
-            {
-                var t = Tabs[i];
-                var b = new Button { text = t.ToString().ToUpper() };
-                b.AddToClassList("fr-nav-btn");
-                b.clicked += () => { Sfx.Click(); SetTab(tab == t ? Tab.None : t); };
-                navButtons[i] = b;
-                nav.Add(b);
-            }
-            root.Add(nav);
-
+            safe = Layer(); safe.style.display = DisplayStyle.Flex;
+            root.Add(safe);
+            BuildHud();
+            BuildFirstSessionGuide();
             BuildWaveHud();
 
-            toastLayer = UiKit.Div("fr-fill"); toastLayer.pickingMode = PickingMode.Ignore;
-            overlayLayer = UiKit.Div("fr-fill"); overlayLayer.pickingMode = PickingMode.Ignore;
-            flash = UiKit.Div("fr-fill"); flash.pickingMode = PickingMode.Ignore;
+            popupLayer = Layer(); modalLayer = Layer(); bannerLayer = Layer(); mapLayer = Layer();
+            toastLayer = UiKit.Div("fr-toasts"); toastLayer.pickingMode = PickingMode.Ignore;
+            overlayLayer = Layer();
+            // Edge-to-edge layer for travel games that draw behind the status bar (no safe-area inset; the game places its own HUD with the insets it is given).
+            travelLayer = Layer();
+            flash = Layer();
             flash.style.backgroundColor = new Color(0.6f, 1f, 1f, 1f);
             flash.style.opacity = 0f;
-            root.Add(toastLayer); root.Add(overlayLayer); root.Add(flash);
+            root.Add(popupLayer); root.Add(bannerLayer); root.Add(modalLayer); root.Add(mapLayer);
+            root.Add(toastLayer); root.Add(overlayLayer); root.Add(travelLayer); root.Add(flash);
 
-            gs.Changed += Refresh;
+            ApplyLayout(true);
+
+            gs.Changed += OnStateChanged;
+            NotificationPreferences.StatusChanged += OnNotificationStatusChanged;
             defense.WaveEnded += OnWaveEnded;
-            Refresh();
+            world.StructureTapped += OnStructureTapped;
+            world.SlotTapped += OnSlotTapped;
+            world.ObstacleTapped += OnObstacleTapped;
+            world.GatherTapped += OnGatherTapped;
+            OnStateChanged();
+        }
 
-            root.schedule.Execute(Animate).Every(33);
+        VisualElement Layer()
+        {
+            var e = UiKit.Div("fr-fill");
+            e.pickingMode = PickingMode.Ignore;
+            return e;
         }
 
         void OnDestroy()
         {
-            if (gs != null) gs.Changed -= Refresh;
+            PresentationQuality.Changed -= ApplyPanelBudget;
+            NotificationPreferences.StatusChanged -= OnNotificationStatusChanged;
+            if (gs != null) gs.Changed -= OnStateChanged;
             if (defense != null) defense.WaveEnded -= OnWaveEnded;
+            if (world != null)
+            {
+                world.StructureTapped -= OnStructureTapped;
+                world.SlotTapped -= OnSlotTapped;
+                world.ObstacleTapped -= OnObstacleTapped;
+                world.GatherTapped -= OnGatherTapped;
+            }
+
         }
 
-        // ------------------------------------------------------------ frame
-        void Animate()
+        void ApplyPanelBudget()
         {
-            float pulse = 0.65f + 0.35f * Mathf.Sin(Time.time * 3f);
-            if (planetTag != null) UiKit.Border(planetTag, new Color(1f, 0.25f, 0.95f, 0.5f + 0.4f * pulse), 2f);
+            if (panelSettings != null) PresentationQuality.ApplyPanelBudget(panelSettings);
+        }
 
-            bool wave = defense.Active;
-            waveHud.style.display = wave ? DisplayStyle.Flex : DisplayStyle.None;
-            if (wave)
+        void OnNotificationStatusChanged()
+        {
+            if (root != null && modalKey == "menu" && menuPage == "settings") RefreshModal();
+        }
+
+        // ------------------------------------------------------------ responsive layout
+        void ApplyLayout(bool force)
+        {
+            var sa = ScreenMetrics.SafeArea;
+            int sw = ScreenMetrics.Width, sh = ScreenMetrics.Height;
+            if (!force && sw == lastW && sh == lastH && sa == lastSafe) return;
+            lastW = sw; lastH = sh; lastSafe = sa;
+            float scale = ComputeScale(ScreenMetrics.ShortSide, ScreenMetrics.Density);
+            if (panelSettings != null) panelSettings.scale = scale;
+            inset = new Vector4(sa.xMin / scale, (sh - sa.yMax) / scale, (sw - sa.xMax) / scale, sa.yMin / scale);
+            hud.style.left = inset.x; hud.style.top = inset.y;
+            hud.style.right = inset.z; hud.style.bottom = inset.w;
+            if (waveHud != null)
             {
-                int total = defense.Current.aliens.Count;
-                UiKit.SetFill(waveFill, total == 0 ? 0f : defense.Killed / (float)total);
-                UiKit.SetFill(reactorFill, defense.ReactorHp / Mathf.Max(1f, defense.ReactorMax));
-                waveLabel.text = "WAVE " + defense.Current.waveNumber + "   " + defense.Killed + " / " + total;
-                reactorLabel.text = "REACTOR " + Mathf.CeilToInt(defense.ReactorHp);
-                float hp = defense.ReactorHp / Mathf.Max(1f, defense.ReactorMax);
-                reactorFill.style.backgroundColor = Color.Lerp(UiKit.Red, UiKit.Lime, hp);
+                waveHud.style.left = inset.x; waveHud.style.right = inset.z; waveHud.style.top = inset.y; waveHud.style.bottom = inset.w;
+                waveHud.style.paddingLeft = UiKit.Space.S32; waveHud.style.paddingRight = UiKit.Space.S32;
+                waveHud.style.paddingTop = HudTopInset + UiKit.Space.S16; waveHud.style.paddingBottom = UiKit.Space.S32;
             }
-            sheet.style.display = (tab == Tab.None || wave) ? DisplayStyle.None : DisplayStyle.Flex;
-            nav.style.display = wave ? DisplayStyle.None : DisplayStyle.Flex;
-            hud.style.display = DisplayStyle.Flex;
+            LayoutContentLayer(popupLayer, inset, false);
+            LayoutContentLayer(modalLayer, inset, false);
+            LayoutContentLayer(bannerLayer, inset, false);
+            LayoutContentLayer(overlayLayer, inset, true);
+            toastLayer.style.top = inset.y + HudTopInset + UiKit.Space.S8;
+            if (mapOpen) LayoutMapChrome();
+        }
+
+        public static void LayoutContentLayer(VisualElement layer, Vector4 safeInsets, bool coverDock)
+        {
+            layer.style.left = safeInsets.x + UiKit.Space.S16;
+            layer.style.right = safeInsets.z + UiKit.Space.S16;
+            layer.style.top = safeInsets.y + HudTopInset;
+            layer.style.bottom = safeInsets.w + (coverDock ? UiKit.Space.S16 : DockInset);
+            layer.style.overflow = Overflow.Hidden;
+        }
+
+        // ------------------------------------------------------------ HUD
+        void BuildHud()
+        {
+            hud = Layer();
+            safe.Add(hud);
+
+            var top = UiKit.Div("fr-topbar"); top.pickingMode = PickingMode.Ignore;
+            top.usageHints = UsageHints.DynamicTransform;
+            planetTag = UiKit.Div("fr-topbar-bar");
+            planetTag.pickingMode = PickingMode.Ignore;
+            planetLabel = UiKit.Text("", "fr-planet-name");
+            planetTag.Add(planetLabel);
+            fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
+            shardLabel = Chip(planetTag, "crystal", UiKit.Cyan, null);
+            shardLabel.name = "hud-nova-shards";
+            levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
+            top.Add(planetTag);
+            var menuBtn = Icons.IconButton("menu", UiKit.Cyan, OpenMenu, 0f, true);
+            menuBtn.AddToClassList("fr-menubtn");
+            menuBtn.name = "menu-button";
+            top.Add(menuBtn);
+            hud.Add(top);
+            surfaceViewButton = Icons.IconButton("base", UiKit.Cyan, () =>
+            {
+                if (busy || introActive || defense.Active) return;
+                CloseModal();
+                ClosePopup();
+                planetView.CloseView = !planetView.CloseView;
+                RefreshViewButton();
+            });
+            surfaceViewIcon = surfaceViewButton.Q(className: "fr-icon");
+            surfaceViewButton.name = "world-view-toggle";
+            surfaceViewButton.style.position = Position.Absolute;
+            surfaceViewButton.style.right = UiKit.Space.S24;
+            surfaceViewButton.style.bottom = DockInset + UiKit.Space.S16;
+            RefreshViewButton();
+            hud.Add(surfaceViewButton);
+
+            var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
+            dock.usageHints = UsageHints.DynamicTransform;
+            dock.Add(DockButton("research", UiText.Get("nav.command"), UiKit.Magenta, OpenResearch));
+            dock.Add(DockButton("map", UiText.Get("nav.map"), UiKit.Cyan, OpenMap));
+            packDock = DockButton("pack", UiText.Get("nav.pack"), UiKit.Amber, OpenPack);
+            var capacity = UiKit.Div("fr-pack-capacity");
+            capacity.name = "pack-capacity-gauge";
+            capacity.pickingMode = PickingMode.Ignore;
+            for (int i = 0; i < 8; i++)
+            {
+                var segment = UiKit.Div("fr-pack-segment");
+                segment.pickingMode = PickingMode.Ignore;
+                packSegments.Add(segment);
+                capacity.Add(segment);
+            }
+            packDock.Add(capacity);
+            packLabel = UiKit.Text("", "fr-pack-capacity-text");
+            packLabel.name = "pack-capacity-text";
+            packDock.Add(packLabel);
+            dock.Add(packDock);
+            dock.Add(DockButton("build", UiText.Get("nav.build"), UiKit.Lime, OpenShop));
+            hud.Add(dock);
+        }
+
+        void RefreshViewButton()
+        {
+            if (surfaceViewButton == null) return;
+            surfaceViewButton.tooltip = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
+            if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, planetView.CloseView ? "map" : "base", UiKit.Cyan);
+        }
+
+        void RefreshPackCapacity()
+        {
+            packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
+            packDock.tooltip = UiText.Get("pack.capacity", gs.SlotsUsed, gs.Slots);
+            float fullness = gs.Slots <= 0 ? 1 : Mathf.Clamp01(gs.SlotsUsed / (float)gs.Slots);
+            int filled = Mathf.CeilToInt(fullness * packSegments.Count);
+            for (int i = 0; i < packSegments.Count; i++)
+            {
+                float fraction = i / (float)(packSegments.Count - 1);
+                Color color = fraction < 0.5f ? Color.Lerp(UiKit.Lime, UiKit.Amber, fraction * 2)
+                    : Color.Lerp(UiKit.Amber, UiKit.Red, (fraction - 0.5f) * 2);
+                packSegments[i].style.backgroundColor = i < filled ? color : UiKit.Tint(UiKit.Muted, 0.18f);
+                packSegments[i].EnableInClassList("fr-pack-segment-filled", i < filled);
+            }
+        }
+
+        /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>
+        Button DockButton(string icon, string caption, Color accent, Action onClick)
+        {
+            var b = new Button { name = "dock-" + icon };
+            b.AddToClassList("fr-dock-btn");
+            UiKit.SetAccent(b, accent);
+            b.Add(Icons.Make(icon, accent));
+            b.Add(UiKit.Text(caption, "fr-dock-label"));
+            b.clicked += () => { Sfx.Click(); onClick(); };
+            return b;
+        }
+
+        Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp)
+        {
+            var chip = UiKit.Div("fr-chip"); chip.pickingMode = PickingMode.Ignore;
+            Color c = UiKit.Ui(color);
+            chip.Add(Icons.Make(icon, c));
+            var l = UiKit.Text("0", "fr-chip-text");
+            if (xp != null)
+            {
+                var col = UiKit.Div("fr-chip-col"); col.pickingMode = PickingMode.Ignore;
+                col.Add(l);
+                VisualElement fill;
+                var bar = UiKit.Bar(color, out fill);
+                bar.AddToClassList("fr-chip-xp");
+                col.Add(bar);
+                xp(fill);
+                chip.Add(col);
+            }
+            else chip.Add(l);
+            parent.Add(chip);
+            return l;
         }
 
         void BuildWaveHud()
         {
-            waveHud = UiKit.Div("fr-fill"); waveHud.pickingMode = PickingMode.Ignore;
+            waveHud = Layer();
             waveHud.style.display = DisplayStyle.None;
             waveHud.style.justifyContent = Justify.SpaceBetween;
-            waveHud.style.paddingTop = 170; waveHud.style.paddingBottom = 60;
-            waveHud.style.paddingLeft = 40; waveHud.style.paddingRight = 40;
 
             var top = UiKit.Div(); top.pickingMode = PickingMode.Ignore;
             waveLabel = UiKit.Text("", "fr-h2", UiKit.Cyan);
             top.Add(waveLabel);
-            var wb = UiKit.Bar(UiKit.Cyan, out waveFill);
-            wb.style.width = Length.Percent(100); wb.style.marginLeft = 0; wb.style.marginTop = 8;
-            top.Add(wb);
-            top.Add(UiKit.Text("Tap aliens to zap them", "fr-tiny"));
+            top.Add(UiKit.Bar(UiKit.Cyan, out waveFill));
+            waveModifierLabel = UiKit.Text("", "fr-small", UiKit.Amber);
+            waveModifierLabel.style.whiteSpace = WhiteSpace.Normal;
+            top.Add(waveModifierLabel);
+            var hint = UiKit.Text(UiText.Get("wave.tap-help"), "fr-tiny");
+            hint.style.marginTop = UiKit.Space.S8;
+            top.Add(hint);
             waveHud.Add(top);
 
             var bottom = UiKit.Div(); bottom.pickingMode = PickingMode.Ignore;
             reactorLabel = UiKit.Text("", "fr-h2", UiKit.Lime);
             bottom.Add(reactorLabel);
             var rb = UiKit.Bar(UiKit.Lime, out reactorFill);
-            rb.style.width = Length.Percent(100); rb.style.marginLeft = 0; rb.style.marginTop = 8; rb.style.height = 26;
+            rb.style.height = UiKit.Space.S24;
             bottom.Add(rb);
             waveHud.Add(bottom);
             root.Add(waveHud);
         }
 
-        // ------------------------------------------------------------ refresh
-        void SetTab(Tab t)
+        void OnStateChanged()
         {
-            if (busy || defense.Active) return;
-            tab = t;
-            if (t == Tab.Map) selected = gs.planet;
-            Refresh();
+            if (batching) return;
+            RefreshViewButton();
+            if (observedUniverse != gs.universe)
+            {
+                observedUniverse = gs.universe;
+                CloseMap();
+                ClosePopup();
+                ExitBuild();
+                selected = gs.planet;
+                planetView.Show(gs.planet, false, gs.TerraformerStageOn(gs.planet));
+            }
+            if (planetView.Current != null && planetView.Current.Id == gs.planet.Id)
+                planetView.SetTerraformingStage(gs.TerraformerStageOn(gs.planet));
+            fuelLabel.text = UiKit.FuelLabel(gs.FuelGallons);
+            fuelLabel.tooltip = UiText.Get("fuel.summary", gs.FuelTankUsed, gs.FuelTankSlots);
+            shardLabel.text = gs.ShardBalance.ToString("N0");
+            shardLabel.tooltip = UiText.Get("hyperspace.revive.balance", gs.ShardBalance);
+            RefreshPackCapacity();
+            levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
+            planetLabel.text = gs.planet.Name.ToUpper();
+            planetLabel.style.color = UiKit.Ui(gs.planet.Rim);
+            UiKit.Border(planetTag, UiKit.Tint(gs.AscensionRank > 0 ? AscensionAccent(gs.AscensionRank) : gs.planet.Rim, 0.5f), 2f);
+            UiKit.SetFill(xpFill, gs.LevelProgress);
+            RefreshFirstSessionGuide();
+            RefreshModal();
+            RefreshPopup();
+            if (mapOpen) { RefreshMapPinPlanets(); InvalidateMapPreview(); BuildMapCard(); }
         }
 
-        void Refresh()
+        // ------------------------------------------------------------ frame
+        void Update()
         {
             if (root == null) return;
-            RebuildHud();
-            for (int i = 0; i < navButtons.Length; i++)
+            if (Input.GetKeyDown(KeyCode.Escape)) HandleBack();
+            ApplyLayout(false);
+
+            bool wave = defense.Active;
+            if (wave && planetView.CloseView)
             {
-                bool on = Tabs[i] == tab;
-                Color c = on ? UiKit.Cyan : new Color(0.5f, 0.65f, 0.8f);
-                UiKit.Border(navButtons[i], new Color(c.r, c.g, c.b, on ? 0.95f : 0.35f), 2f);
-                navButtons[i].style.color = on ? UiKit.Cyan : new Color(0.75f, 0.88f, 1f, 0.8f);
-                navButtons[i].style.backgroundColor = on ? new Color(0.05f, 0.25f, 0.32f, 0.95f) : new Color(0.04f, 0.06f, 0.16f, 0.9f);
+                planetView.CloseView = false;
+                RefreshViewButton();
             }
-            RebuildSheet();
-        }
-
-        void RebuildHud()
-        {
-            hud.Clear();
-            var row = UiKit.Div("fr-hud-row"); row.pickingMode = PickingMode.Ignore;
-
-            planetTag = UiKit.Div("fr-planet-tag");
-            UiKit.Halo(planetTag, UiKit.Magenta, 30f, 0.25f);
-            planetTag.Add(UiKit.Text(gs.planet.displayName.ToUpper(), "fr-title", UiKit.Ui(gs.planet.primary)));
-            planetTag.Add(UiKit.Text("TIER " + (gs.planet.tier + 1) + "  -  NEXT WAVE " + gs.NextWave(gs.planet), "fr-tiny"));
-            row.Add(planetTag);
-
-            var chips = UiKit.Div("fr-row"); chips.pickingMode = PickingMode.Ignore;
-            chips.Add(HudChip(gs.db.fuel.color, "FUEL " + gs.Count(gs.db.fuel)));
-            chips.Add(HudChip(new Color(1f, 0.85f, 0.3f), "PACK " + gs.SlotsUsed + "/" + gs.Slots));
-            row.Add(chips);
-            hud.Add(row);
-        }
-
-        VisualElement HudChip(Color c, string text)
-        {
-            var chip = UiKit.Div("fr-chip");
-            Color ui = UiKit.Ui(c);
-            UiKit.Border(chip, new Color(ui.r, ui.g, ui.b, 0.8f), 2f);
-            var dot = UiKit.Div("fr-dot"); dot.style.backgroundColor = ui;
-            chip.Add(dot);
-            chip.Add(UiKit.Text(text, "fr-small", ui));
-            return chip;
-        }
-
-        // ------------------------------------------------------------ sheet
-        void RebuildSheet()
-        {
-            if (scroll != null) scrollY = scroll.scrollOffset.y;
-            sheet.Clear();
-            scroll = null; mapElement = null;
-            if (tab == Tab.None) return;
-
-            var head = UiKit.Div("fr-row");
-            head.Add(UiKit.Text(tab.ToString().ToUpper(), "fr-title", UiKit.Cyan));
-            sheet.Add(head);
-
-            if (tab == Tab.Map) { BuildMap(); return; }
-
-            scroll = new ScrollView(ScrollViewMode.Vertical);
-            scroll.AddToClassList("fr-scroll");
-            scroll.style.marginTop = 14;
-            sheet.Add(scroll);
-
-            switch (tab)
+            world.Locked = wave || busy;
+            UpdateFirstSessionGuideVisibility();
+            if (waveHud != null)
             {
-                case Tab.Explore: BuildExplore(scroll); break;
-                case Tab.Defend: BuildDefend(scroll); break;
-                case Tab.Shop: BuildShop(scroll); break;
-                case Tab.Pack: BuildPack(scroll); break;
+                waveHud.style.display = wave ? DisplayStyle.Flex : DisplayStyle.None;
+                if (wave)
+                {
+                    if (waveHudInfo != defense.Current)
+                    {
+                        waveHudInfo = defense.Current;
+                        waveModifierLabel.text = waveHudInfo.modifier == null ? "" :
+                            UiText.Get("wave.modifier", gs.db.formula.ModifierName(waveHudInfo.modifier).ToUpperInvariant(),
+                                gs.db.formula.ModifierDescription(waveHudInfo.modifier));
+                        waveModifierLabel.style.display = waveHudInfo.modifier == null ? DisplayStyle.None : DisplayStyle.Flex;
+                    }
+                    int total = defense.Current.aliens.Count;
+                    UiKit.SetFill(waveFill, total == 0 ? 0f : defense.Killed / (float)total);
+                    UiKit.SetFill(reactorFill, defense.ReactorHp / Mathf.Max(1f, defense.ReactorMax));
+                    waveLabel.text = UiText.Get("wave.progress", defense.Current.waveNumber, defense.Killed, total);
+                    reactorLabel.text = UiText.Get("wave.reactor", Mathf.CeilToInt(defense.ReactorHp));
+                    float hp = defense.ReactorHp / Mathf.Max(1f, defense.ReactorMax);
+                    reactorFill.style.backgroundColor = Color.Lerp(UiKit.Red, UiKit.Lime, hp);
+                }
             }
-            float y = scrollY;
-            var sv = scroll;
-            sv.schedule.Execute(() => sv.scrollOffset = new Vector2(0f, y)).StartingIn(1);
+            hud.style.display = wave || introActive || networkFinaleActive ? DisplayStyle.None : DisplayStyle.Flex;
+            if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
+
+            UpdatePopupPosition();
+            RefreshBuilderStatus();
+            RefreshObstacleStatus();
+            UpdateMapInput();
         }
 
-        VisualElement Card(Color accent, string cls = "fr-card")
+        void CloseAll()
         {
-            var c = UiKit.Div(cls);
-            Color ui = UiKit.Ui(accent);
-            UiKit.Border(c, new Color(ui.r, ui.g, ui.b, 0.65f), 2f);
-            return c;
+            ClosePopup();
+            CloseModal();
+            CloseMap();
+            ExitBuild();
         }
 
-        // ------------------------------------------------------------ explore
-        void BuildExplore(VisualElement parent)
+        public bool HandleBack()
         {
-            parent.Add(UiKit.Text(gs.planet.description, "fr-muted"));
-            foreach (var spot in gs.planet.spots)
+            if (skipShipMoment != null) { skipShipMoment(); return true; }
+            if (activeGatherMinigame != null) return activeGatherMinigame.HandleBack();
+            if (activeTravelMinigame is ITravelBackHandler travel) return travel.HandleBack();
+            if (busy || defense.Active) return true;
+            if (waveResultPanel != null) { CloseWaveResult(); return true; }
+            if (popup != null) { ClosePopup(); return true; }
+            if (modal != null)
             {
-                var s = spot;
-                var card = Card(s.resource.color);
-                var top = UiKit.Div("fr-row");
-                top.Add(UiKit.Text(s.label, "fr-h2"));
-                top.Add(UiKit.Div("fr-spacer"));
-                top.Add(UiKit.Text(s.game.ToString().ToUpper(), "fr-small", UiKit.Ui(s.resource.color)));
-                card.Add(top);
+                if (modalKey == "menu" && !string.IsNullOrEmpty(menuPage))
+                {
+                    menuPage = "";
+                    RefreshModal();
+                }
+                else CloseModal();
+                return true;
+            }
+            if (mapOpen) { CloseMap(); return true; }
+            if (buildDef != null) { ExitBuild(); return true; }
+            return false;
+        }
 
-                float mult = gs.ToolMultiplier(s.game);
-                float lo = s.baseYield * mult * 0.4f, hi = s.baseYield * mult * 1.5f;
-                var row = UiKit.Div("fr-row-wrap");
-                row.Add(UiKit.ItemChip(s.resource, 0));
-                row.Add(UiKit.Text(Mathf.RoundToInt(lo) + " - " + Mathf.RoundToInt(hi) + " " + s.resource.displayName, "fr-small"));
-                card.Add(row);
-                card.Add(UiKit.Text(gs.ToolName(s.game) + "  x" + mult.ToString("0.0") + " yield", "fr-tiny"));
+        // ------------------------------------------------------------ helpers
+        /// <summary>A tonal glass card. Only the selected/equipped one (<paramref name="highlight"/>) gets accent colour.</summary>
+        VisualElement Card(Color accent, bool highlight = false)
+        {
+            return new FrontierCard { Accent = accent, Highlighted = highlight };
+        }
 
-                bool full = gs.FreeSpace(s.resource) <= 0;
-                var go = UiKit.Btn(full ? "BACKPACK FULL" : "START", full ? UiKit.Red : UiKit.Ui(s.resource.color), () => StartGather(s));
-                UiKit.SetEnabledLook(go, !full);
-                card.Add(go);
-                parent.Add(card);
+        /// <summary>A tonal action button with an icon. <paramref name="primary"/> marks the screen's single main action.</summary>
+        Button IconBtn(string text, string icon, Color color, Action onClick, bool big = false, bool primary = false)
+        {
+            var b = UiKit.Btn("", color, onClick, big, primary);
+            b.Add(Icons.Make(icon, color, big ? UiKit.Size.IconLg : UiKit.Size.IconMd));
+            b.Add(UiKit.Text(text, "fr-btn-label"));
+            return b;
+        }
+
+        VisualElement ResourceIconChip(ResourceSO r, string text, bool lack = false)
+        {
+            return UiKit.Chip(Icons.ForResource(r), UiKit.Ui(r.color), text, lack);
+        }
+
+        string StructureEffect(StructureSO d, int level)
+        {
+            float effect = d.EffectAt(level);
+            int pct = Mathf.RoundToInt(effect * 100f);
+            if (d.kind.IsTurret()) return UiText.Get("effect.damage", Mathf.RoundToInt(d.damage * (d.HasLevelRows ? effect : 1f + effect)));
+            if (d.kind == StructureKind.Warehouse) return UiText.Get("effect.storage", d.StorageCapacity(level));
+            if (d.kind == StructureKind.FuelDepot)
+                return UiText.Get(pct > 0 ? "effect.fuel-storage-stack" : "effect.fuel-storage", d.StorageCapacity(level), pct);
+            if (d.kind == StructureKind.AutoHarvester)
+                return UiText.Get("effect.offline-harvest", effect, d.CapacityAt(level), d.StorageCapacity(level));
+            if (d.kind == StructureKind.Satellite)
+                return UiText.Get(d.CapacityAt(level) > 0 ? "effect.beam.range" : "effect.beam.system",
+                    d.CapacityAt(level), Mathf.RoundToInt(effect * 100f));
+            if (d.kind == StructureKind.ResearchLab) return UiText.Get("effect.lab", Mathf.RoundToInt(effect));
+            if (d.kind == StructureKind.RadarTower) return UiText.Get("effect.survey", Mathf.RoundToInt(effect));
+            if (d.kind == StructureKind.ColonyHub) return UiText.Get("effect.builders-discount",
+                Mathf.RoundToInt(effect), Mathf.Clamp(d.CapacityAt(level), 0, 90));
+            if (d.kind == StructureKind.WarpGate) return UiText.Get("effect.warp-gate", pct);
+            if (d.kind == StructureKind.DysonCollector)
+                return UiText.Get("effect.dyson", effect, d.CapacityAt(level));
+            if (d.kind == StructureKind.Terraformer) return UiText.Get("effect.terraformer", pct);
+            if (d.HasLevelRows && d.kind.IsStation()) return UiText.Get("effect.batch", Mathf.RoundToInt(effect));
+            if (d.kind == StructureKind.Refinery) return UiText.Get("effect.output", pct);
+            if (d.kind.IsGather()) return UiText.Get("effect.yield", pct);
+            return UiText.Get("effect.rewards", pct);
+        }
+
+        string UpgradeEffectText(UpgradeSO u, int level)
+        {
+            float v = u.ContributionAt(level, gs.db.baseBackpackSlots);
+            switch (u.effect)
+            {
+                case UpgradeEffect.ToolPower: return UiText.Get("effect.tool-power", 1f + v);
+                case UpgradeEffect.BackpackSlots: return UiText.Get("effect.pack-slots", Mathf.RoundToInt(v));
+                case UpgradeEffect.TurretFireRate: return UiText.Get("effect.fire-rate", Mathf.RoundToInt(v * 100f));
+                case UpgradeEffect.ReactorHealth: return UiText.Get("effect.health", Mathf.RoundToInt(v));
+                case UpgradeEffect.JumpRange:
+                case UpgradeEffect.ScannerRange: return UiText.Get("effect.range", u.ValueAt(level));
+                case UpgradeEffect.FuelEfficiency: return UiText.Get("effect.fuel-use", Mathf.RoundToInt(v * 100f));
+                case UpgradeEffect.FuelTankSlots: return UiText.Get("effect.tank-slots", u.ValueAt(level));
+                case UpgradeEffect.HullPlating: return UiText.Get("effect.plating", level);
+                case UpgradeEffect.StackMultiplier: return UiText.Get("effect.stack-multiplier", u.ValueAt(level, 1f));
+                default: return UiText.Get("effect.percent", Mathf.RoundToInt(v * 100f));
             }
         }
 
-        void StartGather(GatherSpot spot)
+        static string StructureIcon(StructureKind k) { return Icons.ForStructure(k); }
+
+        // ------------------------------------------------------------ settings
+        void LoadPrefs()
+        {
+            Sfx.Muted = PlayerPrefs.GetInt("fr_muted", 0) == 1;
+            world.ShowStructureLabels = PlayerPrefs.GetInt("fr_structure_labels", 1) == 1;
+        }
+
+        // ------------------------------------------------------------ gathering
+        void StartGather(GatherSpot spot, Transform at, float bonus)
         {
             if (busy || defense.Active) return;
             busy = true;
-            tab = Tab.None;
-            Refresh();
-            Minigame g = spot.game == MinigameKind.Chop ? (Minigame)new ChopGame()
-                       : spot.game == MinigameKind.Mine ? (Minigame)new MineGame() : new DrillGame();
+            Vector3 fxPos = at != null ? at.position : Vector3.zero;
+            Minigame g = spot.game == MinigameKind.Chop ? (Minigame)new NodeGame(true)
+                       : spot.game == MinigameKind.Mine ? (Minigame)new VeinGame()
+                       : spot.game == MinigameKind.Siphon ? (Minigame)new SiphonGame()
+                       : spot.game == MinigameKind.Excavate ? (Minigame)new ExcavationGame()
+                       : spot.game == MinigameKind.Salvage ? (Minigame)new SalvageGame() : new DrillGame();
+            g.toolDamage = gs.ToolDamage(spot.game);
+            g.toolLevel = gs.ToolLevel(spot.game);
+            g.toolName = gs.ToolName(spot.game);
+            activeGatherMinigame = g;
+            Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield =
+                services != null && services.Ads.IsConfigured
+                    ? (Func<Task<ServiceResult<RewardedAdResult>>>) (() => services.Ads.ShowRewardedAsync("double-yield"))
+                    : null;
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
                 busy = false;
-                float amount = spot.baseYield * gs.ToolMultiplier(spot.game) * (0.4f + 1.1f * r.quality);
-                int n = r.quality > 0.05f ? Mathf.Max(1, Mathf.RoundToInt(amount)) : 0;
+                if (activeGatherMinigame == g) activeGatherMinigame = null;
+                if (r.abandoned)
+                {
+                    Toast(UiText.Get("harvest.abandoned"), UiKit.Amber);
+                    return;
+                }
+                int n = HarvestAmount(spot, bonus, r);
+                if (r.quality > 0.05f) gs.RecordHarvestRunCompleted();
                 int got = gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);
                 if (got > 0)
                 {
-                    Toast("+" + got + " " + spot.resource.displayName, ui);
-                    Fx.Burst(new Vector3(0, 1.2f, -2f), spot.resource.color, 40, 5f, 0.25f);
+                    Toast(UiText.Get("harvest.reward", got, spot.resource.LocalizedName), ui);
+                    Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
                     planetView.Punch();
                     Sfx.Good();
                 }
-                else Toast(n > 0 ? "Backpack full!" : "Missed everything...", UiKit.Red);
-                if (got < n) Toast("Lost " + (n - got) + " (backpack full)", UiKit.Amber);
-                tab = Tab.Explore;
-                Refresh();
+                else Toast(UiText.Get(n > 0 ? "harvest.backpack-full" : "harvest.missed"), UiKit.Red);
+                if (got < n) Toast(UiText.Get("harvest.overflow", n - got), UiKit.Amber);
+                if (r.rewardedDoubleYield && got > 0)
+                {
+                    if (gs.TryCommitHarvestBonus(spot.resource, got, out int bonusGot, out string error))
+                    {
+                        if (bonusGot > 0)
+                        {
+                            Toast(UiText.Get("harvest.reward", bonusGot, spot.resource.LocalizedName), ui);
+                            Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
+                            planetView.Punch();
+                            Sfx.Good();
+                        }
+                    }
+                    else Toast(UiText.Get("harvest.ad.save-failed", error), UiKit.Red);
+                }
+            }, offerDoubleYield, r =>
+            {
+                int expected = HarvestAmount(spot, bonus, r);
+                int free = gs.FreeSpace(spot.resource);
+                return expected > 0 && (long)free >= (long)expected * 2;
             });
         }
 
-        // ------------------------------------------------------------ defend
-        void BuildDefend(VisualElement parent)
+        int HarvestAmount(GatherSpot spot, float bonus, MinigameResult result)
         {
-            var info = defense.Preview(risk);
-            parent.Add(UiKit.Text("Call in a wave. Danger and size scale with the wave number and this planet's threat.", "fr-muted"));
-
-            var riskRow = UiKit.Div("fr-row"); riskRow.style.marginTop = 10;
-            Color[] rc = { UiKit.Cyan, UiKit.Amber, UiKit.Red };
-            for (int i = 0; i < DefenseController.RiskName.Length; i++)
-            {
-                int idx = i;
-                var b = UiKit.Btn(DefenseController.RiskName[i] + "\nx" + DefenseController.RiskMult[i].ToString("0.##"), rc[i], () => { risk = idx; Refresh(); });
-                b.style.flexGrow = 1; b.style.marginRight = 10;
-                if (idx != risk) b.style.opacity = 0.45f;
-                riskRow.Add(b);
-            }
-            parent.Add(riskRow);
-
-            var card = Card(UiKit.Magenta);
-            card.style.marginTop = 14;
-            card.Add(UiKit.Text("WAVE " + info.waveNumber, "fr-h2", UiKit.Magenta));
-            card.Add(UiKit.Text("Threat budget " + info.budget.ToString("0.#") + "  -  " + info.aliens.Count + " aliens  -  HP x" + info.healthMult.ToString("0.00"), "fr-tiny"));
-
-            var counts = new Dictionary<EnemySO, int>();
-            foreach (var a in info.aliens) { int c; counts.TryGetValue(a, out c); counts[a] = c + 1; }
-            var cr = UiKit.Div("fr-row-wrap"); cr.style.marginTop = 8;
-            foreach (var kv in counts)
-            {
-                var chip = UiKit.Div("fr-itemchip");
-                UiKit.Border(chip, UiKit.Ui(kv.Key.color, 0.8f), 2f);
-                var dot = UiKit.Div("fr-dot"); dot.style.backgroundColor = UiKit.Ui(kv.Key.color);
-                chip.Add(dot);
-                chip.Add(UiKit.Text(kv.Value + " x " + kv.Key.displayName, "fr-small"));
-                cr.Add(chip);
-            }
-            card.Add(cr);
-            card.Add(UiKit.Text("Rewards", "fr-tiny"));
-            card.Add(UiKit.CostRow(info.reward, gs, false));
-            parent.Add(card);
-
-            parent.Add(UiKit.Btn("CALL WAVE", UiKit.Magenta, () =>
-            {
-                tab = Tab.None; Refresh();
-                defense.StartWave(risk);
-            }, true));
-            parent.Add(UiKit.Text("Reactor " + Mathf.RoundToInt(gs.ReactorMax) + "   Turrets " + gs.TurretCount + "   Waves cleared " + gs.totalWavesCleared, "fr-tiny"));
+            if (result.quality <= 0.05f) return 0;
+            float amount = spot.baseYield * gs.ToolMultiplier(spot.game) *
+                (1f + bonus + gs.TerraformerHarvestBonus) * (0.4f + 1.1f * result.quality);
+            return Mathf.Max(1, Mathf.RoundToInt(amount));
         }
 
+        // ------------------------------------------------------------ wave end
         void OnWaveEnded(WaveResult r)
         {
+            CloseWaveResult();
             var panel = UiKit.Div("fr-overlay");
+            waveResultPanel = panel;
+            panel.AddToClassList("fr-overlay-clear");
             panel.pickingMode = PickingMode.Position;
+            if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             Color c = r.victory ? UiKit.Lime : UiKit.Red;
-            panel.Add(UiKit.Text(r.victory ? "WAVE CLEARED" : "REACTOR OVERLOADED", "fr-title", c));
+            UiKit.SetAccent(panel, c);
+            panel.Add(UiKit.Text(UiText.Get(r.victory ? "wave.victory" : "wave.defeat"), "fr-title", c));
             if (r.victory)
             {
-                panel.Add(UiKit.Text("Salvage recovered", "fr-muted"));
+                panel.Add(UiKit.Text(UiText.Get("wave.salvage"), "fr-muted"));
                 panel.Add(UiKit.CostRow(r.granted, gs, false));
+                if (defense.Current != null) panel.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("wave.xp", defense.Current.xp)));
                 if (r.lost.Count > 0)
                 {
-                    panel.Add(UiKit.Text("Backpack full - lost:", "fr-muted", UiKit.Amber));
+                    panel.Add(UiKit.Text(UiText.Get("wave.overflow"), "fr-muted", UiKit.Amber));
                     panel.Add(UiKit.CostRow(r.lost, gs, false));
                 }
             }
-            else panel.Add(UiKit.Text("The aliens broke through. No salvage this time.", "fr-muted"));
-            var b = UiKit.Btn("CONTINUE", c, null, true);
-            b.clicked += () => { panel.RemoveFromHierarchy(); tab = Tab.Defend; Refresh(); };
-            b.style.marginTop = 30;
+            else panel.Add(UiKit.Text(UiText.Get("wave.defeat.help"), "fr-muted"));
+            var b = UiKit.Btn(UiText.Get("common.continue"), c, null, true, true);
+            b.clicked += CloseWaveResult;
+            b.style.marginTop = UiKit.Space.S32;
             panel.Add(b);
             overlayLayer.Add(panel);
-            Refresh();
+            OnStateChanged();
         }
 
-        // ------------------------------------------------------------ shop
-        string EffectText(UpgradeSO u, int level)
+        void CloseWaveResult()
         {
-            float v = u.valuePerLevel * level;
-            switch (u.effect)
-            {
-                case UpgradeEffect.ToolPower: return "x" + (1f + v).ToString("0.0") + " yield";
-                case UpgradeEffect.BackpackSlots: return "+" + Mathf.RoundToInt(v) + " slots";
-                case UpgradeEffect.TurretCount: return "+" + Mathf.RoundToInt(v) + " turrets";
-                case UpgradeEffect.ReactorHealth: return "+" + Mathf.RoundToInt(v) + " HP";
-                default: return "+" + Mathf.RoundToInt(v * 100f) + "%";
-            }
+            if (waveResultPanel != null) waveResultPanel.RemoveFromHierarchy();
+            waveResultPanel = null;
+            if (scrimLayer != null && modal == null) scrimLayer.style.display = DisplayStyle.None;
         }
 
-        void BuildShop(VisualElement parent)
-        {
-            foreach (UpgradeCategory cat in System.Enum.GetValues(typeof(UpgradeCategory)))
-            {
-                var h = UiKit.Text(cat.ToString().ToUpper(), "fr-small", UiKit.Magenta);
-                h.style.marginTop = 6; h.style.marginBottom = 8;
-                parent.Add(h);
-                foreach (var up in gs.db.upgrades)
-                {
-                    if (up == null || up.category != cat) continue;
-                    var u = up;
-                    int lvl = gs.Level(u);
-                    bool max = lvl >= u.maxLevel;
-                    var card = Card(u.color);
-                    var top = UiKit.Div("fr-row");
-                    top.Add(UiKit.Text(u.NameAtLevel(lvl), "fr-h2", UiKit.Ui(u.color)));
-                    top.Add(UiKit.Div("fr-spacer"));
-                    top.Add(UiKit.Text("Lv " + lvl + "/" + u.maxLevel, "fr-small"));
-                    card.Add(top);
-                    card.Add(UiKit.Text(u.description, "fr-muted"));
-                    card.Add(UiKit.Text("Now " + EffectText(u, lvl) + (max ? "" : "  >  " + EffectText(u, lvl + 1)), "fr-tiny"));
-                    if (!max)
-                    {
-                        var cost = u.CostAt(lvl);
-                        card.Add(UiKit.CostRow(cost, gs, true));
-                        var buy = UiKit.Btn("UPGRADE", u.color, () =>
-                        {
-                            if (gs.Buy(u)) { Sfx.Good(); Toast(u.NameAtLevel(gs.Level(u)) + " ready!", UiKit.Ui(u.color)); planetView.Punch(); }
-                            else Sfx.Bad();
-                        });
-                        UiKit.SetEnabledLook(buy, gs.Has(cost));
-                        card.Add(buy);
-                    }
-                    else card.Add(UiKit.Text("MAXED", "fr-small", UiKit.Lime));
-                    parent.Add(card);
-                }
-            }
-
-            var rh = UiKit.Text("REFINERY", "fr-small", UiKit.Magenta);
-            rh.style.marginTop = 6; rh.style.marginBottom = 8;
-            parent.Add(rh);
-            foreach (var rec in gs.db.recipes)
-            {
-                var r = rec;
-                var card = Card(UiKit.Lime);
-                card.Add(UiKit.Text(r.displayName, "fr-h2"));
-                card.Add(UiKit.CostRow(r.inputs, gs, true));
-                card.Add(UiKit.Text("produces", "fr-tiny"));
-                card.Add(UiKit.CostRow(r.outputs, gs, false));
-                var b = UiKit.Btn("CRAFT", UiKit.Lime, () =>
-                {
-                    if (gs.Craft(r)) Sfx.Good(); else { Sfx.Bad(); Toast("Not enough room or materials", UiKit.Red); }
-                });
-                UiKit.SetEnabledLook(b, gs.Has(r.inputs));
-                card.Add(b);
-                parent.Add(card);
-            }
-        }
-
-        // ------------------------------------------------------------ pack
-        void BuildPack(VisualElement parent)
-        {
-            parent.Add(UiKit.Text(gs.SlotsUsed + " / " + gs.Slots + " slots used", "fr-muted"));
-            var grid = UiKit.Div("fr-grid");
-            grid.style.marginTop = 8;
-            int used = 0;
-            foreach (var r in gs.db.resources)
-            {
-                int have = gs.Count(r);
-                while (have > 0 && used < gs.Slots)
-                {
-                    int inSlot = Mathf.Min(have, r.stackSize);
-                    grid.Add(Slot(r, inSlot));
-                    have -= inSlot; used++;
-                }
-            }
-            for (; used < gs.Slots; used++) grid.Add(Slot(null, 0));
-            parent.Add(grid);
-
-            var list = UiKit.Div(); list.style.marginTop = 14;
-            foreach (var r in gs.db.resources)
-                if (gs.Count(r) > 0)
-                {
-                    var row = UiKit.Div("fr-row");
-                    var dot = UiKit.Div("fr-dot"); dot.style.backgroundColor = UiKit.Ui(r.color);
-                    row.Add(dot);
-                    row.Add(UiKit.Text(r.displayName, "fr-small"));
-                    row.Add(UiKit.Div("fr-spacer"));
-                    row.Add(UiKit.Text(gs.Count(r).ToString(), "fr-small"));
-                    list.Add(row);
-                }
-            parent.Add(list);
-        }
-
-        VisualElement Slot(ResourceSO r, int count)
-        {
-            var s = UiKit.Div("fr-slot");
-            if (r != null)
-            {
-                Color c = UiKit.Ui(r.color);
-                UiKit.Border(s, new Color(c.r, c.g, c.b, 0.9f), 2f);
-                UiKit.Halo(s, c, 14f, 0.3f);
-                var orb = UiKit.Div(); orb.style.width = 44; orb.style.height = 44;
-                UiKit.Radius(orb, 22);
-                orb.style.backgroundColor = c;
-                s.Add(orb);
-                s.Add(UiKit.Text(r.displayName, "fr-tiny"));
-                s.Add(UiKit.Text(count.ToString(), "fr-slot-count"));
-            }
-            return s;
-        }
-
-        // ------------------------------------------------------------ map
-        void BuildMap()
-        {
-            mapElement = UiKit.Div();
-            mapElement.style.height = 360;
-            mapElement.style.marginTop = 10;
-            UiKit.Radius(mapElement, 22);
-            mapElement.style.backgroundColor = new Color(0.02f, 0.04f, 0.12f, 0.9f);
-            UiKit.Border(mapElement, new Color(0.1f, 0.95f, 1f, 0.3f), 2f);
-            var me = mapElement;
-            mapElement.generateVisualContent += ctx =>
-            {
-                if (selected == null || selected == gs.planet) return;
-                var p = ctx.painter2D;
-                Vector2 a = MapPos(gs.planet, me), b = MapPos(selected, me);
-                p.lineWidth = 4f;
-                p.strokeColor = new Color(1f, 0.25f, 0.95f, 0.9f);
-                p.BeginPath(); p.MoveTo(a); p.LineTo(b); p.Stroke();
-            };
-
-            foreach (var pl in gs.db.planets)
-            {
-                var planet = pl;
-                var node = UiKit.Div();
-                node.style.position = Position.Absolute;
-                node.style.width = 70; node.style.height = 70;
-                node.style.left = Length.Percent(planet.mapPosition.x * 100f);
-                node.style.top = Length.Percent((1f - planet.mapPosition.y) * 100f);
-                node.style.marginLeft = -35; node.style.marginTop = -35;
-                UiKit.Radius(node, 35);
-                node.style.backgroundColor = UiKit.Ui(planet.primary);
-                bool cur = planet == gs.planet, sel = planet == selected;
-                UiKit.Border(node, cur ? Color.white : sel ? UiKit.Magenta : UiKit.Ui(planet.rim, 0.8f), cur || sel ? 5f : 2f);
-                UiKit.Halo(node, UiKit.Ui(planet.rim), 40f, sel ? 0.7f : 0.4f);
-                node.RegisterCallback<PointerDownEvent>(e => { Sfx.Click(); selected = planet; Refresh(); });
-                var name = UiKit.Text(planet.displayName, "fr-tiny");
-                name.style.position = Position.Absolute; name.style.top = 72; name.style.left = -30; name.style.width = 130;
-                name.style.unityTextAlign = TextAnchor.UpperCenter;
-                node.Add(name);
-                mapElement.Add(node);
-            }
-            sheet.Add(mapElement);
-            mapElement.MarkDirtyRepaint();
-
-            var p2 = selected ?? gs.planet;
-            var card = Card(p2.primary);
-            card.style.marginTop = 14;
-            var top = UiKit.Div("fr-row");
-            top.Add(UiKit.Text(p2.displayName, "fr-h2", UiKit.Ui(p2.primary)));
-            top.Add(UiKit.Div("fr-spacer"));
-            top.Add(UiKit.Text("TIER " + (p2.tier + 1) + "  THREAT " + p2.danger.ToString("0.0"), "fr-small"));
-            card.Add(top);
-            card.Add(UiKit.Text(p2.description, "fr-muted"));
-            var res = UiKit.Div("fr-row-wrap");
-            var seen = new HashSet<ResourceSO>();
-            foreach (var s in p2.spots)
-                if (s.resource != null && seen.Add(s.resource)) res.Add(UiKit.ItemChip(s.resource, s.baseYield));
-            card.Add(res);
-            sheet.Add(card);
-
-            if (p2 == gs.planet) card.Add(UiKit.Text("You are here", "fr-small", UiKit.Cyan));
-            else
-            {
-                int cost = gs.FuelCost(p2);
-                bool can = gs.Count(gs.db.fuel) >= cost;
-                var fr = UiKit.Div("fr-row-wrap");
-                fr.Add(UiKit.ItemChip(gs.db.fuel, cost, gs.Count(gs.db.fuel)));
-                card.Add(fr);
-                var go = UiKit.Btn(can ? "WARP" : "NOT ENOUGH FUEL", can ? UiKit.Magenta : UiKit.Red, () => StartTravel(p2), true);
-                UiKit.SetEnabledLook(go, can);
-                card.Add(go);
-            }
-        }
-
-        static Vector2 MapPos(PlanetSO p, VisualElement map)
-        {
-            return new Vector2(p.mapPosition.x * map.contentRect.width, (1f - p.mapPosition.y) * map.contentRect.height);
-        }
-
-        void StartTravel(PlanetSO target)
-        {
-            if (busy || defense.Active || backdrop.Warping) return;
-            busy = true;
-            tab = Tab.None;
-            Refresh();
-            StartCoroutine(backdrop.DoWarp(() =>
-            {
-                gs.Travel(target);
-                planetView.Show(target, true);
-                selected = target;
-            }));
-            StartCoroutine(TravelFlash());
-        }
-
-        IEnumerator TravelFlash()
-        {
-            float t = 0f;
-            while (t < 1.8f)
-            {
-                t += Time.deltaTime;
-                flash.style.opacity = Mathf.Pow(Mathf.Sin(Mathf.Clamp01(t / 1.8f) * Mathf.PI), 6f) * 0.85f;
-                yield return null;
-            }
-            flash.style.opacity = 0f;
-            busy = false;
-            tab = Tab.Explore;
-            Refresh();
-            Toast("Arrived at " + gs.planet.displayName, UiKit.Cyan);
-        }
+        // ------------------------------------------------------------ travel
+        // Multi-leg travel is hosted in UIRoot.Travel.cs.
 
         // ------------------------------------------------------------ toast
         void Toast(string text, Color color)
         {
-            var t = UiKit.Div("fr-toast");
-            UiKit.Border(t, color, 2f);
+            var t = new FrontierToast { Text = text, Tint = color };
             UiKit.Halo(t, color, 24f, 0.25f);
-            t.Add(UiKit.Text(text, "fr-h2", color));
-            t.style.top = 230 + toastLayer.childCount * 90;
             toastLayer.Add(t);
             t.schedule.Execute(() => t.RemoveFromHierarchy()).StartingIn(1800);
         }
