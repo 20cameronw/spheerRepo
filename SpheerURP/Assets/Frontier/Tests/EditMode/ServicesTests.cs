@@ -772,7 +772,10 @@ namespace Frontier.Tests
             Assert.IsFalse(config.enableAnalytics);
             Assert.IsFalse(config.enableRemoteConfig);
             Assert.AreEqual("Lifetime_Earnings_Leaderboard", config.leaderboardId);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(config.privacyPolicyUrl));
+            Assert.AreEqual("https://20cameronw.github.io/spheer-privacy/", config.privacyPolicyUrl);
+            Assert.IsTrue(config.HasValidPrivacyPolicy);
+            Assert.IsFalse(config.CanUseAuthentication);
+            Assert.IsFalse(config.CanUseLeaderboard);
         }
     }
 }

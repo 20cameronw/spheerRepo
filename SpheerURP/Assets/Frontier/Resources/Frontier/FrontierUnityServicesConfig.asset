@@ -17,4 +17,4 @@ MonoBehaviour:
   enableRemoteConfig: 0
   enableNotifications: 0
   leaderboardId: Lifetime_Earnings_Leaderboard
-  privacyPolicyUrl:
+  privacyPolicyUrl: https://20cameronw.github.io/spheer-privacy/
