@@ -8459,6 +8459,26 @@ MonoBehaviour:
     m_Key: service.leaderboard.submission
     m_Metadata:
       m_Items: []
+  - m_Id: 2249921200742400
+    m_Key: gate.player-level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628480
+    m_Key: progression.xp-status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628481
+    m_Key: progression.xp-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628482
+    m_Key: progression.waves
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628483
+    m_Key: progression.required-level
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

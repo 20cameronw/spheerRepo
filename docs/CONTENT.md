@@ -1,5 +1,19 @@
 # Economy content pipeline
 
+## XP-level progression requirements
+
+Building, structure/ship/defense upgrades, research, tool tiers and recipes now use player XP
+level for their numeric unlock requirements. Existing catalog numbers are reused one-for-one;
+`requiresReachTier`, structure `unlockTier`, research `tier` and recipe `tier` retain their
+serialized names for content/save compatibility, but these **gate fields mean required XP level**.
+Research prerequisites, current-world lab/station levels and material costs still apply.
+Already-purchased progression is retained. The existing XP curve and victory XP awards are unchanged;
+other existing XP sources still count. Planet tier, resource distribution, hazards, exploration
+objectives and Frontier Score reach remain geographic. Reachability models repeatable XP once
+an Alarm and fuel are obtainable. The historical offline balance simulator still models the
+original exploration-gated progression; its long-term era forecasts are not XP-loop forecasts
+and it never authorizes live purchases.
+
 ## Planet network and the Grand Archive
 
 `Resources/Frontier/NetworkRules.asset` is the editable, validated ScriptableObject for the new
@@ -186,8 +200,8 @@ Existing stable ids take precedence, so reloads never migrate them twice. `alloy
 owned level. Legacy `axe`/`pick`/`drill` purchases and levels remain legacy upgrades; catalog tiers for supported Axe/Pick/Drill ladders
 are persisted alongside them in v2. The save schema stays v2, v1 originals are backed up, and newer read-only saves are never overwritten.
 
-Imported recipes are filtered by exact station id, station level, reach and research, including the authoritative craft
-action. Purchased research now passes authored research gates; node prerequisites, current-world lab level, reach tier,
+Imported recipes are filtered by exact station id, station level, XP level and research, including the authoritative craft
+action. Purchased research now passes authored research gates; node prerequisites, current-world lab level, XP level,
 catalog identity and resource costs are checked by the runtime. The Command panel exposes research and tool ladders.
 Only Axe/Pick/Drill tiers can be purchased; their yield and active tool level are reflected in harvest rewards and tool feedback.
 Other ladder game types remain visibly unavailable until their minigames exist.

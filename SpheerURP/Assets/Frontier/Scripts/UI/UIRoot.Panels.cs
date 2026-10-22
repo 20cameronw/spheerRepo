@@ -1325,6 +1325,7 @@ namespace Frontier
             tabs.Add(TabButton("shield", UiText.Get("research.tab.defense"), researchTab == 2 && progressionTab == 2, UiKit.Magenta,
                 () => { researchTab = 2; progressionTab = 2; }));
             body.Add(tabs);
+            BuildXpProgress(body, true);
             if (researchTab == 1) BuildTools(body);
             else if (progressionTab == 0) BuildTech(body);
             else

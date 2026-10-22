@@ -20,7 +20,7 @@ namespace Frontier
         public float value;
         [Tooltip("Research node that must be done before this level can be bought; empty = none.")]
         public string researchPrereq;
-        [Tooltip("Highest planet tier the player must have reached.")]
+        [Tooltip("Required player XP level. Serialized name retained for existing content.")]
         public int requiresReachTier;
         [Tooltip("Pacing tier of the purchase (reach and research combined); informational.")]
         public int eraTier;

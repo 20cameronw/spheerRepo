@@ -1095,7 +1095,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336191
-    m_Localized: T{0}
+    m_Localized: XP LV {0}
     m_Metadata:
       m_Items: []
   - m_Id: 1991336192
@@ -1131,8 +1131,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336200
-    m_Localized: Higher tiers improve harvest yield. Research and material costs
-      determine when each tier becomes available.
+    m_Localized: Better tools improve harvest yield. XP level, research and materials
+      determine when upgrades unlock.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336201
@@ -1564,7 +1564,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336307
-    m_Localized: More fuel attracts more aliens, with higher health, damage and speed.
+    m_Localized: Clear waves to earn XP and unlock upgrades. More fuel attracts more
+      aliens, with higher health, damage and speed.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336308
@@ -2231,16 +2232,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530282
-    m_Localized: Follow the input-to-output flow. Station, tier and research gates
-      are shown on each recipe.
+    m_Localized: Follow the input-to-output flow. Station, XP level and research
+      gates are shown on each recipe.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530283
-    m_Localized: "{0}  \xB7  TIER {1}  \xB7  {2} LV {3}"
+    m_Localized: "{0}  \xB7  XP LV {1}  \xB7  {2} LV {3}"
     m_Metadata:
       m_Items: []
   - m_Id: 1995530284
-    m_Localized: "{0}  \xB7  TIER {1}  \xB7  {2} LV {3}  \xB7  RESEARCH: {4}"
+    m_Localized: "{0}  \xB7  XP LV {1}  \xB7  {2} LV {3}  \xB7  RESEARCH: {4}"
     m_Metadata:
       m_Items: []
   - m_Id: 1995530285
@@ -8766,6 +8767,28 @@ MonoBehaviour:
   - m_Id: 2235406253907971
     m_Localized: A leaderboard ID and a nonnegative integer score no greater than
       9,007,199,254,740,991 are required.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921200742400
+    m_Localized: Requires XP level {0} (you are level {1}). Clear alien waves to
+      earn XP.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628480
+    m_Localized: XP LEVEL {0}  -  {1:N0} XP to level {2}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628481
+    m_Localized: Clear alien waves to level up. Unlocks use your XP level, not planet
+      tier.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628482
+    m_Localized: FIND WAVES TO EARN XP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2249921284628483
+    m_Localized: 'Required XP level: {0}'
     m_Metadata:
       m_Items: []
   references:

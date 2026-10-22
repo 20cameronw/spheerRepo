@@ -17,6 +17,11 @@ Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to 
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
 The top bar includes fuel, live Nova Shards and player level; backpack capacity stays on the Pack dock.
+Progression requirements use **player XP level**, not the highest planet tier visited. Command shows
+the current XP level, XP remaining to the next level, and a wave shortcut that selects the local
+Alarm or its Build entry. Research badges say `XP LV`; locks name the required and current levels
+and explain that clearing alien waves earns XP. Actual tool tiers still describe equipment quality.
+Planet tier remains a world difficulty/resource property, not a purchase requirement.
 Missing-material cost and network chips are a single native button containing the existing icon and
 quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
 FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses

@@ -20,11 +20,18 @@ namespace Frontier
             }
         }
 
-        string GateReason(string research, int reach, int lab = 0)
+        public string PlayerLevelLockReason(int requiredLevel)
+        {
+            return requiredLevel > PlayerLevel
+                ? UiText.Get("gate.player-level", requiredLevel, PlayerLevel) : null;
+        }
+
+        string GateReason(string research, int requiredLevel, int lab = 0)
         {
             if (!string.IsNullOrEmpty(research) && !IsResearched(research))
                 return UiText.Get("gate.research", research.Replace('_', ' '));
-            if (reach > ReachTier) return UiText.Get("gate.reach-tier", reach);
+            string levelGate = PlayerLevelLockReason(requiredLevel);
+            if (levelGate != null) return levelGate;
             if (lab > 0)
             {
                 var placed = StructureOfKind(planet, StructureKind.ResearchLab);

@@ -13,7 +13,7 @@ namespace Frontier
         public int level = 1;
         public List<ItemAmount> cost = new List<ItemAmount>();
         public int buildSeconds;
-        [Tooltip("Highest planet tier the player must have reached before this level can start.")]
+        [Tooltip("Required player XP level. Serialized name retained for existing content.")]
         public int requiresReachTier;
         [Tooltip("Research Lab level required (0 = none).")]
         public int requiresLabLevel;
@@ -66,7 +66,7 @@ namespace Frontier
         public HarvestMethod[] gathers = new HarvestMethod[0];
         [Tooltip("Research node that unlocks the structure; empty = available with the tier.")]
         public string unlockResearch;
-        [Tooltip("Reach tier needed to build level 1.")]
+        [Tooltip("Player XP level needed to build level 1.")]
         public int unlockTier;
         [Tooltip("The StructureKind name of the first game's structure, when it had one.")]
         public string legacyKind;

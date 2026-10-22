@@ -184,7 +184,7 @@ namespace Frontier.Tests
             foreach (var upgrade in imported.upgrades)
             {
                 var row = upgrade.NextRow(0);
-                if (string.IsNullOrEmpty(row.researchPrereq) && row.requiresReachTier <= state.ReachTier &&
+                if (string.IsNullOrEmpty(row.researchPrereq) && row.requiresReachTier <= state.PlayerLevel &&
                     upgrade.effect != UpgradeEffect.StackMultiplier) continue;
                 Assert.IsNotNull(state.UpgradeLockReason(upgrade), upgrade.id);
                 Assert.IsFalse(state.Buy(upgrade), upgrade.id);
@@ -558,10 +558,10 @@ namespace Frontier.Tests
             Assert.IsFalse(state.CanCraft(next));
             StringAssert.Contains("station level 2", state.RecipeLockReason(next, refinery));
             state.DebugSetStructureLevel(refinery, 2);
-            Assert.IsFalse(state.CanCraft(next), "upgrading a station does not grant reach tier");
-            var home = state.planet;
-            state.DebugTeleport(state.universe.Get("glacia"));
-            state.DebugTeleport(home);
+            state.DebugSetLevel(Math.Max(1, next.tier - 1));
+            Assert.AreEqual(state.PlayerLevel >= next.tier, state.CanCraft(next),
+                "Recipe unlocks must use player XP level rather than a planet visit.");
+            state.DebugSetLevel(Math.Max(1, next.tier));
             Assert.IsTrue(state.CanCraft(next));
             Assert.IsTrue(state.Craft(next));
             Assert.AreEqual(before + 8, state.Count(db.fuel));

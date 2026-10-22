@@ -109,7 +109,7 @@ namespace Frontier.Economy
         public int level;
         public ItemAmount[] cost;
         public int buildSeconds;
-        /// <summary>Highest planet tier the player must have reached before this level can start.</summary>
+        /// <summary>Required player XP level. Legacy serialized field name retained for content compatibility.</summary>
         public int requiresReachTier;
         /// <summary>Research Lab level required (0 = none).</summary>
         public int requiresLabLevel;
@@ -140,7 +140,7 @@ namespace Frontier.Economy
         public HarvestMethod[] gathers;
         /// <summary>Research node that unlocks the structure (null = available with the tier).</summary>
         public string unlockResearch;
-        /// <summary>Reach tier needed to build level 1.</summary>
+        /// <summary>Player XP level needed to build level 1.</summary>
         public int unlockTier;
         public string legacyKind;
         // Turret data (legacy StructureSO fields), 0 for non-turrets.

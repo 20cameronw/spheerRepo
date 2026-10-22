@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -28,6 +29,119 @@ namespace Frontier.Tests
         }
 
         [Test]
+        [TestCase("building")]
+        [TestCase("structure-upgrade")]
+        [TestCase("ship-upgrade")]
+        [TestCase("research")]
+        [TestCase("tool")]
+        [TestCase("recipe")]
+        public void AllProgressionGatesRequireXpNotPlanetVisits(string surface)
+        {
+            var isolated = GameDatabase.Select(db.ContentSource, GameDatabase.LoadLegacy(), out string error);
+            Assert.IsNull(error);
+            var copies = new List<UnityEngine.Object>();
+            try
+            {
+                isolated.structures = (StructureSO[])isolated.structures.Clone();
+                isolated.upgrades = (UpgradeSO[])isolated.upgrades.Clone();
+                isolated.research = (ResearchNodeSO[])isolated.research.Clone();
+                isolated.toolLadders = (ToolLadderSO[])isolated.toolLadders.Clone();
+                isolated.recipes = (RecipeSO[])isolated.recipes.Clone();
+                var state = new GameState(isolated, false, clock);
+                GiveMaterials(state);
+                Func<string> reason;
+                const int required = 4;
+                if (surface == "building" || surface == "structure-upgrade")
+                {
+                    var def = CloneForGate(isolated.StructureOfKind(StructureKind.Warehouse), isolated.structures, copies);
+                    def.unlockResearch = "";
+                    def.unlockTier = surface == "building" ? required : 0;
+                    var row = def.Row(surface == "building" ? 1 : 2);
+                    row.requiresReachTier = required;
+                    row.requiresLabLevel = 0;
+                    var placed = surface == "building" ? null : state.DebugPlace(def, 0);
+                    reason = surface == "building" ? () => state.BuildLockReason(def)
+                        : () => state.StructureUpgradeLockReason(placed);
+                }
+                else if (surface == "ship-upgrade")
+                {
+                    var def = CloneForGate(isolated.upgrades.First(u => u.HasLevelRows &&
+                        u.effect != UpgradeEffect.StackMultiplier), isolated.upgrades, copies);
+                    def.NextRow(0).requiresReachTier = required;
+                    def.NextRow(0).researchPrereq = "";
+                    reason = () => state.UpgradeLockReason(def);
+                }
+                else if (surface == "research")
+                {
+                    var node = CloneForGate(isolated.research[0], isolated.research, copies);
+                    node.data.tier = required;
+                    node.data.labLevel = 0;
+                    node.data.prereqs = new string[0];
+                    reason = () => state.ResearchLockReason(node);
+                }
+                else if (surface == "tool")
+                {
+                    var ladder = CloneForGate(isolated.toolLadders.First(t => t.data.kind == Economy.ToolKind.Axe),
+                        isolated.toolLadders, copies);
+                    var row = ladder.data.tiers.First(t => t.tier == 2);
+                    row.requiresReachTier = required;
+                    row.researchPrereq = "";
+                    row.requiresLabLevel = 0;
+                    reason = () => state.ToolTierLockReason(ladder);
+                }
+                else
+                {
+                    var recipe = CloneForGate(isolated.recipes[0], isolated.recipes, copies);
+                    recipe.tier = required;
+                    recipe.unlockResearch = "";
+                    var station = state.DebugPlace(isolated.FindStructure(recipe.stationId), 0);
+                    state.DebugSetStructureLevel(station, recipe.stationLevel);
+                    reason = () => state.RecipeLockReason(recipe, station);
+                }
+
+                var home = state.planet;
+                state.DebugSetLevel(1);
+                Assert.AreEqual(UiText.Get("gate.player-level", required, 1), reason());
+                state.DebugSetLevel(required);
+                Assert.AreEqual(0, state.ReachTier);
+                Assert.IsNull(reason(), "High XP must unlock the purchase without ever leaving the starter planet.");
+                state.DebugSetLevel(1);
+                var high = state.universe.FindGenerated(p => p.Tier >= required, 1, 0, 10000);
+                Assert.IsNotNull(high);
+                state.DebugTeleport(high);
+                state.DebugTeleport(home);
+                Assert.GreaterOrEqual(state.ReachTier, required);
+                Assert.AreEqual(UiText.Get("gate.player-level", required, 1), reason(),
+                    "Visiting a high-tier world must not bypass the XP requirement.");
+                int threshold = new Progression(() => FrontierSettings.I.xpPerLevelBase).XpForLevel(required);
+                state.AddXp(threshold - 1);
+                Assert.AreEqual(required - 1, state.PlayerLevel);
+                Assert.IsNotNull(reason(), "One XP below the required level must remain locked.");
+                Assert.AreEqual(1, state.XpToNextLevel);
+                state.AddXp(1);
+                Assert.AreEqual(required, state.PlayerLevel);
+                Assert.IsNull(reason(), "The exact XP threshold should unlock the purchase on the starter planet.");
+                Assert.IsTrue(state.Save());
+                var loaded = new GameState(isolated, true, clock);
+                Assert.AreEqual(required, loaded.PlayerLevel);
+                Assert.AreEqual(threshold, loaded.xp);
+            }
+            finally
+            {
+                foreach (var copy in copies) UnityEngine.Object.DestroyImmediate(copy);
+                UnityEngine.Object.DestroyImmediate(isolated);
+            }
+        }
+
+        static T CloneForGate<T>(T source, T[] entries, List<UnityEngine.Object> copies) where T : UnityEngine.Object
+        {
+            var copy = UnityEngine.Object.Instantiate(source);
+            copies.Add(copy);
+            entries[Array.IndexOf(entries, source)] = copy;
+            return copy;
+        }
+
+        [Test]
         public void ResearchPurchase_SpendsCostAndSurvivesSaveLoad()
         {
             var state = new GameState(db, false);
@@ -38,7 +152,7 @@ namespace Frontier.Tests
             GiveMaterials(state);
 
             var node = db.research.FirstOrDefault(candidate => candidate != null && candidate.data != null &&
-                candidate.data.tier <= state.ReachTier && candidate.data.labLevel <= 20 &&
+                candidate.data.tier <= state.PlayerLevel && candidate.data.labLevel <= 20 &&
                 (candidate.data.prereqs == null || candidate.data.prereqs.Length == 0));
             Assert.IsNotNull(node, "catalog should contain a reachable root research node");
             Assert.IsTrue(state.CanResearch(node), state.ResearchLockReason(node));
@@ -59,23 +173,20 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void ResearchLab_IsBuildableAtTierOneAndEnablesLabGatedResearch()
+        public void ResearchLab_IsBuildableAtStartingXpLevelAndEnablesLabGatedResearch()
         {
             if (!db.UsesImportedEconomy) Assert.Ignore("Imported structure catalog is unavailable");
             var state = new GameState(db, false, clock);
             var labDef = db.StructureOfKind(StructureKind.ResearchLab);
             Assert.IsNotNull(labDef);
             Assert.IsTrue(labDef.Implemented, "research lab is now a supported structure behavior");
-            Assert.AreEqual("Reach planet tier 1", state.BuildLockReason(labDef));
-
-            var tierOneWorld = state.universe.FindGenerated(planet => planet.Tier >= 1, 1, 0, 10000);
-            Assert.IsNotNull(tierOneWorld);
-            state.DebugTeleport(tierOneWorld);
+            Assert.AreEqual(1, state.PlayerLevel);
+            Assert.AreEqual(0, state.ReachTier, "no higher-tier planet visit should be needed");
             GiveMaterials(state);
             Assert.IsNull(state.BuildLockReason(labDef));
 
             var research = db.research.FirstOrDefault(node => node != null && node.data != null &&
-                node.data.tier <= state.ReachTier && node.data.labLevel == 1 &&
+                node.data.tier <= state.PlayerLevel && node.data.labLevel == 1 &&
                 (node.data.prereqs == null || node.data.prereqs.Length == 0));
             Assert.IsNotNull(research, "catalog contains tier-one research gated by a level-one lab");
             StringAssert.StartsWith("Requires Research Lab level 1", state.ResearchLockReason(research));
@@ -174,7 +285,7 @@ namespace Frontier.Tests
                      ladder.data.kind != Economy.ToolKind.Scanner && ladder.data.kind != Economy.ToolKind.Claw) ||
                     ladder.data.games == null || ladder.data.games.Length == 0) continue;
                 var next = ladder.data.tiers.FirstOrDefault(row => row != null && row.tier == state.ToolTier(ladder) + 1);
-                if (next == null || next.requiresReachTier > state.ReachTier ||
+                if (next == null || next.requiresReachTier > state.PlayerLevel ||
                     next.requiresLabLevel > 20 || !string.IsNullOrEmpty(next.researchPrereq)) continue;
                 if (state.ToolTierLockReason(ladder) == null) { selected = ladder; break; }
             }
@@ -271,7 +382,7 @@ namespace Frontier.Tests
             PlaceResearchLab(state);
             GiveMaterials(state);
             var root = db.research.FirstOrDefault(node => node != null && node.data != null &&
-                node.data.tier <= state.ReachTier && node.data.labLevel <= 20 &&
+                node.data.tier <= state.PlayerLevel && node.data.labLevel <= 20 &&
                 (node.data.prereqs == null || node.data.prereqs.Length == 0));
             Assert.IsNotNull(root);
             Assert.IsTrue(state.Research(root));
@@ -282,7 +393,7 @@ namespace Frontier.Tests
                     (candidate.data.kind != Economy.ToolKind.Axe && candidate.data.kind != Economy.ToolKind.Pick &&
                      candidate.data.kind != Economy.ToolKind.Drill)) continue;
                 var tier = candidate.data.tiers.FirstOrDefault(row => row != null && row.tier == 2);
-                if (tier != null && tier.requiresReachTier <= state.ReachTier &&
+                if (tier != null && tier.requiresReachTier <= state.PlayerLevel &&
                     tier.requiresLabLevel <= 20 && string.IsNullOrEmpty(tier.researchPrereq))
                 {
                     ladder = candidate;
@@ -291,9 +402,13 @@ namespace Frontier.Tests
             }
             Assert.IsNotNull(ladder, "catalog should contain a supported tier-two tool without additional research");
             Assert.IsTrue(state.BuyToolTier(ladder));
+            var legacyDb = GameDatabase.LoadLegacy();
+            foreach (var resource in db.resources)
+                if (state.IsTankFuel(resource.id) && legacyDb.FindResource(resource.id) == null)
+                    state.backpack.Set(resource.id, 0);
             Assert.IsTrue(state.Save());
 
-            var legacy = new GameState(GameDatabase.LoadLegacy(), true);
+            var legacy = new GameState(legacyDb, true);
             Assert.IsTrue(legacy.IsResearched(root.data.id));
             Assert.AreEqual(2, legacy.ToolTier(ladder));
             Assert.IsTrue(legacy.Save());
@@ -315,6 +430,7 @@ namespace Frontier.Tests
                 destination = state.universe.FindGenerated(planet => planet.Tier >= 1, 1, 0, 10000);
             Assert.IsNotNull(destination, "universe should generate at least one tier-one world");
             state.DebugTeleport(destination);
+            state.DebugSetLevel(40);
         }
 
         static void GiveMaterials(GameState state)

@@ -80,7 +80,7 @@ namespace Frontier.Tests
 
                 var second = state.db.structures.First(candidate => candidate != null && candidate != refinery &&
                     candidate.levels != null && candidate.levels.Count > 1 && candidate.levels[1].buildSeconds > 0 &&
-                    candidate.levels[1].requiresReachTier <= state.ReachTier && candidate.levels[1].requiresLabLevel == 0 &&
+                    candidate.levels[1].requiresReachTier <= state.PlayerLevel && candidate.levels[1].requiresLabLevel == 0 &&
                     string.IsNullOrEmpty(candidate.unlockResearch));
                 var secondPlaced = state.DebugPlace(second, 1);
                 Assert.IsNotNull(secondPlaced);
@@ -174,7 +174,7 @@ namespace Frontier.Tests
             GiveAllResources(state);
             StructureSO definition = db.structures.FirstOrDefault(candidate => candidate != null &&
                 candidate.Implemented && candidate.levels != null && candidate.levels.Count > 1 &&
-                candidate.levels[1].buildSeconds > 0 && candidate.levels[1].requiresReachTier <= state.ReachTier &&
+                candidate.levels[1].buildSeconds > 0 && candidate.levels[1].requiresReachTier <= state.PlayerLevel &&
                 candidate.levels[1].requiresLabLevel == 0 && string.IsNullOrEmpty(candidate.unlockResearch));
             Assert.IsNotNull(definition, "catalog contains an available timed upgrade");
             var placed = state.DebugPlace(definition, 0);

@@ -39,7 +39,7 @@ namespace Frontier.Tests
         {
             var station = db.StructureOfKind(StructureKind.Refinery);
             var recipe = db.recipes.First(r => r.stationId == station.id &&
-                string.IsNullOrEmpty(r.unlockResearch) && r.stationLevel == 1 && r.tier <= state.ReachTier);
+                string.IsNullOrEmpty(r.unlockResearch) && r.stationLevel == 1 && r.tier <= state.PlayerLevel);
             var output = recipe.outputs[0].resource;
             Assert.AreEqual(ResourceSourceKind.Build, state.FindResourceSource(output).kind);
             state.DebugPlace(station, 0);

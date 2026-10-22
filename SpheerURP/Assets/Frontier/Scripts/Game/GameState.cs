@@ -402,6 +402,7 @@ namespace Frontier
         // ---------- XP ----------
         public int xp { get { return progression.Xp; } }
         public int PlayerLevel { get { return progression.Level; } }
+        public long XpToNextLevel { get { return progression.XpToNextLevel; } }
         public float LevelProgress { get { return progression.LevelProgress; } }
         public int totalWavesCleared { get { return stats.totalWavesCleared; } }
 

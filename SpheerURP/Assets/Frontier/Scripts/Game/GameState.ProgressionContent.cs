@@ -24,7 +24,8 @@ namespace Frontier
             if (node == null || node.data == null || !ContainsResearch(node)) return UiText.Get("gate.research.unknown");
             if (!db.UsesImportedEconomy) return UiText.Get("gate.research.unavailable");
             if (IsResearched(node.data.id)) return UiText.Get("gate.research.complete");
-            if (node.data.tier > ReachTier) return UiText.Get("gate.reach-tier", node.data.tier);
+            string levelGate = PlayerLevelLockReason(node.data.tier);
+            if (levelGate != null) return levelGate;
             if (node.data.labLevel > 0)
             {
                 var lab = StructureOfKind(planet, StructureKind.ResearchLab);
@@ -84,7 +85,8 @@ namespace Frontier
             int current = ToolTier(ladder);
             var next = FindToolTier(ladder, current + 1);
             if (next == null) return UiText.Get("gate.tool.max");
-            if (next.requiresReachTier > ReachTier) return UiText.Get("gate.reach-tier", next.requiresReachTier);
+            string levelGate = PlayerLevelLockReason(next.requiresReachTier);
+            if (levelGate != null) return levelGate;
             if (!string.IsNullOrEmpty(next.researchPrereq) && !IsResearched(next.researchPrereq))
                 return UiText.Get("gate.requires", DisplayId(next.researchPrereq));
             if (next.requiresLabLevel > 0)

@@ -687,6 +687,7 @@ namespace Frontier
                 int have = gs.Count(gs.db.fuel);
                 alarmFuel = Mathf.Clamp(alarmFuel, 1, Mathf.Max(1, Mathf.Min(have, 40)));
                 StructureHeader(body, s, c, UiText.Get("wave.call-help"));
+                BuildXpProgress(body, false);
 
                 var stepper = UiKit.Div("fr-stepper");
                 var minus = Icons.IconButton("minus", UiKit.Amber, () => { alarmFuel = Mathf.Max(1, alarmFuel - 1); RefreshPopup(); });

@@ -16,6 +16,7 @@ namespace Frontier.Economy
         /// <summary>Iteration of the fixpoint in which each resource first became obtainable (0 = at the start).</summary>
         public readonly Dictionary<string, int> resourceRound = new Dictionary<string, int>();
         public int reachTier;
+        public int playerLevel = 1;
         public int rounds;
         public readonly List<string> problems = new List<string>();
     }
@@ -105,6 +106,7 @@ namespace Frontier.Economy
                     for (int i = 0; i < _c.recipes.Length; i++)
                     {
                         RecipeDef rc = _c.recipes[i];
+                        if (rc.tier > _r.playerLevel) continue;
                         if (!HasAll(rc.inputs)) continue;
                         if (Level(rc.stationId) < rc.stationLevel) continue;
                         if (rc.unlockResearch != null && !_r.research.Contains(rc.unlockResearch)) continue;
@@ -119,7 +121,8 @@ namespace Frontier.Economy
                         {
                             StructureLevelDef d = s.levels[have];
                             if (!HasAll(d.cost)) break;
-                            if (d.requiresReachTier > _r.reachTier) break;
+                            if (d.requiresReachTier > _r.playerLevel) break;
+                            if (have == 0 && s.unlockTier > _r.playerLevel) break;
                             if (have == 0 && s.unlockResearch != null && !_r.research.Contains(s.unlockResearch)) break;
                             if (d.requiresLabLevel > Level("research_lab")) break;
                             have++;
@@ -133,6 +136,7 @@ namespace Frontier.Economy
                     {
                         ResearchNodeDef n = _c.research[i];
                         if (_r.research.Contains(n.id)) continue;
+                        if (n.tier > _r.playerLevel) continue;
                         if (!HasAll(n.cost)) continue;
                         if (Level("research_lab") < n.labLevel) continue;
                         bool pre = true;
@@ -151,7 +155,7 @@ namespace Frontier.Economy
                             ToolTierDef d = l.tiers[have];
                             if (!HasAll(d.cost)) break;
                             if (d.researchPrereq != null && !_r.research.Contains(d.researchPrereq)) break;
-                            if (d.requiresReachTier > _r.reachTier) break;
+                            if (d.requiresReachTier > _r.playerLevel) break;
                             if (d.requiresLabLevel > Level("research_lab")) break;
                             have++;
                             _r.toolTier[l.id] = have;
@@ -169,7 +173,7 @@ namespace Frontier.Economy
                             UpgradeLevelDef d = u.levels[have];
                             if (!HasAll(d.cost)) break;
                             if (d.researchPrereq != null && !_r.research.Contains(d.researchPrereq)) break;
-                            if (d.requiresReachTier > _r.reachTier) break;
+                            if (d.requiresReachTier > _r.playerLevel) break;
                             have++;
                             _r.upgradeLevel[u.id] = have;
                             changed = true;
@@ -179,6 +183,12 @@ namespace Frontier.Economy
                                 if (hi >= 0) _plating[hi] = have;
                             }
                         }
+                    }
+                    // Repeatable waves make XP farmable once their caller and fuel are obtainable.
+                    if (_r.playerLevel < UnlimitedTier && Level("alarm") >= 1 && Has("fuel"))
+                    {
+                        _r.playerLevel = UnlimitedTier;
+                        changed = true;
                     }
                     // Reach: once a jump drive exists every tier can be walked to.
                     int jump;
@@ -206,7 +216,7 @@ namespace Frontier.Economy
                 for (int i = 0; i < _c.recipes.Length; i++)
                 {
                     RecipeDef rc = _c.recipes[i];
-                    bool ok = HasAll(rc.inputs) && Level(rc.stationId) >= rc.stationLevel && (rc.unlockResearch == null || _r.research.Contains(rc.unlockResearch));
+                    bool ok = rc.tier <= _r.playerLevel && HasAll(rc.inputs) && Level(rc.stationId) >= rc.stationLevel && (rc.unlockResearch == null || _r.research.Contains(rc.unlockResearch));
                     if (!ok) _r.problems.Add("recipe " + rc.id + " cannot be run");
                 }
             }

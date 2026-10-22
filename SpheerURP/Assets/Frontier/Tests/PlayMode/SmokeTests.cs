@@ -139,7 +139,8 @@ namespace Frontier.Tests
                 label.text == UiText.Get("service.ads.test-editor")));
             rt.Ui.DebugReset();
             rt.Ui.DebugMenu("ranks");
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable") ?? rt.Ui.DebugRoot.Q("leaderboard-publish"),
+                "Ranks must offer opt-in or publishing according to the existing online preference.");
         }
 
         static int ActiveRippleCount()
@@ -299,6 +300,79 @@ namespace Frontier.Tests
                 Object.Destroy(host);
             }
             yield return null;
+        }
+
+        [Test]
+        public void WaveVictoryAwardsUnlockingXpOnceAndDefeatAwardsNone()
+        {
+            var state = new GameState(GameDatabase.Load(), false);
+            var host = new GameObject("WaveXpProbe");
+            try
+            {
+                var defense = host.AddComponent<DefenseController>();
+                defense.enabled = false;
+                defense.Init(null, null, state);
+                state.DebugSetLevel(1);
+                int threshold = new Progression(() => FrontierSettings.I.xpPerLevelBase).XpForLevel(2);
+                int reward = defense.Preview(1).xp;
+                state.AddXp(Math.Max(0, threshold - reward));
+                Assert.IsNotNull(state.PlayerLevelLockReason(2));
+                int before = state.xp;
+                Assert.IsTrue(defense.StartWave(1));
+                defense.DebugEnd(false);
+                Assert.AreEqual(before, state.xp, "Defeated waves must not pay victory XP.");
+                Assert.IsNotNull(state.PlayerLevelLockReason(2));
+
+                Assert.IsTrue(defense.StartWave(1));
+                reward = defense.Current.xp;
+                defense.DebugEnd(true);
+                Assert.AreEqual(before + reward, state.xp);
+                Assert.IsNull(state.PlayerLevelLockReason(2), "Winning waves must advance the same level used by purchase gates.");
+                defense.DebugEnd(true);
+                Assert.AreEqual(before + reward, state.xp, "A settled wave must not award XP again.");
+                Assert.IsTrue(state.Save());
+                var loaded = new GameState(state.db, true);
+                Assert.AreEqual(state.xp, loaded.xp);
+                Assert.IsNull(loaded.PlayerLevelLockReason(2));
+            }
+            finally { Object.Destroy(host); }
+        }
+
+        [UnityTest]
+        public IEnumerator CommandExplainsXpLevelsAndRoutesToWaveCaller()
+        {
+            new GameObject("XpProgressionBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Ui.DebugResearch(2);
+            yield return null;
+            var progress = rt.Ui.DebugRoot.Q("player-xp-progression");
+            Assert.IsNotNull(progress);
+            Assert.IsTrue(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-status",
+                rt.State.PlayerLevel, rt.State.XpToNextLevel, rt.State.PlayerLevel + 1)));
+            Assert.IsTrue(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-help")));
+            var waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
+            Assert.IsNotNull(waves);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
+            yield return null;
+            var alarm = rt.State.StructureOfKind(rt.State.planet, StructureKind.Alarm);
+            if (alarm == null)
+            {
+                var def = rt.Db.StructureOfKind(StructureKind.Alarm);
+                Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + def.id),
+                    "Players without an Alarm must be sent to its Build entry.");
+                alarm = rt.State.DebugPlace(def, 0);
+                Assert.IsNotNull(alarm);
+                yield return null;
+            }
+            rt.Ui.DebugResearch(1);
+            waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("player-xp-progression"), "The Alarm preview should also explain XP.");
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("wave.call-help")));
         }
 
         [Test]

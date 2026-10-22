@@ -44,6 +44,8 @@ namespace Frontier
             return (int)Math.Round(Base * l * l);
         }
 
+        public long XpToNextLevel { get { return Math.Max(0L, (long)Math.Round(Base * Level * Level) - Xp); } }
+
         public void AddXp(int amount)
         {
             if (amount <= 0) return;

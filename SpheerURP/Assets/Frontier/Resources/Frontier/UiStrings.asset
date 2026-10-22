@@ -1137,7 +1137,7 @@ MonoBehaviour:
   - key: research.complete
     text: COMPLETE
   - key: research.tier
-    text: T{0}
+    text: XP LV {0}
   - key: research.lab
     text: "{0}  \xB7  LAB {1}"
   - key: research.prerequisites
@@ -1155,8 +1155,8 @@ MonoBehaviour:
   - key: tools.title
     text: CATALOG TOOL TIERS
   - key: tools.help
-    text: Higher tiers improve harvest yield. Research and material costs determine
-      when each tier becomes available.
+    text: Better tools improve harvest yield. XP level, research and materials determine
+      when upgrades unlock.
   - key: tools.max
     text: MAX TIER
   - key: tools.tier
@@ -1374,7 +1374,8 @@ MonoBehaviour:
   - key: craft.blocked
     text: Not enough room or materials
   - key: wave.call-help
-    text: More fuel attracts more aliens, with higher health, damage and speed.
+    text: Clear waves to earn XP and unlock upgrades. More fuel attracts more aliens,
+      with higher health, damage and speed.
   - key: wave.preview
     text: WAVE {0}  -  {1} ALIENS
   - key: wave.scaling
@@ -1778,12 +1779,12 @@ MonoBehaviour:
   - key: atlas.recipes.empty
     text: No recipes are configured.
   - key: atlas.recipes.help
-    text: Follow the input-to-output flow. Station, tier and research gates are shown
-      on each recipe.
+    text: Follow the input-to-output flow. Station, XP level and research gates are
+      shown on each recipe.
   - key: atlas.recipe.gate
-    text: "{0}  \xB7  TIER {1}  \xB7  {2} LV {3}"
+    text: "{0}  \xB7  XP LV {1}  \xB7  {2} LV {3}"
   - key: atlas.recipe.gate-research
-    text: "{0}  \xB7  TIER {1}  \xB7  {2} LV {3}  \xB7  RESEARCH: {4}"
+    text: "{0}  \xB7  XP LV {1}  \xB7  {2} LV {3}  \xB7  RESEARCH: {4}"
   - key: atlas.recipe.crafted
     text: CRAFTED
   - key: atlas.recipe.uncrafted
@@ -2154,6 +2155,16 @@ MonoBehaviour:
     text: 'Requires research: {0}'
   - key: gate.reach-tier
     text: Reach planet tier {0}
+  - key: gate.player-level
+    text: Requires XP level {0} (you are level {1}). Clear alien waves to earn XP.
+  - key: progression.xp-status
+    text: XP LEVEL {0}  -  {1:N0} XP to level {2}
+  - key: progression.xp-help
+    text: Clear alien waves to level up. Unlocks use your XP level, not planet tier.
+  - key: progression.waves
+    text: FIND WAVES TO EARN XP
+  - key: progression.required-level
+    text: 'Required XP level: {0}'
   - key: gate.lab-level
     text: Requires Research Lab level {0}
   - key: gate.structure.unknown

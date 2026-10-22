@@ -253,7 +253,7 @@ namespace Frontier
             var card = Card(UiKit.Cyan);
             card.Add(UiKit.Text(recipe.LocalizedName.ToUpper(), "fr-h2"));
             string gate = UiText.Get(string.IsNullOrEmpty(recipe.unlockResearch) ? "atlas.recipe.gate" : "atlas.recipe.gate-research",
-                PrettyName(recipe.kind.ToString()), recipe.tier, PrettyName(recipe.stationId),
+                PrettyName(recipe.kind.ToString()), Math.Max(1, recipe.tier), PrettyName(recipe.stationId),
                 recipe.stationLevel, PrettyName(recipe.unlockResearch));
             card.Add(UiKit.Text(gate, "fr-tiny"));
             bool discovered = gs.IsAtlasDiscovered("recipe", recipe.id);

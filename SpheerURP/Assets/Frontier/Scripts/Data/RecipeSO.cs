@@ -25,6 +25,7 @@ namespace Frontier
         [Tooltip("Structure id that runs the recipe.")]
         public string stationId = "refinery";
         public int stationLevel = 1;
+        [Tooltip("Required player XP level.")]
         public int tier;
         [Tooltip("Research node that reveals the recipe; empty when it is known from the start.")]
         public string unlockResearch;
