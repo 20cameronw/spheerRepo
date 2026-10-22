@@ -260,6 +260,7 @@ namespace Frontier
 
         void BuildLeaderboard(VisualElement body)
         {
+            BuildOnlineLeaderboard(body);
             BuildEraProgress(body);
             if (gs.AscensionAvailable)
                 body.Add(IconBtn(UiText.Get("ranks.ascension"), "play", UiKit.Magenta, () => { menuPage = "ascension"; RefreshModal(); }));
@@ -287,6 +288,11 @@ namespace Frontier
             foreach (var s in gs.structures) planets.Add(s.planetId);
             StatRow(card, "map", UiKit.Amber, UiText.Get("ranks.bases"), planets.Count.ToString());
             body.Add(card);
+        }
+
+        void BuildOnlineLeaderboard(VisualElement body)
+        {
+            body.Add(SectionLabel(UiText.Get("ranks.online.title")));
             if (services == null || !services.Leaderboards.IsConfigured)
             {
                 var setup = UiKit.Text(UiText.Get("ranks.setup-required"), "fr-muted");
@@ -297,13 +303,27 @@ namespace Frontier
             if (!services.Consent.Current.hasDecision || !services.Consent.Current.onlineServicesAllowed)
             {
                 body.Add(UiKit.Text(UiText.Get("ranks.enable"), "fr-muted"));
+                var enable = IconBtn(UiText.Get("ranks.opt-in"), "ranks", UiKit.Cyan, () =>
+                {
+                    var current = services.Consent.Current;
+                    SaveConsentPreferences(current.analyticsAllowed, current.adsAllowed, true);
+                    LoadOnlineLeaderboard();
+                });
+                enable.name = "leaderboard-enable";
+                body.Add(enable);
                 return;
             }
 
             body.Add(UiKit.Text(UiText.Get("ranks.online.help"), "fr-muted"));
-            body.Add(UiKit.Text(UiText.Get("ranks.read-only"), "fr-muted"));
             if (!string.IsNullOrEmpty(leaderboardStatus))
-                body.Add(UiKit.Text(leaderboardStatus, "fr-small"));
+                body.Add(UiKit.Text(leaderboardStatus, "fr-muted"));
+            if (onlinePlayerEntry.HasValue)
+            {
+                var entry = onlinePlayerEntry.Value;
+                var own = UiKit.Text(UiText.Get("ranks.your-rank", entry.rank, entry.score.ToString("N0")), "fr-muted");
+                own.name = "leaderboard-player-rank";
+                body.Add(own);
+            }
 
             if (onlineLeaderboardEntries != null)
             {
@@ -322,6 +342,7 @@ namespace Frontier
 
             var load = IconBtn(UiText.Get(leaderboardLoading ? "ranks.loading" : "ranks.load"),
                 "ranks", UiKit.Cyan, LoadOnlineLeaderboard);
+            load.name = "leaderboard-publish";
             UiKit.SetEnabledLook(load, !leaderboardLoading);
             body.Add(load);
         }
@@ -369,6 +390,7 @@ namespace Frontier
         }
 
         IReadOnlyList<LeaderboardEntry> onlineLeaderboardEntries;
+        LeaderboardEntry? onlinePlayerEntry;
         string leaderboardStatusValue;
         ServiceMessage? leaderboardFailure;
         ServiceStatus leaderboardFailureStatus;
@@ -383,38 +405,68 @@ namespace Frontier
         async void LoadOnlineLeaderboard()
         {
             if (leaderboardLoading || services == null || services.AccountDeletionBusy) return;
+            var activeServices = services;
+            long score = gs.FrontierScore.total;
             leaderboardLoading = true;
+            onlineLeaderboardEntries = null;
+            onlinePlayerEntry = null;
             leaderboardStatus = UiText.Get("ranks.connecting");
             RefreshModal();
-
-            ServiceResult<AuthIdentity> signIn = await services.Authentication.SignInAnonymouslyAsync();
-            if (this == null) return;
-            if (!signIn.succeeded)
+            bool withdrawn = false;
+            void Observe(ConsentPreferences preferences)
             {
-                leaderboardStatus = LeaderboardError(signIn.status, signIn.text.Resolve(UiText.Get));
-                leaderboardFailure = signIn.text;
-                leaderboardFailureStatus = signIn.status;
+                if (!preferences.hasDecision || !preferences.onlineServicesAllowed) withdrawn = true;
+            }
+            activeServices.Consent.PreferencesChanged += Observe;
+            void Fail(ServiceStatus status, ServiceMessage text)
+            {
+                leaderboardStatus = LeaderboardError(status, text.Resolve(UiText.Get));
+                leaderboardFailure = text;
+                leaderboardFailureStatus = status;
+            }
+            try
+            {
+                var signIn = await activeServices.Authentication.SignInAnonymouslyAsync();
+                if (this == null || services != activeServices || withdrawn) return;
+                if (!signIn.succeeded) { Fail(signIn.status, signIn.text); return; }
+                if (activeServices.Authentication.CurrentPlayerId != signIn.value.playerId)
+                {
+                    Fail(ServiceStatus.InvalidRequest, ServiceMessage.Get("service.deletion.review"));
+                    return;
+                }
+                var submitted = await activeServices.Leaderboards.SubmitScoreAsync(activeServices.LeaderboardId, score);
+                if (this == null || services != activeServices || withdrawn) return;
+                if (!submitted.succeeded) { Fail(submitted.status, submitted.text); return; }
+                if (activeServices.Authentication.CurrentPlayerId != signIn.value.playerId)
+                {
+                    Fail(ServiceStatus.InvalidRequest, ServiceMessage.Get("service.deletion.review"));
+                    return;
+                }
+                onlinePlayerEntry = submitted.value;
+                var scores = await activeServices.Leaderboards.GetScoresAsync(activeServices.LeaderboardId, 20);
+                if (this == null || services != activeServices || withdrawn) return;
+                if (activeServices.Authentication.CurrentPlayerId != signIn.value.playerId)
+                {
+                    onlinePlayerEntry = null;
+                    Fail(ServiceStatus.InvalidRequest, ServiceMessage.Get("service.deletion.review"));
+                    return;
+                }
+                if (!scores.succeeded) { Fail(scores.status, scores.text); return; }
+                onlineLeaderboardEntries = scores.value;
+                leaderboardStatus = UiText.Get("ranks.connected");
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                Fail(ServiceStatus.Failed, ServiceMessage.Literal(exception.Message));
+            }
+            finally
+            {
+                activeServices.Consent.PreferencesChanged -= Observe;
                 leaderboardLoading = false;
-                RefreshModal();
-                return;
+                if (withdrawn) { onlineLeaderboardEntries = null; onlinePlayerEntry = null; leaderboardStatus = null; }
+                if (this != null && menuPage == "ranks") RefreshModal();
             }
-
-            ServiceResult<IReadOnlyList<LeaderboardEntry>> scores =
-                await services.Leaderboards.GetScoresAsync(services.LeaderboardId, 20);
-            if (this == null) return;
-            leaderboardLoading = false;
-            if (!scores.succeeded)
-            {
-                leaderboardStatus = LeaderboardError(scores.status, scores.text.Resolve(UiText.Get));
-                leaderboardFailure = scores.text;
-                leaderboardFailureStatus = scores.status;
-                RefreshModal();
-                return;
-            }
-
-            onlineLeaderboardEntries = scores.value;
-            leaderboardStatus = UiText.Get("ranks.connected");
-            RefreshModal();
         }
 
         static string LeaderboardError(ServiceStatus status, string details)
@@ -697,7 +749,7 @@ namespace Frontier
             body.Add(UiKit.Text(UiText.Get("deletion.help"), "fr-muted"));
             if (!string.IsNullOrEmpty(accountDeletionStatus))
                 body.Add(UiKit.Text(accountDeletionStatus, "fr-small", accountDeletionIsError ? UiKit.Amber : UiKit.Cyan));
-            if (services == null || !services.Authentication.IsConfigured || !services.CloudSave.IsConfigured)
+            if (services == null || !services.Authentication.IsConfigured)
             {
                 body.Add(UiKit.Text(UiText.Get("deletion.unavailable"), "fr-small"));
                 return;
@@ -759,6 +811,7 @@ namespace Frontier
             cloudRecord = default;
             cloudSaveStatus = accountRecoveryStatus = null;
             onlineLeaderboardEntries = null;
+            onlinePlayerEntry = null;
             leaderboardStatus = null;
             RefreshModal();
         }
@@ -1249,6 +1302,12 @@ namespace Frontier
         void SaveConsentPreferences(bool analyticsAllowed, bool adsAllowed, bool onlineServicesAllowed)
         {
             services.Consent.SavePreferences(analyticsAllowed, adsAllowed, onlineServicesAllowed);
+            if (!onlineServicesAllowed)
+            {
+                onlineLeaderboardEntries = null;
+                onlinePlayerEntry = null;
+                leaderboardStatus = null;
+            }
             Sfx.Good();
             Toast(UiText.Get("privacy.saved"), UiKit.Cyan);
         }

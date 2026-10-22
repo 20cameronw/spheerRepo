@@ -1,13 +1,27 @@
 # Frontier privacy and release gates
 
 Status: implementation checklist, not legal approval or a store-compliance certification.
-Online services, Cloud Save, native account recovery, Analytics and Remote Config remain disabled in the authored build.
-Do not activate them solely because their adapters compile.
+Anonymous Authentication and Leaderboards are enabled in the authored build at the developer's direction.
+Cloud Save, native account recovery, Analytics and Remote Config remain disabled.
 
 ## Current behavior
 
 - Gameplay works offline. Analytics, rewarded ads and online account/cloud/leaderboard access are separate,
-  policy-versioned local opt-ins. No automatic cloud upload or competitive score submission exists.
+  policy-versioned local opt-ins. No automatic cloud upload exists. Online ranks accept all players,
+  without an age gate, after online opt-in. The Ranks screen explains that Unity receives a pseudonymous
+  player ID, Frontier Score and normal connection data, not a chosen public name/email/birthday.
+  Posting a score is explicit, never triggered by launch or normal progression. Consent policy version 3
+  requires a fresh decision for this changed behavior. This is data minimization, not a certification
+  that anonymous authentication is exempt from children's privacy requirements; publish the actual
+  behavior and retention/support details in the public policy before distributing this build.
+- `Lifetime_Earnings_Leaderboard` is the configured UGS board ID. The rebuilt game submits its existing
+  **Frontier Score**, not currency earnings (the ID is retained for the developer's existing dashboard).
+  Configure the board as descending, **Keep Best**, non-bucketed, with player score writes allowed.
+  Client-reported scores are casual rankings, not server-validated anti-cheat. Set up authoritative
+  settlement before treating them as prizes or secure competitive records.
+  The SDK returns zero-based ranks; the provider converts them to one-based display ranks.
+  UGS profile names and metadata are never shown or uploaded by this path; entries use local Pilot labels.
+  Submission returns the player's own rank even when outside the displayed top 20.
 - Local job timers now advance from a startup UTC anchor plus monotonic session elapsed time, ignoring
   device-date edits during the running session. UTC at startup is still untrusted; edits across process
   restarts, offline accrual and cross-device timing require persistent rewind detection and server settlement.
@@ -17,7 +31,8 @@ Do not activate them solely because their adapters compile.
 - Settings offers independent local audio preferences and Reset Progress. Reset starts a new local game and
   removes local progression recovery copies; it is not an account-deletion request or a reset of every device setting.
 - Online Save & Account Deletion is separate from Reset Progress. It requires configured authentication and
-  cloud providers, an already signed-in account and a second confirmation bound to that player's ID.
+  an already signed-in account and a second confirmation bound to that player's ID. Leaderboard-only
+  accounts can be deleted without enabling Cloud Save; cloud removal is attempted only when configured.
   Closing Settings, cancelling or changing the signed-in account invalidates the confirmation.
 - Explicit erasure remains available after consent withdrawal. It does not sign in, create an anonymous account,
   grant consent, upload progress or replace/delete the local game and its retained restore backup.
@@ -109,8 +124,8 @@ Do not activate them solely because their adapters compile.
 - Set the LevelPlay rewarded unit's default reward to `Reward` / `1`, with dashboard pacing/capping off.
   The provider uses that default placement and returns the requested game placement ID;
   Frontier applies the game's limits and reward amounts. Dashboard placement-level reporting is not wired.
-- Keep banners and forced interstitials off. Leaderboard reads remain configured with
-  `Lifetime_Earnings_Leaderboard` but gated by online-service/privacy setup; score submission is still absent.
+- Keep banners and forced interstitials off. Leaderboards are independent of ad activation:
+  anonymous authentication and explicit Frontier Score posting are enabled as described above.
 
 ## Required before enabling providers
 

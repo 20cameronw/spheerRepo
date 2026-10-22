@@ -1842,10 +1842,12 @@ MonoBehaviour:
   - key: privacy.title
     text: PRIVACY
   - key: privacy.help
-    text: Controls gameplay analytics, rewarded ads, and online account, leaderboard
-      and cloud-save features. Choices save locally and online services stay opt-in.
-      Online services require legal, audience and account-deletion setup. Cloud copies
-      are compared and moved only when you choose; no progress is uploaded automatically.
+    text: Choices save locally. Online ranks are available to all players who opt
+      in. Posting ranks sends Unity an anonymous player identifier and your Frontier
+      Score; connecting also exposes normal connection data such as your IP address.
+      No public name, email or birthday is requested. Scores upload only when you
+      choose to post them. Analytics, ads and cloud saves have separate availability
+      and controls.
   - key: privacy.policy
     text: VIEW PRIVACY POLICY
   - key: privacy.analytics
@@ -2018,11 +2020,14 @@ MonoBehaviour:
       HTTPS privacy policy are configured and approved. Your local record remains
       available above.
   - key: ranks.enable
-    text: Enable online account and leaderboard access in Settings to load online
-      ranks. Nothing is sent before you opt in and request the list.
+    text: Anyone can rank. Enabling online ranks connects to Unity using an anonymous
+      player ID and posts your Frontier Score. No public name, email or birthday
+      is needed. Unity also receives connection data such as your IP address. You
+      can turn online services off in Privacy Settings.
   - key: ranks.online.help
-    text: Online ranks load only when requested. Score submissions stay disabled
-      until a server-validated path is available.
+    text: Post your current Frontier Score and load the top 20. Your own rank is
+      shown even outside the top 20. All players use anonymous pilot labels. These
+      are casual, client-reported scores, not cheat-proof competitive rankings.
   - key: ranks.entry
     text: '#{0}  {1}'
   - key: ranks.empty
@@ -2030,7 +2035,7 @@ MonoBehaviour:
   - key: ranks.loading
     text: LOADING RANKS
   - key: ranks.load
-    text: CONNECT AND LOAD RANKS
+    text: POST SCORE & LOAD RANKS
   - key: ranks.era
     text: 'YOUR FRONTIER: {0}'
   - key: ranks.era.help
@@ -2046,7 +2051,7 @@ MonoBehaviour:
   - key: ranks.connecting
     text: Connecting to online services...
   - key: ranks.connected
-    text: Online leaderboard connected.
+    text: Score posted and online ranks loaded.
   - key: ranks.error.not-configured
     text: Online rankings are not configured in this build.
   - key: ranks.error.consent
@@ -4471,11 +4476,24 @@ MonoBehaviour:
   - key: debug.services.failed
     text: The test suite could not open. Check device logs and try again.
   - key: ranks.setup-required
-    text: Online rankings are not enabled in this build. The board ID is configured,
-      but mixed-age online privacy setup and trusted score submission are still pending.
-      Your local record below is not uploaded.
+    text: Online rankings could not be configured. Check that this build is linked
+      to the Unity cloud project and has its leaderboard ID and HTTPS privacy-policy
+      URL. Your local record remains available.
   - key: ranks.read-only
     text: Rankings are read-only. This build does not submit your local score.
+  - key: ranks.online.title
+    text: ONLINE RANKS
+  - key: ranks.opt-in
+    text: ENABLE ONLINE RANKS
+  - key: ranks.your-rank
+    text: 'YOUR RANK: #{0}  -  {1} Frontier Score'
+  - key: ranks.diagnostics
+    text: Online rankings are enabled. Open Menu > Ranks, opt in, then post your
+      score. No age gate or public player name is used. Ads, analytics and cloud
+      saves are separate.
+  - key: service.leaderboard.submission
+    text: A leaderboard ID and a nonnegative integer score no greater than 9,007,199,254,740,991
+      are required.
   - key: service.ads.test-editor
     text: The Editor cannot display real iOS ads. Install an iOS Development Build
       on your iPhone to use the LevelPlay test suite.

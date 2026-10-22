@@ -2357,10 +2357,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530313
-    m_Localized: Controls gameplay analytics, rewarded ads, and online account, leaderboard
-      and cloud-save features. Choices save locally and online services stay opt-in.
-      Online services require legal, audience and account-deletion setup. Cloud copies
-      are compared and moved only when you choose; no progress is uploaded automatically.
+    m_Localized: Choices save locally. Online ranks are available to all players
+      who opt in. Posting ranks sends Unity an anonymous player identifier and your
+      Frontier Score; connecting also exposes normal connection data such as your
+      IP address. No public name, email or birthday is requested. Scores upload only
+      when you choose to post them. Analytics, ads and cloud saves have separate
+      availability and controls.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530314
@@ -2698,13 +2700,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530393
-    m_Localized: Enable online account and leaderboard access in Settings to load
-      online ranks. Nothing is sent before you opt in and request the list.
+    m_Localized: Anyone can rank. Enabling online ranks connects to Unity using an
+      anonymous player ID and posts your Frontier Score. No public name, email or
+      birthday is needed. Unity also receives connection data such as your IP address.
+      You can turn online services off in Privacy Settings.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530394
-    m_Localized: Online ranks load only when requested. Score submissions stay disabled
-      until a server-validated path is available.
+    m_Localized: Post your current Frontier Score and load the top 20. Your own rank
+      is shown even outside the top 20. All players use anonymous pilot labels. These
+      are casual, client-reported scores, not cheat-proof competitive rankings.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530395
@@ -2720,7 +2725,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530398
-    m_Localized: CONNECT AND LOAD RANKS
+    m_Localized: POST SCORE & LOAD RANKS
     m_Metadata:
       m_Items: []
   - m_Id: 1995530399
@@ -2750,7 +2755,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530405
-    m_Localized: Online leaderboard connected.
+    m_Localized: Score posted and online ranks loaded.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530406
@@ -8716,9 +8721,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2230690140741640
-    m_Localized: Online rankings are not enabled in this build. The board ID is configured,
-      but mixed-age online privacy setup and trusted score submission are still pending.
-      Your local record below is not uploaded.
+    m_Localized: Online rankings could not be configured. Check that this build is
+      linked to the Unity cloud project and has its leaderboard ID and HTTPS privacy-policy
+      URL. Your local record remains available.
     m_Metadata:
       m_Items: []
   - m_Id: 2230690140741641
@@ -8738,6 +8743,29 @@ MonoBehaviour:
   - m_Id: 2230690140741644
     m_Localized: Register this iPhone as a LevelPlay test device. In the suite choose
       Unity Ads > Test > Rewarded, not Live. Gameplay ads remain disabled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2235406174216192
+    m_Localized: ONLINE RANKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2235406253907968
+    m_Localized: ENABLE ONLINE RANKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2235406253907969
+    m_Localized: 'YOUR RANK: #{0}  -  {1} Frontier Score'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2235406253907970
+    m_Localized: Online rankings are enabled. Open Menu > Ranks, opt in, then post
+      your score. No age gate or public player name is used. Ads, analytics and cloud
+      saves are separate.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2235406253907971
+    m_Localized: A leaderboard ID and a nonnegative integer score no greater than
+      9,007,199,254,740,991 are required.
     m_Metadata:
       m_Items: []
   references:

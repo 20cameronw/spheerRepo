@@ -130,6 +130,7 @@ namespace Frontier.Services
             { "service.leaderboard.limit", "Leaderboard page size must be between 1 and {0}." },
             { "service.leaderboard.sign-in", "Sign in before loading leaderboard scores." },
             { "service.leaderboard.score", "The configured leaderboard contains a score outside the supported integer range." },
+            { "service.leaderboard.submission", "A leaderboard ID and a nonnegative integer score no greater than 9,007,199,254,740,991 are required." },
             { "service.leaderboard.unknown-pilot", "Unknown pilot" },
             { "service.cloud.payload", "A cloud-save payload is required." },
             { "service.cloud.nonempty", "A non-empty cloud-save payload is required." },

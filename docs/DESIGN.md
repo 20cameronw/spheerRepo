@@ -25,6 +25,14 @@ its Build entry, otherwise a supplying planet selected in the map. Locked/in-pro
 retain their real upgrade/research/job status; planet guidance never silently teleports or starts a job.
 The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
+Online ranks are available to all ages after explicit online opt-in, without name or birthday entry.
+Put the online section first on Ranks, followed by the existing local era/score/record breakdown.
+The first action explains anonymous Unity authentication and score/connection-data sharing; subsequent
+actions explicitly post the current Frontier Score and load the top 20. Show the player's returned rank
+outside that list too. Display anonymous Pilot labels rather than UGS profile names. Keep real network
+errors visible and retryable; never substitute local sample scores for a failed server response.
+These client-reported casual ranks are not a claim of server-validated anti-cheat.
+
 Modal, popup and toast shells enter with a 160 ms ease-out translation (16 px, 6 px and -8 px respectively);
 they do not animate layout sizes or delay interaction/dismissal. World structure and build-pad labels use native
 Unity 6.4 `UIDocument` world-space rendering with one shared panel per `WorldSurface`, the same Chakra font,

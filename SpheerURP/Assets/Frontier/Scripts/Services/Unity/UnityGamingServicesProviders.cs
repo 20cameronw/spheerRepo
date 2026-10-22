@@ -283,11 +283,7 @@ namespace Frontier.Services.Unity
                             return ServiceResult<IReadOnlyList<Frontier.Services.LeaderboardEntry>>.Failed(
                                 ServiceMessage.Get("service.leaderboard.score"));
 
-                        entries.Add(new Frontier.Services.LeaderboardEntry(
-                            entry.PlayerId,
-                            string.IsNullOrWhiteSpace(entry.PlayerName) ? "Unknown pilot" : entry.PlayerName,
-                            long.Parse(entry.Score.ToString("0", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture),
-                            entry.Rank, string.IsNullOrWhiteSpace(entry.PlayerName)));
+                        entries.Add(ToEntry(entry));
                     }
                 }
 
@@ -305,6 +301,44 @@ namespace Frontier.Services.Unity
             }
         }
 
+        public async Task<ServiceResult<Frontier.Services.LeaderboardEntry>> SubmitScoreAsync(string boardId, long score)
+        {
+            if (!IsConfigured)
+                return ServiceResult<Frontier.Services.LeaderboardEntry>.NotConfigured("Unity Leaderboards");
+            if (!string.Equals(boardId, config.leaderboardId, StringComparison.Ordinal))
+                return ServiceResult<Frontier.Services.LeaderboardEntry>.InvalidRequest(
+                    ServiceMessage.Get("service.leaderboard.board"));
+            if (score < 0 || score > MaximumExactIntegerScore)
+                return ServiceResult<Frontier.Services.LeaderboardEntry>.InvalidRequest(
+                    ServiceMessage.Get("service.leaderboard.submission"));
+            var initialized = await initializer.InitializeAsync();
+            if (!initialized.succeeded)
+                return ServiceResult<Frontier.Services.LeaderboardEntry>.Failed(initialized.text);
+            try
+            {
+                if (!AuthenticationService.Instance.IsSignedIn)
+                    return ServiceResult<Frontier.Services.LeaderboardEntry>.InvalidRequest(
+                        ServiceMessage.Get("service.leaderboard.sign-in"));
+                var entry = await LeaderboardsService.Instance.AddPlayerScoreAsync(config.leaderboardId, score);
+                if (entry.Score < 0 || entry.Score > MaximumExactIntegerScore || entry.Score != Math.Truncate(entry.Score))
+                    return ServiceResult<Frontier.Services.LeaderboardEntry>.Failed(
+                        ServiceMessage.Get("service.leaderboard.score"));
+                return ServiceResult<Frontier.Services.LeaderboardEntry>.Success(ToEntry(entry));
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.LogWarning("Unity Leaderboards submission failed: " + exception.Message);
+                return ServiceResult<Frontier.Services.LeaderboardEntry>.Failed(exception.Message);
+            }
+        }
+
+        static Frontier.Services.LeaderboardEntry ToEntry(UgsLeaderboardEntry entry)
+        {
+            // Never display UGS profile names, which can contain identifying text.
+            return new Frontier.Services.LeaderboardEntry(entry.PlayerId, string.Empty,
+                long.Parse(entry.Score.ToString("0", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture),
+                entry.Rank + 1, true);
+        }
     }
 
     sealed class UnityCloudSaveProvider : ICloudSaveService

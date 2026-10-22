@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f8d4ed179514ec89c9fdd8e63cf7bc7, type: 3}
   m_Name: FrontierUnityServicesConfig
   m_EditorClassIdentifier:
-  enableOnlineServices: 0
+  enableOnlineServices: 1
   enableAnalytics: 0
   enableRemoteConfig: 0
   enableNotifications: 0

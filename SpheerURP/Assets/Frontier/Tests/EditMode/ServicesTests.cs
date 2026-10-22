@@ -156,7 +156,16 @@ namespace Frontier.Tests
         {
             public bool IsConfigured { get { return true; } }
             public int readCount;
+            public int submitCount;
+            public TaskCompletionSource<ServiceResult<LeaderboardEntry>> pendingSubmit;
             public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<LeaderboardEntry>> SubmitScoreAsync(string boardId, long score)
+            {
+                submitCount++;
+                return pendingSubmit != null ? pendingSubmit.Task :
+                    Task.FromResult(ServiceResult<LeaderboardEntry>.Success(
+                        new LeaderboardEntry("player", "", score, 1, true)));
+            }
             public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
             {
                 readCount++;
@@ -634,9 +643,49 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void LeaderboardClientContract_IsReadOnlyUntilServerValidatedSubmissionExists()
+        public async Task LeaderboardSubmissionRequiresConsentAndValidScoreAndDiscardsWithdrawnResults()
         {
-            Assert.IsNull(typeof(ILeaderboardService).GetMethod("SubmitScoreAsync"));
+            var consent = new ConsentService(new MemoryConsentStore());
+            var provider = new TestLeaderboardService();
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(consent, unavailable, unavailable, unavailable,
+                provider, unavailable, unavailable, unavailable, new LocalTimeService(), unavailable);
+            Assert.AreEqual(ServiceStatus.ConsentRequired,
+                (await services.Leaderboards.SubmitScoreAsync("board", 10)).status);
+            Assert.AreEqual(0, provider.submitCount);
+            consent.SavePreferences(false, false, true);
+            foreach (var invalid in new[] { -1L, 9007199254740992L, long.MaxValue })
+                Assert.AreEqual(ServiceStatus.InvalidRequest,
+                    (await services.Leaderboards.SubmitScoreAsync("board", invalid)).status);
+            Assert.AreEqual(ServiceStatus.InvalidRequest,
+                (await services.Leaderboards.SubmitScoreAsync("", 1)).status);
+            Assert.AreEqual(0, provider.submitCount);
+            foreach (var valid in new[] { 0L, 1L, 9007199254740991L })
+            {
+                var result = await services.Leaderboards.SubmitScoreAsync("board", valid);
+                Assert.IsTrue(result.succeeded);
+                Assert.AreEqual(valid, result.value.score);
+            }
+            provider.pendingSubmit = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
+            var pending = services.Leaderboards.SubmitScoreAsync("board", 50);
+            consent.SavePreferences(false, false, false);
+            consent.SavePreferences(false, false, true);
+            provider.pendingSubmit.SetResult(ServiceResult<LeaderboardEntry>.Success(
+                new LeaderboardEntry("player", "", 50, 1, true)));
+            Assert.AreEqual(ServiceStatus.ConsentRequired, (await pending).status);
+        }
+
+        [Test]
+        public async Task AccountDeletionWorksForLeaderboardOnlyAccountsWithoutCloudSave()
+        {
+            var auth = new TestAuthService();
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(new ConsentService(new MemoryConsentStore()),
+                unavailable, unavailable, auth, new TestLeaderboardService(), unavailable, unavailable,
+                unavailable, new LocalTimeService(), unavailable, "board");
+            Assert.IsTrue((await services.DeleteCurrentAccountAndSaveAsync("player")).succeeded);
+            Assert.AreEqual(1, auth.deleteCount);
+            Assert.AreEqual(0, auth.signInCount);
         }
 
         [Test]
@@ -760,13 +809,13 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void ResourcesUnityServicesConfig_HasLeaderboardIdButRemainsDisabled()
+        public void ResourcesUnityServicesConfig_EnablesRanksWithoutUnrelatedOnlineFeatures()
         {
             FrontierUnityServicesConfig config =
                 Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
 
             Assert.IsNotNull(config);
-            Assert.IsFalse(config.enableOnlineServices);
+            Assert.IsTrue(config.enableOnlineServices);
             Assert.IsFalse(config.enableCloudSave);
             Assert.IsFalse(config.enableAccountRecovery);
             Assert.IsFalse(config.enableAnalytics);
@@ -774,8 +823,8 @@ namespace Frontier.Tests
             Assert.AreEqual("Lifetime_Earnings_Leaderboard", config.leaderboardId);
             Assert.AreEqual("https://20cameronw.github.io/spheer-privacy/", config.privacyPolicyUrl);
             Assert.IsTrue(config.HasValidPrivacyPolicy);
-            Assert.IsFalse(config.CanUseAuthentication);
-            Assert.IsFalse(config.CanUseLeaderboard);
+            Assert.IsTrue(config.CanUseAuthentication, "The checked-in project must remain linked to UGS.");
+            Assert.IsTrue(config.CanUseLeaderboard);
         }
     }
 }

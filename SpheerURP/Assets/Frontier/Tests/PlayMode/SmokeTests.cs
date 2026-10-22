@@ -139,7 +139,7 @@ namespace Frontier.Tests
                 label.text == UiText.Get("service.ads.test-editor")));
             rt.Ui.DebugReset();
             rt.Ui.DebugMenu("ranks");
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-setup-status"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable"));
         }
 
         static int ActiveRippleCount()
@@ -803,7 +803,7 @@ namespace Frontier.Tests
             runtime.Ui.DebugMenu("ranks");
             Assert.IsNotNull(runtime.Ui.DebugRoot.Q("era-progress"));
             Assert.AreEqual(Frontier.Economy.FrontierEra.Landfall, runtime.State.Era);
-            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help", "ranks.setup-required" })
+            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help", "ranks.enable" })
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get(key)), key);
             var score = runtime.State.FrontierScore;
             foreach (var pair in new Dictionary<string, string>
@@ -974,6 +974,102 @@ namespace Frontier.Tests
             Assert.AreEqual(structures, rt.State.structures.Count);
             Assert.AreEqual(shards, rt.State.ShardBalance);
             rt.Ui.DebugReset();
+        }
+
+        sealed class RanksFixture : IAuthService, ILeaderboardService
+        {
+            public bool IsConfigured { get { return true; } }
+            public string CurrentPlayerId { get { return "rank-player"; } }
+            public bool CanRecoverAccount { get { return false; } }
+            public string RecoveryProviderName { get { return ""; } }
+            public int signIns, submissions, reads;
+            public string board;
+            public long score;
+            public TaskCompletionSource<ServiceResult<LeaderboardEntry>> pending;
+            public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<AuthIdentity>> SignInAnonymouslyAsync()
+            {
+                signIns++;
+                return Task.FromResult(ServiceResult<AuthIdentity>.Success(new AuthIdentity(CurrentPlayerId, true)));
+            }
+            public Task<ServiceResult<AuthIdentity>> LinkRecoveryAccountAsync() { throw new InvalidOperationException(); }
+            public Task<ServiceResult<AuthIdentity>> SignInWithRecoveryAccountAsync() { throw new InvalidOperationException(); }
+            public Task<ServiceResult> DeleteAccountAsync(string id) { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<LeaderboardEntry>> SubmitScoreAsync(string boardId, long value)
+            {
+                submissions++;
+                board = boardId;
+                score = value;
+                return pending != null ? pending.Task : Task.FromResult(ServiceResult<LeaderboardEntry>.Success(
+                    new LeaderboardEntry(CurrentPlayerId, "", value, 27, true)));
+            }
+            public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
+            {
+                reads++;
+                return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.Success(
+                    new List<LeaderboardEntry> { new LeaderboardEntry("other", "", 9999, 1, true) }));
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator OnlineRanksOptInPostsTheActualScoreShowsOwnRankAndAllowsRetry()
+        {
+            new GameObject("RanksBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var consent = new ConsentService(new DeletionConsentStore());
+            var provider = new RanksFixture();
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(consent, unavailable, unavailable, provider, provider,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable, "Lifetime_Earnings_Leaderboard");
+            rt.Ui.DebugSetServices(services);
+            rt.Ui.DebugMenu("ranks");
+            void Press(string name)
+            {
+                var button = rt.Ui.DebugRoot.Q<Button>(name);
+                Assert.IsNotNull(button, name);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = button; button.SendEvent(submit); }
+            }
+            Assert.AreEqual(0, provider.signIns + provider.submissions + provider.reads);
+            Press("leaderboard-enable");
+            yield return null;
+            Assert.IsTrue(consent.Current.onlineServicesAllowed);
+            Assert.IsFalse(consent.Current.analyticsAllowed || consent.Current.adsAllowed);
+            Assert.AreEqual(1, provider.signIns);
+            Assert.AreEqual(1, provider.submissions);
+            Assert.AreEqual(rt.State.FrontierScore.total, provider.score);
+            Assert.AreEqual("Lifetime_Earnings_Leaderboard", provider.board);
+            Assert.AreEqual(1, provider.reads);
+            Assert.AreEqual(UiText.Get("ranks.your-rank", 27, provider.score.ToString("N0")),
+                rt.Ui.DebugRoot.Q<Label>("leaderboard-player-rank").text);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l =>
+                l.text == UiText.Get("ranks.entry", 1, UiText.Get("service.leaderboard.unknown-pilot"))));
+
+            provider.pending = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
+            Press("leaderboard-publish");
+            Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>("leaderboard-publish").enabledSelf);
+            Assert.AreEqual(2, provider.submissions);
+            provider.pending.SetResult(ServiceResult<LeaderboardEntry>.Failed("Network unavailable"));
+            yield return null;
+            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("leaderboard-publish").enabledSelf);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text.Contains("Network unavailable")));
+            Assert.AreEqual(1, provider.reads, "A failed submission cannot claim a successful refresh.");
+            provider.pending = null;
+            Press("leaderboard-publish");
+            yield return null;
+            Assert.AreEqual(2, provider.reads);
+            provider.pending = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
+            Press("leaderboard-publish");
+            consent.SavePreferences(false, false, false);
+            consent.SavePreferences(false, false, true);
+            provider.pending.SetResult(ServiceResult<LeaderboardEntry>.Success(
+                new LeaderboardEntry("rank-player", "", provider.score, 27, true)));
+            yield return null;
+            Assert.AreEqual(2, provider.reads, "Withdrawal must prevent the next request, even after re-opt-in.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("leaderboard-player-rank"));
         }
 
         sealed class DeletionFixture : IAuthService, ICloudSaveService

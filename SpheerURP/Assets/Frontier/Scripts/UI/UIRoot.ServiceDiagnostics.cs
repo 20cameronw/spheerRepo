@@ -25,7 +25,8 @@ namespace Frontier
             open.name = "debug-ad-test-suite";
             UiKit.SetEnabledLook(open, !adTestBusy && diagnostics != null && diagnostics.CanOpenTestSuite);
             card.Add(open);
-            card.Add(UiKit.Text(UiText.Get("ranks.setup-required"), "fr-muted"));
+            card.Add(UiKit.Text(UiText.Get(services != null && services.Leaderboards.IsConfigured
+                ? "ranks.diagnostics" : "ranks.setup-required"), "fr-muted"));
             body.Add(card);
         }
 

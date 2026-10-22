@@ -200,6 +200,7 @@ namespace Frontier.Services
     public interface ILeaderboardService : IServiceEndpoint
     {
         Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit);
+        Task<ServiceResult<LeaderboardEntry>> SubmitScoreAsync(string boardId, long score);
     }
 
     public interface ICloudSaveService : IServiceEndpoint
@@ -270,7 +271,7 @@ namespace Frontier.Services
 
     public sealed class ConsentService : IConsentService
     {
-        public const int CurrentPolicyVersion = 2;
+        public const int CurrentPolicyVersion = 3;
 
         readonly IConsentStore store;
         readonly Func<DateTimeOffset> utcNow;
@@ -524,6 +525,26 @@ namespace Frontier.Services
             return inner.GetScoresAsync(boardId, limit);
         }
 
+        public async Task<ServiceResult<LeaderboardEntry>> SubmitScoreAsync(string boardId, long score)
+        {
+            if (!consent.Current.hasDecision || !consent.Current.onlineServicesAllowed)
+                return ServiceResult<LeaderboardEntry>.ConsentRequired("online leaderboards");
+            if (string.IsNullOrWhiteSpace(boardId) || score < 0 || score > 9007199254740991L)
+                return ServiceResult<LeaderboardEntry>.InvalidRequest(ServiceMessage.Get("service.leaderboard.submission"));
+            bool withdrawn = false;
+            void Observe(ConsentPreferences preferences)
+            {
+                if (!preferences.hasDecision || !preferences.onlineServicesAllowed) withdrawn = true;
+            }
+            consent.PreferencesChanged += Observe;
+            try
+            {
+                var result = await inner.SubmitScoreAsync(boardId, score);
+                return withdrawn ? ServiceResult<LeaderboardEntry>.ConsentRequired("online leaderboards") : result;
+            }
+            finally { consent.PreferencesChanged -= Observe; }
+        }
+
     }
 
     sealed class ConsentGatedCloudSaveService : ICloudSaveService
@@ -594,6 +615,8 @@ namespace Frontier.Services
         public Task<ServiceResult> DeleteAccountAsync(string expectedPlayerId) { return Task.FromResult(ServiceResult.NotConfigured("Authentication")); }
         public Task<ServiceResult<IReadOnlyList<LeaderboardEntry>>> GetScoresAsync(string boardId, int limit)
         { return Task.FromResult(ServiceResult<IReadOnlyList<LeaderboardEntry>>.NotConfigured("Leaderboards")); }
+        public Task<ServiceResult<LeaderboardEntry>> SubmitScoreAsync(string boardId, long score)
+        { return Task.FromResult(ServiceResult<LeaderboardEntry>.NotConfigured("Leaderboards")); }
         public Task<ServiceResult<CloudSaveRecord>> ReadAsync()
         { return Task.FromResult(ServiceResult<CloudSaveRecord>.NotConfigured("Cloud Save")); }
         public Task<ServiceResult<CloudSaveRecord>> WriteAsync(string payload, string writeLock)
@@ -637,22 +660,26 @@ namespace Frontier.Services
         {
             if (AccountDeletionBusy)
                 return ServiceResult.InvalidRequest(ServiceMessage.Get("service.deletion.busy"));
-            if (!Authentication.IsConfigured || !CloudSave.IsConfigured)
-                return ServiceResult.NotConfigured("Account and cloud-save deletion");
+            if (!Authentication.IsConfigured)
+                return ServiceResult.NotConfigured("Authentication");
             if (string.IsNullOrEmpty(expectedPlayerId) || Authentication.CurrentPlayerId != expectedPlayerId)
                 return ServiceResult.InvalidRequest(ServiceMessage.Get("service.deletion.review"));
             AccountDeletionBusy = true;
             bool cloudDeleted = false;
             try
             {
-                ServiceResult removed = await CloudSave.DeleteSaveAsync(expectedPlayerId);
-                if (!removed.succeeded) return removed;
-                cloudDeleted = true;
+                if (CloudSave.IsConfigured)
+                {
+                    ServiceResult removed = await CloudSave.DeleteSaveAsync(expectedPlayerId);
+                    if (!removed.succeeded) return removed;
+                    cloudDeleted = true;
+                }
                 if (Authentication.CurrentPlayerId != expectedPlayerId)
-                    return ServiceResult.Failed(ServiceMessage.Get("service.deletion.cloud-only"));
+                    return ServiceResult.Failed(ServiceMessage.Get(cloudDeleted
+                        ? "service.deletion.cloud-only" : "service.deletion.changed-account"));
                 ServiceResult deleted = await Authentication.DeleteAccountAsync(expectedPlayerId);
                 return deleted.succeeded ? ServiceResult.Success()
-                    : ServiceResult.Failed(ServiceMessage.Get("service.deletion.partial", deleted.text));
+                    : cloudDeleted ? ServiceResult.Failed(ServiceMessage.Get("service.deletion.partial", deleted.text)) : deleted;
             }
             catch (Exception exception)
             {
