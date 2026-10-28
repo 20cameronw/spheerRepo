@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: cryo_composite
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: cryo_composite
+  displayName: Cryo Composite
+  color: {r: 0.49803922, g: 0.83137256, b: 1, a: 1}
+  stackSize: 48
+  description: A foam-cored laminate that keeps its strength far below freezing.
+    It lets a ship set down where the air itself is ice.
+  category: 2
+  tier: 3
+  harvestMethods: 
+  baseValue: 31.63
+  hazardAffinity: 2
+  fuelEnergy: 0
+  colorHex: '#7FD4FF'
+  accentHex: '#1F5F8A'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A foam-cored laminate that keeps its strength far below freezing.
+    It lets a ship set down where the air itself is ice.
+  iconConcept: A hexagonal tile with six small triangular frost notches and a dot
+    at its centre.
+  icon: 

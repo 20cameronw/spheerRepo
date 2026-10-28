@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:fr="Frontier">
+    <fr:FrontierCard name="card" highlighted="true">
+        <fr:FrontierButton name="action" text="COLLECT" primary="true" large="true" />
+        <fr:FrontierProgress name="progress" value="0.65" />
+        <fr:FrontierChip name="cost" icon="wood" text="3/10" low="true" />
+        <fr:FrontierTab name="tab" icon="research" caption="TOOLS" selected="true" />
+        <fr:FrontierTabBar name="tabs" />
+        <fr:FrontierStatRow name="stat" icon="star" caption="Total" value="100" />
+        <fr:FrontierModal name="modal" wide="true" />
+        <fr:FrontierPopup name="popup" compact="true" />
+        <fr:FrontierListRow name="row">
+            <ui:Label text="A nested row label" />
+        </fr:FrontierListRow>
+        <fr:FrontierBadge name="badge" text="READY" />
+        <fr:FrontierToast name="toast" text="Backpack full!" />
+    </fr:FrontierCard>
+</ui:UXML>

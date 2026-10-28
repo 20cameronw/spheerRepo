@@ -1,0 +1,550 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2205d888dc9ed3642a3cde4c84b994d2, type: 3}
+  m_Name: habitats
+  m_EditorClassIdentifier: Frontier.Data::Frontier.HabitatTableSO
+  lockedFields: []
+  rows:
+  - resourceId: wood
+    biome: 0
+    belt: 0
+    method: 0
+    weight: 1
+    minTier: 0
+  - resourceId: stone
+    biome: 0
+    belt: 0
+    method: 1
+    weight: 0.55
+    minTier: 0
+  - resourceId: biomass
+    biome: 0
+    belt: 0
+    method: 6
+    weight: 0.7
+    minTier: 1
+  - resourceId: copper_ore
+    biome: 0
+    belt: 0
+    method: 1
+    weight: 0.1
+    minTier: 1
+  - resourceId: crystal
+    biome: 0
+    belt: 0
+    method: 1
+    weight: 0.12
+    minTier: 2
+  - resourceId: scrap
+    biome: 0
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: stone
+    biome: 1
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 0
+  - resourceId: iron
+    biome: 1
+    belt: 0
+    method: 1
+    weight: 0.9
+    minTier: 1
+  - resourceId: copper_ore
+    biome: 1
+    belt: 0
+    method: 1
+    weight: 0.8
+    minTier: 1
+  - resourceId: silica
+    biome: 1
+    belt: 0
+    method: 1
+    weight: 0.4
+    minTier: 1
+  - resourceId: titanium_ore
+    biome: 1
+    belt: 0
+    method: 1
+    weight: 0.35
+    minTier: 2
+  - resourceId: crystal
+    biome: 1
+    belt: 0
+    method: 1
+    weight: 0.15
+    minTier: 2
+  - resourceId: wood
+    biome: 1
+    belt: 0
+    method: 0
+    weight: 0.2
+    minTier: 0
+  - resourceId: scrap
+    biome: 1
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: ice
+    biome: 2
+    belt: 0
+    method: 4
+    weight: 1
+    minTier: 2
+  - resourceId: crystal
+    biome: 2
+    belt: 0
+    method: 1
+    weight: 0.75
+    minTier: 2
+  - resourceId: wood
+    biome: 2
+    belt: 0
+    method: 0
+    weight: 0.3
+    minTier: 0
+  - resourceId: stone
+    biome: 2
+    belt: 0
+    method: 1
+    weight: 0.45
+    minTier: 0
+  - resourceId: core
+    biome: 2
+    belt: 0
+    method: 2
+    weight: 0.12
+    minTier: 5
+  - resourceId: scrap
+    biome: 2
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: iron
+    biome: 3
+    belt: 0
+    method: 2
+    weight: 1
+    minTier: 1
+  - resourceId: copper_ore
+    biome: 3
+    belt: 0
+    method: 1
+    weight: 0.5
+    minTier: 1
+  - resourceId: stone
+    biome: 3
+    belt: 0
+    method: 1
+    weight: 0.4
+    minTier: 0
+  - resourceId: titanium_ore
+    biome: 3
+    belt: 0
+    method: 2
+    weight: 0.6
+    minTier: 2
+  - resourceId: crystal
+    biome: 3
+    belt: 0
+    method: 2
+    weight: 0.25
+    minTier: 2
+  - resourceId: core
+    biome: 3
+    belt: 0
+    method: 2
+    weight: 0.3
+    minTier: 3
+  - resourceId: radium
+    biome: 3
+    belt: 0
+    method: 4
+    weight: 0.12
+    minTier: 4
+  - resourceId: scrap
+    biome: 3
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: wood
+    biome: 4
+    belt: 0
+    method: 0
+    weight: 1
+    minTier: 0
+  - resourceId: biomass
+    biome: 4
+    belt: 0
+    method: 6
+    weight: 1
+    minTier: 1
+  - resourceId: methane
+    biome: 4
+    belt: 0
+    method: 3
+    weight: 0.4
+    minTier: 2
+  - resourceId: core
+    biome: 4
+    belt: 0
+    method: 2
+    weight: 0.4
+    minTier: 3
+  - resourceId: stone
+    biome: 4
+    belt: 0
+    method: 1
+    weight: 0.2
+    minTier: 0
+  - resourceId: scrap
+    biome: 4
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: crystal
+    biome: 5
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 2
+  - resourceId: silica
+    biome: 5
+    belt: 0
+    method: 1
+    weight: 0.6
+    minTier: 1
+  - resourceId: iron
+    biome: 5
+    belt: 0
+    method: 1
+    weight: 0.5
+    minTier: 1
+  - resourceId: stone
+    biome: 5
+    belt: 0
+    method: 1
+    weight: 0.4
+    minTier: 0
+  - resourceId: ice
+    biome: 5
+    belt: 0
+    method: 4
+    weight: 0.2
+    minTier: 2
+  - resourceId: radium
+    biome: 5
+    belt: 0
+    method: 4
+    weight: 0.3
+    minTier: 4
+  - resourceId: core
+    biome: 5
+    belt: 0
+    method: 2
+    weight: 0.15
+    minTier: 4
+  - resourceId: scrap
+    biome: 5
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: iron
+    biome: 6
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 1
+  - resourceId: titanium_ore
+    biome: 6
+    belt: 0
+    method: 2
+    weight: 0.5
+    minTier: 2
+  - resourceId: crystal
+    biome: 6
+    belt: 0
+    method: 1
+    weight: 0.6
+    minTier: 2
+  - resourceId: core
+    biome: 6
+    belt: 0
+    method: 2
+    weight: 0.55
+    minTier: 3
+  - resourceId: radium
+    biome: 6
+    belt: 0
+    method: 4
+    weight: 0.45
+    minTier: 4
+  - resourceId: dark_matter
+    biome: 6
+    belt: 0
+    method: 4
+    weight: 0.15
+    minTier: 6
+  - resourceId: stone
+    biome: 6
+    belt: 0
+    method: 1
+    weight: 0.3
+    minTier: 0
+  - resourceId: scrap
+    biome: 6
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: crystal
+    biome: 7
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 2
+  - resourceId: core
+    biome: 7
+    belt: 0
+    method: 2
+    weight: 0.8
+    minTier: 3
+  - resourceId: titanium_ore
+    biome: 7
+    belt: 0
+    method: 2
+    weight: 0.4
+    minTier: 2
+  - resourceId: iron
+    biome: 7
+    belt: 0
+    method: 1
+    weight: 0.25
+    minTier: 1
+  - resourceId: radium
+    biome: 7
+    belt: 0
+    method: 4
+    weight: 0.5
+    minTier: 4
+  - resourceId: dark_matter
+    biome: 7
+    belt: 0
+    method: 4
+    weight: 0.35
+    minTier: 6
+  - resourceId: scrap
+    biome: 7
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: stone
+    biome: 8
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 0
+  - resourceId: silica
+    biome: 8
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 1
+  - resourceId: iron
+    biome: 8
+    belt: 0
+    method: 1
+    weight: 0.6
+    minTier: 1
+  - resourceId: copper_ore
+    biome: 8
+    belt: 0
+    method: 1
+    weight: 0.4
+    minTier: 1
+  - resourceId: crystal
+    biome: 8
+    belt: 0
+    method: 1
+    weight: 0.1
+    minTier: 2
+  - resourceId: scrap
+    biome: 8
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: wood
+    biome: 9
+    belt: 0
+    method: 0
+    weight: 0.8
+    minTier: 0
+  - resourceId: biomass
+    biome: 9
+    belt: 0
+    method: 6
+    weight: 0.8
+    minTier: 1
+  - resourceId: methane
+    biome: 9
+    belt: 0
+    method: 3
+    weight: 0.35
+    minTier: 2
+  - resourceId: crystal
+    biome: 9
+    belt: 0
+    method: 1
+    weight: 0.3
+    minTier: 2
+  - resourceId: stone
+    biome: 9
+    belt: 0
+    method: 1
+    weight: 0.2
+    minTier: 0
+  - resourceId: ice
+    biome: 9
+    belt: 0
+    method: 4
+    weight: 0.1
+    minTier: 2
+  - resourceId: scrap
+    biome: 9
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: methane
+    biome: 10
+    belt: 0
+    method: 3
+    weight: 0.9
+    minTier: 2
+  - resourceId: helium3
+    biome: 10
+    belt: 0
+    method: 3
+    weight: 0.8
+    minTier: 3
+  - resourceId: crystal
+    biome: 10
+    belt: 0
+    method: 1
+    weight: 0.3
+    minTier: 2
+  - resourceId: scrap
+    biome: 10
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: stone
+    biome: 11
+    belt: 0
+    method: 1
+    weight: 1
+    minTier: 0
+  - resourceId: iron
+    biome: 11
+    belt: 0
+    method: 1
+    weight: 0.6
+    minTier: 1
+  - resourceId: copper_ore
+    biome: 11
+    belt: 0
+    method: 1
+    weight: 0.3
+    minTier: 1
+  - resourceId: silica
+    biome: 11
+    belt: 0
+    method: 1
+    weight: 0.5
+    minTier: 1
+  - resourceId: ice
+    biome: 11
+    belt: 0
+    method: 4
+    weight: 0.3
+    minTier: 2
+  - resourceId: titanium_ore
+    biome: 11
+    belt: 0
+    method: 1
+    weight: 0.2
+    minTier: 2
+  - resourceId: crystal
+    biome: 11
+    belt: 0
+    method: 1
+    weight: 0.15
+    minTier: 2
+  - resourceId: scrap
+    biome: 11
+    belt: 0
+    method: 5
+    weight: 0.5
+    minTier: 0
+  - resourceId: scrap
+    biome: 11
+    belt: 1
+    method: 5
+    weight: 1
+    minTier: 0
+  - resourceId: stone
+    biome: 11
+    belt: 1
+    method: 1
+    weight: 0.8
+    minTier: 0
+  - resourceId: iron
+    biome: 11
+    belt: 1
+    method: 1
+    weight: 0.8
+    minTier: 1
+  - resourceId: copper_ore
+    biome: 11
+    belt: 1
+    method: 1
+    weight: 0.5
+    minTier: 1
+  - resourceId: ice
+    biome: 11
+    belt: 1
+    method: 4
+    weight: 0.5
+    minTier: 2
+  - resourceId: titanium_ore
+    biome: 11
+    belt: 1
+    method: 1
+    weight: 0.5
+    minTier: 2
+  - resourceId: crystal
+    biome: 11
+    belt: 1
+    method: 1
+    weight: 0.2
+    minTier: 2

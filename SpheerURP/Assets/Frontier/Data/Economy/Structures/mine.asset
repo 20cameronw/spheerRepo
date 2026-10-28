@@ -1,0 +1,177 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a77a5014ca9c1140980f1b987ea7c97, type: 3}
+  m_Name: mine
+  m_EditorClassIdentifier: Frontier.Data::Frontier.StructureSO
+  lockedFields: []
+  id: mine
+  displayName: Mining Rig
+  description: Tap it to mine stone and ore on this planet. Free to build. Higher
+    levels yield more.
+  kind: 3
+  color: {r: 0.4, g: 1.6, b: 2, a: 1}
+  modelKey: 
+  buildCost: []
+  maxLevel: 10
+  upgradeGrowth: 1.9
+  bonusPerLevel: 0.25
+  maxPerPlanet: 1
+  damage: 0
+  fireInterval: 0
+  range: 0
+  beamWidth: 0.07
+  storageSlots: 18
+  storageSlotsPerLevel: 9
+  role: 0
+  tier: 0
+  footprint: 1
+  effectKind: yieldBonus
+  capacityKind: 
+  gathers: 0105
+  unlockResearch: 
+  unlockTier: 0
+  legacyKind: Mine
+  levels:
+  - level: 1
+    cost: []
+    buildSeconds: 0
+    requiresReachTier: 0
+    requiresLabLevel: 0
+    effect: 0
+    capacity: 0
+  - level: 2
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 8
+    buildSeconds: 4
+    requiresReachTier: 0
+    requiresLabLevel: 0
+    effect: 0.25
+    capacity: 0
+  - level: 3
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 9
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 5
+    buildSeconds: 11
+    requiresReachTier: 1
+    requiresLabLevel: 0
+    effect: 0.5
+    capacity: 0
+  - level: 4
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 11
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 7
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 3
+    buildSeconds: 31
+    requiresReachTier: 1
+    requiresLabLevel: 0
+    effect: 0.75
+    capacity: 0
+  - level: 5
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 19
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 11
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 4
+    buildSeconds: 75
+    requiresReachTier: 2
+    requiresLabLevel: 0
+    effect: 1
+    capacity: 0
+  - level: 6
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 25
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 15
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 6
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 2
+    buildSeconds: 180
+    requiresReachTier: 2
+    requiresLabLevel: 0
+    effect: 1.25
+    capacity: 0
+  - level: 7
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 45
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 25
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 10
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 3
+    buildSeconds: 470
+    requiresReachTier: 3
+    requiresLabLevel: 0
+    effect: 1.5
+    capacity: 0
+  - level: 8
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 60
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 35
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 14
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 5
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 4
+    buildSeconds: 1170
+    requiresReachTier: 3
+    requiresLabLevel: 0
+    effect: 1.75
+    capacity: 0
+  - level: 9
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 100
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 60
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 23
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 8
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 7
+    buildSeconds: 2370
+    requiresReachTier: 4
+    requiresLabLevel: 0
+    effect: 2
+    capacity: 0
+  - level: 10
+    cost:
+    - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
+      amount: 170
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 100
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 40
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 14
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 11
+    buildSeconds: 4500
+    requiresReachTier: 4
+    requiresLabLevel: 0
+    effect: 2.25
+    capacity: 0

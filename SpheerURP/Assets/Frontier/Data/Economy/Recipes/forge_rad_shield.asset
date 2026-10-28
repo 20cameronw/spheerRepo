@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: forge_rad_shield
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: forge_rad_shield
+  displayName: Forge Rad-Shield
+  inputs:
+  - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 70a1cc94b4e048f418e235ad5ed4c39a, type: 2}
+    amount: 1
+  outputs:
+  - resource: {fileID: 11400000, guid: 6496c93bff7dcf44a96639d0fdb9ae9a, type: 2}
+    amount: 2
+  fabricator: 0
+  kind: 1
+  stationId: foundry
+  stationLevel: 5
+  tier: 4
+  unlockResearch: radiation_shielding
+  bonus: 0

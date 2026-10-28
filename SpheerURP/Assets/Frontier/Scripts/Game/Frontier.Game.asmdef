@@ -1,0 +1,19 @@
+{
+    "name": "Frontier.Game",
+    "rootNamespace": "Frontier",
+    "references": [
+        "Frontier.Core",
+        "Frontier.Economy",
+        "Frontier.Data",
+        "Frontier.Services"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

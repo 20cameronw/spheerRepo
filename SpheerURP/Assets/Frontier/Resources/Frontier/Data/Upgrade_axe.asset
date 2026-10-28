@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: Upgrade_axe
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.UpgradeSO
+  id: axe
+  displayName: Axe
+  description: Hit the glowing weak spot to fell trees. Better axes deal more damage
+    and swing faster.
+  category: 0
+  effect: 0
+  tool: 0
+  valuePerLevel: 0.6
+  maxLevel: 6
+  baseCost:
+  - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+    amount: 10
+  - resource: {fileID: 11400000, guid: 4f4d2532363d6c94a836abcfda0b73d9, type: 2}
+    amount: 4
+  costGrowth: 1.9
+  color: {r: 1.8, g: 1.1, b: 0.35, a: 1}
+  levelNames:
+  - Bare Hands
+  - Stone Axe
+  - Iron Axe
+  - Steel Axe
+  - Crystal Axe
+  - Plasma Chainsaw
+  - Singularity Saw
+  levelCosts:
+  - cost:
+    - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+      amount: 6
+    - resource: {fileID: 11400000, guid: 4f4d2532363d6c94a836abcfda0b73d9, type: 2}
+      amount: 2
+  - cost:
+    - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+      amount: 14
+    - resource: {fileID: 11400000, guid: 4f4d2532363d6c94a836abcfda0b73d9, type: 2}
+      amount: 8
+  - cost:
+    - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+      amount: 20
+    - resource: {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+      amount: 8
+  - cost:
+    - resource: {fileID: 11400000, guid: f6e8b0c00c7ec824090bb94840c0c01c, type: 2}
+      amount: 18
+    - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+      amount: 30
+  - cost:
+    - resource: {fileID: 11400000, guid: 25b2940a17406dc4c95085d3588a640a, type: 2}
+      amount: 10
+    - resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+      amount: 10
+  - cost:
+    - resource: {fileID: 11400000, guid: 3edbb7015a808624f9e1213ce9497e5c, type: 2}
+      amount: 8
+    - resource: {fileID: 11400000, guid: 8567583bacf739a42a16112cc194cd22, type: 2}
+      amount: 8

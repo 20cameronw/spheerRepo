@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065c1dccc693b8d46b62d4bce84eaa8e, type: 3}
+  m_Name: quantum_chip
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResourceSO
+  lockedFields: []
+  id: quantum_chip
+  displayName: Quantum Chip
+  color: {r: 0.78039217, g: 0.6117647, b: 1, a: 1}
+  stackSize: 64
+  description: A lattice of cooled helium and etched crystal that computes in more
+    than one state at once. Navigation and research run on it.
+  category: 3
+  tier: 5
+  harvestMethods: 
+  baseValue: 168.56
+  hazardAffinity: 0
+  fuelEnergy: 0
+  colorHex: '#C79CFF'
+  accentHex: '#33E0FF'
+  baseYield: 0
+  yieldPerTier: 0
+  difficultyOffset: 0
+  atlasDescription: A lattice of cooled helium and etched crystal that computes in
+    more than one state at once. Navigation and research run on it.
+  iconConcept: A small square chip with pin rows on all four sides and a glowing
+    diamond die in the middle.
+  icon: 

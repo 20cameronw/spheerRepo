@@ -8,7 +8,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Frontier/Scenes/Frontier.unity
     guid: a7c3e5d1b9f24680ace13579bdf02468
-  - enabled: 1
-    path: Assets/Scenes/MainGame.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: c341d01b31f73754d8fd72a95b3bc116,
+      type: 2}
+    com.unity.localization.settings: {fileID: 11400000, guid: e3480ac2205c2ea4384bb55a6d75ae39,
+      type: 2}

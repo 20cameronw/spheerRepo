@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: mix_cryo_composite
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: mix_cryo_composite
+  displayName: Mix Cryo Composite
+  inputs:
+  - resource: {fileID: 11400000, guid: 494f076aeee3eaf44af610d5914f733f, type: 2}
+    amount: 4
+  - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 9240a7bd53f869d4386c01a89e00b4f3, type: 2}
+    amount: 1
+  outputs:
+  - resource: {fileID: 11400000, guid: d049073b5052aae4c8e079ee3a4d155b, type: 2}
+    amount: 2
+  fabricator: 0
+  kind: 1
+  stationId: chem_reactor
+  stationLevel: 1
+  tier: 3
+  unlockResearch: cryo_chemistry
+  bonus: 0

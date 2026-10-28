@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "score_formula",
+  "items": {
+    "formula": {
+      "reachCoefficient": 700,
+      "reachDivisorLy": 10,
+      "worldBase": 130,
+      "worldFullValueCount": 500,
+      "worldExcessShare": 0.20000000298023224,
+      "industryBase": 50,
+      "industryExponent": 1.600000023841858,
+      "techPerUpgradeLevel": 300,
+      "techPerToolTier": 800,
+      "defenseBase": 12,
+      "defenseWaveCap": 25,
+      "atlasPerResource": 100,
+      "atlasPerRecipe": 80,
+      "atlasPerMegaStage": 28000,
+      "ascensionStep": 0.10000000149011612
+    },
+    "keys": [
+      {
+        "key": "score.reach_coefficient",
+        "defaultValue": 700
+      },
+      {
+        "key": "score.reach_divisor_ly",
+        "defaultValue": 10
+      },
+      {
+        "key": "score.world_base",
+        "defaultValue": 130
+      },
+      {
+        "key": "score.world_full_count",
+        "defaultValue": 500
+      },
+      {
+        "key": "score.world_excess_share",
+        "defaultValue": 0.2
+      },
+      {
+        "key": "score.industry_base",
+        "defaultValue": 50
+      },
+      {
+        "key": "score.industry_exponent",
+        "defaultValue": 1.6
+      },
+      {
+        "key": "score.tech_per_upgrade_level",
+        "defaultValue": 300
+      },
+      {
+        "key": "score.tech_per_tool_tier",
+        "defaultValue": 800
+      },
+      {
+        "key": "score.defense_base",
+        "defaultValue": 12
+      },
+      {
+        "key": "score.defense_wave_cap",
+        "defaultValue": 25
+      },
+      {
+        "key": "score.atlas_per_resource",
+        "defaultValue": 100
+      },
+      {
+        "key": "score.atlas_per_recipe",
+        "defaultValue": 80
+      },
+      {
+        "key": "score.atlas_per_mega_stage",
+        "defaultValue": 28000
+      },
+      {
+        "key": "score.ascension_step",
+        "defaultValue": 0.1
+      }
+    ],
+    "notes": "Score = floor((R + W + I + T + D + A) x (1 + ascensionStep x ascensionRank)); see reports/ECONOMY.md"
+  }
+}

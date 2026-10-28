@@ -1,0 +1,166 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: pack
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: pack
+  displayName: Backpack
+  description: +9 slots (one more row). Carry more before you turn back.
+  category: 1
+  effect: 1
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 8
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 0
+  hazard: 0
+  levels:
+  - level: 1
+    displayName: Satchel
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 30
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 30
+    value: 18
+    researchPrereq: 
+    requiresReachTier: 0
+    eraTier: 0
+  - level: 2
+    displayName: Rucksack
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 60
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 60
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 25
+    value: 27
+    researchPrereq: 
+    requiresReachTier: 0
+    eraTier: 0
+  - level: 3
+    displayName: Field Pack
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 240
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 240
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 110
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 40
+    value: 36
+    researchPrereq: 
+    requiresReachTier: 1
+    eraTier: 1
+  - level: 4
+    displayName: Expedition Pack
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 800
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 800
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 470
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 160
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 160
+    value: 45
+    researchPrereq: 
+    requiresReachTier: 2
+    eraTier: 2
+  - level: 5
+    displayName: Cargo Harness
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1080
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1080
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 860
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 300
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 300
+    value: 54
+    researchPrereq: 
+    requiresReachTier: 3
+    eraTier: 3
+  - level: 6
+    displayName: Hauler Rig
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1360
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1360
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1360
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 540
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 540
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 190
+    value: 63
+    researchPrereq: 
+    requiresReachTier: 4
+    eraTier: 4
+  - level: 7
+    displayName: Titan Frame
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 1600
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 1200
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 1200
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 400
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 590
+    value: 72
+    researchPrereq: 
+    requiresReachTier: 5
+    eraTier: 5
+  - level: 8
+    displayName: Exo-Hauler
+    cost:
+    - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
+      amount: 2200
+    - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
+      amount: 2200
+    - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
+      amount: 2200
+    - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
+      amount: 2900
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 2900
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 1000
+    - resource: {fileID: 11400000, guid: c7d94366e7cfe77458e52f381ae69ada, type: 2}
+      amount: 1500
+    value: 81
+    researchPrereq: 
+    requiresReachTier: 7
+    eraTier: 7
+  icon: 

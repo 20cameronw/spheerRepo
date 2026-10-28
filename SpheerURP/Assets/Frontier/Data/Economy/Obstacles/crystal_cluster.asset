@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: crystal_cluster
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: crystal_cluster
+    displayName: Crystal Cluster
+    description: Raw crystal has burst through the ground. Cut it free before the
+      whole pad starts to hum.
+    biomes: Crystal;Shattered
+    biomeMask: 160
+    needsVoid: 0
+    minTier: 2
+    weight: 2.5
+    costMult: 1
+    timeMult: 1.1
+    rewardResource: crystal
+    iconConcept: A fan of five crystal shards of unequal height rising from one faceted
+      base.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: iron_plate
+        amount: 1
+      - resourceId: glass
+        amount: 1
+      reward:
+        resourceId: crystal
+        amount: 1
+    - tier: 1
+      cost:
+      - resourceId: iron_plate
+        amount: 2
+      - resourceId: glass
+        amount: 1
+      reward:
+        resourceId: crystal
+        amount: 1
+    - tier: 2
+      cost:
+      - resourceId: iron_plate
+        amount: 3
+      - resourceId: glass
+        amount: 2
+      reward:
+        resourceId: crystal
+        amount: 1
+    - tier: 3
+      cost:
+      - resourceId: iron_plate
+        amount: 6
+      - resourceId: glass
+        amount: 4
+      reward:
+        resourceId: crystal
+        amount: 3
+    - tier: 4
+      cost:
+      - resourceId: iron_plate
+        amount: 13
+      - resourceId: glass
+        amount: 9
+      reward:
+        resourceId: crystal
+        amount: 6
+    - tier: 5
+      cost:
+      - resourceId: iron_plate
+        amount: 19
+      - resourceId: glass
+        amount: 14
+      - resourceId: optic_lens
+        amount: 4
+      reward:
+        resourceId: crystal
+        amount: 12
+    - tier: 6
+      cost:
+      - resourceId: iron_plate
+        amount: 40
+      - resourceId: glass
+        amount: 25
+      - resourceId: optic_lens
+        amount: 8
+      reward:
+        resourceId: crystal
+        amount: 25
+    - tier: 7
+      cost:
+      - resourceId: iron_plate
+        amount: 80
+      - resourceId: glass
+        amount: 55
+      - resourceId: optic_lens
+        amount: 16
+      reward:
+        resourceId: crystal
+        amount: 51
+    - tier: 8
+      cost:
+      - resourceId: iron_plate
+        amount: 140
+      - resourceId: glass
+        amount: 100
+      - resourceId: optic_lens
+        amount: 30
+      - resourceId: quantum_chip
+        amount: 1
+      reward:
+        resourceId: crystal
+        amount: 102
+    - tier: 9
+      cost:
+      - resourceId: iron_plate
+        amount: 280
+      - resourceId: glass
+        amount: 200
+      - resourceId: optic_lens
+        amount: 60
+      - resourceId: quantum_chip
+        amount: 2
+      reward:
+        resourceId: crystal
+        amount: 204
+    - tier: 10
+      cost:
+      - resourceId: iron_plate
+        amount: 450
+      - resourceId: glass
+        amount: 360
+      - resourceId: optic_lens
+        amount: 160
+      - resourceId: quantum_chip
+        amount: 6
+      reward:
+        resourceId: crystal
+        amount: 288
+    - tier: 11
+      cost:
+      - resourceId: iron_plate
+        amount: 387
+      - resourceId: glass
+        amount: 309
+      - resourceId: optic_lens
+        amount: 413
+      - resourceId: quantum_chip
+        amount: 16
+      reward:
+        resourceId: crystal
+        amount: 288
+    - tier: 12
+      cost:
+      - resourceId: iron_plate
+        amount: 408
+      - resourceId: glass
+        amount: 327
+      - resourceId: optic_lens
+        amount: 436
+      - resourceId: quantum_chip
+        amount: 86
+      reward:
+        resourceId: crystal
+        amount: 288
+  modelKey: 

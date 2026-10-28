@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: magma_crust
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: magma_crust
+    displayName: Magma Crust
+    description: A plate of cooled magma has fused over the pad, still ticking as
+      it shrinks. Break the crust and clear the slag.
+    biomes: Volcanic;Obsidian
+    biomeMask: 72
+    needsVoid: 0
+    minTier: 3
+    weight: 2.5
+    costMult: 1
+    timeMult: 1.3
+    rewardResource: stone
+    iconConcept: A cracked dark slab with a glowing seam zigzagging corner to corner.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: steel
+        amount: 1
+      reward:
+        resourceId: stone
+        amount: 3
+    - tier: 1
+      cost:
+      - resourceId: steel
+        amount: 2
+      reward:
+        resourceId: stone
+        amount: 6
+    - tier: 2
+      cost:
+      - resourceId: steel
+        amount: 3
+      reward:
+        resourceId: stone
+        amount: 12
+    - tier: 3
+      cost:
+      - resourceId: steel
+        amount: 7
+      reward:
+        resourceId: stone
+        amount: 25
+    - tier: 4
+      cost:
+      - resourceId: steel
+        amount: 9
+      - resourceId: titanium_plate
+        amount: 2
+      reward:
+        resourceId: stone
+        amount: 51
+    - tier: 5
+      cost:
+      - resourceId: steel
+        amount: 18
+      - resourceId: titanium_plate
+        amount: 5
+      reward:
+        resourceId: stone
+        amount: 102
+    - tier: 6
+      cost:
+      - resourceId: steel
+        amount: 25
+      - resourceId: titanium_plate
+        amount: 7
+      - resourceId: thermal_alloy
+        amount: 4
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 7
+      cost:
+      - resourceId: steel
+        amount: 50
+      - resourceId: titanium_plate
+        amount: 14
+      - resourceId: thermal_alloy
+        amount: 9
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 8
+      cost:
+      - resourceId: steel
+        amount: 100
+      - resourceId: titanium_plate
+        amount: 25
+      - resourceId: thermal_alloy
+        amount: 17
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 9
+      cost:
+      - resourceId: steel
+        amount: 210
+      - resourceId: titanium_plate
+        amount: 55
+      - resourceId: thermal_alloy
+        amount: 35
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 10
+      cost:
+      - resourceId: steel
+        amount: 410
+      - resourceId: titanium_plate
+        amount: 110
+      - resourceId: thermal_alloy
+        amount: 70
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 11
+      cost:
+      - resourceId: steel
+        amount: 777
+      - resourceId: titanium_plate
+        amount: 230
+      - resourceId: thermal_alloy
+        amount: 150
+      reward:
+        resourceId: stone
+        amount: 120
+    - tier: 12
+      cost:
+      - resourceId: steel
+        amount: 835
+      - resourceId: titanium_plate
+        amount: 630
+      - resourceId: thermal_alloy
+        amount: 400
+      reward:
+        resourceId: stone
+        amount: 120
+  modelKey: 

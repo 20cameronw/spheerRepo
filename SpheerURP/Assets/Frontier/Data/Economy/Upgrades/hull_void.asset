@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: hull_void
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: hull_void
+  displayName: Void Shell
+  description: Void alloy shell for worlds where space itself is thin.
+  category: 1
+  effect: 11
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 3
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 0
+  hazard: 16
+  levels:
+  - level: 1
+    displayName: Void Shell
+    cost:
+    - resource: {fileID: 11400000, guid: 25b13dd3b7badf143b2a295585f45ab7, type: 2}
+      amount: 1400
+    - resource: {fileID: 11400000, guid: 6496c93bff7dcf44a96639d0fdb9ae9a, type: 2}
+      amount: 1400
+    value: 1
+    researchPrereq: hazmat_void
+    requiresReachTier: 5
+    eraTier: 6
+  - level: 2
+    displayName: Event Shell
+    cost:
+    - resource: {fileID: 11400000, guid: 25b13dd3b7badf143b2a295585f45ab7, type: 2}
+      amount: 7000
+    - resource: {fileID: 11400000, guid: 6496c93bff7dcf44a96639d0fdb9ae9a, type: 2}
+      amount: 7000
+    - resource: {fileID: 11400000, guid: 113a1ff664e176647b63069c4c0c6164, type: 2}
+      amount: 1200
+    value: 2
+    researchPrereq: hazmat_void
+    requiresReachTier: 7
+    eraTier: 7
+  - level: 3
+    displayName: Null Shell
+    cost:
+    - resource: {fileID: 11400000, guid: 25b13dd3b7badf143b2a295585f45ab7, type: 2}
+      amount: 9700
+    - resource: {fileID: 11400000, guid: 6496c93bff7dcf44a96639d0fdb9ae9a, type: 2}
+      amount: 9700
+    - resource: {fileID: 11400000, guid: 113a1ff664e176647b63069c4c0c6164, type: 2}
+      amount: 2400
+    value: 3
+    researchPrereq: hazmat_void
+    requiresReachTier: 10
+    eraTier: 10
+  icon: 

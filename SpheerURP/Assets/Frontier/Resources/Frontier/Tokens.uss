@@ -1,0 +1,76 @@
+/* Frontier design tokens. See docs/DESIGN.md.
+
+   Unit: the UI is scaled so that 1 logical px = 0.5 dp on phones (1 dp = 2 px), up to a 900 px wide canvas on tablets.
+   Type and control tokens are therefore authored in half-dps: caption 26 = 13 dp, body 30 = 15 dp, touch 104 = 52 dp.
+
+   USS variables cannot be used inside math or nested in functions (rgba(var(...)) does not work), so every colour that
+   needs a tint is its own token. The project renders in linear colour space, where translucent overlays blend much
+   brighter than the same alpha does in design tools; surfaces, outlines and tints are therefore opaque colours picked by
+   eye so they look identical on every device. Keep the C# mirror (UiKit.Cyan, UiKit.Magenta...) in sync with the accents. */
+
+.fr-root {
+    /* surfaces: deep space -> dark glass */
+    --fr-bg-0: rgb(3, 5, 16);
+    --fr-surface-1: rgb(8, 12, 32);
+    --fr-surface-2: rgb(15, 23, 50);
+    --fr-surface-3: rgb(27, 39, 78);
+    --fr-scrim: rgba(2, 3, 12, 0.72);
+    --fr-outline: rgb(38, 54, 92);
+    --fr-outline-strong: rgb(76, 100, 150);
+
+    /* text */
+    --fr-text-hi: rgb(234, 245, 255);
+    --fr-text-lo: rgb(166, 188, 216);
+    --fr-text-dim: rgb(112, 132, 164);
+
+    /* neon accents: primary action, selection and live state only */
+    --fr-cyan: rgb(26, 242, 255);
+    --fr-magenta: rgb(255, 64, 242);
+    --fr-lime: rgb(128, 255, 77);
+    --fr-amber: rgb(255, 179, 64);
+    --fr-danger: rgb(255, 77, 89);
+
+    /* spacing scale */
+    --fr-sp-4: 4px;
+    --fr-sp-8: 8px;
+    --fr-sp-12: 12px;
+    --fr-sp-16: 16px;
+    --fr-sp-24: 24px;
+    --fr-sp-32: 32px;
+
+    /* radii */
+    --fr-r-sm: 10px;
+    --fr-r-md: 18px;
+    --fr-r-lg: 26px;
+
+    /* type scale (half-dp units) */
+    --fr-fs-caption: 26px;
+    --fr-fs-body: 30px;
+    --fr-fs-label: 32px;
+    --fr-fs-title: 40px;
+    --fr-fs-display: 56px;
+
+    /* control sizes */
+    --fr-touch: 104px;
+    --fr-icon-sm: 32px;
+    --fr-icon-md: 40px;
+    --fr-icon-lg: 56px;
+    --fr-icon-xl: 72px;
+
+    /* motion */
+    --fr-dur-fast: 100ms;
+    --fr-dur-base: 180ms;
+    --fr-dur-slow: 320ms;
+
+    /* default accent; override per panel with .fr-acc-* (acc = neon, line = muted outline, soft = dark tint fill) */
+    --fr-acc: rgb(26, 242, 255);
+    --fr-acc-line: rgb(21, 133, 153);
+    --fr-acc-soft: rgb(11, 57, 75);
+}
+
+.fr-acc-cyan { --fr-acc: rgb(26, 242, 255); --fr-acc-line: rgb(21, 133, 153); --fr-acc-soft: rgb(11, 57, 75); }
+.fr-acc-magenta { --fr-acc: rgb(255, 64, 242); --fr-acc-line: rgb(135, 44, 146); --fr-acc-soft: rgb(57, 22, 72); }
+.fr-acc-lime { --fr-acc: rgb(128, 255, 77); --fr-acc-line: rgb(72, 139, 64); --fr-acc-soft: rgb(31, 60, 39); }
+.fr-acc-amber { --fr-acc: rgb(255, 179, 64); --fr-acc-line: rgb(135, 101, 57); --fr-acc-soft: rgb(57, 45, 37); }
+.fr-acc-red { --fr-acc: rgb(255, 77, 89); --fr-acc-line: rgb(135, 50, 70); --fr-acc-soft: rgb(57, 24, 42); }
+.fr-acc-neutral { --fr-acc: rgb(200, 220, 245); --fr-acc-line: rgb(76, 100, 150); --fr-acc-soft: rgb(30, 40, 68); }

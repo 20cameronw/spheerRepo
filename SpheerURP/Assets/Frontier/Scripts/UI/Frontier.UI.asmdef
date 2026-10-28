@@ -1,0 +1,24 @@
+{
+    "name": "Frontier.UI",
+    "rootNamespace": "Frontier",
+    "references": [
+        "Frontier.Core",
+        "Frontier.Economy",
+        "Frontier.Data",
+        "Frontier.Game",
+        "Frontier.Visual",
+        "Frontier.Services",
+        "Unity.Localization",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

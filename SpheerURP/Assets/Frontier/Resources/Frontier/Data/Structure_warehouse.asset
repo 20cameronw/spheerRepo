@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a77a5014ca9c1140980f1b987ea7c97, type: 3}
+  m_Name: Structure_warehouse
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.StructureSO
+  id: warehouse
+  displayName: Warehouse
+  description: Stores resources on this planet. Drag stacks between your backpack and storage. Upgrades add 9 slots.
+  kind: 9
+  color: {r: 0.4, g: 1.4, b: 1.8, a: 1}
+  modelKey:
+  buildCost:
+  - resource: {fileID: 11400000, guid: 41d60b14022c20a4b9a01f911c0acab4, type: 2}
+    amount: 20
+  - resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+    amount: 10
+  maxLevel: 5
+  upgradeGrowth: 1.9
+  bonusPerLevel: 0
+  maxPerPlanet: 0
+  damage: 0
+  fireInterval: 0.7
+  range: 8
+  beamWidth: 0.07
+  storageSlots: 18
+  storageSlotsPerLevel: 9

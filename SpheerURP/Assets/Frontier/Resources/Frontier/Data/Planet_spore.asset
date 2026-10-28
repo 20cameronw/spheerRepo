@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1175b5dce9dd134ba2ed369b5c2135b, type: 3}
+  m_Name: Planet_spore
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.PlanetSO
+  id: spore
+  displayName: Spore Prime
+  description: Subterranean fungal hive where massive caps pierce the crust.
+  tier: 4
+  mapPosition: {x: 0.5, y: 0.5}
+  danger: 5
+  primary: {r: 0.59973764, g: 0.7859496, b: 0.15, a: 1}
+  secondary: {r: 0.12, g: 0.15, b: 0.04, a: 1}
+  rim: {r: 1.8, g: 2.4, b: 0.5, a: 1}
+  weather: 4
+  mood: 0
+  hasRings: 0
+  style: 2
+  glowIntensity: 0.55
+  atmosphereIntensity: 0.5
+  surfaceBands: 8.449583
+  modelKey: mire
+  surfaceRadius: 1.5
+  modelScale: 1
+  atmosphereScale: 5
+  worldSize: 1.64
+  buildingSlots: 28
+  spots:
+  - label: Titan Fungi
+    game: 0
+    resource: {fileID: 11400000, guid: c0753800a6e147742b9e143fd90c46ec, type: 2}
+    baseYield: 52
+    difficulty: 0.56
+  - label: Methane Bog
+    game: 2
+    resource: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+    baseYield: 16
+    difficulty: 0.61
+  - label: Spore Hive
+    game: 2
+    resource: {fileID: 11400000, guid: 8567583bacf739a42a16112cc194cd22, type: 2}
+    baseYield: 6
+    difficulty: 0.66
+  systemId: verdance

@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: wreckage
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: wreckage
+    displayName: Wreckage
+    description: Someone else's landing ended here. Cut the hull apart for scrap
+      before it blocks anything else.
+    biomes: Lush;Mineral;Glacial;Volcanic;Fungal;Crystal;Obsidian;Shattered;Desert;Oceanic;Barren
+    biomeMask: 3071
+    needsVoid: 0
+    minTier: 0
+    weight: 2
+    costMult: 1.1
+    timeMult: 1.2
+    rewardResource: scrap
+    iconConcept: A snapped hull fin canted on the ground, ragged edge up, with two
+      rows of rivets.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: scrap
+        amount: 9
+      reward:
+        resourceId: scrap
+        amount: 3
+    - tier: 1
+      cost:
+      - resourceId: scrap
+        amount: 12
+      - resourceId: iron_plate
+        amount: 1
+      reward:
+        resourceId: scrap
+        amount: 7
+    - tier: 2
+      cost:
+      - resourceId: scrap
+        amount: 23
+      - resourceId: iron_plate
+        amount: 2
+      reward:
+        resourceId: scrap
+        amount: 14
+    - tier: 3
+      cost:
+      - resourceId: scrap
+        amount: 45
+      - resourceId: iron_plate
+        amount: 4
+      reward:
+        resourceId: scrap
+        amount: 28
+    - tier: 4
+      cost:
+      - resourceId: scrap
+        amount: 55
+      - resourceId: iron_plate
+        amount: 4
+      - resourceId: steel
+        amount: 6
+      reward:
+        resourceId: scrap
+        amount: 56
+    - tier: 5
+      cost:
+      - resourceId: scrap
+        amount: 110
+      - resourceId: iron_plate
+        amount: 9
+      - resourceId: steel
+        amount: 12
+      reward:
+        resourceId: scrap
+        amount: 112
+    - tier: 6
+      cost:
+      - resourceId: scrap
+        amount: 180
+      - resourceId: iron_plate
+        amount: 15
+      - resourceId: steel
+        amount: 19
+      - resourceId: circuit_board
+        amount: 8
+      reward:
+        resourceId: scrap
+        amount: 180
+    - tier: 7
+      cost:
+      - resourceId: scrap
+        amount: 340
+      - resourceId: iron_plate
+        amount: 30
+      - resourceId: steel
+        amount: 40
+      - resourceId: circuit_board
+        amount: 16
+      reward:
+        resourceId: scrap
+        amount: 180
+    - tier: 8
+      cost:
+      - resourceId: scrap
+        amount: 378
+      - resourceId: iron_plate
+        amount: 70
+      - resourceId: steel
+        amount: 95
+      - resourceId: circuit_board
+        amount: 35
+      reward:
+        resourceId: scrap
+        amount: 180
+    - tier: 9
+      cost:
+      - resourceId: scrap
+        amount: 410
+      - resourceId: iron_plate
+        amount: 160
+      - resourceId: steel
+        amount: 210
+      - resourceId: circuit_board
+        amount: 80
+      reward:
+        resourceId: scrap
+        amount: 180
+    - tier: 10
+      cost:
+      - resourceId: scrap
+        amount: 438
+      - resourceId: iron_plate
+        amount: 321
+      - resourceId: steel
+        amount: 419
+      - resourceId: circuit_board
+        amount: 165
+      reward:
+        resourceId: scrap
+        amount: 180
+    - tier: 11
+      cost:
+      - resourceId: scrap
+        amount: 315
+      - resourceId: iron_plate
+        amount: 315
+      - resourceId: steel
+        amount: 503
+      - resourceId: circuit_board
+        amount: 324
+      reward:
+        resourceId: scrap
+        amount: 180
+    - tier: 12
+      cost:
+      - resourceId: scrap
+        amount: 317
+      - resourceId: iron_plate
+        amount: 317
+      - resourceId: steel
+        amount: 510
+      - resourceId: circuit_board
+        amount: 425
+      reward:
+        resourceId: scrap
+        amount: 180
+  modelKey: 

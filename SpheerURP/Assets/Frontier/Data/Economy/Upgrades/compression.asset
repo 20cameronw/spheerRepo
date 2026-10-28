@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06643267d2f59774381d9c637ce83e04, type: 3}
+  m_Name: compression
+  m_EditorClassIdentifier: Frontier.Data::Frontier.UpgradeSO
+  lockedFields: []
+  id: compression
+  displayName: Cargo Compression
+  description: 'Every stack in your backpack and warehouses holds more: the end-game
+    answer to storage.'
+  category: 3
+  effect: 12
+  tool: 0
+  valuePerLevel: 0.5
+  maxLevel: 4
+  baseCost: []
+  costGrowth: 1.8
+  color: {r: 0, g: 1, b: 1, a: 1}
+  levelNames: []
+  levelCosts: []
+  group: 2
+  hazard: 0
+  levels:
+  - level: 1
+    displayName: Vacuum Packing
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 830
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 440
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 120
+    value: 1.15
+    researchPrereq: compression_1
+    requiresReachTier: 3
+    eraTier: 4
+  - level: 2
+    displayName: Dense Racking
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 2700
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 1400
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 380
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 110
+    value: 1.3
+    researchPrereq: compression_2
+    requiresReachTier: 5
+    eraTier: 5
+  - level: 3
+    displayName: Pressure Stacks
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 5280
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 4400
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 1900
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 560
+    - resource: {fileID: 11400000, guid: 25b13dd3b7badf143b2a295585f45ab7, type: 2}
+      amount: 300
+    value: 1.5
+    researchPrereq: compression_3
+    requiresReachTier: 7
+    eraTier: 7
+  - level: 4
+    displayName: Quantum Compression
+    cost:
+    - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
+      amount: 6600
+    - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+      amount: 5500
+    - resource: {fileID: 11400000, guid: db8b9497f83223d4181e5198955a1add, type: 2}
+      amount: 3300
+    - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+      amount: 6300
+    - resource: {fileID: 11400000, guid: 25b13dd3b7badf143b2a295585f45ab7, type: 2}
+      amount: 3400
+    value: 1.75
+    researchPrereq: compression_3
+    requiresReachTier: 9
+    eraTier: 9
+  icon: 

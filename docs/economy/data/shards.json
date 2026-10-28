@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "shards",
+  "items": {
+    "rules": {
+      "skipMultiplier": 1.2,
+      "skipExponent": 0.75,
+      "minSkipCost": 1,
+      "freeFinishSeconds": 30,
+      "baseBuilders": 1,
+      "maxBuilders": 4,
+      "thirdBuilderShards": 250,
+      "fourthBuilderShards": 600,
+      "reviveRunShards": 5,
+      "reviveWaveShards": 8,
+      "cosmeticMinShards": 120,
+      "cosmeticMaxShards": 1200,
+      "levelUpBase": 3,
+      "levelUpEveryLevels": 15,
+      "atlasResourceShards": 3,
+      "atlasRecipeShards": 2,
+      "atlasStructureShards": 1,
+      "achievementSmall": 5,
+      "achievementMedium": 10,
+      "achievementLarge": 25,
+      "streakDays": [
+        2,
+        2,
+        3,
+        3,
+        4,
+        4,
+        12
+      ],
+      "adReward": 2,
+      "adsPerDay": 3,
+      "boardParticipation": 20,
+      "boardTop10Percent": 50,
+      "boardTop1Percent": 150,
+      "weeklyObjectives": 3,
+      "weeklyObjectiveShards": 5,
+      "podBase": 1,
+      "podPerThreeTiers": 1,
+      "packs": [
+        {
+          "id": "shards_1",
+          "shards": 80,
+          "priceTier": 1
+        },
+        {
+          "id": "shards_2",
+          "shards": 500,
+          "priceTier": 5
+        },
+        {
+          "id": "shards_3",
+          "shards": 1100,
+          "priceTier": 10
+        },
+        {
+          "id": "shards_4",
+          "shards": 2400,
+          "priceTier": 20
+        },
+        {
+          "id": "shards_5",
+          "shards": 6500,
+          "priceTier": 50
+        }
+      ]
+    },
+    "builders": {
+      "start": 1,
+      "max": 4,
+      "researchBuilder": "field_engineering",
+      "hubStructure": "colony_hub",
+      "hubLevelForThird": 3,
+      "hubLevelForFourth": 7,
+      "thirdBuilderShards": 250,
+      "fourthBuilderShards": 600,
+      "hubExtraBuildersByLevel": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "skipCurve": [
+      {
+        "seconds": 30,
+        "shards": 0
+      },
+      {
+        "seconds": 60,
+        "shards": 2
+      },
+      {
+        "seconds": 300,
+        "shards": 5
+      },
+      {
+        "seconds": 600,
+        "shards": 7
+      },
+      {
+        "seconds": 1800,
+        "shards": 16
+      },
+      {
+        "seconds": 3600,
+        "shards": 26
+      },
+      {
+        "seconds": 14400,
+        "shards": 74
+      },
+      {
+        "seconds": 28800,
+        "shards": 124
+      },
+      {
+        "seconds": 43200,
+        "shards": 167
+      },
+      {
+        "seconds": 86400,
+        "shards": 281
+      },
+      {
+        "seconds": 172800,
+        "shards": 472
+      },
+      {
+        "seconds": 432000,
+        "shards": 938
+      },
+      {
+        "seconds": 864000,
+        "shards": 1578
+      }
+    ]
+  }
+}

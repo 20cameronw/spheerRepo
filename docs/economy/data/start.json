@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "generator": "frontier-economy-dev",
+  "family": "start",
+  "items": {
+    "start": {
+      "startingItems": [
+        {
+          "resourceId": "fuel",
+          "amount": 10
+        },
+        {
+          "resourceId": "wood",
+          "amount": 24
+        },
+        {
+          "resourceId": "scrap",
+          "amount": 30
+        }
+      ],
+      "baseBackpackSlots": 9,
+      "startPlanetId": "sylva",
+      "builders": 1
+    },
+    "categoryHex": [
+      "#D9A441",
+      "#5CC8B0",
+      "#8FB4E8",
+      "#B28CF5",
+      "#FF7A55"
+    ]
+  }
+}

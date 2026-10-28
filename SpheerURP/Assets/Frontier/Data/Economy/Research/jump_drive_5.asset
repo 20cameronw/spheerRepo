@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5b069e26ffddf42aefe2d991a607b0, type: 3}
+  m_Name: jump_drive_5
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ResearchNodeSO
+  lockedFields: []
+  data:
+    id: jump_drive_5
+    displayName: Jump Drive V
+    description: Tunnel drives and gate harmonics.
+    branch: Navigation
+    tier: 6
+    cost:
+    - resourceId: quantum_chip
+      amount: 340
+    - resourceId: plasma
+      amount: 820
+    - resourceId: rad_shield_alloy
+      amount: 520
+    - resourceId: titanium_plate
+      amount: 2100
+    - resourceId: warp_coil
+      amount: 8
+    prereqs:
+    - jump_drive_4
+    - warp_theory
+    labLevel: 6
+    unlocks:
+    - upgrade:jump:8
+    - upgrade:jump:9
+    - upgrade:jump:10
+  icon: research

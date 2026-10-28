@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91594327e7386974797d3befb38508a3, type: 3}
+  m_Name: ice_spire
+  m_EditorClassIdentifier: Frontier.Data::Frontier.ObstacleKindSO
+  lockedFields: []
+  data:
+    id: ice_spire
+    displayName: Ice Spire
+    description: A spear of old ice has grown through the pad. Melt it carefully;
+      the water is worth keeping.
+    biomes: Glacial;Oceanic
+    biomeMask: 516
+    needsVoid: 0
+    minTier: 2
+    weight: 2.5
+    costMult: 1
+    timeMult: 1.1
+    rewardResource: ice
+    iconConcept: A jagged ice spear leaning off the vertical, with a split foot and
+      a small frozen splash around it.
+    byTier:
+    - tier: 0
+      cost:
+      - resourceId: ice
+        amount: 2
+      reward:
+        resourceId: ice
+        amount: 1
+    - tier: 1
+      cost:
+      - resourceId: ice
+        amount: 3
+      - resourceId: planks
+        amount: 2
+      reward:
+        resourceId: ice
+        amount: 1
+    - tier: 2
+      cost:
+      - resourceId: ice
+        amount: 5
+      - resourceId: planks
+        amount: 5
+      reward:
+        resourceId: ice
+        amount: 3
+    - tier: 3
+      cost:
+      - resourceId: ice
+        amount: 11
+      - resourceId: planks
+        amount: 10
+      reward:
+        resourceId: ice
+        amount: 6
+    - tier: 4
+      cost:
+      - resourceId: ice
+        amount: 14
+      - resourceId: planks
+        amount: 13
+      - resourceId: steel
+        amount: 5
+      reward:
+        resourceId: ice
+        amount: 12
+    - tier: 5
+      cost:
+      - resourceId: ice
+        amount: 30
+      - resourceId: planks
+        amount: 25
+      - resourceId: steel
+        amount: 9
+      reward:
+        resourceId: ice
+        amount: 25
+    - tier: 6
+      cost:
+      - resourceId: ice
+        amount: 45
+      - resourceId: planks
+        amount: 40
+      - resourceId: steel
+        amount: 16
+      - resourceId: cryo_composite
+        amount: 3
+      reward:
+        resourceId: ice
+        amount: 51
+    - tier: 7
+      cost:
+      - resourceId: ice
+        amount: 90
+      - resourceId: planks
+        amount: 85
+      - resourceId: steel
+        amount: 30
+      - resourceId: cryo_composite
+        amount: 6
+      reward:
+        resourceId: ice
+        amount: 102
+    - tier: 8
+      cost:
+      - resourceId: ice
+        amount: 180
+      - resourceId: planks
+        amount: 170
+      - resourceId: steel
+        amount: 60
+      - resourceId: cryo_composite
+        amount: 12
+      reward:
+        resourceId: ice
+        amount: 144
+    - tier: 9
+      cost:
+      - resourceId: ice
+        amount: 330
+      - resourceId: planks
+        amount: 276
+      - resourceId: steel
+        amount: 140
+      - resourceId: cryo_composite
+        amount: 25
+      reward:
+        resourceId: ice
+        amount: 144
+    - tier: 10
+      cost:
+      - resourceId: ice
+        amount: 342
+      - resourceId: planks
+        amount: 285
+      - resourceId: steel
+        amount: 380
+      - resourceId: cryo_composite
+        amount: 71
+      reward:
+        resourceId: ice
+        amount: 144
+    - tier: 11
+      cost:
+      - resourceId: ice
+        amount: 292
+      - resourceId: planks
+        amount: 241
+      - resourceId: steel
+        amount: 586
+      - resourceId: cryo_composite
+        amount: 158
+      reward:
+        resourceId: ice
+        amount: 144
+    - tier: 12
+      cost:
+      - resourceId: ice
+        amount: 265
+      - resourceId: planks
+        amount: 221
+      - resourceId: steel
+        amount: 532
+      - resourceId: cryo_composite
+        amount: 452
+      reward:
+        resourceId: ice
+        amount: 144
+  modelKey: 

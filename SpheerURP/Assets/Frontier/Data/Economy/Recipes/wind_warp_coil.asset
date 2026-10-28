@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: wind_warp_coil
+  m_EditorClassIdentifier: Frontier.Data::Frontier.RecipeSO
+  lockedFields: []
+  id: wind_warp_coil
+  displayName: Wind Warp Coil
+  inputs:
+  - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
+    amount: 6
+  - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 250b1215b98b28d48b4ff331f8496be3, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: fc9241ca824d76647ab62dab4bbf74f0, type: 2}
+    amount: 1
+  outputs:
+  - resource: {fileID: 11400000, guid: 113a1ff664e176647b63069c4c0c6164, type: 2}
+    amount: 1
+  fabricator: 0
+  kind: 2
+  stationId: quantum_lab
+  stationLevel: 3
+  tier: 6
+  unlockResearch: warp_theory
+  bonus: 0

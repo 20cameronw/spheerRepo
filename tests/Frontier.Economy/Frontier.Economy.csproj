@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Frontier.Economy compiled outside Unity, exactly as Unity compiles it: netstandard 2.1, C# 9, warnings are errors.
+    The sources are LINKED from the Unity project (SpheerURP/Assets/Frontier/Scripts/Economy); nothing is copied.
+    Like Frontier.Economy.asmdef it references only Frontier.Core (the sibling project), nothing else.
+    This project is not part of the Unity project (it lives in tests/ at the repository root, which Unity never imports).
+    Paths use forward slashes so the same file builds on Windows, Linux and macOS.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Frontier.Economy</AssemblyName>
+    <RootNamespace>Frontier.Economy</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../SpheerURP/Assets/Frontier/Scripts/Economy/**/*.cs" Link="Economy/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Frontier.Core/Frontier.Core.csproj" />
+  </ItemGroup>
+</Project>

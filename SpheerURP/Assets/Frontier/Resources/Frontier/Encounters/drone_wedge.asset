@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d34ee26d274254998ef72f3dca111a, type: 3}
+  m_Name: drone_wedge
+  m_EditorClassIdentifier: Frontier.Data::Frontier.EncounterSO
+  template:
+    id: drone_wedge
+    index: 7
+    minTier: 1
+    maxTier: 5
+    cost: 7
+    role: 1
+    family: 0
+    entries:
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 1
+      zOffset: 0
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -0.6
+      y: 1
+      zOffset: 9
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0.6
+      y: 1
+      zOffset: 9
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: -1.2
+      y: 1
+      zOffset: 18
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 0
+      y: 1
+      zOffset: 18
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    - type: 1
+      pickup: 0
+      variant: 0
+      flags: 0
+      x: 1.2
+      y: 1
+      zOffset: 18
+      vzOwn: 6
+      path: 0
+      p0: 0
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      p5: 0
+      group: 0
+    durationZ: 18
+    declaredSpeed: 0.35
+    weight: 1
+    mirrorable: 1
+    notes: Filled arrowhead of drones.

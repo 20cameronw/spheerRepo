@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af0054387797fb47bdadefd89c7c2a3, type: 3}
+  m_Name: Recipe_Plasma Cell
+  m_EditorClassIdentifier: Assembly-CSharp::Frontier.RecipeSO
+  displayName: Plasma Cell
+  inputs:
+  - resource: {fileID: 11400000, guid: 8bfbd849d20e97648911a9b7099ac58f, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 2a90e383c44ad0f42a7074dfdf7a056f, type: 2}
+    amount: 2
+  outputs:
+  - resource: {fileID: 11400000, guid: 3edbb7015a808624f9e1213ce9497e5c, type: 2}
+    amount: 1
+  fabricator: 1

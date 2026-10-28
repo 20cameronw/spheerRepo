@@ -1,0 +1,4516 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 280c923ac2aa4657ad932739024adaf2, type: 3}
+  m_Name: UiStrings
+  m_EditorClassIdentifier:
+  locale: en
+  entries:
+  - key: fuel.title
+    text: SHIP FUEL TANKS
+  - key: fuel.open
+    text: FUEL TANKS
+  - key: fuel.gallons
+    text: '{0} gal'
+  - key: fuel.millions
+    text: '{0}M gal'
+  - key: fuel.billions
+    text: '{0}B gal'
+  - key: fuel.slot-thousands
+    text: '{0}k'
+  - key: fuel.summary
+    text: '{0} / {1} tank racks occupied'
+  - key: fuel.help
+    text: Fuel uses ship tanks, not backpack space. Amounts are shown in equivalent
+      gallons; plasma and antimatter carry more energy per rack. Craft fuel to refill,
+      or transfer reserves at a Fuel Depot.
+  - key: fuel.stored
+    text: Stored {0:N0} gal in the Fuel Depot.
+  - key: fuel.withdrew
+    text: Transferred {0:N0} gal to ship tanks.
+  - key: fuel.store-empty
+    text: No matching ship fuel fits in this depot.
+  - key: fuel.withdraw-empty
+    text: No matching reserve fuel fits in the ship tanks. Spend fuel or upgrade
+      tanks.
+  - key: fuel.overflow
+    text: Your previous reserves are safe, even above capacity. Burn or store some
+      fuel, or upgrade the tanks, before refilling.
+  - key: fuel.upgrade
+    text: UPGRADE TANKS
+  - key: network.title
+    text: PLANET NETWORK
+  - key: network.help
+    text: Build a Warp Gate on each visited world, then permanently link them. Connected
+      worlds cost no fuel and have no flight mini-game. Hull protection still applies.
+      Solid green map lines show your links.
+  - key: network.lock.busy
+    text: Finish the current journey or resolve the read-only save before changing
+      the network.
+  - key: network.lock.unavailable
+    text: Planet network content is unavailable in this build.
+  - key: network.lock.destination
+    text: Select another valid world.
+  - key: network.lock.connected
+    text: These worlds already share a permanent connection.
+  - key: network.lock.visit
+    text: Visit this world and build its Warp Gate first.
+  - key: network.lock.gates
+    text: Both worlds need a completed level {0} Warp Gate.
+  - key: network.lock.plating
+    text: Upgrade your hull protection before landing on this world.
+  - key: network.lock.resources
+    text: Bring the required resources to this world or its pooled warehouses.
+  - key: network.lock.complete
+    text: The Grand Archive is already online.
+  - key: network.lock.archive
+    text: Build a Warp Gate and Cargo Depot on your archive world.
+  - key: network.lock.worlds
+    text: Link a different supply world for each resource shown above.
+  - key: network.lock.warehouses
+    text: Dedicate this world to storage with at least {0} warehouses and {1:N0}
+      warehouse slots.
+  - key: network.link
+    text: LINK {0}
+  - key: network.linked
+    text: '{0} permanently linked. Free network travel is ready.'
+  - key: network.link.active
+    text: PERMANENT LINK ACTIVE
+  - key: network.route.free
+    text: Free passage - no fuel, no flight mini-game
+  - key: network.travel
+    text: GATE TRANSIT
+  - key: network.lightspeed
+    text: LIGHTSPEED
+  - key: network.project.title
+    text: THE GRAND ARCHIVE
+  - key: network.project.help
+    text: Unite five different supply worlds, then build a warehouse world to hold
+      the final shipment. Your archive world is the hub, not one of the five suppliers.
+  - key: network.world.missing
+    text: Supply world needed
+  - key: network.find
+    text: FIND
+  - key: network.archive.status
+    text: 'Archive world: {0}/{1} warehouses - {2:N0}/{3:N0} storage slots'
+  - key: network.archive.help
+    text: Choose a large world. Reserve five pads of capacity for its Warp Gate and
+      Cargo Depot, and devote the rest to warehouses. Upgrade them, fill the pooled
+      storage, then commission the archive here. This consumes the shipment once.
+  - key: network.complete
+    text: COMMISSION GRAND ARCHIVE
+  - key: network.complete.title
+    text: YOUR WORLDS, UNITED
+  - key: network.complete.reward
+    text: Lightspeed unlocked. Travel instantly to any previously visited world,
+      even without a gate link. No fuel. No flight mini-game. Your worlds and progress
+      are yours to keep.
+  - key: network.destinations
+    text: LINK FROM THIS WORLD
+  - key: network.destinations.empty
+    text: No other visited world has a completed Warp Gate yet. Build one there,
+      return here, then link it on the map or in this list.
+  - key: network.open-map
+    text: OPEN PLANET MAP
+  - key: network.replay
+    text: REPLAY FINALE
+  - key: network.prestige
+    text: REVIEW OPTIONAL PRESTIGE
+  - key: network.save-failed
+    text: 'Could not save the network change. Nothing was spent. Retry after fixing
+      storage: {0}'
+  - key: network.film.assembly
+    text: FROM ONE SMALL WORLD
+  - key: network.film.assembly-help
+    text: Every harvest, every expedition, every world you returned to brought you
+      here.
+  - key: network.film.connected
+    text: A GALAXY WITHIN REACH
+  - key: network.film.connected-help
+    text: Five supply worlds. One great archive. Your frontier is finally connected.
+  - key: network.film.lightspeed
+    text: DISTANCE IS NO LONGER A LIMIT
+  - key: network.film.thanks
+    text: THANK YOU FOR PLAYING SPHEER
+  - key: network.film.thanks-help
+    text: Keep exploring with lightspeed, or review a fresh universe with a permanent
+      harvest bonus. Prestige is optional and always asks before resetting anything.
+  - key: network.keep-playing
+    text: KEEP EXPLORING
+  - key: resource.find
+    text: Find {0}
+  - key: tools.mining
+    text: MINING
+  - key: tools.mining.help
+    text: One upgrade improves both vein mining and pressure drilling.
+  - key: harvest.vein.title
+    text: FOLLOW THE VEIN
+  - key: harvest.vein.hint
+    text: Steer the cutter through bright ore. Dark unstable rock damages the rig.
+  - key: harvest.vein.metric
+    text: RICH SEAMS
+  - key: harvest.vein.left
+    text: LEFT
+  - key: harvest.vein.right
+    text: RIGHT
+  - key: harvest.vein.status
+    text: DEPTH {0}/{1}   ORE {2}   HULL {3}
+  - key: harvest.vein.steer
+    text: Drag to steer, or use the left and right controls.
+  - key: world.view.close
+    text: SURFACE VIEW
+  - key: world.view.orbit
+    text: ORBIT VIEW
+  - key: world.view.help
+    text: Get closer, rotate the planet and tap a resource or building.
+  - key: world.site.tool
+    text: Ready with {0}
+  - key: world.site.gather
+    text: GATHER
+  - key: world.site.build
+    text: Build or finish a matching gather structure to work this resource.
+  - key: travel.recovery.cannot-start
+    text: Cannot start a journey while another trip is pending or this save is read-only.
+  - key: travel.recovery.save-failed
+    text: 'Journey progress could not be saved: {0}'
+  - key: travel.recovery.invalid
+    text: This interrupted journey no longer matches this save or its route.
+  - key: travel.recovery.pending-save
+    text: Journey progress has not been saved. Keep the game open while saving retries.
+  - key: travel.recovery.restore-busy
+    text: Finish or discard the interrupted journey before restoring a different
+      save. In-flight cloud snapshots cannot be restored in this build.
+  - key: travel.recovery.unavailable
+    text: The travel recovery provider is unavailable. The saved journey has been
+      preserved.
+  - key: travel.recovery.incompatible
+    text: Saved run data is incompatible or damaged. It has been preserved; no fuel
+      charge or trip rewards have been applied.
+  - key: travel.recovery.title
+    text: INTERRUPTED JOURNEY
+  - key: travel.recovery.discard-help
+    text: Discard returns you to the departure world without a fuel charge or trip
+      rewards. Already used revive shards are not refunded.
+  - key: travel.recovery.discard
+    text: DISCARD JOURNEY
+  - key: travel.recovery.read-only
+    text: Returned to the departure world for this read-only session. The saved journey
+      on disk is unchanged.
+  - key: planet.spot.surface-scrap
+    text: Surface Scrap
+  - key: planet.spot.chop
+    text: '{0} Grove'
+  - key: planet.spot.mine
+    text: '{0} Seam'
+  - key: planet.spot.drill
+    text: '{0} Bore'
+  - key: planet.spot.siphon
+    text: '{0} Siphon'
+  - key: planet.spot.excavate
+    text: '{0} Dig'
+  - key: planet.spot.salvage
+    text: '{0} Heap'
+  - key: planet.spot.harvest
+    text: '{0} Beds'
+  - key: planet.list
+    text: '{0}, {1}'
+  - key: planet.enum.biome.lush
+    text: Lush
+  - key: planet.enum.biome.mineral
+    text: Mineral
+  - key: planet.enum.biome.glacial
+    text: Glacial
+  - key: planet.enum.biome.volcanic
+    text: Volcanic
+  - key: planet.enum.biome.fungal
+    text: Fungal
+  - key: planet.enum.biome.crystal
+    text: Crystal
+  - key: planet.enum.biome.obsidian
+    text: Obsidian
+  - key: planet.enum.biome.shattered
+    text: Shattered
+  - key: planet.enum.biome.desert
+    text: Desert
+  - key: planet.enum.biome.oceanic
+    text: Oceanic
+  - key: planet.enum.biome.gasgiant
+    text: Gas giant
+  - key: planet.enum.biome.barren
+    text: Barren
+  - key: planet.enum.sizeclass.dwarf
+    text: Dwarf
+  - key: planet.enum.sizeclass.small
+    text: Small
+  - key: planet.enum.sizeclass.medium
+    text: Medium
+  - key: planet.enum.sizeclass.large
+    text: Large
+  - key: planet.enum.sizeclass.giant
+    text: Giant
+  - key: planet.enum.sizeclass.colossal
+    text: Colossal
+  - key: planet.enum.planetkind.rocky
+    text: Rocky
+  - key: planet.enum.planetkind.gasgiant
+    text: Gas Giant
+  - key: planet.enum.planetkind.asteroidbelt
+    text: Asteroid Belt
+  - key: planet.enum.hazards.none
+    text: None
+  - key: planet.enum.hazards.heat
+    text: Heat
+  - key: planet.enum.hazards.cold
+    text: Cold
+  - key: planet.enum.hazards.toxic
+    text: Toxic
+  - key: planet.enum.hazards.radiation
+    text: Radiation
+  - key: planet.enum.hazards.void
+    text: Void
+  - key: planet.enum.harvestmethod.chop
+    text: Chop
+  - key: planet.enum.harvestmethod.mine
+    text: Mine
+  - key: planet.enum.harvestmethod.drill
+    text: Drill
+  - key: planet.enum.harvestmethod.siphon
+    text: Siphon
+  - key: planet.enum.harvestmethod.excavate
+    text: Excavate
+  - key: planet.enum.harvestmethod.salvage
+    text: Salvage
+  - key: planet.enum.harvestmethod.harvest
+    text: Harvest
+  - key: common.unknown
+    text: Unknown
+  - key: harvest.bonus.collect-first
+    text: A collected harvest reward is required before its bonus can be granted.
+  - key: harvest.bonus.no-room
+    text: The backpack has no room for the harvest bonus.
+  - key: harvest.bonus.stack-full
+    text: The harvest stack has reached its maximum size.
+  - key: harvest.bonus.save-failed
+    text: The harvest bonus could not be saved.
+  - key: settings.language
+    text: LANGUAGE
+  - key: settings.language.help
+    text: Changes interface text immediately. Your game and progress are unchanged.
+  - key: settings.language.only-english
+    text: English is the only language included in this build.
+  - key: settings.language.busy
+    text: A language is already loading. Please wait.
+  - key: settings.language.unavailable
+    text: That language is not installed. Your current language is unchanged.
+  - key: settings.language.failed
+    text: Could not load a complete language table. Your current language is unchanged.
+      Try again.
+  - key: clock.history-invalid
+    text: Saved clock history is unreadable. This save is protected from writes;
+      restore a valid backup.
+  - key: clock.rewind-detected
+    text: The device clock is earlier than this save's recorded time. Offline production
+      will resume only after that recorded time is reached. Check your device date
+      and time.
+  - key: purchase.recovery-required
+    text: This save contains store purchase history. Reset and restore are unavailable
+      until purchase recovery is configured, to protect your purchases. Your current
+      save has not been replaced.
+  - key: debug.header
+    text: DEBUG TOOLS - FOR TESTING ONLY
+  - key: debug.items
+    text: GIVE ITEMS
+  - key: debug.amount
+    text: x{0}
+  - key: debug.give-each
+    text: GIVE ONE OF EACH x{0}
+  - key: debug.progress
+    text: PROGRESS
+  - key: debug.player-level
+    text: Player level {0}
+  - key: debug.level-one
+    text: LEVEL +1
+  - key: debug.level-ten
+    text: LEVEL +10
+  - key: debug.max-upgrades
+    text: MAX ALL UPGRADES
+  - key: debug.reset-upgrades
+    text: RESET UPGRADES
+  - key: debug.teleport-free
+    text: TELEPORT (FREE)
+  - key: debug.generated-world
+    text: GENERATED WORLD (FREE)
+  - key: debug.generated-help
+    text: Teleport to the first matching world found outwards from home. NEXT cycles
+      through matches.
+  - key: debug.biome.label
+    text: BIOME
+  - key: debug.size.label
+    text: SIZE
+  - key: debug.minimum-tier
+    text: MINIMUM TIER
+  - key: debug.tier-choice
+    text: '{0}+'
+  - key: debug.teleport
+    text: TELEPORT
+  - key: debug.next-match
+    text: NEXT MATCH
+  - key: debug.now-on
+    text: 'Now on: {0}  {1}'
+  - key: debug.dump-descriptor
+    text: DUMP DESCRIPTOR
+  - key: debug.no-matching-world
+    text: No matching world found nearby.
+  - key: debug.world-found
+    text: '{0} - {1}, {2}, tier {3}'
+  - key: debug.descriptor-copied
+    text: World descriptor copied to the log and clipboard.
+  - key: debug.biome.any
+    text: ANY
+  - key: debug.biome.lush
+    text: LUSH
+  - key: debug.biome.mineral
+    text: MINERAL
+  - key: debug.biome.glacial
+    text: GLACIAL
+  - key: debug.biome.volcanic
+    text: VOLCANIC
+  - key: debug.biome.fungal
+    text: FUNGAL
+  - key: debug.biome.crystal
+    text: CRYSTAL
+  - key: debug.biome.obsidian
+    text: OBSIDIAN
+  - key: debug.biome.shattered
+    text: SHATTERED
+  - key: debug.biome.desert
+    text: DESERT
+  - key: debug.biome.oceanic
+    text: OCEANIC
+  - key: debug.biome.gas-giant
+    text: GAS GIANT
+  - key: debug.biome.barren
+    text: BARREN
+  - key: debug.size.any
+    text: ANY
+  - key: debug.size.dwarf
+    text: DWARF
+  - key: debug.size.small
+    text: SMALL
+  - key: debug.size.medium
+    text: MEDIUM
+  - key: debug.size.large
+    text: LARGE
+  - key: debug.size.giant
+    text: GIANT
+  - key: debug.size.colossal
+    text: COLOSSAL
+  - key: nav.command
+    text: COMMAND
+  - key: nav.map
+    text: MAP
+  - key: nav.pack
+    text: PACK
+  - key: nav.build
+    text: BUILD
+  - key: nav.menu
+    text: MENU
+  - key: common.continue
+    text: CONTINUE
+  - key: settings.sound.off
+    text: SOUND OFF
+  - key: settings.sound.on
+    text: SOUND ON
+  - key: settings.haptics.on
+    text: HAPTICS ON
+  - key: settings.haptics.off
+    text: HAPTICS OFF
+  - key: settings.haptics.help
+    text: Optional short vibrations for harvest impacts. Independent of sound.
+  - key: settings.haptics.unavailable
+    text: Harvest vibrations are unavailable on this device.
+  - key: settings.quality
+    text: 'QUALITY: {0}'
+  - key: settings.quality-preset.automatic
+    text: AUTOMATIC
+  - key: settings.quality-preset.low
+    text: LOW
+  - key: settings.quality-preset.medium
+    text: MEDIUM
+  - key: settings.quality-preset.high
+    text: HIGH
+  - key: settings.quality-tier.low
+    text: low
+  - key: settings.quality-tier.medium
+    text: medium
+  - key: settings.quality-tier.high
+    text: high
+  - key: settings.quality.help
+    text: Using {0} quality. Lower settings reduce effects and mini-game resolution,
+      not gameplay.
+  - key: settings.frame-rate
+    text: 'FRAME RATE: {0}'
+  - key: settings.automatic
+    text: AUTOMATIC
+  - key: settings.fps
+    text: '{0} FPS'
+  - key: settings.frame-rate.help
+    text: 'Target: {0} fps. 30 saves battery; 60 favours smoother motion. Device
+      limits still apply.'
+  - key: settings.labels.always
+    text: 'STRUCTURE LABELS: ALWAYS'
+  - key: settings.labels.selected
+    text: 'STRUCTURE LABELS: SELECTED ONLY'
+  - key: settings.reset.confirm
+    text: TAP AGAIN TO ERASE
+  - key: settings.reset
+    text: RESET PROGRESS
+  - key: about.version
+    text: Version {0}
+  - key: harvest.pause
+    text: PAUSE
+  - key: harvest.getting-ready
+    text: GETTING READY
+  - key: harvest.ready
+    text: READY
+  - key: harvest.abandon.title
+    text: ABANDON THIS RUN?
+  - key: harvest.paused.title
+    text: RUN PAUSED
+  - key: harvest.keep-playing
+    text: KEEP PLAYING
+  - key: harvest.abandon
+    text: ABANDON RUN
+  - key: harvest.resume
+    text: RESUME
+  - key: harvest.collect
+    text: COLLECT RESOURCES
+  - key: harvest.ad.double-yield
+    text: WATCH VIDEO FOR DOUBLE YIELD
+  - key: harvest.ad.loading
+    text: Loading rewarded video...
+  - key: harvest.ad.earned
+    text: BONUS UNLOCKED
+  - key: harvest.ad.collect
+    text: Collect to apply the bonus.
+  - key: harvest.ad.failed
+    text: Rewarded video could not be completed. Try again.
+  - key: harvest.ad.consent-required
+    text: Advertising consent is no longer active. Your harvest is unchanged.
+  - key: harvest.ad.not-earned
+    text: No reward was issued. You can try again.
+  - key: harvest.ad.save-failed
+    text: The bonus was not saved; your base harvest is safe. {0}
+  - key: harvest.tool
+    text: Tool
+  - key: harvest.perfect-hits
+    text: Perfect hits
+  - key: harvest.abandon.help
+    text: Leaving now gives no resources. Your progress in this run will be lost.
+  - key: harvest.abandoned
+    text: Run abandoned. No resources collected.
+  - key: common.xp
+    text: '{0} XP'
+  - key: harvest.paused.help
+    text: The mini-game is paused. Resume when you are ready, or abandon this run.
+  - key: harvest.complete
+    text: RUN COMPLETE
+  - key: harvest.grade
+    text: GRADE {0}
+  - key: harvest.performance
+    text: '{0} performance'
+  - key: harvest.result.metric
+    text: '{0}  {1} / {2}'
+  - key: harvest.state.recovering
+    text: RECOVERING
+  - key: harvest.tool.axe
+    text: Axe
+  - key: harvest.tool.pick
+    text: Pick
+  - key: harvest.tool.drill
+    text: Drill
+  - key: harvest.tool.hand-pump
+    text: Hand Pump
+  - key: harvest.tool.trowel
+    text: Trowel
+  - key: harvest.tool.grabber
+    text: Grabber
+  - key: harvest.tool.ship
+    text: Ship
+  - key: harvest.node.title.tree
+    text: FELL THE TREE
+  - key: harvest.node.title.rock
+    text: BREAK THE NODE
+  - key: harvest.node.hint
+    text: Hit the glowing weak spot. It keeps moving, and every swing needs a moment
+      to recover
+  - key: harvest.drill.title
+    text: BORE
+  - key: harvest.drill.hint
+    text: Press to drive the drill into the ore. Keep the pressure needle inside
+      the green band
+  - key: harvest.drill.metric
+    text: Seconds on target
+  - key: harvest.drill.hold-control
+    text: HOLD
+  - key: harvest.drill.hold
+    text: HOLD TO DRILL
+  - key: harvest.drill.adjust
+    text: ADJUST PRESSURE
+  - key: harvest.drill.locked
+    text: PRESSURE LOCK
+  - key: harvest.siphon.title
+    text: ATMOSPHERIC SIPHON
+  - key: harvest.siphon.metric
+    text: Perfect pumps
+  - key: harvest.siphon.hint
+    text: Tap PUMP when the needle crosses the capture window. Clean pulses keep
+      the gas flowing
+  - key: harvest.siphon.pump
+    text: PUMP
+  - key: harvest.siphon.watch
+    text: Watch the flow window
+  - key: harvest.siphon.ready
+    text: READY TO PUMP
+  - key: harvest.siphon.clean
+    text: Clean pressure lock
+  - key: harvest.siphon.partial
+    text: Partial capture
+  - key: harvest.siphon.lost
+    text: Pressure lost
+  - key: harvest.siphon.status
+    text: "PULSES {0}/{1}   \xB7   {2}"
+  - key: harvest.excavate.title
+    text: SONAR EXCAVATION
+  - key: harvest.excavate.metric
+    text: Seams uncovered
+  - key: harvest.excavate.hint
+    text: Ping the grid to read echoes. Brighter returns mark the buried seam
+  - key: harvest.excavate.ping
+    text: PING
+  - key: harvest.excavate.progress
+    text: "SEAM {0}/{1}  \xB7  {2} SCANS"
+  - key: harvest.excavate.new-seam
+    text: NEW SEAM
+  - key: harvest.excavate.near
+    text: NEAR
+  - key: harvest.excavate.warm
+    text: WARM
+  - key: harvest.excavate.faint
+    text: FAINT
+  - key: harvest.excavate.near-seam
+    text: NEAR THE SEAM
+  - key: harvest.excavate.follow-echo
+    text: FOLLOW THE ECHO
+  - key: harvest.excavate.strong-echo
+    text: STRONG ECHO
+  - key: harvest.excavate.warm-return
+    text: WARM RETURN
+  - key: harvest.excavate.weak-return
+    text: WEAK RETURN
+  - key: harvest.excavate.echo-status
+    text: "{0}  \xB7  SEAM {1}/{2}  \xB7  {3} SCANS"
+  - key: harvest.excavate.located
+    text: SEAMS LOCATED {0}/{1}
+  - key: harvest.salvage.title
+    text: WRECKAGE SALVAGE
+  - key: harvest.salvage.metric
+    text: Caches recovered
+  - key: harvest.salvage.hint
+    text: Tap tumbling wreckage to catch it with your claw. Misses cost a cast
+  - key: harvest.salvage.help
+    text: "RECOVER {0} FRAGMENTS  \xB7  TAP A TARGET"
+  - key: harvest.salvage.locked
+    text: "FRAGMENT LOCKED  \xB7  {0}/{1}  \xB7  {2} CASTS"
+  - key: harvest.salvage.recovered-target
+    text: TARGET RECOVERED
+  - key: harvest.salvage.missed
+    text: "CLAW MISSED  \xB7  {0}/{1}  \xB7  {2} CASTS"
+  - key: harvest.salvage.aim
+    text: AIM AT WRECKAGE
+  - key: harvest.salvage.complete
+    text: RECOVERED {0}/{1} FRAGMENTS
+  - key: harvest.salvage.status
+    text: "CASTS {0}/{1}  \xB7  {2}"
+  - key: harvest.travel.title
+    text: ASTEROID FIELD
+  - key: harvest.travel.metric
+    text: Orbs collected
+  - key: harvest.travel.hint
+    text: Tap a lane to steer. Dodge rocks, grab orbs. Clean flying refunds fuel
+  - key: harvest.travel.status
+    text: Orbs {0}     Hits {1}
+  - key: hud.player-level
+    text: LV {0}
+  - key: travel.game.title
+    text: TRAVEL GAME
+  - key: travel.debug.legacy
+    text: 'PLAYING: LEGACY TAP GAME'
+  - key: travel.debug.hyperspace
+    text: 'PLAYING: HYPERSPACE RUN'
+  - key: travel.debug.overlay.on
+    text: 'PERFORMANCE OVERLAY: ON'
+  - key: travel.debug.overlay.off
+    text: 'PERFORMANCE OVERLAY: OFF'
+  - key: world.label.level
+    text: '{0}  LV{1}'
+  - key: world.label.building
+    text: '{0}  BUILDING'
+  - key: world.label.upgrading
+    text: '{0}  UPGRADING'
+  - key: travel.leg-progress
+    text: "Leg {0} / {1} \xB7 {2}s"
+  - key: travel.route-changed
+    text: Travel changed. Check your route and fuel, then try again.
+  - key: travel.arrived
+    text: Arrived at {0}
+  - key: travel.arrived.refund
+    text: "Arrived at {0} \xB7 +{1:N0} gal back"
+  - key: travel.autopilot
+    text: AUTOPILOT
+  - key: travel.autopilot.help
+    text: "Fuel x1.6 \xB7 no piloting refund"
+  - key: route.calculating
+    text: "Calculating route\u2026"
+  - key: route.already-here
+    text: You are here
+  - key: route.unknown
+    text: Destination unavailable
+  - key: route.no-drive
+    text: "Jump drive required \xB7 upgrade your ship"
+  - key: route.search-limit
+    text: "Route search limit \xB7 choose a nearer stop"
+  - key: route.out-of-range
+    text: "No route in jump range \xB7 upgrade your drive"
+  - key: route.hazard
+    text: "Hull plating required \xB7 see hazards below"
+  - key: route.fuel-short
+    text: "Need {0:N0} more gal \xB7 craft fuel"
+  - key: route.orbital
+    text: "{0} orbital hop \xB7 {1} ly"
+  - key: route.single-jump
+    text: "{0} jump \xB7 {1} ly"
+  - key: route.multiple-jumps
+    text: "{0} jumps \xB7 {1} ly"
+  - key: travel.legacy-leg-title
+    text: "{0} \xB7 LEG {1} / {2}"
+  - key: nav.backpack
+    text: BACKPACK
+  - key: common.back
+    text: BACK
+  - key: menu.ranks
+    text: RANKS
+  - key: menu.goals
+    text: GOALS
+  - key: menu.ascension
+    text: ASCENSION
+  - key: menu.atlas
+    text: ATLAS
+  - key: menu.tutorial
+    text: HOW TO PLAY
+  - key: menu.about
+    text: ABOUT
+  - key: menu.settings
+    text: SETTINGS
+  - key: menu.debug
+    text: DEBUG
+  - key: shop.economy
+    text: ECON
+  - key: shop.gather
+    text: GATHER
+  - key: shop.defense
+    text: DEFENSE
+  - key: shop.utility
+    text: UTILITY
+  - key: shop.summary
+    text: "Build on {0}  -  {1} / {2} free slots  \xB7  CREWS {3}/{4} busy. Tap a
+      structure on the planet to use it."
+  - key: shop.empty
+    text: Nothing here yet.
+  - key: shop.built
+    text: BUILT - tap it on the planet
+  - key: shop.no-harvest
+    text: Nothing to harvest on this planet
+  - key: shop.place
+    text: PLACE
+  - key: tutorial.build.title
+    text: 1. Build
+  - key: tutorial.build.body
+    text: Open Build on the bottom dock and place a Lumber Camp, then a Refinery
+      and a Warehouse.
+  - key: tutorial.storage.title
+    text: 2. Storage
+  - key: tutorial.storage.body
+    text: Your starter backpack has only 9 slots. Build a Warehouse early to store
+      extra resources and drag stacks between grids.
+  - key: tutorial.gather.title
+    text: 3. Gather
+  - key: tutorial.gather.body
+    text: Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and
+      collect resources.
+  - key: tutorial.refine.title
+    text: 4. Refine
+  - key: tutorial.refine.body
+    text: Tap the Refinery to turn raw resources into fuel.
+  - key: tutorial.defend.title
+    text: 5. Defend
+  - key: tutorial.defend.body
+    text: Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight
+      and bigger rewards. Gunners and Lasers defend automatically.
+  - key: tutorial.travel.title
+    text: 6. Travel
+  - key: tutorial.travel.body
+    text: Open Map on the bottom dock and spend fuel to visit new planets. Your bases
+      stay where you built them.
+  - key: tutorial.upgrade.title
+    text: 7. Upgrade
+  - key: tutorial.upgrade.body
+    text: Open Command on the bottom dock to manage your bases and unlock upgrades,
+      including more backpack space.
+  - key: about.title
+    text: FRONTIER
+  - key: about.body
+    text: Build bases across the stars. Gather, refine, travel, and defend your worlds
+      from alien waves.
+  - key: harvest.reward
+    text: +{0} {1}
+  - key: harvest.backpack-full
+    text: Backpack full!
+  - key: harvest.missed
+    text: Missed everything...
+  - key: harvest.overflow
+    text: Lost {0} (backpack full)
+  - key: wave.victory
+    text: WAVE CLEARED
+  - key: wave.defeat
+    text: REACTOR OVERLOADED
+  - key: wave.salvage
+    text: Salvage recovered
+  - key: wave.xp
+    text: +{0} XP
+  - key: wave.overflow
+    text: 'Backpack full - lost:'
+  - key: wave.defeat.help
+    text: The aliens broke through. No salvage this time.
+  - key: travel.skip-cinematic
+    text: SKIP
+  - key: hyperspace.title
+    text: HYPERSPACE RUN
+  - key: hyperspace.bomb
+    text: BOMB
+  - key: hyperspace.status
+    text: HULL {0}   SHIELD {1}/{2}
+  - key: hyperspace.score
+    text: '{0:N0} PTS   {1} KILLS   x{2}   {3:P0}'
+  - key: hyperspace.boss
+    text: GUARDIAN  /  PHASE {0}  /  {1:P0}
+  - key: hyperspace.bombs
+    text: BOMB  {0}/{1}
+  - key: hyperspace.overdrive-time
+    text: OVERDRIVE  {0:0.0}s
+  - key: hyperspace.shield-time
+    text: SHIELD RECHARGING  {0:0.0}s
+  - key: hyperspace.tip
+    text: 'Drag to steer and line up your shots. Bullets fly straight.
+
+      Dodge
+      the warning shapes. BOMB launches forward to the guardian line before exploding.'
+  - key: hyperspace.notice.boss
+    text: GUARDIAN APPROACHING
+  - key: hyperspace.notice.bomb
+    text: BOMB READY
+  - key: hyperspace.notice.overdrive
+    text: OVERDRIVE
+  - key: hyperspace.notice.shield
+    text: SHIELD BROKEN
+  - key: hyperspace.notice.clear
+    text: WAVE CLEAR
+  - key: hyperspace.pause.title
+    text: RUN PAUSED
+  - key: hyperspace.pause.help
+    text: Your route is frozen. Finishing early completes the trip without loot or
+      a fuel refund.
+  - key: hyperspace.finish
+    text: FINISH TRIP
+  - key: hyperspace.downed.title
+    text: HULL LOST
+  - key: hyperspace.downed.revive-help
+    text: Revive with half hull and 3 seconds of protection. Each revive reduces
+      your grade.
+  - key: hyperspace.downed.finish-help
+    text: No revives remain. You can still finish the trip, without loot or a fuel
+      refund.
+  - key: hyperspace.revive.free
+    text: "REVIVE \xB7 FREE"
+  - key: hyperspace.revive.offer
+    text: "REVIVE \xB7 VIEW OFFER"
+  - key: hyperspace.offer.pending
+    text: "WAITING FOR OFFER\u2026"
+  - key: hyperspace.result.grade
+    text: GRADE {0}
+  - key: hyperspace.result.title
+    text: TRIP COMPLETE
+  - key: hyperspace.result.summary
+    text: "{0} kills  \xB7  best combo x{1}\n{2} hits  \xB7  {3} revives"
+  - key: hyperspace.result.clean
+    text: Clean run!
+  - key: hyperspace.result.rewards
+    text: "+{0:N0} gal refunded  \xB7  +{1} XP"
+  - key: hyperspace.result.unfinished
+    text: 'You reached your destination.
+
+      No loot or fuel refund for an unfinished
+      run.'
+  - key: hyperspace.result.continue
+    text: CONTINUE TO DESTINATION
+  - key: guide.build.title
+    text: Build a Lumber Camp
+  - key: guide.gather.title
+    text: Gather your first wood
+  - key: guide.store.title
+    text: Build a Warehouse
+  - key: guide.craft.title
+    text: Craft your first recipe
+  - key: guide.defend.title
+    text: Clear an alien wave
+  - key: guide.travel.title
+    text: Land on a new world
+  - key: guide.build.help
+    text: Open BUILD > GATHER and place a Lumber Camp on this resource-rich home
+      world.
+  - key: guide.gather.help
+    text: Tap the Lumber Camp and complete its wood mini-game. Better runs fill your
+      pack faster.
+  - key: guide.store.help
+    text: Your backpack is small by design. Store extra resources in a Warehouse
+      before expanding your haul.
+  - key: guide.craft.help
+    text: Build a Refinery, tap it, and craft a recipe from gathered materials. Each
+      recipe is recorded in the Atlas.
+  - key: guide.defend.help
+    text: Build an Alarm if needed, tap it, and call a wave when you are ready. Defend
+      your base; planets cannot be attacked.
+  - key: guide.travel.help
+    text: Open the map, choose a reachable world, and spend fuel to land there.
+  - key: guide.skip
+    text: Skip first-session objectives
+  - key: guide.progress
+    text: '{0} / {1}'
+  - key: guide.complete.title
+    text: Your frontier is open
+  - key: guide.complete.help
+    text: You have built, gathered, crafted, defended, and traveled. Follow the Atlas
+      and grow outward at your own pace.
+  - key: guide.action.atlas
+    text: OPEN ATLAS
+  - key: guide.action.gather-shop
+    text: OPEN GATHER SHOP
+  - key: guide.action.lumber
+    text: OPEN LUMBER CAMP
+  - key: guide.action.build-shop
+    text: OPEN BUILD SHOP
+  - key: guide.action.refinery
+    text: OPEN REFINERY
+  - key: guide.action.alarm
+    text: OPEN ALARM
+  - key: guide.action.alarm-shop
+    text: OPEN ALARM SHOP
+  - key: guide.action.map
+    text: OPEN MAP
+  - key: guide.structure-appearing
+    text: This structure is still appearing. Try again in a moment.
+  - key: guide.gatherer-appearing
+    text: This gatherer is still appearing. Try again in a moment.
+  - key: pack.capacity
+    text: '{0} / {1} slots used'
+  - key: pack.capacity.rearrange
+    text: '{0} / {1} slots used  -  drag to rearrange'
+  - key: pack.empty.title
+    text: Your backpack is empty
+  - key: pack.empty.help
+    text: Resources from harvest runs go here. Use a gatherer on this world, then
+      collect the result to bring materials back.
+  - key: pack.open-gatherer
+    text: OPEN {0}
+  - key: pack.slot-count
+    text: 'In this slot: {0} / {1}'
+  - key: pack.total-count
+    text: 'Total carried: {0}'
+  - key: pack.select-help
+    text: Tap an item to see its details.
+  - key: pack.salvage.title
+    text: RECOVERED SURFACE SALVAGE
+  - key: pack.salvage.waiting
+    text: '{0} waiting on {1}'
+  - key: pack.salvage.claim
+    text: CLAIM
+  - key: pack.salvage.added
+    text: Surface salvage added to backpack
+  - key: pack.salvage.full
+    text: Make room in your backpack to claim salvage
+  - key: pack.upgrade-help
+    text: Upgrade the backpack in Command > Research for more slots.
+  - key: relay.summary
+    text: "{0} \xB7 LV {1} \xB7 {2}"
+  - key: relay.beam.range
+    text: '{0} LY beam'
+  - key: relay.beam.system
+    text: system beam
+  - key: relay.help
+    text: Pull stacks from operational storage on other visited worlds. Each pull
+      costs energy based on stack size and distance; only fuel in your backpack can
+      pay. Fuel Depot reserves stay isolated.
+  - key: relay.empty
+    text: No remote warehouses are in range. Build storage on another visited world,
+      or upgrade the relay to extend its beam.
+  - key: relay.range.system
+    text: SAME SYSTEM
+  - key: relay.range.distance
+    text: '{0:0.#} LY'
+  - key: relay.pull
+    text: "PULL {0} \xB7 {1:N0} GAL"
+  - key: relay.transferred
+    text: Relayed {0} {1}
+  - key: relay.blocked
+    text: 'Transfer blocked: check backpack space and carried fuel.'
+  - key: relay.storage-empty
+    text: This storage is empty. Visit {0} and deposit resources there before pulling
+      them through the relay.
+  - key: storage.summary
+    text: '{0}  -  LV {1}  -  {2} / {3} storage slots'
+  - key: storage.help.fuel
+    text: Fuel Depot stores ship-fuel resources only. Its upgraded racks hold larger
+      fuel stacks; reserves stay on this planet and never pay travel costs.
+  - key: storage.help.harvester
+    text: This hopper stores the Auto-Harvester's offline output. A local Cargo Depot
+      connects its materials to this planet's shared build and craft pool.
+  - key: storage.help.cargo
+    text: This shared buffer joins operational Warehouses and Auto-Harvester hoppers
+      on this planet. Build and craft costs draw from the pool automatically; travel
+      still uses your backpack.
+  - key: storage.help.connected
+    text: Connected to this planet's Cargo Depot. Build and craft costs can draw
+      from this storage automatically.
+  - key: storage.help.warehouse
+    text: Drag a stack between the grids. Resources stay on this planet. Costs use
+      the backpack until a Cargo Depot connects its storage.
+  - key: storage.offline
+    text: "OFFLINE {0:0.#} run-eq/hr  \xB7  {1}h cap"
+  - key: storage.filter.all
+    text: ALL RESOURCES
+  - key: storage.filter.help
+    text: Filter both grids by resource family
+  - key: resource.category.raw
+    text: RAW
+  - key: resource.category.processed
+    text: PROCESSED
+  - key: resource.category.alloy
+    text: ALLOY
+  - key: resource.category.component
+    text: COMPONENT
+  - key: resource.category.energy
+    text: ENERGY
+  - key: storage.quick-store
+    text: QUICK STORE
+  - key: storage.quick-withdraw
+    text: QUICK WITHDRAW
+  - key: storage.title.fuel
+    text: FUEL RESERVE
+  - key: storage.title.harvester
+    text: HARVESTER HOPPER
+  - key: storage.title.cargo
+    text: SHARED BUFFER
+  - key: storage.title.warehouse
+    text: WAREHOUSE
+  - key: storage.stored-count
+    text: '{0}: {1} stored'
+  - key: storage.stack-full
+    text: That stack is full.
+  - key: storage.drop-help
+    text: Drop on an empty slot or the same resource.
+  - key: storage.pack-slot-full
+    text: Backpack slot is full.
+  - key: storage.empty.harvester
+    text: No offline output yet. Leave this operational harvester on a world with
+      compatible deposits and return later.
+  - key: storage.empty.both
+    text: Storage and backpack are empty. Gather local resources first, then return
+      here to deposit them.
+  - key: storage.empty.fuel
+    text: No fuel is reserved here. Quick Store transfers fuel from ship tanks to
+      this depot; Quick Withdraw refills the tanks. Craft fuel first if your tanks
+      are empty.
+  - key: storage.empty.warehouse
+    text: No resources stored yet. Drag a carried stack from the backpack below into
+      an empty storage slot.
+  - key: storage.find-resources
+    text: FIND LOCAL RESOURCES
+  - key: storage.pack-capacity
+    text: BACKPACK  -  {0} / {1}
+  - key: storage.carried-count
+    text: '{0}: {1} carried'
+  - key: storage.fuel-only
+    text: Fuel depots only accept resources that power the ship.
+  - key: storage.fuel-slot-full
+    text: Fuel slot is full or contains another resource.
+  - key: storage.slot-full
+    text: Storage slot is full or contains another resource.
+  - key: storage.pack-full
+    text: BACKPACK FULL
+  - key: storage.quick-stored
+    text: Stored {0} items.
+  - key: storage.quick-withdrew
+    text: Withdrew {0} items.
+  - key: storage.quick-store-empty
+    text: No matching backpack resources fit in this storage.
+  - key: storage.quick-withdraw-empty
+    text: No matching stored resources fit in the backpack.
+  - key: settings.assist.on
+    text: 'ASSIST MODE: ON'
+  - key: settings.assist.off
+    text: 'ASSIST MODE: OFF'
+  - key: settings.assist.help
+    text: 'Assist mode: easier travel, lower rewards.'
+  - key: settings.drag-sensitivity
+    text: TRAVEL DRAG SENSITIVITY
+  - key: settings.drag-value
+    text: '{0:0.0}x'
+  - key: goals.title
+    text: YOUR NEXT FRONTIER
+  - key: goals.help
+    text: One-time rewards for real progress. Older completed milestones are recorded
+      without a payout.
+  - key: goals.unavailable
+    text: Goals are unavailable because the content catalogue could not be loaded.
+      Your progression is unchanged; restart after repairing or updating the game.
+  - key: goals.summary
+    text: '{0} / {1} collected  |  {2} ready'
+  - key: goals.read-only
+    text: This save is read-only. Rewards cannot be collected until a compatible
+      build can save it.
+  - key: goals.ready
+    text: READY TO COLLECT
+  - key: goals.next
+    text: NEXT OBJECTIVES
+  - key: goals.show-three
+    text: SHOW NEXT THREE
+  - key: goals.show-all
+    text: SHOW ALL {0} OBJECTIVES
+  - key: goals.hide-collected
+    text: HIDE COLLECTED
+  - key: goals.show-collected
+    text: VIEW {0} COLLECTED
+  - key: goals.recorded
+    text: Collected / recorded
+  - key: goals.complete
+    text: Complete
+  - key: goals.progress
+    text: '{0} / {1}'
+  - key: goals.reward-summary
+    text: '{0}  |  {1} Nova Shards'
+  - key: goals.collect
+    text: COLLECT {0} SHARDS
+  - key: goals.action.command
+    text: OPEN COMMAND
+  - key: goals.action.recipe
+    text: FIND RECIPE IN ATLAS
+  - key: research.tab.tech
+    text: TECH
+  - key: research.tab.ship
+    text: SHIP
+  - key: research.tab.defense
+    text: DEFENSE
+  - key: research.unavailable
+    text: Research is not configured for this database.
+  - key: research.all
+    text: All research
+  - key: research.branch
+    text: RESEARCH BRANCH
+  - key: research.complete
+    text: COMPLETE
+  - key: research.tier
+    text: XP LV {0}
+  - key: research.lab
+    text: "{0}  \xB7  LAB {1}"
+  - key: research.prerequisites
+    text: "PREREQUISITES  \xB7  {0}"
+  - key: research.complete-help
+    text: 'Research complete. Unlocks: {0}'
+  - key: research.buy
+    text: RESEARCH
+  - key: research.purchased
+    text: '{0} researched'
+  - key: research.unlocks
+    text: "UNLOCKS  \xB7  {0}"
+  - key: research.progression
+    text: Progression
+  - key: tools.title
+    text: CATALOG TOOL TIERS
+  - key: tools.help
+    text: Better tools improve harvest yield. XP level, research and materials determine
+      when upgrades unlock.
+  - key: tools.max
+    text: MAX TIER
+  - key: tools.tier
+    text: TIER {0}/{1}
+  - key: tools.yield
+    text: "{0}  \xB7  YIELD x{1:0.0}"
+  - key: tools.max-help
+    text: Maximum tool tier reached.
+  - key: tools.next
+    text: "NEXT  \xB7  {0}  \xB7  YIELD x{1:0.0}"
+  - key: tools.upgrade
+    text: UPGRADE TOOL
+  - key: tools.purchased
+    text: '{0} ready!'
+  - key: command.bases
+    text: BASES
+  - key: command.tools
+    text: TOOLS
+  - key: command.upgrades
+    text: UPGRADES
+  - key: tools.equipped-summary
+    text: 'Equipped: {0}   DMG x{1:0.0}   Yield x{2:0.0}'
+  - key: tools.level-summary
+    text: DMG x{0:0.0}   Yield x{1:0.0}   Faster swing
+  - key: tools.equipped
+    text: EQUIPPED
+  - key: tools.owned
+    text: OWNED
+  - key: tools.next-state
+    text: NEXT
+  - key: tools.locked
+    text: LOCKED
+  - key: command.upgrade
+    text: UPGRADE
+  - key: command.here
+    text: YOU ARE HERE
+  - key: command.empty-base
+    text: Start a base on {0} with a local resource gatherer. Store extra materials
+      in a Warehouse, then add a Refinery.
+  - key: command.structure-level
+    text: '{0}  LV {1}/{2}'
+  - key: command.upgrade-started
+    text: "Upgrade started \xB7 {0}"
+  - key: command.upgraded
+    text: '{0} LV {1}'
+  - key: command.maxed
+    text: MAXED
+  - key: command.no-bases
+    text: Build a refinery and an alarm to establish a base.
+  - key: command.level
+    text: LV {0}/{1}
+  - key: command.effect.current
+    text: Now {0}
+  - key: command.effect.next
+    text: Now {0}  >  {1}
+  - key: effect.damage
+    text: dmg {0}
+  - key: effect.storage
+    text: '{0} storage slots'
+  - key: effect.fuel-storage
+    text: '{0} fuel slots'
+  - key: effect.fuel-storage-stack
+    text: "{0} fuel slots \xB7 +{1}% fuel stack"
+  - key: effect.offline-harvest
+    text: "{0:0.#} runs/hr \xB7 {1}h offline \xB7 {2} output slots"
+  - key: effect.beam.range
+    text: "{0} ly beam \xB7 {1}% energy"
+  - key: effect.beam.system
+    text: "system beam \xB7 {1}% energy"
+  - key: effect.lab
+    text: Research Lab level {0}
+  - key: effect.survey
+    text: +{0} ly local survey
+  - key: effect.builders
+    text: +{0} builder crews
+  - key: effect.warp-gate
+    text: "-{0}% fuel \xB7 +{0}% jump range"
+  - key: effect.dyson
+    text: "{0:0} energy/hr \xB7 {1}h reserve"
+  - key: effect.terraformer
+    text: +{0}% global harvest
+  - key: effect.batch
+    text: Batch size {0} (level bonus planned)
+  - key: effect.output
+    text: +{0}% output
+  - key: effect.yield
+    text: +{0}% yield
+  - key: effect.rewards
+    text: +{0}% rewards, XP
+  - key: effect.tool-power
+    text: x{0:0.0} yield
+  - key: effect.pack-slots
+    text: +{0} slots
+  - key: effect.fire-rate
+    text: +{0}% firing speed
+  - key: effect.health
+    text: +{0} HP
+  - key: effect.range
+    text: '{0:0} ly'
+  - key: effect.fuel-use
+    text: -{0}% fuel use
+  - key: effect.tank-slots
+    text: +{0:0} dedicated fuel tank racks
+  - key: effect.plating
+    text: Protection level {0}
+  - key: effect.stack-multiplier
+    text: x{0:0.00} stacks (coming later)
+  - key: effect.percent
+    text: +{0}%
+  - key: wave.tap-help
+    text: Tap aliens to zap them
+  - key: wave.progress
+    text: WAVE {0}   {1} / {2}
+  - key: wave.reactor
+    text: REACTOR {0}
+  - key: structure.ready
+    text: READY
+  - key: structure.builder
+    text: Builder crew assigned
+  - key: structure.stage
+    text: "STAGE {0} / {1}  \xB7  {2}"
+  - key: structure.terraformer.pending
+    text: The global harvest bonus activates when this timer completes.
+  - key: structure.warp.pending
+    text: Range and fuel effects activate when complete and apply only to trips leaving
+      this world.
+  - key: structure.dyson.pending
+    text: Fuel production starts when complete; collected fuel stays in this world's
+      reserve.
+  - key: structure.offline-time
+    text: Jobs use local device time in this offline build.
+  - key: structure.offline
+    text: STRUCTURE OFFLINE
+  - key: structure.planned
+    text: '{0} gameplay is planned for a future update.'
+  - key: structure.header
+    text: "{0}  LV\_{1}"
+  - key: structure.max
+    text: MAX LEVEL
+  - key: structure.upgrade-preview
+    text: UPGRADE TO LV {0}  ({1})
+  - key: obstacle.clearing
+    text: "CLEARING  \xB7  {0}"
+  - key: obstacle.completing
+    text: CLEARANCE COMPLETING
+  - key: obstacle.skip
+    text: "SKIP  \xB7  {0} SHARDS"
+  - key: obstacle.title
+    text: SURFACE OBSTRUCTION
+  - key: obstacle.cost
+    text: CLEARANCE COST
+  - key: obstacle.free
+    text: No materials required
+  - key: obstacle.salvage
+    text: RECOVERABLE SALVAGE
+  - key: obstacle.shards
+    text: +{0} shards
+  - key: obstacle.timer-help
+    text: Clearance continues while you explore. Timers use local device time.
+  - key: obstacle.cleared
+    text: Obstruction cleared
+  - key: obstacle.skip-blocked
+    text: Not enough shards to finish clearance
+  - key: obstacle.clear-now
+    text: CLEAR NOW
+  - key: obstacle.assign
+    text: ASSIGN CLEARANCE
+  - key: obstacle.assigned
+    text: Clearance crew assigned
+  - key: obstacle.blocked
+    text: Clearance could not start
+  - key: gather.tool
+    text: 'Tool: {0}  (LV {1}, damage x{2:0.0})'
+  - key: gather.title
+    text: GATHER ON THIS PLANET
+  - key: gather.empty
+    text: NOTHING TO GATHER HERE
+  - key: gather.harvest
+    text: HARVEST
+  - key: gather.drill
+    text: DRILL
+  - key: gather.siphon
+    text: SIPHON
+  - key: gather.excavate
+    text: EXCAVATE
+  - key: gather.salvage
+    text: SALVAGE
+  - key: gather.chop
+    text: CHOP
+  - key: gather.mine
+    text: MINE
+  - key: gather.estimate
+    text: about {0} per run
+  - key: craft.capacity.one
+    text: "BATCH CAPACITY  \xB7  {0} CRAFT PER TAP"
+  - key: craft.capacity.many
+    text: "BATCH CAPACITY  \xB7  {0} CRAFTS PER TAP"
+  - key: craft.pooled-help
+    text: Recipe inputs draw from this planet's backpack and pooled Warehouses. Outputs
+      go to the backpack.
+  - key: craft.pack-help
+    text: Recipe inputs and outputs use the backpack.
+  - key: craft.recipes
+    text: RECIPES  -  you give  >  you get
+  - key: craft.inputs
+    text: "INPUT \xB7 BATCH x{0}"
+  - key: craft.outputs
+    text: "OUTPUT \xB7 BATCH x{0}"
+  - key: craft.have
+    text: 'You have: {0}'
+  - key: craft.make-batch
+    text: MAKE BATCH x{0}
+  - key: craft.make-all
+    text: MAKE ALL ({0})
+  - key: craft.blocked
+    text: Not enough room or materials
+  - key: wave.call-help
+    text: Clear waves to earn XP and unlock upgrades. More fuel attracts more aliens,
+      with higher health, damage and speed.
+  - key: wave.preview
+    text: WAVE {0}  -  {1} ALIENS
+  - key: wave.scaling
+    text: Health x{0:0.00}   Damage x{1:0.00}   Speed x{2:0.00}
+  - key: wave.armor
+    text: '{0}% ARMOR'
+  - key: wave.rewards
+    text: VICTORY REWARDS
+  - key: wave.call
+    text: CALL
+  - key: wave.need-fuel
+    text: NEED FUEL
+  - key: wave.call-blocked
+    text: Cannot call this wave. Check your fuel or wait for the current wave.
+  - key: build.pad-help
+    text: TAP A GLOWING PAD
+  - key: build.started
+    text: '{0} construction started'
+  - key: build.completed
+    text: '{0} built!'
+  - key: build.resources-missing
+    text: Not enough resources
+  - key: duration.hours-minutes
+    text: '{0}h {1:00}m'
+  - key: duration.minutes-seconds
+    text: '{0}m {1:00}s'
+  - key: duration.seconds
+    text: '{0}s'
+  - key: structure.terraformer.subtitle
+    text: Planet-wide harvest program
+  - key: structure.terraformer.bonus
+    text: GLOBAL HARVEST BONUS
+  - key: structure.terraformer.yield
+    text: +{0}% harvest yield on all worlds
+  - key: structure.megaproject-stages
+    text: 'Megaproject stages completed: {0}'
+  - key: structure.warp.subtitle
+    text: Extends outbound reach and lowers fuel use
+  - key: structure.warp.bonus
+    text: 'Local bonus: -{0}% fuel, +{0}% jump range.'
+  - key: structure.warp.range
+    text: 'Jump range from this world: {0:0} ly  ->  {1:0} ly'
+  - key: structure.warp.discount
+    text: 'Combined departure fuel discount: {0:0.#}% (local Hangar + Warp Gate).
+      Applies only when leaving this world.'
+  - key: structure.dyson.subtitle
+    text: Offline fuel generation
+  - key: structure.dyson.production
+    text: "Production: {0:N0} gal / hour  \xB7  {1:0}h reserve"
+  - key: structure.dyson.reserve
+    text: 'Stored reserve: {0:N0} / {1:N0} gal'
+  - key: structure.dyson.help
+    text: Unclaimed fuel stays here if your ship tanks are full. A full reserve pauses
+      production.
+  - key: structure.dyson.collect
+    text: COLLECT {0:N0} GAL
+  - key: structure.dyson.full
+    text: SHIP TANKS FULL
+  - key: structure.dyson.empty
+    text: NO FUEL READY
+  - key: structure.dyson.collected
+    text: Collected {0:N0} gal
+  - key: structure.lab.subtitle
+    text: Research and tool upgrades
+  - key: structure.lab.help
+    text: Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced
+      research.
+  - key: structure.hub.subtitle
+    text: Builder crew capacity
+  - key: structure.hub.capacity
+    text: "Hub bonus: +{0} crew  \xB7  Colony total: {1}/{2}"
+  - key: structure.hub.help
+    text: Hub upgrades add crews at levels 3 and 7. This Hub reduces local obstacle-clearance
+      material costs by {0:0.#}%.
+  - key: structure.radar.subtitle
+    text: Expands local survey coverage
+  - key: structure.radar.coverage
+    text: 'Coverage around this system: {0:0} ly  (+{1:0} ly from tower)'
+  - key: structure.radar.help
+    text: Reveals additional systems and their resource deposits on the star map.
+  - key: structure.hangar.subtitle
+    text: Reduces fuel for trips leaving this planet
+  - key: structure.hangar.discount
+    text: 'Departure discount: {0:0.#}%'
+  - key: structure.hangar.help
+    text: This combines local Hangar and Warp Gate discounts for manual and autopilot
+      routes. Other planets use their own structures.
+  - key: structure.shield.subtitle
+    text: Reinforces this planet's reactor during called waves
+  - key: structure.shield.maximum
+    text: "Reactor maximum: {0:0.#}  \xB7  +{1:0.#}% shield field"
+  - key: structure.shield.help
+    text: Only the planet with this operational Pylon receives the extra reactor
+      health.
+  - key: structure.repair.subtitle
+    text: Repairs reactor damage during called waves
+  - key: structure.repair.rate
+    text: 'Repair rate: {0:0.##} health / second'
+  - key: structure.repair.help
+    text: Repairs stop at the reactor's maximum health and do not affect other planets.
+  - key: structure.turret.missile
+    text: Splash missiles hit clustered raiders during waves
+  - key: structure.turret.tesla
+    text: Lightning chains between nearby raiders during waves
+  - key: structure.turret.automatic
+    text: Fires automatically during waves
+  - key: structure.turret.stats
+    text: DAMAGE {0:0.#}     RANGE {1:0}
+  - key: wave.modifier
+    text: '{0} - {1}'
+  - key: wave.rank.elite
+    text: ELITE
+  - key: wave.rank.boss
+    text: BOSS
+  - key: wave.alien
+    text: '{0} x{1}'
+  - key: wave.ranked-alien
+    text: '{2} {0} x{1}'
+  - key: effect.builders-discount
+    text: "+{0} crews \xB7 -{1:0.#}% clearance cost"
+  - key: builders.view
+    text: CONSTRUCTION JOBS
+  - key: builders.jobs-title
+    text: CONSTRUCTION
+  - key: command.tech
+    text: TECH
+  - key: builders.tab
+    text: CREWS
+  - key: builders.help
+    text: Construction, upgrades and clearance use your shared builder crews. Timers
+      use local device time. Finish a structure job with Nova Shards or for free
+      near completion; review and confirm before spending.
+  - key: builders.summary
+    text: "{0} / {1} crews busy  \xB7  {2} Nova Shards"
+  - key: builders.structure
+    text: "{0}  \xB7  {1}"
+  - key: builders.finish-free
+    text: FINISH FREE
+  - key: builders.confirm-free
+    text: TAP AGAIN TO FINISH FREE
+  - key: builders.finish-paid
+    text: "FINISH  \xB7  {0} SHARDS"
+  - key: builders.confirm-paid
+    text: "CONFIRM  \xB7  {0} SHARDS"
+  - key: builders.clearance
+    text: "Clearance  \xB7  {0}  \xB7  Pad {1}"
+  - key: builders.manage-clearance
+    text: MANAGE CLEARANCE
+  - key: builders.view-world
+    text: VIEW WORLD ON MAP
+  - key: builders.clearance-unavailable
+    text: This clearance is no longer available on the surface.
+  - key: builders.empty
+    text: All crews are available. Build a structure, start an upgrade or assign
+      obstacle clearance to give them a job.
+  - key: builders.read-only
+    text: This save is read-only. Shard and free finishing are disabled.
+  - key: builders.unknown-world
+    text: 'This job references an unavailable world: {0}. Reload the save to recover
+      its crew assignment.'
+  - key: builders.recruit-title
+    text: EXPAND YOUR CREWS
+  - key: builders.recruit-help
+    text: Earn your second crew through Field Engineering. Additional crews can be
+      recruited with shards or earned from Colony Hub upgrades. All sources share
+      the crew cap.
+  - key: builders.recruit-offer
+    text: Recruit crew {0} of {1}
+  - key: builders.recruit
+    text: "RECRUIT  \xB7  {0} SHARDS"
+  - key: builders.recruit-confirm
+    text: "CONFIRM RECRUIT  \xB7  {0} SHARDS"
+  - key: builders.cap-reached
+    text: Shared crew cap reached. No purchase is needed.
+  - key: builders.earn-second
+    text: Progress to two crews before recruiting.
+  - key: hyperspace.revive.balance
+    text: '{0} Nova Shards available'
+  - key: hyperspace.revive.shards
+    text: "REVIVE  \xB7  {0} SHARDS"
+  - key: hyperspace.revive.shards-confirm
+    text: "CONFIRM REVIVE  \xB7  {0} SHARDS"
+  - key: hyperspace.revive.read-only
+    text: This save is read-only. Shard revives are disabled.
+  - key: map.recenter
+    text: Recenter on your ship
+  - key: map.search.tooltip
+    text: Known system/world name, canonical id, or x,y light-years
+  - key: ascension.title
+    text: ASCENSION {0}
+  - key: ascension.disabled
+    text: Ascension is not enabled in this build. Your current universe and progression
+      are unchanged.
+  - key: ascension.legacy-points
+    text: Legacy points
+  - key: ascension.harvest-yield
+    text: Harvest yield
+  - key: ascension.score-multiplier
+    text: Score multiplier
+  - key: ascension.summary
+    text: Optional. Stay in this universe as long as you like. Ascension begins a
+      new seeded frontier with a permanent Legacy harvest bonus and the rank score
+      multiplier.
+  - key: ascension.keeps
+    text: 'KEEP: Nova Shards, Atlas knowledge, researched blueprints, saved cosmetic/settings
+      records and one-time achievement history.'
+  - key: ascension.resets
+    text: 'RESTART: worlds, structures, cargo, fuel, storage, planet links, lightspeed,
+      the archive, tools, purchased upgrades, XP, waves and active builder jobs.
+      Megaproject bonuses must be built again.'
+  - key: ascension.next-yield
+    text: 'Next Legacy harvest yield: x{0:0.00}. The authored bonus caps at +{1:0}%;
+      one-time rewards cannot be farmed again.'
+  - key: ascension.recovery
+    text: A local recovery copy retains the previous universe. This replaces any
+      earlier recovery copy; it is not a cloud backup.
+  - key: ascension.open-command
+    text: OPEN COMMAND
+  - key: ascension.open-build
+    text: OPEN BUILD SHOP
+  - key: ascension.review
+    text: REVIEW NEW UNIVERSE
+  - key: ascension.confirm-prompt
+    text: Replace this universe and restart with the retained progress listed above?
+      You will return to the home world.
+  - key: ascension.confirm
+    text: CONFIRM NEW UNIVERSE
+  - key: ascension.stay
+    text: STAY IN THIS UNIVERSE
+  - key: ascension.lock.read-only
+    text: This save is read-only.
+  - key: ascension.lock.unavailable
+    text: Ascension content is unavailable.
+  - key: ascension.lock.disabled
+    text: Ascension is not enabled in this build.
+  - key: ascension.lock.maximum
+    text: Maximum Legacy progression reached.
+  - key: ascension.lock.research
+    text: Research Ascension Protocol in Command.
+  - key: ascension.lock.project
+    text: Complete stage {0} of a megaproject in this universe.
+  - key: ascension.save-retry
+    text: Ascension completed, but the updated local save needs a retry. Keep the
+      game open. {0}
+  - key: ascension.completed
+    text: Ascension {0} complete. Your previous universe is retained in the local
+      recovery copy.
+  - key: map.search.placeholder
+    text: World / system name or x,y
+  - key: map.search.find
+    text: FIND
+  - key: map.filter.tooltip
+    text: Filter systems by surveyed deposits
+  - key: map.filter.all
+    text: All deposits
+  - key: map.help
+    text: Tap a planet to choose it. Drag or pinch to explore.
+  - key: map.mode.universe
+    text: Universe Map
+  - key: map.mode.orbits
+    text: Planet Orbits
+  - key: map.search.empty
+    text: Enter a world name or x,y
+  - key: map.search.coordinates
+    text: "Coordinates in light-years \xB7 zoom out to explore"
+  - key: map.search.not-found
+    text: "Not found \xB7 search an exact surveyed world/system name or x,y"
+  - key: map.unavailable
+    text: "Map unavailable \xB7 pan or zoom to retry"
+  - key: map.view.galaxy
+    text: "Galaxy \xB7 zoom in for stars"
+  - key: map.view.system
+    text: "System \xB7 orbits schematic"
+  - key: map.view.sector
+    text: "Sector \xB7 {0} stars"
+  - key: map.view.truncated
+    text: "{0} \xB7 zoom in for more"
+  - key: map.here
+    text: YOU ARE HERE
+  - key: map.tier
+    text: TIER {0}
+  - key: map.world.subtitle
+    text: "{0} \xB7 {1} \xB7 {2}"
+  - key: map.unpin
+    text: UNPIN LOCATION
+  - key: map.pin
+    text: PIN LOCATION
+  - key: map.next-stop
+    text: "NO DIRECT ROUTE \xB7 SUGGESTED NEXT STOP"
+  - key: map.next-stop.tooltip
+    text: Set {0} as the next stop toward {1}
+  - key: map.autopilot.help
+    text: "Autopilot \xB7 fuel x1.6, no refund"
+  - key: map.calculating
+    text: "Calculating\u2026"
+  - key: map.price.autopilot
+    text: "{0:N0} / {1:N0} gal aboard \xB7 {2}s"
+  - key: map.price.manual
+    text: "{0:N0} / {1:N0} gal aboard \xB7 {2}s estimate"
+  - key: map.action.calculating
+    text: "CALCULATING\u2026"
+  - key: map.action.autopilot
+    text: "AUTOPILOT \xB7 {0:N0} GAL"
+  - key: map.action.pilot
+    text: "PILOT \xB7 {0:N0} GAL"
+  - key: map.action.unavailable
+    text: ROUTE UNAVAILABLE
+  - key: map.travel.tooltip
+    text: Travel to {0}
+  - key: map.world.summary
+    text: "{0} building slots \xB7 danger {1:0.0}"
+  - key: map.world.summary-base
+    text: "{0} building slots \xB7 danger {1:0.0} \xB7 BASE"
+  - key: map.hazards.none
+    text: No environmental hazards
+  - key: map.hazards.required
+    text: "Hazards: {0} \xB7 hull level {1} per hazard"
+  - key: map.hazards.ready
+    text: "HULL READY \xB7 SAFE TO LAND"
+  - key: map.hazards.gap
+    text: '{0} plating {1} / {2}'
+  - key: map.hazards.disabled
+    text: Landing protection is disabled in development settings
+  - key: map.resources
+    text: "RESOURCES \xB7 HOW TO HARVEST"
+  - key: map.unsurveyed
+    text: UNSURVEYED
+  - key: map.survey.help
+    text: Fly within {0:0} ly of this system to reveal its deposits.
+  - key: map.deposit
+    text: "{0} \xB7 richness x{1:0.00} \xB7 yield {2}"
+  - key: map.worlds-in
+    text: WORLDS IN {0}
+  - key: map.pins
+    text: PINNED LOCATIONS
+  - key: map.pins.empty
+    text: Pin a world to keep its destination handy.
+  - key: map.pinned-world
+    text: "{0} \xB7 {1}"
+  - key: atlas.resources
+    text: RESOURCES
+  - key: atlas.recipes
+    text: ALLOYS & RECIPES
+  - key: atlas.worlds
+    text: WORLDS
+  - key: atlas.bestiary
+    text: BESTIARY
+  - key: atlas.structures
+    text: STRUCTURES
+  - key: atlas.notes
+    text: FIELD NOTES  /  CATALOG DATA
+  - key: atlas.summary.resources-recipes
+    text: "RESOURCES  {0}/{1}  \xB7  RECIPES  {2}/{3}"
+  - key: atlas.summary.structures
+    text: STRUCTURES  {0}/{1}
+  - key: atlas.summary.aliens
+    text: ALIENS  {0}/{1}
+  - key: atlas.help
+    text: Find resources, craft recipes and complete builds to discover entries and
+      earn one-time Nova Shards. World visits are tracked separately.
+  - key: atlas.resource.family
+    text: RESOURCE FAMILY
+  - key: atlas.resource.empty
+    text: No resources are configured for this family.
+  - key: atlas.resource
+    text: RESOURCE
+  - key: atlas.resource.summary
+    text: '{0}  /  TIER {1}  /  STACK {2}'
+  - key: atlas.resource.discovered
+    text: DISCOVERED
+  - key: atlas.resource.undiscovered
+    text: "NOT DISCOVERED  \xB7  FIRST FIND EARNS SHARDS"
+  - key: atlas.resource.where
+    text: WHERE TO FIND IT
+  - key: atlas.resource.belt
+    text: Asteroid belt
+  - key: atlas.resource.habitat
+    text: "{0}  \xB7  {1}  \xB7  tier {2}+"
+  - key: atlas.resource.harvest
+    text: '{0} harvest'
+  - key: atlas.resource.processed
+    text: Produced by processing or crafting.
+  - key: atlas.resource.samples
+    text: SURVEYED WORLD SAMPLES
+  - key: atlas.resource.samples.empty
+    text: No visited surveyed worlds with this resource yet.
+  - key: atlas.resource.sample
+    text: "{0}  \xB7  {1:0.#} LY FROM HOME"
+  - key: atlas.resource.find
+    text: FIND SURVEYED DEPOSITS
+  - key: atlas.resource.use-structure
+    text: "{0}  \xB7  Structure"
+  - key: atlas.resource.use-upgrade
+    text: "{0}  \xB7  Upgrade"
+  - key: atlas.resource.uses
+    text: ALSO USED TO BUILD / UPGRADE
+  - key: atlas.resource.related
+    text: MADE FROM  /  USED IN
+  - key: atlas.resource.related.empty
+    text: No recipes reference this resource yet.
+  - key: atlas.recipes.empty
+    text: No recipes are configured.
+  - key: atlas.recipes.help
+    text: Follow the input-to-output flow. Station, XP level and research gates are
+      shown on each recipe.
+  - key: atlas.recipe.gate
+    text: "{0}  \xB7  XP LV {1}  \xB7  {2} LV {3}"
+  - key: atlas.recipe.gate-research
+    text: "{0}  \xB7  XP LV {1}  \xB7  {2} LV {3}  \xB7  RESEARCH: {4}"
+  - key: atlas.recipe.crafted
+    text: CRAFTED
+  - key: atlas.recipe.uncrafted
+    text: "NOT CRAFTED  \xB7  FIRST CRAFT EARNS SHARDS"
+  - key: atlas.recipe.input
+    text: INPUT
+  - key: atlas.recipe.output
+    text: OUTPUT
+  - key: atlas.worlds.empty
+    text: No visited worlds are recorded yet.
+  - key: atlas.worlds.help
+    text: "VISITED WORLDS  \xB7  TRACKED SEPARATELY FROM CATALOG DISCOVERIES"
+  - key: atlas.world.summary
+    text: "{0}  \xB7  {1}  \xB7  TIER {2}  \xB7  {3}"
+  - key: atlas.world.hazards
+    text: "DANGER {0:0.0}  \xB7  HAZARDS {1}"
+  - key: atlas.world.hazards.none
+    text: NONE
+  - key: atlas.world.resources
+    text: AVAILABLE RESOURCES
+  - key: atlas.structure.unknown
+    text: UNKNOWN STRUCTURE
+  - key: atlas.structure.summary
+    text: "{0}  \xB7  TIER {1}  \xB7  {2}"
+  - key: atlas.structure.active
+    text: GAMEPLAY ACTIVE
+  - key: atlas.structure.catalog-only
+    text: CATALOGUE ONLY
+  - key: atlas.structure.identify
+    text: BUILD TO IDENTIFY
+  - key: atlas.structure.built
+    text: BUILT
+  - key: atlas.structure.unbuilt
+    text: "NOT BUILT  \xB7  BUILD TO REVEAL"
+  - key: atlas.structure.unimplemented
+    text: This definition is in the content catalog; its gameplay behavior is not
+      implemented.
+  - key: atlas.bestiary.empty
+    text: No alien entries are configured.
+  - key: atlas.enemy.unknown
+    text: UNKNOWN LIFEFORM
+  - key: atlas.enemy.summary
+    text: "FIRST WAVE {0}  \xB7  THREAT {1:0.0}"
+  - key: atlas.enemy.reveal
+    text: SURVIVE A WAVE TO REVEAL
+  - key: atlas.enemy.health
+    text: HP {0:0}
+  - key: atlas.enemy.damage
+    text: DMG {0:0}
+  - key: atlas.enemy.armor
+    text: '{0}% ARMOR'
+  - key: atlas.enemy.boss-return
+    text: Returns every {0} waves when the threat budget allows.
+  - key: atlas.enemy.reward
+    text: WAVE REWARD
+  - key: privacy.title
+    text: PRIVACY
+  - key: privacy.help
+    text: Choices save locally. Online ranks are available to all players who opt
+      in. Posting ranks sends Unity an anonymous player identifier and your Frontier
+      Score; connecting also exposes normal connection data such as your IP address.
+      No public name, email or birthday is requested. Scores upload only when you
+      choose to post them. Analytics, ads and cloud saves have separate availability
+      and controls.
+  - key: privacy.policy
+    text: VIEW PRIVACY POLICY
+  - key: privacy.analytics
+    text: Gameplay analytics
+  - key: privacy.ads
+    text: Rewarded ads
+  - key: privacy.online
+    text: Online account, leaderboard and cloud features
+  - key: privacy.on
+    text: ON
+  - key: privacy.off
+    text: OFF
+  - key: privacy.saved
+    text: Privacy choice saved on this device
+  - key: recovery.title
+    text: SAVE RECOVERY
+  - key: recovery.help
+    text: Protect this device's save with Apple Sign-In on iPhone or Google Play
+      Games on Android. Signing in never replaces local progress; cloud copies are
+      compared and moved only when you choose.
+  - key: recovery.enable
+    text: Enable online account features above to manage save recovery.
+  - key: recovery.provider
+    text: 'Provider: {0}'
+  - key: recovery.connecting
+    text: CONNECTING...
+  - key: recovery.protect
+    text: PROTECT THIS SAVE
+  - key: recovery.sign-in
+    text: SIGN IN TO RECOVER
+  - key: recovery.unavailable
+    text: Account recovery is not enabled for this build.
+  - key: recovery.preparing
+    text: Preparing the current save for account linking...
+  - key: recovery.already-linked
+    text: This save is already linked to a recovery account.
+  - key: recovery.link-prompt
+    text: Complete the sign-in prompt to link this save...
+  - key: recovery.protected
+    text: Save protected with {0}. Local progress remains on this device; cloud sync
+      is still off.
+  - key: recovery.sign-in-prompt
+    text: Complete the sign-in prompt for your recovery account...
+  - key: recovery.signed-in
+    text: Signed in with {0}. This device's local save was not replaced; cloud restore
+      remains a separate step.
+  - key: cloud.title
+    text: CLOUD SAVE
+  - key: cloud.help
+    text: No automatic upload or restore. Compare both snapshots, then choose which
+      direction to move data. Replacing a save requires a second confirmation; the
+      local snapshot replaced by a restore stays on this device for undo.
+  - key: cloud.unavailable
+    text: Cloud Save is disabled or not configured for this build.
+  - key: cloud.checking
+    text: CHECKING...
+  - key: cloud.compare
+    text: COMPARE DEVICE AND CLOUD
+  - key: cloud.device-summary
+    text: "THIS DEVICE  \xB7  {0}"
+  - key: cloud.empty
+    text: "CLOUD  \xB7  No save exists for this account yet."
+  - key: cloud.saving
+    text: SAVING...
+  - key: cloud.create.confirm
+    text: TAP AGAIN TO CREATE CLOUD COPY
+  - key: cloud.create
+    text: CREATE CLOUD COPY
+  - key: cloud.invalid
+    text: "CLOUD  \xB7  The stored copy could not be validated and was not changed."
+  - key: cloud.cloud-summary
+    text: "CLOUD  \xB7  {0}"
+  - key: cloud.same
+    text: These snapshots have the same save ID and revision.
+  - key: cloud.different
+    text: These are different snapshots. Revision alone cannot determine which has
+      the right progress.
+  - key: cloud.backup.confirm
+    text: TAP AGAIN TO REPLACE CLOUD SAVE
+  - key: cloud.backup
+    text: BACK UP THIS DEVICE TO CLOUD
+  - key: cloud.restore.confirm
+    text: TAP AGAIN TO RESTORE CLOUD SAVE
+  - key: cloud.restore
+    text: RESTORE CLOUD SAVE TO THIS DEVICE
+  - key: cloud.undo.help
+    text: A previous device save is retained locally after a cloud restore.
+  - key: cloud.undo.confirm
+    text: TAP AGAIN TO RESTORE PREVIOUS DEVICE SAVE
+  - key: cloud.undo
+    text: UNDO CLOUD RESTORE
+  - key: cloud.snapshot
+    text: "XP {0}  \xB7  {1} worlds  \xB7  revision {2}  \xB7  current world {3}"
+  - key: cloud.world.unknown
+    text: unknown
+  - key: cloud.comparing
+    text: Writing the latest device snapshot, then reading the cloud copy...
+  - key: cloud.compared
+    text: Both saves are ready to compare. No copy was changed.
+  - key: cloud.compared-empty
+    text: No cloud copy exists. The device save is unchanged.
+  - key: cloud.compare-failed
+    text: 'Cloud save comparison failed: {0}'
+  - key: cloud.incomplete
+    text: The cloud save is incomplete and was not changed.
+  - key: cloud.schema
+    text: The cloud save uses schema {0}; this build can compare only schema {1}.
+  - key: cloud.validation-failed
+    text: 'The cloud save could not be validated: {0}'
+  - key: cloud.backup.warning
+    text: This will replace the current cloud copy with this device's save. Tap again
+      to confirm.
+  - key: cloud.create.warning
+    text: This will create a cloud copy of this device's save. Tap again to confirm.
+  - key: cloud.backing-up
+    text: Securing the device save and checking the cloud write lock...
+  - key: cloud.backup.changed
+    text: The cloud copy changed since comparison. Compare again before choosing
+      an action.
+  - key: cloud.backed-up
+    text: This device's save was backed up to the cloud. No local progress was replaced.
+  - key: cloud.backup-failed
+    text: 'Cloud backup failed: {0}'
+  - key: cloud.restore.warning
+    text: This replaces device progress with the shown cloud save. The current device
+      save will be retained for undo. Tap again to confirm.
+  - key: cloud.restoring
+    text: Verifying the cloud copy has not changed...
+  - key: cloud.restore.changed
+    text: The cloud copy changed since comparison. Compare again before restoring.
+  - key: cloud.restore-failed
+    text: 'Cloud restore failed: {0}'
+  - key: cloud.undo.warning
+    text: This swaps the current save with the retained device save. Tap again to
+      confirm.
+  - key: ranks.ascension
+    text: VIEW ASCENSION
+  - key: ranks.goals
+    text: VIEW GOALS & REWARDS
+  - key: ranks.score
+    text: FRONTIER SCORE
+  - key: ranks.total
+    text: Total
+  - key: ranks.reach
+    text: Reach
+  - key: ranks.worlds
+    text: Worlds
+  - key: ranks.industry
+    text: Industry
+  - key: ranks.technology
+    text: Technology
+  - key: ranks.defense
+    text: Defense
+  - key: ranks.atlas
+    text: Atlas
+  - key: ranks.multiplier
+    text: Ascension multiplier
+  - key: ranks.record
+    text: YOUR RECORD
+  - key: ranks.level
+    text: Level
+  - key: ranks.waves
+    text: Waves cleared
+  - key: ranks.structures
+    text: Structures
+  - key: ranks.bases
+    text: Bases
+  - key: ranks.unavailable
+    text: Online ranks are unavailable until Unity services, a leaderboard and an
+      HTTPS privacy policy are configured and approved. Your local record remains
+      available above.
+  - key: ranks.enable
+    text: Anyone can rank. Enabling online ranks connects to Unity using an anonymous
+      player ID and posts your Frontier Score. No public name, email or birthday
+      is needed. Unity also receives connection data such as your IP address. You
+      can turn online services off in Privacy Settings.
+  - key: ranks.online.help
+    text: Post your current Frontier Score and load the top 20. Your own rank is
+      shown even outside the top 20. All players use anonymous pilot labels. These
+      are casual, client-reported scores, not cheat-proof competitive rankings.
+  - key: ranks.entry
+    text: '#{0}  {1}'
+  - key: ranks.empty
+    text: No scores have been posted to this board yet.
+  - key: ranks.loading
+    text: LOADING RANKS
+  - key: ranks.load
+    text: POST SCORE & LOAD RANKS
+  - key: ranks.era
+    text: 'YOUR FRONTIER: {0}'
+  - key: ranks.era.help
+    text: Reached eras stay with this save. Earn them through exploration and technology,
+      not XP or premium spending.
+  - key: ranks.era.mastery
+    text: Megaproject mastery reached. Explore deeper worlds, complete the Atlas
+      and expand your projects.
+  - key: ranks.era.next
+    text: 'NEXT: {0}'
+  - key: ranks.era.command
+    text: OPEN COMMAND
+  - key: ranks.connecting
+    text: Connecting to online services...
+  - key: ranks.connected
+    text: Score posted and online ranks loaded.
+  - key: ranks.error.not-configured
+    text: Online rankings are not configured in this build.
+  - key: ranks.error.consent
+    text: Enable Online Services in Privacy Settings to load rankings.
+  - key: ranks.error.request
+    text: 'Leaderboard request rejected: {0}'
+  - key: ranks.error.failed
+    text: 'Leaderboard connection failed: {0}'
+  - key: settings.audio.effects
+    text: EFFECTS & UI VOLUME
+  - key: settings.audio.music
+    text: MUSIC VOLUME
+  - key: settings.audio.percent
+    text: '{0}%'
+  - key: deletion.title
+    text: ONLINE SAVE & ACCOUNT DELETION
+  - key: deletion.help
+    text: Delete this signed-in account's Frontier cloud save and online account.
+      Local progress and the local restore backup are kept; use Reset Progress separately
+      to erase those. This does not claim to remove store purchase history, leaderboard
+      or analytics records.
+  - key: deletion.unavailable
+    text: Online deletion is unavailable until account and cloud-save services are
+      configured. No online data has been deleted.
+  - key: deletion.sign-in
+    text: Sign in to the account you want to delete using Save Recovery above, then
+      return here. Deletion never creates or signs in to an account automatically.
+  - key: deletion.action
+    text: DELETE ONLINE SAVE & ACCOUNT
+  - key: deletion.confirm
+    text: CONFIRM PERMANENT ONLINE DELETION
+  - key: deletion.warning
+    text: This cannot be undone. Your Frontier cloud save is removed first; only
+      then is the signed-in account deleted. If account deletion fails afterward,
+      the cloud save remains deleted and you must retry. Local progress is kept.
+  - key: deletion.cancel
+    text: CANCEL DELETION
+  - key: deletion.busy
+    text: DELETING ONLINE SAVE & ACCOUNT...
+  - key: deletion.done
+    text: Frontier cloud save and online account deleted. Local progress and the
+      local restore backup were not changed.
+  - key: revive.read-only
+    text: Shard revives are disabled while this save is read-only.
+  - key: revive.unavailable
+    text: This run can no longer be revived.
+  - key: revive.price-changed
+    text: The revive price changed. Review the current shard cost before confirming.
+  - key: revive.shards-missing
+    text: Not enough Nova Shards to revive this run.
+  - key: revive.rejected
+    text: This run could not be revived. No shards were spent.
+  - key: revive.pending-save
+    text: Revived for this session, but saving failed. Keep the game open while saving
+      retries. {0}
+  - key: revive.done
+    text: Run revived.
+  - key: clearance.unavailable
+    text: Obstacle clearing is unavailable
+  - key: clearance.absent
+    text: This obstruction is no longer here
+  - key: clearance.assigned
+    text: Clearance crew assigned
+  - key: crew.purchase.read-only
+    text: Builder crews cannot be purchased while this save is read-only.
+  - key: crew.purchase.unavailable
+    text: No additional builder crew is available. Earn your second crew through
+      progression first; crews cannot exceed the shared cap.
+  - key: crew.purchase.changed
+    text: Your crew count or price changed. Review the current offer before confirming.
+  - key: crew.purchase.shards-missing
+    text: Not enough Nova Shards to recruit this crew.
+  - key: crew.purchase.pending-save
+    text: Crew recruited for this session, but saving failed. Keep the game open
+      while saving retries. {0}
+  - key: crew.purchase.done
+    text: Builder crew recruited.
+  - key: crew.finish.read-only
+    text: Jobs cannot be finished with shards while this save is read-only.
+  - key: crew.finish.unavailable
+    text: This builder job is no longer available.
+  - key: crew.finish.price-changed
+    text: The finish price changed. Review the current shard cost before confirming.
+  - key: crew.finish.shards-missing
+    text: Not enough Nova Shards to finish this job.
+  - key: crew.finish.assignment-missing
+    text: This job has no matching crew assignment. Reload the save to recover it.
+  - key: crew.finish.pending-save
+    text: Job finished for this session, but saving failed. Keep the game open while
+      saving retries. {0}
+  - key: crew.finish.done
+    text: Builder job finished.
+  - key: crew.status.construction
+    text: "UNDER CONSTRUCTION  \xB7  {0}"
+  - key: crew.status.upgrade
+    text: "UPGRADING TO LV {0}  \xB7  {1}"
+  - key: crew.busy
+    text: All builder crews are busy
+  - key: gate.research
+    text: 'Requires research: {0}'
+  - key: gate.reach-tier
+    text: Reach planet tier {0}
+  - key: gate.player-level
+    text: Requires XP level {0} (you are level {1}). Clear alien waves to earn XP.
+  - key: progression.xp-status
+    text: XP LEVEL {0}  -  {1:N0} XP to level {2}
+  - key: progression.xp-help
+    text: Clear alien waves to level up. Unlocks use your XP level, not planet tier.
+  - key: progression.waves
+    text: FIND WAVES TO EARN XP
+  - key: progression.required-level
+    text: 'Required XP level: {0}'
+  - key: gate.lab-level
+    text: Requires Research Lab level {0}
+  - key: gate.structure.unknown
+    text: Unknown structure
+  - key: gate.structure.future
+    text: Structure gameplay coming later
+  - key: gate.upgrade.unknown
+    text: Unknown upgrade
+  - key: gate.max-level
+    text: Max level
+  - key: gate.upgrade.future
+    text: Upgrade gameplay coming later
+  - key: gate.structure.building
+    text: Structure is still under construction
+  - key: gate.structure.upgrading
+    text: Upgrade already in progress
+  - key: gate.recipe.unknown
+    text: Unknown recipe
+  - key: gate.recipe.station
+    text: Requires its crafting station
+  - key: gate.recipe.station-level
+    text: Requires station level {0}
+  - key: gate.research.unknown
+    text: Unknown research
+  - key: gate.research.unavailable
+    text: Research is unavailable in this database
+  - key: gate.research.complete
+    text: Already researched
+  - key: gate.lab-world
+    text: Requires Research Lab level {0} on this world
+  - key: gate.requires
+    text: Requires {0}
+  - key: gate.research.invalid-cost
+    text: Invalid research cost
+  - key: gate.research.materials
+    text: Missing research materials
+  - key: gate.tool.unavailable
+    text: This tool's harvest game is not implemented
+  - key: gate.tool.max
+    text: Maximum tool tier
+  - key: gate.tool.invalid-cost
+    text: Invalid tool cost
+  - key: gate.tool.materials
+    text: Missing tool materials
+  - key: claim.read-only
+    text: Achievements cannot be claimed while this save is read-only.
+  - key: claim.unavailable
+    text: This achievement is unavailable in the current catalogue.
+  - key: claim.collected
+    text: This achievement is already collected.
+  - key: claim.incomplete
+    text: Complete this objective before collecting it.
+  - key: claim.wallet-full
+    text: Your shard balance is full. Spend shards before collecting this reward.
+  - key: claim.pending-save
+    text: Reward collected for this session, but the save failed. Keep the game open
+      while saving retries. {0}
+  - key: claim.shards
+    text: +{0} Nova Shards
+  - key: claim.done
+    text: Achievement collected.
+  - key: snapshot.write-failed
+    text: The local save could not be written.
+  - key: snapshot.write-error
+    text: 'The local save could not be written: {0}'
+  - key: snapshot.unreadable
+    text: The local save completed without a readable snapshot.
+  - key: restore.source.cloud
+    text: cloud
+  - key: restore.source.local
+    text: previous local
+  - key: restore.empty
+    text: The selected save is empty.
+  - key: restore.schema
+    text: This save uses schema {0}; this build can restore only schema {1}.
+  - key: restore.generator-newer
+    text: This save was created with a newer universe generator and cannot be restored
+      by this build.
+  - key: restore.invalid-seed
+    text: This save has an invalid universe seed and cannot be restored safely.
+  - key: restore.secure-failed
+    text: The current local save could not be secured before restore.
+  - key: restore.secure-error
+    text: 'The current local save could not be secured before restore: {0}'
+  - key: restore.write-failed
+    text: 'The selected save was not restored: {0}'
+  - key: restore.pending-save
+    text: 'The {0} save was restored, but its updated local snapshot could not be
+      written: {1}. The previous save is still retained.'
+  - key: restore.done
+    text: The {0} save was restored. The save it replaced is retained on this device
+      for undo.
+  - key: notifications.on
+    text: 'JOB NOTIFICATIONS: ON'
+  - key: notifications.off
+    text: 'JOB NOTIFICATIONS: OFF'
+  - key: notifications.help
+    text: Get an alert when construction, an upgrade or clearance finishes. Device
+      permission is requested only when a timer is active.
+  - key: notifications.unavailable
+    text: Job notifications are not enabled on this build or device.
+  - key: notifications.error
+    text: 'Job alerts could not be updated: {0}'
+  - key: notifications.job.title
+    text: Crew job complete
+  - key: notifications.job.body
+    text: A construction, upgrade or clearance timer has finished. Return to check
+      your crews.
+  - key: planet.blurb.opener.lush.0
+    text: A verdant world blanketed in deep forest
+  - key: planet.blurb.opener.lush.1
+    text: A green world of rolling meadows and ancient groves
+  - key: planet.blurb.opener.lush.2
+    text: A humid world of jungle canopies and winding rivers
+  - key: planet.blurb.opener.lush.3
+    text: A temperate world of mossy hills and tall timber
+  - key: planet.blurb.opener.lush.4
+    text: A fertile world of open grassland and dense woods
+  - key: planet.blurb.opener.mineral.0
+    text: A rugged world of exposed ore seams and rust-red cliffs
+  - key: planet.blurb.opener.mineral.1
+    text: A stony world laced with mineral veins
+  - key: planet.blurb.opener.mineral.2
+    text: A rocky world of broken ridges and deep quarries
+  - key: planet.blurb.opener.mineral.3
+    text: A metal-rich world of terraced mesas and bare stone
+  - key: planet.blurb.opener.glacial.0
+    text: A frozen world of glaciers and wind-scoured ice sheets
+  - key: planet.blurb.opener.glacial.1
+    text: An icebound world of crevassed ice fields
+  - key: planet.blurb.opener.glacial.2
+    text: A pale world of frozen seas and drifting snow
+  - key: planet.blurb.opener.glacial.3
+    text: A cold world buried under blue ice
+  - key: planet.blurb.opener.volcanic.0
+    text: A volcanic world of lava rivers and smoking calderas
+  - key: planet.blurb.opener.volcanic.1
+    text: A molten world scarred by fissures and ash plains
+  - key: planet.blurb.opener.volcanic.2
+    text: A burning world of black basalt and glowing vents
+  - key: planet.blurb.opener.volcanic.3
+    text: A hostile world cracked open by magma flows
+  - key: planet.blurb.opener.fungal.0
+    text: A spongy world of towering fungal forests
+  - key: planet.blurb.opener.fungal.1
+    text: A damp world carpeted in glowing spore beds
+  - key: planet.blurb.opener.fungal.2
+    text: A strange world where giant mushrooms pierce the mist
+  - key: planet.blurb.opener.fungal.3
+    text: A murky world of fungal groves and rotting bogs
+  - key: planet.blurb.opener.crystal.0
+    text: A glittering world of faceted crystal spires
+  - key: planet.blurb.opener.crystal.1
+    text: A brilliant world of shimmering crystal fields
+  - key: planet.blurb.opener.crystal.2
+    text: A prismatic world of jagged crystalline ridges
+  - key: planet.blurb.opener.crystal.3
+    text: A resonant world grown over with glassy crystal
+  - key: planet.blurb.opener.obsidian.0
+    text: A dark world of black glass plains and violet veins
+  - key: planet.blurb.opener.obsidian.1
+    text: A shadowed world of polished obsidian shelves
+  - key: planet.blurb.opener.obsidian.2
+    text: A grim world of volcanic glass and deep ravines
+  - key: planet.blurb.opener.obsidian.3
+    text: A dusky world of dark stone and cold lightning
+  - key: planet.blurb.opener.shattered.0
+    text: A broken world of drifting fragments and open voids
+  - key: planet.blurb.opener.shattered.1
+    text: A shattered world torn apart by ancient forces
+  - key: planet.blurb.opener.shattered.2
+    text: A fractured world of floating crags and bright rifts
+  - key: planet.blurb.opener.shattered.3
+    text: A ruined world split by glowing fault lines
+  - key: planet.blurb.opener.desert.0
+    text: A scorched world of endless dunes and wind-carved rock
+  - key: planet.blurb.opener.desert.1
+    text: A sun-baked world of golden sand seas
+  - key: planet.blurb.opener.desert.2
+    text: A dry world of salt flats and shifting dunes
+  - key: planet.blurb.opener.desert.3
+    text: An arid world of cracked basins and red mesas
+  - key: planet.blurb.opener.oceanic.0
+    text: A water world of open seas and scattered islets
+  - key: planet.blurb.opener.oceanic.1
+    text: An ocean world of rolling swells and floating kelp forests
+  - key: planet.blurb.opener.oceanic.2
+    text: A blue world of deep seas and tidal archipelagos
+  - key: planet.blurb.opener.oceanic.3
+    text: A flooded world with only thin ribbons of land
+  - key: planet.blurb.opener.gasgiant.0
+    text: A towering gas giant of banded clouds and storm vortices
+  - key: planet.blurb.opener.gasgiant.1
+    text: A vast gas giant wrapped in swirling cloud bands
+  - key: planet.blurb.opener.gasgiant.2
+    text: A gas giant of churning storm bands
+  - key: planet.blurb.opener.gasgiant.3
+    text: A hazy gas giant crossed by slow, enormous storms
+  - key: planet.blurb.opener.barren.0
+    text: A bare, cratered rock with almost no atmosphere
+  - key: planet.blurb.opener.barren.1
+    text: A lifeless world of dust and impact craters
+  - key: planet.blurb.opener.barren.2
+    text: A barren world of grey regolith and long shadows
+  - key: planet.blurb.opener.barren.3
+    text: A silent, airless world of pitted stone
+  - key: planet.blurb.belt.0
+    text: A drifting belt of rubble and tumbling rock
+  - key: planet.blurb.belt.1
+    text: A dense ring of asteroids and salvageable wreckage
+  - key: planet.blurb.belt.2
+    text: A scattered belt of rock and metal debris
+  - key: planet.blurb.sky.clear.0
+    text: beneath clear skies
+  - key: planet.blurb.sky.clear.1
+    text: under calm, open skies
+  - key: planet.blurb.sky.clear.2
+    text: beneath a quiet sky
+  - key: planet.blurb.sky.rain.0
+    text: under steady rain
+  - key: planet.blurb.sky.rain.1
+    text: beneath endless grey rain
+  - key: planet.blurb.sky.rain.2
+    text: lashed by warm rain
+  - key: planet.blurb.sky.snow.0
+    text: under falling snow
+  - key: planet.blurb.sky.snow.1
+    text: beneath drifting snowfall
+  - key: planet.blurb.sky.snow.2
+    text: shrouded in a snowy haze
+  - key: planet.blurb.sky.embers.0
+    text: under a slow drift of embers
+  - key: planet.blurb.sky.embers.1
+    text: beneath showers of embers
+  - key: planet.blurb.sky.embers.2
+    text: with ash and embers on the wind
+  - key: planet.blurb.sky.spores.0
+    text: wreathed in drifting spores
+  - key: planet.blurb.sky.spores.1
+    text: under clouds of luminous spores
+  - key: planet.blurb.sky.spores.2
+    text: with spores hanging in the air
+  - key: planet.blurb.sky.dust.0
+    text: under dust-laden winds
+  - key: planet.blurb.sky.dust.1
+    text: beneath a veil of dust
+  - key: planet.blurb.sky.dust.2
+    text: swept by dry, gritty winds
+  - key: planet.blurb.sky.storm.0
+    text: wracked by violent storms
+  - key: planet.blurb.sky.storm.1
+    text: under constant lightning storms
+  - key: planet.blurb.sky.storm.2
+    text: battered by howling storms
+  - key: planet.blurb.size.dwarf.0
+    text: Its small size leaves room for only a few structures.
+  - key: planet.blurb.size.dwarf.1
+    text: A tiny world with tight building room.
+  - key: planet.blurb.size.small.0
+    text: A compact world with modest building room.
+  - key: planet.blurb.size.small.1
+    text: Compact, with space for a small outpost.
+  - key: planet.blurb.size.medium.0
+    text: There is room for a respectable base.
+  - key: planet.blurb.size.medium.1
+    text: A mid-sized world with decent building room.
+  - key: planet.blurb.size.large.0
+    text: A large world with plenty of ground to build on.
+  - key: planet.blurb.size.large.1
+    text: Wide plains and ridges leave generous building room.
+  - key: planet.blurb.size.giant.0
+    text: A giant world with sprawling building room.
+  - key: planet.blurb.size.giant.1
+    text: Its sheer size offers sprawling room for bases.
+  - key: planet.blurb.size.colossal.0
+    text: A colossal world with vast tracts of buildable ground.
+  - key: planet.blurb.size.colossal.1
+    text: Colossal in scale, with room for a whole network of bases.
+  - key: planet.blurb.calm.0
+    text: Landing conditions are mild.
+  - key: planet.blurb.calm.1
+    text: A forgiving place to touch down.
+  - key: planet.blurb.calm.2
+    text: The ground is stable and the air is kind.
+  - key: planet.blurb.opening
+    text: '{0} {1}.'
+  - key: planet.blurb.opening-no-sky
+    text: '{0}.'
+  - key: planet.blurb.join
+    text: '{0} {1}'
+  - key: planet.blurb.rings
+    text: Pale rings circle it.
+  - key: planet.blurb.moon.one
+    text: A single moon circles it.
+  - key: planet.blurb.moon.2
+    text: Two moons circle it.
+  - key: planet.blurb.moon.3
+    text: Three moons circle it.
+  - key: planet.blurb.moon.4
+    text: Four moons circle it.
+  - key: planet.blurb.moon.5
+    text: Five moons circle it.
+  - key: planet.blurb.moon.6
+    text: Six moons circle it.
+  - key: planet.blurb.moon.7
+    text: Seven moons circle it.
+  - key: planet.blurb.hazards
+    text: Expect {0}.
+  - key: planet.blurb.list.more
+    text: '{0}, {1}'
+  - key: planet.blurb.list.last
+    text: '{0} and {1}'
+  - key: planet.blurb.hazard.heat
+    text: extreme heat
+  - key: planet.blurb.hazard.cold
+    text: bitter cold
+  - key: planet.blurb.hazard.toxic
+    text: toxic air
+  - key: planet.blurb.hazard.radiation
+    text: hard radiation
+  - key: planet.blurb.hazard.void
+    text: void exposure
+  - key: content.resource.wood.name
+    text: Wood
+  - key: content.resource.wood.description
+    text: Timber from the lush worlds, cut green and stacked by the cartload. Every
+      settlement begins with it, and every great project comes back to it.
+  - key: content.resource.wood.detail
+    text: Timber from the lush worlds, cut green and stacked by the cartload. Every
+      settlement begins with it, and every great project comes back to it.
+  - key: content.resource.stone.name
+    text: Stone
+  - key: content.resource.stone.description
+    text: Dense grey rock that rings when struck. It holds the foundations of everything
+      and never runs out.
+  - key: content.resource.stone.detail
+    text: Dense grey rock that rings when struck. It holds the foundations of everything
+      and never runs out.
+  - key: content.resource.scrap.name
+    text: Scrap
+  - key: content.resource.scrap.description
+    text: Wreckage and worn-out machinery lie on every world, because someone always
+      got there first. Pressed, burned or melted, none of it is ever wasted.
+  - key: content.resource.scrap.detail
+    text: Wreckage and worn-out machinery lie on every world, because someone always
+      got there first. Pressed, burned or melted, none of it is ever wasted.
+  - key: content.resource.biomass.name
+    text: Biomass
+  - key: content.resource.biomass.description
+    text: Fast-growing fibrous growth, thick with sap and spores. It ferments into
+      clean fuel and weaves into seals that shrug off poison.
+  - key: content.resource.biomass.detail
+    text: Fast-growing fibrous growth, thick with sap and spores. It ferments into
+      clean fuel and weaves into seals that shrug off poison.
+  - key: content.resource.iron.name
+    text: Iron Ore
+  - key: content.resource.iron.description
+    text: Rust-red ore heavy with metal, found in veins under volcanic crust and
+      dry plains. Smelted, it becomes the skeleton of everything you build.
+  - key: content.resource.iron.detail
+    text: Rust-red ore heavy with metal, found in veins under volcanic crust and
+      dry plains. Smelted, it becomes the skeleton of everything you build.
+  - key: content.resource.copper_ore.name
+    text: Copper Ore
+  - key: content.resource.copper_ore.description
+    text: Green-streaked ore that conducts better than anything else you can dig
+      up. Drawn into wire, it carries every signal and every current.
+  - key: content.resource.copper_ore.detail
+    text: Green-streaked ore that conducts better than anything else you can dig
+      up. Drawn into wire, it carries every signal and every current.
+  - key: content.resource.silica.name
+    text: Silica
+  - key: content.resource.silica.description
+    text: Fine quartz sand from the dry basins and crystal flats. Melted it turns
+      to glass, and ground it polishes lenses.
+  - key: content.resource.silica.detail
+    text: Fine quartz sand from the dry basins and crystal flats. Melted it turns
+      to glass, and ground it polishes lenses.
+  - key: content.resource.ice.name
+    text: Ice
+  - key: content.resource.ice.description
+    text: Hard blue ice cut from glaciers, comet shells and shadowed craters. It
+      holds the cold that cryogenic hulls and quantum lattices depend on.
+  - key: content.resource.ice.detail
+    text: Hard blue ice cut from glaciers, comet shells and shadowed craters. It
+      holds the cold that cryogenic hulls and quantum lattices depend on.
+  - key: content.resource.titanium_ore.name
+    text: Titanium Ore
+  - key: content.resource.titanium_ore.description
+    text: Grey ore so dense it blunts ordinary drills. Refined, it turns light, strong
+      and unbothered by fire or vacuum.
+  - key: content.resource.titanium_ore.detail
+    text: Grey ore so dense it blunts ordinary drills. Refined, it turns light, strong
+      and unbothered by fire or vacuum.
+  - key: content.resource.crystal.name
+    text: Crystal
+  - key: content.resource.crystal.description
+    text: Resonant crystal that hums when struck and glows when worked. It sharpens
+      tools, focuses beams and stores more energy than it should.
+  - key: content.resource.crystal.detail
+    text: Resonant crystal that hums when struck and glows when worked. It sharpens
+      tools, focuses beams and stores more energy than it should.
+  - key: content.resource.methane.name
+    text: Methane
+  - key: content.resource.methane.description
+    text: Pale gas siphoned from swamps, oceans and giant worlds. A little of it
+      burns hotter than a hold full of wood.
+  - key: content.resource.methane.detail
+    text: Pale gas siphoned from swamps, oceans and giant worlds. A little of it
+      burns hotter than a hold full of wood.
+  - key: content.resource.helium3.name
+    text: Helium-3
+  - key: content.resource.helium3.description
+    text: A rare light gas drifting in the storm bands of the giants. Ships crave
+      it, and so does every quantum machine.
+  - key: content.resource.helium3.detail
+    text: A rare light gas drifting in the storm bands of the giants. Ships crave
+      it, and so does every quantum machine.
+  - key: content.resource.core.name
+    text: Xeno Core
+  - key: content.resource.core.description
+    text: A pulsing organic knot torn from alien hives and fallen raiders. Nobody
+      agrees what it is, but every advanced machine runs better with one inside.
+  - key: content.resource.core.detail
+    text: A pulsing organic knot torn from alien hives and fallen raiders. Nobody
+      agrees what it is, but every advanced machine runs better with one inside.
+  - key: content.resource.radium.name
+    text: Radium
+  - key: content.resource.radium.description
+    text: A faintly glowing salt that ticks in the dark. Dangerous to carry, essential
+      for shielding, and priceless to anyone who knows how to contain it.
+  - key: content.resource.radium.detail
+    text: A faintly glowing salt that ticks in the dark. Dangerous to carry, essential
+      for shielding, and priceless to anyone who knows how to contain it.
+  - key: content.resource.dark_matter.name
+    text: Dark Matter
+  - key: content.resource.dark_matter.description
+    text: A pocket of nothing that pulls on everything. Dug from the deepest shattered
+      worlds, it is the last ingredient of the last machines.
+  - key: content.resource.dark_matter.detail
+    text: A pocket of nothing that pulls on everything. Dug from the deepest shattered
+      worlds, it is the last ingredient of the last machines.
+  - key: content.resource.fuel.name
+    text: Fuel Cell
+  - key: content.resource.fuel.description
+    text: 'Compact cells of refined energy that power every jump. Cooked from whatever
+      burns: wood in the first days, gas and ice when the ship is bigger.'
+  - key: content.resource.fuel.detail
+    text: 'Compact cells of refined energy that power every jump. Cooked from whatever
+      burns: wood in the first days, gas and ice when the ship is bigger.'
+  - key: content.resource.planks.name
+    text: Planks
+  - key: content.resource.planks.description
+    text: Sawn timber cut to length. It frames the buildings of every era, and the
+      late projects eat it by the thousand.
+  - key: content.resource.planks.detail
+    text: Sawn timber cut to length. It frames the buildings of every era, and the
+      late projects eat it by the thousand.
+  - key: content.resource.iron_plate.name
+    text: Iron Plate
+  - key: content.resource.iron_plate.description
+    text: Rolled sheets of smelted iron, still warm from the foundry. The first real
+      building material of any colony.
+  - key: content.resource.iron_plate.detail
+    text: Rolled sheets of smelted iron, still warm from the foundry. The first real
+      building material of any colony.
+  - key: content.resource.copper_wire.name
+    text: Copper Wire
+  - key: content.resource.copper_wire.description
+    text: Copper drawn thin and wound on spools. Everything with a pulse, from a
+      lamp to a reactor, needs a length of it.
+  - key: content.resource.copper_wire.detail
+    text: Copper drawn thin and wound on spools. Everything with a pulse, from a
+      lamp to a reactor, needs a length of it.
+  - key: content.resource.glass.name
+    text: Glass
+  - key: content.resource.glass.description
+    text: Clear, hard panes melted from silica. They keep out the weather, hold the
+      vacuum and become lenses when polished.
+  - key: content.resource.glass.detail
+    text: Clear, hard panes melted from silica. They keep out the weather, hold the
+      vacuum and become lenses when polished.
+  - key: content.resource.titanium_plate.name
+    text: Titanium Plate
+  - key: content.resource.titanium_plate.description
+    text: Pressed titanium cut into light, stubborn armor panels. It survives heat
+      that melts steel and cold that shatters it.
+  - key: content.resource.titanium_plate.detail
+    text: Pressed titanium cut into light, stubborn armor panels. It survives heat
+      that melts steel and cold that shatters it.
+  - key: content.resource.steel.name
+    text: Steel
+  - key: content.resource.steel.description
+    text: Iron hardened with the carbon of burnt timber. The backbone of tools, turrets
+      and hulls.
+  - key: content.resource.steel.detail
+    text: Iron hardened with the carbon of burnt timber. The backbone of tools, turrets
+      and hulls.
+  - key: content.resource.biocomposite.name
+    text: Biocomposite
+  - key: content.resource.biocomposite.description
+    text: Plant fibre pressed with resin into a flexible, self-sealing skin. Toxic
+      air eats steel but slides off this.
+  - key: content.resource.biocomposite.detail
+    text: Plant fibre pressed with resin into a flexible, self-sealing skin. Toxic
+      air eats steel but slides off this.
+  - key: content.resource.thermal_alloy.name
+    text: Thermal Alloy
+  - key: content.resource.thermal_alloy.description
+    text: Titanium and glass fused into a ceramic-bright metal that glows without
+      failing. Hulls plated with it can land where rock still flows.
+  - key: content.resource.thermal_alloy.detail
+    text: Titanium and glass fused into a ceramic-bright metal that glows without
+      failing. Hulls plated with it can land where rock still flows.
+  - key: content.resource.cryo_composite.name
+    text: Cryo Composite
+  - key: content.resource.cryo_composite.description
+    text: A foam-cored laminate that keeps its strength far below freezing. It lets
+      a ship set down where the air itself is ice.
+  - key: content.resource.cryo_composite.detail
+    text: A foam-cored laminate that keeps its strength far below freezing. It lets
+      a ship set down where the air itself is ice.
+  - key: content.resource.rad_shield_alloy.name
+    text: Rad-Shield Alloy
+  - key: content.resource.rad_shield_alloy.description
+    text: Layered steel and radium-laced glass that drinks hard radiation. Shielding
+      like this opens the worlds that glow in the dark.
+  - key: content.resource.rad_shield_alloy.detail
+    text: Layered steel and radium-laced glass that drinks hard radiation. Shielding
+      like this opens the worlds that glow in the dark.
+  - key: content.resource.void_alloy.name
+    text: Void Alloy
+  - key: content.resource.void_alloy.description
+    text: A black metal grown around a seed of dark matter. It bends light and survives
+      where space itself is thin.
+  - key: content.resource.void_alloy.detail
+    text: A black metal grown around a seed of dark matter. It bends light and survives
+      where space itself is thin.
+  - key: content.resource.circuit_board.name
+    text: Circuit Board
+  - key: content.resource.circuit_board.description
+    text: Etched copper on a glass-fibre sheet. Every control, sensor and drone starts
+      with one.
+  - key: content.resource.circuit_board.detail
+    text: Etched copper on a glass-fibre sheet. Every control, sensor and drone starts
+      with one.
+  - key: content.resource.servo_motor.name
+    text: Servo Motor
+  - key: content.resource.servo_motor.description
+    text: A sealed motor with a precision gearhead. It moves every arm, drill carriage
+      and turret in the colony.
+  - key: content.resource.servo_motor.detail
+    text: A sealed motor with a precision gearhead. It moves every arm, drill carriage
+      and turret in the colony.
+  - key: content.resource.optic_lens.name
+    text: Optic Lens
+  - key: content.resource.optic_lens.description
+    text: A ground and polished lens, flawless enough to focus a laser or read a
+      star. Scanners and turrets are blind without it.
+  - key: content.resource.optic_lens.detail
+    text: A ground and polished lens, flawless enough to focus a laser or read a
+      star. Scanners and turrets are blind without it.
+  - key: content.resource.quantum_chip.name
+    text: Quantum Chip
+  - key: content.resource.quantum_chip.description
+    text: A lattice of cooled helium and etched crystal that computes in more than
+      one state at once. Navigation and research run on it.
+  - key: content.resource.quantum_chip.detail
+    text: A lattice of cooled helium and etched crystal that computes in more than
+      one state at once. Navigation and research run on it.
+  - key: content.resource.warp_coil.name
+    text: Warp Coil
+  - key: content.resource.warp_coil.description
+    text: A superconducting coil wound around a speck of dark matter. Charge it and
+      space folds; it is the last part of every great ship.
+  - key: content.resource.warp_coil.detail
+    text: A superconducting coil wound around a speck of dark matter. Charge it and
+      space folds; it is the last part of every great ship.
+  - key: content.resource.plasma.name
+    text: Plasma Cell
+  - key: content.resource.plasma.description
+    text: A magnetic bottle of superheated gas that carries eight times the energy
+      of a fuel cell. It lets a deep run fit in a few slots.
+  - key: content.resource.plasma.detail
+    text: A magnetic bottle of superheated gas that carries eight times the energy
+      of a fuel cell. It lets a deep run fit in a few slots.
+  - key: content.resource.antimatter.name
+    text: Antimatter Pod
+  - key: content.resource.antimatter.description
+    text: A pod of trapped antiparticles in a mirrored field. Sixty-four cells of
+      energy in a package you can hold, and a carelessness you cannot survive.
+  - key: content.resource.antimatter.detail
+    text: A pod of trapped antiparticles in a mirrored field. Sixty-four cells of
+      energy in a package you can hold, and a carelessness you cannot survive.
+  - key: content.structure.lumber.name
+    text: Lumber Camp
+  - key: content.structure.lumber.description
+    text: Tap it to chop the trees on this planet. Higher levels yield more.
+  - key: content.structure.mine.name
+    text: Mining Rig
+  - key: content.structure.mine.description
+    text: Tap it to mine stone and ore on this planet. Free to build. Higher levels
+      yield more.
+  - key: content.structure.driller.name
+    text: Deep Driller
+  - key: content.structure.driller.description
+    text: Tap it to drill ore, crystal and xeno cores. Higher levels yield more.
+  - key: content.structure.biodome.name
+    text: Biodome Harvester
+  - key: content.structure.biodome.description
+    text: Tap it to harvest the plant growth on this planet. Higher levels yield
+      more.
+  - key: content.structure.siphon_rig.name
+    text: Gas Siphon Rig
+  - key: content.structure.siphon_rig.description
+    text: Tap it to siphon gas from the atmosphere. Higher levels yield more.
+  - key: content.structure.excavator.name
+    text: Excavation Rig
+  - key: content.structure.excavator.description
+    text: Tap it to excavate buried ice, sand and rare salts. Higher levels yield
+      more.
+  - key: content.structure.salvage_yard.name
+    text: Salvage Yard
+  - key: content.structure.salvage_yard.description
+    text: Sorts wreckage into scrap and the occasional cache. Higher levels yield
+      more.
+  - key: content.structure.refinery.name
+    text: Refinery
+  - key: content.structure.refinery.description
+    text: Converts raw materials into fuel and planks. Higher levels unlock better
+      recipes and larger craft batches.
+  - key: content.structure.fabricator.name
+    text: Fabricator
+  - key: content.structure.fabricator.description
+    text: Draws wire and assembles components. Higher levels unlock better recipes
+      and larger craft batches.
+  - key: content.structure.foundry.name
+    text: Foundry
+  - key: content.structure.foundry.description
+    text: Smelts ore into plates and alloys. Higher levels unlock tougher alloys
+      and larger craft batches.
+  - key: content.structure.chem_reactor.name
+    text: Chem Reactor
+  - key: content.structure.chem_reactor.description
+    text: Mixes composites and charges plasma cells.
+  - key: content.structure.quantum_lab.name
+    text: Quantum Lab
+  - key: content.structure.quantum_lab.description
+    text: Etches quantum chips and grows void alloy, warp coils and antimatter.
+  - key: content.structure.warehouse.name
+    text: Warehouse
+  - key: content.structure.warehouse.description
+    text: Stores resources on this planet. Drag stacks between your backpack and
+      storage. The first upgrades add 9 slots each; the late ones add far more.
+  - key: content.structure.fuel_depot.name
+    text: Fuel Depot
+  - key: content.structure.fuel_depot.description
+    text: Holds fuel cells, plasma and antimatter in dense racks that do not use
+      backpack slots.
+  - key: content.structure.cargo_depot.name
+    text: Cargo Depot
+  - key: content.structure.cargo_depot.description
+    text: Pools every warehouse on this planet, so crafting and building draw from
+      all of them at once.
+  - key: content.structure.orbital_relay.name
+    text: Orbital Relay
+  - key: content.structure.orbital_relay.description
+    text: Withdraw from operational warehouses on visited worlds in this system;
+      upgrades extend its beam and reduce transfer energy.
+  - key: content.structure.gunner.name
+    text: Gunner Turret
+  - key: content.structure.gunner.description
+    text: Rapid fire kinetic turret. Fires during waves.
+  - key: content.structure.laser.name
+    text: Laser Turret
+  - key: content.structure.laser.description
+    text: Slow, heavy beam with long range. Fires during waves.
+  - key: content.structure.shield_pylon.name
+    text: Shield Pylon
+  - key: content.structure.shield_pylon.description
+    text: Projects a field that raises reactor health.
+  - key: content.structure.missile_silo.name
+    text: Missile Silo
+  - key: content.structure.missile_silo.description
+    text: Launches a splash missile that clears clustered raiders. Fires during waves.
+  - key: content.structure.tesla_coil.name
+    text: Tesla Coil
+  - key: content.structure.tesla_coil.description
+    text: Arcs lightning between nearby aliens. Fires during waves.
+  - key: content.structure.repair_bay.name
+    text: Repair Bay
+  - key: content.structure.repair_bay.description
+    text: Slowly repairs the reactor during a wave.
+  - key: content.structure.alarm.name
+    text: Alarm Beacon
+  - key: content.structure.alarm.description
+    text: Tap it to burn fuel and call a wave. More fuel means a longer fight and
+      bigger rewards.
+  - key: content.structure.research_lab.name
+    text: Research Lab
+  - key: content.structure.research_lab.description
+    text: Unlocks research. Higher levels open deeper research nodes and tool tiers.
+  - key: content.structure.radar_tower.name
+    text: Radar Tower
+  - key: content.structure.radar_tower.description
+    text: 'Extends the survey radius: see more worlds around you before you jump.'
+  - key: content.structure.colony_hub.name
+    text: Colony Hub
+  - key: content.structure.colony_hub.description
+    text: Adds builder crews at levels 3 and 7 and discounts planetary obstacle clearance.
+  - key: content.structure.hangar.name
+    text: Hangar
+  - key: content.structure.hangar.description
+    text: 'A spaceport hangar: cuts the fuel cost of every trip.'
+  - key: content.structure.auto_harvester.name
+    text: Auto-Harvester
+  - key: content.structure.auto_harvester.description
+    text: Slowly gathers raw bulk materials while you are away. Active harvesting
+      stays far better.
+  - key: content.structure.terraformer.name
+    text: Terraformer
+  - key: content.structure.terraformer.description
+    text: Megaproject. Reshapes the planet in five stages; each stage permanently
+      raises harvest yield everywhere.
+  - key: content.structure.warp_gate.name
+    text: Warp Gate
+  - key: content.structure.warp_gate.description
+    text: 'Megaproject. A ring gate in orbit: each stage cuts fuel costs and extends
+      jump range.'
+  - key: content.structure.dyson_collector.name
+    text: Dyson Collector
+  - key: content.structure.dyson_collector.description
+    text: Megaproject. A swarm of collectors around the star feeds your ships fuel
+      while you sleep.
+  - key: content.recipe.distill_wood.name
+    text: Wood Distillate
+  - key: content.recipe.burn_scrap.name
+    text: Scrap Burner
+  - key: content.recipe.saw_planks.name
+    text: Saw Planks
+  - key: content.recipe.press_scrap.name
+    text: Scrap Press
+  - key: content.recipe.ferment_biomass.name
+    text: Biomass Ferment
+  - key: content.recipe.crystal_cell.name
+    text: Crystal Cell
+  - key: content.recipe.condense_methane.name
+    text: Methane Condenser
+  - key: content.recipe.smelt_iron_plate.name
+    text: Smelt Iron Plate
+  - key: content.recipe.smelt_glass.name
+    text: Smelt Glass
+  - key: content.recipe.smelt_steel.name
+    text: Smelt Steel
+  - key: content.recipe.smelt_titanium_plate.name
+    text: Press Titanium Plate
+  - key: content.recipe.forge_thermal_alloy.name
+    text: Forge Thermal Alloy
+  - key: content.recipe.forge_rad_shield.name
+    text: Forge Rad-Shield
+  - key: content.recipe.draw_copper_wire.name
+    text: Draw Copper Wire
+  - key: content.recipe.press_biocomposite.name
+    text: Press Biocomposite
+  - key: content.recipe.etch_circuit_board.name
+    text: Etch Circuit Board
+  - key: content.recipe.assemble_servo_motor.name
+    text: Assemble Servo Motor
+  - key: content.recipe.grind_optic_lens.name
+    text: Grind Optic Lens
+  - key: content.recipe.mix_cryo_composite.name
+    text: Mix Cryo Composite
+  - key: content.recipe.charge_plasma_cell.name
+    text: Charge Plasma Cell
+  - key: content.recipe.etch_quantum_chip.name
+    text: Etch Quantum Chip
+  - key: content.recipe.grow_void_alloy.name
+    text: Grow Void Alloy
+  - key: content.recipe.wind_warp_coil.name
+    text: Wind Warp Coil
+  - key: content.recipe.synthesize_antimatter.name
+    text: Synthesize Antimatter
+  - key: content.enemy.scout.name
+    text: Scout
+  - key: content.enemy.swarmer.name
+    text: Swarmer
+  - key: content.enemy.raider.name
+    text: Raider
+  - key: content.enemy.brute.name
+    text: Brute
+  - key: content.enemy.titan.name
+    text: Titan
+  - key: content.upgrade.pack.name
+    text: Backpack
+  - key: content.upgrade.pack.description
+    text: +9 slots (one more row). Carry more before you turn back.
+  - key: content.upgrade.pack.level-1
+    text: Satchel
+  - key: content.upgrade.pack.level-2
+    text: Rucksack
+  - key: content.upgrade.pack.level-3
+    text: Field Pack
+  - key: content.upgrade.pack.level-4
+    text: Expedition Pack
+  - key: content.upgrade.pack.level-5
+    text: Cargo Harness
+  - key: content.upgrade.pack.level-6
+    text: Hauler Rig
+  - key: content.upgrade.pack.level-7
+    text: Titan Frame
+  - key: content.upgrade.pack.level-8
+    text: Exo-Hauler
+  - key: content.upgrade.engine.name
+    text: Engine Efficiency
+  - key: content.upgrade.engine.description
+    text: Every trip burns less fuel.
+  - key: content.upgrade.engine.level-1
+    text: Tuned Injectors
+  - key: content.upgrade.engine.level-2
+    text: Flow Manifold
+  - key: content.upgrade.engine.level-3
+    text: Ion Nozzles
+  - key: content.upgrade.engine.level-4
+    text: Cryo Intake
+  - key: content.upgrade.engine.level-5
+    text: Plasma Lens
+  - key: content.upgrade.engine.level-6
+    text: Phase Vents
+  - key: content.upgrade.engine.level-7
+    text: Zero-Point Taps
+  - key: content.upgrade.engine.level-8
+    text: Gradient Drive
+  - key: content.upgrade.engine.level-9
+    text: Resonant Core
+  - key: content.upgrade.engine.level-10
+    text: Quiet Singularity
+  - key: content.upgrade.jump.name
+    text: Jump Range
+  - key: content.upgrade.jump.description
+    text: A single jump reaches farther, so depth is earned.
+  - key: content.upgrade.jump.level-1
+    text: Jump Coils
+  - key: content.upgrade.jump.level-2
+    text: Capacitor Bank
+  - key: content.upgrade.jump.level-3
+    text: Resonance Array
+  - key: content.upgrade.jump.level-4
+    text: Folded Lattice
+  - key: content.upgrade.jump.level-5
+    text: Deep Coils
+  - key: content.upgrade.jump.level-6
+    text: Rift Anchors
+  - key: content.upgrade.jump.level-7
+    text: Tunnel Drive
+  - key: content.upgrade.jump.level-8
+    text: Gate Harmonics
+  - key: content.upgrade.jump.level-9
+    text: Fold Engine
+  - key: content.upgrade.jump.level-10
+    text: Boundless Drive
+  - key: content.upgrade.scanner_range.name
+    text: Scanner Range
+  - key: content.upgrade.scanner_range.description
+    text: Worlds within range of any world you have visited show their resources.
+  - key: content.upgrade.scanner_range.level-1
+    text: Long Lens
+  - key: content.upgrade.scanner_range.level-2
+    text: Sweep Array
+  - key: content.upgrade.scanner_range.level-3
+    text: Deep Survey
+  - key: content.upgrade.scanner_range.level-4
+    text: Parallax Net
+  - key: content.upgrade.scanner_range.level-5
+    text: Galactic Atlas
+  - key: content.upgrade.scanner_range.level-6
+    text: Dark Survey
+  - key: content.upgrade.scanner_range.level-7
+    text: Lattice Scan
+  - key: content.upgrade.scanner_range.level-8
+    text: Cosmic Ear
+  - key: content.upgrade.fuel_tank.name
+    text: Fuel Tank
+  - key: content.upgrade.fuel_tank.description
+    text: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops eating
+      backpack space.
+  - key: content.upgrade.fuel_tank.level-1
+    text: Auxiliary Cell
+  - key: content.upgrade.fuel_tank.level-2
+    text: Reserve Tank
+  - key: content.upgrade.fuel_tank.level-3
+    text: Baffled Tank
+  - key: content.upgrade.fuel_tank.level-4
+    text: Cryo Tank
+  - key: content.upgrade.fuel_tank.level-5
+    text: Plasma Tank
+  - key: content.upgrade.fuel_tank.level-6
+    text: Containment Vault
+  - key: content.upgrade.hull_toxic.name
+    text: Toxic Seal
+  - key: content.upgrade.hull_toxic.description
+    text: Biocomposite plating that lets the hull set down on toxic worlds.
+  - key: content.upgrade.hull_toxic.level-1
+    text: Biocomposite Seal
+  - key: content.upgrade.hull_toxic.level-2
+    text: Triple Seal
+  - key: content.upgrade.hull_toxic.level-3
+    text: Sealed Hull
+  - key: content.upgrade.hull_heat.name
+    text: Thermal Plating
+  - key: content.upgrade.hull_heat.description
+    text: Thermal alloy plating for volcanic and desert worlds.
+  - key: content.upgrade.hull_heat.level-1
+    text: Thermal Plating
+  - key: content.upgrade.hull_heat.level-2
+    text: Ceramic Shell
+  - key: content.upgrade.hull_heat.level-3
+    text: Magma Shell
+  - key: content.upgrade.hull_cold.name
+    text: Cryo Plating
+  - key: content.upgrade.hull_cold.description
+    text: Cryo composite plating for glacial worlds.
+  - key: content.upgrade.hull_cold.level-1
+    text: Cryo Plating
+  - key: content.upgrade.hull_cold.level-2
+    text: Thermal Break
+  - key: content.upgrade.hull_cold.level-3
+    text: Polar Shell
+  - key: content.upgrade.hull_rad.name
+    text: Rad-Shield Plating
+  - key: content.upgrade.hull_rad.description
+    text: Rad-Shield alloy plating for irradiated worlds and hostile stars.
+  - key: content.upgrade.hull_rad.level-1
+    text: Rad-Shield Plating
+  - key: content.upgrade.hull_rad.level-2
+    text: Lead Lattice
+  - key: content.upgrade.hull_rad.level-3
+    text: Pulsar Shell
+  - key: content.upgrade.hull_void.name
+    text: Void Shell
+  - key: content.upgrade.hull_void.description
+    text: Void alloy shell for worlds where space itself is thin.
+  - key: content.upgrade.hull_void.level-1
+    text: Void Shell
+  - key: content.upgrade.hull_void.level-2
+    text: Event Shell
+  - key: content.upgrade.hull_void.level-3
+    text: Null Shell
+  - key: content.upgrade.turret.name
+    text: Turret Actuators
+  - key: content.upgrade.turret.description
+    text: +15% firing speed for placed turrets. Does not spawn turrets.
+  - key: content.upgrade.turret.level-1
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-2
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-3
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-4
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-5
+    text: Turret Actuators
+  - key: content.upgrade.turret.level-6
+    text: Turret Actuators
+  - key: content.upgrade.turretdmg.name
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.description
+    text: +35% turret damage.
+  - key: content.upgrade.turretdmg.level-1
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-2
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-3
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-4
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-5
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-6
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-7
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-8
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-9
+    text: Turret Damage
+  - key: content.upgrade.turretdmg.level-10
+    text: Turret Damage
+  - key: content.upgrade.pulse.name
+    text: Ion Pulse
+  - key: content.upgrade.pulse.description
+    text: +40% tap damage.
+  - key: content.upgrade.pulse.level-1
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-2
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-3
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-4
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-5
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-6
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-7
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-8
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-9
+    text: Ion Pulse
+  - key: content.upgrade.pulse.level-10
+    text: Ion Pulse
+  - key: content.upgrade.shield.name
+    text: Reactor Shield
+  - key: content.upgrade.shield.description
+    text: +25 reactor health.
+  - key: content.upgrade.shield.level-1
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-2
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-3
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-4
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-5
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-6
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-7
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-8
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-9
+    text: Reactor Shield
+  - key: content.upgrade.shield.level-10
+    text: Reactor Shield
+  - key: content.upgrade.salvage.name
+    text: Salvage Rig
+  - key: content.upgrade.salvage.description
+    text: +10% wave rewards.
+  - key: content.upgrade.salvage.level-1
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-2
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-3
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-4
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-5
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-6
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-7
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-8
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-9
+    text: Salvage Rig
+  - key: content.upgrade.salvage.level-10
+    text: Salvage Rig
+  - key: content.upgrade.compression.name
+    text: Cargo Compression
+  - key: content.upgrade.compression.description
+    text: 'Every stack in your backpack and warehouses holds more: the end-game answer
+      to storage.'
+  - key: content.upgrade.compression.level-1
+    text: Vacuum Packing
+  - key: content.upgrade.compression.level-2
+    text: Dense Racking
+  - key: content.upgrade.compression.level-3
+    text: Pressure Stacks
+  - key: content.upgrade.compression.level-4
+    text: Quantum Compression
+  - key: content.upgrade.axe.name
+    text: Axe
+  - key: content.upgrade.axe.description
+    text: Hit the glowing weak spot to fell trees. Better axes deal more damage and
+      swing faster.
+  - key: content.upgrade.axe.legacy-level-0
+    text: Bare Hands
+  - key: content.upgrade.axe.legacy-level-1
+    text: Stone Axe
+  - key: content.upgrade.axe.legacy-level-2
+    text: Iron Axe
+  - key: content.upgrade.axe.legacy-level-3
+    text: Steel Axe
+  - key: content.upgrade.axe.legacy-level-4
+    text: Crystal Axe
+  - key: content.upgrade.axe.legacy-level-5
+    text: Plasma Chainsaw
+  - key: content.upgrade.axe.legacy-level-6
+    text: Singularity Saw
+  - key: content.upgrade.pick.name
+    text: Pickaxe
+  - key: content.upgrade.pick.description
+    text: Strike the shiny spot to break nodes through stages. Better picks crack
+      them faster.
+  - key: content.upgrade.pick.legacy-level-0
+    text: Bare Hands
+  - key: content.upgrade.pick.legacy-level-1
+    text: Stone Pick
+  - key: content.upgrade.pick.legacy-level-2
+    text: Iron Pick
+  - key: content.upgrade.pick.legacy-level-3
+    text: Steel Pick
+  - key: content.upgrade.pick.legacy-level-4
+    text: Pneumatic Pick
+  - key: content.upgrade.pick.legacy-level-5
+    text: Jackhammer
+  - key: content.upgrade.pick.legacy-level-6
+    text: Plasma Jackhammer
+  - key: content.upgrade.drill.name
+    text: Drill
+  - key: content.upgrade.drill.description
+    text: Hold to bore through rock. Better drills fill the progress gauge faster.
+  - key: content.upgrade.drill.legacy-level-0
+    text: Hand Auger
+  - key: content.upgrade.drill.legacy-level-1
+    text: Pneumatic Drill
+  - key: content.upgrade.drill.legacy-level-2
+    text: Crystal Bore
+  - key: content.upgrade.drill.legacy-level-3
+    text: Plasma Bore
+  - key: content.upgrade.drill.legacy-level-4
+    text: Quantum Bore
+  - key: content.upgrade.drill.legacy-level-5
+    text: Singularity Bore
+  - key: content.upgrade.drill.legacy-level-6
+    text: Void Bore
+  - key: content.research.survey_basics.name
+    text: Survey Basics
+  - key: content.research.survey_basics.description
+    text: Calibrate the ship's sensors and raise a radar tower.
+  - key: content.research.smelting.name
+    text: Smelting
+  - key: content.research.smelting.description
+    text: Hot enough furnaces turn ore into plate and sand into glass.
+  - key: content.research.fabrication.name
+    text: Fabrication
+  - key: content.research.fabrication.description
+    text: Wire drawing and bench assembly.
+  - key: content.research.deep_drilling.name
+    text: Deep Drilling
+  - key: content.research.deep_drilling.description
+    text: Bores deep enough to reach ore under the crust.
+  - key: content.research.bio_cultivation.name
+    text: Bio-Cultivation
+  - key: content.research.bio_cultivation.description
+    text: Tended domes harvest the fast growth of green worlds.
+  - key: content.research.jump_drive_1.name
+    text: Jump Drive I
+  - key: content.research.jump_drive_1.description
+    text: 'The first jump coils: leave the home system.'
+  - key: content.research.steelmaking.name
+    text: Steelmaking
+  - key: content.research.steelmaking.description
+    text: Burn timber into carbon and fold it into iron.
+  - key: content.research.composites.name
+    text: Composites
+  - key: content.research.composites.description
+    text: Press plant fibre and resin into a poison-proof skin.
+  - key: content.research.circuitry.name
+    text: Circuitry
+  - key: content.research.circuitry.description
+    text: Etched copper traces on a glass-fibre sheet.
+  - key: content.research.titanium_working.name
+    text: Titanium Working
+  - key: content.research.titanium_working.description
+    text: A furnace hot enough for the stubborn grey ore.
+  - key: content.research.gas_extraction.name
+    text: Gas Extraction
+  - key: content.research.gas_extraction.description
+    text: Pumps and turbines for the storm bands.
+  - key: content.research.geo_survey.name
+    text: Geo-Survey
+  - key: content.research.geo_survey.description
+    text: Sonar and trowel work for buried deposits.
+  - key: content.research.salvage_ops.name
+    text: Salvage Operations
+  - key: content.research.salvage_ops.description
+    text: A yard to sort the wreckage of the galaxy.
+  - key: content.research.fuel_logistics.name
+    text: Fuel Logistics
+  - key: content.research.fuel_logistics.description
+    text: Dense racks for fuel cells.
+  - key: content.research.cargo_logistics.name
+    text: Cargo Logistics
+  - key: content.research.cargo_logistics.description
+    text: One pool for every warehouse on a world.
+  - key: content.research.ballistics.name
+    text: Ballistics
+  - key: content.research.ballistics.description
+    text: Focused beams for long range.
+  - key: content.research.shield_tech.name
+    text: Shield Tech
+  - key: content.research.shield_tech.description
+    text: Fields that blunt incoming fire.
+  - key: content.research.hazmat_toxic.name
+    text: 'Hazmat: Toxic'
+  - key: content.research.hazmat_toxic.description
+    text: Seal the hull against toxic air.
+  - key: content.research.jump_drive_2.name
+    text: Jump Drive II
+  - key: content.research.jump_drive_2.description
+    text: 'More stable coils: a longer first leap.'
+  - key: content.research.field_engineering.name
+    text: Field Engineering
+  - key: content.research.field_engineering.description
+    text: A second crew works your sites.
+  - key: content.research.long_range_scanning_1.name
+    text: Long-Range Scanning I
+  - key: content.research.long_range_scanning_1.description
+    text: Wider survey sweeps.
+  - key: content.research.toolsmithing_1.name
+    text: Toolsmithing I
+  - key: content.research.toolsmithing_1.description
+    text: Steel heads on every handle.
+  - key: content.research.chemistry.name
+    text: Chemistry
+  - key: content.research.chemistry.description
+    text: Reactors for resins, cryogels and charged gas.
+  - key: content.research.thermal_metallurgy.name
+    text: Thermal Metallurgy
+  - key: content.research.thermal_metallurgy.description
+    text: Alloys that glow without failing.
+  - key: content.research.cryo_chemistry.name
+    text: Cryo-Chemistry
+  - key: content.research.cryo_chemistry.description
+    text: Foam-cored laminates for deep cold.
+  - key: content.research.robotics.name
+    text: Robotics
+  - key: content.research.robotics.description
+    text: Sealed motors with precision gearheads.
+  - key: content.research.optics.name
+    text: Optics
+  - key: content.research.optics.description
+    text: Lenses ground flawless enough for lasers.
+  - key: content.research.hazmat_heat.name
+    text: 'Hazmat: Heat'
+  - key: content.research.hazmat_heat.description
+    text: Plating for worlds where rock flows.
+  - key: content.research.hazmat_cold.name
+    text: 'Hazmat: Cold'
+  - key: content.research.hazmat_cold.description
+    text: Plating for worlds where air freezes.
+  - key: content.research.missile_tech.name
+    text: Missile Tech
+  - key: content.research.missile_tech.description
+    text: Splash missiles for the thick of a wave.
+  - key: content.research.tesla_tech.name
+    text: Tesla Tech
+  - key: content.research.tesla_tech.description
+    text: Chain lightning between aliens.
+  - key: content.research.field_repair.name
+    text: Field Repair
+  - key: content.research.field_repair.description
+    text: Repair drones for the reactor.
+  - key: content.research.colony_charter.name
+    text: Colony Charter
+  - key: content.research.colony_charter.description
+    text: A hub that runs the settlement.
+  - key: content.research.jump_drive_3.name
+    text: Jump Drive III
+  - key: content.research.jump_drive_3.description
+    text: Folded lattices for deep hops.
+  - key: content.research.nav_autopilot.name
+    text: Autopilot Navigation
+  - key: content.research.nav_autopilot.description
+    text: Skip the flight at a fuel premium.
+  - key: content.research.toolsmithing_2.name
+    text: Toolsmithing II
+  - key: content.research.toolsmithing_2.description
+    text: Crystal-edged tools.
+  - key: content.research.long_range_scanning_2.name
+    text: Long-Range Scanning II
+  - key: content.research.long_range_scanning_2.description
+    text: Parallax surveys of whole sectors.
+  - key: content.research.plasma_physics.name
+    text: Plasma Physics
+  - key: content.research.plasma_physics.description
+    text: Bottle a star in a flask.
+  - key: content.research.radiation_shielding.name
+    text: Radiation Shielding
+  - key: content.research.radiation_shielding.description
+    text: Layered alloys that drink hard radiation.
+  - key: content.research.quantum_computing.name
+    text: Quantum Computing
+  - key: content.research.quantum_computing.description
+    text: Machines that think in more than one state.
+  - key: content.research.hazmat_rad.name
+    text: 'Hazmat: Radiation'
+  - key: content.research.hazmat_rad.description
+    text: Plating for worlds that glow in the dark.
+  - key: content.research.orbital_logistics.name
+    text: Orbital Logistics
+  - key: content.research.orbital_logistics.description
+    text: Withdraw from any warehouse the beam can see.
+  - key: content.research.automation.name
+    text: Automation
+  - key: content.research.automation.description
+    text: Machines that gather bulk goods while you sleep.
+  - key: content.research.hangar_ops.name
+    text: Hangar Operations
+  - key: content.research.hangar_ops.description
+    text: Ground crews that shave fuel off every launch.
+  - key: content.research.toolsmithing_3.name
+    text: Toolsmithing III
+  - key: content.research.toolsmithing_3.description
+    text: Plasma-edged tools.
+  - key: content.research.jump_drive_4.name
+    text: Jump Drive IV
+  - key: content.research.jump_drive_4.description
+    text: 'Anchors in the rift: long, safe jumps.'
+  - key: content.research.compression_1.name
+    text: Cargo Compression I
+  - key: content.research.compression_1.description
+    text: Vacuum-packed stacks.
+  - key: content.research.terraforming.name
+    text: Terraforming
+  - key: content.research.terraforming.description
+    text: Reshape a world's climate in five stages.
+  - key: content.research.long_range_scanning_3.name
+    text: Long-Range Scanning III
+  - key: content.research.long_range_scanning_3.description
+    text: A survey net that spans galaxies.
+  - key: content.research.compression_2.name
+    text: Cargo Compression II
+  - key: content.research.compression_2.description
+    text: Dense racking.
+  - key: content.research.void_forging.name
+    text: Void Forging
+  - key: content.research.void_forging.description
+    text: Grow metal around a seed of nothing.
+  - key: content.research.warp_theory.name
+    text: Warp Theory
+  - key: content.research.warp_theory.description
+    text: Fold space inside a coil.
+  - key: content.research.antimatter_synthesis.name
+    text: Antimatter Synthesis
+  - key: content.research.antimatter_synthesis.description
+    text: 'Mirror-bottled energy: sixty-four cells in a pod.'
+  - key: content.research.hazmat_void.name
+    text: 'Hazmat: Void'
+  - key: content.research.hazmat_void.description
+    text: Plating for the places between places.
+  - key: content.research.warp_gate_engineering.name
+    text: Warp Gate Engineering
+  - key: content.research.warp_gate_engineering.description
+    text: A ring in orbit that makes distance negotiable.
+  - key: content.research.jump_drive_5.name
+    text: Jump Drive V
+  - key: content.research.jump_drive_5.description
+    text: Tunnel drives and gate harmonics.
+  - key: content.research.toolsmithing_4.name
+    text: Toolsmithing IV
+  - key: content.research.toolsmithing_4.description
+    text: Singularity-edged tools.
+  - key: content.research.stellar_engineering.name
+    text: Stellar Engineering
+  - key: content.research.stellar_engineering.description
+    text: Harness a star.
+  - key: content.research.compression_3.name
+    text: Cargo Compression III
+  - key: content.research.compression_3.description
+    text: 'Quantum compression: a hold inside a speck.'
+  - key: content.research.ascension_protocol.name
+    text: Ascension Protocol
+  - key: content.research.ascension_protocol.description
+    text: Begin again in a new seeded universe, keeping what you learned.
+  - key: content.tool.axe.name
+    text: Axe
+  - key: content.tool.axe.tier-1
+    text: Bare Hands
+  - key: content.tool.axe.tier-2
+    text: Stone Axe
+  - key: content.tool.axe.tier-3
+    text: Iron Axe
+  - key: content.tool.axe.tier-4
+    text: Steel Axe
+  - key: content.tool.axe.tier-5
+    text: Crystal Axe
+  - key: content.tool.axe.tier-6
+    text: Plasma Chainsaw
+  - key: content.tool.axe.tier-7
+    text: Singularity Saw
+  - key: content.tool.pick.name
+    text: Pickaxe
+  - key: content.tool.pick.tier-1
+    text: Bare Hands
+  - key: content.tool.pick.tier-2
+    text: Stone Pick
+  - key: content.tool.pick.tier-3
+    text: Iron Pick
+  - key: content.tool.pick.tier-4
+    text: Steel Pick
+  - key: content.tool.pick.tier-5
+    text: Pneumatic Pick
+  - key: content.tool.pick.tier-6
+    text: Jackhammer
+  - key: content.tool.pick.tier-7
+    text: Plasma Jackhammer
+  - key: content.tool.claw.name
+    text: Salvage Claw
+  - key: content.tool.claw.tier-1
+    text: Grabber
+  - key: content.tool.claw.tier-2
+    text: Magnet Claw
+  - key: content.tool.claw.tier-3
+    text: Servo Claw
+  - key: content.tool.claw.tier-4
+    text: Titan Claw
+  - key: content.tool.claw.tier-5
+    text: Plasma Claw
+  - key: content.tool.claw.tier-6
+    text: Gravity Claw
+  - key: content.tool.claw.tier-7
+    text: Singularity Claw
+  - key: content.tool.drill.name
+    text: Drill
+  - key: content.tool.drill.tier-1
+    text: Hand Auger
+  - key: content.tool.drill.tier-2
+    text: Pneumatic Drill
+  - key: content.tool.drill.tier-3
+    text: Crystal Bore
+  - key: content.tool.drill.tier-4
+    text: Plasma Bore
+  - key: content.tool.drill.tier-5
+    text: Quantum Bore
+  - key: content.tool.drill.tier-6
+    text: Singularity Bore
+  - key: content.tool.drill.tier-7
+    text: Void Bore
+  - key: content.tool.siphon.name
+    text: Siphon
+  - key: content.tool.siphon.tier-1
+    text: Hand Pump
+  - key: content.tool.siphon.tier-2
+    text: Vacuum Pump
+  - key: content.tool.siphon.tier-3
+    text: Cryo Siphon
+  - key: content.tool.siphon.tier-4
+    text: Turbine Siphon
+  - key: content.tool.siphon.tier-5
+    text: Plasma Siphon
+  - key: content.tool.siphon.tier-6
+    text: Vortex Siphon
+  - key: content.tool.siphon.tier-7
+    text: Singularity Siphon
+  - key: content.tool.scanner.name
+    text: Excavator
+  - key: content.tool.scanner.tier-1
+    text: Trowel
+  - key: content.tool.scanner.tier-2
+    text: Sonar Scanner
+  - key: content.tool.scanner.tier-3
+    text: Resonance Probe
+  - key: content.tool.scanner.tier-4
+    text: Seismic Excavator
+  - key: content.tool.scanner.tier-5
+    text: Plasma Excavator
+  - key: content.tool.scanner.tier-6
+    text: Quantum Excavator
+  - key: content.tool.scanner.tier-7
+    text: Void Excavator
+  - key: content.obstacle.boulder.name
+    text: Boulder
+  - key: content.obstacle.boulder.description
+    text: A weathered lump of rock sits where a pad should be. Break it up with picks
+      and haul the pieces away.
+  - key: content.obstacle.dead_tree.name
+    text: Dead Tree
+  - key: content.obstacle.dead_tree.description
+    text: The trunk is long dead and the roots still grip the pad. Fell it, split
+      it, and the wood is yours.
+  - key: content.obstacle.wreckage.name
+    text: Wreckage
+  - key: content.obstacle.wreckage.description
+    text: Someone else's landing ended here. Cut the hull apart for scrap before
+      it blocks anything else.
+  - key: content.obstacle.fungal_growth.name
+    text: Fungal Growth
+  - key: content.obstacle.fungal_growth.description
+    text: A shelf of spore-heavy fungus has taken the pad. Burn it back and collect
+      what the rot left behind.
+  - key: content.obstacle.ice_spire.name
+    text: Ice Spire
+  - key: content.obstacle.ice_spire.description
+    text: A spear of old ice has grown through the pad. Melt it carefully; the water
+      is worth keeping.
+  - key: content.obstacle.crystal_cluster.name
+    text: Crystal Cluster
+  - key: content.obstacle.crystal_cluster.description
+    text: Raw crystal has burst through the ground. Cut it free before the whole
+      pad starts to hum.
+  - key: content.obstacle.magma_crust.name
+    text: Magma Crust
+  - key: content.obstacle.magma_crust.description
+    text: A plate of cooled magma has fused over the pad, still ticking as it shrinks.
+      Break the crust and clear the slag.
+  - key: content.obstacle.void_scar.name
+    text: Void Scar
+  - key: content.obstacle.void_scar.description
+    text: Space itself is torn here. Seal the scar with shielding alloy before it
+      spreads under the next pad.
+  - key: content.planet.sylva.description
+    text: A gentle forest world. Perfect for a first axe swing.
+  - key: content.planet.sylva.spot-0
+    text: Ironbark Grove
+  - key: content.planet.sylva.spot-1
+    text: Mossy Outcrop
+  - key: content.planet.ferrum.description
+    text: Rust-red plains laced with ore veins. Few trees.
+  - key: content.planet.ferrum.spot-0
+    text: Scrub Trees
+  - key: content.planet.ferrum.spot-1
+    text: Quarry
+  - key: content.planet.ferrum.spot-2
+    text: Ore Seam
+  - key: content.planet.glacia.description
+    text: Frozen world with cryo-vents full of fuel.
+  - key: content.planet.glacia.spot-0
+    text: Ice Crystals
+  - key: content.planet.cinder.description
+    text: Volcanic and hostile. Metal-rich, crystal-poor.
+  - key: content.planet.cinder.spot-0
+    text: Magma Vent
+  - key: content.planet.cinder.spot-1
+    text: Slag Field
+  - key: content.planet.cinder.spot-2
+    text: Deep Bore
+  - key: content.planet.arbor.description
+    text: A planet-sized jungle. Titanic trees, dense crystal roots.
+  - key: content.planet.arbor.spot-0
+    text: Titan Grove
+  - key: content.planet.arbor.spot-1
+    text: Root Crystals
+  - key: content.planet.nyx.description
+    text: A dark hive world. Dangerous, valuable.
+  - key: content.planet.nyx.spot-0
+    text: Crystal Heart
+  - key: content.planet.nyx.spot-1
+    text: Hive Breach
+  - key: content.planet.nyx.spot-2
+    text: Void Ore
+  - key: content.planet.aurum.description
+    text: Endless golden dunes hiding dense mineral beds.
+  - key: content.planet.aurum.spot-0
+    text: Dune Quarry
+  - key: content.planet.aurum.spot-1
+    text: Gilded Seam
+  - key: content.planet.tide.description
+    text: An ocean world of floating kelp forests and fuel-rich brine.
+  - key: content.planet.tide.spot-0
+    text: Kelp Forest
+  - key: content.planet.zephyr.description
+    text: A pastel gas giant with floating platforms in the storm bands.
+  - key: content.planet.zephyr.spot-0
+    text: Cloud Crystals
+  - key: content.planet.pyre.description
+    text: A molten shell cracked open by rivers of lava.
+  - key: content.planet.pyre.spot-0
+    text: Lava Tap
+  - key: content.planet.pyre.spot-1
+    text: Cinder Vein
+  - key: content.planet.halcyon.description
+    text: A serene teal ice world, still and deceptively rich.
+  - key: content.planet.halcyon.spot-0
+    text: Frost Geodes
+  - key: content.planet.mire.description
+    text: A rotting swamp world. Spore storms and enormous fungal trees.
+  - key: content.planet.mire.spot-0
+    text: Fungal Giants
+  - key: content.planet.mire.spot-1
+    text: Husk Nest
+  - key: content.planet.obsidian.description
+    text: Black glass plains threaded with violet crystal.
+  - key: content.planet.obsidian.spot-0
+    text: Glass Shelf
+  - key: content.planet.obsidian.spot-1
+    text: Violet Spires
+  - key: content.planet.vesper.description
+    text: Twilight world of endless dusk and warring hives.
+  - key: content.planet.vesper.spot-0
+    text: Dusk Ore
+  - key: content.planet.vesper.spot-1
+    text: Hive Heart
+  - key: content.planet.prism.description
+    text: A crystalline world that fractures light into rainbows. Rare.
+  - key: content.planet.prism.spot-0
+    text: Prism Fields
+  - key: content.planet.kaos.description
+    text: A shattered world orbiting nothing. The end of the map.
+  - key: content.planet.kaos.spot-0
+    text: Null Seam
+  - key: content.planet.kaos.spot-1
+    text: Singular Ore
+  - key: content.planet.tundra.description
+    text: A windswept frozen steppe on the outer ring.
+  - key: content.planet.tundra.spot-0
+    text: Frozen Pines
+  - key: content.planet.tundra.spot-1
+    text: Permafrost Pit
+  - key: content.planet.coral.description
+    text: A living reef world with bioluminescent forests.
+  - key: content.planet.coral.spot-0
+    text: Glow Reef
+  - key: content.planet.coral.spot-1
+    text: Pearl Beds
+  - key: content.planet.veridian.description
+    text: Lush emerald moon dense with ancient mossy canopy.
+  - key: content.planet.veridian.spot-0
+    text: Ancient Canopy
+  - key: content.planet.veridian.spot-1
+    text: River Bed
+  - key: content.planet.calcite.description
+    text: Chalk-white world with deep stone quarries and iron deposits.
+  - key: content.planet.calcite.spot-0
+    text: Hematite Ridge
+  - key: content.planet.calcite.spot-1
+    text: Basalt Quarry
+  - key: content.planet.sulfur.description
+    text: Yellow brimstone plains erupting with pressurized vapor.
+  - key: content.planet.sulfur.spot-0
+    text: Molten Lode
+  - key: content.planet.magma.description
+    text: Churning rivers of liquid rock and rich titanium deposits.
+  - key: content.planet.magma.spot-0
+    text: Molten Lode
+  - key: content.planet.magma.spot-1
+    text: Caldera Nexus
+  - key: content.planet.lotus.description
+    text: Oceanic world of giant bioluminescent floating flora.
+  - key: content.planet.lotus.spot-0
+    text: Ancient Canopy
+  - key: content.planet.lotus.spot-1
+    text: River Bed
+  - key: content.planet.spore.description
+    text: Subterranean fungal hive where massive caps pierce the crust.
+  - key: content.planet.spore.spot-0
+    text: Titan Fungi
+  - key: content.planet.spore.spot-1
+    text: Spore Hive
+  - key: content.planet.eclipse.description
+    text: A dark world locked in permanent transit. Violet lightning storms.
+  - key: content.planet.eclipse.spot-0
+    text: Black Glass Shelf
+  - key: content.planet.eclipse.spot-1
+    text: Violet Vein
+  - key: content.planet.eclipse.spot-2
+    text: Void Rift
+  - key: content.planet.phantom.description
+    text: Eerie gravitational void world threaded with alien wreckage.
+  - key: content.planet.phantom.spot-0
+    text: Black Glass Shelf
+  - key: content.planet.phantom.spot-1
+    text: Violet Vein
+  - key: content.planet.phantom.spot-2
+    text: Void Rift
+  - key: content.planet.borealis.description
+    text: Atmosphere glows with shifting auroras above frozen seas.
+  - key: content.planet.borealis.spot-0
+    text: Frost Geodes
+  - key: content.planet.borealis.spot-1
+    text: Frozen Timber
+  - key: content.planet.cryo.description
+    text: Sub-zero glacial rift where geothermal vents spew concentrated fuel.
+  - key: content.planet.cryo.spot-0
+    text: Frost Geodes
+  - key: content.planet.aether.description
+    text: Floating crystalline fragments trapped in an ion field.
+  - key: content.planet.aether.spot-0
+    text: Prismatic Spire
+  - key: content.planet.aether.spot-1
+    text: Quartz Seam
+  - key: content.planet.genesis.description
+    text: A primordial anomaly pulsating with raw energy. The deepest world.
+  - key: content.planet.genesis.spot-0
+    text: Fracture Core
+  - key: content.planet.genesis.spot-1
+    text: Null Bore
+  - key: content.wave-modifier.0.name
+    text: Swift
+  - key: content.wave-modifier.0.description
+    text: Faster approach. Victory rewards +10%.
+  - key: content.wave-modifier.1.name
+    text: Fortified
+  - key: content.wave-modifier.1.description
+    text: Tougher aliens. Victory rewards +10%.
+  - key: content.wave-modifier.2.name
+    text: Overcharged
+  - key: content.wave-modifier.2.description
+    text: Harder reactor impacts. Victory rewards +10%.
+  - key: content.objective.first_structure.title
+    text: Make landfall yours
+  - key: content.objective.first_structure.description
+    text: Complete your first structure. Construction must finish before it counts.
+  - key: content.objective.first_harvest.title
+    text: First haul
+  - key: content.objective.first_harvest.description
+    text: Complete and collect a harvest run. Abandoned runs do not count.
+  - key: content.objective.first_warehouse.title
+    text: Room to grow
+  - key: content.objective.first_warehouse.description
+    text: Complete a Warehouse to store resources beyond your backpack.
+  - key: content.objective.first_fuel.title
+    text: Fuel the frontier
+  - key: content.objective.first_fuel.description
+    text: Craft fuel at a processing station. Found or starting fuel does not count.
+  - key: content.objective.first_hop.title
+    text: Leave the cradle
+  - key: content.objective.first_hop.description
+    text: Land on a second distinct world.
+  - key: content.objective.first_wave.title
+    text: Hold your ground
+  - key: content.objective.first_wave.description
+    text: Call and clear an alien wave on your planet.
+  - key: content.objective.research_lab.title
+    text: A place for discovery
+  - key: content.objective.research_lab.description
+    text: Complete a Research Lab to unlock advanced technology.
+  - key: content.objective.jump_range_1.title
+    text: A longer reach
+  - key: content.objective.jump_range_1.description
+    text: Purchase the first Jump Range upgrade. Temporary debug settings do not
+      count.
+  - key: content.objective.first_steel.title
+    text: Stronger foundations
+  - key: content.objective.first_steel.description
+    text: Craft steel at a Foundry.
+  - key: content.objective.first_hazard_plating.title
+    text: Beyond safe skies
+  - key: content.objective.first_hazard_plating.description
+    text: Purchase any hazard plating to prepare for hostile worlds.
+  - key: content.objective.mega_first_stage.title
+    text: Think on a planetary scale
+  - key: content.objective.mega_first_stage.description
+    text: Complete the first stage of a megaproject.
+  - key: content.objective.mega_stage_3.title
+    text: Megaproject mastery
+  - key: content.objective.mega_stage_3.description
+    text: Complete stage three of any one megaproject.
+  - key: content.objective.era_foothold.title
+    text: Foothold
+  - key: content.objective.era_foothold.description
+    text: Reach the Foothold era by landing on a second world.
+  - key: content.objective.era_settlement.title
+    text: Settlement
+  - key: content.objective.era_settlement.description
+    text: Complete a Research Lab and purchase Jump Range level one.
+  - key: content.objective.era_industry.title
+    text: Industry
+  - key: content.objective.era_industry.description
+    text: Purchase hazard plating and enter the Industry era.
+  - key: content.objective.era_interstellar.title
+    text: Interstellar
+  - key: content.objective.era_interstellar.description
+    text: Purchase Rad-Shield Plating and craft an Antimatter Pod.
+  - key: content.objective.era_ascension.title
+    text: Ready for the unknown
+  - key: content.objective.era_ascension.description
+    text: Reach the Ascension era by completing stage three of a megaproject.
+  - key: content.objective.reach_tier_1.title
+    text: Tier one explorer
+  - key: content.objective.reach_tier_1.description
+    text: Land on a tier one or deeper world.
+  - key: content.objective.reach_tier_2.title
+    text: Tier two explorer
+  - key: content.objective.reach_tier_2.description
+    text: Land on a tier two or deeper world.
+  - key: content.objective.reach_tier_3.title
+    text: Tier three explorer
+  - key: content.objective.reach_tier_3.description
+    text: Land on a tier three or deeper world.
+  - key: content.objective.reach_tier_4.title
+    text: Tier four explorer
+  - key: content.objective.reach_tier_4.description
+    text: Land on a tier four or deeper world.
+  - key: content.objective.reach_tier_5.title
+    text: Tier five explorer
+  - key: content.objective.reach_tier_5.description
+    text: Land on a tier five or deeper world.
+  - key: content.objective.reach_tier_6.title
+    text: Tier six explorer
+  - key: content.objective.reach_tier_6.description
+    text: Land on a tier six or deeper world.
+  - key: content.objective.reach_tier_7.title
+    text: Tier seven explorer
+  - key: content.objective.reach_tier_7.description
+    text: Land on a tier seven or deeper world.
+  - key: content.objective.reach_tier_8.title
+    text: Tier eight explorer
+  - key: content.objective.reach_tier_8.description
+    text: Land on a tier eight or deeper world.
+  - key: content.objective.reach_tier_9.title
+    text: Deep frontier explorer
+  - key: content.objective.reach_tier_9.description
+    text: Land on a tier nine or deeper world.
+  - key: content.label.Alloy.name
+    text: Alloy
+  - key: content.label.Component.name
+    text: Component
+  - key: content.label.Defense.name
+    text: Defense
+  - key: content.label.Energy.name
+    text: Energy
+  - key: content.label.Harvest.name
+    text: Harvest
+  - key: content.label.Industry.name
+    text: Industry
+  - key: content.label.Logistics.name
+    text: Logistics
+  - key: content.label.Megaprojects.name
+    text: Megaprojects
+  - key: content.label.Navigation.name
+    text: Navigation
+  - key: content.label.Processing.name
+    text: Processing
+  - key: content.label.antimatter_synthesis.name
+    text: Antimatter Synthesis
+  - key: content.label.automation.name
+    text: Automation
+  - key: content.label.ballistics.name
+    text: Ballistics
+  - key: content.label.bio_cultivation.name
+    text: Bio Cultivation
+  - key: content.label.cargo_logistics.name
+    text: Cargo Logistics
+  - key: content.label.chem_reactor.name
+    text: Chem Reactor
+  - key: content.label.chemistry.name
+    text: Chemistry
+  - key: content.label.circuitry.name
+    text: Circuitry
+  - key: content.label.colony_charter.name
+    text: Colony Charter
+  - key: content.label.composites.name
+    text: Composites
+  - key: content.label.compression_1.name
+    text: Compression 1
+  - key: content.label.compression_2.name
+    text: Compression 2
+  - key: content.label.cryo_chemistry.name
+    text: Cryo Chemistry
+  - key: content.label.deep_drilling.name
+    text: Deep Drilling
+  - key: content.label.fabrication.name
+    text: Fabrication
+  - key: content.label.fabricator.name
+    text: Fabricator
+  - key: content.label.feature:ascension.name
+    text: Feature:ascension
+  - key: content.label.feature:autopilot.name
+    text: Feature:autopilot
+  - key: content.label.feature:builder_2.name
+    text: Feature:builder 2
+  - key: content.label.feature:builder_3.name
+    text: Feature:builder 3
+  - key: content.label.field_engineering.name
+    text: Field Engineering
+  - key: content.label.foundry.name
+    text: Foundry
+  - key: content.label.gas_extraction.name
+    text: Gas Extraction
+  - key: content.label.geo_survey.name
+    text: Geo Survey
+  - key: content.label.hazmat_rad.name
+    text: Hazmat Rad
+  - key: content.label.hazmat_toxic.name
+    text: Hazmat Toxic
+  - key: content.label.jump_drive_1.name
+    text: Jump Drive 1
+  - key: content.label.jump_drive_2.name
+    text: Jump Drive 2
+  - key: content.label.jump_drive_3.name
+    text: Jump Drive 3
+  - key: content.label.jump_drive_4.name
+    text: Jump Drive 4
+  - key: content.label.long_range_scanning_1.name
+    text: Long Range Scanning 1
+  - key: content.label.long_range_scanning_2.name
+    text: Long Range Scanning 2
+  - key: content.label.optics.name
+    text: Optics
+  - key: content.label.orbital_logistics.name
+    text: Orbital Logistics
+  - key: content.label.plasma_physics.name
+    text: Plasma Physics
+  - key: content.label.quantum_computing.name
+    text: Quantum Computing
+  - key: content.label.quantum_lab.name
+    text: Quantum Lab
+  - key: content.label.radiation_shielding.name
+    text: Radiation Shielding
+  - key: content.label.recipe:assemble_servo_motor.name
+    text: Recipe:assemble Servo Motor
+  - key: content.label.recipe:charge_plasma_cell.name
+    text: Recipe:charge Plasma Cell
+  - key: content.label.recipe:crystal_cell.name
+    text: Recipe:crystal Cell
+  - key: content.label.recipe:draw_copper_wire.name
+    text: Recipe:draw Copper Wire
+  - key: content.label.recipe:etch_circuit_board.name
+    text: Recipe:etch Circuit Board
+  - key: content.label.recipe:etch_quantum_chip.name
+    text: Recipe:etch Quantum Chip
+  - key: content.label.recipe:forge_rad_shield.name
+    text: Recipe:forge Rad Shield
+  - key: content.label.recipe:forge_thermal_alloy.name
+    text: Recipe:forge Thermal Alloy
+  - key: content.label.recipe:grind_optic_lens.name
+    text: Recipe:grind Optic Lens
+  - key: content.label.recipe:grow_void_alloy.name
+    text: Recipe:grow Void Alloy
+  - key: content.label.recipe:mix_cryo_composite.name
+    text: Recipe:mix Cryo Composite
+  - key: content.label.recipe:press_biocomposite.name
+    text: Recipe:press Biocomposite
+  - key: content.label.recipe:smelt_glass.name
+    text: Recipe:smelt Glass
+  - key: content.label.recipe:smelt_iron_plate.name
+    text: Recipe:smelt Iron Plate
+  - key: content.label.recipe:smelt_steel.name
+    text: Recipe:smelt Steel
+  - key: content.label.recipe:smelt_titanium_plate.name
+    text: Recipe:smelt Titanium Plate
+  - key: content.label.recipe:synthesize_antimatter.name
+    text: Recipe:synthesize Antimatter
+  - key: content.label.recipe:wind_warp_coil.name
+    text: Recipe:wind Warp Coil
+  - key: content.label.refinery.name
+    text: Refinery
+  - key: content.label.robotics.name
+    text: Robotics
+  - key: content.label.smelting.name
+    text: Smelting
+  - key: content.label.steelmaking.name
+    text: Steelmaking
+  - key: content.label.stellar_engineering.name
+    text: Stellar Engineering
+  - key: content.label.structure:auto_harvester.name
+    text: Structure:auto Harvester
+  - key: content.label.structure:biodome.name
+    text: Structure:biodome
+  - key: content.label.structure:cargo_depot.name
+    text: Structure:cargo Depot
+  - key: content.label.structure:chem_reactor.name
+    text: Structure:chem Reactor
+  - key: content.label.structure:colony_hub.name
+    text: Structure:colony Hub
+  - key: content.label.structure:driller.name
+    text: Structure:driller
+  - key: content.label.structure:dyson_collector.name
+    text: Structure:dyson Collector
+  - key: content.label.structure:excavator.name
+    text: Structure:excavator
+  - key: content.label.structure:fabricator.name
+    text: Structure:fabricator
+  - key: content.label.structure:foundry.name
+    text: Structure:foundry
+  - key: content.label.structure:fuel_depot.name
+    text: Structure:fuel Depot
+  - key: content.label.structure:hangar.name
+    text: Structure:hangar
+  - key: content.label.structure:laser.name
+    text: Structure:laser
+  - key: content.label.structure:missile_silo.name
+    text: Structure:missile Silo
+  - key: content.label.structure:orbital_relay.name
+    text: Structure:orbital Relay
+  - key: content.label.structure:quantum_lab.name
+    text: Structure:quantum Lab
+  - key: content.label.structure:radar_tower.name
+    text: Structure:radar Tower
+  - key: content.label.structure:repair_bay.name
+    text: Structure:repair Bay
+  - key: content.label.structure:salvage_yard.name
+    text: Structure:salvage Yard
+  - key: content.label.structure:shield_pylon.name
+    text: Structure:shield Pylon
+  - key: content.label.structure:siphon_rig.name
+    text: Structure:siphon Rig
+  - key: content.label.structure:terraformer.name
+    text: Structure:terraformer
+  - key: content.label.structure:tesla_coil.name
+    text: Structure:tesla Coil
+  - key: content.label.structure:warp_gate.name
+    text: Structure:warp Gate
+  - key: content.label.survey_basics.name
+    text: Survey Basics
+  - key: content.label.terraforming.name
+    text: Terraforming
+  - key: content.label.thermal_metallurgy.name
+    text: Thermal Metallurgy
+  - key: content.label.titanium_working.name
+    text: Titanium Working
+  - key: content.label.tool:*:4.name
+    text: Tool:*:4
+  - key: content.label.tool:*:5.name
+    text: Tool:*:5
+  - key: content.label.tool:*:6.name
+    text: Tool:*:6
+  - key: content.label.tool:*:7.name
+    text: Tool:*:7
+  - key: content.label.tool:drill:2.name
+    text: Tool:drill:2
+  - key: content.label.tool:scanner:2.name
+    text: Tool:scanner:2
+  - key: content.label.tool:siphon:2.name
+    text: Tool:siphon:2
+  - key: content.label.toolsmithing_1.name
+    text: Toolsmithing 1
+  - key: content.label.toolsmithing_2.name
+    text: Toolsmithing 2
+  - key: content.label.toolsmithing_3.name
+    text: Toolsmithing 3
+  - key: content.label.toolsmithing_4.name
+    text: Toolsmithing 4
+  - key: content.label.upgrade:compression:1.name
+    text: Upgrade:compression:1
+  - key: content.label.upgrade:compression:2.name
+    text: Upgrade:compression:2
+  - key: content.label.upgrade:compression:3.name
+    text: Upgrade:compression:3
+  - key: content.label.upgrade:compression:4.name
+    text: Upgrade:compression:4
+  - key: content.label.upgrade:hull_cold:1.name
+    text: Upgrade:hull Cold:1
+  - key: content.label.upgrade:hull_heat:1.name
+    text: Upgrade:hull Heat:1
+  - key: content.label.upgrade:hull_rad:1.name
+    text: Upgrade:hull Rad:1
+  - key: content.label.upgrade:hull_toxic:1.name
+    text: Upgrade:hull Toxic:1
+  - key: content.label.upgrade:hull_void:1.name
+    text: Upgrade:hull Void:1
+  - key: content.label.upgrade:jump:1.name
+    text: Upgrade:jump:1
+  - key: content.label.upgrade:jump:10.name
+    text: Upgrade:jump:10
+  - key: content.label.upgrade:jump:2.name
+    text: Upgrade:jump:2
+  - key: content.label.upgrade:jump:3.name
+    text: Upgrade:jump:3
+  - key: content.label.upgrade:jump:4.name
+    text: Upgrade:jump:4
+  - key: content.label.upgrade:jump:5.name
+    text: Upgrade:jump:5
+  - key: content.label.upgrade:jump:6.name
+    text: Upgrade:jump:6
+  - key: content.label.upgrade:jump:7.name
+    text: Upgrade:jump:7
+  - key: content.label.upgrade:jump:8.name
+    text: Upgrade:jump:8
+  - key: content.label.upgrade:jump:9.name
+    text: Upgrade:jump:9
+  - key: content.label.upgrade:scanner_range:1.name
+    text: Upgrade:scanner Range:1
+  - key: content.label.upgrade:scanner_range:2.name
+    text: Upgrade:scanner Range:2
+  - key: content.label.upgrade:scanner_range:3.name
+    text: Upgrade:scanner Range:3
+  - key: content.label.upgrade:scanner_range:4.name
+    text: Upgrade:scanner Range:4
+  - key: content.label.upgrade:scanner_range:5.name
+    text: Upgrade:scanner Range:5
+  - key: content.label.upgrade:scanner_range:6.name
+    text: Upgrade:scanner Range:6
+  - key: content.label.upgrade:scanner_range:7.name
+    text: Upgrade:scanner Range:7
+  - key: content.label.upgrade:scanner_range:8.name
+    text: Upgrade:scanner Range:8
+  - key: content.label.void_forging.name
+    text: Void Forging
+  - key: content.label.warp_gate_engineering.name
+    text: Warp Gate Engineering
+  - key: content.label.warp_theory.name
+    text: Warp Theory
+  - key: service.not-configured
+    text: '{0} is not configured.'
+  - key: service.consent-required
+    text: Opt-in consent is required for {0}.
+  - key: service.label.external
+    text: External services
+  - key: service.label.ads
+    text: Rewarded ads
+  - key: service.label.purchases
+    text: Purchases
+  - key: service.label.authentication
+    text: Authentication
+  - key: service.label.recovery
+    text: Account recovery
+  - key: service.label.leaderboards
+    text: Leaderboards
+  - key: service.label.cloud
+    text: Cloud Save
+  - key: service.label.analytics
+    text: Analytics
+  - key: service.label.remote
+    text: Remote Config
+  - key: service.label.notifications
+    text: Notifications
+  - key: service.label.local-notifications
+    text: Local notifications
+  - key: service.label.deletion
+    text: Account and cloud-save deletion
+  - key: service.label.advertising-consent
+    text: advertising
+  - key: service.label.analytics-consent
+    text: analytics
+  - key: service.label.analytics-collection
+    text: analytics data collection
+  - key: service.label.remote-consent
+    text: online remote configuration
+  - key: service.label.account-consent
+    text: online account services
+  - key: service.label.leaderboard-consent
+    text: online leaderboards
+  - key: service.label.cloud-consent
+    text: cloud saves
+  - key: service.ads.placement
+    text: A rewarded-ad placement is required.
+  - key: service.ads.unknown
+    text: Unknown rewarded-ad placement.
+  - key: service.ads.busy
+    text: A rewarded ad is already in progress.
+  - key: service.ads.disabled
+    text: This rewarded-ad placement is disabled.
+  - key: service.ads.invalid-time
+    text: Rewarded-ad usage or device time is invalid. Retry after the device clock
+      is corrected.
+  - key: service.ads.limit
+    text: The daily limit for this rewarded-ad placement has been reached.
+  - key: service.ads.cooldown
+    text: This rewarded-ad placement is cooling down.
+  - key: service.ads.mismatch
+    text: The ad provider returned a different reward placement.
+  - key: service.ads.rewound
+    text: The device clock moved backwards during the rewarded ad.
+  - key: service.purchase.receipt
+    text: A purchase product, transaction ID and receipt payload are required.
+  - key: service.purchase.busy
+    text: A purchase is already being processed. Keep this purchase pending and retry.
+  - key: service.purchase.destination
+    text: A persistent purchase destination is required.
+  - key: service.purchase.verification
+    text: 'Purchase verification did not complete: {0}'
+  - key: service.purchase.mismatch
+    text: The verified purchase does not match the pending store transaction.
+  - key: service.purchase.destination-changed
+    text: The purchase destination changed. Keep this purchase pending and retry.
+  - key: service.purchase.confirmation
+    text: The purchase reward is saved, but store confirmation is pending. Retry
+      without granting again. {0}
+  - key: service.purchase.read-only
+    text: Purchases cannot be granted while this save is read-only.
+  - key: service.purchase.retry
+    text: The purchase destination changed. Retry this pending purchase.
+  - key: service.purchase.identity
+    text: The verified purchase identity is incomplete.
+  - key: service.purchase.journal
+    text: The purchase journal is invalid. Store reconciliation is required.
+  - key: service.purchase.conflict
+    text: The purchase journal conflicts with this transaction. Store reconciliation
+      is required.
+  - key: service.purchase.rewards
+    text: The purchased shard pack has invalid catalog rewards.
+  - key: service.purchase.unsupported
+    text: This store product has no supported catalog reward.
+  - key: service.purchase.wallet-full
+    text: The shard wallet is full. Keep the purchase pending until there is room.
+  - key: service.purchase.save-failed
+    text: The purchase reward was not granted because its save failed. Keep the store
+      transaction pending. {0}
+  - key: service.analytics.event
+    text: An analytics event name is required.
+  - key: service.analytics.parameters
+    text: Analytics parameters require non-empty keys and values.
+  - key: service.leaderboard.request
+    text: A leaderboard ID and positive result limit are required.
+  - key: service.leaderboard.board
+    text: The requested leaderboard does not match the configured board.
+  - key: service.leaderboard.limit
+    text: Leaderboard page size must be between 1 and {0}.
+  - key: service.leaderboard.sign-in
+    text: Sign in before loading leaderboard scores.
+  - key: service.leaderboard.score
+    text: The configured leaderboard contains a score outside the supported integer
+      range.
+  - key: service.leaderboard.unknown-pilot
+    text: Unknown pilot
+  - key: service.cloud.payload
+    text: A cloud-save payload is required.
+  - key: service.cloud.nonempty
+    text: A non-empty cloud-save payload is required.
+  - key: service.cloud.limit
+    text: The cloud-save payload exceeds the 5 MiB limit.
+  - key: service.cloud.sign-in-load
+    text: Sign in before loading a cloud save.
+  - key: service.cloud.sign-in-write
+    text: Sign in before writing a cloud save.
+  - key: service.cloud.empty
+    text: The stored cloud save is empty and cannot be restored.
+  - key: service.cloud.changed-account
+    text: The signed-in account changed. No cloud save was deleted.
+  - key: service.cloud.delete-lock
+    text: The cloud save returned no write lock. Nothing was deleted; retry before
+      deleting the account.
+  - key: service.cloud.replace-lock
+    text: A write lock is required to replace an existing cloud save. Reload it before
+      retrying.
+  - key: service.cloud.missing-lock
+    text: Unity Cloud Save did not return a write lock. Reload the save before retrying.
+  - key: service.cloud.conflict
+    text: The cloud save changed on another device. Reload it before retrying.
+  - key: service.recovery.sign-in
+    text: Sign in to the current save before linking an account.
+  - key: service.recovery.credential
+    text: The recovery provider returned an empty credential.
+  - key: service.recovery.provider
+    text: The configured recovery provider is not supported.
+  - key: service.remote.sign-in
+    text: Sign in with an existing account before fetching remote configuration.
+  - key: service.deletion.busy
+    text: Account deletion is already in progress.
+  - key: service.deletion.review
+    text: The signed-in account changed. Review deletion again.
+  - key: service.deletion.changed-account
+    text: The signed-in account changed. No account was deleted.
+  - key: service.deletion.cloud-only
+    text: The cloud save was deleted, but the signed-in account changed. No account
+      was deleted.
+  - key: service.deletion.partial
+    text: The cloud save was deleted, but account deletion failed. Retry account
+      deletion. {0}
+  - key: service.deletion.unconfirmed
+    text: Online deletion failed before cloud-save removal was confirmed. {0}
+  - key: service.notifications.busy
+    text: Notification synchronization is already pending.
+  - key: service.notifications.limit
+    text: At most eight crew notifications are supported.
+  - key: service.notifications.jobs
+    text: Crew notifications must have unique IDs and nonempty text.
+  - key: service.notifications.request
+    text: Enable notifications again to request device permission when a timer is
+      active.
+  - key: service.notifications.permission-changed
+    text: Notification settings or jobs changed while permission was pending.
+  - key: service.notifications.sync-changed
+    text: Notification settings or jobs changed during synchronization.
+  - key: service.notifications.schedule-changed
+    text: Notification settings or jobs changed during scheduling.
+  - key: service.notifications.denied
+    text: Notification permission was denied. Enable it in device settings to receive
+      completion alerts.
+  - key: service.notifications.future
+    text: A future Frontier crew notification with title and body is required.
+  - key: service.notifications.revoked
+    text: Device notification permission is no longer granted.
+  - key: service.notifications.id
+    text: A valid Frontier crew notification ID is required.
+  - key: service.notifications.channel
+    text: Construction
+  - key: service.notifications.channel-description
+    text: Completed construction, upgrades and clearance
+  - key: content.era.landfall.name
+    text: Landfall
+  - key: content.era-requirement.second-world.label
+    text: Land on a second world
+  - key: content.era.foothold.name
+    text: Foothold
+  - key: content.era-requirement.research-lab.label
+    text: Build a Research Lab
+  - key: content.era-requirement.jump-range.label
+    text: Purchase Jump Range level 1
+  - key: content.era.settlement.name
+    text: Settlement
+  - key: content.era-requirement.hazard-plating.label
+    text: Purchase any hazard plating
+  - key: content.era.industry.name
+    text: Industry
+  - key: content.era-requirement.radiation-plating.label
+    text: Purchase Rad-Shield Plating
+  - key: content.era-requirement.antimatter.label
+    text: Craft an Antimatter Pod
+  - key: content.era.interstellar.name
+    text: Interstellar
+  - key: content.era-requirement.megaproject.label
+    text: Complete stage 3 of any megaproject
+  - key: content.era.ascension.name
+    text: Ascension
+  - key: service.ads.init-failed
+    text: Ads could not connect. Check your connection and try again.
+  - key: service.ads.load-failed
+    text: No rewarded ad is available right now. You can keep playing without ads.
+  - key: service.ads.display-failed
+    text: The ad could not open. No reward was granted.
+  - key: service.ads.timeout
+    text: The ad service did not respond in time. No reward was granted.
+  - key: service.ads.unconfirmed
+    text: The ad closed without reward confirmation. No reward was granted.
+  - key: service.ads.config-changed
+    text: The ad configuration changed. Restart the game before watching an ad.
+  - key: resource.source.planet
+    text: '{0}: find supplies on {1}.'
+  - key: resource.source.unavailable
+    text: No usable source for {0} is available yet. Check its Atlas requirements.
+  - key: debug.services.title
+    text: Ads & online services
+  - key: debug.services.ads-disabled
+    text: Gameplay ads remain off pending mixed-age privacy setup and iPhone verification.
+      Test diagnostics do not enable live rewards.
+  - key: debug.services.ads-unavailable
+    text: No ad diagnostics provider is configured for this session.
+  - key: debug.services.open-ads
+    text: Open LevelPlay test suite
+  - key: debug.services.connecting
+    text: Connecting to LevelPlay...
+  - key: debug.services.opened
+    text: Test suite opened. Select Unity Ads > Test > Rewarded. Do not select Live.
+  - key: debug.services.failed
+    text: The test suite could not open. Check device logs and try again.
+  - key: ranks.setup-required
+    text: Online rankings could not be configured. Check that this build is linked
+      to the Unity cloud project and has its leaderboard ID and HTTPS privacy-policy
+      URL. Your local record remains available.
+  - key: ranks.read-only
+    text: Rankings are read-only. This build does not submit your local score.
+  - key: ranks.online.title
+    text: ONLINE RANKS
+  - key: ranks.opt-in
+    text: ENABLE ONLINE RANKS
+  - key: ranks.your-rank
+    text: 'YOUR RANK: #{0}  -  {1} Frontier Score'
+  - key: ranks.diagnostics
+    text: Online rankings are enabled. Open Menu > Ranks, opt in, then post your
+      score. No age gate or public player name is used. Ads, analytics and cloud
+      saves are separate.
+  - key: service.leaderboard.submission
+    text: A leaderboard ID and a nonnegative integer score no greater than 9,007,199,254,740,991
+      are required.
+  - key: service.ads.test-editor
+    text: The Editor cannot display real iOS ads. Install an iOS Development Build
+      on your iPhone to use the LevelPlay test suite.
+  - key: service.ads.test-device
+    text: LevelPlay tests require an iOS Development Build with test diagnostics
+      enabled. Release builds and Android cannot open this suite.
+  - key: service.ads.test-ready
+    text: Register this iPhone as a LevelPlay test device. In the suite choose Unity
+      Ads > Test > Rewarded, not Live. Gameplay ads remain disabled.
