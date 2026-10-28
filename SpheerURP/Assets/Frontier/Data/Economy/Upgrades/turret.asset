@@ -15,7 +15,7 @@ MonoBehaviour:
   lockedFields: []
   id: turret
   displayName: Turret Actuators
-  description: +15% firing speed for placed turrets. Does not spawn turrets.
+  description: All placed turrets fire 15% faster per level.
   category: 2
   effect: 3
   tool: 0

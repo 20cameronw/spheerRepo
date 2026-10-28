@@ -229,7 +229,7 @@ namespace Frontier
             dock.usageHints = UsageHints.DynamicTransform;
             dock.Add(DockButton("research", UiText.Get("nav.command"), UiKit.Magenta, OpenResearch));
             dock.Add(DockButton("map", UiText.Get("nav.map"), UiKit.Cyan, OpenMap));
-            packDock = DockButton("pack", UiText.Get("nav.pack"), UiKit.Amber, OpenPack);
+            packDock = DockButton("ship", UiText.Get("nav.pack"), UiKit.Amber, OpenPack);
             var capacity = UiKit.Div("fr-pack-capacity");
             capacity.name = "pack-capacity-gauge";
             capacity.pickingMode = PickingMode.Ignore;

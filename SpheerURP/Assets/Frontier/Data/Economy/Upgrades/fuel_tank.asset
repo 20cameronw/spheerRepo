@@ -15,8 +15,7 @@ MonoBehaviour:
   lockedFields: []
   id: fuel_tank
   displayName: Fuel Tank
-  description: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops
-    eating backpack space.
+  description: More ship fuel racks for longer expeditions. Fuel stays separate from cargo.
   category: 1
   effect: 10
   tool: 0

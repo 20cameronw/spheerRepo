@@ -2,6 +2,23 @@
 
 Behaviour notes for the systems that exist today. The long-term direction lives in [ROADMAP.md](ROADMAP.md).
 
+## Player navigation and purchase resources
+
+The dock is **Research / Map / Ship / Build**, in the existing positions. Ship always opens Cargo in one tap,
+with the capacity gauge and used/total count on its dock button. Cargo contains carried items and its capacity
+upgrade; surface salvage is explicitly unclaimed and not aboard. Tools contains harvest equipment. Systems contains
+ship fuel reserves and tank upgrades, engine efficiency, jump/scanner range and hull protection with their upgrades.
+Research contains Tech (available work first, completed nodes in a foldout) and Improvements (global defense and logistics).
+Map exposes the planetary network from every selected world, plus ship-readiness access. Build retains local structures
+and Construction Jobs. Tapping world structures still manages them; the lab links to Research and Ship tools.
+
+Research, tool tiers and ship/defense/global upgrades use the same resource pool as construction: carried cargo plus
+operational storage on the current planet connected by an operational Cargo Depot. Cost chips, eligibility and spending
+share this rule. Cargo is spent first, then connected storage; insufficient totals spend nothing. Disconnected,
+under-construction and remote storage, unclaimed salvage and Fuel Depot reserves are excluded. Remote resources still
+require transfer or retrieval. XP, research prerequisites, local labs and other gates are unchanged.
+No save schema, stable content IDs, inventory capacity, job timing or production-ad settings change with this navigation release.
+
 ## Combat
 
 Player-built surface turrets and fuel-funded alarm waves; alarms never spawn orbital turrets. The former Orbital Turret
@@ -25,18 +42,19 @@ resources, saved by planet and slot.
 
 Tap a warehouse to open its storage and your backpack together. Drag stacks either way or rearrange either grid; matching
 resources merge up to the stack limit, transfers move only what fits and never discard the remainder. Stored resources stay
-on that planet and are not used automatically for crafting, fuel or construction. A translucent icon and stack count follow
+on that planet; an operational Cargo Depot is required to spend them without withdrawing first. A translucent icon and stack count follow
 mouse/touch drags, including ordinary backpack rearrangement. A resource-family filter applies to both grids; **Quick Store**
 and **Quick Withdraw** transfer as much as fits in the selected family (or all families), preserving any remainder.
 The panel shows used versus total storage slots. Multiple Warehouses are allowed; an operational Cargo Depot pools local
-Warehouse and Auto-Harvester contents for building and crafting without exposing Fuel Depot reserves.
+Warehouse, Cargo Depot and Auto-Harvester contents for building, crafting, research and equipment/global upgrades without
+exposing Fuel Depot reserves.
 
 An **Orbital Relay** pulls from operational storage on other visited worlds. Same-system transfers are available at every
-relay tier; higher tiers extend the beam into other systems. Each pull spends energy from fuel carried in the backpack,
+relay tier; higher tiers extend the beam into other systems. Each pull spends energy from ship fuel tanks,
 scaled by stack size and distance. Remote Fuel Depot reserves remain inaccessible.
 
-The starter backpack has 9 slots on purpose: it fills quickly, which teaches the Warehouse early. Research adds 9 slots per
-tier (up to 63).
+The starter backpack has 9 slots; Ship > Cargo exposes its capacity upgrades. The imported catalog supplies the current
+capacity progression; local Warehouse slots are separate from carried capacity.
 
 ## Planet sizing and travel
 

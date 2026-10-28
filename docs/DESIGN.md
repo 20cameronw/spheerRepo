@@ -16,8 +16,13 @@ Declare `xmlns:frontier="Frontier"` in UXML and use tags such as `<frontier:Fron
 Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to load tokens/fonts.
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
-The top bar includes fuel, live Nova Shards and player level; backpack capacity stays on the Pack dock.
-Progression requirements use **player XP level**, not the highest planet tier visited. Command shows
+The top bar includes fuel, live Nova Shards and player level; carried capacity stays on the Ship dock.
+The dock retains its four positions: Research / Map / Ship / Build. Ship always opens Cargo in one tap,
+with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
+and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
+Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
+Map exposes the planetary network and ship readiness; Build retains structures and jobs.
+Progression requirements use **player XP level**, not the highest planet tier visited. Research and Ship > Tools show
 the current XP level, XP remaining to the next level, and a wave shortcut that selects the local
 Alarm or its Build entry. Research badges say `XP LV`; locks name the required and current levels
 and explain that clearing alien waves earns XP. Actual tool tiers still describe equipment quality.
@@ -148,9 +153,8 @@ local bundles, with no remote content host required. `Build Local Tables` synchr
 The local Android-target bundle build passed; that is not an APK/native-device sign-off. Only English is authored:
 language selection/live switching, translations, remaining generated text, locale fonts and RTL are still open.
 
-Command has Bases, Tools, Tech and Crews tabs; the short Tech caption avoids truncating the four-tab phone row.
-Crews lists active structure construction/upgrades and obstacle-clearance jobs across visited worlds. A Build
-shortcut opens the same panel. Timers and finish prices update once per second without replacing touch controls.
+Build > Construction Jobs lists active structure construction/upgrades and obstacle-clearance jobs across visited worlds.
+Timers and finish prices update once per second without replacing touch controls.
 Structure finish uses the authored shard curve, including its free-finish window, and requires a second press.
 The game revalidates the job, assignment, quoted maximum price, wallet and read-only state, then uses the normal
 completion/reward path and saves job/currency changes together. A failed write explicitly reports the completed
@@ -201,7 +205,7 @@ Frontier Score breakdown. Era progress is a persistent achievement of this save,
 
 Goals live in Menu and are linked from Ranks. Ready rewards lead, followed by three concrete next objectives;
 players can expand the remaining list and collected history. Actions open the live build/gather shop, map,
-Command or recipe Atlas, rather than a second tutorial. The authored 26-entry ScriptableObject catalogue uses
+Research or recipe Atlas, rather than a second tutorial. The authored 26-entry ScriptableObject catalogue uses
 only one-time milestones already represented in the simulator (12 small, nine reach tiers, five era entries).
 At current tuning the complete catalogue awards at most 275 Nova Shards per save, in addition to the separate
 existing Atlas rewards. Calling a wave alone is insufficient: the live defense achievement requires clearing it.
@@ -339,7 +343,7 @@ milestone adds 47 glyphs without replacing the existing visual family.
 
 | Group | Icons |
 |-------|-------|
-| Dock and controls | `research` (flask, **COMMAND**), `map` (planet with orbit), `pack` (backpack), `build` (**hammer crossed with a toothed hand saw**), `menu` (hamburger), `close`, `plus`, `minus`, `up`, `back`, `check`, `lock`, `play` |
+| Dock and controls | `research` (flask, **RESEARCH**), `map` (planet with orbit), `ship` (**SHIP**, cargo-first), `pack` (cargo/backpack within panels), `build` (**hammer crossed with a toothed hand saw**), `menu` (hamburger), `close`, `plus`, `minus`, `up`, `back`, `check`, `lock`, `play` |
 | HUD and glyphs | `fuel`, `star`, `bolt`, `skull`, `sound`, `mute`, `gear`, `ranks`, `tutorial`, `about`, `alien`, `shield`, `tools`, `base`, `warp`, `ship` |
 | Resources | `wood` (log end), `stone` (faceted rock), `iron` (ore chunks with a shine), `crystal` (gem), `fuel` (drop), `core` (orb with slit pupil), `scrap` (broken gear), `alloy` (ingot), `plasma` (energy cell), `cube` (generic fallback) |
 | Structures | `refinery`, `fabricator` (anvil), `alarm` (beacon), `lumber` (axe), `mine` (pick), `drill`, `gunner`, `laser`, `satellite`, `warehouse` (crates) |

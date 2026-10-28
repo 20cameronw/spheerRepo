@@ -15,7 +15,10 @@ namespace Frontier
         ScrollView modalScroll;
         Action<VisualElement> modalBuild;
         string modalKey;
-        int researchTab = 1;
+        enum ResearchPage { Tech, Improvements }
+        enum ShipPage { Cargo, Tools, Systems }
+        ResearchPage researchPage;
+        ShipPage shipPage;
         PlacedStructure confirmBuilderFinish;
         int confirmBuilderPurchaseOwned = -1;
 
@@ -80,9 +83,25 @@ namespace Frontier
         }
 
         void OpenShop() { if (defense.Active || busy) return; OpenModal("shop", "build", UiText.Get("nav.build"), UiKit.Lime, BuildShop, true); }
-        void OpenResearch() { if (defense.Active || busy) return; OpenModal("research", "research", UiText.Get("nav.command"), UiKit.Magenta, BuildResearch, true); }
+        void OpenResearch() { OpenResearch(ResearchPage.Tech); }
+        void OpenResearch(ResearchPage page)
+        {
+            if (defense.Active || busy) return;
+            bool samePage = researchPage == page;
+            researchPage = page;
+            if (modalKey == "research" && !samePage) { RefreshModal(); return; }
+            OpenModal("research", "research", UiText.Get("nav.command"), UiKit.Magenta, BuildResearch, true);
+        }
         void OpenBuilders() { if (defense.Active || busy) return; OpenModal("builders", "build", UiText.Get("builders.jobs-title"), UiKit.Cyan, BuildBuilders, true); }
-        void OpenPack() { if (defense.Active || busy) return; OpenModal("pack", "pack", UiText.Get("nav.backpack"), UiKit.Amber, BuildPack, true); }
+        void OpenPack() { OpenShip(ShipPage.Cargo); }
+        void OpenShip(ShipPage page)
+        {
+            if (defense.Active || busy) return;
+            bool samePage = shipPage == page;
+            shipPage = page;
+            if (modalKey == "pack" && !samePage) { RefreshModal(); return; }
+            OpenModal("pack", "ship", UiText.Get("nav.backpack"), UiKit.Amber, BuildShip, true);
+        }
 
         // ------------------------------------------------------------ build shop
         int shopTab;
@@ -378,7 +397,7 @@ namespace Frontier
                 else if (era == FrontierEra.Interstellar) { action = OpenShop; label = UiText.Get("guide.action.build-shop"); icon = "build"; }
                 else
                 {
-                    action = () => { researchTab = 2; progressionTab = 0; OpenResearch(); };
+                    action = OpenResearch;
                     label = UiText.Get("ranks.era.command");
                     icon = "research";
                 }
@@ -1319,32 +1338,63 @@ namespace Frontier
             Toast(UiText.Get("privacy.saved"), UiKit.Cyan);
         }
 
-        // ------------------------------------------------------------ command
+        // ------------------------------------------------------------ research and ship
         void BuildResearch(VisualElement body)
         {
             var tabs = UiKit.Div("fr-tabs");
-            tabs.name = "command-navigation";
-            tabs.Add(TabButton("tools", UiText.Get("command.tools"), researchTab == 1, UiKit.Magenta, () => researchTab = 1));
-            tabs.Add(TabButton("research", UiText.Get("research.tab.tech"), researchTab == 2 && progressionTab == 0, UiKit.Magenta,
-                () => { researchTab = 2; progressionTab = 0; }));
-            tabs.Add(TabButton("ship", UiText.Get("research.tab.ship"), researchTab == 2 && progressionTab == 1, UiKit.Magenta,
-                () => { researchTab = 2; progressionTab = 1; }));
-            tabs.Add(TabButton("shield", UiText.Get("research.tab.defense"), researchTab == 2 && progressionTab == 2, UiKit.Magenta,
-                () => { researchTab = 2; progressionTab = 2; }));
+            tabs.name = "research-navigation";
+            tabs.Add(TabButton("research", UiText.Get("research.tab.tech"), researchPage == ResearchPage.Tech, UiKit.Magenta,
+                () => researchPage = ResearchPage.Tech));
+            tabs.Add(TabButton("shield", UiText.Get("research.tab.improvements"), researchPage == ResearchPage.Improvements, UiKit.Magenta,
+                () => researchPage = ResearchPage.Improvements));
             body.Add(tabs);
             BuildXpProgress(body, true);
-            if (researchTab == 1) BuildTools(body);
-            else if (progressionTab == 0) BuildTech(body);
+            BuildProgressionResourceHelp(body);
+            if (researchPage == ResearchPage.Tech) BuildTech(body);
             else
             {
-                if (progressionTab == 1)
-                {
-                    var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Cyan, OpenNetwork);
-                    network.name = "command-open-network";
-                    body.Add(network);
-                }
-                BuildUpgrades(body, progressionTab == 1 ? UpgradeCategory.Ship : UpgradeCategory.Defense);
+                BuildUpgrades(body, UpgradeCategory.Defense);
+                BuildUpgrades(body, UpgradeCategory.Logistics);
             }
+        }
+
+        void BuildShip(VisualElement body)
+        {
+            var tabs = UiKit.Div("fr-tabs");
+            tabs.name = "ship-navigation";
+            tabs.Add(TabButton("pack", UiText.Get("ship.tab.cargo"), shipPage == ShipPage.Cargo, UiKit.Amber,
+                () => shipPage = ShipPage.Cargo));
+            tabs.Add(TabButton("tools", UiText.Get("command.tools"), shipPage == ShipPage.Tools, UiKit.Amber,
+                () => shipPage = ShipPage.Tools));
+            tabs.Add(TabButton("ship", UiText.Get("ship.tab.systems"), shipPage == ShipPage.Systems, UiKit.Amber,
+                () => shipPage = ShipPage.Systems));
+            body.Add(tabs);
+            if (shipPage == ShipPage.Cargo)
+            {
+                BuildPack(body);
+                BuildProgressionResourceHelp(body);
+                BuildUpgrades(body, UpgradeCategory.Ship, u => u.effect == UpgradeEffect.BackpackSlots);
+            }
+            else if (shipPage == ShipPage.Tools)
+            {
+                BuildXpProgress(body, true);
+                BuildProgressionResourceHelp(body);
+                BuildTools(body);
+            }
+            else
+            {
+                BuildFuelReserves(body);
+                body.Add(UiKit.Text(UiText.Get("fuel.help"), "fr-muted"));
+                BuildProgressionResourceHelp(body);
+                BuildUpgrades(body, UpgradeCategory.Ship, u => u.effect == UpgradeEffect.FuelTankSlots);
+                BuildUpgrades(body, UpgradeCategory.Ship, u => u.effect != UpgradeEffect.BackpackSlots && u.effect != UpgradeEffect.FuelTankSlots);
+            }
+        }
+
+        void BuildProgressionResourceHelp(VisualElement body)
+        {
+            body.Add(UiKit.Text(UiText.Get(gs.CargoDepotActive ? "progression.resources.connected" :
+                "progression.resources.cargo"), "fr-tiny"));
         }
 
         void BuildBuilders(VisualElement body)
@@ -1556,16 +1606,17 @@ namespace Frontier
             }
         }
 
-        void BuildUpgrades(VisualElement body, UpgradeCategory cat)
+        void BuildUpgrades(VisualElement body, UpgradeCategory cat, Predicate<UpgradeSO> include = null)
         {
             {
                 foreach (var up in gs.db.upgrades)
                 {
-                    if (up == null || up.category != cat) continue;
+                    if (up == null || up.category != cat || (include != null && !include(up))) continue;
                     var u = up;
                     int lvl = gs.Level(u);
                     bool max = lvl >= u.maxLevel;
                     var card = Card(UiKit.Magenta);
+                    card.name = "upgrade-" + u.id;
                     var top = UiKit.Div("fr-row");
                     top.Add(UiKit.Text(u.NameAtLevel(lvl), "fr-h2"));
                     top.Add(UiKit.Div("fr-spacer"));
@@ -1593,12 +1644,13 @@ namespace Frontier
             }
         }
 
-        // ------------------------------------------------------------ backpack (Minecraft style)
+        // ------------------------------------------------------------ carried cargo
         const int PackColumns = 9;
 
         void BuildPack(VisualElement body)
         {
             SyncPack();
+            body.Add(UiKit.Text(UiText.Get("ship.cargo.help"), "fr-tiny"));
             var fuel = IconBtn(UiText.Get("fuel.open"), "fuel", UiKit.Amber, OpenFuelTanks);
             fuel.name = "pack-open-tanks";
             body.Add(fuel);
@@ -1687,7 +1739,6 @@ namespace Frontier
                     body.Add(row);
                 }
             }
-            body.Add(UiKit.Text(UiText.Get("pack.upgrade-help"), "fr-tiny"));
         }
 
         ResourceSO[] packRes = new ResourceSO[0];

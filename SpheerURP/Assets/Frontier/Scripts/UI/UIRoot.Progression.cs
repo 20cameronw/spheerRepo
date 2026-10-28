@@ -10,7 +10,7 @@ namespace Frontier
     public partial class UIRoot
     {
         string researchBranch = "";
-        int progressionTab;
+        bool showCompletedResearch;
 
         void BuildXpProgress(VisualElement body, bool showWaveAction)
         {
@@ -102,10 +102,20 @@ namespace Frontier
 
             var nodes = gs.db.research.Where(node => node != null && node.data != null &&
                 (string.IsNullOrEmpty(researchBranch) || node.data.branch == researchBranch))
-                .OrderBy(node => node.data.tier)
+                .OrderBy(node => gs.IsResearched(node.data.id) ? 2 : gs.CanResearch(node) ? 0 : 1)
+                .ThenBy(node => node.data.tier)
                 .ThenBy(node => node.data.branch, StringComparer.Ordinal)
                 .ThenBy(node => node.LocalizedName, StringComparer.Ordinal);
-            foreach (var node in nodes) BuildResearchCard(body, node);
+            foreach (var node in nodes.Where(node => !gs.IsResearched(node.data.id))) BuildResearchCard(body, node);
+            var completed = nodes.Where(node => gs.IsResearched(node.data.id)).ToList();
+            if (completed.Count > 0)
+            {
+                var foldout = new Foldout { text = UiText.Get("research.completed-count", completed.Count), value = showCompletedResearch };
+                foldout.Q<Toggle>().style.minHeight = UiKit.Size.Touch;
+                foldout.RegisterValueChangedCallback(e => showCompletedResearch = e.newValue);
+                foreach (var node in completed) BuildResearchCard(foldout, node);
+                body.Add(foldout);
+            }
         }
 
         void BuildResearchCard(VisualElement body, ResearchNodeSO node)

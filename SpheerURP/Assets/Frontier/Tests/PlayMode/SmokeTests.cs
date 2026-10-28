@@ -339,14 +339,14 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator CommandExplainsXpLevelsAndRoutesToWaveCaller()
+        public IEnumerator ResearchAndShipExplainXpLevelsAndRouteToWaveCaller()
         {
             new GameObject("XpProgressionBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
             while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
-            rt.Ui.DebugResearch(2);
+            rt.Ui.DebugResearch();
             yield return null;
             var progress = rt.Ui.DebugRoot.Q("player-xp-progression");
             Assert.IsNotNull(progress);
@@ -367,7 +367,7 @@ namespace Frontier.Tests
                 Assert.IsNotNull(alarm);
                 yield return null;
             }
-            rt.Ui.DebugResearch(1);
+            rt.Ui.DebugShip(1);
             waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
             yield return null;
@@ -627,7 +627,7 @@ namespace Frontier.Tests
                     || entry.key.StartsWith("planet.blurb.belt.", StringComparison.Ordinal))
                     complete.GetEntry(entry.key).Value = "LOCALIZED TERRAIN";
             complete.GetEntry("planet.enum.biome.lush").Value = "LOCALIZED BIOME";
-            complete.GetEntry("nav.command").Value = "LOCALIZED COMMAND";
+            complete.GetEntry("nav.command").Value = "LOCALIZED RESEARCH";
             complete.GetEntry("nav.menu").Value = "LOCALIZED MENU";
             complete.GetEntry("settings.language").Value = "LOCALIZED LANGUAGE";
             complete.GetEntry("guide.skip").Value = "LOCALIZED SKIP";
@@ -675,7 +675,7 @@ namespace Frontier.Tests
                 yield return null;
                 Assert.AreEqual("fr", UiText.LocaleCode);
                 Assert.AreEqual("fr", PlayerPrefs.GetString(UiText.LocalePreferenceKey));
-                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED COMMAND"));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED RESEARCH"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED MENU"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED LANGUAGE"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
@@ -703,10 +703,10 @@ namespace Frontier.Tests
                 var captions = runtime.Planet.Spin.GetComponentsInChildren<UIDocument>();
                 Assert.IsTrue(Array.Exists(captions, caption => caption.rootVisualElement.Query<Label>().ToList()
                     .Exists(label => label.text != null && label.text.Contains(existingStructure.LocalizedName.ToUpper()))));
-                runtime.Ui.DebugResearch(2);
+                runtime.Ui.DebugResearch();
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
                     .Exists(label => label.text == research.LocalizedName.ToUpper()));
-                runtime.Ui.DebugResearch(1);
+                runtime.Ui.DebugShip(1);
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
                     .Exists(label => label.text == ladder.LocalizedName.ToUpper()));
                 runtime.Ui.DebugMenu("goals");
@@ -850,7 +850,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
             Assert.IsNotNull(runtime.Db);
             Assert.IsTrue(UiText.UsesUnityLocalization, "Bootstrap must await the packaged Unity string table before building UI.");
-            Assert.AreEqual("COMMAND", UiText.Get("nav.command"));
+            Assert.AreEqual("RESEARCH", UiText.Get("nav.command"));
             Assert.IsTrue(runtime.Db.UsesImportedEconomy);
             Assert.IsNotNull(runtime.State);
             Assert.IsInstanceOf<SessionClock>(runtime.State.clock,
@@ -1023,9 +1023,9 @@ namespace Frontier.Tests
             }
             var assist = rt.Ui.DebugRoot.Q<Button>("assist-toggle");
             Assert.IsNull(assist, "travel settings must not expose an easy mode");
-            rt.Ui.DebugResearch(2);
+            rt.Ui.DebugResearch();
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.branch")));
-            rt.Ui.DebugResearch(1);
+            rt.Ui.DebugShip(1);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("tools.title")));
             Assert.AreEqual(1, rt.Ui.DebugRoot.Query<Label>().ToList().FindAll(label => label.text == UiText.Get("tools.mining")).Count);
             Assert.IsFalse(rt.Ui.DebugRoot.Query<Button>().ToList().Exists(button =>
@@ -2222,7 +2222,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator CommandNavigationAndDockCapacityUseTheNewLocalFlow()
+        public IEnumerator ResearchShipNavigationAndDockCapacityUseThePlayerFlow()
         {
             new GameObject("CommandDockBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -2241,7 +2241,9 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.State.TryRestoreCloudSave(shardSave, out shardError), shardError);
             Assert.AreEqual(1234.ToString("N0"), shards.text, "The HUD reflects wallet changes without reopening a panel.");
             Assert.AreEqual(UiText.Get("hyperspace.revive.balance", 1234), shards.tooltip);
-            var pack = rt.Ui.DebugRoot.Q<Button>("dock-pack");
+            var dockLabels = rt.Ui.DebugRoot.Q(className: "fr-dock").Query<Label>(className: "fr-dock-label").ToList();
+            CollectionAssert.AreEqual(new[] { "RESEARCH", "MAP", "SHIP", "BUILD" }, dockLabels.ConvertAll(label => label.text));
+            var pack = rt.Ui.DebugRoot.Q<Button>("dock-ship");
             var gauge = pack.Q("pack-capacity-gauge");
             Assert.AreEqual(8, gauge.childCount);
             rt.Ui.DebugEmptyPack();
@@ -2254,24 +2256,49 @@ namespace Frontier.Tests
             Assert.AreEqual(8, gauge.Query(className: "fr-pack-segment-filled").ToList().Count);
             Assert.AreEqual(UiText.Get("pack.capacity", rt.State.SlotsUsed, rt.State.Slots), pack.tooltip);
 
-            rt.Ui.DebugResearch(1);
-            var navigation = rt.Ui.DebugRoot.Q("command-navigation");
-            Assert.AreEqual(4, navigation.childCount, "Command has one flat Tools / Tech / Ship / Defense navigation.");
+            rt.Ui.DebugResearch();
+            var navigation = rt.Ui.DebugRoot.Q("research-navigation");
+            Assert.AreEqual(2, navigation.childCount, "Research owns technology and global improvements.");
             var labels = navigation.Query<Label>().ToList();
             Assert.IsFalse(labels.Exists(label => label.text == UiText.Get("command.bases") || label.text == UiText.Get("builders.tab")));
-            foreach (string key in new[] { "command.tools", "research.tab.tech", "research.tab.ship", "research.tab.defense" })
+            foreach (string key in new[] { "research.tab.tech", "research.tab.improvements" })
                 Assert.IsTrue(labels.Exists(label => label.text == UiText.Get(key)), key);
-            var shipTab = navigation.Query<Button>().ToList().Find(button =>
-                button.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.tab.ship")));
-            Assert.IsNotNull(shipTab);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shipTab; shipTab.SendEvent(submit); }
+            rt.Ui.DebugResearch(1);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-turret"), "Global defense upgrades belong to Research.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("upgrade-pack"));
+            rt.Ui.DebugShip(2);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("upgrade-turret"));
             Assert.IsFalse(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.branch")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pack; pack.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("ship-navigation"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-pack"), "The Ship dock always opens Cargo, including its capacity upgrade.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("pack-open-tanks"));
+            rt.Ui.DebugFuelTanks();
+            var fuelUpgrade = rt.Ui.DebugRoot.Q<Button>("fuel-open-upgrades");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = fuelUpgrade; fuelUpgrade.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"), "Fuel upgrades route to Ship systems, not Research.");
+            rt.Ui.DebugMap(null);
+            var network = rt.Ui.DebugRoot.Q<Button>("map-open-network");
+            Assert.IsNotNull(network, "Map exposes the network on the home world even without a Warp Gate.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = network; network.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("network-open-map"));
+            rt.Ui.DebugMenu("goals");
+            var expand = rt.Ui.DebugRoot.Q<Button>("goals-toggle-all");
+            Assert.IsNotNull(expand);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = expand; expand.SendEvent(submit); }
+            var shipObjective = rt.Ui.DebugRoot.Q<Button>("objective-action-jump_range_1");
+            Assert.IsNotNull(shipObjective);
+            Assert.IsTrue(shipObjective.Query<Label>().ToList().Exists(label => label.text == UiText.Get("goals.action.ship")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shipObjective; shipObjective.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-jump"), "Jump-range objectives route to Ship systems.");
             rt.Ui.DebugShop(0);
             var jobs = rt.Ui.DebugRoot.Q<Button>("build-jobs");
-            Assert.IsNotNull(jobs, "Construction jobs remain available from Build, outside Command.");
+            Assert.IsNotNull(jobs, "Construction jobs remain available from Build.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = jobs; jobs.SendEvent(submit); }
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
-            Assert.IsNull(rt.Ui.DebugRoot.Q("command-navigation"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));
             rt.Ui.DebugAtlas(0);
             var atlasFind = rt.Ui.DebugRoot.Q<Button>(className: "fr-resource-find-icon");
             Assert.IsNotNull(atlasFind);

@@ -350,12 +350,10 @@ namespace Frontier
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
             for (int tab = 0; tab < 4; tab++) { int t = tab; yield return new Shot("shop-tab" + t, () => { ResetView(); ui.DebugShop(t); }); }
             yield return new Shot("construction-jobs", ui.DebugBuilders);
-            yield return new Shot("command-tools-axe", () => ui.DebugResearch(1, 0));
-            yield return new Shot("command-tools-pick", () => ui.DebugResearch(1, 1));
-            yield return new Shot("command-tools-drill", () => ui.DebugResearch(1, 2));
-            yield return new Shot("command-tech", () => ui.DebugResearch(2));
-            yield return new Shot("command-ship", () => ui.DebugResearch(2, 0, 1));
-            yield return new Shot("command-defense", () => ui.DebugResearch(2, 0, 2));
+            yield return new Shot("ship-tools", () => ui.DebugShip(1));
+            yield return new Shot("research-tech", () => ui.DebugResearch());
+            yield return new Shot("ship-systems", () => ui.DebugShip(2));
+            yield return new Shot("research-improvements", () => ui.DebugResearch(1));
             yield return new Shot("pack", () => ui.DebugPack(-1));
             yield return new Shot("pack-selected", () => ui.DebugPack(0));
             var carriedBeforeEmptyShot = new Dictionary<ResourceSO, int>();
@@ -563,10 +561,10 @@ namespace Frontier
                     PrepareConstructionFixture();
                     ui.DebugTapStructure(constructionFixture);
                 }, 0.3f);
-                yield return new Shot("command-crews", () =>
+                yield return new Shot("construction-crews", () =>
                 {
                     PrepareConstructionFixture();
-                    ui.DebugResearch(3);
+                    ui.DebugBuilders();
                 }, 0.3f);
             }
             finally

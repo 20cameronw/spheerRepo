@@ -8479,6 +8479,42 @@ MonoBehaviour:
     m_Key: progression.required-level
     m_Metadata:
       m_Items: []
+  - m_Id: 4486758615048192
+    m_Key: ship.tab.cargo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545664
+    m_Key: ship.tab.systems
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545665
+    m_Key: ship.cargo.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545666
+    m_Key: map.open-ship
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545667
+    m_Key: progression.resources.connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545668
+    m_Key: progression.resources.cargo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545669
+    m_Key: research.tab.improvements
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545670
+    m_Key: research.completed-count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4487544858304512
+    m_Key: goals.action.ship
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

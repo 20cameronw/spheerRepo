@@ -29,7 +29,7 @@ namespace Frontier
             activeTravelMinigame = null;
             debugToolsOverride = null;
             debugFirstSessionGuideOverride = false;
-            menuPage = ""; shopTab = 0; researchTab = 1; packSel = -1; confirmReset = false;
+            menuPage = ""; shopTab = 0; researchPage = ResearchPage.Tech; shipPage = ShipPage.Cargo; packSel = -1; confirmReset = false;
             selected = gs.planet;
             RefreshFirstSessionGuide();
         }
@@ -65,14 +65,13 @@ namespace Frontier
             menuPage = "atlas";
             RefreshModal();
         }
-        public void DebugResearch(int tab, int tool = 0, int progression = 0)
+        public void DebugResearch(int tab = 0)
         {
             DebugReset();
-            researchTab = tab == 1 ? 1 : 2;
-            progressionTab = progression;
             researchBranch = "";
-            OpenResearch();
+            OpenResearch(tab == 0 ? ResearchPage.Tech : ResearchPage.Improvements);
         }
+        public void DebugShip(int tab) { DebugReset(); OpenShip((ShipPage)Mathf.Clamp(tab, 0, 2)); }
         public void DebugBuilders() { DebugReset(); OpenBuilders(); }
         public void DebugNetwork() { DebugReset(); OpenNetwork(); }
         public void DebugFuelTanks() { DebugReset(); OpenFuelTanks(); }

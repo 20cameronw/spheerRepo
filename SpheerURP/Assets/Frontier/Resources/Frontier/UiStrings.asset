@@ -29,9 +29,9 @@ MonoBehaviour:
   - key: fuel.summary
     text: '{0} / {1} tank racks occupied'
   - key: fuel.help
-    text: Fuel uses ship tanks, not backpack space. Amounts are shown in equivalent
-      gallons; plasma and antimatter carry more energy per rack. Craft fuel to refill,
-      or transfer reserves at a Fuel Depot.
+    text: Ship fuel is measured in equivalent gallons. Plasma and antimatter hold
+      more energy per rack. Refill by crafting fuel or withdrawing from a local Fuel
+      Depot.
   - key: fuel.stored
     text: Stored {0:N0} gal in the Fuel Depot.
   - key: fuel.withdrew
@@ -414,11 +414,11 @@ MonoBehaviour:
   - key: debug.size.colossal
     text: COLOSSAL
   - key: nav.command
-    text: COMMAND
+    text: RESEARCH
   - key: nav.map
     text: MAP
   - key: nav.pack
-    text: PACK
+    text: SHIP
   - key: nav.build
     text: BUILD
   - key: nav.menu
@@ -703,7 +703,7 @@ MonoBehaviour:
   - key: travel.legacy-leg-title
     text: "{0} \xB7 LEG {1} / {2}"
   - key: nav.backpack
-    text: BACKPACK
+    text: SHIP
   - key: common.back
     text: BACK
   - key: menu.ranks
@@ -773,8 +773,8 @@ MonoBehaviour:
   - key: tutorial.upgrade.title
     text: 7. Upgrade
   - key: tutorial.upgrade.body
-    text: Open Command on the bottom dock to manage your bases and unlock upgrades,
-      including more backpack space.
+    text: Ship holds your cargo, tools and ship upgrades. Research unlocks technology
+      and global improvements. Tap a structure to manage it, or open Build for construction.
   - key: about.title
     text: FRONTIER
   - key: about.body
@@ -890,8 +890,8 @@ MonoBehaviour:
     text: Tap the Lumber Camp and complete its wood mini-game. Better runs fill your
       pack faster.
   - key: guide.store.help
-    text: Your backpack is small by design. Store extra resources in a Warehouse
-      before expanding your haul.
+    text: Store extra cargo in a Warehouse on this world to make room for your next
+      haul.
   - key: guide.craft.help
     text: Build a Refinery, tap it, and craft a recipe from gathered materials. Each
       recipe is recorded in the Atlas.
@@ -934,7 +934,7 @@ MonoBehaviour:
   - key: pack.capacity.rearrange
     text: '{0} / {1} slots used  -  drag to rearrange'
   - key: pack.empty.title
-    text: Your backpack is empty
+    text: Your cargo is empty
   - key: pack.empty.help
     text: Resources from harvest runs go here. Use a gatherer on this world, then
       collect the result to bring materials back.
@@ -947,7 +947,7 @@ MonoBehaviour:
   - key: pack.select-help
     text: Tap an item to see its details.
   - key: pack.salvage.title
-    text: RECOVERED SURFACE SALVAGE
+    text: ON THE SURFACE - NOT ABOARD
   - key: pack.salvage.waiting
     text: '{0} waiting on {1}'
   - key: pack.salvage.claim
@@ -957,7 +957,21 @@ MonoBehaviour:
   - key: pack.salvage.full
     text: Make room in your backpack to claim salvage
   - key: pack.upgrade-help
-    text: Upgrade the backpack in Command > Research for more slots.
+    text: Cargo capacity upgrades are below.
+  - key: ship.tab.cargo
+    text: CARGO
+  - key: ship.tab.systems
+    text: SYSTEMS
+  - key: ship.cargo.help
+    text: Carried cargo only. Warehouses and unclaimed salvage stay on their world.
+  - key: map.open-ship
+    text: SHIP READINESS
+  - key: progression.resources.connected
+    text: Costs use cargo and connected local storage. Retrieve or transfer remote
+      stock first.
+  - key: progression.resources.cargo
+    text: Costs use cargo. A local Cargo Depot connects operational storage; remote
+      stock needs retrieval or transfer.
   - key: relay.summary
     text: "{0} \xB7 LV {1} \xB7 {2}"
   - key: relay.beam.range
@@ -966,8 +980,8 @@ MonoBehaviour:
     text: system beam
   - key: relay.help
     text: Pull stacks from operational storage on other visited worlds. Each pull
-      costs energy based on stack size and distance; only fuel in your backpack can
-      pay. Fuel Depot reserves stay isolated.
+      uses ship fuel based on stack size and distance. Fuel Depot reserves stay on
+      their world until transferred.
   - key: relay.empty
     text: No remote warehouses are in range. Build storage on another visited world,
       or upgrade the relay to extend its beam.
@@ -991,14 +1005,14 @@ MonoBehaviour:
       fuel stacks; reserves stay on this planet and never pay travel costs.
   - key: storage.help.harvester
     text: This hopper stores the Auto-Harvester's offline output. A local Cargo Depot
-      connects its materials to this planet's shared build and craft pool.
+      connects its materials to this planet's shared resource pool.
   - key: storage.help.cargo
     text: This shared buffer joins operational Warehouses and Auto-Harvester hoppers
-      on this planet. Build and craft costs draw from the pool automatically; travel
-      still uses your backpack.
+      on this planet. Building, crafting, research and upgrades draw from the pool.
+      Travel uses ship fuel; remote storage stays separate.
   - key: storage.help.connected
-    text: Connected to this planet's Cargo Depot. Build and craft costs can draw
-      from this storage automatically.
+    text: Connected to this planet's Cargo Depot. Building, crafting, research and
+      upgrades can draw from this storage automatically.
   - key: storage.help.warehouse
     text: Drag a stack between the grids. Resources stay on this planet. Costs use
       the backpack until a Cargo Depot connects its storage.
@@ -1119,11 +1133,17 @@ MonoBehaviour:
   - key: goals.collect
     text: COLLECT {0} SHARDS
   - key: goals.action.command
-    text: OPEN COMMAND
+    text: OPEN RESEARCH
+  - key: goals.action.ship
+    text: OPEN SHIP SYSTEMS
   - key: goals.action.recipe
     text: FIND RECIPE IN ATLAS
   - key: research.tab.tech
     text: TECH
+  - key: research.tab.improvements
+    text: IMPROVEMENTS
+  - key: research.completed-count
+    text: Completed research ({0})
   - key: research.tab.ship
     text: SHIP
   - key: research.tab.defense
@@ -1153,7 +1173,7 @@ MonoBehaviour:
   - key: research.progression
     text: Progression
   - key: tools.title
-    text: CATALOG TOOL TIERS
+    text: HARVEST TOOLS
   - key: tools.help
     text: Better tools improve harvest yield. XP level, research and materials determine
       when upgrades unlock.
@@ -1441,8 +1461,8 @@ MonoBehaviour:
   - key: structure.lab.subtitle
     text: Research and tool upgrades
   - key: structure.lab.help
-    text: Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced
-      research.
+    text: Enables technology in Research and tool upgrades in Ship. Higher lab levels
+      open advanced research.
   - key: structure.hub.subtitle
     text: Builder crew capacity
   - key: structure.hub.capacity
@@ -1593,7 +1613,7 @@ MonoBehaviour:
     text: A local recovery copy retains the previous universe. This replaces any
       earlier recovery copy; it is not a cloud backup.
   - key: ascension.open-command
-    text: OPEN COMMAND
+    text: OPEN RESEARCH
   - key: ascension.open-build
     text: OPEN BUILD SHOP
   - key: ascension.review
@@ -1614,7 +1634,7 @@ MonoBehaviour:
   - key: ascension.lock.maximum
     text: Maximum Legacy progression reached.
   - key: ascension.lock.research
-    text: Research Ascension Protocol in Command.
+    text: Research Ascension Protocol in Research.
   - key: ascension.lock.project
     text: Complete stage {0} of a megaproject in this universe.
   - key: ascension.save-retry
@@ -2048,7 +2068,7 @@ MonoBehaviour:
   - key: ranks.era.next
     text: 'NEXT: {0}'
   - key: ranks.era.command
-    text: OPEN COMMAND
+    text: OPEN RESEARCH
   - key: ranks.connecting
     text: Connecting to online services...
   - key: ranks.connected
@@ -2160,7 +2180,7 @@ MonoBehaviour:
   - key: progression.xp-status
     text: XP LEVEL {0}  -  {1:N0} XP to level {2}
   - key: progression.xp-help
-    text: Clear alien waves to level up. Unlocks use your XP level, not planet tier.
+    text: Clear alien waves to earn XP and unlock new upgrades.
   - key: progression.waves
     text: FIND WAVES TO EARN XP
   - key: progression.required-level
@@ -3048,8 +3068,7 @@ MonoBehaviour:
   - key: content.upgrade.fuel_tank.name
     text: Fuel Tank
   - key: content.upgrade.fuel_tank.description
-    text: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops eating
-      backpack space.
+    text: More ship fuel racks for longer expeditions. Fuel stays separate from cargo.
   - key: content.upgrade.fuel_tank.level-1
     text: Auxiliary Cell
   - key: content.upgrade.fuel_tank.level-2
@@ -3115,7 +3134,7 @@ MonoBehaviour:
   - key: content.upgrade.turret.name
     text: Turret Actuators
   - key: content.upgrade.turret.description
-    text: +15% firing speed for placed turrets. Does not spawn turrets.
+    text: All placed turrets fire 15% faster per level.
   - key: content.upgrade.turret.level-1
     text: Turret Actuators
   - key: content.upgrade.turret.level-2
@@ -3888,8 +3907,7 @@ MonoBehaviour:
   - key: content.objective.jump_range_1.title
     text: A longer reach
   - key: content.objective.jump_range_1.description
-    text: Purchase the first Jump Range upgrade. Temporary debug settings do not
-      count.
+    text: Purchase the first Jump Range upgrade to reach more distant worlds.
   - key: content.objective.first_steel.title
     text: Stronger foundations
   - key: content.objective.first_steel.description

@@ -297,7 +297,7 @@ namespace Frontier
         {
             if (!CanBuy(u)) return false;
             int lvl = Level(u);
-            if (!SpendQuietly(u.CostAt(lvl))) return false;
+            if (!SpendPlanetResourcesQuietly(ToIds(u.CostAt(lvl)))) return false;
             progression.SetUpgradeLevel(u.id, lvl + 1, u.MaxLevel);
             Notify();
             return true;

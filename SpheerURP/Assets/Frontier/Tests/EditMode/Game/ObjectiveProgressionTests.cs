@@ -27,6 +27,8 @@ namespace Frontier.Tests
             Assert.AreEqual(12, catalog.entries.Count(x => AchievementRewards.TrySize(x.id, out var size) && size == AchievementSize.Small));
             Assert.AreEqual(9, catalog.entries.Count(x => AchievementRewards.TrySize(x.id, out var size) && size == AchievementSize.Medium));
             Assert.AreEqual(5, catalog.entries.Count(x => AchievementRewards.TrySize(x.id, out var size) && size == AchievementSize.Large));
+            Assert.AreEqual(ObjectiveRoute.Ship, catalog.entries.Single(x => x.id == "jump_range_1").route);
+            Assert.AreEqual(ObjectiveRoute.Ship, catalog.entries.Single(x => x.id == "first_hazard_plating").route);
         }
 
         [Test]

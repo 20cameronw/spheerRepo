@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Frontier
 {
     public enum ObjectiveMetric { HarvestRuns = 0, StructuresBuilt = 1, StructureBuilt = 2, RecipeOutput = 3, WorldsLanded = 4, WavesCleared = 5, UpgradeLevel = 6, HazardPlating = 7, MegaprojectStage = 8, Era = 9, ReachTier = 10 }
-    public enum ObjectiveRoute { Gather = 0, Build = 1, Map = 2, Command = 3, Atlas = 4 }
+    public enum ObjectiveRoute { Gather = 0, Build = 1, Map = 2, Command = 3, Atlas = 4, Ship = 5 }
 
     [Serializable]
     public sealed class ObjectiveDefinition

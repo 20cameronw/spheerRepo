@@ -44,6 +44,28 @@ advertising-ID permission. No physical-device installation or store signing was 
 
 Script execution is usually disabled by policy, so prefix scripts with `powershell -NoProfile -ExecutionPolicy Bypass -File`.
 
+Release A navigation uses `DebugResearch()` / `DebugResearch(1)` for Tech / Improvements and
+`DebugShip(0..2)` for Cargo / Tools / Systems. `DebugPack` remains a Cargo entry for inventory captures.
+The updated screenshot names are `research-tech`, `research-improvements`, `ship-tools`, `ship-systems`
+and `construction-crews`; inventory captures retain `pack*`. The 24 purchase-pool cases in
+`ProgressionContentTests` cover research, tools, ship and defense with connected, disconnected,
+remote, under-construction storage/depot and insufficient resources, including save/load.
+The live `ResearchShipNavigationAndDockCapacityUseThePlayerFlow` check covers Cargo-first access,
+the gauge, fuel-upgrade and objective routes, network access without a gate, Build jobs and Atlas.
+Screenshot `-Only` filters are substring matches: `hud` also selects wave HUDs. For a bounded navigation
+capture use the explicit panel names above, `pack`, `map-selected`, `network-tanks` and `network-project`
+instead; partial combat sequences can leave combat active for subsequent shots/devices.
+The static layout gate waits for entrance transforms to settle after its first validated layout.
+
+Release A verification (2026-10-28): 139 targeted EditMode and 14 affected PlayMode tests passed.
+The panel gate passed at 900x1600 and 1600x900. The bounded phone capture produced 24 screenshots
+at 1080x1920 and 1080x2340 with zero harness errors, overflow, sub-12dp text or sub-48dp touch targets;
+outputs are under the ignored `SpheerURP\Screens\release-a-confirm` folder. The broader
+`Bootstrap_BuildsTheWholeSession` probe separately failed its existing `ranks.enable` availability
+expectation in this configured-service environment. Capture startup/shutdown also logged Unity Search
+index and uninitialized Analytics exceptions, outside the navigation path. These service/editor issues
+remain open; the successful targeted results are not a full-suite or native-device sign-off.
+
 ```powershell
 # Core tests, no Unity (needs the .NET 8 SDK; ~5 s)
 cd tests

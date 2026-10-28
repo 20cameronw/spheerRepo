@@ -49,7 +49,7 @@ namespace Frontier
             return GateReason(def.unlockResearch, Math.Max(def.unlockTier, row.requiresReachTier), row.requiresLabLevel);
         }
 
-        public bool CanBuy(UpgradeSO upgrade) { return UpgradeLockReason(upgrade) == null && Has(upgrade.CostAt(Level(upgrade))); }
+        public bool CanBuy(UpgradeSO upgrade) { return UpgradeLockReason(upgrade) == null && HasPlanetResources(upgrade.CostAt(Level(upgrade))); }
 
         public string UpgradeLockReason(UpgradeSO upgrade)
         {

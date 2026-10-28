@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 1941004288
-    m_Localized: COMMAND
+    m_Localized: RESEARCH
     m_Metadata:
       m_Items: []
   - m_Id: 1987141632
@@ -27,7 +27,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991335936
-    m_Localized: PACK
+    m_Localized: SHIP
     m_Metadata:
       m_Items: []
   - m_Id: 1991335937
@@ -267,7 +267,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991335995
-    m_Localized: BACKPACK
+    m_Localized: SHIP
     m_Metadata:
       m_Items: []
   - m_Id: 1991335996
@@ -401,8 +401,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336027
-    m_Localized: Open Command on the bottom dock to manage your bases and unlock
-      upgrades, including more backpack space.
+    m_Localized: Ship holds your cargo, tools and ship upgrades. Research unlocks
+      technology and global improvements. Tap a structure to manage it, or open Build
+      for construction.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336028
@@ -622,8 +623,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336079
-    m_Localized: Your backpack is small by design. Store extra resources in a Warehouse
-      before expanding your haul.
+    m_Localized: Store extra cargo in a Warehouse on this world to make room for
+      your next haul.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336080
@@ -706,7 +707,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336099
-    m_Localized: Your backpack is empty
+    m_Localized: Your cargo is empty
     m_Metadata:
       m_Items: []
   - m_Id: 1991336100
@@ -731,7 +732,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336105
-    m_Localized: RECOVERED SURFACE SALVAGE
+    m_Localized: ON THE SURFACE - NOT ABOARD
     m_Metadata:
       m_Items: []
   - m_Id: 1991336106
@@ -751,7 +752,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336110
-    m_Localized: Upgrade the backpack in Command > Research for more slots.
+    m_Localized: Cargo capacity upgrades are below.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336111
@@ -768,8 +769,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1991336114
     m_Localized: Pull stacks from operational storage on other visited worlds. Each
-      pull costs energy based on stack size and distance; only fuel in your backpack
-      can pay. Fuel Depot reserves stay isolated.
+      pull uses ship fuel based on stack size and distance. Fuel Depot reserves stay
+      on their world until transferred.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336115
@@ -813,19 +814,18 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1991336124
     m_Localized: This hopper stores the Auto-Harvester's offline output. A local
-      Cargo Depot connects its materials to this planet's shared build and craft
-      pool.
+      Cargo Depot connects its materials to this planet's shared resource pool.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336125
     m_Localized: This shared buffer joins operational Warehouses and Auto-Harvester
-      hoppers on this planet. Build and craft costs draw from the pool automatically;
-      travel still uses your backpack.
+      hoppers on this planet. Building, crafting, research and upgrades draw from
+      the pool. Travel uses ship fuel; remote storage stays separate.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336126
-    m_Localized: Connected to this planet's Cargo Depot. Build and craft costs can
-      draw from this storage automatically.
+    m_Localized: Connected to this planet's Cargo Depot. Building, crafting, research
+      and upgrades can draw from this storage automatically.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336127
@@ -1059,7 +1059,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336182
-    m_Localized: OPEN COMMAND
+    m_Localized: OPEN RESEARCH
     m_Metadata:
       m_Items: []
   - m_Id: 1991336183
@@ -1127,7 +1127,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336199
-    m_Localized: CATALOG TOOL TIERS
+    m_Localized: HARVEST TOOLS
     m_Metadata:
       m_Items: []
   - m_Id: 1991336200
@@ -1695,8 +1695,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336339
-    m_Localized: Unlocks research and tool tiers in COMMAND. Higher lab levels open
-      advanced research.
+    m_Localized: Enables technology in Research and tool upgrades in Ship. Higher
+      lab levels open advanced research.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336340
@@ -2748,7 +2748,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530403
-    m_Localized: OPEN COMMAND
+    m_Localized: OPEN RESEARCH
     m_Metadata:
       m_Items: []
   - m_Id: 1995530404
@@ -3444,7 +3444,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1399931771379721
-    m_Localized: OPEN COMMAND
+    m_Localized: OPEN RESEARCH
     m_Metadata:
       m_Items: []
   - m_Id: 1399931771379722
@@ -3485,7 +3485,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1399931771379731
-    m_Localized: Research Ascension Protocol in Command.
+    m_Localized: Research Ascension Protocol in Research.
     m_Metadata:
       m_Items: []
   - m_Id: 1399931771379732
@@ -5453,8 +5453,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1502514515107955
-    m_Localized: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops
-      eating backpack space.
+    m_Localized: More ship fuel racks for longer expeditions. Fuel stays separate
+      from cargo.
     m_Metadata:
       m_Items: []
   - m_Id: 1502514515107956
@@ -5586,7 +5586,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1502514519302170
-    m_Localized: +15% firing speed for placed turrets. Does not spawn turrets.
+    m_Localized: All placed turrets fire 15% faster per level.
     m_Metadata:
       m_Items: []
   - m_Id: 1502514519302171
@@ -7124,8 +7124,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1502514578022422
-    m_Localized: Purchase the first Jump Range upgrade. Temporary debug settings
-      do not count.
+    m_Localized: Purchase the first Jump Range upgrade to reach more distant worlds.
     m_Metadata:
       m_Items: []
   - m_Id: 1502514578022423
@@ -8433,9 +8432,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2188116860428293
-    m_Localized: Fuel uses ship tanks, not backpack space. Amounts are shown in equivalent
-      gallons; plasma and antimatter carry more energy per rack. Craft fuel to refill,
-      or transfer reserves at a Fuel Depot.
+    m_Localized: Ship fuel is measured in equivalent gallons. Plasma and antimatter
+      hold more energy per rack. Refill by crafting fuel or withdrawing from a local
+      Fuel Depot.
     m_Metadata:
       m_Items: []
   - m_Id: 2188116860428294
@@ -8779,8 +8778,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2249921284628481
-    m_Localized: Clear alien waves to level up. Unlocks use your XP level, not planet
-      tier.
+    m_Localized: Clear alien waves to earn XP and unlock new upgrades.
     m_Metadata:
       m_Items: []
   - m_Id: 2249921284628482
@@ -8789,6 +8787,45 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2249921284628483
     m_Localized: 'Required XP level: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758615048192
+    m_Localized: CARGO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545664
+    m_Localized: SYSTEMS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545665
+    m_Localized: Carried cargo only. Warehouses and unclaimed salvage stay on their
+      world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545666
+    m_Localized: SHIP READINESS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545667
+    m_Localized: Costs use cargo and connected local storage. Retrieve or transfer
+      remote stock first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545668
+    m_Localized: Costs use cargo. A local Cargo Depot connects operational storage;
+      remote stock needs retrieval or transfer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545669
+    m_Localized: IMPROVEMENTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545670
+    m_Localized: Completed research ({0})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4487544858304512
+    m_Localized: OPEN SHIP SYSTEMS
     m_Metadata:
       m_Items: []
   references:

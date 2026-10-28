@@ -425,6 +425,8 @@ namespace Frontier
             {
                 StructureHeader(body, s, c, UiText.Get("structure.lab.subtitle"));
                 body.Add(UiKit.Text(UiText.Get("structure.lab.help"), "fr-tiny"));
+                body.Add(IconBtn(UiText.Get("goals.action.command"), "research", UiKit.Magenta, OpenResearch));
+                body.Add(IconBtn(UiText.Get("command.tools"), "tools", UiKit.Amber, () => OpenShip(ShipPage.Tools)));
                 UpgradeButton(body, s, c);
             });
         }

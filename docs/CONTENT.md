@@ -19,7 +19,7 @@ and it never authorizes live purchases.
 `Resources/Frontier/NetworkRules.asset` is the editable, validated ScriptableObject for the new
 network progression; it sits alongside, and does not rewrite, the imported economy catalog.
 After Warp Gate Engineering, visit and build an operational gate on each endpoint, then pay
-the local link cost through a gate, Command > Ship > Planet Network, or a selected map world.
+the local link cost through a gate or Map > Planet Network.
 Links are permanent, undirected, transitive and saved as canonical planet ids. They remain
 after dismantling a gate. Solid green lines connect worlds on the local orbital chart and
 systems on the universe chart. Connected worlds use zero fuel and have no flight legs,
@@ -86,14 +86,14 @@ coordinate searches stay in universe view. Search, resource filters, pins and ro
 ## World interaction and shared mining
 
 Orbit/Surface framing uses an interruptible 0.6-second eased camera move and an icon-only
-world-view button with a localized action tooltip. Backpack usage lives on the Pack dock action
+world-view button with a localized action tooltip. Carried cargo usage lives on the Ship dock action
 as eight segmented green-to-amber-to-red bars and an exact used/total count, not a second top-bar
-chip. Command has one Tools / Tech / Ship / Defense navigation; Bases and Crews are no longer
-Command tabs. Buildings are managed by tapping them. Existing construction timers, finish
+chip. The dock is Research / Map / Ship / Build. Ship opens Cargo and also owns Tools and Systems;
+Research owns Tech and global Improvements. Buildings are managed by tapping them. Existing construction timers, finish
 confirmations and recruitment remain accessible through Build > Construction Jobs, without
 changing saved crews or progression. Map pinning is a compact native checkbox.
 
-Command > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed
+Ship > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed
 legacy shop. The Mining entry uses the existing Pick ladder's costs, research and reach gates;
 both Mine and Drill receive its tier. The highest previously owned Pick or Drill tier is retained
 without deleting either saved entry. Old legacy pick/drill power bonuses remain effective for both
@@ -202,7 +202,9 @@ are persisted alongside them in v2. The save schema stays v2, v1 originals are b
 
 Imported recipes are filtered by exact station id, station level, XP level and research, including the authoritative craft
 action. Purchased research now passes authored research gates; node prerequisites, current-world lab level, XP level,
-catalog identity and resource costs are checked by the runtime. The Command panel exposes research and tool ladders.
+catalog identity and resource costs are checked by the runtime. Research exposes technology; Ship exposes tool ladders.
+Research, tools and upgrades spend carried cargo plus operational current-world storage connected by a Cargo Depot,
+using the same atomic spending helper as construction. Cost chips show that same pool; remote stock is never included.
 Only Axe/Pick/Drill tiers can be purchased; their yield and active tool level are reflected in harvest rewards and tool feedback.
 Other ladder game types remain visibly unavailable until their minigames exist.
 Unsupported structures/effects cannot be purchased. Supported legacy actions remain synchronous: batch size is not treated

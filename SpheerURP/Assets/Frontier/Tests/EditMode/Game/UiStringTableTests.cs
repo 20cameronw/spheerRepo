@@ -102,7 +102,12 @@ namespace Frontier.Tests
             Assert.AreEqual("LANGUAGE", UiText.Get("settings.language"));
             StringAssert.Contains("only language", UiText.Get("settings.language.only-english"));
             StringAssert.Contains("no room", UiText.Get("harvest.bonus.no-room"));
-            Assert.AreEqual("COMMAND", UiText.Get("nav.command"));
+            Assert.AreEqual("RESEARCH", UiText.Get("nav.command"));
+            Assert.AreEqual("SHIP", UiText.Get("nav.pack"));
+            Assert.AreEqual("SHIP", UiText.Get("nav.backpack"));
+            foreach (string id in new[] { "fuel_tank", "turret" })
+                Assert.AreEqual(GameDatabase.Load().FindUpgrade(id).LocalizedDescription,
+                    UiText.Get("content.upgrade." + id + ".description"), "English authored and localized upgrade copy must agree.");
             Assert.AreEqual("COLLECT RESOURCES", UiText.Get("harvest.collect"));
             Assert.AreEqual("Run abandoned. No resources collected.", UiText.Get("harvest.abandoned"));
             Assert.AreEqual("25 XP", UiText.Get("common.xp", 25));
@@ -182,7 +187,7 @@ namespace Frontier.Tests
             Assert.AreEqual($"Mine · richness x{1.25f:0.00} · yield 3", UiText.Get("map.deposit", "Mine", 1.25f, 3));
             Assert.AreEqual("Set Glacia as the next stop toward Nyx", UiText.Get("map.next-stop.tooltip", "Glacia", "Nyx"));
             Assert.AreEqual("RESOURCES  2/34  ·  RECIPES  1/12", UiText.Get("atlas.summary.resources-recipes", 2, 34, 1, 12));
-            Assert.AreEqual("Craft  ·  TIER 3  ·  Refinery LV 2  ·  RESEARCH: Alloys",
+            Assert.AreEqual("Craft  ·  XP LV 3  ·  Refinery LV 2  ·  RESEARCH: Alloys",
                 UiText.Get("atlas.recipe.gate-research", "Craft", 3, "Refinery", 2, "Alloys"));
             Assert.AreEqual($"Sylva  ·  {12.5:0.#} LY FROM HOME",
                 UiText.Get("atlas.resource.sample", "Sylva", 12.5));

@@ -17,7 +17,7 @@ namespace Frontier
                 BuildFuelReserves(body);
                 body.Add(UiKit.Text(UiText.Get("fuel.help"), "fr-muted"));
                 var upgrade = IconBtn(UiText.Get("fuel.upgrade"), "up", UiKit.Amber,
-                    () => { researchTab = 2; progressionTab = 1; OpenResearch(); });
+                    () => OpenShip(ShipPage.Systems));
                 upgrade.name = "fuel-open-upgrades";
                 body.Add(upgrade);
             }, true);
@@ -48,6 +48,9 @@ namespace Frontier
         void BuildNetwork(VisualElement body)
         {
             body.Add(UiKit.Text(UiText.Get("network.help"), "fr-muted"));
+            var map = IconBtn(UiText.Get("network.open-map"), "map", UiKit.Cyan, () => { CloseModal(); OpenMap(); });
+            map.name = "network-open-map";
+            body.Add(map);
             if (gs.NetworkRules == null)
             {
                 body.Add(Note(UiText.Get("network.lock.unavailable"), UiKit.Amber));
@@ -145,9 +148,6 @@ namespace Frontier
                 body.Add(link);
                 if (reason != null) body.Add(Note(reason, UiKit.Amber));
             }
-            var map = IconBtn(UiText.Get("network.open-map"), "map", UiKit.Cyan, () => { CloseModal(); OpenMap(); });
-            map.name = "network-open-map";
-            body.Add(map);
         }
 
         VisualElement NetworkCostRow(List<ItemAmount> costs)

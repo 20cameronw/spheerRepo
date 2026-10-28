@@ -142,6 +142,96 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void ProgressionPurchasesUseOnlyTheConnectedOperationalLocalPool(
+            [Values("research", "tool", "ship", "defense")] string purchase,
+            [Values("connected", "disconnected", "remote", "building-storage", "building-depot", "short")] string scope)
+        {
+            var isolated = GameDatabase.Select(db.ContentSource, GameDatabase.LoadLegacy(), out string error);
+            Assert.IsNull(error);
+            var copies = new List<UnityEngine.Object>();
+            try
+            {
+                isolated.research = (ResearchNodeSO[])isolated.research.Clone();
+                isolated.toolLadders = (ToolLadderSO[])isolated.toolLadders.Clone();
+                isolated.upgrades = (UpgradeSO[])isolated.upgrades.Clone();
+                var state = new GameState(isolated, false, clock);
+                var wood = isolated.FindResource("wood");
+                var stone = isolated.FindResource("stone");
+                var cost = new[] { new Economy.ItemAmount("wood", 12), new Economy.ItemAmount("stone", 5) };
+                Func<bool> eligible, buy;
+                Func<GameState, bool> purchased;
+                if (purchase == "research")
+                {
+                    var node = CloneForGate(isolated.research[0], isolated.research, copies);
+                    node.data.cost = cost;
+                    node.data.tier = 1;
+                    node.data.labLevel = 0;
+                    node.data.prereqs = new string[0];
+                    eligible = () => state.CanResearch(node);
+                    buy = () => state.Research(node);
+                    purchased = loaded => loaded.IsResearched(node.data.id);
+                }
+                else if (purchase == "tool")
+                {
+                    var ladder = CloneForGate(isolated.toolLadders.First(t => t.data.kind == Economy.ToolKind.Axe),
+                        isolated.toolLadders, copies);
+                    var next = ladder.data.tiers.First(t => t.tier == 2);
+                    next.cost = cost;
+                    next.requiresReachTier = 1;
+                    next.requiresLabLevel = 0;
+                    next.researchPrereq = "";
+                    eligible = () => state.ToolTierLockReason(ladder) == null;
+                    buy = () => state.BuyToolTier(ladder);
+                    purchased = loaded => loaded.ToolTier(ladder) == 2;
+                }
+                else
+                {
+                    var category = purchase == "ship" ? UpgradeCategory.Ship : UpgradeCategory.Defense;
+                    var upgrade = CloneForGate(isolated.upgrades.First(u => u.category == category && u.HasLevelRows),
+                        isolated.upgrades, copies);
+                    var next = upgrade.NextRow(0);
+                    next.cost = new List<ItemAmount> { new ItemAmount(wood, 12), new ItemAmount(stone, 5) };
+                    next.requiresReachTier = 1;
+                    next.researchPrereq = "";
+                    eligible = () => state.CanBuy(upgrade);
+                    buy = () => state.Buy(upgrade);
+                    purchased = loaded => loaded.Level(upgrade) == 1;
+                }
+
+                var warehouse = state.DebugPlace(isolated.StructureOfKind(StructureKind.Warehouse), 0);
+                var depot = scope == "disconnected" ? null :
+                    state.DebugPlace(isolated.StructureOfKind(StructureKind.CargoDepot), 1);
+                var storage = state.StorageFor(warehouse);
+                storage.slots[0].resourceId = wood.id;
+                storage.slots[0].count = 8;
+                storage.slots[1].resourceId = stone.id;
+                storage.slots[1].count = scope == "short" ? 4 : 5;
+                state.backpack.Clear();
+                state.backpack.Set(wood.id, 4);
+                if (scope == "building-storage") state.DebugSetBuilderJob(warehouse, 60);
+                if (scope == "building-depot") state.DebugSetBuilderJob(depot, 60);
+                if (scope == "remote") state.DebugTeleport(state.universe.Get(isolated.planets[1].id));
+                bool connected = scope == "connected";
+                Assert.AreEqual(connected, eligible(), "Eligibility must use the same resource scope as spending.");
+                Assert.AreEqual(connected, buy());
+                Assert.AreEqual(connected ? 0 : 4, state.Count(wood), "Rejected purchases must not partially spend cargo.");
+                Assert.AreEqual(connected ? 0 : 8, WarehouseOps.Held(storage, wood.id));
+                Assert.AreEqual(connected ? 0 : scope == "short" ? 4 : 5, WarehouseOps.Held(storage, stone.id));
+                Assert.AreEqual(connected, purchased(state));
+                Assert.IsTrue(state.Save());
+                var loaded = new GameState(isolated, true, clock);
+                Assert.AreEqual(connected, purchased(loaded), "Stable progression IDs survive save/load.");
+                var loadedWarehouse = loaded.structures.First(s => s.planetId == warehouse.planetId && s.slot == warehouse.slot);
+                Assert.AreEqual(connected ? 0 : 8, WarehouseOps.Held(loaded.StorageFor(loadedWarehouse), wood.id));
+            }
+            finally
+            {
+                foreach (var copy in copies) UnityEngine.Object.DestroyImmediate(copy);
+                UnityEngine.Object.DestroyImmediate(isolated);
+            }
+        }
+
+        [Test]
         public void ResearchPurchase_SpendsCostAndSurvivesSaveLoad()
         {
             var state = new GameState(db, false);

@@ -113,10 +113,13 @@ namespace Frontier
                     scroll.Add(link);
                     if (reason != null) scroll.Add(Note(reason, UiKit.Amber));
                 }
-                var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Cyan, OpenNetwork);
-                network.name = "map-open-network";
-                scroll.Add(network);
             }
+            var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Cyan, OpenNetwork);
+            network.name = "map-open-network";
+            scroll.Add(network);
+            var ship = IconBtn(UiText.Get("map.open-ship"), "ship", UiKit.Amber, () => OpenShip(ShipPage.Systems));
+            ship.name = "map-open-ship";
+            scroll.Add(ship);
             scroll.Add(UiKit.Text(UiText.Get(gs.HasBase(planet) ? "map.world.summary-base" : "map.world.summary",
                 planet.BuildingSlots, planet.Danger), "fr-small"));
             if (planet.Hazards == Hazards.None) scroll.Add(UiKit.Text(UiText.Get("map.hazards.none"), "fr-tiny", UiKit.Lime));
