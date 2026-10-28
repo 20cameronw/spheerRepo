@@ -1,5 +1,18 @@
 # Economy content pipeline
 
+## Player-flow reward authoring
+
+`Resources/Frontier/GameplayRewardRules.asset` is the explicit gameplay placement gate. Harvest and
+construction ship disabled; construction seconds remains zero until tuning is approved. Do not copy
+historical `RewardedAdsPolicy` caps into approved gameplay tuning. Construction uses existing service
+placement ID `timer-skip`; harvest uses `double-yield`. The proposed values and child-inclusive activation
+gates are documented in [SYSTEMS.md](SYSTEMS.md), not activated by this content.
+
+Player-flow copy lives in `UiStrings.asset` (`project.*`, `reward.*` and first-departure guidance).
+Use `FrontierLocalization.SyncEnglishCatalog` after canonical edits; generated locale tables must not
+be edited manually. Stable project content/world/slot IDs live in existing save settings; do not rename
+content to change navigation. Tracked quantities and availability use the originating action's pool.
+
 ## XP-level progression requirements
 
 Building, structure/ship/defense upgrades, research, tool tiers and recipes now use player XP

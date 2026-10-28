@@ -52,6 +52,28 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void SameProcessResumeAccruesOnceAndReportsOutputInItsActualStorage()
+        {
+            var state = Seed();
+            int cargo = state.Count(db.FindResource("wood"));
+            clock.Advance(3600);
+            state.ResumeOfflineProgress();
+            Assert.AreEqual(400, Fuel(state), 0.001);
+            Assert.Greater(Raw(state), 0);
+            Assert.AreEqual(cargo, state.Count(db.FindResource("wood")));
+            Assert.IsTrue(state.ReturnItems.Any(i => i.slot == 0 && i.amount > 0));
+            Assert.IsTrue(state.ReturnItems.Any(i => i.slot == 1 && i.resourceId == db.fuel.id && i.amount > 0));
+            int raw = Raw(state);
+            state.ResumeOfflineProgress();
+            Assert.AreEqual(400, Fuel(state), 0.001);
+            Assert.AreEqual(raw, Raw(state));
+            Assert.IsEmpty(state.ReturnItems);
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(400, Fuel(loaded), 0.001);
+            Assert.AreEqual(raw, Raw(loaded));
+        }
+
+        [Test]
         public void RewindAndRepeatedSavesCannotReplayOfflineIntervalsForEitherProducer()
         {
             Seed();

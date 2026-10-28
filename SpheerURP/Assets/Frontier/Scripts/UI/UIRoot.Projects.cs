@@ -35,7 +35,8 @@ namespace Frontier
         VisualElement ProjectCosts(List<ItemAmount> costs, PlayerProject project)
         {
             return UiKit.CostRow(costs, gs, true, resource =>
-                OpenShortage(project, resource, costs.Where(c => c.resource == resource).Sum(c => c.amount)));
+                OpenShortage(project, resource, costs.Where(c => c.resource == resource).Sum(c => c.amount)),
+                resource => gs.ProjectResourceCount(project, resource));
         }
 
         void AddProjectAction(VisualElement body, PlayerProject project)
@@ -160,6 +161,16 @@ namespace Frontier
                     scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
                 };
             }
+            if (mapOpen)
+            {
+                var savedWorld = selected;
+                return () =>
+                {
+                    if (gs.planet.Id != planetId) { OpenProject(project); return; }
+                    CloseAll(); OpenMap();
+                    if (savedWorld != null) { SelectMapWorld(savedWorld); CenterOn(savedWorld); }
+                };
+            }
             return () => OpenProject(project);
         }
 
@@ -208,13 +219,14 @@ namespace Frontier
             CloseAll();
             OpenModal("shortage-" + resource.id, Icons.ForResource(resource), resource.LocalizedName, UiKit.Cyan, body =>
             {
-                int have = gs.PlanetCount(resource);
+                body.AddToClassList("fr-project-body");
+                int have = gs.ProjectResourceCount(project, resource);
                 body.Add(UiKit.Text(UiText.Get("project.shortfall", required, resource.LocalizedName,
                     have, Math.Max(0, required - have)), "fr-small"));
                 if (gs.FreeSpace(resource) <= 0)
                     body.Add(IconBtn(UiText.Get("project.capacity"), "pack", UiKit.Amber,
                         () => FollowProject(project, () => { CloseAll(); OpenShip(ShipPage.Cargo); })));
-                foreach (var option in gs.ResourceOptions(resource, required))
+                foreach (var option in gs.ResourceOptions(resource, required, project.kind == "obstacle"))
                 {
                     var source = option;
                     if (source.kind == ResourceSourceKind.Usable)
@@ -238,7 +250,7 @@ namespace Frontier
                             body.Add(IconBtn(UiText.Get("project.withdraw"), "warehouse", UiKit.Cyan,
                                 () => OpenSourceStructure(source.structure)));
                             var depot = gs.db.StructureOfKind(StructureKind.CargoDepot);
-                            if (depot != null)
+                            if (depot != null && project.kind != "obstacle")
                                 body.Add(IconBtn(UiText.Get("project.connect"), "cargo_depot", UiKit.Cyan,
                                     () => FollowProject(project, () => OpenProject(Project("build", depot.id)))));
                         }
@@ -324,6 +336,15 @@ namespace Frontier
                     ScrollProject(modalScroll, "shop-structure-" + project.id);
                     break;
                 case "network": OpenNetwork(); break;
+                case "link":
+                    OpenMap(); SelectMapWorld(gs.universe.Get(project.id)); CenterOn(gs.universe.Get(project.id));
+                    break;
+                case "obstacle":
+                    if (!world.SimulateObstacleTap(project.slot))
+                    {
+                        Toast(UiText.Get("project.anchor-missing"), UiKit.Amber); OpenProjectPanel();
+                    }
+                    break;
                 default:
                     var structure = gs.structures.FirstOrDefault(s => s.planetId == project.planetId && s.slot == project.slot);
                     if (structure == null || !world.SelectStructure(structure))
@@ -351,6 +372,7 @@ namespace Frontier
             CloseAll();
             OpenModal("project", "star", UiText.Get("project.title"), UiKit.Cyan, body =>
             {
+                body.AddToClassList("fr-project-body");
                 BuildRewardRecovery(body);
                 var project = gs.TrackedProject;
                 var status = gs.ProjectState(project);
@@ -391,10 +413,12 @@ namespace Frontier
                             OpenMap(); SelectMapWorld(planet);
                         }));
                     }
-                    body.Add(IconBtn(UiText.Get("common.close"), "close", UiKit.Muted, () =>
+                    var dismiss = IconBtn(UiText.Get("project.dismiss-summary"), "close", UiKit.Muted, () =>
                     {
                         returnSummaryDismissed = true; RefreshProjectResume(); RefreshModal();
-                    }));
+                    });
+                    dismiss.name = "project-dismiss-summary";
+                    body.Add(dismiss);
                 }
             });
         }

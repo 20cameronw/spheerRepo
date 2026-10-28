@@ -2228,6 +2228,32 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator ReturnSummaryRendersAndDismissesWithoutChangingStoredOutput()
+        {
+            new GameObject("ReturnSummaryBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            int before = rt.State.Count(rt.Db.FindResource("wood"));
+            rt.State.ReturnItems.Add(new SessionReturnItem { planetId = rt.State.planet.Id, slot = 0 });
+            rt.State.ReturnItems.Add(new SessionReturnItem { planetId = rt.State.planet.Id, slot = 1,
+                resourceId = "wood", amount = 24 });
+            rt.Ui.DebugProject();
+            yield return null;
+            var dismiss = rt.Ui.DebugRoot.Q<Button>("project-dismiss-summary");
+            Assert.IsNotNull(dismiss);
+            Assert.AreEqual(UiText.Get("project.dismiss-summary"), dismiss.Q<Label>(className: "fr-btn-label").text);
+            foreach (var label in rt.Ui.DebugRoot.Q(className: "fr-project-body").Query<Label>(className: "fr-small").ToList())
+                Assert.AreEqual(WhiteSpace.Normal, label.resolvedStyle.whiteSpace, "Return text must wrap rather than clip.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = dismiss; dismiss.SendEvent(submit); }
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q("project-dismiss-summary"));
+            Assert.AreEqual(before, rt.State.Count(rt.Db.FindResource("wood")));
+            Assert.AreEqual(2, rt.State.ReturnItems.Count, "Dismissal hides the report; it never grants or consumes stored output.");
+        }
+
+        [UnityTest]
         public IEnumerator ConstructionAdsRequireFlagsAndPreserveTheNormalActionOnNoFill()
         {
             new GameObject("RewardBootstrap").AddComponent<FrontierBootstrap>();
@@ -2294,6 +2320,8 @@ namespace Frontier.Tests
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
             yield return null;
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            foreach (var label in rt.Ui.DebugRoot.Q(className: "fr-project-body").Query<Label>(className: "fr-small").ToList())
+                Assert.AreEqual(WhiteSpace.Normal, label.resolvedStyle.whiteSpace, "Exact shortfalls must stay readable.");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Still missing:")));
             var track = rt.Ui.DebugRoot.Q<Button>("track-upgrade-pack");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }

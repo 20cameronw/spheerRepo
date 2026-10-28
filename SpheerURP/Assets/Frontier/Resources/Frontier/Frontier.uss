@@ -28,6 +28,10 @@
     font-size: var(--fr-fs-body);
     -unity-font-definition: url("/Assets/Frontier/Art/Fonts/Barlow-SemiBold-SDF.asset");
 }
+.fr-project-body .fr-small {
+    white-space: normal;
+    flex-shrink: 0;
+}
 .fr-tiny, .fr-t-caption { font-size: var(--fr-fs-caption); color: var(--fr-text-lo); white-space: normal; }
 
 .fr-surface-enter {

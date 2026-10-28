@@ -224,14 +224,15 @@ namespace Frontier
         }
 
         public static VisualElement CostRow(System.Collections.Generic.List<ItemAmount> items, GameState gs, bool showHave,
-            Action<ResourceSO> onFind = null)
+            Action<ResourceSO> onFind = null, Func<ResourceSO, int> available = null)
         {
             var row = Div("fr-row-wrap");
             foreach (var i in items)
             {
                 if (i.resource == null) continue;
-                var chip = ItemChip(i.resource, i.amount, showHave ? gs.PlanetCount(i.resource) : -1);
-                if (onFind != null && gs.PlanetCount(i.resource) < i.amount)
+                int have = available == null ? gs.PlanetCount(i.resource) : available(i.resource);
+                var chip = ItemChip(i.resource, i.amount, showHave ? have : -1);
+                if (onFind != null && have < i.amount)
                     chip = BindResourceFind(chip, i.resource, onFind);
                 row.Add(chip);
             }

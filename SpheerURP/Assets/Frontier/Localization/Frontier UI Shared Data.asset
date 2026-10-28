@@ -8739,6 +8739,10 @@ MonoBehaviour:
     m_Key: reward.restore-busy
     m_Metadata:
       m_Items: []
+  - m_Id: 4497463032504320
+    m_Key: project.dismiss-summary
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

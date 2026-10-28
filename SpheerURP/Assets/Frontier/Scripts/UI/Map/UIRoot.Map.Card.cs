@@ -103,7 +103,9 @@ namespace Frontier
                 else
                 {
                     string reason = gs.PlanetLinkLockReason(planet);
-                    scroll.Add(NetworkCostRow(gs.NetworkCosts(false)));
+                    var project = Project("link", planet.Id);
+                    scroll.Add(ProjectCosts(gs.NetworkCosts(false), project));
+                    AddProjectAction(scroll, project);
                     var link = IconBtn(UiText.Get("network.link", planet.Name), "warp", UiKit.Cyan, () =>
                     {
                         bool ok = gs.TryLinkPlanet(planet, out string message);

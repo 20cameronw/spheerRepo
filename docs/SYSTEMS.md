@@ -21,11 +21,14 @@ No save schema, stable content IDs, inventory capacity, job timing or production
 
 ## Shortage journeys, projects and returning sessions
 
-Missing-resource chips on build, research, tools, upgrades, station recipes and the Grand Archive open
+Missing-resource chips on build, research, tools, upgrades, station recipes, obstacle clearance,
+planet links and the Grand Archive open
 stock-aware help with the requested amount, usable local total and shortfall. Usable stock comes first,
 then disconnected local storage, affordable relay retrieval and production; remote stock remains explicitly
 remote. Transfer energy and travel blockers are visible. Unknown deposits stay hidden until normal survey
 or visit discovery. Manual Atlas/map alternatives remain available.
+Obstacle clearance retains its existing **carried-only** spending rule; its help and availability use
+that rule even with connected storage, offering withdrawal rather than pretending the stock is spendable.
 
 The in-session journey retains the original panel, tab, selection, scroll and recipe batch quantity.
 Previous-step and original-project actions revalidate current state; opening help never spends, crafts,

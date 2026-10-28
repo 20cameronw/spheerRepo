@@ -16,6 +16,8 @@ MonoBehaviour:
   entries:
   - key: project.capacity
     text: MAKE ROOM OR UPGRADE CARGO
+  - key: project.dismiss-summary
+    text: DISMISS SUMMARY
   - key: project.connect
     text: CONNECT LOCAL STORAGE
   - key: project.hull

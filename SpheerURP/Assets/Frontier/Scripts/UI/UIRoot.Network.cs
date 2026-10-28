@@ -114,7 +114,6 @@ namespace Frontier
                 body.Add(complete);
             }
             body.Add(SectionLabel(UiText.Get("network.destinations")));
-            body.Add(NetworkCostRow(gs.NetworkCosts(false)));
             var destinations = new List<PlanetData>();
             foreach (var delta in gs.world.All)
             {
@@ -138,6 +137,9 @@ namespace Frontier
                     continue;
                 }
                 string reason = gs.PlanetLinkLockReason(destination);
+                var project = Project("link", destination.Id);
+                body.Add(ProjectCosts(gs.NetworkCosts(false), project));
+                AddProjectAction(body, project);
                 var link = IconBtn(UiText.Get("network.link", destination.Name), "warp", UiKit.Cyan, () =>
                 {
                     if (busy || defense.Active) return;
@@ -149,20 +151,6 @@ namespace Frontier
                 body.Add(link);
                 if (reason != null) body.Add(Note(reason, UiKit.Amber));
             }
-        }
-
-        VisualElement NetworkCostRow(List<ItemAmount> costs)
-        {
-            var row = UiKit.Div("fr-row-wrap");
-            foreach (var cost in costs)
-            {
-                var chip = UiKit.ItemChip(cost.resource, cost.amount, gs.PlanetCount(cost.resource));
-                var resource = cost.resource;
-                if (gs.PlanetCount(resource) < cost.amount)
-                    chip = UiKit.BindResourceFind(chip, resource, OpenResourceSource);
-                row.Add(chip);
-            }
-            return row;
         }
 
         void PlayNetworkFinale()

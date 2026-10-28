@@ -54,6 +54,10 @@ namespace Frontier
             Save();
         }
         public bool HasTrackedProject { get { return settings.Any(s => s != null && s.key == TrackedProjectKey && !string.IsNullOrEmpty(s.value)); } }
+        public int ProjectResourceCount(PlayerProject project, ResourceSO resource)
+        {
+            return project != null && project.kind == "obstacle" ? Count(resource) : PlanetCount(resource);
+        }
 
         public PlayerProject TrackedProject
         {
@@ -156,6 +160,23 @@ namespace Frontier
                     result.costs = NetworkCosts(true);
                     result.blocker = local ? NetworkCompletionLockReason() : UiText.Get("project.return-world");
                     break;
+                case "link":
+                    var destination = universe.Get(project.id);
+                    var origin = universe.Get(project.planetId);
+                    if (destination == null || origin == null) return result;
+                    result.name = UiText.Get("network.link", destination.Name);
+                    result.complete = HasPlanetLink(origin, destination);
+                    result.costs = NetworkCosts(false);
+                    result.blocker = local ? PlanetLinkLockReason(destination) : UiText.Get("project.return-world");
+                    break;
+                case "obstacle":
+                    var obstacleWorld = universe.Get(project.planetId);
+                    if (obstacleWorld == null || project.slot < 0) return result;
+                    result.name = UiText.Get("obstacle.title");
+                    result.complete = !ObstacleAt(obstacleWorld, project.slot).HasValue;
+                    result.costs = ObstacleClearCost(obstacleWorld, project.slot);
+                    result.blocker = local ? ObstacleClearLockReason(project.slot) : UiText.Get("project.return-world");
+                    break;
                 default: return result;
             }
             if (result.complete) { result.costs = new List<ItemAmount>(); result.blocker = null; }
@@ -163,12 +184,13 @@ namespace Frontier
             return result;
         }
 
-        public List<ResourceSource> ResourceOptions(ResourceSO resource, int required)
+        public List<ResourceSource> ResourceOptions(ResourceSO resource, int required, bool carriedOnly = false)
         {
             if (required < 1) throw new ArgumentOutOfRangeException(nameof(required));
             var result = new List<ResourceSource>();
-            if (PlanetCount(resource) >= required)
-                result.Add(new ResourceSource { kind = ResourceSourceKind.Usable, resource = resource, amount = PlanetCount(resource) });
+            int usable = carriedOnly ? Count(resource) : PlanetCount(resource);
+            if (usable >= required)
+                result.Add(new ResourceSource { kind = ResourceSourceKind.Usable, resource = resource, amount = usable });
             var relay = StructureOfKind(planet, StructureKind.Satellite);
             var accessible = relay == null ? new List<PlacedStructure>() : RelayWarehouses(relay);
             foreach (var storage in structures)
@@ -178,7 +200,7 @@ namespace Frontier
                 int held = WarehouseOps.Held(StorageFor(storage), resource.id);
                 if (held <= 0) continue;
                 bool local = storage.planetId == planet.Id;
-                if (local && CargoDepotActive) continue;
+                if (local && CargoDepotActive && !carriedOnly) continue;
                 int energy = !local && accessible.Contains(storage)
                     ? RelayTransferEnergyCost(relay, storage, Math.Min(held, required)) : int.MaxValue;
                 result.Add(new ResourceSource { kind = local ? ResourceSourceKind.LocalStock : ResourceSourceKind.RemoteStock,

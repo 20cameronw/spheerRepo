@@ -102,13 +102,13 @@ namespace Frontier.EditorTools
             {
                 var panel = canvas.panel;
                 if (panel == null) throw new InvalidOperationException("Editor panel is not attached.");
-                ValidateLayout();
-                // The first validated layout schedules the entrance; measure after its transform settles.
-                if (canvas.Q(className: "fr-surface-enter-start") != null)
+                // This gate measures static geometry. PlayMode lifecycle tests cover entrance motion.
+                foreach (var surface in canvas.Query<VisualElement>(className: "fr-surface-enter").ToList())
                 {
-                    next = EditorApplication.timeSinceStartup + 0.4;
-                    return;
+                    surface.RemoveFromClassList("fr-surface-enter");
+                    surface.RemoveFromClassList("fr-surface-enter-start");
                 }
+                ValidateLayout();
                 int phase = step % 5;
                 if (phase <= 1)
                 {

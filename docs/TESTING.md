@@ -55,7 +55,9 @@ the gauge, fuel-upgrade and objective routes, network access without a gate, Bui
 Screenshot `-Only` filters are substring matches: `hud` also selects wave HUDs. For a bounded navigation
 capture use the explicit panel names above, `pack`, `map-selected`, `network-tanks` and `network-project`
 instead; partial combat sequences can leave combat active for subsequent shots/devices.
-The static layout gate waits for entrance transforms to settle after its first validated layout.
+The static layout gate removes entrance-motion classes in its isolated EditorWindow fixture before
+measuring bounds. Editor-only transition timing was intermittent; actual motion remains covered by
+PlayMode lifecycle checks rather than changing the runtime animation or weakening geometry assertions.
 
 Release A verification (2026-10-28): 139 targeted EditMode and 14 affected PlayMode tests passed.
 The panel gate passed at 900x1600 and 1600x900. The bounded phone capture produced 24 screenshots
@@ -65,6 +67,42 @@ outputs are under the ignored `SpheerURP\Screens\release-a-confirm` folder. The 
 expectation in this configured-service environment. Capture startup/shutdown also logged Unity Search
 index and uninitialized Analytics exceptions, outside the navigation path. These service/editor issues
 remain open; the successful targeted results are not a full-suite or native-device sign-off.
+
+### Player-flow follow-through verification (2026-10-28)
+
+The final targeted run passed **189 EditMode** tests across progression projects, resource sources,
+storage/save round-trips, builder jobs, planetary network, objectives/first session, clock history,
+service lifecycle and rewarded policy. **27 PlayMode** tests passed across bootstrap, navigation,
+shortage return paths, return-summary dismissal, construction no-fill, minigames and service lifecycle.
+After visual inspection, two affected PlayMode cases passed again with resolved text-wrapping assertions.
+These counts are targeted runs, not a full-suite or physical-device certification.
+
+The pending-reward cloud-restore regression exposed mutable references in exported cloud snapshots.
+`TryCreateCloudSaveSnapshot` now returns a detached copy; later reward cancellation cannot alter a
+previously exported pending ticket and defeat incoming-save validation. Save-failure tests verify no
+partial base/bonus publication and successful retry; restart/capacity/exact-job tests cover settlement.
+Same-process resume tests cover actual stored Auto-Harvester/Dyson output and no repeated accrual.
+Obstacle help explicitly tests carried-only availability despite an operational connected warehouse.
+
+The bounded confirmation produced **28 captures** at 1080x1920 and 1080x2340 under ignored
+`SpheerURP\Screens\player-plan-confirm`, with zero setup errors, lint overflow, sub-12dp text or
+sub-48dp touch targets. Initial return captures exposed missing `common.close`; a canonical
+`project.dismiss-summary` key and live dismissal regression fix it. Visual inspection also caught
+clipped explanatory text despite clean lint; project/shortage text now has scoped wrapping, checked
+by the two follow-up PlayMode cases. Captures precede that final wrapping change; they are not proof
+that lint detects text truncation or that larger native accessibility text has been certified.
+Static layout passed at 900x1600 and 1600x900.
+
+Bootstrap and capture services now use isolated in-memory consent whenever saves are redirected;
+they neither inherit nor write the real player's consent. The previously failing bootstrap expectation
+passes, and the final capture did not reproduce the Analytics/Search exceptions recorded in Release A.
+This does not certify Unity package internals or production SDK lifecycle.
+
+`player-shortage`, `player-project`, `player-return` and `player-reward-recovery` are isolated harness
+fixtures. Gameplay reward flags ship off; transient fake services/rules exercise offers without live ads.
+Approval, child-inclusive policy/legal/SDK/platform setup, approved telemetry schemas, real-device
+touch/accessibility/background/termination/ad tests and observed new-player journeys remain release
+gates, detailed with unactivated tuning proposals in [SYSTEMS.md](SYSTEMS.md).
 
 ```powershell
 # Core tests, no Unity (needs the .NET 8 SDK; ~5 s)

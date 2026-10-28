@@ -130,12 +130,13 @@ namespace Frontier
                     : UiText.Get("snapshot.write-error", saves.LastError);
                 return false;
             }
-            snapshot = saves.LastWrittenSnapshot;
-            if (snapshot == null)
+            var written = saves.LastWrittenSnapshot;
+            if (written == null)
             {
                 message = UiText.Get("snapshot.unreadable");
                 return false;
             }
+            snapshot = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(written)).Normalize();
             return true;
         }
 

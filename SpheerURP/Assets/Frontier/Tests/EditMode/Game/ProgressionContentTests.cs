@@ -198,6 +198,40 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CarriedOnlyProjectsDoNotMistakeConnectedStockForSpendableCargo()
+        {
+            var state = new GameState(db, false, clock);
+            var wood = db.FindResource("wood");
+            state.backpack.Clear();
+            var warehouse = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            var storage = state.StorageFor(warehouse);
+            storage.slots[0].resourceId = wood.id; storage.slots[0].count = 12;
+            state.DebugPlace(db.StructureOfKind(StructureKind.CargoDepot), 1);
+            var obstacle = new PlayerProject { kind = "obstacle", id = "clear", slot = 2, planetId = state.planet.Id };
+            Assert.AreEqual(0, state.ProjectResourceCount(obstacle, wood));
+            Assert.AreEqual(12, state.ProjectResourceCount(new PlayerProject { kind = "upgrade" }, wood));
+            var options = state.ResourceOptions(wood, 5, carriedOnly: true);
+            Assert.IsFalse(options.Any(s => s.kind == ResourceSourceKind.Usable));
+            Assert.IsTrue(options.Any(s => s.kind == ResourceSourceKind.LocalStock && s.amount == 12));
+            Assert.AreEqual(12, WarehouseOps.Held(storage, wood.id));
+        }
+
+        [Test]
+        public void TrackedPlanetLinkKeepsItsDestinationAndLiveCosts()
+        {
+            var state = new GameState(db, false, clock);
+            var destination = state.universe.Get(db.planets[1].id);
+            var project = new PlayerProject { kind = "link", id = destination.Id, planetId = state.planet.Id };
+            Assert.IsTrue(state.TrackProject(project, out var error), error);
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(destination.Id, loaded.TrackedProject.id);
+            Assert.AreEqual(UiText.Get("network.link", destination.Name), loaded.ProjectState(loaded.TrackedProject).name);
+            CollectionAssert.AreEquivalent(state.NetworkCosts(false).Select(c => c.amount),
+                loaded.ProjectState(loaded.TrackedProject).costs.Select(c => c.amount));
+            Assert.IsFalse(loaded.ProjectState(loaded.TrackedProject).complete);
+        }
+
+        [Test]
         public void ResourceOptionsPreferUsableAndLocalStockAndKeepRemoteRetrievalExplicit()
         {
             var state = new GameState(db, false, clock);
