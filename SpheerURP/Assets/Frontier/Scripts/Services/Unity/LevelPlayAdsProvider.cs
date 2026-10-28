@@ -47,7 +47,8 @@ namespace Frontier.Services.Unity
         {
             if (!IsConfigured) return ServiceResult<RewardedAdResult>.NotConfigured("Rewarded ads");
             if (!HasConsent) return ServiceResult<RewardedAdResult>.ConsentRequired("advertising");
-            if (Array.Find(policy.placements, row => row != null && row.id == placementId && row.dailyCap > 0) == null)
+            if (Array.Find(policy.placements, row => row != null && row.id == placementId &&
+                (row.unlimitedDaily || row.dailyCap > 0)) == null)
                 return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.unknown"));
             if (showing)
                 return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.busy"));

@@ -7,6 +7,9 @@ construction ship disabled; construction seconds remains zero until tuning is ap
 historical `RewardedAdsPolicy` caps into approved gameplay tuning. Construction uses existing service
 placement ID `timer-skip`; harvest uses `double-yield`. The proposed values and child-inclusive activation
 gates are documented in [SYSTEMS.md](SYSTEMS.md), not activated by this content.
+The user's subsequent frequency decision removes daily caps for these two placements via explicit
+`unlimitedDaily` flags. A zero numeric cap without that flag still means disabled. Cooldowns remain in
+force; flags do not enable gameplay or native providers. Other staged placements are unchanged.
 
 Player-flow copy lives in `UiStrings.asset` (`project.*`, `reward.*` and first-departure guidance).
 Use `FrontierLocalization.SyncEnglishCatalog` after canonical edits; generated locale tables must not

@@ -70,6 +70,11 @@ remain open; the successful targeted results are not a full-suite or native-devi
 
 ### Player-flow follow-through verification (2026-10-28)
 
+The subsequent user-directed removal of harvest/construction daily caps passed **107 targeted EditMode**
+and **16 PlayMode** tests. Policy and fake native-provider cases cover explicit unlimited mode, retained
+cooldowns, persisted counter saturation, restart and unchanged finite/zero-cap semantics. Gameplay and
+platform gates remain disabled; no live ad requests were used for validation.
+
 The final targeted run passed **189 EditMode** tests across progression projects, resource sources,
 storage/save round-trips, builder jobs, planetary network, objectives/first session, clock history,
 service lifecycle and rewarded policy. **27 PlayMode** tests passed across bootstrap, navigation,

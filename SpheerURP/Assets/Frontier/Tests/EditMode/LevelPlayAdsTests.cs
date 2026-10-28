@@ -146,6 +146,18 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public async Task ExplicitUnlimitedPlacementReachesSdkWithoutNumericCap()
+        {
+            policy.placements[0].dailyCap = 0;
+            policy.placements[0].unlimitedDaily = true;
+            sdk.ad.show = () => { sdk.ad.Reward(); sdk.ad.Close(); };
+            var result = await provider.ShowRewardedAsync("double-yield");
+            Assert.IsTrue(result.succeeded);
+            Assert.IsTrue(result.value.rewardEarned);
+            Assert.AreEqual(1, sdk.created);
+        }
+
+        [Test]
         public async Task DuplicateRewardCallbacksGrantOneResultAndCleanUp()
         {
             sdk.ad.show = () => { sdk.ad.Reward(); sdk.ad.Reward(); sdk.ad.Close(); };

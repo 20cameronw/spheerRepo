@@ -19,13 +19,15 @@ MonoBehaviour:
   enableIosDevelopmentTests: 1
   placements:
   - id: double-yield
-    dailyCap: 8
+    unlimitedDaily: 1
+    dailyCap: 0
     cooldownSeconds: 180
   - id: emergency-fuel
     dailyCap: 3
     cooldownSeconds: 600
   - id: timer-skip
-    dailyCap: 5
+    unlimitedDaily: 1
+    dailyCap: 0
     cooldownSeconds: 300
   - id: revive
     dailyCap: 3

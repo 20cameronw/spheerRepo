@@ -70,6 +70,30 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public async Task UnlimitedDailyPlacementsKeepCooldownAndSaturatePersistedCounts()
+        {
+            var provider = new Provider();
+            var store = new Store();
+            var clock = new Clock();
+            var row = new RewardedAdPlacement { id = "double-yield", unlimitedDaily = true, dailyCap = 0, cooldownSeconds = 60 };
+            var policy = new RewardedAdsPolicyService(provider, store, clock, true, new[] { row });
+            row.unlimitedDaily = false;
+            Assert.IsTrue((await policy.ShowRewardedAsync("double-yield")).succeeded,
+                "The service copies authored flags and permits unlimited placements with a zero numeric cap.");
+            Assert.IsFalse(policy.RewardedAvailability("double-yield").succeeded, "Unlimited is not a cooldown bypass.");
+            clock.now = clock.now.AddSeconds(60);
+            store.rows["double-yield"].rewards = int.MaxValue;
+            Assert.IsTrue(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.IsTrue((await policy.ShowRewardedAsync("double-yield")).succeeded);
+            Assert.AreEqual(int.MaxValue, store.rows["double-yield"].rewards, "No overflow to negative/corrupt usage.");
+            clock.now = clock.now.AddSeconds(60);
+            var restarted = new RewardedAdsPolicyService(provider, store, clock, true,
+                new[] { new RewardedAdPlacement { id = "double-yield", unlimitedDaily = true, cooldownSeconds = 60 } });
+            Assert.IsTrue((await restarted.ShowRewardedAsync("double-yield")).succeeded);
+            Assert.AreEqual(3, provider.shows);
+        }
+
+        [Test]
         public async Task AvailabilityUsesTheSameLimitsWithoutShowingAdsOrWritingUsage()
         {
             var provider = new Provider();
@@ -274,7 +298,7 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void AuthoredPolicyHasCappedPlacementsButIosRemainsGated()
+        public void AuthoredHarvestAndConstructionHaveNoDailyCapButIosRemainsGated()
         {
             var policy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
             Assert.IsNotNull(policy);
@@ -284,7 +308,13 @@ namespace Frontier.Tests
             Assert.AreEqual("eurexbly1unznz2g", policy.iosRewardedAdUnitId);
             CollectionAssert.AreEquivalent(new[] { "double-yield", "emergency-fuel", "timer-skip", "revive", "daily-supply", "free-shards" },
                 Array.ConvertAll(policy.placements, row => row.id));
-            foreach (var placement in policy.placements) Assert.Greater(placement.dailyCap, 0);
+            foreach (var placement in policy.placements)
+                if (placement.id == "double-yield" || placement.id == "timer-skip")
+                {
+                    Assert.IsTrue(placement.unlimitedDaily);
+                    Assert.AreEqual(0, placement.dailyCap);
+                }
+                else Assert.Greater(placement.dailyCap, 0, "Other staged placements retain their existing policy.");
             Assert.IsFalse(policy.CanUseIos(Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig")));
         }
 

@@ -74,21 +74,37 @@ from a client-only SDK callback; server verification/native termination tests re
 Cloud restores reject unresolved local or incoming reward journals, preventing snapshot reward replay.
 Restoring/restarting replaces the callback context.
 
-### Tuning proposal - not approved or activated
+### Reward frequency decision and remaining tuning proposal
 
-| Placement | Proposed benefit | Proposed daily cap | Proposed cooldown |
+User-directed update: no daily cap on the first-stage harvest/construction placements, rather than a
+small daily allowance. `unlimitedDaily` is explicit, so old saves/assets with omitted flags retain their
+existing finite-cap behavior and zero still disables a placement unless unlimited is explicitly set.
+Persisted counts saturate safely; cooldown, consent, request overlap and reward settlement checks remain.
+Only `double-yield` and `timer-skip` change now; later placements retain their historical inactive-stage
+configuration pending their separate evaluation. Gameplay flags and production platform gates remain off.
+
+Not annoying means passive contextual buttons, never automatic ad screens, notifications or repeat
+decline dialogs. Normal Collect/wait/finish actions remain; harvest offers once per completed result,
+does not retry after no-fill on that result, and does not appear on the first successful harvest.
+High availability is not permission to nag or remove the no-ad path. Native experience and child-inclusive
+review are still mandatory. Benefit sizes and cooldown tuning below remain proposals, not activation.
+
+| Placement | Proposed benefit | Daily cap decision | Proposed cooldown |
 |---|---|---|---|
-| Harvest | +100% of that completed run, only when all output fits | 3 | 180 seconds |
-| Construction | Up to 120 seconds on the selected job | 3 | 600 seconds |
+| Harvest | +100% of that completed run, only when all output fits | None | 180 seconds |
+| Construction | Up to 120 seconds on the selected job | None | 600 seconds |
 | Emergency fuel / revive / targeted supplies / bonus shards | No new placement or grant in this stage | 0 for staged activation | N/A |
 
-This is a bounded initial comparison, not measured retention or a balance certification. With equal-yield
-harvests, 20 normal runs provide 20 run-units without ads; 3 accepted harvest offers provide at most 23
-(15% extra). Five normal runs versus the same three offers provide 5 versus 8 (60% extra), making low-session
-acceleration a specific playtest risk. Actual rewards scale with the chosen run's real tool/quality output.
-Construction adds at most six crew-minutes/day, not resources, crew slots or free prerequisite unlocks.
-The combined ceiling is three extra already-earned harvest yields plus six crew-minutes; no direct fuel,
-shard, research, XP or hazard bypass is introduced. Model low/mid/late-game bottlenecks and interactions
+This is not measured retention or a balance certification. With equal-yield harvests, N normal runs give
+N run-units; K accepted bonuses give N+K, with K no greater than eligible completed runs and subject to
+cooldown. Twenty runs with five accepted bonuses give 25 units (25% extra); accepting a bonus for every
+eligible run approaches twice the normal output. There is no longer a three-yield or six-crew-minute
+daily ceiling. Under proposed cooldowns, the sustained rate is at most 20 harvest acceptances/hour and
+6 construction acceptances/hour (up to 12 crew-minutes/hour), also bounded by real runs/jobs/ad availability.
+An initial immediately available offer can add one at an interval boundary. This is a material
+economy acceleration risk to evaluate, not a reason to make the ordinary path punitive. Actual harvest
+rewards scale with tool/quality output. No direct fuel, shard, research, XP or hazard bypass is introduced.
+Model low/mid/late-game bottlenecks and interactions
 using observed no-ad/ad-assisted journeys before approving any activation or adding fuel/revive/supplies.
 Existing nonzero policy entries remain historical development configuration, not this proposal's approval.
 
@@ -103,7 +119,7 @@ failed stage and bounded outcome enum. Do not send free text, planet names, save
 Retention/progression reporting and any necessary SDK identifiers require a separately approved
 child-inclusive privacy/retention design; do not infer consent from gameplay or previous editor preferences.
 
-Before production: approve amounts/caps/cooldowns and quantitative targets; complete child-inclusive
+Before production: approve amounts/cooldowns and quantitative targets; complete child-inclusive
 legal/platform/SDK/creative/consent review and HTTPS privacy policy; configure and verify Android/iOS;
 approve dashboard schemas before enabling collection; test native touch, pause/resume, offline/no-fill,
 consent withdrawal, app termination, durable settlement and save failure; observe new players finding Cargo,
