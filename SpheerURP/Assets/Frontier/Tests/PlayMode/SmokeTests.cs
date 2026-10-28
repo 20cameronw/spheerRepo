@@ -84,6 +84,11 @@ namespace Frontier.Tests
             Assert.IsNotNull(chip.Q<Label>());
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
             yield return null;
+            var produce = rt.Ui.DebugRoot.Query<Button>().ToList().Find(button =>
+                button.Query<Label>().ToList().Exists(label => label.text == UiText.Get("project.build-producer")));
+            Assert.IsNotNull(produce);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = produce; produce.SendEvent(submit); }
+            yield return null;
             var source = rt.State.FindResourceSource(wood);
             Assert.AreEqual(ResourceSourceKind.Build, source.kind);
             var buildCard = rt.Ui.DebugRoot.Q("shop-structure-" + source.build.id);
@@ -116,6 +121,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("recipe-" + processed.recipe.id));
 
             ResourceSource remote = null;
+            rt.State.RecordMapDiscoveries(new List<PlanetData>(rt.State.universe.AuthoredPlanets).ConvertAll(p => p.Star));
             foreach (var resource in rt.Db.resources)
             {
                 var candidate = rt.State.FindResourceSource(resource);
@@ -2219,6 +2225,91 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.State.NetworkComplete);
             Assert.AreEqual(seed, rt.State.universe.Seed, "Watching/skipping the ending cannot trigger prestige.");
             Assert.AreEqual(fuel, rt.State.FuelGallons);
+        }
+
+        [UnityTest]
+        public IEnumerator ConstructionAdsRequireFlagsAndPreserveTheNormalActionOnNoFill()
+        {
+            new GameObject("RewardBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var consent = new ConsentService(new DeletionConsentStore());
+            consent.SavePreferences(false, true, false);
+            var ads = new GameplayAdsFixture();
+            var unavailable = new UnavailableFrontierProvider();
+            rt.Ui.DebugSetServices(new FrontierServices(consent, ads, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable));
+            var rules = ScriptableObject.CreateInstance<GameplayRewardRules>();
+            try
+            {
+                var job = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Warehouse), 0);
+                rt.State.DebugSetBuilderJob(job, 120);
+                rt.Ui.DebugGameplayRewardRules(rules);
+                rt.Ui.DebugBuilders();
+                Assert.IsNull(rt.Ui.DebugRoot.Q("construction-reward"));
+                rules.constructionEnabled = true; rules.constructionSeconds = 60;
+                rt.Ui.DebugBuilders();
+                var watch = rt.Ui.DebugRoot.Q<Button>("construction-reward");
+                Assert.IsNotNull(watch);
+                Assert.IsTrue(watch.Query<Label>().ToList().Exists(label => label.text ==
+                    UiText.Get("reward.construction", UiText.Get("duration.minutes-seconds", 1, 0))));
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = watch; watch.SendEvent(submit); }
+                Assert.AreEqual(1, ads.calls);
+                Assert.IsFalse(watch.enabledSelf);
+                ads.pending.SetResult(ServiceResult<RewardedAdResult>.Failed("No fill"));
+                yield return null;
+                Assert.AreEqual("cancelled", rt.State.GameplayReward.state);
+                Assert.Greater(rt.State.BuilderJobSecondsRemaining(job), 100);
+                Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-finish-" + job.planetId + "-" + job.slot));
+            }
+            finally { Object.Destroy(rules); }
+        }
+
+        sealed class GameplayAdsFixture : IAdsService
+        {
+            public bool IsConfigured { get { return true; } }
+            public int calls;
+            public TaskCompletionSource<ServiceResult<RewardedAdResult>> pending = new TaskCompletionSource<ServiceResult<RewardedAdResult>>();
+            public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placement) { calls++; return pending.Task; }
+        }
+
+        [UnityTest]
+        public IEnumerator ShortageJourneysKeepQuantitiesAndReturnToTheOriginalUpgrade()
+        {
+            new GameObject("ShortageBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            Assert.IsFalse(rt.Services.Consent.Current.hasDecision, "Isolated saves must not inherit player consent.");
+            rt.State.backpack.Clear();
+            rt.Ui.DebugShip(0);
+            yield return null;
+            var upgrade = rt.Ui.DebugRoot.Q("upgrade-pack");
+            var chip = upgrade.Q<Button>(className: "fr-itemchip-find");
+            Assert.IsNotNull(chip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Still missing:")));
+            var track = rt.Ui.DebugRoot.Q<Button>("track-upgrade-pack");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.AreEqual("pack", rt.State.TrackedProject.id);
+            rt.Ui.DebugShortage(rt.Db.FindResource("stone"), 17);
+            yield return null;
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Need 17")));
+            var back = rt.Ui.DebugRoot.Q<Button>("shortage-return");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = back; back.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-pack"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.AreEqual(0, rt.State.Count(rt.Db.FindResource("wood")));
+            rt.Ui.DebugProject();
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("project-open"));
         }
 
         [UnityTest]

@@ -179,6 +179,11 @@ namespace Frontier
             }
 
             snapshot.Normalize();
+            if (RewardRestoreBlocked(snapshot))
+            {
+                message = UiText.Get("reward.restore-busy");
+                return false;
+            }
             if (PendingTravel != null || snapshot.travel != null)
             {
                 message = UiText.Get("travel.recovery.restore-busy");
@@ -296,6 +301,8 @@ namespace Frontier
         void ClearState()
         {
             PendingTravel = null;
+            ReturnItems.Clear();
+            rewardRequestContext = Guid.NewGuid().ToString("N");
             purchaseContextId = Guid.NewGuid().ToString("N");
             purchaseGrants = new List<PurchaseGrantRecord>();
             eraReached = Frontier.Economy.FrontierEra.Landfall;
@@ -461,7 +468,18 @@ namespace Frontier
             string offlineSince = LoadClockHistory(save.clock, report);
             bool offlineChanged = AccrueOfflineHarvesters(offlineSince);
             offlineChanged |= AccrueOfflineDysonCollectors(offlineSince);
+            var returningJobs = new List<PlacedStructure>();
+            foreach (var structure in structures)
+            {
+                string endText = !string.IsNullOrEmpty(structure.record.buildEndUtc) ?
+                    structure.record.buildEndUtc : structure.record.upgradeEndUtc;
+                if (UtcText.TryParse(endText, out var end) && end <= clock.UtcNow) returningJobs.Add(structure);
+            }
             bool builderJobsChanged = RecoverBuilderJobs(warnings);
+            foreach (var job in returningJobs)
+                if (string.IsNullOrEmpty(job.record.buildEndUtc) && string.IsNullOrEmpty(job.record.upgradeEndUtc))
+                    ReturnItems.Add(new SessionReturnItem { planetId = job.planetId, slot = job.slot });
+            if (ReturnItems.Count > 0) ReturnSummaryVersion++;
             SeedAtlasFromExistingProgress();
             LoadEraProgress(report);
             bool objectivesChanged = ObserveObjectives(!objectivesInitialized);

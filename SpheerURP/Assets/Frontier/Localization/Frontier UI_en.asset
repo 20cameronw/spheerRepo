@@ -613,13 +613,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336077
-    m_Localized: Open BUILD > GATHER and place a Lumber Camp on this resource-rich
-      home world.
+    m_Localized: Prepare for your first departure. A Lumber Camp supplies wood for
+      your first base.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336078
-    m_Localized: Tap the Lumber Camp and complete its wood mini-game. Better runs
-      fill your pack faster.
+    m_Localized: Tap your Lumber Camp and gather wood. Better runs bring back more
+      cargo.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336079
@@ -628,13 +628,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336080
-    m_Localized: Build a Refinery, tap it, and craft a recipe from gathered materials.
-      Each recipe is recorded in the Atlas.
+    m_Localized: Turn gathered materials into supplies at a Refinery.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336081
-    m_Localized: Build an Alarm if needed, tap it, and call a wave when you are ready.
-      Defend your base; planets cannot be attacked.
+    m_Localized: Call a wave from an Alarm when your defenses are ready. Victories
+      earn XP for better equipment.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336082
@@ -1131,8 +1130,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336200
-    m_Localized: Better tools improve harvest yield. XP level, research and materials
-      determine when upgrades unlock.
+    m_Localized: Better tools bring back more from each harvest.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336201
@@ -8826,6 +8824,242 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4487544858304512
     m_Localized: OPEN SHIP SYSTEMS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703457959936
+    m_Localized: TRACKED PROJECT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514368
+    m_Localized: TRACK THIS PROJECT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514369
+    m_Localized: Tracking {0}. One project stays with you between sessions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514370
+    m_Localized: RESUME PROJECT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514371
+    m_Localized: OPEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514372
+    m_Localized: STOP TRACKING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514373
+    m_Localized: Track an upgrade, recipe or construction from its cost card.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514374
+    m_Localized: Project complete.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514375
+    m_Localized: Gather the remaining materials, then return to finish.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514376
+    m_Localized: This project is no longer available. Stop tracking it and choose
+      another.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514377
+    m_Localized: Tracking cannot be saved while this save is read-only.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514378
+    m_Localized: Project changed, but could not be saved. Keep the game open and
+      retry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514379
+    m_Localized: Return to the project's world. Remote stock is not automatically
+      spendable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514380
+    m_Localized: This structure is no longer here. Open the project or choose another
+      source.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514381
+    m_Localized: PREVIOUS STEP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514382
+    m_Localized: RETURN TO {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514383
+    m_Localized: Too many ingredient steps. Return to your project or choose another
+      source.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514384
+    m_Localized: 'Need {0} {1}. Usable here: {2}. Still missing: {3}.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514385
+    m_Localized: You already have enough in cargo and connected local storage. Return
+      to your project.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514386
+    m_Localized: '{0} {1} stored on {2}, not aboard.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514387
+    m_Localized: OPEN LOCAL STORAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514388
+    m_Localized: 'Relay quote: {0} fuel energy. Space and fuel are checked when you
+      transfer.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514389
+    m_Localized: OPEN RELAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514390
+    m_Localized: CHECK TRAVEL TO THIS WORLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514391
+    m_Localized: OPEN LOCAL PRODUCER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514392
+    m_Localized: FIND A LOCAL PRODUCER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514393
+    m_Localized: FIND A SUPPLYING WORLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514394
+    m_Localized: BROWSE RESOURCE ATLAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514395
+    m_Localized: WHILE YOU WERE AWAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514396
+    m_Localized: Construction ready on {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514397
+    m_Localized: '{0} {1} produced on {2}. Output remains in local storage.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814260654080
+    m_Localized: 'WATCH AD: +{0} {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208512
+    m_Localized: 'WATCH AD: SAVE {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208513
+    m_Localized: Ad bonus saved.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208514
+    m_Localized: No bonus earned. Your normal progress is unchanged.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208515
+    m_Localized: This reward is no longer available. Continue normally or check your
+      project.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208516
+    m_Localized: Make room in cargo, then retry your saved ad bonus.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208517
+    m_Localized: Reward could not be saved. Do not close the game; retry from your
+      project. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208518
+    m_Localized: That construction job has changed or finished. No other job was
+      boosted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208519
+    m_Localized: The ad did not finish in time. Continue normally; no bonus was granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208520
+    m_Localized: The ad was unavailable. Your normal action is still available.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208521
+    m_Localized: An earned ad bonus is saved and waiting. Retry to claim it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208522
+    m_Localized: An interrupted ad could not be verified. No bonus is assumed; any
+      collected base harvest is safe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208523
+    m_Localized: CLAIM SAVED BONUS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208524
+    m_Localized: DISMISS INTERRUPTED REQUEST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208525
+    m_Localized: DISCARD THIS UNCLAIMED BONUS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208526
+    m_Localized: OPEN REQUIRED RESEARCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208527
+    m_Localized: PREPARE A LOCAL LAB
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208528
+    m_Localized: EARN XP FROM WAVES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208529
+    m_Localized: UPGRADE THIS STATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435363344384
+    m_Localized: MAKE ROOM OR UPGRADE CARGO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870336
+    m_Localized: CONNECT LOCAL STORAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870337
+    m_Localized: IMPROVE HULL PROTECTION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870338
+    m_Localized: 'Trip quote: {0} gal. Review the route on the map before departure.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870339
+    m_Localized: Tap discard again to permanently give up this saved bonus.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4496640378494976
+    m_Localized: Finish or dismiss the pending ad reward before restoring. Saves
+      with an unresolved reward cannot be restored.
     m_Metadata:
       m_Items: []
   references:

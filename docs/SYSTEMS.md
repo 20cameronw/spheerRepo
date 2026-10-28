@@ -19,6 +19,95 @@ under-construction and remote storage, unclaimed salvage and Fuel Depot reserves
 require transfer or retrieval. XP, research prerequisites, local labs and other gates are unchanged.
 No save schema, stable content IDs, inventory capacity, job timing or production-ad settings change with this navigation release.
 
+## Shortage journeys, projects and returning sessions
+
+Missing-resource chips on build, research, tools, upgrades, station recipes and the Grand Archive open
+stock-aware help with the requested amount, usable local total and shortfall. Usable stock comes first,
+then disconnected local storage, affordable relay retrieval and production; remote stock remains explicitly
+remote. Transfer energy and travel blockers are visible. Unknown deposits stay hidden until normal survey
+or visit discovery. Manual Atlas/map alternatives remain available.
+
+The in-session journey retains the original panel, tab, selection, scroll and recipe batch quantity.
+Previous-step and original-project actions revalidate current state; opening help never spends, crafts,
+travels or accelerates jobs. Dependency depth is bounded, and missing anchors produce recoverable feedback.
+Research, lab, station-level, XP, capacity and hull blockers link to their existing destinations.
+
+Players can explicitly track one project from an eligible card. Stable kind/content/world/slot/target/quantity
+values are stored under `player.tracked-project` in existing save settings, not as UI objects or a schema bump.
+The resume action and Menu project page show live requirements, completion and the original destination.
+Replacing or clearing a project is explicit; removed content stays clearable.
+
+Completed construction/upgrade jobs and actual stored offline Auto-Harvester/Dyson output form a dismissible
+return summary. Links open the actual structure or its world. Output is still in its hopper/reserve, not cargo.
+Load and same-process background/resume share the existing offline production and builder rules; background
+saves establish an elapsed-time watermark so active play is not credited again. Repeated resume signals do
+not repeat the elapsed interval. Real native lifecycle timing remains a device-test requirement.
+
+## Gated gameplay rewards
+
+`Resources/Frontier/GameplayRewardRules` ships with harvest/construction flags **off** and construction
+seconds **zero**. Missing rules also fail closed. These flags are additional to provider/platform configuration,
+consent and the existing per-placement policy; historical policy caps are not newly approved tuning.
+No banners, interstitials, automatic requests or shortage-to-ad shortcuts are added.
+
+The staged placements reuse stable service IDs `double-yield` and `timer-skip`. Harvest quotes the exact
+additional output, requires space for both base and bonus, and does not appear on the first successful
+harvest. Its normal Collect action remains available. Construction quotes the exact reduction on one job;
+ordinary waiting and shard completion remain available. Eligibility checks share the service policy's
+caps/cooldowns without consuming quota or showing an ad.
+
+`player.reward-ticket` journals one request in existing settings. A detached snapshot secures base harvest
+before an ad request; verified completion is recorded before atomic settlement. Settlement writes inventory,
+discovery rewards or the exact job/crew timer before publishing live changes. Capacity failure retains an
+earned ticket for retry. Overlap, replaced jobs, replaced saves and late callbacks cannot grant twice.
+No-fill, cancellation, consent withdrawal, timeout and provider exceptions leave ordinary progression usable.
+A 90-second request timeout does not interpret a late completion as a new reward.
+
+After termination, a persisted earned ticket is retryable. An interrupted *pending* ticket is unverified:
+the UI never invents SDK completion and lets the player dismiss it; secured base harvest is retained.
+An obsolete earned ticket requires explicit two-step discard. Save failures are reported, not treated as
+successful grants. A reward that could not be durably verified before process death cannot be reconstructed
+from a client-only SDK callback; server verification/native termination tests remain activation gates.
+Cloud restores reject unresolved local or incoming reward journals, preventing snapshot reward replay.
+Restoring/restarting replaces the callback context.
+
+### Tuning proposal - not approved or activated
+
+| Placement | Proposed benefit | Proposed daily cap | Proposed cooldown |
+|---|---|---|---|
+| Harvest | +100% of that completed run, only when all output fits | 3 | 180 seconds |
+| Construction | Up to 120 seconds on the selected job | 3 | 600 seconds |
+| Emergency fuel / revive / targeted supplies / bonus shards | No new placement or grant in this stage | 0 for staged activation | N/A |
+
+This is a bounded initial comparison, not measured retention or a balance certification. With equal-yield
+harvests, 20 normal runs provide 20 run-units without ads; 3 accepted harvest offers provide at most 23
+(15% extra). Five normal runs versus the same three offers provide 5 versus 8 (60% extra), making low-session
+acceleration a specific playtest risk. Actual rewards scale with the chosen run's real tool/quality output.
+Construction adds at most six crew-minutes/day, not resources, crew slots or free prerequisite unlocks.
+The combined ceiling is three extra already-earned harvest yields plus six crew-minutes; no direct fuel,
+shard, research, XP or hazard bypass is introduced. Model low/mid/late-game bottlenecks and interactions
+using observed no-ad/ad-assisted journeys before approving any activation or adding fuel/revive/supplies.
+Existing nonzero policy entries remain historical development configuration, not this proposal's approval.
+
+### Measurement proposal and activation gates
+
+Proposed schema version 1 (definitions only; no new emitters are enabled): `player_flow_step` with stable
+milestone ID and elapsed-time bucket; `shortage_journey` with target kind/content ID, resource ID and
+entry/destination/return/completed stage; `progression_blocked` with resource/level/lab/capacity/travel enum;
+`project_state` with kind/content ID and tracked/completed/cleared stage; `return_action` with item kind
+and opened/dismissed stage; `reward_flow` with placement, eligible/offered/accepted/filled/completed/settled/
+failed stage and bounded outcome enum. Do not send free text, planet names, save payloads or age/birthday.
+Retention/progression reporting and any necessary SDK identifiers require a separately approved
+child-inclusive privacy/retention design; do not infer consent from gameplay or previous editor preferences.
+
+Before production: approve amounts/caps/cooldowns and quantitative targets; complete child-inclusive
+legal/platform/SDK/creative/consent review and HTTPS privacy policy; configure and verify Android/iOS;
+approve dashboard schemas before enabling collection; test native touch, pause/resume, offline/no-fill,
+consent withdrawal, app termination, durable settlement and save failure; observe new players finding Cargo,
+choosing a goal and returning from a multistep shortage. Start harvest/construction only, evaluate, then
+separately consider fuel/revive. Targeted supplies require separate economy approval. Editor tests and
+virtual-phone captures do not satisfy these external approval and device gates.
+
 ## Combat
 
 Player-built surface turrets and fuel-funded alarm waves; alarms never spawn orbital turrets. The former Orbital Turret

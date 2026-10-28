@@ -28,12 +28,17 @@ namespace Frontier
             yield return UiText.InitializeLocalization();
 
             var db = GameDatabase.ForRuntime(database);
-            var consent = new ConsentService(new PlayerPrefsConsentStore());
-            var serviceConfig = Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
-            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HarnessRunner.PrepareFromCommandLine();
 #endif
+            IConsentStore consentStore = new PlayerPrefsConsentStore();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // Save-isolated tools must not inherit or change the player's online/analytics choices.
+            if (!string.IsNullOrEmpty(GameState.SaveDirectoryOverride)) consentStore = new IsolatedConsentStore();
+#endif
+            var consent = new ConsentService(consentStore);
+            var serviceConfig = Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
+            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig);
             var bundledDb = db;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (!HarnessRunner.Requested)
@@ -155,6 +160,15 @@ namespace Frontier
             if (HarnessRunner.Requested) new GameObject("Harness").AddComponent<HarnessRunner>().Begin(FrontierRuntime.Current);
 #endif
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        sealed class IsolatedConsentStore : IConsentStore
+        {
+            ConsentPreferences preferences;
+            public ConsentPreferences Load() { return preferences; }
+            public void Save(ConsentPreferences value) { preferences = value; }
+        }
+#endif
     }
 
     /// <summary>Keeps the centered planet fully visible whatever the aspect ratio of the device.</summary>

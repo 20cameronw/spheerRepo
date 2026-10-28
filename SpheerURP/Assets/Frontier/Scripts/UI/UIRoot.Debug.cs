@@ -19,6 +19,7 @@ namespace Frontier
         public void DebugReset()
         {
             CloseAll();
+            shortageOrigin = null; shortageProject = null; shortageReturns.Clear();
             CloseWaveResult();
             if (root != null) { var oldSheet = root.Q("icon-sheet"); if (oldSheet != null) oldSheet.RemoveFromHierarchy(); }
             if (overlayLayer != null) overlayLayer.Clear();
@@ -57,6 +58,12 @@ namespace Frontier
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
         public void DebugResourceSource(ResourceSO resource) { DebugReset(); OpenResourceSource(resource); }
+        public void DebugProject() { DebugReset(); OpenProjectPanel(); }
+        public void DebugGameplayRewardRules(GameplayRewardRules rules) { gameplayRewardRules = rules; }
+        public void DebugShortage(ResourceSO resource, int required)
+        {
+            OpenShortage(Project("upgrade", "pack", gs.Level(gs.db.FindUpgrade("pack")) + 1), resource, required);
+        }
         public void DebugAtlas(int tab)
         {
             DebugReset();

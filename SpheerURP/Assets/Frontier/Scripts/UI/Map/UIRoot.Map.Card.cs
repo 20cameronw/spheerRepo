@@ -94,6 +94,7 @@ namespace Frontier
             var scroll = UiKit.VerticalScroll("fr-map-details");
             scroll.style.minHeight = 0; scroll.style.flexShrink = 1;
             mapCard.Add(scroll);
+            BuildJourneyLinks(scroll);
             if (planet.Id != gs.planet.Id && gs.NetworkRules != null &&
                 gs.StructureOfKind(gs.planet, StructureKind.WarpGate) != null)
             {

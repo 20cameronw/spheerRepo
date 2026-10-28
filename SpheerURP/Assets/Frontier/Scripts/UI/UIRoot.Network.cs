@@ -71,6 +71,7 @@ namespace Frontier
             else
             {
                 body.Add(SectionLabel(UiText.Get("network.project.title")));
+                AddProjectAction(body, Project("network", "grand_archive"));
                 var projectHelp = UiKit.Text(UiText.Get("network.project.help"), "fr-small");
                 projectHelp.style.whiteSpace = WhiteSpace.Normal;
                 body.Add(projectHelp);
@@ -99,7 +100,7 @@ namespace Frontier
                 archiveStatus.style.whiteSpace = WhiteSpace.Normal;
                 body.Add(archiveStatus);
                 body.Add(UiKit.Text(UiText.Get("network.archive.help"), "fr-muted"));
-                body.Add(NetworkCostRow(gs.NetworkCosts(true)));
+                body.Add(ProjectCosts(gs.NetworkCosts(true), Project("network", "grand_archive")));
                 string reason = gs.NetworkCompletionLockReason();
                 if (reason != null) body.Add(Note(reason, UiKit.Amber));
                 var complete = IconBtn(UiText.Get("network.complete"), "warp", UiKit.Lime, () =>

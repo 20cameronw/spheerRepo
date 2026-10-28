@@ -123,6 +123,7 @@ namespace Frontier
             bool complete = gs.IsResearched(node.data.id);
             string lockReason = complete ? null : gs.ResearchLockReason(node);
             var card = Card(UiKit.Magenta, complete);
+            card.name = "research-" + node.data.id;
             var head = UiKit.Div("fr-row");
             head.Add(UiKit.Text(node.LocalizedName.ToUpper(), "fr-h2"));
             head.Add(UiKit.Div("fr-spacer"));
@@ -133,7 +134,11 @@ namespace Frontier
             card.Add(UiKit.Text(node.LocalizedDescription, "fr-muted"));
             if (node.data.prereqs != null && node.data.prereqs.Length > 0)
                 card.Add(UiKit.Text(UiText.Get("research.prerequisites", string.Join(", ", node.data.prereqs.Select(PrettyName))), "fr-small"));
-            if (!complete) card.Add(UiKit.CostRow(CatalogCost(node.data.cost), gs, true, OpenResourceSource));
+            if (!complete)
+            {
+                card.Add(ProjectCosts(CatalogCost(node.data.cost), Project("research", node.data.id)));
+                AddProjectAction(card, Project("research", node.data.id));
+            }
             if (complete)
                 card.Add(Note(UiText.Get("research.complete-help", UnlockSummary(node.data.unlocks)), UiKit.Lime));
             else if (lockReason == null)
@@ -167,6 +172,7 @@ namespace Frontier
                 string lockReason = gs.ToolTierLockReason(ladder);
                 var color = ladder.color == default(Color) ? UiKit.Magenta : UiKit.Ui(ladder.color);
                 var card = Card(color, nextRow == null);
+                card.name = "tool-" + ladder.data.id;
                 var head = UiKit.Div("fr-row");
                 head.Add(UiKit.Text(ladder.data.kind == ToolKind.Pick ? UiText.Get("tools.mining") : ladder.LocalizedName.ToUpper(), "fr-h2"));
                 head.Add(UiKit.Div("fr-spacer"));
@@ -185,7 +191,8 @@ namespace Frontier
                 {
                     card.Add(UiKit.Text(UiText.Get("tools.next", ladder.TierName(nextRow), nextRow.yieldMult), "fr-small"));
                     card.Add(UiKit.Text(UiText.Get("progression.required-level", Math.Max(1, nextRow.requiresReachTier)), "fr-tiny"));
-                    card.Add(UiKit.CostRow(CatalogCost(nextRow.cost), gs, true, OpenResourceSource));
+                    card.Add(ProjectCosts(CatalogCost(nextRow.cost), Project("tool", ladder.data.id, current + 1)));
+                    AddProjectAction(card, Project("tool", ladder.data.id, current + 1));
                     if (lockReason != null) card.Add(Note(lockReason, UiKit.Amber));
                     else
                     {

@@ -11,9 +11,125 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 280c923ac2aa4657ad932739024adaf2, type: 3}
   m_Name: UiStrings
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   locale: en
   entries:
+  - key: project.capacity
+    text: MAKE ROOM OR UPGRADE CARGO
+  - key: project.connect
+    text: CONNECT LOCAL STORAGE
+  - key: project.hull
+    text: IMPROVE HULL PROTECTION
+  - key: project.travel-cost
+    text: 'Trip quote: {0} gal. Review the route on the map before departure.'
+  - key: reward.confirm-discard
+    text: Tap discard again to permanently give up this saved bonus.
+  - key: reward.harvest
+    text: 'WATCH AD: +{0} {1}'
+  - key: reward.construction
+    text: 'WATCH AD: SAVE {0}'
+  - key: reward.saved
+    text: Ad bonus saved.
+  - key: reward.not-earned
+    text: No bonus earned. Your normal progress is unchanged.
+  - key: reward.changed
+    text: This reward is no longer available. Continue normally or check your project.
+  - key: reward.restore-busy
+    text: Finish or dismiss the pending ad reward before restoring. Saves with an
+      unresolved reward cannot be restored.
+  - key: reward.space
+    text: Make room in cargo, then retry your saved ad bonus.
+  - key: reward.save-failed
+    text: Reward could not be saved. Do not close the game; retry from your project.
+      {0}
+  - key: reward.job-changed
+    text: That construction job has changed or finished. No other job was boosted.
+  - key: reward.timeout
+    text: The ad did not finish in time. Continue normally; no bonus was granted.
+  - key: reward.failed
+    text: The ad was unavailable. Your normal action is still available.
+  - key: reward.recovery-earned
+    text: An earned ad bonus is saved and waiting. Retry to claim it.
+  - key: reward.recovery-pending
+    text: An interrupted ad could not be verified. No bonus is assumed; any collected
+      base harvest is safe.
+  - key: reward.retry
+    text: CLAIM SAVED BONUS
+  - key: reward.dismiss
+    text: DISMISS INTERRUPTED REQUEST
+  - key: reward.discard
+    text: DISCARD THIS UNCLAIMED BONUS
+  - key: project.prerequisite
+    text: OPEN REQUIRED RESEARCH
+  - key: project.lab
+    text: PREPARE A LOCAL LAB
+  - key: project.xp
+    text: EARN XP FROM WAVES
+  - key: project.upgrade-station
+    text: UPGRADE THIS STATION
+  - key: project.title
+    text: TRACKED PROJECT
+  - key: project.track
+    text: TRACK THIS PROJECT
+  - key: project.tracked
+    text: Tracking {0}. One project stays with you between sessions.
+  - key: project.resume
+    text: RESUME PROJECT
+  - key: project.open
+    text: OPEN
+  - key: project.clear
+    text: STOP TRACKING
+  - key: project.empty
+    text: Track an upgrade, recipe or construction from its cost card.
+  - key: project.complete
+    text: Project complete.
+  - key: project.remaining
+    text: Gather the remaining materials, then return to finish.
+  - key: project.missing
+    text: This project is no longer available. Stop tracking it and choose another.
+  - key: project.read-only
+    text: Tracking cannot be saved while this save is read-only.
+  - key: project.save-failed
+    text: Project changed, but could not be saved. Keep the game open and retry.
+  - key: project.return-world
+    text: Return to the project's world. Remote stock is not automatically spendable.
+  - key: project.anchor-missing
+    text: This structure is no longer here. Open the project or choose another source.
+  - key: project.previous
+    text: PREVIOUS STEP
+  - key: project.return
+    text: RETURN TO {0}
+  - key: project.depth
+    text: Too many ingredient steps. Return to your project or choose another source.
+  - key: project.shortfall
+    text: 'Need {0} {1}. Usable here: {2}. Still missing: {3}.'
+  - key: project.stock-ready
+    text: You already have enough in cargo and connected local storage. Return to
+      your project.
+  - key: project.stored
+    text: '{0} {1} stored on {2}, not aboard.'
+  - key: project.withdraw
+    text: OPEN LOCAL STORAGE
+  - key: project.transfer-cost
+    text: 'Relay quote: {0} fuel energy. Space and fuel are checked when you transfer.'
+  - key: project.open-relay
+    text: OPEN RELAY
+  - key: project.view-world
+    text: CHECK TRAVEL TO THIS WORLD
+  - key: project.produce
+    text: OPEN LOCAL PRODUCER
+  - key: project.build-producer
+    text: FIND A LOCAL PRODUCER
+  - key: project.find-world
+    text: FIND A SUPPLYING WORLD
+  - key: project.manual
+    text: BROWSE RESOURCE ATLAS
+  - key: project.while-away
+    text: WHILE YOU WERE AWAY
+  - key: project.job-ready
+    text: Construction ready on {0}.
+  - key: project.output-ready
+    text: '{0} {1} produced on {2}. Output remains in local storage.'
   - key: fuel.title
     text: SHIP FUEL TANKS
   - key: fuel.open
@@ -884,20 +1000,18 @@ MonoBehaviour:
   - key: guide.travel.title
     text: Land on a new world
   - key: guide.build.help
-    text: Open BUILD > GATHER and place a Lumber Camp on this resource-rich home
-      world.
+    text: Prepare for your first departure. A Lumber Camp supplies wood for your
+      first base.
   - key: guide.gather.help
-    text: Tap the Lumber Camp and complete its wood mini-game. Better runs fill your
-      pack faster.
+    text: Tap your Lumber Camp and gather wood. Better runs bring back more cargo.
   - key: guide.store.help
     text: Store extra cargo in a Warehouse on this world to make room for your next
       haul.
   - key: guide.craft.help
-    text: Build a Refinery, tap it, and craft a recipe from gathered materials. Each
-      recipe is recorded in the Atlas.
+    text: Turn gathered materials into supplies at a Refinery.
   - key: guide.defend.help
-    text: Build an Alarm if needed, tap it, and call a wave when you are ready. Defend
-      your base; planets cannot be attacked.
+    text: Call a wave from an Alarm when your defenses are ready. Victories earn
+      XP for better equipment.
   - key: guide.travel.help
     text: Open the map, choose a reachable world, and spend fuel to land there.
   - key: guide.skip
@@ -1175,8 +1289,7 @@ MonoBehaviour:
   - key: tools.title
     text: HARVEST TOOLS
   - key: tools.help
-    text: Better tools improve harvest yield. XP level, research and materials determine
-      when upgrades unlock.
+    text: Better tools bring back more from each harvest.
   - key: tools.max
     text: MAX TIER
   - key: tools.tier

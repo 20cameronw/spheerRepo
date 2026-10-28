@@ -30,9 +30,13 @@ Planet tier remains a world difficulty/resource property, not a purchase require
 Missing-material cost and network chips are a single native button containing the existing icon and
 quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
 FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses
-its existing border. Shortages route to an existing local producer and matching recipe, otherwise
-its Build entry, otherwise a supplying planet selected in the map. Locked/in-progress producers
-retain their real upgrade/research/job status; planet guidance never silently teleports or starts a job.
+its existing border. Contextual shortages first compare usable, locally stored and explicitly remote
+stock, then production and reachable discovered worlds. A shortfall names its actual quantity.
+Previous-step and original-project actions preserve the originating tab/selection/scroll.
+Locked/in-progress producers retain their real upgrade/research/job status; guidance never spends,
+teleports or starts a job. One explicitly tracked project provides live requirements and a resume action.
+The return summary links completed jobs and stored offline output to their real location, not ship cargo.
+Reward offers use explicit ad labels and exact bonuses beside the normal action; gameplay flags ship off.
 The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
 Online ranks are available to all ages after explicit online opt-in, without name or birthday entry.

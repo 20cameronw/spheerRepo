@@ -83,6 +83,7 @@ namespace Frontier
         {
             popupScroll = UiKit.VerticalScroll("fr-popup-scroll");
             popup.Add(popupScroll);
+            BuildJourneyLinks(popupScroll.contentContainer);
             popupBuild(popupScroll.contentContainer);
             popup.Add(PopupClose());
         }
@@ -137,6 +138,7 @@ namespace Frontier
             if (popup == null || popupBuild == null) return;
             var offset = popupScroll.scrollOffset;
             popupScroll.contentContainer.Clear();
+            BuildJourneyLinks(popupScroll.contentContainer);
             popupBuild(popupScroll.contentContainer);
             var scroll = popupScroll;
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
@@ -323,7 +325,8 @@ namespace Frontier
             if (s.level >= s.def.maxLevel) { body.Add(Note(UiText.Get("structure.max"), UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
             body.Add(SectionLabel(UiText.Get("structure.upgrade-preview", s.level + 1, StructureEffect(s.def, s.level + 1))));
-            body.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
+            body.Add(ProjectCosts(cost, Project("structure", s.def.id, s.level + 1, s.slot)));
+            AddProjectAction(body, Project("structure", s.def.id, s.level + 1, s.slot));
             var up = IconBtn(UiText.Get("command.upgrade"), "up", c, () =>
             {
                 if (gs.UpgradeStructure(s))
@@ -597,7 +600,11 @@ namespace Frontier
                         if (i.resource != null)
                         {
                             int required = (int)Math.Min(int.MaxValue, (long)i.amount * batchSize);
-                            inputs.Add(RecipeResource(i.resource, required, gs.PlanetCount(i.resource) < required));
+                            var chip = RecipeResource(i.resource, required);
+                            if (gs.PlanetCount(i.resource) < required)
+                                chip = UiKit.BindResourceFind(chip, i.resource, resource =>
+                                    OpenShortage(Project("recipe", r.id, slot: s.slot, quantity: batchSize), resource, required));
+                            inputs.Add(chip);
                         }
                     line.Add(inputs);
                     var arrow = UiKit.Text(">", "fr-h2");
@@ -645,6 +652,7 @@ namespace Frontier
                         guideMarked = true;
                     }
                     card.Add(btns);
+                    AddProjectAction(card, Project("recipe", r.id, slot: s.slot, quantity: batchSize));
                     body.Add(card);
                 }
             });

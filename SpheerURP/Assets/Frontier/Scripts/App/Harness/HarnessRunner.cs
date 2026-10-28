@@ -350,6 +350,61 @@ namespace Frontier
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
             for (int tab = 0; tab < 4; tab++) { int t = tab; yield return new Shot("shop-tab" + t, () => { ResetView(); ui.DebugShop(t); }); }
             yield return new Shot("construction-jobs", ui.DebugBuilders);
+            SaveV2 playerFlowBaseline = null;
+            void PreparePlayerFlowFixture()
+            {
+                ui.DebugReset();
+                if (playerFlowBaseline == null)
+                {
+                    if (!gs.TryCreateCloudSaveSnapshot(out playerFlowBaseline, out var error))
+                        throw new InvalidOperationException(error);
+                }
+                else if (!gs.TryRestoreCloudSave(playerFlowBaseline, out var restoreError))
+                    throw new InvalidOperationException(restoreError);
+            }
+            try
+            {
+                yield return new Shot("player-shortage", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    var wood = db.FindResource("wood");
+                    ui.DebugShip(0);
+                    ui.DebugShortage(wood, gs.PlanetCount(wood) + 100);
+                });
+                yield return new Shot("player-project", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    var pack = db.FindUpgrade("pack");
+                    if (!gs.TrackProject(new PlayerProject { kind = "upgrade", id = pack.id,
+                        target = gs.Level(pack) + 1, planetId = gs.planet.Id }, out var error))
+                        throw new InvalidOperationException(error);
+                    ui.DebugProject();
+                });
+                yield return new Shot("player-return", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.ReturnItems.Add(new SessionReturnItem { planetId = gs.planet.Id, slot = 0 });
+                    gs.ReturnItems.Add(new SessionReturnItem { planetId = gs.planet.Id, slot = 11,
+                        resourceId = "wood", amount = 24 });
+                    ui.DebugProject();
+                });
+                yield return new Shot("player-reward-recovery", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.backpack.Clear();
+                    if (!gs.PrepareGameplayReward("double-yield", db.FindResource("wood"), 3, null, out _, out var error))
+                        throw new InvalidOperationException(error);
+                    ui.DebugProject();
+                });
+            }
+            finally
+            {
+                var ticket = gs.GameplayReward;
+                if (ticket != null && ticket.state == "pending" && !gs.CancelUnverifiedGameplayReward(out var cancelError))
+                    throw new InvalidOperationException(cancelError);
+                if (playerFlowBaseline != null && !gs.TryRestoreCloudSave(playerFlowBaseline, out var error))
+                    throw new InvalidOperationException(error);
+            }
             yield return new Shot("ship-tools", () => ui.DebugShip(1));
             yield return new Shot("research-tech", () => ui.DebugResearch());
             yield return new Shot("ship-systems", () => ui.DebugShip(2));

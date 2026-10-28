@@ -38,6 +38,8 @@ namespace Frontier
         Action<MinigameResult> onDone;
         Func<Task<ServiceResult<RewardedAdResult>>> doubleYieldOffer;
         Func<MinigameResult, bool> canOfferDoubleYield;
+        Func<MinigameResult, string> doubleYieldQuote;
+        string doubleYieldLabel;
         Button doubleYieldButton, collectButton;
         Label doubleYieldStatus;
         VisualElement pauseLayer;
@@ -63,13 +65,15 @@ namespace Frontier
 
         public void Run(VisualElement host, Color accent, float tol, float diff, Action<MinigameResult> done,
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield = null,
-            Func<MinigameResult, bool> canOfferDoubleYield = null)
+            Func<MinigameResult, bool> canOfferDoubleYield = null,
+            Func<MinigameResult, string> doubleYieldQuote = null)
         {
             HarvestFeedback.Warmup();
             rawColor = accent;
             color = UiKit.Ui(accent); tolerance = tol; difficulty = diff; onDone = done;
             doubleYieldOffer = offerDoubleYield;
             this.canOfferDoubleYield = canOfferDoubleYield;
+            this.doubleYieldQuote = doubleYieldQuote;
 
             overlay = UiKit.Div("fr-overlay");
             titleLabel = UiKit.Text(Title, "fr-title", color);
@@ -270,7 +274,8 @@ namespace Frontier
             if (doubleYieldOffer != null && result.quality > 0.05f &&
                 (canOfferDoubleYield == null || canOfferDoubleYield(result)))
             {
-                doubleYieldButton = PauseAction(UiText.Get("harvest.ad.double-yield"), UiKit.Magenta,
+                doubleYieldLabel = doubleYieldQuote != null ? doubleYieldQuote(result) : UiText.Get("harvest.ad.double-yield");
+                doubleYieldButton = PauseAction(doubleYieldLabel, UiKit.Magenta,
                     RequestDoubleYield, "minigame-double-yield", false);
                 panel.Add(doubleYieldButton);
                 doubleYieldStatus = UiKit.Text("", "fr-tiny");
@@ -327,8 +332,8 @@ namespace Frontier
                     if (collectButton != null) collectButton.SetEnabled(true);
                     if (!pendingResult.rewardedDoubleYield && doubleYieldButton != null)
                     {
-                        doubleYieldButton.text = UiText.Get("harvest.ad.double-yield");
-                        doubleYieldButton.SetEnabled(true);
+                        doubleYieldButton.text = doubleYieldLabel;
+                        doubleYieldButton.SetEnabled(false);
                     }
                 }
             }

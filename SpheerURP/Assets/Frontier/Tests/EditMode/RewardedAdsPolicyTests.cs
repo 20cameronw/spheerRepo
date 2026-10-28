@@ -70,6 +70,25 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public async Task AvailabilityUsesTheSameLimitsWithoutShowingAdsOrWritingUsage()
+        {
+            var provider = new Provider();
+            var store = new Store();
+            var clock = new Clock();
+            var policy = Policy(provider, store, clock, cap: 1);
+            Assert.IsTrue(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.IsFalse(policy.RewardedAvailability("unknown").succeeded);
+            Assert.IsEmpty(store.rows);
+            Assert.AreEqual(0, provider.shows);
+            Assert.IsTrue((await policy.ShowRewardedAsync("double-yield")).succeeded);
+            Assert.IsFalse(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.AreEqual(1, provider.shows);
+            clock.now = clock.now.AddDays(1);
+            Assert.IsTrue(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.AreEqual(1, store.rows["double-yield"].rewards);
+        }
+
+        [Test]
         public async Task DisabledUnknownAndZeroCapPlacementsNeverReachTheProvider()
         {
             var provider = new Provider();

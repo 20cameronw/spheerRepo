@@ -69,6 +69,7 @@ namespace Frontier
         {
             doc = document; gs = state; defense = def; planetView = pv; backdrop = bd; world = ws; cam = camera;
             services = serviceSet;
+            gameplayRewardRules = Resources.Load<GameplayRewardRules>("Frontier/GameplayRewardRules");
             observedUniverse = gs.universe;
             LoadPrefs();
             panelSettings = doc.panelSettings;
@@ -117,6 +118,7 @@ namespace Frontier
             world.ObstacleTapped += OnObstacleTapped;
             world.GatherTapped += OnGatherTapped;
             OnStateChanged();
+            BuildProjectResume();
         }
 
         VisualElement Layer()
@@ -337,6 +339,7 @@ namespace Frontier
         void OnStateChanged()
         {
             if (batching) return;
+            ResetProjectContextIfNeeded();
             RefreshViewButton();
             if (observedUniverse != gs.universe)
             {
@@ -380,6 +383,7 @@ namespace Frontier
             }
             world.Locked = wave || busy;
             UpdateFirstSessionGuideVisibility();
+            RefreshProjectResume();
             if (waveHud != null)
             {
                 waveHud.style.display = wave ? DisplayStyle.Flex : DisplayStyle.None;
@@ -533,9 +537,21 @@ namespace Frontier
             g.toolLevel = gs.ToolLevel(spot.game);
             g.toolName = gs.ToolName(spot.game);
             activeGatherMinigame = g;
+            MinigameResult previewResult = default;
+            bool baseCommitted = false;
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield =
-                services != null && services.Ads.IsConfigured
-                    ? (Func<Task<ServiceResult<RewardedAdResult>>>) (() => services.Ads.ShowRewardedAsync("double-yield"))
+                gameplayRewardRules != null && gs.stats.harvestRunsCompleted > 0 &&
+                GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield")
+                    ? (Func<Task<ServiceResult<RewardedAdResult>>>) (async () =>
+                    {
+                        if (baseCommitted || !GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield"))
+                            return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.changed"));
+                        int quote = HarvestAmount(spot, bonus, previewResult);
+                        if (!gs.PrepareGameplayReward("double-yield", spot.resource, quote, null, out var ticket, out var error))
+                            return ServiceResult<RewardedAdResult>.Failed(error);
+                        baseCommitted = true;
+                        return await ShowGameplayReward(ticket);
+                    })
                     : null;
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
@@ -547,8 +563,8 @@ namespace Frontier
                     return;
                 }
                 int n = HarvestAmount(spot, bonus, r);
-                if (r.quality > 0.05f) gs.RecordHarvestRunCompleted();
-                int got = gs.Add(spot.resource, n);
+                if (!baseCommitted && r.quality > 0.05f) gs.RecordHarvestRunCompleted();
+                int got = baseCommitted ? n : gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);
                 if (got > 0)
                 {
@@ -559,26 +575,15 @@ namespace Frontier
                 }
                 else Toast(UiText.Get(n > 0 ? "harvest.backpack-full" : "harvest.missed"), UiKit.Red);
                 if (got < n) Toast(UiText.Get("harvest.overflow", n - got), UiKit.Amber);
-                if (r.rewardedDoubleYield && got > 0)
-                {
-                    if (gs.TryCommitHarvestBonus(spot.resource, got, out int bonusGot, out string error))
-                    {
-                        if (bonusGot > 0)
-                        {
-                            Toast(UiText.Get("harvest.reward", bonusGot, spot.resource.LocalizedName), ui);
-                            Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
-                            planetView.Punch();
-                            Sfx.Good();
-                        }
-                    }
-                    else Toast(UiText.Get("harvest.ad.save-failed", error), UiKit.Red);
-                }
+                if (r.rewardedDoubleYield && baseCommitted)
+                    Toast(UiText.Get("reward.saved"), UiKit.Lime);
             }, offerDoubleYield, r =>
             {
+                previewResult = r;
                 int expected = HarvestAmount(spot, bonus, r);
                 int free = gs.FreeSpace(spot.resource);
                 return expected > 0 && (long)free >= (long)expected * 2;
-            });
+            }, r => UiText.Get("reward.harvest", HarvestAmount(spot, bonus, r), spot.resource.LocalizedName));
         }
 
         int HarvestAmount(GatherSpot spot, float bonus, MinigameResult result)

@@ -31,6 +31,7 @@ namespace Frontier
             CloseMap();
             ExitBuild();
             modalKey = key; modalBuild = build;
+            modalIcon = icon; modalTitle = title; modalAccent = accent;
             Color c = UiKit.Ui(accent);
 
             var backdropEl = UiKit.Div("fr-backdrop");
@@ -51,6 +52,7 @@ namespace Frontier
             backdropEl.Add(panel);
             modalLayer.Add(backdropEl);
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
+            BuildJourneyLinks(modalScroll.contentContainer);
             build(modalScroll.contentContainer);
         }
 
@@ -77,6 +79,7 @@ namespace Frontier
             var offset = modalScroll.scrollOffset;
             EndInventoryDrag();
             modalScroll.contentContainer.Clear();
+            BuildJourneyLinks(modalScroll.contentContainer);
             modalBuild(modalScroll.contentContainer);
             var scroll = modalScroll;
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
@@ -181,7 +184,8 @@ namespace Frontier
                 else if (!gs.CanBuildHere(def)) card.Add(Note(UiText.Get("shop.no-harvest"), UiKit.Amber));
                 else
                 {
-                    card.Add(UiKit.CostRow(def.buildCost, gs, true, OpenResourceSource));
+                    card.Add(ProjectCosts(def.buildCost, Project("build", def.id)));
+                    AddProjectAction(card, Project("build", def.id));
                     bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
                     if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
                     bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
@@ -258,6 +262,7 @@ namespace Frontier
             grid.Add(MenuTile("gear", UiText.Get("menu.settings"), UiKit.Cyan, "settings"));
             if (DebugToolsAvailable) grid.Add(MenuTile("tools", UiText.Get("menu.debug"), UiKit.Red, "debug"));
             body.Add(grid);
+            body.Add(IconBtn(UiText.Get("project.title"), "star", UiKit.Cyan, OpenProjectPanel));
         }
 
         VisualElement MenuTile(string icon, string label, Color color, string page)
@@ -1451,6 +1456,7 @@ namespace Frontier
                     UiKit.SetEnabledLook(finish, !gs.SaveIsReadOnly && gs.ShardBalance >= cost &&
                         gs.db.shardRules != null && gs.db.shardRules.data != null);
                     card.Add(finish);
+                    BuildConstructionOffer(card, job);
                     var finishText = finish.Q<Label>(className: "fr-btn-label");
                     card.schedule.Execute(() =>
                     {
@@ -1593,7 +1599,8 @@ namespace Frontier
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);
-                    card.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
+                    card.Add(ProjectCosts(cost, Project("upgrade", u2.id, lvl + 1)));
+                    AddProjectAction(card, Project("upgrade", u2.id, lvl + 1));
                     var buy = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                     {
                         if (gs.Buy(u2)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", u2.NameAtLevel(gs.Level(u2))), UiKit.Ui(u2.color)); planetView.Punch(); }
@@ -1628,7 +1635,8 @@ namespace Frontier
                     if (!max)
                     {
                         var cost = u.CostAt(lvl);
-                        card.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
+                        card.Add(ProjectCosts(cost, Project("upgrade", u.id, lvl + 1)));
+                        AddProjectAction(card, Project("upgrade", u.id, lvl + 1));
                         var buy = IconBtn(UiText.Get("command.upgrade"), "up", UiKit.Magenta, () =>
                         {
                             if (gs.Buy(u)) { Sfx.Good(); Toast(UiText.Get("tools.purchased", u.NameAtLevel(gs.Level(u))), UiKit.Ui(u.color)); planetView.Punch(); }

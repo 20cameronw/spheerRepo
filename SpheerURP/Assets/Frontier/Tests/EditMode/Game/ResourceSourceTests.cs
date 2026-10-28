@@ -58,6 +58,9 @@ namespace Frontier.Tests
                     state.planet.SpotsFor(game).Any(spot => spot.resource == resource)) &&
                 state.universe.AuthoredPlanets.Any(planet => planet.Resources.Contains(resource)));
             var source = state.FindResourceSource(offWorld);
+            Assert.AreNotEqual(ResourceSourceKind.Planet, source.kind, "Unsurveyed deposits must not be revealed.");
+            state.RecordMapDiscoveries(state.universe.AuthoredPlanets.Select(p => p.Star));
+            source = state.FindResourceSource(offWorld);
             Assert.AreEqual(ResourceSourceKind.Planet, source.kind, offWorld.id);
             Assert.AreNotEqual(state.planet.Id, source.planet.Id);
             Assert.IsTrue(source.planet.Resources.Contains(offWorld));
