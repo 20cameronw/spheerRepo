@@ -2780,6 +2780,70 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator BuildAndResearchCardsShowActualModelsWithSmallerUnlockPreviews()
+        {
+            new GameObject("StructurePreviewsBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            foreach (var definition in rt.Db.structures.Where(item => item != null))
+            {
+                var texture = Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + definition.id);
+                Assert.IsNotNull(texture, definition.id + " must have an actual model picture.");
+                Assert.AreEqual(256, texture.width);
+                Assert.AreEqual(256, texture.height);
+            }
+            float buildWidth = 0f;
+            for (int tab = 0; tab < 4; tab++)
+            {
+                rt.Ui.DebugShop(tab);
+                yield return null;
+                var cards = rt.Ui.DebugRoot.Query<VisualElement>().ToList()
+                    .Where(element => element.name != null && element.name.StartsWith("shop-structure-")).ToList();
+                Assert.Greater(cards.Count, 0);
+                foreach (var card in cards)
+                {
+                    string id = card.name.Substring("shop-structure-".Length);
+                    var image = card.Q<Image>("structure-preview-" + id);
+                    Assert.IsNotNull(image, id);
+                    Assert.AreSame(Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + id), image.image);
+                    Assert.AreEqual(PickingMode.Ignore, image.pickingMode);
+                    Assert.Greater(image.resolvedStyle.width, 0f);
+                    buildWidth = image.resolvedStyle.width;
+                }
+            }
+            rt.State.DebugSetLevel(10);
+            rt.Ui.DebugResearch();
+            yield return null;
+            int structureUnlocks = 0, recipeUnlocks = 0;
+            foreach (var node in rt.Db.research.Where(item => item != null && !rt.State.IsResearched(item.data.id)))
+            {
+                var card = rt.Ui.DebugRoot.Q("research-" + node.data.id);
+                Assert.IsNotNull(card);
+                foreach (string unlock in node.data.unlocks)
+                {
+                    if (unlock.StartsWith("structure:"))
+                    {
+                        string id = unlock.Substring("structure:".Length);
+                        var image = card.Q<Image>("structure-preview-" + id);
+                        Assert.IsNotNull(image, node.data.id + " previews " + id);
+                        Assert.AreSame(Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + id), image.image);
+                        Assert.Less(image.resolvedStyle.width, buildWidth, "Research previews must be smaller than Build.");
+                        structureUnlocks++;
+                    }
+                    if (unlock.StartsWith("recipe:"))
+                    {
+                        Assert.IsNotNull(card.Q(className: "fr-unlock-icon"), "Recipe unlocks show their output glyphs.");
+                        recipeUnlocks++;
+                    }
+                }
+            }
+            Assert.Greater(structureUnlocks, 0);
+            Assert.Greater(recipeUnlocks, 0);
+        }
+
+        [UnityTest]
         public IEnumerator ResearchLabContainsWorkingTechToolsAndLabTabs()
         {
             new GameObject("InlineLabBootstrap").AddComponent<FrontierBootstrap>();
@@ -2797,6 +2861,8 @@ namespace Frontier.Tests
             Assert.IsNotNull(nav);
             Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));
             Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Image>(className: "fr-structure-preview-small"),
+                "The local lab uses the same compact unlock pictures as the Research dock.");
             var filter = rt.Ui.DebugRoot.Q<DropdownField>();
             Assert.IsNotNull(filter);
             if (filter.choices.Count > 1)

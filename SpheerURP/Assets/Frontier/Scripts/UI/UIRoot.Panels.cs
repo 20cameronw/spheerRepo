@@ -159,7 +159,7 @@ namespace Frontier
                 var card = Card(c);
                 card.name = "shop-structure-" + def.id;
                 var top = UiKit.Div("fr-card-head");
-                top.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconXl));
+                top.Add(StructurePreview(def));
                 var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
                 col.Add(UiKit.Text(def.LocalizedName.ToUpper(), "fr-h2"));
                 col.Add(UiKit.Text(def.LocalizedDescription, "fr-tiny"));

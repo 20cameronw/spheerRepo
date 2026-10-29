@@ -37,6 +37,10 @@ resume stay unavailable until the tutorial is dismissed or opens another screen.
 Debris is embedded slightly into the local rendered terrain at spawn, not placed on the approximate ground sphere.
 Sylva uses the authored split land/ocean meshes: raised land is green, the ocean sphere blue, with a white atmosphere.
 Its atmosphere retains the standard authored diameter (5 units), including after terraforming; the terrain palette does not shrink the shell.
+Build cards show static pictures baked from the actual ModelLibrary structure prefabs. Research uses smaller
+structure pictures alongside the resource/equipment glyphs it unlocks, including in the Research Lab popup.
+After model revisions, regenerate these textures with `Frontier/Models/Bake Structure Thumbnails`
+(`Frontier.EditorTools.StructureThumbnails.Bake` in the Unity runner); no live preview cameras run during gameplay.
 Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
 systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
 Panning stays near scanner coverage or remembered systems; coordinates outside that space clamp to its nearest edge.

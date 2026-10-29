@@ -106,6 +106,7 @@ namespace Frontier
             card.Add(head);
             card.Add(UiKit.Text(UiText.Get("research.lab", PrettyName(node.data.branch), node.data.labLevel), "fr-tiny"));
             card.Add(UiKit.Text(node.LocalizedDescription, "fr-muted"));
+            BuildResearchPreviews(card, node);
             if (node.data.prereqs != null && node.data.prereqs.Length > 0)
                 card.Add(UiKit.Text(UiText.Get("research.prerequisites", string.Join(", ", node.data.prereqs.Select(PrettyName))), "fr-small"));
             if (!complete)

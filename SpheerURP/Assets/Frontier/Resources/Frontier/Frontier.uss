@@ -329,6 +329,10 @@
 .fr-card-dim { opacity: 0.6; }
 .fr-card-head { flex-direction: row; align-items: center; }
 .fr-card-text { flex-grow: 1; flex-shrink: 1; min-width: 0; margin-left: var(--fr-sp-12); }
+.fr-structure-preview { width: 160px; height: 144px; flex-shrink: 0; }
+.fr-structure-preview-small { width: 88px; height: 80px; margin-right: var(--fr-sp-8); }
+.fr-unlock-previews { flex-direction: row; flex-wrap: wrap; align-items: center; margin-top: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
+.fr-unlock-icon { margin-right: var(--fr-sp-12); }
 .fr-card-note { color: var(--fr-text-lo); margin-top: var(--fr-sp-8); }
 
 .fr-itemchip {
