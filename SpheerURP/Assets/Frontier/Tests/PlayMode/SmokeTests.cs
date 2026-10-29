@@ -1747,7 +1747,7 @@ namespace Frontier.Tests
             Assert.AreEqual(0f, ui.DebugRoot.Q<VisualElement>(className: "fr-topbar").resolvedStyle.translate.y, 0.01f);
             Assert.AreEqual(0f, ui.DebugRoot.Q<VisualElement>(className: "fr-dock").resolvedStyle.translate.y, 0.01f);
             Vector3 naturalCameraOrigin = runtime.Camera.transform.position;
-            bool naturalArrivalComplete = false, observedTouchdownImpulse = false;
+            bool naturalArrivalComplete = false, observedTouchdownImpulse = false, observedLandingBoost = false, observedBoostCutoff = false;
             IEnumerator NaturalArrival()
             {
                 yield return ui.PlayArrivalIntro(false);
@@ -1759,10 +1759,30 @@ namespace Frontier.Tests
             {
                 if (Vector3.Distance(naturalCameraOrigin, runtime.Camera.transform.position) > 0.0001f)
                     observedTouchdownImpulse = true;
+                var lander = Object.FindFirstObjectByType<ShipRig>();
+                if (lander != null)
+                {
+                    observedLandingBoost |= lander.LandingThrust > 0.4f;
+                    observedBoostCutoff |= observedLandingBoost && lander.LandingThrust == 0f;
+                    var center = runtime.Planet.Spin.position;
+                    var shipScreen = runtime.Camera.WorldToViewportPoint(lander.transform.position);
+                    var centerScreen = runtime.Camera.WorldToViewportPoint(center);
+                    Assert.AreEqual(centerScreen.x, shipScreen.x, 0.015f, "Landing stays vertically above the world, like a 2D view.");
+                    Assert.Greater(shipScreen.y, centerScreen.y);
+                    Assert.Greater(Vector3.Dot(lander.transform.forward, runtime.Camera.transform.right), 0.99f, "The ship faces sideways.");
+                    Assert.AreEqual(0f, lander.Throttle, "Landing uses downward boosters, not the rear flight engines.");
+                    var air = lander.transform.Find("Hull/LandingAir_1");
+                    if (air != null && lander.LandingThrust > 0f)
+                        Assert.Greater(Vector3.Dot(-air.forward, -runtime.Camera.transform.up), 0.95f);
+                }
                 yield return null;
             }
             Assert.IsTrue(naturalArrivalComplete, "The natural arrival must finish and release input.");
             Assert.IsTrue(observedTouchdownImpulse, "Touchdown should produce a visible, bounded camera settle.");
+            Assert.IsTrue(observedLandingBoost);
+            Assert.IsTrue(observedBoostCutoff, "Air boosters shut off at touchdown.");
+            Assert.AreEqual(planet, state.planet.Id);
+            Assert.AreEqual(fuel, state.Count(state.db.fuel));
             Assert.AreEqual(naturalCameraOrigin, runtime.Camera.transform.position,
                 "The camera must settle back to its exact origin.");
             var menu = ui.DebugRoot.Q<Button>("menu-button");
@@ -2522,7 +2542,8 @@ namespace Frontier.Tests
             yield return null;
             var lab = rt.Ui.DebugRoot.Q<Button>("project-local-lab");
             Assert.IsNotNull(lab);
-            Assert.IsTrue(lab.parent.ClassListContains("fr-project-gates"));
+            Assert.IsTrue(lab.parent.ClassListContains("fr-project-gates-inline"), "Gate icons belong beside the tracking star, not in their own body row.");
+            Assert.IsNotNull(lab.parent.parent.Q<Button>(className: "fr-project-track"));
             foreach (var gate in rt.Ui.DebugRoot.Query(className: "fr-project-gates").ToList())
             {
                 Assert.AreEqual(FlexDirection.Row, gate.resolvedStyle.flexDirection);
@@ -2571,6 +2592,68 @@ namespace Frontier.Tests
             var text = rt.Ui.DebugRoot.Query<Label>().ToList();
             foreach (var key in new[] { "build", "gather", "storage", "refine", "defend", "research", "upgrade", "travel", "expand" })
                 Assert.IsTrue(text.Exists(label => label.text == UiText.Get("tutorial." + key + ".body")), key);
+        }
+
+        [UnityTest]
+        public IEnumerator TrackedMaterialsUseScannerCoverageAndRememberDiscoveriesWithoutSearchLeaks()
+        {
+            new GameObject("TrackedMapBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.backpack.Clear();
+            var pack = rt.Db.FindUpgrade("pack");
+            var project = new PlayerProject { kind = "upgrade", id = pack.id,
+                target = rt.State.Level(pack) + 1, planetId = rt.State.planet.Id };
+            Assert.IsTrue(rt.State.TrackProject(project, out var error), error);
+            rt.Ui.DebugMap(null);
+            yield return null;
+            Assert.IsTrue(rt.Ui.DebugMapProjectMatch(rt.State.planet));
+            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("map-planet-" + rt.State.planet.Id).ClassListContains("fr-map-project-world"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("map-project-resource-wood"));
+            Assert.AreEqual(UiText.Get("map.filter.project"), rt.Ui.DebugRoot.Q<DropdownField>(className: "fr-map-filter").value);
+            Assert.AreEqual(rt.State.ScannerRangeLy, rt.Ui.DebugMapSurveyRadius(rt.State.planet), 0.001);
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.RadarTower), 0, 3);
+            rt.State.Notify();
+            Assert.Greater(rt.Ui.DebugMapSurveyRadius(rt.State.planet), rt.State.ScannerRangeLy);
+            Assert.AreEqual(rt.State.ScannerRangeLy + rt.State.RadarRangeBonus(rt.State.planet),
+                rt.Ui.DebugMapSurveyRadius(rt.State.planet), 0.001);
+
+            var distant = rt.State.universe.FindGenerated(d => d.HasResource("wood"), 8, 0, 1000);
+            Assert.IsNotNull(distant);
+            Assert.IsFalse(rt.Ui.DebugMapSurveyed(distant));
+            string origin = rt.Ui.DebugMapSelectedId;
+            rt.Ui.DebugMapSearch(distant.Id);
+            Assert.AreEqual(origin, rt.Ui.DebugMapSelectedId, "A canonical id cannot bypass scanners.");
+            rt.Ui.DebugMapSearch(distant.Name);
+            Assert.AreEqual(origin, rt.Ui.DebugMapSelectedId, "A name cannot bypass scanners.");
+            rt.Ui.DebugMapSearch(distant.Star.Id);
+            Assert.AreEqual(origin, rt.Ui.DebugMapSelectedId, "A system id cannot bypass scanners.");
+            rt.Ui.DebugMapSearch(distant.Star.X.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," +
+                distant.Star.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            yield return null;
+            Assert.IsFalse(rt.Ui.DebugMapSurveyed(distant), "Panning to coordinates is not discovery.");
+            Assert.IsFalse(rt.Ui.DebugMapProjectMatch(distant));
+            rt.State.RecordMapDiscoveries(new[] { distant.Star });
+            rt.State.Notify();
+            rt.Ui.DebugMapSearch(distant.Name);
+            Assert.AreEqual(distant.Id, rt.Ui.DebugMapSelectedId);
+            Assert.IsTrue(rt.Ui.DebugMapProjectMatch(distant), "Previously scanned materials stay marked outside current coverage.");
+            rt.State.Save();
+            rt.Ui.DebugMap(null);
+            rt.Ui.DebugMapSearch(distant.Id);
+            Assert.AreEqual(distant.Id, rt.Ui.DebugMapSelectedId, "Reopening preserves discovered destinations.");
+            foreach (var cost in rt.State.ProjectState(project).costs)
+                rt.State.backpack.Set(cost.resource.id, cost.amount);
+            rt.State.Notify();
+            Assert.IsFalse(rt.Ui.DebugMapProjectMatch(distant), "Materials already available no longer need a source highlight.");
+            rt.State.backpack.Clear();
+            rt.State.Notify();
+            Assert.IsTrue(rt.Ui.DebugMapProjectMatch(distant));
+            Assert.IsTrue(rt.State.TrackProject(null, out error), error);
+            Assert.IsFalse(rt.Ui.DebugMapProjectMatch(distant), "Untracking clears the map highlights.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("map-project-resource-wood"));
         }
 
         [UnityTest]

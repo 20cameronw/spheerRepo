@@ -33,7 +33,7 @@ namespace Frontier
         public bool densityOnly, truncated;
     }
 
-    /// <summary>Exact-name lookup for authored and surveyed destinations only.</summary>
+    /// <summary>Exact-name lookup for surveyed and previously pinned destinations only.</summary>
     public sealed class MapNameIndex
     {
         readonly Dictionary<string, string> planetIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -42,7 +42,6 @@ namespace Frontier
         {
             if (universe == null) throw new ArgumentNullException(nameof(universe));
             var ids = new SortedSet<string>(StringComparer.Ordinal);
-            foreach (var system in universe.AuthoredSystems) ids.Add(system.Id);
             if (discoveredSystemIds != null)
                 foreach (string id in discoveredSystemIds)
                     if (!string.IsNullOrEmpty(id)) ids.Add(id);
@@ -131,7 +130,6 @@ namespace Frontier
 
         public static bool Surveyed(StarSystem star, MapPoint[] centers, double radius)
         {
-            if (star.IsAuthored) return true;
             foreach (var center in centers)
             {
                 double dx = star.X - center.x, dy = star.Y - center.y;
@@ -147,7 +145,7 @@ namespace Frontier
 
         public static bool Surveyed(StarSystem star, MapSurveyPoint[] centers, ISet<string> discovered)
         {
-            if (star.IsAuthored || (discovered != null && discovered.Contains(star.Id))) return true;
+            if (discovered != null && discovered.Contains(star.Id)) return true;
             foreach (var center in centers)
             {
                 double dx = star.X - center.x, dy = star.Y - center.y;
@@ -188,12 +186,14 @@ namespace Frontier
             result.densityOnly = width > MaxSystemSpanLy || height > MaxSystemSpanLy;
             if (!result.densityOnly) universe.SystemsInRect(x0, y0, x1, y1, systems);
             else
-                foreach (var star in universe.AuthoredSystems)
-                    if (star.X >= x0 && star.X <= x1 && star.Y >= y0 && star.Y <= y1) systems.Add(star);
+                foreach (var id in discovered)
+                    if (universe.TryGetSystemById(id, out var star) &&
+                        star.X >= x0 && star.X <= x1 && star.Y >= y0 && star.Y <= y1) systems.Add(star);
             var surveyedSystems = new List<StarSystem>();
             foreach (var star in systems)
                 if (Surveyed(star, centers)) surveyedSystems.Add(star);
             result.surveyedSystems = surveyedSystems.ToArray();
+            systems.RemoveAll(star => !Surveyed(star, centers, discovered));
             if (!string.IsNullOrEmpty(resource))
                 systems.RemoveAll(star =>
                 {

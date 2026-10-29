@@ -77,6 +77,17 @@ MonoBehaviour:
     text: TRACKED PROJECT
   - key: project.track
     text: TRACK THIS PROJECT
+  - key: map.filter.project
+    text: Tracked needs
+  - key: map.project-material
+    text: Needed for your tracked project
+  - key: map.scanner.legend
+    text: 'Dashed: scanner coverage'
+  - key: map.scanner.help
+    text: Ship scanners and Radar Towers extend survey coverage around visited worlds.
+      Previously discovered worlds stay known.
+  - key: map.unscanned
+    text: Outside scanner coverage. Explore closer or extend your scanners.
   - key: project.tracked
     text: Tracking {0}. One project stays with you between sessions.
   - key: project.resume
@@ -975,7 +986,9 @@ MonoBehaviour:
       or pinch to explore. Move within scanner range to reveal deposits. Pin location
       keeps a world in your saved list. Manual flight rewards good piloting; Autopilot
       skips the flight at a higher fuel cost with no refund. Ship > Systems has range,
-      scanner and hull upgrades.
+      scanner       and hull upgrades. Dashed cyan rings show scanner coverage; Radar
+      Towers extend it around their planets. With a tracked project, green diamonds
+      mark known worlds with materials you still need.
   - key: tutorial.upgrade.title
     text: 7. Upgrade
   - key: tutorial.upgrade.body

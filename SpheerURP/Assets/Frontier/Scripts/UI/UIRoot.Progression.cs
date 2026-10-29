@@ -127,8 +127,10 @@ namespace Frontier
             var head = UiKit.Div("fr-row");
             head.Add(UiKit.Text(node.LocalizedName.ToUpper(), "fr-h2"));
             head.Add(UiKit.Div("fr-spacer"));
-            head.Add(new FrontierBadge { text = UiText.Get(complete ? "research.complete" : "research.tier", Math.Max(1, node.data.tier)),
-                Tint = complete ? UiKit.Lime : UiKit.Muted });
+            var badge = new FrontierBadge { text = UiText.Get(complete ? "research.complete" : "research.tier", Math.Max(1, node.data.tier)),
+                Tint = complete ? UiKit.Lime : UiKit.Muted };
+            badge.style.marginLeft = UiKit.Space.S8;
+            head.Add(badge);
             card.Add(head);
             card.Add(UiKit.Text(UiText.Get("research.lab", PrettyName(node.data.branch), node.data.labLevel), "fr-tiny"));
             card.Add(UiKit.Text(node.LocalizedDescription, "fr-muted"));

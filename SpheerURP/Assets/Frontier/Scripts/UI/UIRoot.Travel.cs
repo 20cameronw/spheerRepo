@@ -266,11 +266,13 @@ namespace Frontier
             ship.transform.localScale = Vector3.one * 0.48f;
             Vector3 center = planetView.Spin.position;
             Vector3 radial = (cam.transform.position - center).normalized;
-            Vector3 ground = center + radial * (planetView.SurfaceRadius() + 0.3f) + cam.transform.up * 0.2f;
-            Vector3 sky = ground + cam.transform.up * 2f + radial * 1.2f;
-            ship.transform.rotation = Quaternion.LookRotation(cam.transform.up, radial);
-            var heat = arriving ? Fx.GlowQuad(ship.transform, UiKit.Tint(UiKit.Amber, 0.45f), 1.3f,
-                Vector3.forward * 0.45f) : null;
+            Vector3 up = Vector3.ProjectOnPlane(cam.transform.up, radial).normalized;
+            float radius = planetView.SurfaceRadius();
+            float tangentDepth = cam.orthographic ? 0f : Mathf.Clamp01(radius / Vector3.Distance(cam.transform.position, center));
+            Vector3 contact = center + (up * Mathf.Sqrt(1f - tangentDepth * tangentDepth) + radial * tangentDepth) * radius;
+            Vector3 ground = contact + up * 0.2f;
+            Vector3 sky = ground + up * 2f;
+            ship.transform.rotation = Quaternion.LookRotation(cam.transform.right, up);
             bool skip = false;
             skipShipMoment = () => skip = true;
             var skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
@@ -288,13 +290,11 @@ namespace Frontier
                     float t = Mathf.Clamp01(elapsed / duration);
                     float height = arriving ? Mathf.Pow(1f - t, 3f) : t * t;
                     ship.transform.position = Vector3.Lerp(ground, sky, height);
-                    ship.SetFlight(arriving ? 0.3f + height * 0.7f : 0.3f + t * 0.7f,
+                    ship.SetFlight(0f,
                         arriving ? Mathf.Clamp01(t * 2f) : Mathf.Clamp01(1f - t * 3f), 0f);
-                    if (heat != null)
-                    {
-                        heat.SetActive(t < 0.75f);
-                        FxTransientPool.SetGlowQuadSize(heat.transform, 0.3f + height);
-                    }
+                    float thrust = arriving ? (0.45f + Mathf.Sin(t * Mathf.PI) * 0.55f) *
+                        (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.8f, 1f, t))) : 0.35f + t * 0.65f;
+                    ship.SetLandingThrust(thrust, elapsed);
                     elapsed += Time.unscaledDeltaTime;
                     yield return null;
                 }
@@ -302,14 +302,16 @@ namespace Frontier
                 {
                     ship.transform.position = ground;
                     ship.SetFlight(0f, 1f, 0f);
+                    ship.SetLandingThrust(0f, 0f);
                     Sfx.ShipTouchdown();
-                    Fx.Ripple(ground - radial * 0.2f, UiKit.Cyan, 1.2f, 0.4f);
-                    Fx.Burst(ground - radial * 0.2f, UiKit.Tint(gs.planet.Primary, 0.6f), 12, 0.7f, 0.08f);
+                    Fx.Ripple(contact, UiKit.Cyan, 1.2f, 0.4f);
+                    Fx.Burst(contact, UiKit.Tint(gs.planet.Primary, 0.6f), 12, 0.7f, 0.08f);
                     float settleElapsed = 0f;
                     while (cameraTransform != null && settleElapsed < TouchdownSettleDuration && !skip)
                     {
                         float t = Mathf.Clamp01(settleElapsed / TouchdownSettleDuration);
                         float offset = Mathf.Sin(t * Mathf.PI * 4f) * (1f - t) * TouchdownCameraImpulse;
+                        ship.transform.position = ground - up * (Mathf.Sin(t * Mathf.PI) * 0.025f);
                         cameraTransform.position = cameraOrigin + cameraTransform.up * offset;
                         settleElapsed += Time.unscaledDeltaTime;
                         yield return null;
@@ -321,7 +323,6 @@ namespace Frontier
                 if (cameraTransform != null) cameraTransform.position = cameraOrigin;
                 skipShipMoment = null;
                 skipButton.RemoveFromHierarchy();
-                if (heat != null) FxTransientPool.ReleaseGlowQuad(heat, true);
                 if (ship != null) Destroy(ship.gameObject);
             }
         }

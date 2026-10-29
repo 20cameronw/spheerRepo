@@ -9229,7 +9229,9 @@ MonoBehaviour:
       Drag or pinch to explore. Move within scanner range to reveal deposits. Pin
       location keeps a world in your saved list. Manual flight rewards good piloting;
       Autopilot skips the flight at a higher fuel cost with no refund. Ship > Systems
-      has range, scanner and hull upgrades.
+      has range, scanner       and hull upgrades. Dashed cyan rings show scanner
+      coverage; Radar Towers extend it around their planets. With a tracked project,
+      green diamonds mark known worlds with materials you still need.
     m_Metadata:
       m_Items: []
   - m_Id: 4800388132855808
@@ -9288,6 +9290,27 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4804934359932932
     m_Localized: OPEN SHIP UPGRADES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4809562103308288
+    m_Localized: Tracked needs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4809562157834240
+    m_Localized: Needed for your tracked project
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459193630720
+    m_Localized: 'Dashed: scanner coverage'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459235573760
+    m_Localized: Ship scanners and Radar Towers extend survey coverage around visited
+      worlds. Previously discovered worlds stay known.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459235573761
+    m_Localized: Outside scanner coverage. Explore closer or extend your scanners.
     m_Metadata:
       m_Items: []
   references:

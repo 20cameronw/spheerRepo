@@ -363,7 +363,13 @@ namespace Frontier
             RefreshFirstSessionGuide();
             RefreshModal();
             RefreshPopup();
-            if (mapOpen) { RefreshMapPinPlanets(); InvalidateMapPreview(); BuildMapCard(); }
+            if (mapOpen)
+            {
+                RefreshMapSurvey(); RefreshMapPinPlanets(); RefreshMapProjectResources();
+                mapNameIndex = MapNameIndex.Build(gs.universe.Universe, KnownMapSystems(), gs.MapPins);
+                mapVersion++; mapQueryAt = 0;
+                InvalidateMapPreview(); BuildMapCard();
+            }
             RefreshShortage();
             foreach (var track in root.Query<Button>(className: "fr-project-track").ToList())
                 RefreshProjectTrackButton(track);

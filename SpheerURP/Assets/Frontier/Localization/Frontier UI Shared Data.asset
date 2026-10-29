@@ -8943,6 +8943,26 @@ MonoBehaviour:
     m_Key: guide.action.upgrade
     m_Metadata:
       m_Items: []
+  - m_Id: 4809562103308288
+    m_Key: map.filter.project
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4809562157834240
+    m_Key: map.project-material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459193630720
+    m_Key: map.scanner.legend
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459235573760
+    m_Key: map.scanner.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459235573761
+    m_Key: map.unscanned
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

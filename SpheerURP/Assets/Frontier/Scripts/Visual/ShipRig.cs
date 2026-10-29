@@ -13,10 +13,12 @@ namespace Frontier
         readonly List<Transform> engines = new List<Transform>();
         readonly List<MeshFilter> parts = new List<MeshFilter>();
         readonly List<ParticleSystem> exhaust = new List<ParticleSystem>();
+        readonly List<Transform> landingJets = new List<Transform>();
         Transform hull, lamps;
         Material material;
         public float Gear { get; private set; }
         public float Throttle { get; private set; }
+        public float LandingThrust { get; private set; }
         public int TriangleCount { get; private set; }
 
         public static ShipRig Create(Transform parent, int layer = 0, bool cameraOnly = false)
@@ -156,6 +158,34 @@ namespace Frontier
             {
                 if (Throttle > 0f && !particles.isPlaying) particles.Play();
                 else if (Throttle == 0f) particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+        }
+
+        public void SetLandingThrust(float thrust, float phase)
+        {
+            if (float.IsNaN(thrust) || float.IsInfinity(thrust) || float.IsNaN(phase) || float.IsInfinity(phase))
+                throw new ArgumentOutOfRangeException(nameof(thrust), "Landing presentation values must be finite.");
+            LandingThrust = Mathf.Clamp01(thrust);
+            if (landingJets.Count == 0 && LandingThrust > 0f)
+            {
+                var nozzleMesh = BoxMesh("Landing booster nozzle", new Color(0.48f, 0.6f, 0.76f));
+                var airMesh = FlameMesh(new Color(0.65f, 0.95f, 1f));
+                for (int side = -1; side <= 1; side += 2)
+                {
+                    var nozzle = Part("LandingBooster_" + side, nozzleMesh, hull, gameObject.layer);
+                    nozzle.localPosition = new Vector3(0f, -0.15f, side * 0.4f);
+                    nozzle.localScale = new Vector3(0.18f, 0.1f, 0.18f);
+                    var jet = Part("LandingAir_" + side, airMesh, hull, gameObject.layer);
+                    jet.localPosition = nozzle.localPosition + Vector3.down * 0.05f;
+                    jet.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                    landingJets.Add(jet);
+                }
+            }
+            float pulse = 1f + Mathf.Sin(phase * 46f) * 0.12f;
+            foreach (var jet in landingJets)
+            {
+                jet.gameObject.SetActive(LandingThrust > 0f);
+                jet.localScale = new Vector3(0.11f, 0.11f, 0.65f) * (LandingThrust * pulse);
             }
         }
 

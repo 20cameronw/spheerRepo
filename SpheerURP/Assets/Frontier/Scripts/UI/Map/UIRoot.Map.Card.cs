@@ -65,7 +65,7 @@ namespace Frontier
                 if (!string.IsNullOrEmpty(mapNextStopPlanetId))
                 {
                     var nextStop = gs.universe.Get(mapNextStopPlanetId);
-                    if (nextStop != null)
+                    if (nextStop != null && Surveyed(nextStop.Star))
                     {
                         scroll.Add(UiKit.Text(UiText.Get("map.next-stop"), "fr-tiny", UiKit.Amber));
                         var nextStopButton = UiKit.Btn(nextStop.Name, UiKit.Cyan, () =>
@@ -147,7 +147,14 @@ namespace Frontier
                     var resource = gs.db.FindResource(deposit.ResourceId);
                     if (resource == null) continue;
                     var row = UiKit.Div("fr-row-wrap");
-                    row.Add(ResourceIconChip(resource, resource.LocalizedName));
+                    var chip = ResourceIconChip(resource, resource.LocalizedName);
+                    if (mapResource == ProjectMapFilter && mapProjectResources.Contains(resource.id))
+                    {
+                        chip.AddToClassList("fr-project-resource");
+                        chip.name = "map-project-resource-" + resource.id;
+                        chip.tooltip = UiText.Get("map.project-material");
+                    }
+                    row.Add(chip);
                     row.Add(UiKit.Text(UiText.Get("map.deposit", deposit.Method, deposit.Richness, deposit.BaseYield), "fr-tiny", UiKit.Muted));
                     scroll.Add(row);
                 }

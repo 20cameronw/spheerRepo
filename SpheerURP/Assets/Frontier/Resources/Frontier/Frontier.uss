@@ -323,6 +323,9 @@
 .fr-costs .fr-itemchip .fr-icon { flex-shrink: 0; }
 .fr-project-gates { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: center; margin-top: var(--fr-sp-8); }
 .fr-project-gates .fr-iconbtn { margin-left: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
+.fr-project-gates-inline { margin-top: 0; flex-shrink: 0; }
+.fr-project-gates-inline .fr-iconbtn { margin-bottom: 0; }
+.fr-project-resource { border-color: var(--fr-lime); }
 .fr-dot { width: 18px; height: 18px; border-radius: 9px; }
 
 /* ---------- Backpack ---------- */

@@ -24,6 +24,8 @@ namespace Frontier
                 {
                     mapSnapshot = mapQuery.Result;
                     gs.RecordMapDiscoveries(mapSnapshot.surveyedSystems);
+                    foreach (var star in mapSnapshot.surveyedSystems) mapRememberedSystems.Add(star.Id);
+                    RefreshMapProjectMatches();
                     if (mapNameIndex != null) mapNameIndex.AddSystems(gs.universe.Universe, mapSnapshot.surveyedSystems);
                     PositionMapLabels();
                     mapWorld.MarkDirtyRepaint();
@@ -40,8 +42,8 @@ namespace Frontier
                 MapPoint a = viewport.Unproject(0, viewport.Height), b = viewport.Unproject(viewport.Width, 0);
                 var universe = gs.universe.Universe;
                 var points = SurveyPoints();
-                var discovered = gs.MapDiscoveryIds();
-                string resource = mapResource;
+                var discovered = KnownMapSystems();
+                string resource = mapResource == ProjectMapFilter ? "" : mapResource;
                 mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, discovered));
             }
             if (mapPreviewTask != null && mapPreviewTask.IsCompleted)
@@ -95,17 +97,5 @@ namespace Frontier
             }
         }
 
-        void DrawMapDensity(Painter2D p)
-        {
-            int index = 0;
-            foreach (var cell in mapSnapshot.density)
-            {
-                if (index++ % 7 != 0) continue;
-                if (cell.density < 0.02f) continue;
-                Vector2 a = Project(cell.x, cell.y), b = Project(cell.x + cell.width, cell.y + cell.height);
-                MapDisc(p, (a + b) * 0.5f, Mathf.Lerp(1, 2.5f, cell.density),
-                    new Color(0.4f, 0.56f, 0.8f, Mathf.Min(0.4f, cell.density)));
-            }
-        }
     }
 }

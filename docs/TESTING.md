@@ -1,5 +1,18 @@
 # Testing
 
+## Side-on lander and scanner-limited project map
+
+- Ship presentation uses the screen-top terrain silhouette and a horizontal profile. Downward air boosters
+  pulse during braking and shut off on contact; flight thrust, costs, saved positions and settlement are unchanged.
+- The arrival/skip regression checks side-on alignment, top-of-world placement, downward thrust, cutoff, cleanup,
+  camera restoration and unchanged fuel. ShipRig tests cover owned resources and independent landing/flight states.
+- MapQuery hides unknown systems even without a resource filter and removes the authored-world visibility exception.
+  Galaxy zoom returns remembered systems only, without enumerating distant sectors or painting unscanned star density.
+- Discovery, name/ID search, tracked-material highlights, Radar Tower coverage updates and reopening the map have
+  targeted coverage. New discoveries and old saved knowledge remain usable beyond current scanner range.
+- Final focused run: 32 EditMode and 10 PlayMode tests passed. Ten confirmation captures across two phone sizes
+  showed no overflow, sub-12dp text or sub-48dp targets. Native device motion/performance still needs human playtesting.
+
 ## Destination footer and card layout
 
 - Pilot / Autopilot / Route Unavailable stays below the destination details, outside the ScrollView.

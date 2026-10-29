@@ -136,6 +136,13 @@ namespace Frontier
         public double DebugMapCenterX { get { return viewport.CenterX; } }
         public bool DebugMapInSystem { get { return SystemMapView; } }
         public string DebugMapSelectedId { get { return selected == null ? null : selected.Id; } }
+        public bool DebugMapProjectMatch(PlanetData planet) { return mapProjectWorlds.Contains(planet.Id); }
+        public bool DebugMapSurveyed(PlanetData planet) { return Surveyed(planet.Star); }
+        public double DebugMapSurveyRadius(PlanetData planet)
+        {
+            int index = surveyCenters.FindIndex(star => star.Id == planet.Star.Id);
+            return index < 0 ? 0 : surveyRadii[index];
+        }
         public float DebugMapOrbitRadius(PlanetData planet)
         {
             return PlanetOrbitAxes(planet).y;

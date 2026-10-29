@@ -298,6 +298,12 @@ namespace Frontier
             }
 
             yield return new Shot("hud", ResetView);
+            yield return new Shot("ship-landing-boost", () =>
+            {
+                ResetView();
+                ui.StartCoroutine(ui.PlayArrivalIntro(false));
+            }, 0.45f);
+            yield return new Shot("ship-landing-settled", () => { }, 0.8f);
             yield return new Shot("surface-view", () =>
             {
                 ResetView();
@@ -431,6 +437,19 @@ namespace Frontier
                     if (lab == null) throw new InvalidOperationException("No lab shortcut in research fixture.");
                     using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = lab; lab.SendEvent(submit); }
                 });
+                void PrepareTrackedMap(float zoom)
+                {
+                    PreparePlayerFlowFixture();
+                    var pack = db.FindUpgrade("pack");
+                    gs.DebugSetUpgrade(pack, 0);
+                    gs.backpack.Set("wood", 0);
+                    if (!gs.TrackProject(new PlayerProject { kind = "upgrade", id = pack.id,
+                        target = 1, planetId = gs.planet.Id }, out var error))
+                        throw new InvalidOperationException(error);
+                    ui.DebugMap(null, zoom);
+                }
+                yield return new Shot("player-project-map-scanner", () => PrepareTrackedMap(6f), 1f);
+                yield return new Shot("player-project-map-orbits", () => PrepareTrackedMap(12f), 1f);
                 yield return new Shot("player-return", () =>
                 {
                     PreparePlayerFlowFixture();

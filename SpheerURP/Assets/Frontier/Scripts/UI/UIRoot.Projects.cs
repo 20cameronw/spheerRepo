@@ -47,6 +47,19 @@ namespace Frontier
             var track = ProjectTrackButton(project);
             if (inline)
             {
+                var gates = body.Children().FirstOrDefault(child => child.ClassListContains("fr-project-gates"));
+                if (gates != null)
+                {
+                    gates.AddToClassList("fr-project-gates-inline");
+                    heading.Add(gates);
+                }
+                var title = heading.Q<Label>();
+                if (title != null)
+                {
+                    title.style.flexShrink = 1;
+                    title.style.minWidth = 0;
+                    title.style.whiteSpace = WhiteSpace.Normal;
+                }
                 track.style.marginLeft = UiKit.Space.S8;
                 heading.Add(track);
             }
