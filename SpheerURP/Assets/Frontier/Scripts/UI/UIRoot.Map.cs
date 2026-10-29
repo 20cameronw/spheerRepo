@@ -14,10 +14,12 @@ namespace Frontier
         const float MinZoom = 1f, NeighborZoom = 4f;
         const float SystemZoom = 12f, SystemZoomThreshold = 8f;
         PlanetData selected;
-        bool mapOpen, mapAutopilot;
+        bool mapOpen, mapAutopilot, mapMinimal;
         VisualElement mapView, mapWorld, mapCard, mapTools;
+        VisualElement mapLocationBar, mapSearchBar;
+        Label mapLocation;
         Label mapReadout, mapNotice;
-        Button mapViewMode, mapZoomIn, mapZoomOut;
+        Button mapViewMode, mapZoomIn, mapZoomOut, mapHideControls;
         TextField mapSearch;
         DropdownField mapFilter;
         readonly MapViewport viewport = new MapViewport();
@@ -63,10 +65,18 @@ namespace Frontier
 
         void OpenMap()
         {
+            OpenMap(false);
+        }
+
+        void OpenMap(bool minimal)
+        {
             if (defense.Active || busy) return;
             if (mapOpen) { CloseMap(); return; }
             ClosePopup(); CloseModal(); ExitBuild();
-            mapOpen = true; selected = gs.planet; mapAutopilot = false; mapResource = ""; mapZoom = SystemZoom;
+            mapOpen = true; mapMinimal = minimal;
+            selected = gs.planet; mapAutopilot = false; mapResource = ""; mapZoom = SystemZoom;
+            planetView.Zoom01 = 0f;
+            planetView.MapZoomBlend = minimal ? 0f : 1f;
             RefreshMapSurvey();
             mapNameIndex = MapNameIndex.Build(gs.universe.Universe, KnownMapSystems(), gs.MapPins);
             mapView = UiKit.Div("fr-map");
@@ -85,7 +95,7 @@ namespace Frontier
             mapWorld.RegisterCallback<WheelEvent>(e => { if (e.delta.y != 0) StepMapZoom(e.delta.y < 0); e.StopPropagation(); });
 
             mapTools = UiKit.Div("fr-map-tools");
-            mapTools.Add(Icons.IconButton("close", UiKit.Muted, CloseMap));
+            mapTools.Add(Icons.IconButton("close", UiKit.Muted, ReturnFromMap));
             mapZoomIn = Icons.IconButton("plus", UiKit.Muted, () => StepMapZoom(true));
             mapZoomIn.name = "map-zoom-in";
             mapZoomOut = Icons.IconButton("minus", UiKit.Muted, () => StepMapZoom(false));
@@ -95,6 +105,13 @@ namespace Frontier
             var home = Icons.IconButton("map", UiKit.Cyan, () => { mapZoom = SystemZoom; SelectMapWorld(gs.planet); CenterOn(gs.planet); });
             home.tooltip = UiText.Get("map.recenter"); mapTools.Add(home);
             mapView.Add(mapTools);
+            mapHideControls = Icons.IconButton("eye", UiKit.Cyan, () => SetMapMinimal(true));
+            mapHideControls.name = "map-hide-controls";
+            mapHideControls.tooltip = UiText.Get("map.hide-controls");
+            mapHideControls.style.position = Position.Absolute;
+            mapHideControls.style.right = UiKit.Space.S16 + inset.z;
+            mapHideControls.style.top = 260 + inset.y;
+            mapView.Add(mapHideControls);
             mapViewMode = UiKit.Btn("", UiKit.Cyan, () =>
             {
                 mapZoom = SystemMapView ? NeighborZoom : NeighborMapView ? MinZoom : SystemZoom;
@@ -106,6 +123,19 @@ namespace Frontier
             mapViewMode.style.top = 16 + inset.y;
             mapViewMode.style.width = 200;
             mapView.Add(mapViewMode);
+            mapLocationBar = UiKit.Div("fr-map-location");
+            mapLocationBar.name = "map-location-bar";
+            var back = Icons.IconButton("back", UiKit.Muted, ReturnFromMap);
+            back.name = "map-return-world";
+            back.tooltip = UiText.Get("map.return-world", gs.planet.Name);
+            mapLocationBar.Add(back);
+            mapLocation = UiKit.Text("", "fr-small");
+            mapLocation.name = "map-location";
+            mapLocationBar.Add(mapLocation);
+            var controls = IconBtn(UiText.Get("map.controls"), "gear", UiKit.Cyan, () => SetMapMinimal(false));
+            controls.name = "map-show-controls";
+            mapLocationBar.Add(controls);
+            mapView.Add(mapLocationBar);
             RefreshMapProjectResources();
             BuildMapSearch();
             var scanLegend = UiKit.Text(UiText.Get("map.scanner.legend"), "fr-tiny", UiKit.Cyan);
@@ -139,13 +169,18 @@ namespace Frontier
 
         void CloseMap()
         {
+            if (mapZoomTransition != null) StopCoroutine(mapZoomTransition);
+            mapZoomTransition = null;
+            if (planetView != null) planetView.MapZoomBlend = 0f;
             ResetMapPointer();
             if (mapView != null) mapView.RemoveFromHierarchy();
             mapView = null; mapWorld = null; mapCard = null; mapTools = null;
             mapOpen = false; lastPinch = 0f; mapSnapshot = null;
             mapQueryBoundsKnown = false;
             mapNameIndex = null;
-            mapViewMode = null;
+            mapViewMode = null; mapHideControls = null;
+            mapLocationBar = null; mapLocation = null; mapSearchBar = null;
+            mapGestureHeld = false;
             mapFilter = null;
             mapVersion++; previewVersion++;
             mapLabels.Clear(); mapPlanets.Clear();
@@ -159,16 +194,35 @@ namespace Frontier
         void LayoutMapChrome()
         {
             if (mapTools == null) return;
+            foreach (var element in new VisualElement[] { mapTools, mapViewMode, mapHideControls, mapSearchBar, mapFilter, mapReadout, mapCard })
+                if (element != null) element.style.display = mapMinimal ? DisplayStyle.None : DisplayStyle.Flex;
+            if (mapLocationBar != null)
+            {
+                mapLocationBar.style.display = mapMinimal ? DisplayStyle.Flex : DisplayStyle.None;
+                mapLocationBar.style.top = UiKit.Space.S16 + inset.y;
+                mapLocationBar.style.left = UiKit.Space.S16 + inset.x;
+                mapLocationBar.style.right = UiKit.Space.S16 + inset.z;
+            }
             mapTools.style.right = UiKit.Space.S16 + inset.z;
             mapTools.style.top = UiKit.Space.S16 + inset.y;
             mapTools.style.left = UiKit.Space.S16 + inset.x;
             if (mapCard != null) mapCard.style.marginBottom = UiKit.Space.S16 + inset.w;
             if (mapWorld != null)
             {
-                mapWorld.style.top = (mapNotice != null && !string.IsNullOrEmpty(mapNotice.text) ? 390 : 336) + inset.y;
+                mapWorld.style.top = (mapMinimal ? UiKit.Size.Touch + UiKit.Space.S32 :
+                    mapNotice != null && !string.IsNullOrEmpty(mapNotice.text) ? 434 : 380) + inset.y;
                 float cardHeight = mapCard != null ? mapCard.layout.height : 0;
-                mapWorld.style.bottom = (float.IsNaN(cardHeight) ? 0 : cardHeight) + 32 + inset.w;
+                mapWorld.style.bottom = (mapMinimal ? UiKit.Space.S16 :
+                    (float.IsNaN(cardHeight) ? 0 : cardHeight) + 32) + inset.w;
             }
+            if (mapNotice != null) mapNotice.style.top = (mapMinimal ? UiKit.Size.Touch + UiKit.Space.S24 : 380) + inset.y;
+        }
+
+        void SetMapMinimal(bool minimal)
+        {
+            mapMinimal = minimal;
+            LayoutMapChrome();
+            ApplyMapTransform();
         }
 
         bool SystemMapView { get { return viewport.Scale >= SystemZoomThreshold; } }
@@ -185,6 +239,12 @@ namespace Frontier
 
         void StepMapZoom(bool inward)
         {
+            if (inward && SystemMapView && mapMinimal)
+            {
+                if (selected != null && selected.Id == gs.planet.Id) ReturnFromMap();
+                else SetMapMinimal(false);
+                return;
+            }
             mapZoom = inward ? (NeighborMapView || SystemMapView ? SystemZoom : NeighborZoom)
                 : (SystemMapView ? NeighborZoom : MinZoom);
             ApplyMapTransform();
@@ -211,7 +271,13 @@ namespace Frontier
                     NeighborMapView ? "map.mode.overview" : "map.mode.orbits");
             mapZoomIn.SetEnabled(!SystemMapView);
             mapZoomOut.SetEnabled(SystemMapView || NeighborMapView);
-            mapWorld.Q("map-scanner-legend").style.display = SystemMapView ? DisplayStyle.None : DisplayStyle.Flex;
+            mapWorld.Q("map-scanner-legend").style.display = SystemMapView || mapMinimal ? DisplayStyle.None : DisplayStyle.Flex;
+            if (mapLocation != null)
+                mapLocation.text = SystemMapView ? UiText.Get("map.location.planet", gs.planet.Name, gs.planet.Star.Name) :
+                    NeighborMapView ? UiText.Get("map.location.system", gs.planet.Star.Name) :
+                    UiText.Get("map.location.sector", gs.planet.Star.Name,
+                        gs.planet.Star.X.ToString("0.#", CultureInfo.InvariantCulture),
+                        gs.planet.Star.Y.ToString("0.#", CultureInfo.InvariantCulture));
             PositionMapLabels();
             mapWorld.MarkDirtyRepaint();
         }
@@ -247,11 +313,19 @@ namespace Frontier
         {
             if (!mapOpen || mapWorld == null) return;
             PollMapWorkers();
+            if (mapZoomTransition != null) return;
+            if (mapGestureHeld)
+            {
+                if (Input.touchCount == 0) mapGestureHeld = false;
+                lastPinch = 0f;
+                return;
+            }
             if (mapPreview != null && selected != null && selected.Id != gs.planet.Id) mapWorld.MarkDirtyRepaint();
             if (Input.touchCount == 2)
             {
                 var a = Input.GetTouch(0).position; var b = Input.GetTouch(1).position;
                 float d = Vector2.Distance(a, b);
+                if (lastPinch <= 1f && (!ScreenPointInMap(a) || !ScreenPointInMap(b))) return;
                 suppressMapClick = true;
                 if (lastPinch > 1 && d > 1)
                 {
@@ -264,6 +338,13 @@ namespace Frontier
                 if (lastPinch <= 1) lastPinch = d;
             }
             else lastPinch = 0;
+        }
+
+        bool ScreenPointInMap(Vector2 screen)
+        {
+            var point = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screen.x, ScreenMetrics.Height - screen.y));
+            var element = root.panel.Pick(point);
+            return element == mapWorld || (element != null && mapWorld.Contains(element));
         }
 
         void RefreshMapSurvey()
@@ -830,6 +911,7 @@ namespace Frontier
         void BuildMapSearch()
         {
             var bar = UiKit.Div("fr-map-search");
+            mapSearchBar = bar;
             bar.style.top = 140 + inset.y; bar.style.left = 16 + inset.x; bar.style.right = 16 + inset.z;
             mapSearch = new TextField { tooltip = UiText.Get("map.search.tooltip") };
             mapSearch.textEdition.placeholder = UiText.Get("map.search.placeholder");
@@ -856,7 +938,7 @@ namespace Frontier
             filter.style.position = Position.Absolute; filter.style.left = 16 + inset.x; filter.style.top = 260 + inset.y; filter.style.width = 260;
             mapView.Add(filter);
             mapReadout = UiKit.Text("", "fr-tiny", UiKit.Muted);
-            mapReadout.style.position = Position.Absolute; mapReadout.style.left = 296 + inset.x; mapReadout.style.right = 16 + inset.z; mapReadout.style.top = 266 + inset.y;
+            mapReadout.style.position = Position.Absolute; mapReadout.style.left = 296 + inset.x; mapReadout.style.right = UiKit.Size.Touch + UiKit.Space.S32 + inset.z; mapReadout.style.top = 266 + inset.y;
             mapView.Add(mapReadout);
             mapNotice = UiKit.Text("", "fr-tiny", UiKit.Muted);
             mapNotice.style.position = Position.Absolute; mapNotice.style.left = 16 + inset.x;

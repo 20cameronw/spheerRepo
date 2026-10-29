@@ -93,7 +93,7 @@ namespace Frontier
             if (modalKey == "research" && !samePage) { RefreshModal(); return; }
             OpenModal("research", "research", UiText.Get("nav.command"), UiKit.Magenta, BuildResearch, true);
         }
-        void OpenBuilders() { if (defense.Active || busy) return; OpenModal("builders", "build", UiText.Get("builders.jobs-title"), UiKit.Cyan, BuildBuilders, true); }
+        void OpenBuilders() { if (defense.Active || busy) return; OpenModal("builders", "builders", UiText.Get("builders.jobs-title"), UiKit.Cyan, BuildBuilders, true); }
         void OpenPack() { OpenShip(ShipPage.Cargo); }
         void OpenShip(ShipPage page)
         {
@@ -167,8 +167,11 @@ namespace Frontier
                 int have = gs.CountOnPlanet(gs.planet, def);
                 var count = UiKit.Text(def.maxPerPlanet > 0 ? have + "/" + def.maxPerPlanet : "x" + have, "fr-small");
                 count.style.marginLeft = UiKit.Space.S12;
-                top.Add(count);
                 card.Add(top);
+                var track = ProjectTrackButton(Project("build", def.id));
+                track.style.alignSelf = Align.FlexStart;
+                track.style.marginLeft = UiKit.Space.S8;
+                top.Add(track);
 
                 PlacedStructure activeJob = null;
                 foreach (var structure in gs.StructuresOn(gs.planet))
@@ -184,7 +187,6 @@ namespace Frontier
                 else
                 {
                     card.Add(ProjectCosts(def.buildCost, Project("build", def.id)));
-                    AddProjectAction(card, Project("build", def.id));
                     bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
                     if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
                     bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
@@ -209,6 +211,10 @@ namespace Frontier
                         AddFirstSessionCue(card, CurrentFirstSessionGuideStep);
                     card.Add(actions);
                 }
+                count.name = "shop-count-" + def.id;
+                count.style.alignSelf = Align.FlexEnd;
+                count.style.marginTop = UiKit.Space.S8;
+                card.Add(count);
                 body.Add(card);
             }
         }
@@ -1618,7 +1624,7 @@ namespace Frontier
                 bool confirming = confirmBuilderPurchaseOwned == owned;
                 card.Add(UiKit.Text(UiText.Get("builders.recruit-offer", owned + 1, rules.maxBuilders), "fr-small"));
                 var buy = IconBtn(UiText.Get(confirming ? "builders.recruit-confirm" : "builders.recruit", price),
-                    "build", confirming ? UiKit.Amber : UiKit.Cyan, () =>
+                    "builders", confirming ? UiKit.Amber : UiKit.Cyan, () =>
                     {
                         if (confirmBuilderPurchaseOwned != owned)
                         {

@@ -20,7 +20,10 @@ namespace Frontier
         public event System.Action<PlanetData> Rebuilt;
         float punch;
         public bool IdleSpin = true;
-        public bool CloseView;
+        float zoom01;
+        public float Zoom01 { get { return zoom01; } set { zoom01 = Mathf.Clamp01(value); } }
+        public bool CloseView { get { return zoom01 >= 0.5f; } set { Zoom01 = value ? 1f : 0f; } }
+        public float MapZoomBlend { get; set; }
         /// <summary>Holds the planet completely still (used while a structure is selected).</summary>
         public bool Frozen;
         float appear = 1f;

@@ -31,6 +31,7 @@ namespace Frontier
 
         public static float CloudCoverage(PlanetData planet)
         {
+            if (planet.AuthoredId == "sylva") return 0f;
             float coverage;
             switch (planet.Weather)
             {
@@ -43,7 +44,6 @@ namespace Frontier
                 default: coverage = 0.08f; break;
             }
             if (planet.Kind == PlanetKind.GasGiant) coverage = Mathf.Max(coverage, 0.72f);
-            if (planet.ModelKey == "sylva" && planet.Biome == Biome.Lush) coverage = Mathf.Max(coverage, 0.38f);
             return coverage * Mathf.Clamp01(planet.AtmosphereIntensity);
         }
 

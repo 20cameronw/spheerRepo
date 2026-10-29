@@ -344,7 +344,7 @@
 .fr-itemchip .fr-icon { width: var(--fr-icon-md); height: var(--fr-icon-md); margin-right: var(--fr-sp-8); }
 .fr-itemchip-low { border-color: rgb(135, 50, 70); }
 .fr-costs { align-self: stretch; min-width: 0; max-width: 100%; }
-.fr-costs .fr-itemchip { max-width: 100%; flex-shrink: 1; min-width: 0; }
+.fr-costs .fr-itemchip { max-width: 100%; flex-shrink: 1; min-width: 0; min-height: var(--fr-touch); }
 .fr-costs .fr-itemchip Label { flex-shrink: 1; min-width: 0; white-space: normal; }
 .fr-costs .fr-itemchip .fr-icon { flex-shrink: 0; }
 .fr-project-gates { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: center; margin-top: var(--fr-sp-8); }
@@ -470,6 +470,13 @@
 
 /* ---------- Map ---------- */
 .fr-map { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgb(12, 20, 43); overflow: hidden; }
+.fr-map-location {
+    position: absolute; flex-direction: row; align-items: center;
+    background-color: var(--fr-surface-1); border-radius: var(--fr-r-md);
+    padding: var(--fr-sp-8); border-width: 2px; border-color: var(--fr-outline);
+}
+.fr-map-location > Label { flex-grow: 1; flex-shrink: 1; min-width: 0; white-space: normal; margin: 0 var(--fr-sp-12); }
+.fr-map-location .fr-btn { flex-shrink: 0; }
 .fr-map-planet {
     position: absolute; width: 104px; height: 104px; margin: 0; padding: 0;
     background-color: transparent; border-width: 0; border-radius: 52px;

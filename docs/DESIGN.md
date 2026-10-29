@@ -31,11 +31,17 @@ and lists engine, range, scanner and hull protection. Surface salvage is explici
 Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
 XP-locked research has a gray overlay with a lock and required XP level. Its tracking star remains interactive;
 research cards omit prerequisite-navigation buttons and retain their written requirements.
-The world-view control sits at top left below the HUD bar and always uses a camera glyph; its tooltip names the destination view.
-The tutorial retains the full HUD width and overlays the camera button. Covered camera input and the corner project
+Pinch or mouse-wheel zoom interpolates between the original surface and orbit camera endpoints; neither boundary moves.
+Continuing outward by a small deliberate amount beyond orbit pulls the camera back while the orbital chart scales/fades in
+over 600 ms. There is no camera toggle. Pinching must start on the world, not a popup/HUD, and suppresses taps/rotation.
+The tutorial retains the full HUD width and overlays the crew button. Covered crew input and the corner project
 resume stay unavailable until the tutorial is dismissed or opens another screen.
 Debris is embedded slightly into the local rendered terrain at spawn, not placed on the approximate ground sphere.
 Sylva uses the authored split land/ocean meshes: raised land is green, the ocean sphere blue, with a white atmosphere.
+Painted white cloud patches are disabled on this starting world only. Lumber Camp logs have a separate brown,
+nonmetallic wood material. Each placed structure recolors only `Structure_Accent` from its current instance level:
+orange, amber, lime, green, teal, cyan, blue, violet, magenta and gold at levels 1-10 (clamped beyond 10).
+Foundations, armor, wood, glass and lights retain their materials; shared prefabs and level-one shop pictures do not change.
 Its atmosphere retains the standard authored diameter (5 units), including after terraforming; the terrain palette does not shrink the shell.
 Build cards show static pictures baked from the actual ModelLibrary structure prefabs. Research uses smaller
 structure pictures alongside the resource/equipment glyphs it unlocks, including in the Research Lab popup.
@@ -43,6 +49,11 @@ After model revisions, regenerate these textures with `Frontier/Models/Bake Stru
 (`Frontier.EditorTools.StructureThumbnails.Bake` in the Unity runner); no live preview cameras run during gameplay.
 Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
 systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
+World overzoom enters a minimal map: only a safe-area location bar, return arrow and Controls action remain.
+The location broadens from current planet/system to nearby systems to the current system's sector coordinates.
+Controls reveals the existing search/filter/destination/travel interface without changing zoom or selection;
+the eye action hides it again. The Map dock still opens the full controls directly. Further inward zoom at the
+current planet's local-system level returns smoothly to orbit; another world's selection opens its controls, never teleports.
 Panning stays near scanner coverage or remembered systems; coordinates outside that space clamp to its nearest edge.
 Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right.
 The route action stays in the destination card footer outside its scrolling details. Prerequisite actions share a
@@ -50,7 +61,7 @@ right-aligned icon row (research, local lab, station upgrade or XP only when nee
 undecorated wrapping container inside cards, never a nested scroller; exact quantities remain readable.
 The planetary-network action is last in the details and disabled until a local Warp Gate is completed. Ship systems remain on
 the Ship dock rather than a duplicate readiness action. Build lists structures without jobs/harvest shortcut rows.
-Tap a harvester for resources. One hammer below the camera opens construction jobs and crew recruitment;
+Tap a harvester for resources. One hard-hat button at top left opens construction jobs and crew recruitment;
 building headers no longer repeat that shortcut. The HUD shard balance opens the wallet and optional ad offer.
 General map/network instructions live in How to Play, not above the operational controls.
 Progression requirements use **player XP level**, not the highest planet tier visited. Research and Ship > Tools show
@@ -61,7 +72,9 @@ Planet tier remains a world difficulty/resource property, not a purchase require
 Missing-material cost and network chips are a single native button containing the existing icon and
 quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
 FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses
-its existing border. Contextual shortages first compare usable, locally stored and explicitly remote
+its existing border. Cost chips use the same touch-height minimum whether owned or missing.
+Build cards keep tracking stars top right (including locked/built cards), and their built/limit counts bottom right.
+Contextual shortages first compare usable, locally stored and explicitly remote
 stock, then production and reachable discovered worlds. A shortfall names its actual quantity.
 Shortage panels do not inject previous-step or return-to controls into other panels.
 Missing-resource chips open a smaller dimmed overlay without discarding the originating screen.

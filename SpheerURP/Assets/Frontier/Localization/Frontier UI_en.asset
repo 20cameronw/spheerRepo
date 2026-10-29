@@ -347,8 +347,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336015
-    m_Localized: Place buildings from Build; tap them to use or upgrade. The hammer
-      below the camera opens jobs and crews. Timers continue while you are away.
+    m_Localized: Place buildings from Build; tap them to use or upgrade. The hard-hat
+      button opens jobs and crews. Timers continue while you are away.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336016
@@ -1943,7 +1943,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336399
-    m_Localized: Tap a planet to choose it. Drag or pinch to explore.
+    m_Localized: Pinch to move between the surface and orbit. Keep zooming out to
+      enter the map. Controls opens search, routes and travel. Drag or pinch to explore
+      known space.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336400
@@ -9471,6 +9473,30 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5067001465757696
     m_Localized: Upgrade this tool from Tools. Existing equipment bonuses are kept.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920542597120
+    m_Localized: Controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345856
+    m_Localized: Hide map controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345857
+    m_Localized: Return to {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345858
+    m_Localized: '{0} / {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345859
+    m_Localized: '{0} / Nearby systems'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345860
+    m_Localized: '{0} / Sector {1}, {2}'
     m_Metadata:
       m_Items: []
   references:

@@ -585,6 +585,33 @@ namespace Frontier
             }
             try
             {
+                yield return new Shot("zoom-flow-minimal-orbits", () => { PrepareFlowReview(); ui.DebugMinimalMap(); });
+                yield return new Shot("zoom-flow-entry", () =>
+                {
+                    PrepareFlowReview();
+                    rt.Planet.Zoom01 = 0f;
+                    ui.DebugWorldZoom(-0.25f);
+                }, 0.3f);
+                yield return new Shot("zoom-flow-minimal-neighbors", () => { PrepareFlowReview(); ui.DebugMinimalMap(4f); });
+                yield return new Shot("zoom-flow-minimal-sector", () => { PrepareFlowReview(); ui.DebugMinimalMap(1f); });
+                yield return new Shot("zoom-flow-full-controls", () => { PrepareFlowReview(); ui.DebugMap(gs.planet); });
+                yield return new Shot("world-refine-overview", () => { PrepareFlowReview(); rt.Planet.Zoom01 = 0f; });
+                yield return new Shot("world-refine-lumber", () =>
+                {
+                    PrepareFlowReview();
+                    var lumber = At(StructureKind.Lumber);
+                    if (lumber == null) throw new InvalidOperationException("Wood review requires the seeded Lumber Camp.");
+                    rt.Planet.CloseView = true;
+                    StartCoroutine(CenterStructureForCapture(lumber, new Vector2(0.5f, 0.4f)));
+                }, 1.0f);
+                yield return new Shot("world-refine-level-accent", () =>
+                {
+                    PrepareFlowReview();
+                    var lumber = At(StructureKind.Lumber);
+                    gs.DebugSetStructureLevel(lumber, 8);
+                    rt.Planet.CloseView = true;
+                    StartCoroutine(CenterStructureForCapture(lumber, new Vector2(0.5f, 0.4f)));
+                }, 1.0f);
                 yield return new Shot("flow-review-world", PrepareFlowReview);
                 yield return new Shot("flow-review-guide", () => { PrepareFlowReview(); ui.DebugFirstSessionGuide(0); });
                 yield return new Shot("flow-review-lab-tech", () =>

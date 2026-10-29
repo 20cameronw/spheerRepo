@@ -198,6 +198,7 @@ namespace Frontier
             mapCard.RegisterCallback<GeometryChangedEvent>(e => LayoutMapChrome());
             mapView.Add(mapCard);
             LayoutMapChrome();
+            LayoutMapChrome();
         }
     }
 }

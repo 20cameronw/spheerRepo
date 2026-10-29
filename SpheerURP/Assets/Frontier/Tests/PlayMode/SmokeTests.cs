@@ -227,16 +227,8 @@ namespace Frontier.Tests
             rt.State.DismissFirstSessionGuide();
             rt.State.Notify();
             yield return null;
-            var toggle = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
-            Assert.IsEmpty(toggle.text, "The world view switch should be an icon, not a text button.");
-            Assert.IsNotNull(toggle.Q(className: "fr-icon"));
-            Assert.AreEqual(UIRoot.HudTopInset + UiKit.Space.S16, toggle.style.top.value.value, 1);
-            Assert.AreEqual(UiKit.Space.S16, toggle.style.left.value.value, 1);
-            var cameraImage = Resources.Load<VectorImage>("Frontier/Icons/camera");
-            Assert.IsNotNull(cameraImage);
-            Assert.AreEqual(cameraImage, toggle.Q(className: "fr-icon").resolvedStyle.backgroundImage.vectorImage);
-            Assert.AreEqual(UiText.Get("world.view.close"), toggle.tooltip);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("world-view-toggle"), "Zoom gestures replace the camera toggle.");
+            rt.Ui.DebugWorldZoom(1f);
             yield return null;
             yield return null;
             Assert.IsTrue(rt.Planet.CloseView);
@@ -244,8 +236,6 @@ namespace Frontier.Tests
                 "Entering surface view must animate instead of snapping to the destination.");
             yield return new WaitForSecondsRealtime(0.7f);
             Assert.Less(Mathf.Abs(rt.Camera.transform.position.z), Mathf.Abs(overview.z) * 0.5f);
-            Assert.AreEqual(UiText.Get("world.view.orbit"), toggle.tooltip);
-            Assert.AreEqual(cameraImage, toggle.Q(className: "fr-icon").resolvedStyle.backgroundImage.vectorImage);
             Assert.AreEqual(anchor, structureAnchor.localPosition, "Saved building slots must not move when resource visuals are removed.");
             foreach (var t in rt.Planet.Spin.GetComponentsInChildren<Transform>(true))
             {
@@ -257,18 +247,19 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == resource.LocalizedName));
             Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + resource.id + "-" + MinigameKind.Chop));
             rt.Ui.DebugReset();
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            rt.Ui.DebugWorldZoom(-1f);
             yield return null;
             yield return null;
             Assert.IsFalse(rt.Planet.CloseView);
             yield return WaitForCamera(rt.Camera, overview);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            rt.Ui.DebugWorldZoom(1f);
             yield return new WaitForSecondsRealtime(0.15f);
             Vector3 midTransition = rt.Camera.transform.position;
             Assert.AreNotEqual(overview, midTransition);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            rt.Ui.DebugWorldZoom(-1f);
             yield return null;
-            Assert.Less(Vector3.Distance(midTransition, rt.Camera.transform.position), 0.5f,
+            Assert.Less(Vector3.Distance(midTransition, rt.Camera.transform.position),
+                Vector3.Distance(midTransition, overview) * 0.5f,
                 "Reversing the camera mid-flight must start from its current position.");
             yield return WaitForCamera(rt.Camera, overview);
 
@@ -304,7 +295,15 @@ namespace Frontier.Tests
             var affordable = UiKit.CostRow(new List<ItemAmount> { new ItemAmount(resource, 1) },
                 rt.State, true, _ => Assert.Fail("Owned resources must not expose a missing-item action."));
             Assert.IsNull(affordable.Q<Button>());
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            affordable.style.position = Position.Absolute;
+            affordable.style.left = 200;
+            affordable.style.top = 300;
+            rt.Ui.DebugRoot.Add(affordable);
+            yield return null;
+            Assert.That(affordable[0].resolvedStyle.height, Is.EqualTo(UiKit.Size.Touch).Within(1f / rt.Ui.DebugPanelScale),
+                "Owned and missing resource chips must use the same height.");
+            affordable.RemoveFromHierarchy();
+            rt.Ui.DebugWorldZoom(1f);
             yield return null;
             Assert.IsTrue(rt.Planet.CloseView);
             Assert.IsTrue(rt.Defense.StartWave(1));
@@ -1732,6 +1731,124 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator WorldOverzoomTransitionsToMinimalMapAndControlsStayOptional()
+        {
+            new GameObject("WorldZoomBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("intro-skip");
+            if (skip != null)
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            deadline = Time.realtimeSinceStartup + 15;
+            while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+            rt.State.DismissFirstSessionGuide();
+            rt.Ui.DebugReset();
+            rt.Planet.Zoom01 = 0f;
+            yield return new WaitForSecondsRealtime(0.7f);
+            Vector3 orbit = rt.Camera.transform.position;
+            rt.Ui.DebugWorldZoom(4f);
+            Assert.AreEqual(1f, rt.Planet.Zoom01, "The old surface endpoint is the closest boundary.");
+            rt.Ui.DebugWorldZoom(-1f);
+            Assert.AreEqual(0f, rt.Planet.Zoom01);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Reaching the orbit boundary alone does not open the map.");
+            rt.Ui.DebugWorldZoom(-0.1f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Allow a little intentional overzoom.");
+            rt.Ui.DebugWorldZoom(0.01f);
+            rt.Ui.DebugWorldZoom(-0.25f);
+            Assert.IsTrue(rt.Ui.DebugMapMinimal);
+            var map = rt.Ui.DebugRoot.Q(className: "fr-map");
+            Assert.Less(map.resolvedStyle.opacity, 1f, "Do not snap straight to a fully opaque map.");
+            yield return new WaitForSecondsRealtime(0.8f);
+            Assert.AreEqual(1f, rt.Planet.MapZoomBlend);
+            Assert.AreEqual(0f, rt.Planet.Zoom01, "Map transition never changes the stored zoom endpoints.");
+            Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-map-card").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-map-search").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q("map-location-bar").resolvedStyle.display);
+            var location = rt.Ui.DebugRoot.Q<Label>("map-location");
+            Assert.AreEqual(UiText.Get("map.location.planet", rt.State.planet.Name, rt.State.planet.Star.Name), location.text);
+            rt.Ui.DebugMapZoomStep(false);
+            Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
+            Assert.AreEqual(UiText.Get("map.location.system", rt.State.planet.Star.Name), location.text);
+            rt.Ui.DebugMapZoomStep(false);
+            Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
+            StringAssert.Contains("Sector", location.text);
+            var controls = rt.Ui.DebugRoot.Q<Button>("map-show-controls");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = controls; controls.SendEvent(submit); }
+            yield return null;
+            Assert.IsFalse(rt.Ui.DebugMapMinimal);
+            Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q(className: "fr-map-card").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q(className: "fr-map-search").resolvedStyle.display);
+            var hide = rt.Ui.DebugRoot.Q<Button>("map-hide-controls");
+            Assert.IsFalse(hide.worldBound.Overlaps(rt.Ui.DebugRoot.Q("map-switch-view").worldBound),
+                "The clean-map action must not cover the map mode switch.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = hide; hide.SendEvent(submit); }
+            Assert.IsTrue(rt.Ui.DebugMapMinimal);
+            rt.Ui.DebugMapZoomStep(true);
+            rt.Ui.DebugMapZoomStep(true);
+            rt.Ui.DebugMapZoomStep(true);
+            yield return new WaitForSecondsRealtime(1.4f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Further inward zoom on the current system returns to the planet.");
+            Assert.AreEqual(0f, rt.Planet.MapZoomBlend);
+            Assert.AreEqual(orbit, rt.Camera.transform.position);
+            rt.Ui.DebugShop(0);
+            rt.Ui.DebugWorldZoom(-1f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Scrolling a shop cannot trigger world zoom.");
+            rt.Ui.DebugReset();
+            rt.Ui.DebugWorldZoom(-1f);
+            Assert.IsTrue(rt.Ui.DebugMapOpen);
+            rt.Ui.DebugReset();
+            yield return new WaitForSecondsRealtime(0.8f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen);
+            Assert.AreEqual(0f, rt.Planet.MapZoomBlend, "Interrupting an entry restores the world camera.");
+        }
+
+        [UnityTest]
+        public IEnumerator StructureLevelAccentsArePerInstanceAndDoNotRecolorWoodOrFoundations()
+        {
+            new GameObject("StructureAccentBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            var lumber = rt.Db.StructureOfKind(StructureKind.Lumber);
+            var mine = rt.Db.StructureOfKind(StructureKind.Mine);
+            var first = rt.State.DebugPlace(lumber, 0, 1);
+            var second = rt.State.DebugPlace(mine, 1, 5);
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            yield return null;
+            void Check(StructureSO definition, int level)
+            {
+                var anchor = rt.Planet.Spin.Find("Struct_" + definition.id);
+                var materials = anchor.GetComponentsInChildren<MeshRenderer>()
+                    .SelectMany(renderer => renderer.sharedMaterials).Where(material => material != null).ToList();
+                var accent = materials.First(material => material.name == "Structure_Accent");
+                Assert.Less(Vector4.Distance(StructureAppearance.AccentForLevel(level), accent.GetColor("_BaseColor")), 0.0001f);
+                var foundation = materials.First(material => material.name == "Structure_Base");
+                Assert.Less(Vector4.Distance((Color)new Color32(18, 21, 24, 255), foundation.GetColor("_BaseColor")), 0.0001f);
+                if (definition == lumber)
+                {
+                    var wood = materials.First(material => material.name == "Structure_Wood").GetColor("_BaseColor");
+                    Assert.Greater(wood.r, wood.g);
+                    Assert.Greater(wood.g, wood.b);
+                }
+            }
+            Check(lumber, 1);
+            Check(mine, 5);
+            rt.State.DebugSetStructureLevel(first, 9);
+            yield return null;
+            yield return null;
+            Check(lumber, 9);
+            Check(mine, 5);
+            var source = ModelLibrary.Prefab(lumber.modelKey).GetComponent<MeshRenderer>().sharedMaterials
+                .First(material => material.name == "Structure_Accent");
+            Assert.Less(Vector4.Distance(StructureAppearance.AccentForLevel(1), source.GetColor("_BaseColor")), 0.0001f,
+                "Instance upgrades must not edit the shared model or its level-one shop picture.");
+        }
+
+        [UnityTest]
         public IEnumerator ResearchXpOverlaysKeepTrackingInteractiveAndDisappearAtTheRequiredLevel()
         {
             new GameObject("ResearchLocksBootstrap").AddComponent<FrontierBootstrap>();
@@ -1803,6 +1920,7 @@ namespace Frontier.Tests
                 {
                     Assert.AreEqual(0f, material.GetFloat("_LandMix"), "Geometry, not a painted pattern, defines continents.");
                     Assert.AreEqual(material.GetColor("_BaseColor"), material.GetColor("_AltColor"));
+                    Assert.AreEqual(0f, material.GetFloat("_CloudCoverage"), "No painted white patches on Earth.");
                 }
                 var shell = rt.Planet.Root.Find("Atmosphere");
                 Assert.AreEqual(Vector3.one * rt.Planet.Current.AtmosphereScale, shell.localScale,
@@ -2079,12 +2197,12 @@ namespace Frontier.Tests
             for (int i = 0; i < 10; i++) yield return null;
             yield return null;
             var guide = rt.Ui.DebugRoot.Q(className: "fr-guide-card");
-            var cameraButton = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
+            var cameraButton = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
             Assert.AreEqual(UiKit.Space.S16, guide.resolvedStyle.left, 1);
             Assert.AreEqual(UiKit.Space.S16, guide.resolvedStyle.right, 1);
-            Assert.IsTrue(guide.worldBound.Overlaps(cameraButton.worldBound), "The full-width tutorial covers the relocated camera button.");
+            Assert.IsTrue(guide.worldBound.Overlaps(cameraButton.worldBound), "The full-width tutorial covers the crew button.");
             Assert.Greater(guide.parent.IndexOf(guide), cameraButton.parent.IndexOf(cameraButton));
-            Assert.IsFalse(cameraButton.enabledInHierarchy, "A covered camera control must not accept keyboard input.");
+            Assert.IsFalse(cameraButton.enabledInHierarchy, "A covered crew control must not accept keyboard input.");
             var guideSkip = rt.Ui.DebugRoot.Q<Button>("first-session-guide-skip");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = guideSkip; guideSkip.SendEvent(submit); }
             Assert.IsTrue(cameraButton.enabledInHierarchy);
@@ -2741,10 +2859,11 @@ namespace Frontier.Tests
             rt.State.DismissFirstSessionGuide();
             rt.Ui.DebugReset();
             yield return null;
-            var camera = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("world-view-toggle"));
             var jobs = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
-            Assert.Greater(jobs.worldBound.yMin, camera.worldBound.yMax);
-            Assert.AreEqual(camera.worldBound.xMin, jobs.worldBound.xMin, 1);
+            Assert.AreEqual(UIRoot.HudTopInset + UiKit.Space.S16, jobs.resolvedStyle.top, 1);
+            Assert.AreEqual(Resources.Load<VectorImage>("Frontier/Icons/builders"),
+                jobs.Q(className: "fr-icon").resolvedStyle.backgroundImage.vectorImage);
             var wallet = rt.Ui.DebugRoot.Q<Button>("hud-open-shards");
             Assert.IsNotNull(wallet);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = wallet; wallet.SendEvent(submit); }
@@ -2810,6 +2929,13 @@ namespace Frontier.Tests
                     Assert.AreSame(Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + id), image.image);
                     Assert.AreEqual(PickingMode.Ignore, image.pickingMode);
                     Assert.Greater(image.resolvedStyle.width, 0f);
+                    var track = card.Q<Button>("track-build-" + id);
+                    var count = card.Q<Label>("shop-count-" + id);
+                    Assert.IsNotNull(track, "Every Build card keeps its tracking star at top right.");
+                    Assert.AreEqual(card[0], track.parent);
+                    Assert.AreEqual(card[card.childCount - 1], count, "Build count is the bottom-right item.");
+                    Assert.AreEqual(Align.FlexEnd, count.resolvedStyle.alignSelf);
+                    Assert.Less(track.worldBound.yMin, count.worldBound.yMin);
                     buildWidth = image.resolvedStyle.width;
                 }
             }
@@ -3288,6 +3414,16 @@ namespace Frontier.Tests
                 }
                 Assert.Greater(row.resolvedStyle.height, row.ElementAt(0).resolvedStyle.height, "Costs should form multiple lines.");
             }
+            container.Clear();
+            container.style.flexDirection = FlexDirection.Row;
+            var simpleCost = new List<ItemAmount> { new ItemAmount(costs[0].resource, 10) };
+            var missing = UiKit.CostRow(simpleCost, rt.State, true, resource => { }, resource => 0);
+            var owned = UiKit.CostRow(simpleCost, rt.State, true, resource => { }, resource => 20);
+            container.Add(missing);
+            container.Add(owned);
+            for (int i = 0; i < 3; i++) yield return null;
+            Assert.AreEqual(owned[0].resolvedStyle.height, missing[0].resolvedStyle.height, 0.1f,
+                "Missing-resource buttons and owned-resource chips keep the same height.");
             container.RemoveFromHierarchy();
         }
 

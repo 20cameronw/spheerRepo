@@ -30,8 +30,7 @@ namespace Frontier
         Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, levelLabel, planetLabel;
         WaveInfo waveHudInfo;
         VisualElement planetTag;
-        Button surfaceViewButton, constructionButton;
-        VisualElement surfaceViewIcon;
+        Button constructionButton;
         bool busy, introActive;
         public bool IsTravelling { get; private set; }
         Minigame activeGatherMinigame;
@@ -207,27 +206,12 @@ namespace Frontier
             menuBtn.name = "menu-button";
             top.Add(menuBtn);
             hud.Add(top);
-            surfaceViewButton = Icons.IconButton("camera", UiKit.Cyan, () =>
-            {
-                if (busy || introActive || defense.Active) return;
-                CloseModal();
-                ClosePopup();
-                planetView.CloseView = !planetView.CloseView;
-                RefreshViewButton();
-            });
-            surfaceViewIcon = surfaceViewButton.Q(className: "fr-icon");
-            surfaceViewButton.name = "world-view-toggle";
-            surfaceViewButton.style.position = Position.Absolute;
-            surfaceViewButton.style.left = UiKit.Space.S16;
-            surfaceViewButton.style.top = HudTopInset + UiKit.Space.S16;
-            RefreshViewButton();
-            hud.Add(surfaceViewButton);
-            constructionButton = Icons.IconButton("build", UiKit.Lime, OpenBuilders);
+            constructionButton = Icons.IconButton("builders", UiKit.Lime, OpenBuilders);
             constructionButton.name = "world-open-jobs";
             constructionButton.tooltip = UiText.Get("builders.jobs-title");
             constructionButton.style.position = Position.Absolute;
             constructionButton.style.left = UiKit.Space.S16;
-            constructionButton.style.top = HudTopInset + UiKit.Space.S16 + UiKit.Size.Touch + UiKit.Space.S12;
+            constructionButton.style.top = HudTopInset + UiKit.Space.S16;
             hud.Add(constructionButton);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
@@ -237,13 +221,6 @@ namespace Frontier
             dock.Add(DockButton("ship", UiText.Get("nav.pack"), UiKit.Amber, OpenPack));
             dock.Add(DockButton("build", UiText.Get("nav.build"), UiKit.Lime, OpenShop));
             hud.Add(dock);
-        }
-
-        void RefreshViewButton()
-        {
-            if (surfaceViewButton == null) return;
-            surfaceViewButton.tooltip = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
-            if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, "camera", UiKit.Cyan);
         }
 
         /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>
@@ -326,7 +303,6 @@ namespace Frontier
         {
             if (batching) return;
             ResetProjectContextIfNeeded();
-            RefreshViewButton();
             if (observedUniverse != gs.universe)
             {
                 observedUniverse = gs.universe;
@@ -370,12 +346,11 @@ namespace Frontier
             ApplyLayout(false);
 
             bool wave = defense.Active;
-            if (wave && planetView.CloseView)
+            if (wave && planetView.Zoom01 > 0f)
             {
                 planetView.CloseView = false;
-                RefreshViewButton();
             }
-            world.Locked = wave || busy;
+            world.Locked = wave || busy || mapOpen;
             UpdateFirstSessionGuideVisibility();
             RefreshProjectResume();
             if (waveHud != null)
@@ -400,12 +375,13 @@ namespace Frontier
                     reactorFill.style.backgroundColor = Color.Lerp(UiKit.Red, UiKit.Lime, hp);
                 }
             }
-            hud.style.display = wave || introActive || networkFinaleActive ? DisplayStyle.None : DisplayStyle.Flex;
+            hud.style.display = wave || introActive || networkFinaleActive || mapOpen ? DisplayStyle.None : DisplayStyle.Flex;
             if (wave && (popup != null || modal != null || buildDef != null || shortageOverlay != null)) { CloseAll(); }
 
             UpdatePopupPosition();
             RefreshBuilderStatus();
             RefreshObstacleStatus();
+            UpdateWorldZoomInput();
             UpdateMapInput();
         }
 
@@ -439,7 +415,7 @@ namespace Frontier
                 else CloseModal();
                 return true;
             }
-            if (mapOpen) { CloseMap(); return true; }
+            if (mapOpen) { ReturnFromMap(); return true; }
             if (buildDef != null) { ExitBuild(); return true; }
             return false;
         }

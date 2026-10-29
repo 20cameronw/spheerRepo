@@ -26,7 +26,7 @@ namespace Frontier.EditorTools
             "tesla_coil", "repair_bay", "terraformer", "warp_gate", "dyson_collector"
         };
 
-        const int Base = 0, Armor = 1, Accent = 2, Machinery = 3, Metal = 4, Glass = 5, Emissive = 6;
+        const int Base = 0, Armor = 1, Accent = 2, Machinery = 3, Metal = 4, Glass = 5, Emissive = 6, Wood = 7;
 
         sealed class Geometry
         {
@@ -253,6 +253,7 @@ namespace Frontier.EditorTools
                 SaveGlass(),
                 SaveEmissive()
             };
+            var wood = SaveMaterial("Structure_Wood", new Color32(125, 73, 35, 255), 0f);
 
             ModelLibrary library = AssetDatabase.LoadAssetAtPath<ModelLibrary>(LibraryPath);
             if (library == null) throw new InvalidOperationException("ModelLibrary asset is missing: " + LibraryPath);
@@ -278,7 +279,9 @@ namespace Frontier.EditorTools
                 {
                     root.AddComponent<MeshFilter>().sharedMesh = mesh;
                     var renderer = root.AddComponent<MeshRenderer>();
-                    renderer.sharedMaterials = materials;
+                    var roles = new List<Material>(materials);
+                    if (id == "lumber") roles.Add(wood);
+                    renderer.sharedMaterials = roles.ToArray();
                     renderer.shadowCastingMode = ShadowCastingMode.On;
                     renderer.receiveShadows = true;
                     PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
@@ -297,7 +300,7 @@ namespace Frontier.EditorTools
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("Frontier: built " + Ids.Length + " structure models, " + totalVertices +
-                " vertices, " + totalTriangles + " triangles; 7 shared material roles.");
+                " vertices, " + totalTriangles + " triangles; shared material roles include lumber wood.");
         }
 
         public static void UpsertLibraryEntries(List<ModelLibrary.Entry> entries)
@@ -375,7 +378,7 @@ namespace Frontier.EditorTools
 
         static Geometry[] CreateGeometry(string id)
         {
-            var g = new Geometry[7];
+            var g = new Geometry[id == "lumber" ? 8 : 7];
             for (int i = 0; i < g.Length; i++) g[i] = new Geometry();
             switch (id)
             {
@@ -535,14 +538,14 @@ namespace Frontier.EditorTools
             Box(g, Armor, new Vector3(0f, 0.70f, 0.12f), new Vector3(0.74f, 0.10f, 0.27f), Quaternion.Euler(0f, 0f, -7f));
             Box(g, Accent, new Vector3(0f, 0.755f, 0.12f), new Vector3(0.68f, 0.035f, 0.24f), Quaternion.Euler(0f, 0f, -7f));
             for (int i = 0; i < 4; i++)
-                Cylinder(g, Metal, new Vector3(-0.31f, 0.19f + i * 0.07f, -0.22f),
+                Cylinder(g, Wood, new Vector3(-0.31f, 0.19f + i * 0.07f, -0.22f),
                     new Vector3(0.29f, 0.19f + i * 0.07f, -0.22f), 0.06f, 8);
             Cylinder(g, Machinery, new Vector3(-0.34f, 0.20f, 0.12f), new Vector3(-0.34f, 0.50f, 0.12f), 0.13f, 12);
             g[Metal].Ring(new Vector3(-0.34f, 0.50f, 0.12f), 0.15f, 0.025f, 16, 5);
             for (int i = 0; i < 5; i++)
                 Beam(g, Metal, new Vector3(-0.34f, 0.50f, 0.12f), new Vector3(-0.34f + (i - 2) * 0.12f, 0.50f + (i % 2) * 0.04f, 0.12f), 0.018f);
             for (int i = 0; i < 3; i++)
-                Cylinder(g, Metal, new Vector3(-0.30f + i * 0.20f, 0.25f, -0.20f),
+                Cylinder(g, Wood, new Vector3(-0.30f + i * 0.20f, 0.25f, -0.20f),
                     new Vector3(0.08f + i * 0.20f, 0.25f, -0.20f), 0.055f, 8);
             Box(g, Machinery, new Vector3(0.29f, 0.22f, 0.24f), new Vector3(0.24f, 0.18f, 0.22f));
             Box(g, Armor, new Vector3(0.29f, 0.34f, 0.24f), new Vector3(0.27f, 0.05f, 0.24f));

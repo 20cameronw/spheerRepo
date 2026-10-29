@@ -1001,8 +1001,8 @@ MonoBehaviour:
   - key: tutorial.build.title
     text: 1. Build
   - key: tutorial.build.body
-    text: Place buildings from Build; tap them to use or upgrade. The hammer below
-      the camera opens jobs and crews. Timers continue while you are away.
+    text: Place buildings from Build; tap them to use or upgrade. The hard-hat button
+      opens jobs and crews. Timers continue while you are away.
   - key: tutorial.storage.title
     text: 3. Store
   - key: tutorial.storage.body
@@ -1960,7 +1960,9 @@ MonoBehaviour:
   - key: map.filter.all
     text: All deposits
   - key: map.help
-    text: Tap a planet to choose it. Drag or pinch to explore.
+    text: Pinch to move between the surface and orbit. Keep zooming out to enter
+      the map. Controls opens search, routes and travel. Drag or pinch to explore
+      known space.
   - key: map.mode.universe
     text: Universe Map
   - key: map.mode.orbits
@@ -1991,6 +1993,18 @@ MonoBehaviour:
     text: "{0} \xB7 zoom in for more"
   - key: map.here
     text: YOU ARE HERE
+  - key: map.controls
+    text: Controls
+  - key: map.hide-controls
+    text: Hide map controls
+  - key: map.return-world
+    text: Return to {0}
+  - key: map.location.planet
+    text: '{0} / {1}'
+  - key: map.location.system
+    text: '{0} / Nearby systems'
+  - key: map.location.sector
+    text: '{0} / Sector {1}, {2}'
   - key: map.tier
     text: TIER {0}
   - key: map.world.subtitle

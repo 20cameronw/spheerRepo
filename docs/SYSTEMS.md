@@ -10,7 +10,7 @@ upgrade; surface salvage is explicitly unclaimed and not aboard. Tools contains 
 ship fuel reserves and tank upgrades, engine efficiency, jump/scanner range and hull protection with their upgrades.
 Research contains Tech (available work first, completed nodes in a foldout) and Improvements (global defense and logistics).
 Map exposes the planetary network from every selected world. Build retains local structures;
-the single hammer below the camera opens Construction Jobs and crews. Tapping a Research Lab opens
+the single hard-hat button at top left opens Construction Jobs and crews. Tapping a Research Lab opens
 working Tech, Tools and Lab-upgrade tabs inside its popup; the dock destinations remain available.
 Research and tools retain compact XP counts without repeated XP paragraphs or full-row wave shortcuts.
 How to Play owns era requirements and the next-step action; Stats contains the score and actual records.

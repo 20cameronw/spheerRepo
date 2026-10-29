@@ -167,7 +167,6 @@ namespace Frontier
                 firstSessionGuideVisibilityKnown = true;
                 firstSessionGuideVisible = visible;
                 firstSessionGuideCard.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
-                surfaceViewButton?.SetEnabled(!visible);
                 constructionButton?.SetEnabled(!visible);
                 if (visible) firstSessionGuideCard.BringToFront();
                 RefreshProjectResume();

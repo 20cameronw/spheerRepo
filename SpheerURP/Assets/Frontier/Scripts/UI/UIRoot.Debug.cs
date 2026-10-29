@@ -11,6 +11,15 @@ namespace Frontier
         public VisualElement DebugRoot { get { return root; } }
         public float DebugPanelScale { get { return panelSettings != null ? panelSettings.scale : 1f; } }
         public bool DebugBusy { get { return busy; } }
+        public void DebugWorldZoom(float delta) { ApplyWorldZoom(delta); }
+        public bool DebugMapMinimal { get { return mapOpen && mapMinimal; } }
+        public bool DebugMapOpen { get { return mapOpen; } }
+        public void DebugMapZoomStep(bool inward) { StepMapZoom(inward); }
+        public void DebugMinimalMap(float zoom = SystemZoom)
+        {
+            DebugMap(gs.planet, zoom);
+            SetMapMinimal(true);
+        }
         public Minigame DebugActiveGather { get { return activeGatherMinigame; } }
         public void DebugSetServices(Frontier.Services.FrontierServices serviceSet) { services = serviceSet; }
 

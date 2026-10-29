@@ -4,6 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace Frontier.EditorTools
@@ -15,6 +16,14 @@ namespace Frontier.EditorTools
 
         [MenuItem("Frontier/Models/Bake Structure Thumbnails")]
         public static void Bake()
+        {
+            bool asyncCompilation = ShaderUtil.allowAsyncCompilation;
+            ShaderUtil.allowAsyncCompilation = false;
+            try { BakeAll(); }
+            finally { ShaderUtil.allowAsyncCompilation = asyncCompilation; }
+        }
+
+        static void BakeAll()
         {
             Directory.CreateDirectory(Folder);
             foreach (var definition in GameDatabase.Load().structures)
@@ -80,19 +89,26 @@ namespace Frontier.EditorTools
 
                 AddLight(scene, new Vector3(35f, -35f, 0f), 1.8f);
                 AddLight(scene, new Vector3(25f, 140f, 0f), 0.9f);
+                // The first batch-mode camera render initializes the SRP and its material buffers.
                 camera.Render();
+                RenderPipeline.SubmitRenderRequest(camera, new RenderPipeline.StandardRequest { destination = target });
                 RenderTexture.active = target;
                 pixels.ReadPixels(new Rect(0, 0, Resolution, Resolution), 0, 0);
                 pixels.Apply();
+                bool visible = false;
+                foreach (var pixel in pixels.GetPixels32())
+                    if (pixel.a > 32) { visible = true; break; }
+                if (!visible) throw new InvalidOperationException("Empty structure thumbnail: " + prefab.name);
                 File.WriteAllBytes(path, pixels.EncodeToPNG());
+                camera.targetTexture = null;
             }
             finally
             {
                 RenderTexture.active = previous;
                 UnityEngine.Object.DestroyImmediate(pixels);
+                EditorSceneManager.ClosePreviewScene(scene);
                 target.Release();
                 UnityEngine.Object.DestroyImmediate(target);
-                EditorSceneManager.ClosePreviewScene(scene);
             }
         }
 

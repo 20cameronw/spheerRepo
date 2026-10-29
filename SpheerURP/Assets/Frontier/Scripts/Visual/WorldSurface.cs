@@ -63,7 +63,7 @@ namespace Frontier
         }
 
         // drag state
-        bool down, dragging, blocked;
+        bool down, dragging, blocked, suppressTouchRelease;
         Vector2 downPos, lastPos;
         float lastTime;
 
@@ -409,10 +409,13 @@ namespace Frontier
                     var src = source[i];
                     Color tint = src != null && src.HasProperty("_BaseColor") ? src.GetColor("_BaseColor")
                         : src != null && src.HasProperty("_Color") ? src.GetColor("_Color") : Color.gray;
+                    if (src != null && src.name == "Structure_Accent")
+                        tint = StructureAppearance.AccentForLevel(item.level);
                     bool preserveSurface = src != null &&
                         (src.renderQueue >= (int)UnityEngine.Rendering.RenderQueue.Transparent ||
                          src.IsKeywordEnabled("_EMISSION"));
                     var material = preserveSurface ? new Material(src) : Lit(Fx.Displayable(tint));
+                    if (src != null) material.name = src.name;
                     if (!preserveSurface && src != null && src.HasProperty("_BaseMap"))
                         material.SetTexture("_BaseMap", src.GetTexture("_BaseMap"));
                     material.SetFloat("_Smoothness", 0.25f);
@@ -802,6 +805,18 @@ namespace Frontier
         // ------------------------------------------------------------ input
         void HandleInput()
         {
+            if (Input.touchCount >= 2)
+            {
+                if (dragging) view.EndDrag();
+                down = false; dragging = false; blocked = true;
+                suppressTouchRelease = true;
+                return;
+            }
+            if (suppressTouchRelease)
+            {
+                if (Input.touchCount == 0 && !Input.GetMouseButton(0)) suppressTouchRelease = false;
+                return;
+            }
             if (Locked) { down = false; return; }
             Vector2 pos = Input.mousePosition;
             if (Input.GetMouseButtonDown(0))

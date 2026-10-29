@@ -9135,6 +9135,30 @@ MonoBehaviour:
     m_Key: gate.upgrade.legacy-tool
     m_Metadata:
       m_Items: []
+  - m_Id: 5105920542597120
+    m_Key: map.controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345856
+    m_Key: map.hide-controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345857
+    m_Key: map.return-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345858
+    m_Key: map.location.planet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345859
+    m_Key: map.location.system
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345860
+    m_Key: map.location.sector
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
