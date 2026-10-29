@@ -273,6 +273,16 @@ namespace Frontier
             PlanetData obstacleShowcase = null;
             int obstacleShowcasePad = -1;
             PlacedStructure At(StructureKind k) { return gs.StructureOfKind(gs.planet, k); }
+            void ShowMapFooter()
+            {
+                ui.DebugMap(null);
+                ui.DebugRoot.schedule.Execute(() =>
+                {
+                    var network = ui.DebugRoot.Q<Button>("map-open-network");
+                    if (network == null) throw new InvalidOperationException("Map network footer is missing.");
+                    network.GetFirstAncestorOfType<ScrollView>().ScrollTo(network);
+                }).StartingIn(200);
+            }
             void DrillShot(bool result)
             {
                 var world = gs.universe.FindGenerated(d =>
@@ -356,18 +366,6 @@ namespace Frontier
                 GoTo(harvestAccessWorld); ResetView(); rt.Planet.CloseView = true;
             }, 0.8f);
             yield return new Shot("harvest-access-build", () => { GoTo(harvestAccessWorld); ResetView(); ui.DebugShop(1); });
-            yield return new Shot("harvest-access-list", () => { GoTo(harvestAccessWorld); ResetView(); ui.DebugHarvestList(); });
-            yield return new Shot("harvest-access-missing", () =>
-            {
-                var world = gs.universe.FindGenerated(d =>
-                {
-                    foreach (var deposit in d.Deposits)
-                        if (deposit.Method == Frontier.Universe.HarvestMethod.Drill) return true;
-                    return false;
-                }, 2, 0, 10000);
-                if (world == null) throw new InvalidOperationException("No harvesting discovery fixture.");
-                GoTo(world); ResetView(); ui.DebugHarvestList();
-            });
             yield return new Shot("harvest-access-structure", () =>
             {
                 GoTo(harvestAccessWorld); ResetView(); ui.DebugTapStructure(At(StructureKind.Lumber));
@@ -379,7 +377,7 @@ namespace Frontier
                 if (mine == null) throw new InvalidOperationException("No Mine for pending harvesting fixture.");
                 harvestAccessPending = mine;
                 gs.DebugSetBuilderJob(mine, 600, mine.level + 1);
-                ui.DebugHarvestList();
+                ui.DebugTapStructure(mine);
             });
             if (harvestAccessPending != null) gs.DebugSetBuilderJob(harvestAccessPending, 0);
             yield return new Shot("construction-jobs", ui.DebugBuilders);
@@ -544,6 +542,7 @@ namespace Frontier
             }
             yield return new Shot("map", () => ui.DebugMap(null), 0.8f);
             yield return new Shot("orbital-chart-home", () => ui.DebugMap(null), 0.8f);
+            yield return new Shot("map-network-locked", ShowMapFooter, 0.8f);
             yield return new Shot("orbital-chart-selected", () => ui.DebugMap(gs.universe.Get("glacia")), 0.8f);
             yield return new Shot("orbital-chart-sector", () => ui.DebugMap(null, 2f), 0.8f);
             yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 1f), 0.8f);
@@ -592,6 +591,7 @@ namespace Frontier
                 yield return new Shot("network-tanks", () => { PrepareNetworkFixture(); ui.DebugFuelTanks(); });
                 yield return new Shot("network-project", () => { PrepareNetworkFixture(); ui.DebugNetwork(); });
                 yield return new Shot("network-links", () => { PrepareNetworkFixture(); ui.DebugMap(gs.universe.Get("glacia"), 12); }, 0.8f);
+                yield return new Shot("network-map-footer", () => { PrepareNetworkFixture(); ShowMapFooter(); }, 0.8f);
                 yield return new Shot("network-finale", () => { PrepareNetworkFixture(true); ui.DebugNetworkFinale(); }, 14.2f);
             }
             finally

@@ -20,8 +20,12 @@ MonoBehaviour:
     text: DISMISS SUMMARY
   - key: project.connect
     text: CONNECT LOCAL STORAGE
+  - key: common.close
+    text: Close
   - key: project.hull
     text: IMPROVE HULL PROTECTION
+  - key: project.landing-blocked
+    text: Hull protection is required to land here.
   - key: project.travel-cost
     text: 'Trip quote: {0} gal. Review the route on the map before departure.'
   - key: reward.confirm-discard
@@ -106,8 +110,7 @@ MonoBehaviour:
   - key: project.shortfall
     text: 'Need {0} {1}. Usable here: {2}. Still missing: {3}.'
   - key: project.stock-ready
-    text: You already have enough in cargo and connected local storage. Return to
-      your project.
+    text: You have enough in cargo and connected local storage.
   - key: project.stored
     text: '{0} {1} stored on {2}, not aboard.'
   - key: project.withdraw
@@ -170,6 +173,8 @@ MonoBehaviour:
     text: Build a Warp Gate on each visited world, then permanently link them. Connected
       worlds cost no fuel and have no flight mini-game. Hull protection still applies.
       Solid green map lines show your links.
+  - key: network.map.lock
+    text: Complete a Warp Gate on this world to use the planet network.
   - key: network.lock.busy
     text: Finish the current journey or resolve the read-only save before changing
       the network.
@@ -293,7 +298,7 @@ MonoBehaviour:
   - key: world.view.orbit
     text: ORBIT VIEW
   - key: world.view.help
-    text: Rotate to tap buildings or debris. Use Build > Harvest for resources.
+    text: Rotate to tap buildings or debris.
   - key: world.site.tool
     text: Ready with {0}
   - key: world.site.gather
@@ -911,12 +916,11 @@ MonoBehaviour:
   - key: shop.utility
     text: UTILITY
   - key: shop.summary
-    text: "Build on {0}  -  {1} / {2} free slots  \xB7  CREWS {3}/{4} busy. Tap a
-      structure on the planet to use it."
+    text: "{0} \xB7 {1}/{2} free slots \xB7 crews {3}/{4} busy"
   - key: shop.empty
     text: Nothing here yet.
   - key: shop.built
-    text: BUILT - tap it on the planet
+    text: BUILT
   - key: shop.no-harvest
     text: Nothing to harvest on this planet
   - key: shop.place
@@ -925,7 +929,8 @@ MonoBehaviour:
     text: 1. Build
   - key: tutorial.build.body
     text: Open Build on the bottom dock and place a Lumber Camp, then a Refinery
-      and a Warehouse.
+      and a Warehouse. Tap a building to use or upgrade it. Its build icon opens
+      construction jobs and crew recruitment. Jobs continue while you are away.
   - key: tutorial.storage.title
     text: 2. Storage
   - key: tutorial.storage.body
@@ -934,7 +939,9 @@ MonoBehaviour:
   - key: tutorial.gather.title
     text: 3. Gather
   - key: tutorial.gather.body
-    text: Tap a harvester, then HARVEST a resource. You can also use Build > Harvest.
+    text: Tap a Lumber Camp, Mining Rig or another harvester, then HARVEST a resource.
+      Collect the result to bring it aboard. The Mining Rig also gathers surface
+      scrap.
   - key: tutorial.refine.title
     text: 4. Refine
   - key: tutorial.refine.body
@@ -949,6 +956,14 @@ MonoBehaviour:
   - key: tutorial.travel.body
     text: Open Map on the bottom dock and spend fuel to visit new planets. Your bases
       stay where you built them.
+  - key: tutorial.map.title
+    text: Reading the map
+  - key: tutorial.map.body
+    text: Tap a world to see its resources, landing hazards and travel cost. Drag
+      or pinch to explore. Move within scanner range to reveal deposits. Pin location
+      keeps a world in your saved list. Manual flight rewards good piloting; Autopilot
+      skips the flight at a higher fuel cost with no refund. Ship > Systems has range,
+      scanner and hull upgrades.
   - key: tutorial.upgrade.title
     text: 7. Upgrade
   - key: tutorial.upgrade.body
@@ -1066,8 +1081,8 @@ MonoBehaviour:
     text: Prepare for your first departure. A Lumber Camp supplies wood for your
       first base.
   - key: guide.gather.help
-    text: Tap your Lumber Camp, then HARVEST wood. Build > Harvest also lists this
-      world's resources.
+    text: Tap your Lumber Camp, then HARVEST wood. Better timing brings back more
+      cargo.
   - key: guide.store.help
     text: Store extra cargo in a Warehouse on this world to make room for your next
       haul.
@@ -1857,7 +1872,7 @@ MonoBehaviour:
   - key: map.view.galaxy
     text: "Galaxy \xB7 zoom in for stars"
   - key: map.view.system
-    text: "System \xB7 orbits schematic"
+    text: System
   - key: map.view.sector
     text: "Sector \xB7 {0} stars"
   - key: map.view.truncated
@@ -1909,7 +1924,7 @@ MonoBehaviour:
   - key: map.hazards.disabled
     text: Landing protection is disabled in development settings
   - key: map.resources
-    text: "RESOURCES \xB7 HOW TO HARVEST"
+    text: RESOURCES
   - key: map.unsurveyed
     text: UNSURVEYED
   - key: map.survey.help

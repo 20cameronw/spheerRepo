@@ -19,7 +19,7 @@ namespace Frontier
         {
             if (mapQuery != null && mapQuery.IsCompleted)
             {
-                if (mapQuery.IsFaulted) { Debug.LogException(mapQuery.Exception); mapNotice.text = UiText.Get("map.unavailable"); }
+                if (mapQuery.IsFaulted) { Debug.LogException(mapQuery.Exception); SetMapNotice(UiText.Get("map.unavailable")); }
                 else if (queryVersion == mapVersion)
                 {
                     mapSnapshot = mapQuery.Result;

@@ -164,7 +164,7 @@ namespace Frontier
             if (mapCard != null) mapCard.style.marginBottom = UiKit.Space.S16 + inset.w;
             if (mapWorld != null)
             {
-                mapWorld.style.top = 390 + inset.y;
+                mapWorld.style.top = (mapNotice != null && !string.IsNullOrEmpty(mapNotice.text) ? 390 : 336) + inset.y;
                 float cardHeight = mapCard != null ? mapCard.layout.height : 0;
                 mapWorld.style.bottom = (float.IsNaN(cardHeight) ? 0 : cardHeight) + 32 + inset.w;
             }
@@ -602,23 +602,30 @@ namespace Frontier
             mapReadout = UiKit.Text("", "fr-tiny", UiKit.Muted);
             mapReadout.style.position = Position.Absolute; mapReadout.style.left = 296 + inset.x; mapReadout.style.right = 16 + inset.z; mapReadout.style.top = 266 + inset.y;
             mapView.Add(mapReadout);
-            mapNotice = UiKit.Text(UiText.Get("map.help"), "fr-tiny", UiKit.Muted);
+            mapNotice = UiKit.Text("", "fr-tiny", UiKit.Muted);
             mapNotice.style.position = Position.Absolute; mapNotice.style.left = 16 + inset.x;
             mapNotice.style.top = 336 + inset.y; mapNotice.style.right = 16 + inset.z;
             mapView.Add(mapNotice);
         }
 
+        void SetMapNotice(string message)
+        {
+            mapNotice.text = message;
+            LayoutMapChrome();
+        }
+
         void SearchMap()
         {
             string text = mapSearch.value.Trim();
-            if (text.Length == 0) { mapNotice.text = UiText.Get("map.search.empty"); return; }
+            SetMapNotice("");
+            if (text.Length == 0) { SetMapNotice(UiText.Get("map.search.empty")); return; }
             string[] xy = text.Split(',');
             double x, y;
             if (xy.Length == 2 && double.TryParse(xy[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) && double.TryParse(xy[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y)
                 && !double.IsNaN(x) && !double.IsNaN(y) && Math.Abs(x) <= 1e7 && Math.Abs(y) <= 1e7)
             {
                 mapZoom = 2f;
-                viewport.Center(x, y); ApplyMapTransform(); mapNotice.text = UiText.Get("map.search.coordinates"); return;
+                viewport.Center(x, y); ApplyMapTransform(); SetMapNotice(UiText.Get("map.search.coordinates")); return;
             }
             var byPlanetId = gs.universe.Get(text);
             if (byPlanetId != null) { SelectMapWorld(byPlanetId); CenterOn(byPlanetId); return; }
@@ -647,7 +654,7 @@ namespace Frontier
                 var knownWorld = gs.universe.Get(knownPlanetId);
                 if (knownWorld != null) { SelectMapWorld(knownWorld); CenterOn(knownWorld); return; }
             }
-            mapNotice.text = UiText.Get("map.search.not-found");
+            SetMapNotice(UiText.Get("map.search.not-found"));
         }
     }
 }

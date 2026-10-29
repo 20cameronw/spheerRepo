@@ -206,7 +206,8 @@ The broader `AuthoredTablePreservesShellCopyAndFormatting` test has a pre-existi
 That unrelated assertion is left unchanged. The standalone .NET runner was unavailable on this host; the same linked
 mechanics ran successfully under Unity Mono.
 
-Harvest access follow-up: **58 EditMode** source/progression/localization checks and **10 PlayMode** routing checks passed.
+Initial harvest access follow-up (the Build-list entry was superseded by the simplification below):
+**58 EditMode** source/progression/localization checks and **10 PlayMode** routing checks passed.
 Build > Harvest is exercised through real buttons for missing, ready and upgrading harvesters; both the list's Scrap run
 and a structure's Wood run collect through the normal exactly-once result flow. Surface-scrap yield/difficulty and Mine
 requirements are checked explicitly. Surface tests reject resource models/labels/tap targets and compare saved slot-direction
@@ -214,6 +215,16 @@ prefixes at 12, 18 and 30 slots, including travel to high-pad worlds. Existing s
 world actions and world-label checks remain covered. Sixteen two-phone captures cover Build, ready/missing/pending lists,
 the structure popup and debris/clearance; all had zero setup or UI-lint issues.
 Representative surface, list, popup and debris images were visually inspected; native touch still needs device testing.
+
+UI simplification follow-up: **58 EditMode** and **10 PlayMode** checks passed. The updated cases verify that Build no
+longer exposes jobs/harvest rows; real building taps retain harvesting, Scrap settlement, pending jobs and crew access.
+Map's network footer is disabled without a completed local Warp Gate and enabled once complete; pin controls share one
+header row beneath location status and keep full-sized touch targets. Shortage chips open a smaller icon-action overlay
+over the original panel; Back, close and backdrop dismiss only that overlay, while build/producer icons open their actual
+destinations without granting resources. Exact quantities, explicit tracking and How to Play copy remain covered.
+Twenty confirmation captures across the two phone sizes had zero setup, overflow, sub-12dp text or sub-48dp target issues.
+Representative overlay and Map/header/locked/unlocked footer images were visually inspected. Native touch remains a human
+device check. The initial capture's wrapping pin and persistent Map help were corrected in one batch before confirmation.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "harvest-access,obstacle-surface,obstacle-clearance"

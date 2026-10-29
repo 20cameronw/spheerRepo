@@ -30,9 +30,10 @@ or visit discovery. Manual Atlas/map alternatives remain available.
 Obstacle clearance retains its existing **carried-only** spending rule; its help and availability use
 that rule even with connected storage, offering withdrawal rather than pretending the stock is spendable.
 
-The in-session journey retains the original panel, tab, selection, scroll and recipe batch quantity.
-Previous-step and original-project actions revalidate current state; opening help never spends, crafts,
-travels or accelerates jobs. Dependency depth is bounded, and missing anchors produce recoverable feedback.
+The compact shortage overlay keeps the original panel, tab, selection, scroll and recipe batch underneath it.
+Dismiss it with close, Back or the backdrop; there is no previous-step/return-to history stack.
+Shortage help and explicitly tracked project actions revalidate current state; opening help never spends, crafts,
+travels or accelerates jobs. Source searches reject cycles, and missing anchors produce recoverable feedback.
 Research, lab, station-level, XP, capacity and hull blockers link to their existing destinations.
 
 Players can explicitly track one project from an eligible card. Stable kind/content/world/slot/target/quantity

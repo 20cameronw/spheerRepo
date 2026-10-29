@@ -323,8 +323,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336009
-    m_Localized: "Build on {0}  -  {1} / {2} free slots  \xB7  CREWS {3}/{4} busy.
-      Tap a structure on the planet to use it."
+    m_Localized: "{0} \xB7 {1}/{2} free slots \xB7 crews {3}/{4} busy"
     m_Metadata:
       m_Items: []
   - m_Id: 1991336010
@@ -332,7 +331,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336011
-    m_Localized: BUILT - tap it on the planet
+    m_Localized: BUILT
     m_Metadata:
       m_Items: []
   - m_Id: 1991336012
@@ -349,7 +348,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1991336015
     m_Localized: Open Build on the bottom dock and place a Lumber Camp, then a Refinery
-      and a Warehouse.
+      and a Warehouse. Tap a building to use or upgrade it. Its build icon opens
+      construction jobs and crew recruitment. Jobs continue while you are away.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336016
@@ -366,8 +366,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336019
-    m_Localized: Tap a harvester, then HARVEST a resource. You can also use Build
-      > Harvest.
+    m_Localized: Tap a Lumber Camp, Mining Rig or another harvester, then HARVEST
+      a resource. Collect the result to bring it aboard. The Mining Rig also gathers
+      surface scrap.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336020
@@ -618,8 +619,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336078
-    m_Localized: Tap your Lumber Camp, then HARVEST wood. Build > Harvest also lists
-      this world's resources.
+    m_Localized: Tap your Lumber Camp, then HARVEST wood. Better timing brings back
+      more cargo.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336079
@@ -1969,7 +1970,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336405
-    m_Localized: "System \xB7 orbits schematic"
+    m_Localized: System
     m_Metadata:
       m_Items: []
   - m_Id: 1991336406
@@ -2073,7 +2074,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530243
-    m_Localized: "RESOURCES \xB7 HOW TO HARVEST"
+    m_Localized: RESOURCES
     m_Metadata:
       m_Items: []
   - m_Id: 1995530244
@@ -8379,7 +8380,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205707
-    m_Localized: Rotate to tap buildings or debris. Use Build > Harvest for resources.
+    m_Localized: Rotate to tap buildings or debris.
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205708
@@ -8905,8 +8906,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514385
-    m_Localized: You already have enough in cargo and connected local storage. Return
-      to your project.
+    m_Localized: You have enough in cargo and connected local storage.
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514386
@@ -9206,6 +9206,30 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4763015495901188
     m_Localized: Harvester unavailable. Choose a ready one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4798174022688768
+    m_Localized: Complete a Warp Gate on this world to use the planet network.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4798174068826112
+    m_Localized: Reading the map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4798174068826113
+    m_Localized: Tap a world to see its resources, landing hazards and travel cost.
+      Drag or pinch to explore. Move within scanner range to reveal deposits. Pin
+      location keeps a world in your saved list. Manual flight rewards good piloting;
+      Autopilot skips the flight at a higher fuel cost with no refund. Ship > Systems
+      has range, scanner and hull upgrades.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4800388132855808
+    m_Localized: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4801657140502528
+    m_Localized: Hull protection is required to land here.
     m_Metadata:
       m_Items: []
   references:

@@ -8,21 +8,21 @@ namespace Frontier
 {
     public partial class UIRoot
     {
-        readonly Stack<Action> shortageReturns = new Stack<Action>();
-        Action shortageOrigin;
-        PlayerProject shortageProject;
-        string modalIcon, modalTitle;
-        Color modalAccent;
         VisualElement projectResume;
         bool returnSummaryDismissed;
         string projectContext;
         int observedReturnVersion;
+        VisualElement shortageOverlay, shortageReturnFocus;
+        ScrollView shortageScroll;
+        PlayerProject shortageProject;
+        ResourceSO shortageResource;
+        int shortageRequired;
 
         void ResetProjectContextIfNeeded()
         {
             if (projectContext == gs.RewardRequestContext) return;
             projectContext = gs.RewardRequestContext;
-            shortageOrigin = null; shortageProject = null; shortageReturns.Clear();
+            CloseShortage();
             returnSummaryDismissed = false;
         }
 
@@ -42,22 +42,31 @@ namespace Frontier
         void AddProjectAction(VisualElement body, PlayerProject project)
         {
             BuildProjectGates(body, project);
-            var track = IconBtn(UiText.Get("project.track"), "star", UiKit.Cyan, () =>
+            var heading = body.childCount > 0 ? body.ElementAt(0) : null;
+            bool inline = heading != null && (heading.ClassListContains("fr-row") || heading.ClassListContains("fr-card-head"));
+            var track = ProjectTrackButton(project);
+            if (inline)
+            {
+                track.style.marginLeft = UiKit.Space.S8;
+                heading.Add(track);
+            }
+            else
+            {
+                track.style.alignSelf = Align.FlexEnd;
+                body.Add(track);
+            }
+        }
+
+        Button ProjectTrackButton(PlayerProject project)
+        {
+            var track = Icons.IconButton("star", UiKit.Muted, () =>
             {
                 if (!gs.TrackProject(project, out var error)) Toast(error, UiKit.Amber);
                 else Toast(UiText.Get("project.tracked", gs.ProjectState(project).name), UiKit.Cyan);
             });
             track.name = "track-" + project.kind + "-" + project.id;
-            body.Add(track);
-        }
-
-        void FollowProject(PlayerProject origin, Action action)
-        {
-            if (shortageReturns.Count >= 12) { Toast(UiText.Get("project.depth"), UiKit.Amber); return; }
-            var restore = CaptureProjectLocation(origin);
-            if (shortageOrigin == null) { shortageOrigin = restore; shortageProject = origin; }
-            shortageReturns.Push(restore);
-            action();
+            track.tooltip = UiText.Get("project.track");
+            return track;
         }
 
         void BuildProjectGates(VisualElement body, PlayerProject project)
@@ -83,7 +92,7 @@ namespace Frontier
                 var station = gs.structures.FirstOrDefault(s => s.planetId == project.planetId && s.slot == project.slot);
                 if (station != null && station.level < recipe.stationLevel)
                     body.Add(IconBtn(UiText.Get("project.upgrade-station"), "up", UiKit.Cyan,
-                        () => FollowProject(project, () => OpenProject(Project("structure", station.def.id, station.level + 1, station.slot)))));
+                        () => OpenProject(Project("structure", station.def.id, station.level + 1, station.slot))));
             }
             else if (project.kind == "upgrade")
             {
@@ -101,11 +110,10 @@ namespace Frontier
             }
             if (!string.IsNullOrEmpty(prerequisite) && !gs.IsResearched(prerequisite))
                 body.Add(IconBtn(UiText.Get("project.prerequisite"), "research", UiKit.Cyan,
-                    () => FollowProject(project, () => OpenProject(Project("research", prerequisite)))));
+                    () => OpenProject(Project("research", prerequisite))));
             var localLab = gs.StructureOfKind(gs.planet, StructureKind.ResearchLab);
             if (lab > 0 && (localLab == null || localLab.level < lab))
                 body.Add(IconBtn(UiText.Get("project.lab"), "research_lab", UiKit.Cyan, () =>
-                    FollowProject(project, () =>
                     {
                         if (localLab != null) OpenSourceStructure(localLab);
                         else
@@ -113,178 +121,151 @@ namespace Frontier
                             var definition = gs.db.StructureOfKind(StructureKind.ResearchLab);
                             OpenProject(Project("build", definition.id));
                         }
-                    })));
+                    }));
             if (xp > gs.PlayerLevel)
                 body.Add(IconBtn(UiText.Get("project.xp"), "alarm", UiKit.Cyan,
-                    () => FollowProject(project, () => { CloseAll(); if (!OpenFirstSessionStructure(StructureKind.Alarm)) { shopTab = 0; OpenShop(); } })));
-        }
-
-        Action CaptureProjectLocation(PlayerProject project)
-        {
-            string planetId = gs.planet.Id;
-            if (modal != null)
-            {
-                var build = modalBuild;
-                string key = modalKey, icon = modalIcon, title = modalTitle;
-                Color accent = modalAccent;
-                var offset = modalScroll.scrollOffset;
-                var savedResearch = researchPage; var savedShip = shipPage; int savedShop = shopTab;
-                string savedBranch = researchBranch, savedMenu = menuPage;
-                int savedAtlas = atlasTab, savedPack = packSel;
-                return () =>
-                {
-                    if (gs.planet.Id != planetId) { OpenProject(project); return; }
-                    researchPage = savedResearch; shipPage = savedShip; shopTab = savedShop;
-                    researchBranch = savedBranch; menuPage = savedMenu; atlasTab = savedAtlas; packSel = savedPack;
-                    CloseAll();
-                    OpenModal(key, icon, title, accent, build);
-                    var scroll = modalScroll;
-                    scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
-                };
-            }
-            if (popup != null)
-            {
-                var build = popupBuild; var anchor = popupAnchor; string key = popupKey;
-                Color color = popupColor; bool compact = popupCompact;
-                var offset = popupScroll.scrollOffset;
-                return () =>
-                {
-                    if (gs.planet.Id != planetId || anchor == null || gs.ProjectState(project).name == null)
-                    {
-                        Toast(UiText.Get("project.anchor-missing"), UiKit.Amber);
-                        OpenProject(project);
-                        return;
-                    }
-                    CloseAll();
-                    OpenPopup(key, anchor, color, build, compact);
-                    var scroll = popupScroll;
-                    scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
-                };
-            }
-            if (mapOpen)
-            {
-                var savedWorld = selected;
-                return () =>
-                {
-                    if (gs.planet.Id != planetId) { OpenProject(project); return; }
-                    CloseAll(); OpenMap();
-                    if (savedWorld != null) { SelectMapWorld(savedWorld); CenterOn(savedWorld); }
-                };
-            }
-            return () => OpenProject(project);
-        }
-
-        void BuildJourneyLinks(VisualElement body)
-        {
-            if (shortageOrigin == null) return;
-            var row = UiKit.Div("fr-row-wrap");
-            if (shortageReturns.Count > 0)
-            {
-                var back = IconBtn(UiText.Get("project.previous"), "back", UiKit.Cyan, () =>
-                {
-                    var restore = shortageReturns.Pop();
-                    restore();
-                });
-                back.name = "shortage-previous";
-                row.Add(back);
-            }
-            var original = IconBtn(UiText.Get("project.return", gs.ProjectState(shortageProject).name ??
-                UiText.Get("project.title")), "back", UiKit.Amber, ReturnToProject);
-            original.name = "shortage-return";
-            original.style.maxWidth = Length.Percent(100);
-            original.Q<Label>(className: "fr-btn-label").style.whiteSpace = WhiteSpace.Normal;
-            row.Add(original);
-            body.Add(row);
-        }
-
-        void ReturnToProject()
-        {
-            var restore = shortageOrigin;
-            shortageOrigin = null;
-            shortageReturns.Clear();
-            restore?.Invoke();
+                    () => { CloseAll(); if (!OpenFirstSessionStructure(StructureKind.Alarm)) { shopTab = 0; OpenShop(); } }));
         }
 
         void OpenShortage(PlayerProject project, ResourceSO resource, int required)
         {
             if (busy || defense.Active) return;
-            if (shortageReturns.Count >= 12)
+            CloseShortage();
+            shortageProject = project; shortageResource = resource; shortageRequired = required;
+            shortageReturnFocus = root.panel.focusController.focusedElement as VisualElement;
+            shortageOverlay = UiKit.Div("fr-backdrop fr-scrim");
+            shortageOverlay.name = "shortage-overlay";
+            shortageOverlay.RegisterCallback<PointerDownEvent>(e =>
             {
-                Toast(UiText.Get("project.depth"), UiKit.Amber);
-                return;
-            }
-            var restore = CaptureProjectLocation(project);
-            if (shortageOrigin == null) { shortageOrigin = restore; shortageProject = project; }
-            shortageReturns.Push(restore);
-            CloseAll();
-            OpenModal("shortage-" + resource.id, Icons.ForResource(resource), resource.LocalizedName, UiKit.Cyan, body =>
-            {
-                body.AddToClassList("fr-project-body");
-                int have = gs.ProjectResourceCount(project, resource);
-                body.Add(UiKit.Text(UiText.Get("project.shortfall", required, resource.LocalizedName,
-                    have, Math.Max(0, required - have)), "fr-small"));
-                if (gs.FreeSpace(resource) <= 0)
-                    body.Add(IconBtn(UiText.Get("project.capacity"), "pack", UiKit.Amber,
-                        () => FollowProject(project, () => { CloseAll(); OpenShip(ShipPage.Cargo); })));
-                foreach (var option in gs.ResourceOptions(resource, required, project.kind == "obstacle"))
-                {
-                    var source = option;
-                    if (source.kind == ResourceSourceKind.Usable)
-                    {
-                        body.Add(Note(UiText.Get("project.stock-ready"), UiKit.Lime));
-                        continue;
-                    }
-                    if (source.kind == ResourceSourceKind.LocalStock || source.kind == ResourceSourceKind.RemoteStock)
-                    {
-                        body.Add(UiKit.Text(UiText.Get("project.stored", source.amount, resource.LocalizedName,
-                            source.planet.Name), "fr-small"));
-                        if (source.kind == ResourceSourceKind.RemoteStock)
-                        {
-                            var route = gs.PlanRoute(source.planet);
-                            body.Add(Note(RouteStatus(route), route.reachable ? UiKit.Cyan : UiKit.Amber));
-                            if (route.reachable) body.Add(UiKit.Text(UiText.Get("project.travel-cost",
-                                (long)route.totalFuel * GameState.GallonsPerEnergy), "fr-tiny"));
-                        }
-                        if (source.kind == ResourceSourceKind.LocalStock)
-                        {
-                            body.Add(IconBtn(UiText.Get("project.withdraw"), "warehouse", UiKit.Cyan,
-                                () => OpenSourceStructure(source.structure)));
-                            var depot = gs.db.StructureOfKind(StructureKind.CargoDepot);
-                            if (depot != null && project.kind != "obstacle")
-                                body.Add(IconBtn(UiText.Get("project.connect"), "cargo_depot", UiKit.Cyan,
-                                    () => FollowProject(project, () => OpenProject(Project("build", depot.id)))));
-                        }
-                        else if (source.relay != null)
-                        {
-                            body.Add(UiKit.Text(UiText.Get("project.transfer-cost", source.energy), "fr-tiny"));
-                            body.Add(IconBtn(UiText.Get("project.open-relay"), "satellite", UiKit.Cyan,
-                                () => OpenSourceStructure(source.relay)));
-                        }
-                        body.Add(IconBtn(UiText.Get("project.view-world"), "map", UiKit.Cyan, () =>
-                        {
-                            CloseAll(); OpenMap(); SelectMapWorld(source.planet); CenterOn(source.planet);
-                        }));
-                    }
-                    else
-                    {
-                        if (source.kind == ResourceSourceKind.Planet)
-                        {
-                            body.Add(Note(RouteStatus(gs.PlanRoute(source.planet)), UiKit.Cyan));
-                            if (gs.PlanRoute(source.planet).Has(RouteReasons.Hazard))
-                                body.Add(IconBtn(UiText.Get("project.hull"), "shield", UiKit.Amber,
-                                    () => FollowProject(project, () => { CloseAll(); OpenShip(ShipPage.Systems); })));
-                        }
-                        string label = source.kind == ResourceSourceKind.Structure ? "project.produce" :
-                            source.kind == ResourceSourceKind.Build ? "project.build-producer" :
-                            source.kind == ResourceSourceKind.Planet ? "project.find-world" : "project.manual";
-                        body.Add(IconBtn(UiText.Get(label), source.kind == ResourceSourceKind.Planet ? "map" : "play",
-                            UiKit.Lime, () => OpenResourceSource(resource)));
-                        if (source.reason != null) body.Add(Note(source.reason, UiKit.Amber));
-                    }
-                }
-                body.Add(IconBtn(UiText.Get("project.manual"), "map", UiKit.Muted, () => OpenAtlasResource(resource)));
-                AddProjectAction(body, shortageProject);
+                if (e.target == shortageOverlay) { CloseShortage(); e.StopPropagation(); }
             });
+            var panel = new FrontierModal();
+            panel.AddToClassList("fr-shortage");
+            UiKit.SetAccent(panel, UiKit.Cyan);
+            var heading = UiKit.Div("fr-modal-head");
+            heading.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color)));
+            heading.Add(UiKit.Text(resource.LocalizedName, "fr-modal-title"));
+            var track = ProjectTrackButton(project);
+            track.name = "shortage-track";
+            heading.Add(track);
+            var close = Icons.IconButton("close", UiKit.Muted, CloseShortage);
+            close.name = "shortage-close";
+            close.tooltip = UiText.Get("common.close");
+            heading.Add(close);
+            panel.Add(heading);
+            shortageScroll = UiKit.VerticalScroll("fr-modal-scroll");
+            shortageScroll.contentContainer.AddToClassList("fr-project-body");
+            panel.Add(shortageScroll);
+            shortageOverlay.Add(panel);
+            overlayLayer.Add(shortageOverlay);
+            RefreshShortage();
+            close.Focus();
+        }
+
+        void CloseShortage()
+        {
+            shortageOverlay?.RemoveFromHierarchy();
+            shortageOverlay = null; shortageScroll = null;
+            shortageProject = null; shortageResource = null;
+            if (shortageReturnFocus != null && shortageReturnFocus.panel != null) shortageReturnFocus.Focus();
+            shortageReturnFocus = null;
+        }
+
+        void ShortageAction(VisualElement row, string labelKey, string icon, Color accent, Action action)
+        {
+            var button = Icons.IconButton(icon, accent, () => { CloseShortage(); action(); });
+            button.name = "shortage-" + labelKey.Substring("project.".Length);
+            button.tooltip = UiText.Get(labelKey);
+            row.Add(button);
+        }
+
+        void RefreshShortage()
+        {
+            if (shortageScroll == null) return;
+            var body = shortageScroll.contentContainer;
+            var offset = shortageScroll.scrollOffset;
+            body.Clear();
+            var project = shortageProject;
+            var resource = shortageResource;
+            int have = gs.ProjectResourceCount(project, resource);
+            body.Add(UiKit.Text(UiText.Get("project.shortfall", shortageRequired, resource.LocalizedName,
+                have, Math.Max(0, shortageRequired - have)), "fr-small"));
+            foreach (var source in gs.ResourceOptions(resource, shortageRequired, project.kind == "obstacle"))
+            {
+                var section = UiKit.Div("fr-shortage-source");
+                body.Add(section);
+                if (source.kind == ResourceSourceKind.Usable)
+                {
+                    section.Add(Note(UiText.Get("project.stock-ready"), UiKit.Lime));
+                    continue;
+                }
+                var actions = UiKit.Div("fr-shortage-actions");
+                if (source.kind == ResourceSourceKind.LocalStock || source.kind == ResourceSourceKind.RemoteStock)
+                {
+                    section.Add(UiKit.Text(UiText.Get("project.stored", source.amount, resource.LocalizedName,
+                        source.planet.Name), "fr-small"));
+                    if (source.kind == ResourceSourceKind.RemoteStock)
+                    {
+                        var route = gs.PlanRoute(source.planet);
+                        section.Add(Note(route.Has(RouteReasons.Hazard) ? UiText.Get("project.landing-blocked") :
+                            RouteStatus(route), route.reachable ? UiKit.Cyan : UiKit.Amber));
+                        if (route.reachable) section.Add(UiKit.Text(UiText.Get("project.travel-cost",
+                            (long)route.totalFuel * GameState.GallonsPerEnergy), "fr-tiny"));
+                    }
+                    if (source.kind == ResourceSourceKind.LocalStock)
+                    {
+                        ShortageAction(actions, "project.withdraw", "warehouse", UiKit.Cyan,
+                            () => OpenSourceStructure(source.structure));
+                        var depot = gs.db.StructureOfKind(StructureKind.CargoDepot);
+                        if (depot != null && project.kind != "obstacle")
+                            ShortageAction(actions, "project.connect", "cargo_depot", UiKit.Cyan,
+                                () => OpenProject(Project("build", depot.id)));
+                    }
+                    else if (source.relay != null)
+                    {
+                        section.Add(UiKit.Text(UiText.Get("project.transfer-cost", source.energy), "fr-tiny"));
+                        ShortageAction(actions, "project.open-relay", "satellite", UiKit.Cyan,
+                            () => OpenSourceStructure(source.relay));
+                    }
+                    ShortageAction(actions, "project.view-world", "map", UiKit.Cyan, () =>
+                    {
+                        CloseAll(); OpenMap(); SelectMapWorld(source.planet); CenterOn(source.planet);
+                    });
+                }
+                else
+                {
+                    if (source.kind == ResourceSourceKind.Planet)
+                    {
+                        var route = gs.PlanRoute(source.planet);
+                        section.Add(Note(route.Has(RouteReasons.Hazard) ? UiText.Get("project.landing-blocked") :
+                            RouteStatus(route), route.reachable ? UiKit.Cyan : UiKit.Amber));
+                        if (route.Has(RouteReasons.Hazard))
+                            ShortageAction(actions, "project.hull", "shield", UiKit.Amber,
+                                () => { CloseAll(); OpenShip(ShipPage.Systems); });
+                    }
+                    var definition = source.structure != null ? source.structure.def : source.build;
+                    if (definition != null) section.Add(UiKit.Text(definition.LocalizedName, "fr-small"));
+                    string label = source.kind == ResourceSourceKind.Structure ? "project.produce" :
+                        source.kind == ResourceSourceKind.Build ? "project.build-producer" : "project.find-world";
+                    string icon = source.kind == ResourceSourceKind.Build ? "build" :
+                        definition != null ? StructureIcon(definition.kind) : "map";
+                    if (source.kind != ResourceSourceKind.Unavailable)
+                        ShortageAction(actions, label, icon, UiKit.Lime, () => OpenResourceSource(resource));
+                    if (source.reason != null) section.Add(Note(source.reason, UiKit.Amber));
+                }
+                section.Add(actions);
+            }
+            var common = UiKit.Div("fr-shortage-actions");
+            if (gs.FreeSpace(resource) <= 0)
+            {
+                body.Add(Note(UiText.Get("project.capacity"), UiKit.Amber));
+                ShortageAction(common, "project.capacity", "pack", UiKit.Amber,
+                    () => { CloseAll(); OpenShip(ShipPage.Cargo); });
+            }
+            ShortageAction(common, "project.manual", "tutorial", UiKit.Muted, () => OpenAtlasResource(resource));
+            body.Add(common);
+            var scroll = shortageScroll;
+            scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
         }
 
         void OpenSourceStructure(PlacedStructure structure)
@@ -294,8 +275,7 @@ namespace Frontier
             {
                 Debug.LogWarning("Frontier: project source anchor unavailable: " + structure.def.id);
                 Toast(UiText.Get("project.anchor-missing"), UiKit.Amber);
-                if (shortageProject != null) OpenProject(shortageProject);
-                else OpenHarvestList();
+                OpenGatherShop();
             }
         }
 
@@ -426,10 +406,7 @@ namespace Frontier
 
         void BuildProjectResume()
         {
-            projectResume = IconBtn(UiText.Get("project.resume"), "star", UiKit.Cyan, () =>
-            {
-                if (shortageOrigin != null) ReturnToProject(); else OpenProjectPanel();
-            });
+            projectResume = IconBtn(UiText.Get("project.resume"), "star", UiKit.Cyan, OpenProjectPanel);
             projectResume.name = "project-resume";
             projectResume.style.position = Position.Absolute;
             projectResume.style.bottom = DockInset;
@@ -445,11 +422,11 @@ namespace Frontier
                 observedReturnVersion = gs.ReturnSummaryVersion;
                 returnSummaryDismissed = false;
             }
-            bool useful = shortageOrigin != null || gs.HasTrackedProject || !returnSummaryDismissed && gs.ReturnItems.Count > 0;
+            bool useful = gs.HasTrackedProject || !returnSummaryDismissed && gs.ReturnItems.Count > 0;
             var reward = gs.GameplayReward;
             useful |= reward != null && reward.state != "settled" && reward.state != "cancelled";
             projectResume.style.display = useful && !busy && !defense.Active && modal == null && popup == null &&
-                !mapOpen && buildDef == null ? DisplayStyle.Flex : DisplayStyle.None;
+                !mapOpen && buildDef == null && shortageOverlay == null ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }

@@ -266,6 +266,12 @@
     -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-Bold-SDF.asset");
 }
 .fr-modal-scroll { flex-shrink: 1; flex-grow: 0; min-height: 0; min-width: 0; }
+.fr-shortage { width: 660px; max-width: 90%; max-height: 65%; }
+.fr-shortage .fr-modal-title { min-width: 0; flex-shrink: 1; white-space: normal; letter-spacing: 0; }
+.fr-shortage .fr-modal-head .fr-iconbtn { margin-left: var(--fr-sp-8); }
+.fr-shortage-source { margin-top: var(--fr-sp-12); }
+.fr-shortage-actions { flex-direction: row; flex-wrap: wrap; margin-top: var(--fr-sp-8); }
+.fr-shortage-actions .fr-iconbtn { margin-right: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
 
 .fr-tabs { flex-direction: row; margin-bottom: var(--fr-sp-12); flex-shrink: 0; }
 .fr-tab {
@@ -445,6 +451,11 @@
 .fr-map-card Toggle { margin-top: 8px; margin-bottom: 8px; color: var(--fr-text-hi); font-size: var(--fr-fs-caption); flex-shrink: 0; }
 .fr-map-card .unity-toggle__input { min-height: 56px; }
 .fr-map-card .unity-toggle__checkmark { width: 44px; height: 44px; margin-right: 12px; background-color: var(--fr-surface-2); }
+.fr-map-card-actions { align-items: flex-end; flex-shrink: 0; margin-left: var(--fr-sp-12); }
+.fr-map-card-actions Toggle { min-height: var(--fr-touch); margin: 0; flex-direction: row; align-items: center; justify-content: flex-end; }
+.fr-map-card-actions .unity-toggle__label { min-width: 0; margin-right: var(--fr-sp-8); flex-grow: 0; }
+.fr-map-card-actions .unity-toggle__input { width: 56px; flex-grow: 0; }
+.fr-map-card-actions .unity-toggle__checkmark { margin-right: 0; }
 .fr-consent-choice {
     width: 100%; min-height: var(--fr-touch); flex-direction: row; align-items: center;
     margin-top: 4px; margin-bottom: 4px; padding: 0 20px;

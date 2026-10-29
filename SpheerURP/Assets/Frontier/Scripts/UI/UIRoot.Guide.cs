@@ -228,7 +228,7 @@ namespace Frontier
         void RunEmptyPackAction()
         {
             var gatherer = AvailableLocalGatherer();
-            if (gatherer == null) OpenHarvestList();
+            if (gatherer == null) OpenGatherShop();
             else if (!world.SelectStructure(gatherer))
                 Toast(UiText.Get("guide.gatherer-appearing"), UiKit.Amber);
         }

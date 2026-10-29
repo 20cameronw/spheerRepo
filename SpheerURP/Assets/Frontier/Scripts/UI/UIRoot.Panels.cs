@@ -31,7 +31,6 @@ namespace Frontier
             CloseMap();
             ExitBuild();
             modalKey = key; modalBuild = build;
-            modalIcon = icon; modalTitle = title; modalAccent = accent;
             Color c = UiKit.Ui(accent);
 
             var backdropEl = UiKit.Div("fr-backdrop");
@@ -52,7 +51,6 @@ namespace Frontier
             backdropEl.Add(panel);
             modalLayer.Add(backdropEl);
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
-            BuildJourneyLinks(modalScroll.contentContainer);
             build(modalScroll.contentContainer);
         }
 
@@ -79,7 +77,6 @@ namespace Frontier
             var offset = modalScroll.scrollOffset;
             EndInventoryDrag();
             modalScroll.contentContainer.Clear();
-            BuildJourneyLinks(modalScroll.contentContainer);
             modalBuild(modalScroll.contentContainer);
             var scroll = modalScroll;
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
@@ -128,12 +125,6 @@ namespace Frontier
                 gs.planet.BuildingSlots, gs.BusyBuilderCount, gs.BuilderCount), "fr-muted");
             note.style.marginBottom = UiKit.Space.S12;
             body.Add(note);
-            var jobs = IconBtn(UiText.Get("builders.view"), "build", UiKit.Cyan, OpenBuilders);
-            jobs.name = "build-jobs";
-            body.Add(jobs);
-            var harvest = IconBtn(UiText.Get("gather.list.title"), "mine", UiKit.Lime, OpenHarvestList);
-            harvest.name = "build-harvest";
-            body.Add(harvest);
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Foundry,
@@ -522,6 +513,8 @@ namespace Frontier
             TutorialStep(body, "alarm", UiKit.Magenta, UiText.Get("tutorial.defend.title"), UiText.Get("tutorial.defend.body"));
             TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.travel.title"), UiText.Get("tutorial.travel.body"));
             TutorialStep(body, "research", UiKit.Magenta, UiText.Get("tutorial.upgrade.title"), UiText.Get("tutorial.upgrade.body"));
+            TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.map.title"), UiText.Get("tutorial.map.body"));
+            TutorialStep(body, "warp", UiKit.Cyan, UiText.Get("network.title"), UiText.Get("network.help"));
         }
 
         void TutorialStep(VisualElement body, string icon, Color color, string title, string text)
@@ -1673,8 +1666,8 @@ namespace Frontier
                 body.Add(UiKit.Text(UiText.Get("pack.empty.help"), "fr-muted"));
                 var harvest = AvailableLocalGatherer();
                 var gather = IconBtn(harvest != null ? UiText.Get("pack.open-gatherer", harvest.def.LocalizedName.ToUpperInvariant())
-                    : UiText.Get("gather.list.title"),
-                    harvest != null ? StructureIcon(harvest.def.kind) : "mine", UiKit.Lime, RunEmptyPackAction);
+                    : UiText.Get("guide.action.gather-shop"),
+                    harvest != null ? StructureIcon(harvest.def.kind) : "build", UiKit.Lime, RunEmptyPackAction);
                 gather.name = "empty-pack-action";
                 body.Add(gather);
             }

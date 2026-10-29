@@ -21,7 +21,11 @@ The dock retains its four positions: Research / Map / Ship / Build. Ship always 
 with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
 and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
 Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
-Map exposes the planetary network and ship readiness; Build retains structures and jobs.
+Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right;
+the planetary-network action is last and disabled until a local Warp Gate is completed. Ship systems remain on
+the Ship dock rather than a duplicate readiness action. Build lists structures without jobs/harvest shortcut rows.
+Tap a harvester for resources; each building header's build icon opens construction jobs and crew recruitment.
+General map/network instructions live in How to Play, not above the operational controls.
 Progression requirements use **player XP level**, not the highest planet tier visited. Research and Ship > Tools show
 the current XP level, XP remaining to the next level, and a wave shortcut that selects the local
 Alarm or its Build entry. Research badges say `XP LV`; locks name the required and current levels
@@ -32,7 +36,11 @@ quantity/name, using the chip's existing boundary. Do not overlay another icon-s
 FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses
 its existing border. Contextual shortages first compare usable, locally stored and explicitly remote
 stock, then production and reachable discovered worlds. A shortfall names its actual quantity.
-Previous-step and original-project actions preserve the originating tab/selection/scroll.
+Shortage panels do not inject previous-step or return-to controls into other panels.
+Missing-resource chips open a smaller dimmed overlay without discarding the originating screen.
+Keep exact quantities, source names and travel/storage warnings visible; source actions use icon buttons
+with localized tooltips. Back, close and backdrop dismiss only that overlay; choosing a source opens its real destination.
+Project tracking is explicit; card headings use a small star action instead of an extra full-width button.
 Locked/in-progress producers retain their real upgrade/research/job status; guidance never spends,
 teleports or starts a job. One explicitly tracked project provides live requirements and a resume action.
 The return summary links completed jobs and stored offline output to their real location, not ship cargo.

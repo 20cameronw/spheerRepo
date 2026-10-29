@@ -25,14 +25,17 @@ namespace Frontier
             mapCard.style.maxHeight = Length.Percent(40);
             UiKit.SetAccent(mapCard, UiKit.Ui(planet.Rim));
             var header = UiKit.Div("fr-row");
+            header.style.alignItems = Align.FlexStart;
+            var identity = UiKit.Div("fr-card-text");
             var title = UiKit.Text(planet.Name, "fr-h2", UiKit.Ui(planet.Rim));
-            title.style.flexShrink = 1; title.style.flexGrow = 1;
-            header.Add(title);
-            header.Add(UiKit.Text(here ? UiText.Get("map.here") : UiText.Get("map.tier", planet.Tier), "fr-tiny", UiKit.Cyan));
-            mapCard.Add(header);
+            title.style.whiteSpace = WhiteSpace.Normal;
+            identity.Add(title);
             var subtitle = UiKit.Text(UiText.Get("map.world.subtitle", planet.Star.Name, planet.BiomeName, planet.SizeName), "fr-tiny", UiKit.Muted);
-            subtitle.style.marginBottom = 8;
-            mapCard.Add(subtitle);
+            subtitle.style.whiteSpace = WhiteSpace.Normal;
+            identity.Add(subtitle);
+            header.Add(identity);
+            var actions = UiKit.Div("fr-map-card-actions");
+            actions.Add(UiKit.Text(here ? UiText.Get("map.here") : UiText.Get("map.tier", planet.Tier), "fr-tiny", UiKit.Cyan));
             var pin = new Toggle(UiText.Get("map.pin")) { value = gs.IsMapPinned(planet.Id) };
             pin.RegisterValueChangedCallback(e =>
             {
@@ -42,7 +45,9 @@ namespace Frontier
             });
             pin.name = "map-pin-toggle";
             pin.SetEnabled(!gs.SaveIsReadOnly);
-            mapCard.Add(pin);
+            actions.Add(pin);
+            header.Add(actions);
+            mapCard.Add(header);
 
             if (!here)
             {
@@ -94,7 +99,6 @@ namespace Frontier
             var scroll = UiKit.VerticalScroll("fr-map-details");
             scroll.style.minHeight = 0; scroll.style.flexShrink = 1;
             mapCard.Add(scroll);
-            BuildJourneyLinks(scroll);
             if (planet.Id != gs.planet.Id && gs.NetworkRules != null &&
                 gs.StructureOfKind(gs.planet, StructureKind.WarpGate) != null)
             {
@@ -117,22 +121,13 @@ namespace Frontier
                     if (reason != null) scroll.Add(Note(reason, UiKit.Amber));
                 }
             }
-            var network = IconBtn(UiText.Get("network.title"), "warp", UiKit.Cyan, OpenNetwork);
-            network.name = "map-open-network";
-            scroll.Add(network);
-            var ship = IconBtn(UiText.Get("map.open-ship"), "ship", UiKit.Amber, () => OpenShip(ShipPage.Systems));
-            ship.name = "map-open-ship";
-            scroll.Add(ship);
             scroll.Add(UiKit.Text(UiText.Get(gs.HasBase(planet) ? "map.world.summary-base" : "map.world.summary",
                 planet.BuildingSlots, planet.Danger), "fr-small"));
-            if (planet.Hazards == Hazards.None) scroll.Add(UiKit.Text(UiText.Get("map.hazards.none"), "fr-tiny", UiKit.Lime));
-            else
+            if (planet.Hazards != Hazards.None)
             {
                 scroll.Add(UiKit.Text(UiText.Get("map.hazards.required", PlanetData.HazardText(planet.Hazards), gs.Rules.RequiredPlatingLevel(planet.Tier)), "fr-tiny", UiKit.Amber));
                 var gaps = gs.Rules.LandingGaps(gs.Ship, planet.Hazards, planet.Tier);
-                if (gaps.Length == 0)
-                    scroll.Add(UiKit.Text(UiText.Get("map.hazards.ready"), "fr-tiny", UiKit.Lime));
-                else
+                if (gaps.Length > 0)
                 {
                     foreach (var gap in gaps)
                         scroll.Add(UiKit.Text(UiText.Get("map.hazards.gap", gap.hazard, gap.have, gap.need), "fr-tiny", UiKit.Amber));
@@ -162,10 +157,9 @@ namespace Frontier
                 worlds.Add(button);
             }
             scroll.Add(worlds);
-            scroll.Add(SectionLabel(UiText.Get("map.pins")));
-            if (mapPinPlanets.Count == 0)
-                scroll.Add(UiKit.Text(UiText.Get("map.pins.empty"), "fr-tiny", UiKit.Muted));
-            else
+            if (mapPinPlanets.Count > 0)
+            {
+                scroll.Add(SectionLabel(UiText.Get("map.pins")));
                 foreach (var pinned in mapPinPlanets)
                 {
                     var captured = pinned;
@@ -180,6 +174,14 @@ namespace Frontier
                     button.style.marginBottom = 8;
                     scroll.Add(button);
                 }
+            }
+            var gate = gs.StructureOfKind(gs.planet, StructureKind.WarpGate);
+            bool networkReady = gs.NetworkRules != null && gs.IsOperational(gate);
+            var network = IconBtn(UiText.Get("network.title"), "warp", networkReady ? UiKit.Cyan : UiKit.Muted, OpenNetwork);
+            network.name = "map-open-network";
+            network.tooltip = UiText.Get(networkReady ? "network.title" : "network.map.lock");
+            UiKit.SetEnabledLook(network, networkReady);
+            scroll.Add(network);
             scroll.scrollOffset = new Vector2(0, oldScroll);
             mapCard.RegisterCallback<GeometryChangedEvent>(e => LayoutMapChrome());
             mapView.Add(mapCard);

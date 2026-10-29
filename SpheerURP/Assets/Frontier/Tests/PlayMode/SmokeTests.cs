@@ -82,10 +82,25 @@ namespace Frontier.Tests
             var chip = rt.Ui.DebugRoot.Q<Button>("find-resource-" + wood.id);
             Assert.IsNotNull(chip, "Economy shop costs should expose the real missing-resource control.");
             Assert.IsNotNull(chip.Q<Label>());
+            var origin = chip.GetFirstAncestorOfType<FrontierModal>();
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
             yield return null;
-            var produce = rt.Ui.DebugRoot.Query<Button>().ToList().Find(button =>
-                button.Query<Label>().ToList().Exists(label => label.text == UiText.Get("project.build-producer")));
+            var overlay = rt.Ui.DebugRoot.Q("shortage-overlay");
+            Assert.IsNotNull(overlay);
+            Assert.AreSame(origin, rt.Ui.DebugRoot.Q<FrontierModal>(), "The originating panel stays underneath the overlay.");
+            var sheet = overlay.Q(className: "fr-shortage");
+            Assert.Less(sheet.resolvedStyle.width, origin.resolvedStyle.width, "Resource help is narrower than a normal panel.");
+            foreach (var button in overlay.Query<Button>().ToList())
+            {
+                Assert.AreEqual(0, button.Query<Label>().ToList().Count, "Shortage actions use icons, not full text rows.");
+                Assert.IsFalse(string.IsNullOrEmpty(button.tooltip), "Every icon keeps a localized action label.");
+            }
+            Assert.IsTrue(rt.Ui.HandleBack());
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            Assert.AreSame(origin, rt.Ui.DebugRoot.Q<FrontierModal>(), "Back dismisses only the resource overlay.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
+            yield return null;
+            var produce = rt.Ui.DebugRoot.Q<Button>("shortage-build-producer");
             Assert.IsNotNull(produce);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = produce; produce.SendEvent(submit); }
             yield return null;
@@ -286,7 +301,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator BuildHarvestListRoutesMissingAndPendingHarvestersAndCollectsSurfaceScrapOnce()
+        public IEnumerator BuildingHarvestAccessCollectsSurfaceScrapOnceAndRoutesPendingJobs()
         {
             new GameObject("HarvestListBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -302,24 +317,19 @@ namespace Frontier.Tests
             var wood = rt.Db.FindResource("wood");
             var scrap = rt.Db.scrap;
             rt.State.backpack.Clear();
-            rt.Ui.DebugShop(0);
-            var entry = rt.Ui.DebugRoot.Q<Button>("build-harvest");
-            Assert.IsNotNull(entry);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = entry; entry.SendEvent(submit); }
-            yield return null;
-            var missing = rt.Ui.DebugRoot.Q<Button>("harvest-build-" + wood.id);
-            Assert.IsNotNull(missing, "Unbuilt harvesters must offer their real construction route.");
+            rt.Ui.DebugShop(1);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-harvest"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-jobs"));
             Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + wood.id + "-Chop"));
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = missing; missing.SendEvent(submit); }
-            yield return null;
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id));
             var lumber = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
             var mine = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Mine), 1);
             Assert.IsNotNull(lumber); Assert.IsNotNull(mine);
             yield return null;
-            rt.Ui.DebugHarvestList();
+            rt.Ui.DebugReset();
+            Assert.IsTrue(rt.Surface.SelectStructure(mine));
             var start = rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine");
-            Assert.IsNotNull(start, "Surface scrap must remain harvestable from the list through the Mine.");
+            Assert.IsNotNull(start, "Surface scrap remains harvestable by tapping the Mining Rig.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
             Assert.IsTrue(rt.Ui.DebugBusy);
             Assert.IsInstanceOf<VeinGame>(rt.Ui.DebugActiveGather);
@@ -354,14 +364,16 @@ namespace Frontier.Tests
             mine = rt.State.StructureOfKind(rt.State.planet, StructureKind.Mine);
             rt.State.DebugSetBuilderJob(mine, 600, 2);
             yield return null;
-            rt.Ui.DebugHarvestList();
+            rt.Ui.DebugReset();
+            Assert.IsTrue(rt.Surface.SelectStructure(mine));
             Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine"));
-            var pending = rt.Ui.DebugRoot.Q<Button>("harvest-job-" + scrap.id);
-            Assert.IsNotNull(pending, "Upgrading harvesters must open their job instead of bypassing it or suggesting a duplicate.");
+            var pending = rt.Ui.DebugRoot.Q<Button>("structure-open-jobs");
+            Assert.IsNotNull(pending, "Tapping an upgrading building must retain access to job controls and crews.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pending; pending.SendEvent(submit); }
             Assert.IsFalse(rt.Ui.DebugBusy);
             Assert.AreEqual(earned, rt.State.Count(scrap));
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-finish-" + mine.planetId + "-" + mine.slot));
         }
 
         static IEnumerator WaitForCamera(Camera camera, Vector3 target)
@@ -2117,8 +2129,8 @@ namespace Frontier.Tests
             Assert.IsTrue(empty.enabledSelf);
             Assert.AreEqual(0, rt.State.SlotsUsed);
             rt.Ui.DebugEmptyPackAction();
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("harvest-build-wood"),
-                "No gatherer should lead to the Harvest list's required-building route.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id),
+                "No gatherer should lead to its building shop.");
             Assert.AreEqual(0, rt.State.SlotsUsed);
 
             rt.Ui.DebugReset();
@@ -2404,7 +2416,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator ShortageJourneysKeepQuantitiesAndReturnToTheOriginalUpgrade()
+        public IEnumerator ShortagesKeepQuantitiesAndTrackedProjectsWithoutHistoryButtons()
         {
             new GameObject("ShortageBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -2420,25 +2432,56 @@ namespace Frontier.Tests
             Assert.IsNotNull(chip);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
             yield return null;
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-previous"));
             foreach (var label in rt.Ui.DebugRoot.Q(className: "fr-project-body").Query<Label>(className: "fr-small").ToList())
                 Assert.AreEqual(WhiteSpace.Normal, label.resolvedStyle.whiteSpace, "Exact shortfalls must stay readable.");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Still missing:")));
-            var track = rt.Ui.DebugRoot.Q<Button>("track-upgrade-pack");
+            var track = rt.Ui.DebugRoot.Q("shortage-overlay").Q<Button>("shortage-track");
+            Assert.IsTrue(track.parent.ClassListContains("fr-modal-head"), "Tracking uses the header, not another action row.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
             Assert.AreEqual("pack", rt.State.TrackedProject.id);
             rt.Ui.DebugShortage(rt.Db.FindResource("stone"), 17);
             yield return null;
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Need 17")));
-            var back = rt.Ui.DebugRoot.Q<Button>("shortage-return");
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = back; back.SendEvent(submit); }
-            yield return null;
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-pack"));
             Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-previous"));
             Assert.AreEqual(0, rt.State.Count(rt.Db.FindResource("wood")));
+            var close = rt.Ui.DebugRoot.Q<Button>("shortage-close");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = close; close.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            rt.Ui.DebugShortage(rt.Db.FindResource("wood"), 17);
+            var buildSource = rt.Ui.DebugRoot.Q<Button>("shortage-build-producer");
+            Assert.IsNotNull(buildSource);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = buildSource; buildSource.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id));
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            yield return null;
+            rt.Ui.DebugShortage(rt.Db.FindResource("wood"), 17);
+            var produce = rt.Ui.DebugRoot.Q<Button>("shortage-produce");
+            Assert.IsNotNull(produce);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = produce; produce.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("harvest-start-wood-Chop"), "The producer icon opens the real building.");
+            Assert.AreEqual(0, rt.State.Count(rt.Db.FindResource("wood")), "Finding a source never grants resources.");
+            rt.Ui.DebugShortage(rt.Db.FindResource("wood"), 17);
+            var overlay = rt.Ui.DebugRoot.Q("shortage-overlay");
+            using (var down = PointerDownEvent.GetPooled()) { down.target = overlay; overlay.SendEvent(down); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"), "Tapping the backdrop dismisses only the shortage.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("harvest-start-wood-Chop"));
             rt.Ui.DebugProject();
             yield return null;
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("project-open"));
+            var open = rt.Ui.DebugRoot.Q<Button>("project-open");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = open; open.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-pack"), "Explicitly tracked projects still open their target.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            rt.Ui.DebugMap(null);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-previous"));
+            rt.Ui.DebugMenu("tutorial");
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tutorial.map.body")));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("network.help")));
         }
 
         [UnityTest]
@@ -2501,9 +2544,25 @@ namespace Frontier.Tests
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"), "Fuel upgrades route to Ship systems, not Research.");
             rt.Ui.DebugMap(null);
             var network = rt.Ui.DebugRoot.Q<Button>("map-open-network");
-            Assert.IsNotNull(network, "Map exposes the network on the home world even without a Warp Gate.");
+            Assert.IsNotNull(network);
+            Assert.IsFalse(network.enabledSelf, "The network is disabled until a local Warp Gate is completed.");
+            Assert.AreEqual(network, network.parent.ElementAt(network.parent.childCount - 1), "Network is the last Map detail.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("map-open-ship"));
+            var pin = rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle");
+            Assert.IsTrue(pin.parent.ClassListContains("fr-map-card-actions"));
+            Assert.IsTrue(pin.parent.ElementAt(0) is Label);
+            var gate = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.WarpGate), 0);
+            rt.State.DebugSetBuilderJob(gate, 600);
+            rt.Ui.DebugMap(null);
+            Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>("map-open-network").enabledSelf,
+                "An unfinished gate must not enable the network.");
+            rt.State.DebugSetBuilderJob(gate, 0);
+            rt.Ui.DebugMap(null);
+            network = rt.Ui.DebugRoot.Q<Button>("map-open-network");
+            Assert.IsTrue(network.enabledSelf);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = network; network.SendEvent(submit); }
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("network-open-map"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("network-open-map"), "The Map dock already provides this route.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("network-complete"));
             rt.Ui.DebugMenu("goals");
             var expand = rt.Ui.DebugRoot.Q<Button>("goals-toggle-all");
             Assert.IsNotNull(expand);
@@ -2514,8 +2573,12 @@ namespace Frontier.Tests
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shipObjective; shipObjective.SendEvent(submit); }
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-jump"), "Jump-range objectives route to Ship systems.");
             rt.Ui.DebugShop(0);
-            var jobs = rt.Ui.DebugRoot.Q<Button>("build-jobs");
-            Assert.IsNotNull(jobs, "Construction jobs remain available from Build.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-jobs"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-harvest"));
+            rt.Ui.DebugReset();
+            Assert.IsTrue(rt.Surface.SelectStructure(gate));
+            var jobs = rt.Ui.DebugRoot.Q<Button>("structure-open-jobs");
+            Assert.IsNotNull(jobs, "Construction jobs and recruitment remain accessible from buildings.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = jobs; jobs.SendEvent(submit); }
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
             Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));
@@ -2551,7 +2614,12 @@ namespace Frontier.Tests
                 Assert.IsNotNull(chart);
                 var pin = rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle");
                 Assert.IsNotNull(pin);
-                Assert.Less(pin.layout.height, UiKit.Size.Touch, "Pinning should use a compact checkbox, not a full action button.");
+                Assert.GreaterOrEqual(pin.layout.height, UiKit.Size.Touch - 1, "The compact header checkbox keeps a phone-sized hit target.");
+                Assert.Less(pin.layout.width, pin.parent.parent.layout.width * 0.5f,
+                    "Pinning belongs under the status at the right, not across the whole card.");
+                Assert.Less(Mathf.Abs(pin.Q<Label>(className: "unity-toggle__label").worldBound.center.y -
+                    pin.Q(className: "unity-toggle__input").worldBound.center.y), 2f,
+                    "Pin text and checkbox share one compact row under the status.");
                 Assert.IsFalse(pin.value);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pin; pin.SendEvent(submit); }
                 Assert.IsTrue(rt.State.IsMapPinned(rt.State.planet.Id));

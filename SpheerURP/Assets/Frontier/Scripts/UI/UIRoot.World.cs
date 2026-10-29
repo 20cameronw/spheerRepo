@@ -39,75 +39,6 @@ namespace Frontier
             return gs.IsOperational(structure) && !gs.IsBuilderBusy(structure);
         }
 
-        PlacedStructure HarvestOwner(GatherSpot spot)
-        {
-            PlacedStructure owner = null;
-            foreach (var structure in gs.structures)
-            {
-                if (!StructureCanGather(structure, spot)) continue;
-                if (owner == null || (ReadyToHarvest(structure) && (!ReadyToHarvest(owner) ||
-                    gs.StructureBonus(structure) > gs.StructureBonus(owner)))) owner = structure;
-            }
-            return owner;
-        }
-
-        void OpenHarvestList()
-        {
-            if (busy || defense.Active) return;
-            OpenModal("harvest", "mine", UiText.Get("gather.list.title"), UiKit.Lime, BuildHarvestList);
-        }
-
-        void BuildHarvestList(VisualElement body)
-        {
-            body.Add(UiKit.Text(UiText.Get("gather.list.help", gs.planet.Name), "fr-muted"));
-            var shown = new HashSet<string>();
-            foreach (var definition in gs.db.structures)
-            {
-                if (definition == null || !definition.Implemented || !definition.kind.IsGather()) continue;
-                foreach (var spot in gs.SpotsFor(gs.planet, definition.kind))
-                {
-                    if (!shown.Add(spot.resource.id + "-" + spot.game)) continue;
-                    var owner = HarvestOwner(spot);
-                    var required = owner != null ? owner.def : definition;
-                    var card = Card(UiKit.Ui(spot.resource.color));
-                    card.name = "harvest-resource-" + spot.resource.id + "-" + spot.game;
-                    card.Add(UiKit.Text(spot.resource.LocalizedName, "fr-h2"));
-                    card.Add(UiKit.Text(UiText.Get("gather.list.requires", required.LocalizedName), "fr-small"));
-                    if (owner != null && ReadyToHarvest(owner))
-                        AddHarvestAction(card, spot, owner);
-                    else if (owner != null)
-                    {
-                        card.Add(Note(gs.BuilderJobStatus(owner), UiKit.Amber));
-                        var view = IconBtn(UiText.Get("gather.list.view"), "build", UiKit.Cyan, () => OpenSourceStructure(owner));
-                        view.name = "harvest-job-" + spot.resource.id;
-                        card.Add(view);
-                    }
-                    else
-                    {
-                        string locked = gs.BuildLockReason(required);
-                        if (!string.IsNullOrEmpty(locked)) card.Add(Note(locked, UiKit.Amber));
-                        var build = IconBtn(UiText.Get("gather.list.build", required.LocalizedName), "build",
-                            UiKit.Lime, () => OpenBuildDefinition(required));
-                        build.name = "harvest-build-" + spot.resource.id;
-                        card.Add(build);
-                    }
-                    body.Add(card);
-                }
-            }
-            if (shown.Count == 0) body.Add(Note(UiText.Get("gather.empty"), UiKit.Muted));
-        }
-
-        void AddHarvestAction(VisualElement body, GatherSpot spot, PlacedStructure owner)
-        {
-            int estimate = Mathf.Max(1, Mathf.RoundToInt(spot.baseYield * gs.ToolMultiplier(spot.game) *
-                (1f + gs.StructureBonus(owner) + gs.TerraformerHarvestBonus)));
-            body.Add(UiKit.Text(UiText.Get("gather.estimate", estimate), "fr-tiny"));
-            var go = IconBtn(UiText.Get("gather.harvest"), Icons.ForTool(spot.game), UiKit.Lime,
-                () => BeginHarvest(spot, owner));
-            go.name = "harvest-start-" + spot.resource.id + "-" + spot.game;
-            body.Add(go);
-        }
-
         void BeginHarvest(GatherSpot spot, PlacedStructure owner)
         {
             if (busy || defense.Active) return;
@@ -151,7 +82,6 @@ namespace Frontier
         {
             popupScroll = UiKit.VerticalScroll("fr-popup-scroll");
             popup.Add(popupScroll);
-            BuildJourneyLinks(popupScroll.contentContainer);
             popupBuild(popupScroll.contentContainer);
             popup.Add(PopupClose());
         }
@@ -206,7 +136,6 @@ namespace Frontier
             if (popup == null || popupBuild == null) return;
             var offset = popupScroll.scrollOffset;
             popupScroll.contentContainer.Clear();
-            BuildJourneyLinks(popupScroll.contentContainer);
             popupBuild(popupScroll.contentContainer);
             var scroll = popupScroll;
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
@@ -265,7 +194,6 @@ namespace Frontier
                         body.Add(UiKit.Text(UiText.Get(s.def.kind == StructureKind.WarpGate
                             ? "structure.warp.pending" : "structure.dyson.pending"), "fr-tiny"));
                     }
-                    body.Add(UiKit.Text(UiText.Get("structure.offline-time"), "fr-tiny"));
                 });
                 jobPopupStructure = s;
                 return;
@@ -371,6 +299,11 @@ namespace Frontier
             col.Add(UiKit.Text(UiText.Get("structure.header", s.def.LocalizedName.ToUpper(), s.level), "fr-h2"));
             if (!string.IsNullOrEmpty(subtitle)) col.Add(UiKit.Text(subtitle, "fr-tiny"));
             head.Add(col);
+            var crews = Icons.IconButton("build", UiKit.Muted, OpenBuilders);
+            crews.name = "structure-open-jobs";
+            crews.tooltip = UiText.Get("builders.jobs-title");
+            crews.style.marginLeft = UiKit.Space.S8;
+            head.Add(crews);
             body.Add(head);
         }
 

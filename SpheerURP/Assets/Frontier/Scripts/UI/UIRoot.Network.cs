@@ -47,10 +47,6 @@ namespace Frontier
 
         void BuildNetwork(VisualElement body)
         {
-            body.Add(UiKit.Text(UiText.Get("network.help"), "fr-muted"));
-            var map = IconBtn(UiText.Get("network.open-map"), "map", UiKit.Cyan, () => { CloseModal(); OpenMap(); });
-            map.name = "network-open-map";
-            body.Add(map);
             if (gs.NetworkRules == null)
             {
                 body.Add(Note(UiText.Get("network.lock.unavailable"), UiKit.Amber));

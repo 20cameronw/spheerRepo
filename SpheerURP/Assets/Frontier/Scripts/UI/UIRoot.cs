@@ -364,6 +364,7 @@ namespace Frontier
             RefreshModal();
             RefreshPopup();
             if (mapOpen) { RefreshMapPinPlanets(); InvalidateMapPreview(); BuildMapCard(); }
+            RefreshShortage();
         }
 
         // ------------------------------------------------------------ frame
@@ -405,7 +406,7 @@ namespace Frontier
                 }
             }
             hud.style.display = wave || introActive || networkFinaleActive ? DisplayStyle.None : DisplayStyle.Flex;
-            if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
+            if (wave && (popup != null || modal != null || buildDef != null || shortageOverlay != null)) { CloseAll(); }
 
             UpdatePopupPosition();
             RefreshBuilderStatus();
@@ -415,6 +416,7 @@ namespace Frontier
 
         void CloseAll()
         {
+            CloseShortage();
             ClosePopup();
             CloseModal();
             CloseMap();
@@ -428,6 +430,7 @@ namespace Frontier
             if (activeTravelMinigame is ITravelBackHandler travel) return travel.HandleBack();
             if (busy || defense.Active) return true;
             if (waveResultPanel != null) { CloseWaveResult(); return true; }
+            if (shortageOverlay != null) { CloseShortage(); return true; }
             if (popup != null) { ClosePopup(); return true; }
             if (modal != null)
             {
