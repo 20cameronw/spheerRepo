@@ -2247,6 +2247,86 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator ConstructionAndUpgradeTimersCanBeFinishedFromStructureAndBuildCards()
+        {
+            new GameObject("DirectTimerFinishBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            Assert.IsTrue(rt.State.TryCreateCloudSaveSnapshot(out var snapshot, out var error), error);
+            snapshot.wallet.RemoveAll(entry => entry.currency == "shards");
+            snapshot.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+            Assert.IsTrue(rt.State.TryRestoreCloudSave(snapshot, out error), error);
+            var structure = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Refinery), 0);
+            for (int surface = 0; surface < 2; surface++)
+            {
+                rt.State.DebugSetBuilderJob(structure, 600, surface == 0 ? 0 : 2);
+                yield return null;
+                if (surface == 0) rt.Ui.DebugTapStructure(structure);
+                else rt.Ui.DebugShop(0);
+                yield return null;
+                string buttonName = "builder-finish-" + structure.planetId + "-" + structure.slot;
+                var finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+                Assert.IsNotNull(finish, "Finish must be available without navigating to Construction Jobs.");
+                Assert.IsTrue(finish.enabledInHierarchy);
+                int before = rt.State.ShardBalance;
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = finish; finish.SendEvent(submit); }
+                Assert.AreEqual(before, rt.State.ShardBalance, "First tap only confirms.");
+                Assert.IsTrue(rt.State.IsBuilderBusy(structure));
+                Assert.IsTrue(rt.Ui.HandleBack(), "Closing cancels the confirmation.");
+                if (surface == 0) rt.Ui.DebugTapStructure(structure);
+                else rt.Ui.DebugShop(0);
+                finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+                Assert.IsTrue(finish.Query<Label>().ToList().Exists(label =>
+                    label.text == UiText.Get("builders.finish-paid", rt.State.BuilderSkipCost(structure))));
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = finish; finish.SendEvent(submit); }
+                finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+                yield return new WaitForSecondsRealtime(1.1f);
+                Assert.AreSame(finish, rt.Ui.DebugRoot.Q<Button>(buttonName), "Countdowns retain the live control.");
+                int cost = rt.State.BuilderSkipCost(structure);
+                Assert.Greater(cost, 0, "This fixture must exercise a paid finish.");
+                bool discovered = rt.State.IsAtlasDiscovered("structure", structure.def.kind.ToString());
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = finish; finish.SendEvent(submit); }
+                Assert.IsFalse(rt.State.IsBuilderBusy(structure));
+                Assert.IsTrue(rt.State.IsOperational(structure));
+                Assert.AreEqual(0, rt.State.BusyBuilderCount);
+                Assert.AreEqual(before - cost + (discovered ? 0 : rt.Db.shardRules.data.atlasStructureShards),
+                    rt.State.ShardBalance);
+                Assert.IsNull(rt.Ui.DebugRoot.Q<Button>(buttonName));
+                Assert.AreEqual(surface == 0 ? 1 : 2, structure.level);
+                var persisted = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(Path.Combine(saveDir, "frontier_save.json")));
+                Assert.AreEqual(rt.State.ShardBalance, persisted.wallet.Find(w => w.currency == "shards").amount);
+                rt.Ui.DebugReset();
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator StructureTimerFinishDisablesWithoutShardsAndAfterNaturalCompletion()
+        {
+            new GameObject("UnavailableTimerFinishBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var structure = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Refinery), 0);
+            rt.State.DebugSetBuilderJob(structure, 86400, 2);
+            yield return null;
+            rt.Ui.DebugTapStructure(structure);
+            string buttonName = "builder-finish-" + structure.planetId + "-" + structure.slot;
+            var finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+            Assert.IsNotNull(finish, "Upgrading structures also expose their timer action.");
+            Assert.Greater(rt.State.BuilderSkipCost(structure), rt.State.ShardBalance);
+            Assert.IsFalse(finish.enabledInHierarchy);
+            int before = rt.State.ShardBalance;
+            rt.State.DebugSetBuilderJob(structure, 0);
+            yield return new WaitForSecondsRealtime(1.1f);
+            finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+            Assert.IsTrue(finish == null || !finish.enabledInHierarchy);
+            Assert.AreEqual(before, rt.State.ShardBalance);
+        }
+
+        [UnityTest]
         public IEnumerator CrewPanelConfirmsFreeFinishAndKeepsTimerControlsStable()
         {
             new GameObject("CrewPanelBootstrap").AddComponent<FrontierBootstrap>();

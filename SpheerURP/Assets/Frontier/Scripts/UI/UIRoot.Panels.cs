@@ -172,7 +172,11 @@ namespace Frontier
                 PlacedStructure activeJob = null;
                 foreach (var structure in gs.StructuresOn(gs.planet))
                     if (structure.def == def && gs.IsBuilderBusy(structure)) { activeJob = structure; break; }
-                if (activeJob != null) card.Add(Note(gs.BuilderJobStatus(activeJob), UiKit.Cyan));
+                if (activeJob != null)
+                {
+                    card.Add(Note(gs.BuilderJobStatus(activeJob), UiKit.Cyan));
+                    BuildBuilderFinishAction(card, activeJob, RefreshModal);
+                }
                 else if (gs.AtLimit(gs.planet, def)) card.Add(Note(UiText.Get("shop.built"), UiKit.Lime));
                 else if (gs.BuildLockReason(def) != null) card.Add(Note(gs.BuildLockReason(def), UiKit.Amber));
                 else if (!gs.CanBuildHere(def)) card.Add(Note(UiText.Get("shop.no-harvest"), UiKit.Amber));
@@ -1505,44 +1509,8 @@ namespace Frontier
                     card.Add(UiKit.Text(UiText.Get("builders.structure", job.def.LocalizedName, planet.Name), "fr-h2"));
                     var status = UiKit.Text(gs.BuilderJobStatus(job), "fr-small");
                     card.Add(status);
-                    int cost = gs.BuilderSkipCost(job);
-                    bool confirming = confirmBuilderFinish == job;
-                    string key = cost == 0 ? confirming ? "builders.confirm-free" : "builders.finish-free" :
-                        confirming ? "builders.confirm-paid" : "builders.finish-paid";
-                    var finish = IconBtn(UiText.Get(key, cost), "bolt", confirming ? UiKit.Amber : UiKit.Magenta, () =>
-                    {
-                        if (confirmBuilderFinish != job)
-                        {
-                            confirmBuilderPurchaseOwned = -1;
-                            confirmBuilderFinish = job;
-                            RefreshModal();
-                            return;
-                        }
-                        confirmBuilderFinish = null;
-                        var result = gs.FinishBuilderJob(job, cost, out string message);
-                        if (result == BuilderFinishResult.Rejected) Sfx.Bad();
-                        else Sfx.Good();
-                        Toast(message, result == BuilderFinishResult.Saved ? UiKit.Lime :
-                            result == BuilderFinishResult.PendingSave ? UiKit.Amber : UiKit.Red);
-                        RefreshModal();
-                    });
-                    finish.name = "builder-finish-" + job.planetId + "-" + job.slot;
-                    UiKit.SetEnabledLook(finish, !gs.SaveIsReadOnly && gs.ShardBalance >= cost &&
-                        gs.db.shardRules != null && gs.db.shardRules.data != null);
-                    card.Add(finish);
+                    BuildBuilderFinishAction(card, job, RefreshModal, status);
                     BuildConstructionOffer(card, job);
-                    var finishText = finish.Q<Label>(className: "fr-btn-label");
-                    card.schedule.Execute(() =>
-                    {
-                        status.text = gs.BuilderJobStatus(job);
-                        cost = gs.BuilderSkipCost(job);
-                        bool armed = confirmBuilderFinish == job;
-                        string currentKey = cost == 0 ? armed ? "builders.confirm-free" : "builders.finish-free" :
-                            armed ? "builders.confirm-paid" : "builders.finish-paid";
-                        finishText.text = UiText.Get(currentKey, cost);
-                        UiKit.SetEnabledLook(finish, gs.IsBuilderBusy(job) && !gs.SaveIsReadOnly && gs.ShardBalance >= cost &&
-                            gs.db.shardRules != null && gs.db.shardRules.data != null);
-                    }).Every(1000);
                     jobs.Add(card);
                 }
                 foreach (var delta in gs.world.All)
@@ -1591,6 +1559,47 @@ namespace Frontier
                 if (gs.SaveIsReadOnly) jobs.Add(Note(UiText.Get("builders.read-only"), UiKit.Amber));
             }
             RefreshJobs();
+        }
+
+        void BuildBuilderFinishAction(VisualElement body, PlacedStructure job, Action refresh, Label status = null)
+        {
+            int cost = gs.BuilderSkipCost(job);
+            bool confirming = confirmBuilderFinish == job;
+            string key = cost == 0 ? confirming ? "builders.confirm-free" : "builders.finish-free" :
+                confirming ? "builders.confirm-paid" : "builders.finish-paid";
+            var finish = IconBtn(UiText.Get(key, cost), "crystal", confirming ? UiKit.Amber : UiKit.Magenta, () =>
+            {
+                if (confirmBuilderFinish != job)
+                {
+                    confirmBuilderPurchaseOwned = -1;
+                    confirmBuilderFinish = job;
+                    refresh();
+                    return;
+                }
+                confirmBuilderFinish = null;
+                var result = gs.FinishBuilderJob(job, cost, out string message);
+                if (result == BuilderFinishResult.Rejected) Sfx.Bad();
+                else Sfx.Good();
+                Toast(message, result == BuilderFinishResult.Saved ? UiKit.Lime :
+                    result == BuilderFinishResult.PendingSave ? UiKit.Amber : UiKit.Red);
+                refresh();
+            });
+            finish.name = "builder-finish-" + job.planetId + "-" + job.slot;
+            var text = finish.Q<Label>(className: "fr-btn-label");
+            void UpdateFinish()
+            {
+                if (status != null) status.text = gs.BuilderJobStatus(job);
+                cost = gs.BuilderSkipCost(job);
+                bool armed = confirmBuilderFinish == job;
+                string currentKey = cost == 0 ? armed ? "builders.confirm-free" : "builders.finish-free" :
+                    armed ? "builders.confirm-paid" : "builders.finish-paid";
+                text.text = UiText.Get(currentKey, cost);
+                UiKit.SetEnabledLook(finish, gs.IsBuilderBusy(job) && !gs.SaveIsReadOnly && gs.ShardBalance >= cost &&
+                    gs.db.shardRules != null && gs.db.shardRules.data != null);
+            }
+            UpdateFinish();
+            finish.schedule.Execute(UpdateFinish).Every(1000);
+            body.Add(finish);
         }
 
         void BuildCrewRecruitment(VisualElement body)

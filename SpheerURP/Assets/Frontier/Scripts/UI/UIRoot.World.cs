@@ -95,6 +95,7 @@ namespace Frontier
 
         void ClosePopup()
         {
+            confirmBuilderFinish = null;
             if (popup != null) popup.RemoveFromHierarchy();
             popup = null; popupAnchor = null; popupBuild = null; popupKey = null;
             popupScroll = null;
@@ -181,6 +182,11 @@ namespace Frontier
                     StructureHeader(body, s, jobColor, UiText.Get("structure.builder"));
                     jobStatusLabel = UiKit.Text(gs.BuilderJobStatus(s), "fr-small", UiKit.Cyan);
                     body.Add(jobStatusLabel);
+                    BuildBuilderFinishAction(body, s, () =>
+                    {
+                        if (gs.IsBuilderBusy(s)) RefreshPopup();
+                        else ClosePopup();
+                    });
                     if (s.def.kind == StructureKind.Terraformer)
                     {
                         int stage = s.record.pendingUpgradeLevel > s.level ? s.record.pendingUpgradeLevel : s.level;

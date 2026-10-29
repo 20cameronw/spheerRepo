@@ -24,6 +24,9 @@ level-1 structure without materials or a builder: twice the full build timer's s
 Research, XP, local lab, matching planet resources, free pads and per-planet limits remain mandatory.
 Selecting the shard button spends nothing; selecting a free pad confirms the displayed price. Cancellation is free.
 The structure and wallet are saved together; a failed write explicitly reports pending saving and cannot charge the same pad twice.
+Active construction and upgrade timers can also be finished with shards directly from the tapped structure,
+its Build catalogue card or Construction Jobs. All three show the live remaining-time price, require a second
+confirmation, and share the same persisted finish action; the final short free-finish window still applies.
 Map queries preload at least 192 UI pixels beyond each edge (25% of the larger viewport dimension), refreshing
 at half that margin so small pans reuse already loaded systems. Scanner, discovery and resource filters still apply.
 
