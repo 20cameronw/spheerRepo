@@ -21,8 +21,11 @@ The dock retains its four positions: Research / Map / Ship / Build. Ship always 
 with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
 and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
 Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
-Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right;
-the planetary-network action is last and disabled until a local Warp Gate is completed. Ship systems remain on
+Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right.
+The route action stays in the destination card footer outside its scrolling details. Prerequisite actions share a
+right-aligned icon row (research, local lab, station upgrade or XP only when needed). Material costs use a bounded,
+undecorated wrapping container inside cards, never a nested scroller; exact quantities remain readable.
+The planetary-network action is last in the details and disabled until a local Warp Gate is completed. Ship systems remain on
 the Ship dock rather than a duplicate readiness action. Build lists structures without jobs/harvest shortcut rows.
 Tap a harvester for resources; each building header's build icon opens construction jobs and crew recruitment.
 General map/network instructions live in How to Play, not above the operational controls.

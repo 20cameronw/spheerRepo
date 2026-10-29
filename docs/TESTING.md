@@ -1,5 +1,14 @@
 # Testing
 
+## Destination footer and card layout
+
+- Pilot / Autopilot / Route Unavailable stays below the destination details, outside the ScrollView.
+  Route status, mode, price, next stop and world information scroll above it without moving the footer.
+- Prerequisite actions use one wrapping icon row, with only relevant research/lab/station/XP actions.
+  Shared cost rows constrain and wrap resource chips within their card, including large exact quantities.
+- Four targeted PlayMode tests passed, including scroll-invariant footer geometry and cost containment at
+  360/700 logical pixels. Eight captures across two phone sizes had no overflow, small-text or small-touch warnings.
+
 ## Project icons and full-loop tutorial follow-up
 
 - Lab shortcut selects Utility and scrolls the Research Lab card into view; tracked Utility projects use the same route.

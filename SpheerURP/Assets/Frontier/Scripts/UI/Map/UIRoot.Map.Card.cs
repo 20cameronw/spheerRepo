@@ -48,6 +48,11 @@ namespace Frontier
             actions.Add(pin);
             header.Add(actions);
             mapCard.Add(header);
+            header.style.flexShrink = 0;
+            var scroll = UiKit.VerticalScroll("fr-map-details");
+            scroll.style.minHeight = 0; scroll.style.flexShrink = 1;
+            mapCard.Add(scroll);
+            Button travelAction = null;
 
             if (!here)
             {
@@ -56,13 +61,13 @@ namespace Frontier
                 status.style.whiteSpace = WhiteSpace.Normal;
                 status.style.flexShrink = 1;
                 row.Add(status);
-                mapCard.Add(row);
+                scroll.Add(row);
                 if (!string.IsNullOrEmpty(mapNextStopPlanetId))
                 {
                     var nextStop = gs.universe.Get(mapNextStopPlanetId);
                     if (nextStop != null)
                     {
-                        mapCard.Add(UiKit.Text(UiText.Get("map.next-stop"), "fr-tiny", UiKit.Amber));
+                        scroll.Add(UiKit.Text(UiText.Get("map.next-stop"), "fr-tiny", UiKit.Amber));
                         var nextStopButton = UiKit.Btn(nextStop.Name, UiKit.Cyan, () =>
                         {
                             SelectMapWorld(nextStop);
@@ -70,7 +75,7 @@ namespace Frontier
                         });
                         nextStopButton.name = "map-next-stop";
                         nextStopButton.tooltip = UiText.Get("map.next-stop.tooltip", nextStop.Name, planet.Name);
-                        mapCard.Add(nextStopButton);
+                        scroll.Add(nextStopButton);
                     }
                 }
                 bool can = mapPreview != null && mapPreview.reachable;
@@ -78,13 +83,13 @@ namespace Frontier
                 {
                     var mode = new Toggle(UiText.Get("map.autopilot.help")) { value = mapAutopilot };
                     mode.RegisterValueChangedCallback(e => { mapAutopilot = e.newValue; InvalidateMapPreview(); BuildMapCard(); });
-                    mapCard.Add(mode);
+                    scroll.Add(mode);
                     string price = mapPreview == null ? UiText.Get("map.calculating")
                         : UiText.Get(mapAutopilot ? "map.price.autopilot" : "map.price.manual",
                             (long)mapPreview.totalFuel * GameState.GallonsPerEnergy, gs.FuelGallons, mapPreview.totalSeconds);
                     var priceLabel = UiKit.Text(price, "fr-tiny", UiKit.Muted);
                     priceLabel.style.whiteSpace = WhiteSpace.Normal;
-                    mapCard.Add(priceLabel);
+                    scroll.Add(priceLabel);
                 }
                 string action = mapPreview == null ? UiText.Get("map.action.calculating")
                     : can && mapPreview.instant ? UiText.Get(gs.HasPlanetLink(gs.planet, planet) ? "network.travel" : "network.lightspeed")
@@ -93,12 +98,11 @@ namespace Frontier
                 var fly = IconBtn(action, "warp", can ? UiKit.Magenta : UiKit.Muted, () => StartTravel(planet, mapAutopilot), false, can);
                 UiKit.SetEnabledLook(fly, can);
                 fly.tooltip = UiText.Get("map.travel.tooltip", planet.Name);
-                mapCard.Add(fly);
+                fly.name = "map-travel-action";
+                fly.style.flexShrink = 0;
+                fly.style.marginTop = UiKit.Space.S12;
+                travelAction = fly;
             }
-            foreach (var child in mapCard.Children()) child.style.flexShrink = 0;
-            var scroll = UiKit.VerticalScroll("fr-map-details");
-            scroll.style.minHeight = 0; scroll.style.flexShrink = 1;
-            mapCard.Add(scroll);
             if (planet.Id != gs.planet.Id && gs.NetworkRules != null &&
                 gs.StructureOfKind(gs.planet, StructureKind.WarpGate) != null)
             {
@@ -182,6 +186,7 @@ namespace Frontier
             network.tooltip = UiText.Get(networkReady ? "network.title" : "network.map.lock");
             UiKit.SetEnabledLook(network, networkReady);
             scroll.Add(network);
+            if (travelAction != null) mapCard.Add(travelAction);
             scroll.scrollOffset = new Vector2(0, oldScroll);
             mapCard.RegisterCallback<GeometryChangedEvent>(e => LayoutMapChrome());
             mapView.Add(mapCard);

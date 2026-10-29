@@ -91,6 +91,14 @@ namespace Frontier
 
         void BuildProjectGates(VisualElement body, PlayerProject project)
         {
+            var actions = UiKit.Div("fr-project-gates");
+            void GateAction(string name, string icon, string tooltip, Action action)
+            {
+                var button = Icons.IconButton(icon, UiKit.Cyan, action);
+                button.name = name;
+                button.tooltip = UiText.Get(tooltip);
+                actions.Add(button);
+            }
             int xp = 1, lab = 0;
             string prerequisite = null;
             if (project.kind == "research")
@@ -111,8 +119,8 @@ namespace Frontier
                 xp = recipe.tier; prerequisite = recipe.unlockResearch;
                 var station = gs.structures.FirstOrDefault(s => s.planetId == project.planetId && s.slot == project.slot);
                 if (station != null && station.level < recipe.stationLevel)
-                    body.Add(IconBtn(UiText.Get("project.upgrade-station"), "up", UiKit.Cyan,
-                        () => OpenProject(Project("structure", station.def.id, station.level + 1, station.slot))));
+                    GateAction("project-upgrade-station", "up", "project.upgrade-station",
+                        () => OpenProject(Project("structure", station.def.id, station.level + 1, station.slot)));
             }
             else if (project.kind == "upgrade")
             {
@@ -129,21 +137,18 @@ namespace Frontier
                 xp = Math.Max(xp, definition.unlockTier);
             }
             if (!string.IsNullOrEmpty(prerequisite) && !gs.IsResearched(prerequisite))
-                body.Add(IconBtn(UiText.Get("project.prerequisite"), "research", UiKit.Cyan,
-                    () => OpenProject(Project("research", prerequisite))));
+                GateAction("project-required-research", "research", "project.prerequisite",
+                    () => OpenProject(Project("research", prerequisite)));
             var localLab = gs.StructureOfKind(gs.planet, StructureKind.ResearchLab);
             if (lab > 0 && (localLab == null || localLab.level < lab))
             {
-                var labButton = Icons.IconButton("research_lab", UiKit.Cyan,
+                GateAction("project-local-lab", "research_lab", "project.lab",
                     () => OpenBuildDefinition(gs.db.StructureOfKind(StructureKind.ResearchLab)));
-                labButton.name = "project-local-lab";
-                labButton.tooltip = UiText.Get("project.lab");
-                labButton.style.alignSelf = Align.FlexEnd;
-                body.Add(labButton);
             }
             if (xp > gs.PlayerLevel)
-                body.Add(IconBtn(UiText.Get("project.xp"), "alarm", UiKit.Cyan,
-                    () => { CloseAll(); if (!OpenFirstSessionStructure(StructureKind.Alarm)) { shopTab = 0; OpenShop(); } }));
+                GateAction("project-required-xp", "alarm", "project.xp",
+                    () => { CloseAll(); if (!OpenFirstSessionStructure(StructureKind.Alarm)) { shopTab = 0; OpenShop(); } });
+            if (actions.childCount > 0) body.Add(actions);
         }
 
         void OpenShortage(PlayerProject project, ResourceSO resource, int required)

@@ -2255,6 +2255,17 @@ namespace Frontier.Tests
                 .Exists(label => label.text == UiText.Get("map.price.manual",
                     (long)preview.totalFuel * GameState.GallonsPerEnergy, originalFuel * GameState.GallonsPerEnergy, preview.totalSeconds)));
             Assert.AreEqual(UiText.Get("map.pin"), rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle").label);
+            yield return null;
+            var travel = rt.Ui.DebugRoot.Q<Button>("map-travel-action");
+            var details = travel.parent.Q<ScrollView>(className: "fr-map-details");
+            Assert.AreSame(travel, travel.parent.ElementAt(travel.parent.childCount - 1), "Travel is the card footer.");
+            Assert.IsNull(travel.GetFirstAncestorOfType<ScrollView>(), "Travel must not scroll with the details.");
+            Assert.LessOrEqual(details.worldBound.yMax, travel.worldBound.yMin + 1);
+            Assert.Greater(details.contentViewport.resolvedStyle.height, 0);
+            float footerY = travel.worldBound.y;
+            details.scrollOffset = new Vector2(0, 10000);
+            yield return null;
+            Assert.AreEqual(footerY, travel.worldBound.y, 1, "Scrolling leaves the route action pinned.");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Toggle>().ToList()
                 .Exists(toggle => toggle.label == UiText.Get("map.autopilot.help")));
             int manualPrice = preview.totalFuel;
@@ -2511,6 +2522,13 @@ namespace Frontier.Tests
             yield return null;
             var lab = rt.Ui.DebugRoot.Q<Button>("project-local-lab");
             Assert.IsNotNull(lab);
+            Assert.IsTrue(lab.parent.ClassListContains("fr-project-gates"));
+            foreach (var gate in rt.Ui.DebugRoot.Query(className: "fr-project-gates").ToList())
+            {
+                Assert.AreEqual(FlexDirection.Row, gate.resolvedStyle.flexDirection);
+                foreach (var button in gate.Query<Button>().ToList())
+                    Assert.AreEqual(0, button.Query<Label>().ToList().Count, "Prerequisite actions are compact icons, not full-width text.");
+            }
             Assert.AreEqual(0, lab.Query<Label>().ToList().Count);
             Assert.AreEqual(UiText.Get("project.lab"), lab.tooltip);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = lab; lab.SendEvent(submit); }
@@ -2553,6 +2571,42 @@ namespace Frontier.Tests
             var text = rt.Ui.DebugRoot.Query<Label>().ToList();
             foreach (var key in new[] { "build", "gather", "storage", "refine", "defend", "research", "upgrade", "travel", "expand" })
                 Assert.IsTrue(text.Exists(label => label.text == UiText.Get("tutorial." + key + ".body")), key);
+        }
+
+        [UnityTest]
+        public IEnumerator ResourceCostsWrapInsideTheirContainerWithoutNestedScrolling()
+        {
+            new GameObject("CostLayoutBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var costs = new List<ItemAmount>();
+            foreach (var id in new[] { "wood", "stone", "fuel", "planks" })
+            {
+                var resource = rt.Db.FindResource(id);
+                if (resource != null) costs.Add(new ItemAmount(resource, 1234567));
+            }
+            var container = new VisualElement();
+            container.style.position = Position.Absolute;
+            container.style.width = 360;
+            var row = UiKit.CostRow(costs, rt.State, true, resource => { }, resource => 123456);
+            container.Add(row);
+            rt.Ui.DebugRoot.Add(container);
+            foreach (float width in new[] { 360f, 700f })
+            {
+                container.style.width = width;
+                for (int i = 0; i < 3; i++) yield return null;
+                Assert.IsNull(row.Q<ScrollView>());
+                Assert.AreEqual(Wrap.Wrap, row.resolvedStyle.flexWrap);
+                foreach (var chip in row.Children())
+                {
+                    Assert.GreaterOrEqual(chip.worldBound.xMin, row.worldBound.xMin - 1);
+                    Assert.LessOrEqual(chip.worldBound.xMax, row.worldBound.xMax + 1);
+                }
+                Assert.Greater(row.resolvedStyle.height, row.ElementAt(0).resolvedStyle.height, "Costs should form multiple lines.");
+            }
+            container.RemoveFromHierarchy();
         }
 
         [UnityTest]

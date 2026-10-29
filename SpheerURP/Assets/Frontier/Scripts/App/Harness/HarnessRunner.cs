@@ -415,6 +415,15 @@ namespace Frontier
                 });
                 yield return new Shot("player-project-corner", () => { ui.DebugReset(); });
                 yield return new Shot("player-project-research", () => ui.DebugResearch());
+                yield return new Shot("player-project-requirements", () =>
+                {
+                    ui.DebugResearch();
+                    var action = ui.DebugRoot.Q<Button>("project-required-research");
+                    if (action == null) throw new InvalidOperationException("No research prerequisite in layout fixture.");
+                    var card = action.parent.parent;
+                    var scroll = card.GetFirstAncestorOfType<ScrollView>();
+                    scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                });
                 yield return new Shot("player-project-lab-shop", () =>
                 {
                     ui.DebugResearch();

@@ -226,7 +226,7 @@ namespace Frontier
         public static VisualElement CostRow(System.Collections.Generic.List<ItemAmount> items, GameState gs, bool showHave,
             Action<ResourceSO> onFind = null, Func<ResourceSO, int> available = null)
         {
-            var row = Div("fr-row-wrap");
+            var row = Div("fr-row-wrap fr-costs");
             foreach (var i in items)
             {
                 if (i.resource == null) continue;
