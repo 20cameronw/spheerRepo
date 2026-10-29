@@ -63,11 +63,6 @@ namespace Frontier
         public SphereCollider Surface { get; private set; }
 
         public float SurfaceRadius() { return Surface != null ? Surface.radius : Radius; }
-        float AtmosphereDiameter()
-        {
-            return Current.ModelKey == "sylva" && Current.Biome == Biome.Lush
-                ? SurfaceRadius() * 2.16f : Current.AtmosphereScale;
-        }
         /// <summary>The crater pattern (style 2) turns into black and white dice when its cells are big and the palette is dark: generated worlds get a finer grid and keep the terrain between the discs. Authored worlds keep their values and look.</summary>
         const float MinGeneratedCraterBands = 9f;
 
@@ -211,7 +206,7 @@ namespace Frontier
             Destroy(atmo.GetComponent<Collider>());
             atmo.transform.SetParent(root, false);
             atmosphere = atmo.transform;
-            atmo.transform.localScale = Vector3.one * AtmosphereDiameter();
+            atmo.transform.localScale = Vector3.one * p.AtmosphereScale;
             Color atmosphereColor = PlanetSurfaceStyle.AtmosphereColor(p, rim) * (1.2f * p.AtmosphereIntensity);
             atmosphereMat = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
             atmo.GetComponent<MeshRenderer>().sharedMaterial = atmosphereMat;
@@ -393,7 +388,7 @@ namespace Frontier
             float size = (Current.IsAuthored ? SurfaceRadius() / Mathf.Max(0.01f, displayedRadius) : 1f) *
                 (Current.ModelScale > 0f ? Current.ModelScale : 1f) / displayedModelScale;
             core.localScale = Vector3.one * (usesModel ? 1f : displayedRadius * 2f * displayedModelScale) * size * pulse;
-            if (atmosphere != null) atmosphere.localScale = Vector3.one * AtmosphereDiameter();
+            if (atmosphere != null) atmosphere.localScale = Vector3.one * Current.AtmosphereScale;
             if (Frozen) { angVel = Vector3.zero; }
             else if (!grabbed)
             {

@@ -1804,7 +1804,11 @@ namespace Frontier.Tests
                     Assert.AreEqual(0f, material.GetFloat("_LandMix"), "Geometry, not a painted pattern, defines continents.");
                     Assert.AreEqual(material.GetColor("_BaseColor"), material.GetColor("_AltColor"));
                 }
-                var atmosphere = rt.Planet.Root.Find("Atmosphere").GetComponent<MeshRenderer>().sharedMaterial.GetColor("_Color");
+                var shell = rt.Planet.Root.Find("Atmosphere");
+                Assert.AreEqual(Vector3.one * rt.Planet.Current.AtmosphereScale, shell.localScale,
+                    "Earth keeps the same authored atmosphere diameter as the other planets.");
+                Assert.AreEqual(PlanetData.StandardAtmosphereScale, shell.localScale.x, 0.001f);
+                var atmosphere = shell.GetComponent<MeshRenderer>().sharedMaterial.GetColor("_Color");
                 Assert.AreEqual(atmosphere.r, atmosphere.g, 0.001f);
                 Assert.AreEqual(atmosphere.g, atmosphere.b, 0.001f);
             }

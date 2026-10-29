@@ -36,6 +36,7 @@ The tutorial retains the full HUD width and overlays the camera button. Covered 
 resume stay unavailable until the tutorial is dismissed or opens another screen.
 Debris is embedded slightly into the local rendered terrain at spawn, not placed on the approximate ground sphere.
 Sylva uses the authored split land/ocean meshes: raised land is green, the ocean sphere blue, with a white atmosphere.
+Its atmosphere retains the standard authored diameter (5 units), including after terraforming; the terrain palette does not shrink the shell.
 Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
 systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
 Panning stays near scanner coverage or remembered systems; coordinates outside that space clamp to its nearest edge.
