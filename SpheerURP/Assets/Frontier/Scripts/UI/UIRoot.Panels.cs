@@ -131,6 +131,9 @@ namespace Frontier
             var jobs = IconBtn(UiText.Get("builders.view"), "build", UiKit.Cyan, OpenBuilders);
             jobs.name = "build-jobs";
             body.Add(jobs);
+            var harvest = IconBtn(UiText.Get("gather.list.title"), "mine", UiKit.Lime, OpenHarvestList);
+            harvest.name = "build-harvest";
+            body.Add(harvest);
             switch (shopTab)
             {
                 case 0: ShopSection(body, StructureKind.Refinery, StructureKind.Fabricator, StructureKind.Foundry,
@@ -1670,8 +1673,8 @@ namespace Frontier
                 body.Add(UiKit.Text(UiText.Get("pack.empty.help"), "fr-muted"));
                 var harvest = AvailableLocalGatherer();
                 var gather = IconBtn(harvest != null ? UiText.Get("pack.open-gatherer", harvest.def.LocalizedName.ToUpperInvariant())
-                    : UiText.Get("guide.action.gather-shop"),
-                    harvest != null ? StructureIcon(harvest.def.kind) : "build", UiKit.Lime, RunEmptyPackAction);
+                    : UiText.Get("gather.list.title"),
+                    harvest != null ? StructureIcon(harvest.def.kind) : "mine", UiKit.Lime, RunEmptyPackAction);
                 gather.name = "empty-pack-action";
                 body.Add(gather);
             }

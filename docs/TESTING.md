@@ -206,6 +206,19 @@ The broader `AuthoredTablePreservesShellCopyAndFormatting` test has a pre-existi
 That unrelated assertion is left unchanged. The standalone .NET runner was unavailable on this host; the same linked
 mechanics ran successfully under Unity Mono.
 
+Harvest access follow-up: **58 EditMode** source/progression/localization checks and **10 PlayMode** routing checks passed.
+Build > Harvest is exercised through real buttons for missing, ready and upgrading harvesters; both the list's Scrap run
+and a structure's Wood run collect through the normal exactly-once result flow. Surface-scrap yield/difficulty and Mine
+requirements are checked explicitly. Surface tests reject resource models/labels/tap targets and compare saved slot-direction
+prefixes at 12, 18 and 30 slots, including travel to high-pad worlds. Existing shortage-return, first-session cues, empty cargo,
+world actions and world-label checks remain covered. Sixteen two-phone captures cover Build, ready/missing/pending lists,
+the structure popup and debris/clearance; all had zero setup or UI-lint issues.
+Representative surface, list, popup and debris images were visually inspected; native touch still needs device testing.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "harvest-access,obstacle-surface,obstacle-clearance"
+```
+
 ```powershell
 dotnet test .\tests\Frontier.Core.Tests\Frontier.Core.Tests.csproj --filter "FullyQualifiedName~HarvestRun"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -TestFilter "NodeHarvestRunTests;DrillHarvestRunTests;HarvestRunsTests"

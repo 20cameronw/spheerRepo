@@ -110,7 +110,7 @@ namespace Frontier
         {
             switch (route)
             {
-                case ObjectiveRoute.Gather: OpenGatherShop(); break;
+                case ObjectiveRoute.Gather: OpenHarvestList(); break;
                 case ObjectiveRoute.Build: shopTab = 0; OpenShop(); break;
                 case ObjectiveRoute.Map: OpenMap(); break;
                 case ObjectiveRoute.Command: OpenResearch(); break;

@@ -26,39 +26,107 @@ namespace Frontier
         VisualElement banner;
         int alarmFuel = 3;
 
-        void OnGatherTapped(GatherSpot spot, Transform anchor)
+        bool StructureCanGather(PlacedStructure structure, GatherSpot spot)
         {
-            if (busy || defense.Active) return;
-            CloseModal();
-            if (popup != null && popupAnchor == anchor) { ClosePopup(); return; }
-            PlacedStructure gatherer = null;
+            if (structure == null || structure.planetId != gs.planet.Id || !structure.def.kind.IsGather()) return false;
+            foreach (var candidate in gs.SpotsFor(gs.planet, structure.def.kind))
+                if (candidate.resource == spot.resource && candidate.game == spot.game) return true;
+            return false;
+        }
+
+        bool ReadyToHarvest(PlacedStructure structure)
+        {
+            return gs.IsOperational(structure) && !gs.IsBuilderBusy(structure);
+        }
+
+        PlacedStructure HarvestOwner(GatherSpot spot)
+        {
+            PlacedStructure owner = null;
             foreach (var structure in gs.structures)
             {
-                if (structure.planetId != gs.planet.Id || !structure.def.kind.IsGather() || !gs.IsOperational(structure)) continue;
-                foreach (var candidate in gs.SpotsFor(gs.planet, structure.def.kind))
-                    if (candidate.resource == spot.resource && candidate.game == spot.game &&
-                        (gatherer == null || gs.StructureBonus(structure) > gs.StructureBonus(gatherer))) gatherer = structure;
+                if (!StructureCanGather(structure, spot)) continue;
+                if (owner == null || (ReadyToHarvest(structure) && (!ReadyToHarvest(owner) ||
+                    gs.StructureBonus(structure) > gs.StructureBonus(owner)))) owner = structure;
             }
-            var owner = gatherer;
-            OpenPopup("resource-" + spot.resource.id, anchor, UiKit.Ui(spot.resource.color), body =>
+            return owner;
+        }
+
+        void OpenHarvestList()
+        {
+            if (busy || defense.Active) return;
+            OpenModal("harvest", "mine", UiText.Get("gather.list.title"), UiKit.Lime, BuildHarvestList);
+        }
+
+        void BuildHarvestList(VisualElement body)
+        {
+            body.Add(UiKit.Text(UiText.Get("gather.list.help", gs.planet.Name), "fr-muted"));
+            var shown = new HashSet<string>();
+            foreach (var definition in gs.db.structures)
             {
-                body.Add(UiKit.Text(spot.resource.LocalizedName, "fr-h2"));
-                body.Add(UiKit.Text(spot.resource.LocalizedDescription, "fr-small"));
-                if (owner != null)
+                if (definition == null || !definition.Implemented || !definition.kind.IsGather()) continue;
+                foreach (var spot in gs.SpotsFor(gs.planet, definition.kind))
                 {
-                    body.Add(UiKit.Text(UiText.Get("world.site.tool", gs.ToolName(spot.game)), "fr-small"));
-                    body.Add(IconBtn(UiText.Get("world.site.gather"), Icons.ForTool(spot.game), UiKit.Lime, () =>
+                    if (!shown.Add(spot.resource.id + "-" + spot.game)) continue;
+                    var owner = HarvestOwner(spot);
+                    var required = owner != null ? owner.def : definition;
+                    var card = Card(UiKit.Ui(spot.resource.color));
+                    card.name = "harvest-resource-" + spot.resource.id + "-" + spot.game;
+                    card.Add(UiKit.Text(spot.resource.LocalizedName, "fr-h2"));
+                    card.Add(UiKit.Text(UiText.Get("gather.list.requires", required.LocalizedName), "fr-small"));
+                    if (owner != null && ReadyToHarvest(owner))
+                        AddHarvestAction(card, spot, owner);
+                    else if (owner != null)
                     {
-                        ClosePopup();
-                        StartGather(spot, anchor, gs.StructureBonus(owner));
-                    }));
+                        card.Add(Note(gs.BuilderJobStatus(owner), UiKit.Amber));
+                        var view = IconBtn(UiText.Get("gather.list.view"), "build", UiKit.Cyan, () => OpenSourceStructure(owner));
+                        view.name = "harvest-job-" + spot.resource.id;
+                        card.Add(view);
+                    }
+                    else
+                    {
+                        string locked = gs.BuildLockReason(required);
+                        if (!string.IsNullOrEmpty(locked)) card.Add(Note(locked, UiKit.Amber));
+                        var build = IconBtn(UiText.Get("gather.list.build", required.LocalizedName), "build",
+                            UiKit.Lime, () => OpenBuildDefinition(required));
+                        build.name = "harvest-build-" + spot.resource.id;
+                        card.Add(build);
+                    }
+                    body.Add(card);
                 }
-                else
-                {
-                    body.Add(UiKit.Text(UiText.Get("world.site.build"), "fr-small"));
-                    body.Add(IconBtn(UiText.Get("nav.build"), "build", UiKit.Lime, OpenShop));
-                }
-            }, true);
+            }
+            if (shown.Count == 0) body.Add(Note(UiText.Get("gather.empty"), UiKit.Muted));
+        }
+
+        void AddHarvestAction(VisualElement body, GatherSpot spot, PlacedStructure owner)
+        {
+            int estimate = Mathf.Max(1, Mathf.RoundToInt(spot.baseYield * gs.ToolMultiplier(spot.game) *
+                (1f + gs.StructureBonus(owner) + gs.TerraformerHarvestBonus)));
+            body.Add(UiKit.Text(UiText.Get("gather.estimate", estimate), "fr-tiny"));
+            var go = IconBtn(UiText.Get("gather.harvest"), Icons.ForTool(spot.game), UiKit.Lime,
+                () => BeginHarvest(spot, owner));
+            go.name = "harvest-start-" + spot.resource.id + "-" + spot.game;
+            body.Add(go);
+        }
+
+        void BeginHarvest(GatherSpot spot, PlacedStructure owner)
+        {
+            if (busy || defense.Active) return;
+            owner = owner != null && owner.planetId == gs.planet.Id ? gs.StructureAt(gs.planet, owner.slot) : null;
+            if (!StructureCanGather(owner, spot) || !ReadyToHarvest(owner))
+            {
+                Toast(UiText.Get("gather.list.not-ready"), UiKit.Amber);
+                RefreshModal(); RefreshPopup();
+                return;
+            }
+            var anchor = world.AnchorFor(owner);
+            if (anchor == null)
+            {
+                Debug.LogError("Frontier: harvester has no world anchor: " + owner.def.id);
+                Toast(UiText.Get("guide.gatherer-appearing"), UiKit.Amber);
+                return;
+            }
+            CloseAll();
+            StartGather(spot, anchor, gs.StructureBonus(owner));
         }
 
         // ------------------------------------------------------------ popup core
@@ -523,10 +591,6 @@ namespace Frontier
                 float bonus = gs.StructureBonus(s);
                 var spots = gs.SpotsFor(gs.planet, s.def.kind);
                 body.Add(SectionLabel(UiText.Get(spots.Count > 0 ? "gather.title" : "gather.empty")));
-                string verb = UiText.Get(s.def.kind == StructureKind.Biodome ? "gather.harvest" :
-                    game == MinigameKind.Drill ? "gather.drill" : game == MinigameKind.Siphon ? "gather.siphon" :
-                    game == MinigameKind.Excavate ? "gather.excavate" : game == MinigameKind.Salvage ? "gather.salvage" :
-                    game == MinigameKind.Chop ? "gather.chop" : "gather.mine");
                 bool guideMarked = false;
                 foreach (var spot in spots)
                 {
@@ -541,7 +605,8 @@ namespace Frontier
                     txt.Add(UiKit.Text(sp.resource.LocalizedName, "fr-small"));
                     txt.Add(UiKit.Text(UiText.Get("gather.estimate", est), "fr-tiny"));
                     row.Add(txt);
-                    var go = IconBtn(verb, "play", c, () => { ClosePopup(); StartGather(sp, t, bonus); });
+                    var go = IconBtn(UiText.Get("gather.harvest"), "play", c, () => BeginHarvest(sp, s));
+                    go.name = "harvest-start-" + sp.resource.id + "-" + sp.game;
                     go.style.marginTop = 0;
                     row.Add(go);
                     if (!guideMarked && s.def.kind == StructureKind.Lumber)

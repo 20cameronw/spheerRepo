@@ -116,7 +116,6 @@ namespace Frontier
             world.StructureTapped += OnStructureTapped;
             world.SlotTapped += OnSlotTapped;
             world.ObstacleTapped += OnObstacleTapped;
-            world.GatherTapped += OnGatherTapped;
             OnStateChanged();
             BuildProjectResume();
         }
@@ -139,7 +138,6 @@ namespace Frontier
                 world.StructureTapped -= OnStructureTapped;
                 world.SlotTapped -= OnSlotTapped;
                 world.ObstacleTapped -= OnObstacleTapped;
-                world.GatherTapped -= OnGatherTapped;
             }
 
         }

@@ -181,8 +181,7 @@ namespace Frontier
             if (step == 4 && OpenFirstSessionStructure(StructureKind.Alarm)) return;
             if (step == 0 || step == 1)
             {
-                shopTab = 1;
-                OpenShop();
+                OpenGatherShop();
             }
             else if (step == 2 || step == 3 || step == 4)
             {
@@ -221,7 +220,7 @@ namespace Frontier
         PlacedStructure AvailableLocalGatherer()
         {
             foreach (var structure in gs.StructuresOn(gs.planet))
-                if (structure.def.kind.IsGather() && gs.IsOperational(structure) &&
+                if (structure.def.kind.IsGather() && ReadyToHarvest(structure) &&
                     gs.SpotsFor(gs.planet, structure.def.kind).Count > 0) return structure;
             return null;
         }
@@ -229,7 +228,7 @@ namespace Frontier
         void RunEmptyPackAction()
         {
             var gatherer = AvailableLocalGatherer();
-            if (gatherer == null) OpenGatherShop();
+            if (gatherer == null) OpenHarvestList();
             else if (!world.SelectStructure(gatherer))
                 Toast(UiText.Get("guide.gatherer-appearing"), UiKit.Amber);
         }

@@ -171,7 +171,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator SurfaceViewAndResourceObjectsUseLiveActionsWithoutChangingBuildingSlots()
+        public IEnumerator SurfaceViewShowsStructuresAndDebrisWithoutResourceObjectsOrMovingSlots()
         {
             new GameObject("SurfaceInteractionBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -205,18 +205,22 @@ namespace Frontier.Tests
             yield return new WaitForSecondsRealtime(0.7f);
             Assert.Less(Mathf.Abs(rt.Camera.transform.position.z), Mathf.Abs(overview.z) * 0.5f);
             Assert.AreEqual(UiText.Get("world.view.orbit"), toggle.tooltip);
-            Assert.AreEqual(anchor, structureAnchor.localPosition, "saved building slots must not move when gathering sites are added");
+            Assert.AreEqual(anchor, structureAnchor.localPosition, "Saved building slots must not move when resource visuals are removed.");
+            foreach (var t in rt.Planet.Spin.GetComponentsInChildren<Transform>(true))
+            {
+                Assert.IsFalse(t.name.StartsWith("Gather_", StringComparison.Ordinal));
+                Assert.AreNotEqual("ResourceSeam", t.name);
+            }
             var resource = rt.State.planet.SpotsFor(MinigameKind.Chop)[0].resource;
-            Assert.IsTrue(rt.Surface.SelectGatherSite(resource));
+            Assert.IsTrue(rt.Surface.SimulateTap(lumber));
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == resource.LocalizedName));
-            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("world.site.gather")));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + resource.id + "-" + MinigameKind.Chop));
             rt.Ui.DebugReset();
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
             yield return null;
             yield return null;
             Assert.IsFalse(rt.Planet.CloseView);
-            yield return new WaitForSecondsRealtime(0.7f);
-            Assert.AreEqual(overview, rt.Camera.transform.position);
+            yield return WaitForCamera(rt.Camera, overview);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
             yield return new WaitForSecondsRealtime(0.15f);
             Vector3 midTransition = rt.Camera.transform.position;
@@ -225,8 +229,7 @@ namespace Frontier.Tests
             yield return null;
             Assert.Less(Vector3.Distance(midTransition, rt.Camera.transform.position), 0.5f,
                 "Reversing the camera mid-flight must start from its current position.");
-            yield return new WaitForSecondsRealtime(0.7f);
-            Assert.AreEqual(overview, rt.Camera.transform.position);
+            yield return WaitForCamera(rt.Camera, overview);
 
             rt.State.backpack.Set(resource.id, 0);
             bool found = false;
@@ -269,6 +272,103 @@ namespace Frontier.Tests
             Assert.IsFalse(rt.Planet.CloseView, "called waves need the full planet visible");
             yield return new WaitForSecondsRealtime(0.7f);
             Assert.AreEqual(overview, rt.Camera.transform.position);
+        }
+
+        [Test]
+        public void RemovingResourceDirectionsPreservesEveryExistingSlotPrefix()
+        {
+            foreach (int count in new[] { 12, 18, 30 })
+            {
+                var existing = WorldSurface.SlotDirections(count + 9);
+                var current = WorldSurface.SlotDirections(count);
+                for (int slot = 0; slot < count; slot++) Assert.AreEqual(existing[slot], current[slot], "slot " + slot);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator BuildHarvestListRoutesMissingAndPendingHarvestersAndCollectsSurfaceScrapOnce()
+        {
+            new GameObject("HarvestListBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("intro-skip");
+            if (skip != null)
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            for (int i = 0; i < 240 && rt.Ui.DebugBusy; i++) yield return null;
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            var wood = rt.Db.FindResource("wood");
+            var scrap = rt.Db.scrap;
+            rt.State.backpack.Clear();
+            rt.Ui.DebugShop(0);
+            var entry = rt.Ui.DebugRoot.Q<Button>("build-harvest");
+            Assert.IsNotNull(entry);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = entry; entry.SendEvent(submit); }
+            yield return null;
+            var missing = rt.Ui.DebugRoot.Q<Button>("harvest-build-" + wood.id);
+            Assert.IsNotNull(missing, "Unbuilt harvesters must offer their real construction route.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + wood.id + "-Chop"));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = missing; missing.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id));
+            var lumber = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            var mine = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Mine), 1);
+            Assert.IsNotNull(lumber); Assert.IsNotNull(mine);
+            yield return null;
+            rt.Ui.DebugHarvestList();
+            var start = rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine");
+            Assert.IsNotNull(start, "Surface scrap must remain harvestable from the list through the Mine.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
+            Assert.IsTrue(rt.Ui.DebugBusy);
+            Assert.IsInstanceOf<VeinGame>(rt.Ui.DebugActiveGather);
+            rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
+            deadline = Time.realtimeSinceStartup + 5;
+            while (rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources") == null && Time.realtimeSinceStartup < deadline)
+                yield return null;
+            var collect = rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources");
+            Assert.IsNotNull(collect);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = collect; collect.SendEvent(submit); }
+            int earned = rt.State.Count(scrap);
+            Assert.Greater(earned, 0);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = collect; collect.SendEvent(submit); }
+            Assert.AreEqual(earned, rt.State.Count(scrap));
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            yield return null;
+
+            Assert.IsTrue(rt.Surface.SimulateTap(lumber));
+            start = rt.Ui.DebugRoot.Q<Button>("harvest-start-" + wood.id + "-Chop");
+            Assert.IsNotNull(start);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
+            Assert.IsInstanceOf<NodeGame>(rt.Ui.DebugActiveGather);
+            rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
+            deadline = Time.realtimeSinceStartup + 5;
+            while (rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources") == null && Time.realtimeSinceStartup < deadline)
+                yield return null;
+            collect = rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources");
+            Assert.IsNotNull(collect);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = collect; collect.SendEvent(submit); }
+            Assert.Greater(rt.State.Count(wood), 0);
+
+            mine = rt.State.StructureOfKind(rt.State.planet, StructureKind.Mine);
+            rt.State.DebugSetBuilderJob(mine, 600, 2);
+            yield return null;
+            rt.Ui.DebugHarvestList();
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine"));
+            var pending = rt.Ui.DebugRoot.Q<Button>("harvest-job-" + scrap.id);
+            Assert.IsNotNull(pending, "Upgrading harvesters must open their job instead of bypassing it or suggesting a duplicate.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pending; pending.SendEvent(submit); }
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            Assert.AreEqual(earned, rt.State.Count(scrap));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+        }
+
+        static IEnumerator WaitForCamera(Camera camera, Vector3 target)
+        {
+            float deadline = Time.realtimeSinceStartup + 3f;
+            while (!camera.transform.position.Equals(target) && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.AreEqual(target, camera.transform.position);
         }
 
         [UnityTest]
@@ -2017,7 +2117,8 @@ namespace Frontier.Tests
             Assert.IsTrue(empty.enabledSelf);
             Assert.AreEqual(0, rt.State.SlotsUsed);
             rt.Ui.DebugEmptyPackAction();
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-tabs"), "No gatherer should lead to the build shop.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("harvest-build-wood"),
+                "No gatherer should lead to the Harvest list's required-building route.");
             Assert.AreEqual(0, rt.State.SlotsUsed);
 
             rt.Ui.DebugReset();

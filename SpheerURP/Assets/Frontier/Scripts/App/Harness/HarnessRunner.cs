@@ -268,6 +268,8 @@ namespace Frontier
         {
             var db = rt.Db; var gs = rt.State; var ui = rt.Ui;
             string showcaseWorld = null;
+            string harvestAccessWorld = gs.planet.Id;
+            PlacedStructure harvestAccessPending = null;
             PlanetData obstacleShowcase = null;
             int obstacleShowcasePad = -1;
             PlacedStructure At(StructureKind k) { return gs.StructureOfKind(gs.planet, k); }
@@ -349,6 +351,37 @@ namespace Frontier
             });
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
             for (int tab = 0; tab < 4; tab++) { int t = tab; yield return new Shot("shop-tab" + t, () => { ResetView(); ui.DebugShop(t); }); }
+            yield return new Shot("harvest-access-surface", () =>
+            {
+                GoTo(harvestAccessWorld); ResetView(); rt.Planet.CloseView = true;
+            }, 0.8f);
+            yield return new Shot("harvest-access-build", () => { GoTo(harvestAccessWorld); ResetView(); ui.DebugShop(1); });
+            yield return new Shot("harvest-access-list", () => { GoTo(harvestAccessWorld); ResetView(); ui.DebugHarvestList(); });
+            yield return new Shot("harvest-access-missing", () =>
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    foreach (var deposit in d.Deposits)
+                        if (deposit.Method == Frontier.Universe.HarvestMethod.Drill) return true;
+                    return false;
+                }, 2, 0, 10000);
+                if (world == null) throw new InvalidOperationException("No harvesting discovery fixture.");
+                GoTo(world); ResetView(); ui.DebugHarvestList();
+            });
+            yield return new Shot("harvest-access-structure", () =>
+            {
+                GoTo(harvestAccessWorld); ResetView(); ui.DebugTapStructure(At(StructureKind.Lumber));
+            });
+            yield return new Shot("harvest-access-pending", () =>
+            {
+                GoTo(harvestAccessWorld); ResetView();
+                var mine = At(StructureKind.Mine);
+                if (mine == null) throw new InvalidOperationException("No Mine for pending harvesting fixture.");
+                harvestAccessPending = mine;
+                gs.DebugSetBuilderJob(mine, 600, mine.level + 1);
+                ui.DebugHarvestList();
+            });
+            if (harvestAccessPending != null) gs.DebugSetBuilderJob(harvestAccessPending, 0);
             yield return new Shot("construction-jobs", ui.DebugBuilders);
             SaveV2 playerFlowBaseline = null;
             void PreparePlayerFlowFixture()

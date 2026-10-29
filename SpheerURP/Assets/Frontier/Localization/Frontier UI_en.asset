@@ -366,8 +366,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336019
-    m_Localized: Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game
-      and collect resources.
+    m_Localized: Tap a harvester, then HARVEST a resource. You can also use Build
+      > Harvest.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336020
@@ -618,8 +618,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336078
-    m_Localized: Tap your Lumber Camp and gather wood. Better runs bring back more
-      cargo.
+    m_Localized: Tap your Lumber Camp, then HARVEST wood. Build > Harvest also lists
+      this world's resources.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336079
@@ -8379,7 +8379,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205707
-    m_Localized: Get closer, rotate the planet and tap a resource or building.
+    m_Localized: Rotate to tap buildings or debris. Use Build > Harvest for resources.
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205708
@@ -9182,6 +9182,30 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4760616387567616
     m_Localized: OVERHEATED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015407820800
+    m_Localized: HARVEST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901184
+    m_Localized: '{0}: choose a resource.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901185
+    m_Localized: Uses {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901186
+    m_Localized: BUILD {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901187
+    m_Localized: VIEW HARVESTER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901188
+    m_Localized: Harvester unavailable. Choose a ready one.
     m_Metadata:
       m_Items: []
   references:

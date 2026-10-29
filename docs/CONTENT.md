@@ -139,9 +139,14 @@ three seams and eighteen pings remain. Salvage selects a moving target, then hol
 0.55 and 1.4 seconds. Early/late releases spend a cast but never remove previous captures; cancellation or pause spends
 nothing. Six fragments/ten casts and all quality ceilings and harvest/reward settlement remain unchanged.
 
-Natural trees and mineral seams are tappable on the planet. Their resource panels launch the existing
-gather/reward flow through an operational matching structure, preserving method restrictions, hazard
-gates and structure bonuses. Sites do not consume or move persisted building pads. Surface View crops
+The planet surface shows placed structures and removable debris, plus empty pads only in build mode.
+Resources have no separate surface model, label, collider or tap target. Tap a harvester and choose HARVEST,
+or open Build > Harvest for this planet's short resource list. Each entry names its required harvester;
+ready structures launch the same gather/reward flow, pending structures open their job, and missing structures
+route to their own construction card. Method restrictions, hazard/research gates and structure bonuses remain.
+Surface scrap stays in the existing Mine opportunities and is obtainable from either the Mining Rig or the list;
+it has not been merged into debris rewards or removed. GatherSpot yields/difficulty and auto-harvesting are unchanged.
+The stable slot-direction prefix and saved pads/structures/obstacles do not move. Surface View crops
 into the upper hemisphere for rotation and selection; Orbit View restores the overview. Called waves
 return to the overview so enemies remain visible. Missing-resource
 cost chips are native buttons with localized find tooltips, not separate FIND actions. Debris has no

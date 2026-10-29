@@ -19,7 +19,6 @@ namespace Frontier
         public event Action<PlacedStructure, Transform> StructureTapped;
         public event Action<int, Transform> SlotTapped;
         public event Action<int, Transform> ObstacleTapped;
-        public event Action<GatherSpot, Transform> GatherTapped;
 
         public Func<Vector2, bool> IsOverUi;
         public bool Locked;
@@ -36,7 +35,6 @@ namespace Frontier
         readonly List<Item> items = new List<Item>();
         readonly List<Item> pads = new List<Item>();
         readonly List<Item> obstacles = new List<Item>();
-        readonly List<Item> gatherSites = new List<Item>();
         string signature = "";
         string obstacleSignature = "";
         PanelSettings labelPanel;
@@ -49,7 +47,6 @@ namespace Frontier
             public Transform label;
             public PlacedStructure structure;
             public bool obstacle;
-            public GatherSpot gatherSpot;
             public int slot;
             public float phase;
             public Transform glow;
@@ -109,18 +106,13 @@ namespace Frontier
             int count = p.BuildingSlots;
             foreach (var structure in gs.structures)
                 if (structure.planetId == p.Id) count = Mathf.Max(count, structure.slot + 1);
-            var spots = new List<GatherSpot>();
-            foreach (MinigameKind game in Enum.GetValues(typeof(MinigameKind)))
-                spots.AddRange(p.SpotsFor(game));
-            dirs = SlotDirections(count + spots.Count);
+            dirs = SlotDirections(count);
             signature = null;
             obstacleSignature = null;
             ClearAll();
             RebuildStructures();
             RebuildObstacles();
             RebuildPads();
-            for (int i = 0; i < spots.Count; i++)
-                gatherSites.Add(MakeGatherSite(spots[i], count + i));
         }
 
         public static Vector3[] SlotDirections(int count)
@@ -166,8 +158,7 @@ namespace Frontier
             foreach (var i in items) DestroyItem(i);
             foreach (var i in pads) if (i.t != null) Destroy(i.t.gameObject);
             foreach (var i in obstacles) DestroyItem(i);
-            foreach (var i in gatherSites) DestroyItem(i);
-            items.Clear(); pads.Clear(); obstacles.Clear(); gatherSites.Clear();
+            items.Clear(); pads.Clear(); obstacles.Clear();
             obstacleSignature = null;
         }
 
@@ -365,34 +356,6 @@ namespace Frontier
             if (model == null) BuildFallbackObstacle(it.t, obstacle.kind, it.materials);
             it.phase = obstacle.pad * 0.31f;
             return it;
-        }
-
-        Item MakeGatherSite(GatherSpot spot, int slot)
-        {
-            var item = NewItem(slot, "Gather_" + spot.resource.id + "_" + slot);
-            item.gatherSpot = spot;
-            var ground = Lit(new Color(0.25f, 0.3f, 0.34f));
-            var resource = Lit(spot.resource.color, 0.2f);
-            item.materials.Add(ground); item.materials.Add(resource);
-            if (spot.game == MinigameKind.Chop)
-            {
-                var bark = Lit(new Color(0.35f, 0.2f, 0.1f));
-                item.materials.Add(bark);
-                Prim(item.t, PrimitiveType.Cylinder, new Vector3(0, 0.25f, 0), new Vector3(0.13f, 0.25f, 0.13f), bark);
-                Prim(item.t, PrimitiveType.Sphere, new Vector3(0, 0.65f, 0), new Vector3(0.55f, 0.65f, 0.55f), resource);
-            }
-            else
-            {
-                Prim(item.t, PrimitiveType.Sphere, new Vector3(0, 0.12f, 0), new Vector3(0.6f, 0.24f, 0.5f), ground);
-                for (int i = 0; i < 3; i++)
-                {
-                    Prim(item.t, PrimitiveType.Capsule, new Vector3((i - 1) * 0.16f, 0.25f, 0),
-                        new Vector3(0.13f, 0.2f + i * 0.04f, 0.13f), resource,
-                        new Vector3(0, i * 65, (i - 1) * 18)).name = "ResourceSeam";
-                }
-            }
-            item.label = MakeLabel(item.t, spot.resource.LocalizedName, Fx.Displayable(spot.resource.color), 0.7f, false, out item.labelElement);
-            return item;
         }
 
         static void BuildFallbackObstacle(Transform parent, int kind, List<Material> materials)
@@ -715,9 +678,6 @@ namespace Frontier
 
         public void RefreshLocalizedLabels()
         {
-            foreach (var site in gatherSites)
-                if (site.labelElement != null)
-                    site.labelElement.Q<Label>().text = site.gatherSpot.resource.LocalizedName;
             foreach (var item in items)
             {
                 var structure = item.structure;
@@ -777,12 +737,10 @@ namespace Frontier
                 foreach (var it in items) if (it.t != null && !it.orbit) it.t.localPosition = dirs[it.slot] * r;
                 foreach (var it in pads) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
                 foreach (var it in obstacles) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
-                foreach (var it in gatherSites) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
             }
             AnimateItems(items);
             AnimateItems(pads);
             AnimateItems(obstacles);
-            AnimateItems(gatherSites);
             HandleInput();
         }
 
@@ -817,8 +775,7 @@ namespace Frontier
                 if (it.label != null)
                 {
                     it.label.localPosition = new Vector3(0f, (it.structure != null ? 1.0f : 0.6f) + bob, 0f);
-                    bool show = facing && !Locked && (it.structure == null || ShowStructureLabels || selected)
-                        && (it.gatherSpot == null || view.CloseView || selected);
+                    bool show = facing && !Locked && (it.structure == null || ShowStructureLabels || selected);
                     it.labelElement.style.visibility = show ? Visibility.Visible : Visibility.Hidden;
                 }
                 if (it.glow != null)
@@ -870,13 +827,12 @@ namespace Frontier
                 foreach (var it in obstacles) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
                 foreach (var it in pads) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
                 foreach (var it in items) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
-                foreach (var it in gatherSites) if (it.t == h.transform && Visible(ProbePoint(it))) { Tap(it); return; }
             }
 
             // Generous screen-space fallback: anything visible near the tap counts.
             float best = 95f * Mathf.Max(0.6f, ScreenMetrics.Height / 1080f);
             Item pick = null;
-            foreach (var list in new[] { items, pads, obstacles, gatherSites })
+            foreach (var list in new[] { items, pads, obstacles })
                 foreach (var it in list)
                 {
                     if (it.t == null) continue;
@@ -893,7 +849,6 @@ namespace Frontier
         {
             Sfx.Click();
             if (it.structure != null) { if (StructureTapped != null) StructureTapped(it.structure, it.t); }
-            else if (it.gatherSpot != null) GatherTapped?.Invoke(it.gatherSpot, it.t);
             else if (it.obstacle) { if (ObstacleTapped != null) ObstacleTapped(it.slot, it.t); }
             else if (SlotTapped != null) SlotTapped(it.slot, it.t);
         }
@@ -901,8 +856,12 @@ namespace Frontier
         /// <summary>Selects a placed structure from the UI using the same path as a world tap.</summary>
         public bool SelectStructure(PlacedStructure structure)
         {
+            if (structure == null || structure.planetId != gs.planet.Id) return false;
+            var current = gs.StructureAt(gs.planet, structure.slot);
+            if (current == null || current.def.id != structure.def.id) return false;
             foreach (var it in items)
-                if (it.structure == structure && it.t != null) { Tap(it); return true; }
+                if (SameStructure(it.structure, current) && it.t != null)
+                { it.structure = current; Tap(it); return true; }
             return false;
         }
 
@@ -917,12 +876,16 @@ namespace Frontier
             return false;
         }
 
-        public bool SelectGatherSite(ResourceSO resource)
+        public Transform AnchorFor(PlacedStructure structure)
         {
-            if (Locked) return false;
-            foreach (var item in gatherSites)
-                if (item.gatherSpot.resource == resource) { Tap(item); return true; }
-            return false;
+            foreach (var item in items)
+                if (SameStructure(item.structure, structure)) return item.t;
+            return null;
+        }
+
+        static bool SameStructure(PlacedStructure a, PlacedStructure b)
+        {
+            return a != null && b != null && a.planetId == b.planetId && a.slot == b.slot && a.def.id == b.def.id;
         }
     }
 }

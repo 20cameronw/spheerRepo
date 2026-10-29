@@ -11,6 +11,7 @@ namespace Frontier
         public VisualElement DebugRoot { get { return root; } }
         public float DebugPanelScale { get { return panelSettings != null ? panelSettings.scale : 1f; } }
         public bool DebugBusy { get { return busy; } }
+        public Minigame DebugActiveGather { get { return activeGatherMinigame; } }
         public void DebugSetServices(Frontier.Services.FrontierServices serviceSet) { services = serviceSet; }
 
         public void DebugRelayout() { ApplyLayout(true); }
@@ -57,6 +58,7 @@ namespace Frontier
         }
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
+        public void DebugHarvestList() { DebugReset(); OpenHarvestList(); }
         public void DebugResourceSource(ResourceSO resource) { DebugReset(); OpenResourceSource(resource); }
         public void DebugProject() { DebugReset(); OpenProjectPanel(); }
         public void DebugGameplayRewardRules(GameplayRewardRules rules) { gameplayRewardRules = rules; }

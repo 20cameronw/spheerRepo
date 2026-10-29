@@ -8859,6 +8859,30 @@ MonoBehaviour:
     m_Key: harvest.drill.overheated
     m_Metadata:
       m_Items: []
+  - m_Id: 4763015407820800
+    m_Key: gather.list.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901184
+    m_Key: gather.list.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901185
+    m_Key: gather.list.requires
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901186
+    m_Key: gather.list.build
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901187
+    m_Key: gather.list.view
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901188
+    m_Key: gather.list.not-ready
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

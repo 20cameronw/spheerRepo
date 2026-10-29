@@ -293,7 +293,7 @@ MonoBehaviour:
   - key: world.view.orbit
     text: ORBIT VIEW
   - key: world.view.help
-    text: Get closer, rotate the planet and tap a resource or building.
+    text: Rotate to tap buildings or debris. Use Build > Harvest for resources.
   - key: world.site.tool
     text: Ready with {0}
   - key: world.site.gather
@@ -934,8 +934,7 @@ MonoBehaviour:
   - key: tutorial.gather.title
     text: 3. Gather
   - key: tutorial.gather.body
-    text: Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and
-      collect resources.
+    text: Tap a harvester, then HARVEST a resource. You can also use Build > Harvest.
   - key: tutorial.refine.title
     text: 4. Refine
   - key: tutorial.refine.body
@@ -1067,7 +1066,8 @@ MonoBehaviour:
     text: Prepare for your first departure. A Lumber Camp supplies wood for your
       first base.
   - key: guide.gather.help
-    text: Tap your Lumber Camp and gather wood. Better runs bring back more cargo.
+    text: Tap your Lumber Camp, then HARVEST wood. Build > Harvest also lists this
+      world's resources.
   - key: guide.store.help
     text: Store extra cargo in a Warehouse on this world to make room for your next
       haul.
@@ -1529,6 +1529,18 @@ MonoBehaviour:
     text: 'Tool: {0}  (LV {1}, damage x{2:0.0})'
   - key: gather.title
     text: GATHER ON THIS PLANET
+  - key: gather.list.title
+    text: HARVEST
+  - key: gather.list.help
+    text: '{0}: choose a resource.'
+  - key: gather.list.requires
+    text: Uses {0}
+  - key: gather.list.build
+    text: BUILD {0}
+  - key: gather.list.view
+    text: VIEW HARVESTER
+  - key: gather.list.not-ready
+    text: Harvester unavailable. Choose a ready one.
   - key: gather.empty
     text: NOTHING TO GATHER HERE
   - key: gather.harvest

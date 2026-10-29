@@ -294,7 +294,8 @@ namespace Frontier
             {
                 Debug.LogWarning("Frontier: project source anchor unavailable: " + structure.def.id);
                 Toast(UiText.Get("project.anchor-missing"), UiKit.Amber);
-                OpenProject(shortageProject);
+                if (shortageProject != null) OpenProject(shortageProject);
+                else OpenHarvestList();
             }
         }
 
