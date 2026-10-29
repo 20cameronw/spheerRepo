@@ -46,6 +46,8 @@ Shortage panels do not inject previous-step or return-to controls into other pan
 Missing-resource chips open a smaller dimmed overlay without discarding the originating screen.
 Keep exact quantities, source names and travel/storage warnings visible; source actions use icon buttons
 with localized tooltips. Back, close and backdrop dismiss only that overlay; choosing a source opens its real destination.
+All shortage source, capacity and manual actions share one compact horizontal strip below the explanations,
+wrapping only when needed; source-specific tooltips identify their destination.
 Project tracking is explicit; card headings use a small star action instead of an extra full-width button.
 Stars toggle tracking on/off, with a cyan selected state and action tooltip. Resume is a star in the top-right
 corner below the HUD bar; first-session guidance reserves that corner. Lab requirements use a lab icon that opens

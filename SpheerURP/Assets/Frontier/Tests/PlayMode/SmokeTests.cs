@@ -90,6 +90,16 @@ namespace Frontier.Tests
             Assert.AreSame(origin, rt.Ui.DebugRoot.Q<FrontierModal>(), "The originating panel stays underneath the overlay.");
             var sheet = overlay.Q(className: "fr-shortage");
             Assert.Less(sheet.resolvedStyle.width, origin.resolvedStyle.width, "Resource help is narrower than a normal panel.");
+            var actions = overlay.Q("shortage-actions");
+            Assert.AreEqual(1, overlay.Query(className: "fr-shortage-actions").ToList().Count,
+                "Source and manual actions share a single horizontal strip.");
+            Assert.AreEqual(FlexDirection.Row, actions.resolvedStyle.flexDirection);
+            var sourceAction = actions.Q<Button>("shortage-build-producer");
+            var manualAction = actions.Q<Button>("shortage-manual");
+            Assert.IsNotNull(sourceAction);
+            Assert.IsNotNull(manualAction);
+            Assert.That(manualAction.layout.y, Is.EqualTo(sourceAction.layout.y).Within(1f));
+            Assert.Greater(manualAction.layout.x, sourceAction.layout.x);
             foreach (var button in overlay.Query<Button>().ToList())
             {
                 Assert.AreEqual(0, button.Query<Label>().ToList().Count, "Shortage actions use icons, not full text rows.");
@@ -2559,6 +2569,46 @@ namespace Frontier.Tests
             rt.Ui.DebugMenu("tutorial");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tutorial.map.body")));
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("network.help")));
+        }
+
+        [UnityTest]
+        public IEnumerator ShortageActionsWrapTogetherOnNarrowPanelsWithoutShrinkingTouchTargets()
+        {
+            new GameObject("ShortageLayoutBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.backpack.Clear();
+            var wood = rt.Db.FindResource("wood");
+            var warehouse = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Warehouse), 0);
+            var storage = rt.State.StorageFor(warehouse);
+            storage.slots[0].resourceId = wood.id;
+            storage.slots[0].count = 12;
+            rt.Ui.DebugShortage(wood, 17);
+            var overlay = rt.Ui.DebugRoot.Q("shortage-overlay");
+            Assert.IsNotNull(overlay);
+            overlay.Q(className: "fr-shortage").style.width = 440;
+            yield return null;
+            yield return null;
+            var actions = overlay.Q("shortage-actions");
+            var buttons = actions.Query<Button>().ToList();
+            Assert.GreaterOrEqual(buttons.Count, 5, "Exercise storage, production and manual actions together.");
+            Assert.AreEqual(Wrap.Wrap, actions.resolvedStyle.flexWrap);
+            Assert.That(buttons[1].layout.y, Is.EqualTo(buttons[0].layout.y).Within(1f),
+                "Actions must fill the row before wrapping, not stack individually.");
+            Assert.Greater(buttons[1].layout.x, buttons[0].layout.x);
+            Assert.Greater(buttons[buttons.Count - 1].layout.y, buttons[0].layout.y,
+                "Extra actions wrap rather than overflow the narrow panel.");
+            foreach (var button in buttons)
+            {
+                Assert.That(button.layout.width, Is.EqualTo(UiKit.Size.Touch).Within(1f));
+                Assert.That(button.layout.height, Is.EqualTo(UiKit.Size.Touch).Within(1f));
+                Assert.GreaterOrEqual(button.layout.x, 0);
+                Assert.LessOrEqual(button.layout.xMax, actions.layout.width + 1);
+            }
+            StringAssert.Contains(rt.State.planet.Name, actions.Q<Button>("shortage-withdraw").tooltip);
+            Assert.AreEqual(12, WarehouseOps.Held(storage, wood.id), "Changing layout never spends stored resources.");
         }
 
         [UnityTest]

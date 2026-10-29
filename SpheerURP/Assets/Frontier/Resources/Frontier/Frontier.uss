@@ -271,7 +271,10 @@
 .fr-shortage .fr-modal-title { min-width: 0; flex-shrink: 1; white-space: normal; letter-spacing: 0; }
 .fr-shortage .fr-modal-head .fr-iconbtn { margin-left: var(--fr-sp-8); }
 .fr-shortage-source { margin-top: var(--fr-sp-12); }
-.fr-shortage-actions { flex-direction: row; flex-wrap: wrap; margin-top: var(--fr-sp-8); }
+.fr-shortage-actions {
+    flex-direction: row; flex-wrap: wrap; align-items: center;
+    flex-shrink: 0; min-width: 0; margin-top: var(--fr-sp-12);
+}
 .fr-shortage-actions .fr-iconbtn { margin-right: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
 
 .fr-tabs { flex-direction: row; margin-bottom: var(--fr-sp-12); flex-shrink: 0; }
