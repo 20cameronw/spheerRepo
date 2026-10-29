@@ -181,19 +181,36 @@ No new screenshot sweep or on-device/IL2CPP run was performed for this bounded m
 
 ### Harvest rule and bot regressions
 
-`NodeHarvestRun`, `DrillHarvestRun`, `SiphonHarvestRun`, `ExcavationHarvestRun` and `SalvageHarvestRun` live in `Frontier.Core`
+`NodeHarvestRun`, `VeinHarvestRun`, `DrillHarvestRun`, `SiphonHarvestRun`, `ExcavationHarvestRun` and `SalvageHarvestRun` live in `Frontier.Core`
 and drive all six actual harvest games, not separate test-only simulations. Their tests are linked into the .NET test project
 and also run under Unity Mono. They cover the
 existing damage/yield rules, rejected cooldown spam, stage overkill, tool scaling, bounded bot completion, deterministic
 replays, pressure/contact and invalid inputs. `MinigameFlowTests` also drives the rendered games through completion,
 verifies paused input is ignored, and waits for explicit collection before the exactly-once result callback.
 The common harvest input gate also rejects input before scene readiness, after completion and after stage cleanup.
+The improvement pass additionally measures 2.2x productive boost rate and real bit descent, heat lockout/recovery,
+timing-zone/tool/difficulty effects, actual braking speed and bounded chain repairs, vent recovery and pump exclusion,
+direction clues across seeds, and early/ready/late/cancelled tethers. Synthetic real UI Toolkit events cover independently
+owned pressure/boost fingers, unrelated releases, cancel/capture loss, keyboard rearming, pause/focus loss and finish resets.
+Salvage releases settle once; cancellation and pause cannot consume a cast. The Editor cannot certify native multi-touch,
+haptics or subjective fun: these still need human phone playtesting.
+
+Harvest improvement verification: **58 EditMode passed**, with two runtime-unsupported allocation counters skipped;
+**21 PlayMode passed**. A two-second controlled drill sample measured progress **0.0950 normal / 0.2090 boosted**
+and bit height **0.932 / 0.880**. Eighteen phone confirmation captures (1080x1920 and 1080x2340) cover all six games,
+boost/overheat and a result; no setup errors, overflow, sub-12dp text or sub-48dp touch targets were reported.
+The confirmation exposed an almost invisible billboard tether; it is now volumetric geometry, with a rendered-game
+regression checking its width, length and mesh volume. No further polish loop was run.
+The broader `AuthoredTablePreservesShellCopyAndFormatting` test has a pre-existing stale defense-copy assertion
+(`guide.defend.help` expects "planets cannot be attacked"; HEAD already says "Call a wave from an Alarm").
+That unrelated assertion is left unchanged. The standalone .NET runner was unavailable on this host; the same linked
+mechanics ran successfully under Unity Mono.
 
 ```powershell
 dotnet test .\tests\Frontier.Core.Tests\Frontier.Core.Tests.csproj --filter "FullyQualifiedName~HarvestRun"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -TestFilter "NodeHarvestRunTests;DrillHarvestRunTests;HarvestRunsTests"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform PlayMode -TestFilter MinigameFlowTests
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "game-chop,game-mine,game-drill,minigame-result,minigame-drill-result"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "game-chop,game-mine,game-drill,game-siphon,game-excavate,game-salvage,harvest-boost,harvest-overheat,minigame-drill-result"
 ```
 
 The drill screenshot cases locate a real generated drilling deposit. A missing deposit or failed game start is an error,

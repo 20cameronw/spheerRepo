@@ -272,7 +272,12 @@ MonoBehaviour:
   - key: harvest.vein.title
     text: FOLLOW THE VEIN
   - key: harvest.vein.hint
-    text: Steer the cutter through bright ore. Dark unstable rock damages the rig.
+    text: Steer through bright ore. Hold BRAKE (Space) for time to plan. Three rich
+      seams in a row repair the rig.
+  - key: harvest.vein.brake
+    text: HOLD BRAKE
+  - key: harvest.vein.chain
+    text: Rich chain {0} - every 3 repairs the rig
   - key: harvest.vein.metric
     text: RICH SEAMS
   - key: harvest.vein.left
@@ -673,12 +678,31 @@ MonoBehaviour:
   - key: harvest.drill.title
     text: BORE
   - key: harvest.drill.hint
-    text: Press to drive the drill into the ore. Keep the pressure needle inside
-      the green band
+    text: Hold PRESSURE (Space) in the green band. Hold BOOST (Shift) to drill faster.
+      Release BOOST to cool; overheating briefly stops cutting.
+  - key: harvest.drill.boost
+    text: HOLD BOOST
+  - key: harvest.drill.heat
+    text: HEAT {0}% - release BOOST before 100%
+  - key: harvest.drill.cooling
+    text: COOLING - cutting resumes at 35% heat
+  - key: harvest.drill.overheated
+    text: OVERHEATED
+  - key: harvest.chop.timing-hint
+    text: Tap SWING (Space) as the marker crosses the middle. Green is good; the
+      very center is perfect. Wait for the axe to recover.
+  - key: harvest.chop.swing
+    text: SWING
+  - key: harvest.chop.result.perfect
+    text: PERFECT - axe recovering
+  - key: harvest.chop.result.good
+    text: GOOD - axe recovering
+  - key: harvest.chop.result.miss
+    text: MISS - wait for the middle
   - key: harvest.drill.metric
     text: Seconds on target
   - key: harvest.drill.hold-control
-    text: HOLD
+    text: HOLD PRESSURE
   - key: harvest.drill.hold
     text: HOLD TO DRILL
   - key: harvest.drill.adjust
@@ -690,8 +714,14 @@ MonoBehaviour:
   - key: harvest.siphon.metric
     text: Perfect pumps
   - key: harvest.siphon.hint
-    text: Tap PUMP when the needle crosses the capture window. Clean pulses keep
-      the gas flowing
+    text: PUMP (Space) in the green window. Pressure narrows it; hold VENT (Shift)
+      to recover. Clean pump chains steady the window.
+  - key: harvest.siphon.vent
+    text: HOLD VENT
+  - key: harvest.siphon.venting
+    text: VENTING - pressure recovering
+  - key: harvest.siphon.pressure
+    text: PRESSURE {0}% - clean chain {1}
   - key: harvest.siphon.pump
     text: PUMP
   - key: harvest.siphon.watch
@@ -711,7 +741,28 @@ MonoBehaviour:
   - key: harvest.excavate.metric
     text: Seams uncovered
   - key: harvest.excavate.hint
-    text: Ping the grid to read echoes. Brighter returns mark the buried seam
+    text: Ping a cell, then follow its direction and distance clue to the seam. Each
+      step is one grid cell.
+  - key: harvest.excavate.direction
+    text: '{0} - {1} steps from your last ping'
+  - key: harvest.excavate.direction.up.left
+    text: UP + LEFT
+  - key: harvest.excavate.direction.up.right
+    text: UP + RIGHT
+  - key: harvest.excavate.direction.up.same
+    text: UP
+  - key: harvest.excavate.direction.down.left
+    text: DOWN + LEFT
+  - key: harvest.excavate.direction.down.right
+    text: DOWN + RIGHT
+  - key: harvest.excavate.direction.down.same
+    text: DOWN
+  - key: harvest.excavate.direction.same.left
+    text: LEFT
+  - key: harvest.excavate.direction.same.right
+    text: RIGHT
+  - key: harvest.excavate.direction.same.same
+    text: HERE
   - key: harvest.excavate.ping
     text: PING
   - key: harvest.excavate.progress
@@ -743,7 +794,18 @@ MonoBehaviour:
   - key: harvest.salvage.metric
     text: Caches recovered
   - key: harvest.salvage.hint
-    text: Tap tumbling wreckage to catch it with your claw. Misses cost a cast
+    text: Tap wreckage (or use arrow keys) to select. Hold TETHER (Space), then release
+      when it says RELEASE. Early or late releases cost a cast.
+  - key: harvest.salvage.tether
+    text: HOLD TETHER
+  - key: harvest.salvage.selected
+    text: Target {0} selected - hold TETHER
+  - key: harvest.salvage.charging
+    text: TETHERING - keep holding
+  - key: harvest.salvage.release
+    text: RELEASE NOW
+  - key: harvest.salvage.slipping
+    text: TETHER SLIPPING - release and try again
   - key: harvest.salvage.help
     text: "RECOVER {0} FRAGMENTS  \xB7  TAP A TARGET"
   - key: harvest.salvage.locked

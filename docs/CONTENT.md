@@ -118,7 +118,26 @@ games; new purchases use the catalog rather than requiring two parallel upgrade 
 Mine now runs a five-lane descending vein cutter: read six upcoming rows, steer into bright elongated
 rich seams, and avoid dark flattened unstable rock. Four hull points and eighteen rows bound a run.
 Rich seams yield three ore versus one from ordinary rock; accumulated ore determines quality.
-Stronger tools preserve existing yield benefits and add reaction time. Pressure-band drilling stays unchanged.
+Stronger tools preserve existing yield benefits and add reaction time. Hold BRAKE (Space) halves the real row speed;
+each three consecutive rich seams restores one lost integrity point, never multiplying ore or exceeding four integrity.
+
+Chopping uses a moving timing marker and a central good zone with a narrower perfect center. Tap SWING or press Space;
+the existing axe cooldown, four stages and perfect/good/miss damage remain. Difficulty changes marker speed, and tool power
+and tolerance widen the forgiving zone. Axe/tree impacts still reflect the actual swing result.
+
+Drilling retains independent pressure control (Space) and adds hold BOOST (left Shift): productive progress is 2.2x,
+with slightly stronger pressure rise. Heat gains 28 percentage points/second during boost and cools at 35/second otherwise.
+At 100% it pauses cutting until 35%, preserving all earned depth; releasing boost early avoids the lockout.
+The bit and ore surface follow real progress, not an accelerated cosmetic timer. A 90-second safety finish keeps earned
+partial quality proportional to depth (idle timeout yields zero).
+
+Siphoning adds pressure management: pumping adds 28% pressure, narrowing the capture window by up to 35%.
+Hold VENT (left Shift) to cool pressure at 50%/second rather than passive 5.5%; pumping is blocked while venting.
+Consecutive clean pumps stabilize the next window, capped at 16% extra width; seven pulses and averaged quality remain.
+Excavation now gives grid direction plus Manhattan steps from the last ping, rather than only vague echo strength;
+three seams and eighteen pings remain. Salvage selects a moving target, then holds TETHER (Space) and releases between
+0.55 and 1.4 seconds. Early/late releases spend a cast but never remove previous captures; cancellation or pause spends
+nothing. Six fragments/ten casts and all quality ceilings and harvest/reward settlement remain unchanged.
 
 Natural trees and mineral seams are tappable on the planet. Their resource panels launch the existing
 gather/reward flow through an operational matching structure, preserving method restrictions, hazard

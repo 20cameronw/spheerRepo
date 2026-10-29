@@ -14,6 +14,8 @@ namespace Frontier
         public int Integrity { get; private set; } = 4;
         public int Ore { get; private set; }
         public int RichSeams { get; private set; }
+        public int RichChain { get; private set; }
+        public bool Braking { get; private set; }
         public bool Completed { get { return Depth >= Rows || Integrity <= 0; } }
         public float Progress { get { return clock / rowSeconds; } }
         public float Quality { get { return Math.Min(1f, Ore / (Rows * 3f)); } }
@@ -52,18 +54,30 @@ namespace Frontier
 
         public void Advance(float seconds)
         {
+            Advance(seconds, false);
+        }
+
+        public void Advance(float seconds, bool brake)
+        {
             HarvestInput.Seconds(seconds);
             if (Completed) return;
-            clock += seconds;
+            Braking = brake;
+            clock += seconds * (brake ? 0.5f : 1f);
             while (!Completed && clock >= rowSeconds)
             {
                 clock -= rowSeconds;
                 int value = cells[Depth++, Column];
-                if (value < 0) Integrity--;
+                if (value < 0) { Integrity--; RichChain = 0; }
                 else
                 {
                     Ore += value;
-                    if (value == 3) RichSeams++;
+                    if (value == 3)
+                    {
+                        RichSeams++;
+                        RichChain++;
+                        if (RichChain % 3 == 0) Integrity = Math.Min(4, Integrity + 1);
+                    }
+                    else RichChain = 0;
                 }
             }
             if (Completed) clock = 0f;

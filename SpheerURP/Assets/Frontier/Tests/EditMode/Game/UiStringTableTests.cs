@@ -115,7 +115,7 @@ namespace Frontier.Tests
             Assert.AreEqual("Crew job complete", UiText.Get("notifications.job.title"));
             Assert.AreEqual("FELL THE TREE", UiText.Get("harvest.node.title.tree"));
             Assert.AreEqual("Axe", UiText.Get("harvest.tool.axe"));
-            Assert.AreEqual("HOLD", UiText.Get("harvest.drill.hold-control"));
+            Assert.AreEqual("HOLD PRESSURE", UiText.Get("harvest.drill.hold-control"));
             Assert.AreEqual("PRESSURE LOCK", UiText.Get("harvest.drill.locked"));
             Assert.AreEqual("PULSES 2/4   ·   Clean pressure lock",
                 UiText.Get("harvest.siphon.status", 2, 4, UiText.Get("harvest.siphon.clean")));
@@ -243,6 +243,20 @@ namespace Frontier.Tests
                 UiText.Get("hyperspace.score", 1234, 9, 3, 0.5f));
             foreach (var entry in table.entries)
                 Assert.DoesNotThrow(() => table.Get(entry.key, "one", "two", "three", "four", "five"), entry.key);
+        }
+
+        [Test]
+        public void HarvestControlsPreserveLocalizedActionsAndFeedback()
+        {
+            Assert.AreEqual("HOLD PRESSURE", UiText.Get("harvest.drill.hold-control"));
+            Assert.AreEqual("HOLD BOOST", UiText.Get("harvest.drill.boost"));
+            Assert.AreEqual("HEAT 42% - release BOOST before 100%", UiText.Get("harvest.drill.heat", 42));
+            Assert.AreEqual("SWING", UiText.Get("harvest.chop.swing"));
+            Assert.AreEqual("HOLD VENT", UiText.Get("harvest.siphon.vent"));
+            Assert.AreEqual("HOLD BRAKE", UiText.Get("harvest.vein.brake"));
+            Assert.AreEqual("RELEASE NOW", UiText.Get("harvest.salvage.release"));
+            Assert.AreEqual("UP + RIGHT - 3 steps from your last ping",
+                UiText.Get("harvest.excavate.direction", UiText.Get("harvest.excavate.direction.up.right"), 3));
         }
 
         [Test]

@@ -646,6 +646,8 @@ namespace Frontier
                 session.DebugAdvance(Mathf.CeilToInt((session.Run.Route.bossStart + 5) * 60), true, true);
             });
             yield return new Shot("game-drill", () => DrillShot(false), 1.8f);
+            yield return new Shot("harvest-boost", () => { DrillShot(false); ui.DebugDrillPreview(false); }, 1.8f);
+            yield return new Shot("harvest-overheat", () => { DrillShot(false); ui.DebugDrillPreview(true); }, 1.8f);
             yield return new Shot("minigame-drill-result", () => DrillShot(true), 1.2f);
             yield return new Shot("glacia-hud", () => { ResetView(); }, 0.3f);
             yield return new Shot("wave-hud", () => { GoTo("sylva"); ResetView(); rt.Defense.StartWave(3); }, 4.0f);
@@ -756,6 +758,7 @@ namespace Frontier
                 if (world == null) throw new InvalidOperationException("no generated world with siphon deposits");
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Siphon)) throw new InvalidOperationException("world has no siphon gather spot");
+                ui.DebugHarvestPreview(MinigameKind.Siphon);
             }, 1.8f);
             yield return new Shot("game-excavate", () =>
             {
@@ -768,6 +771,7 @@ namespace Frontier
                 if (world == null) throw new InvalidOperationException("no generated world with excavation deposits");
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Excavate)) throw new InvalidOperationException("world has no excavation gather spot");
+                ui.DebugHarvestPreview(MinigameKind.Excavate);
             }, 1.8f);
             yield return new Shot("game-salvage", () =>
             {
@@ -780,6 +784,7 @@ namespace Frontier
                 if (world == null) throw new InvalidOperationException("no generated world with salvage deposits");
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Salvage)) throw new InvalidOperationException("world has no salvage gather spot");
+                ui.DebugHarvestPreview(MinigameKind.Salvage);
             }, 1.8f);
             yield return new Shot("obstacle-surface", () =>
             {

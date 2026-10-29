@@ -38,6 +38,38 @@ namespace Frontier.Tests
         sealed class DrillProbeMinigame : DrillGame
         {
             public bool Ready { get { return stage != null && stage.root.Find("Rig/Spin") != null; } }
+            public void LoseFocus() { stage.FocusLost?.Invoke(); }
+        }
+
+        // Unity's sealed pooled pointer events expose no public synthetic multi-touch setter.
+        static void Touch(EventBase e, int id)
+        {
+            e.GetType().GetProperty("pointerId").SetValue(e, id);
+            e.GetType().GetProperty("pointerType").SetValue(e, UnityEngine.UIElements.PointerType.touch);
+        }
+        static void Down(VisualElement target, int id)
+        {
+            using (var e = PointerDownEvent.GetPooled(new Event { type = EventType.MouseDown, button = 0 }))
+            { Touch(e, id); e.target = target; target.SendEvent(e); }
+        }
+        static void Up(VisualElement target, int id)
+        {
+            using (var e = PointerUpEvent.GetPooled(new Event { type = EventType.MouseUp, button = 0 }))
+            { Touch(e, id); e.target = target; target.SendEvent(e); }
+        }
+        static void Cancel(VisualElement target, int id)
+        {
+            using (var e = PointerCancelEvent.GetPooled())
+            { Touch(e, id); e.target = target; target.SendEvent(e); }
+        }
+        static void Key(VisualElement target, KeyCode key, bool down)
+        {
+            var input = new Event { type = down ? EventType.KeyDown : EventType.KeyUp, keyCode = key };
+            if (down)
+            {
+                using (var e = KeyDownEvent.GetPooled(input)) { e.target = target; target.SendEvent(e); }
+            }
+            else using (var e = KeyUpEvent.GetPooled(input)) { e.target = target; target.SendEvent(e); }
         }
 
         sealed class SiphonProbeMinigame : SiphonGame
@@ -87,6 +119,153 @@ namespace Frontier.Tests
             while (root.Q("minigame-result") == null && Time.realtimeSinceStartup < deadline)
                 yield return null;
             Assert.IsNotNull(root.Q("minigame-result"), "The scheduled result must appear within five seconds.");
+        }
+
+        [UnityTest]
+        public IEnumerator DrillRealControls_KeepTwoPointerOwnershipAndResetOnCancelPauseFocusAndFinish()
+        {
+            var game = new DrillProbeMinigame();
+            game.Run(root, UiKit.Cyan, 10f, 0.5f, null);
+            for (int frame = 0; frame < 120 && !game.Ready; frame++) yield return null;
+            Assert.IsTrue(game.Ready);
+            var pressure = root.Q("drill-pressure");
+            var boost = root.Q("drill-boost");
+            Down(pressure, 1); Down(boost, 2);
+            Assert.IsTrue(game.DebugPressureHeld);
+            Assert.IsTrue(game.DebugBoostHeld);
+            game.DebugAdvanceInput(0.5f);
+            Assert.IsTrue(game.DebugRun.Boosting);
+            Assert.Greater(game.DebugRun.Progress, 0f);
+            Up(pressure, 3);
+            Assert.IsTrue(game.DebugPressureHeld, "An unrelated finger cannot release pressure.");
+            Cancel(boost, 2);
+            Assert.IsFalse(game.DebugBoostHeld);
+            Assert.IsTrue(game.DebugPressureHeld);
+            using (var lost = PointerCaptureOutEvent.GetPooled(pressure, null, 1))
+            {
+                lost.target = pressure; pressure.SendEvent(lost);
+            }
+            Assert.IsFalse(game.DebugPressureHeld, "Capture loss must cancel only its owned action.");
+            Down(pressure, 1);
+            Down(boost, 2); Up(pressure, 1);
+            Assert.IsFalse(game.DebugPressureHeld);
+            Assert.IsTrue(game.DebugBoostHeld, "Releasing pressure must not release boost.");
+            game.Pause();
+            Assert.IsFalse(game.DebugBoostHeld);
+            float time = game.DebugRun.Elapsed;
+            game.DebugAdvanceInput(1f);
+            Assert.AreEqual(time, game.DebugRun.Elapsed);
+            game.Resume();
+            Assert.IsFalse(game.DebugPressureHeld);
+            Key(pressure, KeyCode.Space, true); Key(boost, KeyCode.LeftShift, true);
+            Assert.IsTrue(game.DebugPressureHeld); Assert.IsTrue(game.DebugBoostHeld);
+            game.LoseFocus();
+            Assert.IsTrue(game.IsPaused);
+            Assert.IsFalse(game.DebugPressureHeld); Assert.IsFalse(game.DebugBoostHeld);
+            game.Resume();
+            Key(pressure, KeyCode.Space, true);
+            Assert.IsFalse(game.DebugPressureHeld, "A still-held/repeating key cannot restart after focus loss.");
+            Key(pressure, KeyCode.Space, false); Key(boost, KeyCode.LeftShift, false);
+            Key(pressure, KeyCode.Space, true); Key(boost, KeyCode.LeftShift, true);
+            Assert.IsTrue(game.DebugPressureHeld); Assert.IsTrue(game.DebugBoostHeld);
+            game.DebugComplete(0.8f, 1, 1);
+            Assert.IsFalse(game.DebugPressureHeld); Assert.IsFalse(game.DebugBoostHeld);
+            Down(pressure, 1);
+            Assert.IsFalse(game.DebugPressureHeld);
+            root.Clear();
+        }
+
+        [UnityTest]
+        public IEnumerator MiningBrakeAndSiphonVent_ChangeLiveSimulationAndResetOnPause()
+        {
+            var mine = new VeinGame();
+            mine.Run(root, UiKit.Cyan, 1f, 0.5f, null);
+            for (int frame = 0; frame < 120 && !mine.DebugReady; frame++) yield return null;
+            Assert.IsTrue(mine.DebugReady);
+            var brake = root.Q("vein-brake");
+            float start = mine.DebugRun.Progress;
+            Down(brake, 1); mine.DebugAdvance(0.2f);
+            float slow = mine.DebugRun.Progress - start;
+            Up(brake, 1); mine.DebugAdvance(0.2f);
+            float fast = mine.DebugRun.Progress - start - slow;
+            Assert.AreEqual(slow * 2f, fast, 0.0001f);
+            Down(brake, 1); mine.Pause(); mine.Resume(); mine.DebugAdvance(0f);
+            Assert.IsFalse(mine.DebugRun.Braking);
+            root.Clear();
+
+            var siphon = new SiphonProbeMinigame();
+            siphon.Run(root, UiKit.Cyan, 1f, 0.5f, null);
+            for (int frame = 0; frame < 120 && !siphon.Ready; frame++) yield return null;
+            Assert.IsTrue(siphon.Ready);
+            siphon.DebugPump();
+            var vent = root.Q("siphon-vent");
+            Down(vent, 1); siphon.DebugAdvance(0.3f);
+            Assert.AreEqual(0.13f, siphon.DebugRun.Pressure, 0.0001f);
+            siphon.DebugPump();
+            Assert.AreEqual(1, siphon.DebugRun.Pulses);
+            Up(vent, 1); siphon.DebugAdvance(0f); siphon.DebugPump();
+            Assert.AreEqual(2, siphon.DebugRun.Pulses);
+            Down(vent, 1); siphon.Pause(); siphon.Resume(); siphon.DebugAdvance(0f);
+            Assert.IsFalse(siphon.DebugRun.Venting);
+            root.Clear();
+        }
+
+        [UnityTest]
+        public IEnumerator ChopTimingControls_SwingFromBarNotPointerLocationAndFreezeWhilePaused()
+        {
+            var game = new NodeProbeMinigame(true);
+            game.Run(root, UiKit.Cyan, 1f, 0.5f, null);
+            for (int frame = 0; frame < 120 && !game.Ready; frame++) yield return null;
+            Assert.IsTrue(game.Ready);
+            Assert.IsNotNull(root.Q("chop-timing"));
+            int swings = game.DebugRun.Swings;
+            Key(root.Q("chop-swing"), KeyCode.Space, true);
+            Assert.AreEqual(swings + 1, game.DebugRun.Swings);
+            game.Advance(game.DebugRun.SwingSeconds);
+            Key(root.Q("chop-swing"), KeyCode.Space, true);
+            Assert.AreEqual(swings + 1, game.DebugRun.Swings, "Key repeats must not auto-swing.");
+            Key(root.Q("chop-swing"), KeyCode.Space, false);
+            Key(root.Q("chop-swing"), KeyCode.Space, true);
+            Assert.AreEqual(swings + 2, game.DebugRun.Swings);
+            game.Pause();
+            float marker = game.DebugRun.Marker;
+            game.DebugTimedSwing();
+            Assert.AreEqual(marker, game.DebugRun.Marker);
+            Assert.AreEqual(swings + 2, game.DebugRun.Swings);
+            root.Clear();
+        }
+
+        [UnityTest]
+        public IEnumerator SalvageRealTether_ReleaseCapturesOnceButCancelAndPauseDoNotSpend()
+        {
+            var game = new SalvageProbeMinigame();
+            int callbacks = 0;
+            game.Run(root, UiKit.Cyan, 1f, 0.5f, r => callbacks++);
+            for (int frame = 0; frame < 120 && !game.Ready; frame++) yield return null;
+            Assert.IsTrue(game.Ready);
+            var tether = root.Q("salvage-tether");
+            game.DebugSelect(0); Down(tether, 1); game.DebugAdvance(0.8f);
+            Assert.IsTrue(game.DebugRun.TetherReady);
+            Assert.IsTrue(game.DebugTetherIsVolume, "Tether cannot be a subpixel billboard.");
+            Assert.Greater(game.DebugTetherLength, 0.3f);
+            Assert.GreaterOrEqual(game.DebugTetherWidth, 0.1f);
+            Cancel(tether, 1); game.DebugAdvance(0f);
+            Assert.AreEqual(0, game.DebugRun.Casts);
+            game.DebugSelect(0); Down(tether, 1); game.DebugAdvance(0.8f);
+            game.Pause(); game.Resume(); game.DebugAdvance(0f);
+            Assert.AreEqual(0, game.DebugRun.Casts);
+            for (int target = 0; target < SalvageHarvestRun.TargetCount; target++)
+            {
+                game.DebugSelect(target);
+                Down(tether, 1); game.DebugAdvance(0.8f);
+                Up(tether, 1); game.DebugAdvance(0f);
+                Up(tether, 1); game.DebugAdvance(0f);
+            }
+            Assert.AreEqual(6, game.DebugRun.Casts);
+            Assert.AreEqual(6, game.DebugRun.Captured);
+            yield return WaitForResult();
+            game.ContinueResult(); game.ContinueResult();
+            Assert.AreEqual(1, callbacks);
         }
 
         [UnityTest]
@@ -147,7 +326,8 @@ namespace Frontier.Tests
             Assert.IsNotNull(root.Q<Button>("minigame-resume"));
             game.RequestAbandon();
             game.ConfirmAbandon();
-            yield return new WaitForSecondsRealtime(0.35f);
+            float deadline = Time.realtimeSinceStartup + 3f;
+            while (callbacks == 0 && Time.realtimeSinceStartup < deadline) yield return null;
 
             Assert.AreEqual(1, callbacks);
             Assert.IsTrue(result.abandoned);
@@ -343,7 +523,8 @@ namespace Frontier.Tests
                     game.DebugStrike(HarvestStrike.Perfect);
                     if (hit < 7)
                     {
-                        Assert.AreEqual("RECOVERING", root.Q<Label>("minigame-tool-state").text);
+                        Assert.AreEqual(UiText.Get(tree ? "harvest.chop.result.perfect" : "harvest.state.recovering"),
+                            root.Q<Label>("minigame-tool-state").text);
                         game.Advance(0.6f);
                         Assert.AreEqual("READY", root.Q<Label>("minigame-tool-state").text);
                     }

@@ -3166,8 +3166,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751435
-    m_Localized: Press to drive the drill into the ore. Keep the pressure needle
-      inside the green band
+    m_Localized: Hold PRESSURE (Space) in the green band. Hold BOOST (Shift) to drill
+      faster. Release BOOST to cool; overheating briefly stops cutting.
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751436
@@ -3195,8 +3195,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751442
-    m_Localized: Tap PUMP when the needle crosses the capture window. Clean pulses
-      keep the gas flowing
+    m_Localized: PUMP (Space) in the green window. Pressure narrows it; hold VENT
+      (Shift) to recover. Clean pump chains steady the window.
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751443
@@ -3236,7 +3236,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751452
-    m_Localized: Ping the grid to read echoes. Brighter returns mark the buried seam
+    m_Localized: Ping a cell, then follow its direction and distance clue to the
+      seam. Each step is one grid cell.
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751453
@@ -3300,8 +3301,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751468
-    m_Localized: Tap tumbling wreckage to catch it with your claw. Misses cost a
-      cast
+    m_Localized: Tap wreckage (or use arrow keys) to select. Hold TETHER (Space),
+      then release when it says RELEASE. Early or late releases cost a cast.
     m_Metadata:
       m_Items: []
   - m_Id: 1393722955751469
@@ -3350,7 +3351,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1394302193328128
-    m_Localized: HOLD
+    m_Localized: HOLD PRESSURE
     m_Metadata:
       m_Items: []
   - m_Id: 1394827450212352
@@ -8345,8 +8346,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205699
-    m_Localized: Steer the cutter through bright ore. Dark unstable rock damages
-      the rig.
+    m_Localized: Steer through bright ore. Hold BRAKE (Space) for time to plan. Three
+      rich seams in a row repair the rig.
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205700
@@ -9064,6 +9065,123 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4497463032504320
     m_Localized: DISMISS SUMMARY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510293311488
+    m_Localized: HOLD BRAKE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060224
+    m_Localized: Rich chain {0} - every 3 repairs the rig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060225
+    m_Localized: HOLD BOOST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060226
+    m_Localized: HEAT {0}% - release BOOST before 100%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060227
+    m_Localized: COOLING - cutting resumes at 35% heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060228
+    m_Localized: Tap SWING (Space) as the marker crosses the middle. Green is good;
+      the very center is perfect. Wait for the axe to recover.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060229
+    m_Localized: SWING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060230
+    m_Localized: HOLD VENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060231
+    m_Localized: PRESSURE {0}% - clean chain {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060232
+    m_Localized: '{0} - {1} steps from your last ping'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060233
+    m_Localized: UP + LEFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060234
+    m_Localized: UP + RIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060235
+    m_Localized: UP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060236
+    m_Localized: DOWN + LEFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060237
+    m_Localized: DOWN + RIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060238
+    m_Localized: DOWN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060239
+    m_Localized: LEFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060240
+    m_Localized: RIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060241
+    m_Localized: HERE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060242
+    m_Localized: HOLD TETHER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060243
+    m_Localized: Target {0} selected - hold TETHER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060244
+    m_Localized: TETHERING - keep holding
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060245
+    m_Localized: RELEASE NOW
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060246
+    m_Localized: TETHER SLIPPING - release and try again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622022946816
+    m_Localized: PERFECT - axe recovering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084160
+    m_Localized: GOOD - axe recovering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084161
+    m_Localized: MISS - wait for the middle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084162
+    m_Localized: VENTING - pressure recovering
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4760616387567616
+    m_Localized: OVERHEATED
     m_Metadata:
       m_Items: []
   references:

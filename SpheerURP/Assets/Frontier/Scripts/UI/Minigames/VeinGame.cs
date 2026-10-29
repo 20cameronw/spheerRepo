@@ -15,6 +15,7 @@ namespace Frontier
         int desiredColumn = VeinHarvestRun.Columns / 2;
         int dragPointer;
         float steerCooldown;
+        HarvestHoldInput brake;
         public VeinHarvestRun DebugRun { get { return run; } }
         public bool DebugReady { get { return CanInteract; } }
         public void DebugAdvance(float seconds) { if (CanInteract) Tick(seconds); }
@@ -32,19 +33,25 @@ namespace Frontier
             left.name = "vein-left"; right.name = "vein-right";
             left.style.flexGrow = right.style.flexGrow = 1;
             controls.Add(left); controls.Add(right);
+            brake = new HarvestHoldInput(overlay, KeyCode.Space, () => CanInteract);
+            var brakeButton = UiKit.Btn(UiText.Get("harvest.vein.brake"), UiKit.Amber, null, true);
+            brakeButton.name = "vein-brake";
+            brakeButton.style.flexGrow = 1; brakeButton.style.minWidth = 0;
+            brake.Bind(brakeButton); controls.Add(brakeButton);
             readout = UiKit.Text("", "fr-small");
             overlay.Insert(overlay.IndexOf(arena), readout);
             arena.RegisterCallback<PointerDownEvent>(e =>
             {
-                if (!CanInteract) return;
+                if (!CanInteract || dragging) return;
                 dragging = true;
                 dragPointer = e.pointerId;
                 arena.CapturePointer(e.pointerId);
                 Aim(e.localPosition.x);
             });
-            arena.RegisterCallback<PointerMoveEvent>(e => { if (dragging && CanInteract) Aim(e.localPosition.x); });
-            arena.RegisterCallback<PointerUpEvent>(e => { dragging = false; arena.ReleasePointer(e.pointerId); });
-            arena.RegisterCallback<PointerCaptureOutEvent>(e => dragging = false);
+            arena.RegisterCallback<PointerMoveEvent>(e => { if (dragging && e.pointerId == dragPointer && CanInteract) Aim(e.localPosition.x); });
+            arena.RegisterCallback<PointerUpEvent>(e => { if (e.pointerId == dragPointer) ResetDrag(); });
+            arena.RegisterCallback<PointerCancelEvent>(e => { if (e.pointerId == dragPointer) ResetDrag(); });
+            arena.RegisterCallback<PointerCaptureOutEvent>(e => { if (e.pointerId == dragPointer) dragging = false; });
             overlay.focusable = true;
             overlay.RegisterCallback<KeyDownEvent>(e =>
             {
@@ -69,6 +76,12 @@ namespace Frontier
         }
 
         protected override void ResetInput()
+        {
+            brake?.Reset();
+            ResetDrag();
+        }
+
+        void ResetDrag()
         {
             dragging = false;
             if (arena.HasPointerCapture(dragPointer)) arena.ReleasePointer(dragPointer);
@@ -100,7 +113,7 @@ namespace Frontier
             steerCooldown = Mathf.Max(0, steerCooldown - dt);
             if (dragging && desiredColumn != run.Column) Steer(desiredColumn - run.Column);
             int oldDepth = run.Depth, oldIntegrity = run.Integrity, oldRich = run.RichSeams;
-            run.Advance(dt);
+            run.Advance(dt, brake.Held);
             if (run.Depth != oldDepth)
             {
                 bool damaged = run.Integrity < oldIntegrity;
@@ -123,7 +136,7 @@ namespace Frontier
                         : value < 0 ? new Vector3(1.1f, 0.6f, 1f) : Vector3.one;
                 }
             readout.text = UiText.Get("harvest.vein.status", run.Depth, VeinHarvestRun.Rows, run.Ore, run.Integrity);
-            SetToolState(UiText.Get("harvest.vein.steer"));
+            SetToolState(UiText.Get("harvest.vein.chain", run.RichChain));
             if (run.Completed)
                 Finish(new MinigameResult { quality = run.Quality, perfects = run.RichSeams, total = VeinHarvestRun.Rows });
         }

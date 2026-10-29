@@ -179,6 +179,50 @@ namespace Frontier
             return true;
         }
 
+        public void DebugDrillPreview(bool overheated)
+        {
+            overlayLayer.schedule.Execute(() =>
+            {
+                var game = activeGatherMinigame as DrillGame;
+                if (game == null || game.DebugRun == null)
+                    throw new InvalidOperationException("Drill preview was not ready.");
+                var control = overlayLayer.Q("drill-boost");
+                foreach (var key in new[] { KeyCode.Space, KeyCode.LeftShift })
+                    using (var e = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = key }))
+                    { e.target = control; control.SendEvent(e); }
+                game.DebugAdvance(overheated ? 3.65f : 0.8f, true, true);
+            }).StartingIn(1500);
+        }
+
+        public void DebugHarvestPreview(MinigameKind kind)
+        {
+            overlayLayer.schedule.Execute(() =>
+            {
+                if (kind == MinigameKind.Excavate)
+                {
+                    var game = activeGatherMinigame as ExcavationGame;
+                    if (game == null || game.DebugRun == null) throw new InvalidOperationException("Excavation preview was not ready.");
+                    game.DebugPing((game.DebugRun.Target + 1) % ExcavationHarvestRun.CellCount);
+                }
+                else if (kind == MinigameKind.Salvage)
+                {
+                    var game = activeGatherMinigame as SalvageGame;
+                    if (game == null) throw new InvalidOperationException("Salvage preview was not ready.");
+                    game.DebugSelect(0);
+                    var control = overlayLayer.Q("salvage-tether");
+                    using (var e = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = KeyCode.Space }))
+                    { e.target = control; control.SendEvent(e); }
+                    game.DebugAdvance(0.7f);
+                }
+                else if (kind == MinigameKind.Siphon)
+                {
+                    var game = activeGatherMinigame as SiphonGame;
+                    if (game == null || game.DebugRun == null) throw new InvalidOperationException("Siphon preview was not ready.");
+                    game.DebugPump(); game.DebugAdvance(0.3f); game.DebugPump();
+                }
+            }).StartingIn(1500);
+        }
+
         public void DebugTravelGame()
         {
             DebugReset();

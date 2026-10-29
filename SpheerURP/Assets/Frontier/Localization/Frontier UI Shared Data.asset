@@ -8743,6 +8743,122 @@ MonoBehaviour:
     m_Key: project.dismiss-summary
     m_Metadata:
       m_Items: []
+  - m_Id: 4758510293311488
+    m_Key: harvest.vein.brake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060224
+    m_Key: harvest.vein.chain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060225
+    m_Key: harvest.drill.boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060226
+    m_Key: harvest.drill.heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060227
+    m_Key: harvest.drill.cooling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060228
+    m_Key: harvest.chop.timing-hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060229
+    m_Key: harvest.chop.swing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060230
+    m_Key: harvest.siphon.vent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060231
+    m_Key: harvest.siphon.pressure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060232
+    m_Key: harvest.excavate.direction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060233
+    m_Key: harvest.excavate.direction.up.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060234
+    m_Key: harvest.excavate.direction.up.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060235
+    m_Key: harvest.excavate.direction.up.same
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060236
+    m_Key: harvest.excavate.direction.down.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060237
+    m_Key: harvest.excavate.direction.down.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060238
+    m_Key: harvest.excavate.direction.down.same
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060239
+    m_Key: harvest.excavate.direction.same.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060240
+    m_Key: harvest.excavate.direction.same.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060241
+    m_Key: harvest.excavate.direction.same.same
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060242
+    m_Key: harvest.salvage.tether
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060243
+    m_Key: harvest.salvage.selected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060244
+    m_Key: harvest.salvage.charging
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060245
+    m_Key: harvest.salvage.release
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060246
+    m_Key: harvest.salvage.slipping
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622022946816
+    m_Key: harvest.chop.result.perfect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084160
+    m_Key: harvest.chop.result.good
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084161
+    m_Key: harvest.chop.result.miss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084162
+    m_Key: harvest.siphon.venting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4760616387567616
+    m_Key: harvest.drill.overheated
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
