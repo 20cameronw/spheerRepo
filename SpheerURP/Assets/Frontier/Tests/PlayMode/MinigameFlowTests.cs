@@ -176,21 +176,80 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator MiningBrakeAndSiphonVent_ChangeLiveSimulationAndResetOnPause()
+        public IEnumerator MiningOreHasDistinctVolumeAndDrillingDebrisIsBoundedAndPauses()
+        {
+            var game = new VeinGame();
+            game.Run(root, UiKit.Cyan, 1f, 0.5f, null);
+            for (int frame = 0; frame < 120 && !game.DebugReady; frame++) yield return null;
+            Assert.IsTrue(game.DebugReady);
+            game.DebugAdvance(0f);
+            int richCells = 0, normalCells = 0;
+            for (int row = 0; row < 6; row++)
+                for (int column = 0; column < VeinHarvestRun.Columns; column++)
+                {
+                    var cell = game.DebugScene.Find("VeinCell_" + row + "_" + column);
+                    var crown = cell.Find("RichCrystalCrown");
+                    var seams = cell.Find("NormalOreInclusions");
+                    int value = game.DebugRun.Cell(game.DebugRun.Depth + row, column);
+                    Assert.AreEqual(value == 3, crown.gameObject.activeSelf);
+                    Assert.AreEqual(value == 1, seams.gameObject.activeSelf);
+                    if (value == 3)
+                    {
+                        richCells++;
+                        Assert.Greater(crown.GetComponent<MeshFilter>().sharedMesh.bounds.size.y, 0.5f);
+                        var material = crown.GetComponent<Renderer>().sharedMaterial;
+                        Assert.Greater(material.GetColor("_BaseColor").r, 0.9f, "Rich ore uses a distinct gold palette.");
+                    }
+                    else if (value == 1)
+                    {
+                        normalCells++;
+                        Assert.AreEqual(3, seams.childCount);
+                        Assert.Greater(cell.GetComponent<MeshFilter>().sharedMesh.bounds.size.z, 0.4f);
+                    }
+                }
+            Assert.Greater(richCells, 0);
+            Assert.Greater(normalCells, 0);
+            game.DebugAdvance(0.1f);
+            var chip = game.DebugScene.Find("DrillingChip_0");
+            Assert.IsTrue(chip.gameObject.activeSelf, "Drilling continuously ejects visible mesh chips.");
+            int oldDepth = game.DebugRun.Depth;
+            game.DebugAdvance(1.4f);
+            Assert.Greater(game.DebugRun.Depth, oldDepth);
+            Assert.IsTrue(game.DebugScene.Find("DrillingChip_8").gameObject.activeSelf, "Breaking a row emits a larger chip burst.");
+            int chipCount = 0;
+            foreach (Transform child in game.DebugScene)
+                if (child.name.StartsWith("DrillingChip_", System.StringComparison.Ordinal)) chipCount++;
+            Assert.AreEqual(32, chipCount, "Debris reuses a fixed pool rather than growing during the run.");
+            game.Pause();
+            var position = chip.localPosition;
+            game.DebugAdvance(1f);
+            Assert.AreEqual(position, chip.localPosition);
+            root.Clear();
+        }
+
+        [UnityTest]
+        public IEnumerator MiningSpeedAndSiphonVent_ChangeLiveSimulationAndResetOnPause()
         {
             var mine = new VeinGame();
             mine.Run(root, UiKit.Cyan, 1f, 0.5f, null);
             for (int frame = 0; frame < 120 && !mine.DebugReady; frame++) yield return null;
             Assert.IsTrue(mine.DebugReady);
-            var brake = root.Q("vein-brake");
+            Assert.IsNull(root.Q("vein-brake"));
+            var speed = root.Q("vein-speed");
             float start = mine.DebugRun.Progress;
-            Down(brake, 1); mine.DebugAdvance(0.2f);
-            float slow = mine.DebugRun.Progress - start;
-            Up(brake, 1); mine.DebugAdvance(0.2f);
-            float fast = mine.DebugRun.Progress - start - slow;
-            Assert.AreEqual(slow * 2f, fast, 0.0001f);
-            Down(brake, 1); mine.Pause(); mine.Resume(); mine.DebugAdvance(0f);
-            Assert.IsFalse(mine.DebugRun.Braking);
+            Down(speed, 1); mine.DebugAdvance(0.2f);
+            float fast = mine.DebugRun.Progress - start;
+            Up(speed, 1); mine.DebugAdvance(0.2f);
+            float normal = mine.DebugRun.Progress - start - fast;
+            Assert.AreEqual(normal * 2f, fast, 0.0001f);
+            Down(speed, 1); mine.Pause(); mine.Resume(); mine.DebugAdvance(0f);
+            Assert.IsFalse(mine.DebugRun.Boosting);
+            Key(speed, KeyCode.Space, true);
+            mine.DebugAdvance(0f);
+            Assert.IsTrue(mine.DebugRun.Boosting);
+            Key(speed, KeyCode.Space, false);
+            mine.DebugAdvance(0f);
+            Assert.IsFalse(mine.DebugRun.Boosting);
             root.Clear();
 
             var siphon = new SiphonProbeMinigame();

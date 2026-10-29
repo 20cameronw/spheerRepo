@@ -117,11 +117,14 @@ both Mine and Drill receive its tier. The highest previously owned Pick or Drill
 without deleting either saved entry. Old legacy pick/drill power bonuses remain effective for both
 games; new purchases use the catalog rather than requiring two parallel upgrade tracks.
 
-Mine now runs a five-lane descending vein cutter: read six upcoming rows, steer into bright elongated
-rich seams, and avoid dark flattened unstable rock. Four hull points and eighteen rows bound a run.
+Mine now runs a five-lane descending vein cutter: read six upcoming rows, steer into gold crystal crowns,
+distinguish ordinary blue-grey ore chunks with small metal inclusions, and avoid the unchanged dark flattened unstable rock.
+Four hull points and eighteen rows bound a run.
 Rich seams yield three ore versus one from ordinary rock; accumulated ore determines quality.
-Stronger tools preserve existing yield benefits and add reaction time. Hold BRAKE (Space) halves the real row speed;
+Stronger tools preserve existing yield benefits and add reaction time. Hold SPEED (Space) doubles the real row speed;
 each three consecutive rich seams restores one lost integrity point, never multiplying ore or exceeding four integrity.
+The bit spins faster under speed control; continuous cutting chips and larger per-row break bursts reuse a
+32-piece, quality-scaled mesh pool that freezes with the minigame.
 
 Chopping uses a moving timing marker and a central good zone with a narrower perfect center. Tap SWING or press Space;
 the existing axe cooldown, four stages and perfect/good/miss damage remain. Difficulty changes marker speed, and tool power

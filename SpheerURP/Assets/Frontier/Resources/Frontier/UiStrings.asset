@@ -318,10 +318,10 @@ MonoBehaviour:
   - key: harvest.vein.title
     text: FOLLOW THE VEIN
   - key: harvest.vein.hint
-    text: Steer through bright ore. Hold BRAKE (Space) for time to plan. Three rich
-      seams in a row repair the rig.
-  - key: harvest.vein.brake
-    text: HOLD BRAKE
+    text: Steer through gold crystal seams. Hold SPEED (Space) to drill twice as
+      fast. Three rich seams in a row repair the rig.
+  - key: harvest.vein.speed
+    text: HOLD SPEED
   - key: harvest.vein.chain
     text: Rich chain {0} - every 3 repairs the rig
   - key: harvest.vein.metric

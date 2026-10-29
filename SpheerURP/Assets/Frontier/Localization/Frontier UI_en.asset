@@ -8355,8 +8355,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205699
-    m_Localized: Steer through bright ore. Hold BRAKE (Space) for time to plan. Three
-      rich seams in a row repair the rig.
+    m_Localized: Steer through gold crystal seams. Hold SPEED (Space) to drill twice
+      as fast. Three rich seams in a row repair the rig.
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205700
@@ -9396,6 +9396,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4886970273718275
     m_Localized: RETRY LEADERBOARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5026773145313280
+    m_Localized: HOLD SPEED
     m_Metadata:
       m_Items: []
   references:

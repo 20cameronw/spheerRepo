@@ -59,6 +59,27 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void SpeedChangesRowTimingWithoutChangingOreOrIntegrityForTheSameRoute()
+        {
+            var normal = new VeinHarvestRun(42, 0.6f, 1f);
+            var fast = new VeinHarvestRun(42, 0.6f, 1f);
+            for (int row = 0; row < VeinHarvestRun.Rows; row++)
+            {
+                int column = 0;
+                while (normal.Cell(row, column) != 3) column++;
+                while (normal.Column != column) normal.Steer(column - normal.Column);
+                while (fast.Column != column) fast.Steer(column - fast.Column);
+                while (normal.Depth == row) normal.Advance(0.01f);
+                while (fast.Depth == row) fast.Advance(0.005f, true);
+                Assert.AreEqual(normal.Ore, fast.Ore);
+                Assert.AreEqual(normal.Integrity, fast.Integrity);
+                Assert.AreEqual(normal.RichChain, fast.RichChain);
+            }
+            Assert.AreEqual(1f, fast.Quality);
+            Assert.IsFalse(fast.Boosting);
+        }
+
+        [Test]
         public void StrongerToolsGiveMoreReactionTimeAndInputsAreValidated()
         {
             var basic = new VeinHarvestRun(5, 1, 1);

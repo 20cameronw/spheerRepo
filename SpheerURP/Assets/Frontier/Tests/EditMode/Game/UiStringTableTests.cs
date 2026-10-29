@@ -253,7 +253,7 @@ namespace Frontier.Tests
             Assert.AreEqual("HEAT 42% - release BOOST before 100%", UiText.Get("harvest.drill.heat", 42));
             Assert.AreEqual("SWING", UiText.Get("harvest.chop.swing"));
             Assert.AreEqual("HOLD VENT", UiText.Get("harvest.siphon.vent"));
-            Assert.AreEqual("HOLD BRAKE", UiText.Get("harvest.vein.brake"));
+            Assert.AreEqual("HOLD SPEED", UiText.Get("harvest.vein.speed"));
             Assert.AreEqual("RELEASE NOW", UiText.Get("harvest.salvage.release"));
             Assert.AreEqual("UP + RIGHT - 3 steps from your last ping",
                 UiText.Get("harvest.excavate.direction", UiText.Get("harvest.excavate.direction.up.right"), 3));

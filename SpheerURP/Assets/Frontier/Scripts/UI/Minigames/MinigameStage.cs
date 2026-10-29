@@ -133,6 +133,29 @@ namespace Frontier
             return bd.ToMesh();
         }
 
+        public static Mesh OreChunk()
+        {
+            var bd = new Builder();
+            var front = new Vector3[7];
+            var back = new Vector3[7];
+            for (int i = 0; i < front.Length; i++)
+            {
+                float a = i * Mathf.PI * 2f / front.Length;
+                float r = 0.9f + 0.12f * Mathf.Sin(i * 2.4f);
+                front[i] = new Vector3(Mathf.Cos(a) * 0.42f * r, Mathf.Sin(a) * 0.32f * r, -0.22f);
+                back[i] = new Vector3(front[i].x * 0.78f, front[i].y * 0.84f, 0.24f);
+            }
+            for (int i = 0; i < front.Length; i++)
+            {
+                int next = (i + 1) % front.Length;
+                bd.Tri(front[i], front[next], new Vector3(0.06f, -0.02f, -0.30f), Vector3.back);
+                bd.Tri(back[next], back[i], new Vector3(0f, 0f, 0.27f), Vector3.forward);
+                bd.Tri(front[i], back[i], back[next], front[i] + back[next]);
+                bd.Tri(front[i], back[next], front[next], front[i] + front[next]);
+            }
+            return bd.ToMesh();
+        }
+
         public static Mesh CrystalCluster()
         {
             var bd = new Builder();

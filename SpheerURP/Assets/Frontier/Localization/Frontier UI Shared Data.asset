@@ -9043,6 +9043,10 @@ MonoBehaviour:
     m_Key: ranks.retry
     m_Metadata:
       m_Items: []
+  - m_Id: 5026773145313280
+    m_Key: harvest.vein.speed
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

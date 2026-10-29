@@ -443,6 +443,7 @@ namespace Frontier
             if (m == null) { Destroy(holder); return null; }
             Bounds b;
             float lift = ModelLibrary.MeshBounds(m.gameObject, out b) ? holder.transform.position.y - b.min.y : size * 0.5f;
+            lift -= ModelLibrary.FoundationDepth(key) * m.localScale.y;
             m.SetParent(parent, false);
             m.localPosition += new Vector3(0f, lift, 0f);
             m.localRotation = Quaternion.identity;

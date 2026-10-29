@@ -62,12 +62,15 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void VeinBrake_HalvesRealRowSpeed_AndRichChainRepairsWithoutExtraOre()
+        public void VeinSpeed_DoublesRealRowSpeed_AndRichChainRepairsWithoutExtraOre()
         {
             var normal = new VeinHarvestRun(42, 0.5f, 1f);
-            var braking = new VeinHarvestRun(42, 0.5f, 1f);
-            normal.Advance(0.5f); braking.Advance(0.5f, true);
-            Assert.AreEqual(normal.Progress * 0.5f, braking.Progress, 0.0001f);
+            var boosted = new VeinHarvestRun(42, 0.5f, 1f);
+            normal.Advance(0.5f); boosted.Advance(0.5f, true);
+            Assert.AreEqual(normal.Progress * 2f, boosted.Progress, 0.0001f);
+            Assert.IsTrue(boosted.Boosting);
+            boosted.Advance(0f, false);
+            Assert.IsFalse(boosted.Boosting);
             var run = new VeinHarvestRun(42, 0.5f, 1f);
             int dark = -1;
             for (int col = 0; col < VeinHarvestRun.Columns; col++)

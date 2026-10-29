@@ -357,12 +357,13 @@ namespace Frontier
             }
 
             yield return new Shot("hud", ResetView);
-            yield return new Shot("ship-landing-boost", () =>
+            yield return new Shot("ship-landing-orbit", () =>
             {
                 ResetView();
                 ui.StartCoroutine(ui.PlayArrivalIntro(false));
-            }, 0.45f);
-            yield return new Shot("ship-landing-settled", () => { }, 0.8f);
+            }, 0.7f);
+            yield return new Shot("ship-landing-boost", () => { }, 2.7f);
+            yield return new Shot("ship-landing-settled", () => { }, 1.6f);
             yield return new Shot("surface-view", () =>
             {
                 ResetView();

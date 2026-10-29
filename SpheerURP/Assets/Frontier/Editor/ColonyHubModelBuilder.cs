@@ -197,7 +197,8 @@ namespace Frontier.EditorTools
             {
                 if (!ModelLibrary.MeshBounds(instance, out Bounds bounds))
                     throw new InvalidOperationException("The Colony Hub prefab contains no mesh renderers.");
-                float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+                float buriedDepth = Mathf.Max(0f, -bounds.min.y);
+                float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y - buriedDepth, bounds.size.z));
                 correction = 0.75f / diameter;
                 var entries = new List<ModelLibrary.Entry>(library.entries ?? new ModelLibrary.Entry[0]);
                 int index = entries.FindIndex(entry => entry.key == "colony_hub");
@@ -207,7 +208,8 @@ namespace Frontier.EditorTools
                     prefab = prefab,
                     scale = correction,
                     referenceDiameter = 0.75f,
-                    groundScale = 1f
+                    groundScale = 1f,
+                    foundationDepth = buriedDepth
                 };
                 if (index >= 0) entries[index] = entry; else entries.Add(entry);
                 library.entries = entries.ToArray();
@@ -238,7 +240,7 @@ namespace Frontier.EditorTools
         {
             Geometry baseMetal = g[0], armor = g[1], orange = g[2], dark = g[3], light = g[4];
 
-            baseMetal.Box(new Vector3(0f, 0.045f, 0f), new Vector3(1.05f, 0.09f, 0.91f), Quaternion.identity);
+            baseMetal.Box(new Vector3(0f, -0.045f, 0f), new Vector3(1.05f, 0.27f, 0.91f), Quaternion.identity);
             baseMetal.Box(new Vector3(0f, 0.101f, 0f), new Vector3(0.99f, 0.035f, 0.85f), Quaternion.identity);
             baseMetal.Box(new Vector3(0f, 0.123f, 0.015f), new Vector3(0.91f, 0.02f, 0.78f), Quaternion.identity);
 

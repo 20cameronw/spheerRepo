@@ -57,7 +57,7 @@ namespace Frontier
                 intro.RemoveFromHierarchy();
                 skipShipMoment = null;
                 if (skip) yield break;
-                yield return ShipMoment(true, firstLaunch ? 1.4f : 0.7f);
+                yield return ShipMoment(true, firstLaunch ? 5.2f : 4.6f, true);
                 introActive = false;
                 float reveal = 0f;
                 while (reveal < 0.22f)
@@ -258,7 +258,7 @@ namespace Frontier
             root.Add(overlay);
         }
 
-        IEnumerator ShipMoment(bool arriving, float duration = 0.7f)
+        IEnumerator ShipMoment(bool arriving, float duration = 0.7f, bool orbitalApproach = false)
         {
             var cameraTransform = cam != null ? cam.transform : null;
             Vector3 cameraOrigin = cameraTransform != null ? cameraTransform.position : Vector3.zero;
@@ -271,7 +271,7 @@ namespace Frontier
             float tangentDepth = cam.orthographic ? 0f : Mathf.Clamp01(radius / Vector3.Distance(cam.transform.position, center));
             Vector3 contact = center + (up * Mathf.Sqrt(1f - tangentDepth * tangentDepth) + radial * tangentDepth) * radius;
             Vector3 ground = contact + up * 0.2f;
-            Vector3 sky = ground + up * 2f;
+            Vector3 sky = ground + up * (orbitalApproach ? 0.85f : 2f);
             ship.transform.rotation = Quaternion.LookRotation(cam.transform.right, up);
             bool skip = false;
             skipShipMoment = () => skip = true;
@@ -288,13 +288,33 @@ namespace Frontier
                 while (elapsed < duration && !skip)
                 {
                     float t = Mathf.Clamp01(elapsed / duration);
-                    float height = arriving ? Mathf.Pow(1f - t, 3f) : t * t;
-                    ship.transform.position = Vector3.Lerp(ground, sky, height);
-                    ship.SetFlight(0f,
-                        arriving ? Mathf.Clamp01(t * 2f) : Mathf.Clamp01(1f - t * 3f), 0f);
-                    float thrust = arriving ? (0.45f + Mathf.Sin(t * Mathf.PI) * 0.55f) *
-                        (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.8f, 1f, t))) : 0.35f + t * 0.65f;
-                    ship.SetLandingThrust(thrust, elapsed);
+                    if (orbitalApproach && t < 0.68f)
+                    {
+                        float orbit = t / 0.68f;
+                        float angle = -Mathf.PI * 2f * Mathf.Pow(1f - orbit, 1.2f);
+                        Vector3 orbitUp = (sky - center).normalized;
+                        Vector3 outward = orbitUp * Mathf.Cos(angle) + cam.transform.right * Mathf.Sin(angle);
+                        Vector3 tangent = cam.transform.right * Mathf.Cos(angle) - orbitUp * Mathf.Sin(angle);
+                        ship.transform.position = center + outward * Vector3.Distance(sky, center);
+                        ship.transform.rotation = Quaternion.LookRotation(tangent, outward);
+                        float braking = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.76f, 1f, orbit));
+                        ship.SetFlight(0.65f * (1f - braking), braking, 0f);
+                        ship.SetLandingThrust(braking * 0.7f, elapsed);
+                    }
+                    else
+                    {
+                        float descent = orbitalApproach ? Mathf.InverseLerp(0.68f, 1f, t) : t;
+                        float height = arriving ? Mathf.Pow(1f - descent, 3f) : descent * descent;
+                        ship.transform.position = Vector3.Lerp(ground, sky, height);
+                        ship.transform.rotation = Quaternion.LookRotation(cam.transform.right, up);
+                        ship.SetFlight(0f,
+                            arriving ? Mathf.Clamp01(descent * 2f + (orbitalApproach ? 1f : 0f)) :
+                            Mathf.Clamp01(1f - descent * 3f), 0f);
+                        float thrust = arriving ? (0.7f + Mathf.Sin(descent * Mathf.PI) * 0.3f) *
+                            (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.8f, 1f, descent))) :
+                            0.35f + descent * 0.65f;
+                        ship.SetLandingThrust(thrust, elapsed);
+                    }
                     elapsed += Time.unscaledDeltaTime;
                     yield return null;
                 }

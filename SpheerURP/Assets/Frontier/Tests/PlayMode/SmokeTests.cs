@@ -216,6 +216,12 @@ namespace Frontier.Tests
             var structureAnchor = rt.Planet.Spin.Find("Struct_" + lumber.def.id);
             Assert.IsNotNull(structureAnchor);
             Vector3 anchor = structureAnchor.localPosition;
+            var visualRoot = structureAnchor.Find("StructureVisualRoot");
+            Assert.AreEqual(-0.045f, visualRoot.localPosition.y, 0.0001f, "Do not move the building.");
+            var model = visualRoot.GetChild(0);
+            Assert.AreEqual(0f, model.localPosition.y, 0.001f, "Foundation depth must not lift the model.");
+            var mesh = model.GetComponent<MeshFilter>().sharedMesh;
+            Assert.AreEqual(-0.36f, mesh.bounds.min.y, 0.0001f, "The extra foundation extends below its original origin.");
             Vector3 overview = rt.Camera.transform.position;
             var toggle = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
             Assert.IsEmpty(toggle.text, "The world view switch should be an icon, not a text button.");
@@ -1795,7 +1801,9 @@ namespace Frontier.Tests
                 naturalArrivalComplete = true;
             }
             ui.StartCoroutine(NaturalArrival());
-            float naturalDeadline = Time.realtimeSinceStartup + 3f;
+            bool flewLeft = false, flewRight = false, flewBelow = false, observedCruise = false;
+            float arrivalStarted = Time.realtimeSinceStartup;
+            float naturalDeadline = arrivalStarted + 7f;
             while (!naturalArrivalComplete && Time.realtimeSinceStartup < naturalDeadline)
             {
                 if (Vector3.Distance(naturalCameraOrigin, runtime.Camera.transform.position) > 0.0001f)
@@ -1808,17 +1816,25 @@ namespace Frontier.Tests
                     var center = runtime.Planet.Spin.position;
                     var shipScreen = runtime.Camera.WorldToViewportPoint(lander.transform.position);
                     var centerScreen = runtime.Camera.WorldToViewportPoint(center);
-                    Assert.AreEqual(centerScreen.x, shipScreen.x, 0.015f, "Landing stays vertically above the world, like a 2D view.");
-                    Assert.Greater(shipScreen.y, centerScreen.y);
-                    Assert.Greater(Vector3.Dot(lander.transform.forward, runtime.Camera.transform.right), 0.99f, "The ship faces sideways.");
-                    Assert.AreEqual(0f, lander.Throttle, "Landing uses downward boosters, not the rear flight engines.");
+                    flewLeft |= shipScreen.x < centerScreen.x - 0.1f;
+                    flewRight |= shipScreen.x > centerScreen.x + 0.1f;
+                    flewBelow |= shipScreen.y < centerScreen.y - 0.1f;
+                    observedCruise |= lander.Throttle > 0.4f && lander.Gear < 0.1f;
                     var air = lander.transform.Find("Hull/LandingAir_1");
                     if (air != null && lander.LandingThrust > 0f)
-                        Assert.Greater(Vector3.Dot(-air.forward, -runtime.Camera.transform.up), 0.95f);
+                        Assert.Greater(Vector3.Dot(-air.forward, -lander.transform.up), 0.99f);
+                    if (lander.Gear == 1f && lander.Throttle == 0f)
+                    {
+                        Assert.Greater(shipScreen.y, centerScreen.y);
+                        Assert.Greater(Vector3.Dot(lander.transform.forward, runtime.Camera.transform.right), 0.99f);
+                    }
                 }
                 yield return null;
             }
             Assert.IsTrue(naturalArrivalComplete, "The natural arrival must finish and release input.");
+            Assert.Greater(Time.realtimeSinceStartup - arrivalStarted, 4.6f);
+            Assert.IsTrue(flewLeft && flewRight && flewBelow, "The ship makes a full loop, not just a vertical drop.");
+            Assert.IsTrue(observedCruise, "The orbital approach flies with retracted gear and rear engines.");
             Assert.IsTrue(observedTouchdownImpulse, "Touchdown should produce a visible, bounded camera settle.");
             Assert.IsTrue(observedLandingBoost);
             Assert.IsTrue(observedBoostCutoff, "Air boosters shut off at touchdown.");

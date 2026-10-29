@@ -17,9 +17,14 @@ Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to 
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
 The top bar includes fuel, live Nova Shards and player level; carried capacity stays inside Cargo, not on the dock.
-Ship arrivals and departures are staged side-on at the screen-top silhouette of the planet, not on its front face.
+The startup arrival makes a full, skippable orbital loop before its side-on descent at the screen-top silhouette.
+First-launch flight lasts 5.2 seconds and repeat-startup flight 4.6 seconds, plus touchdown/reveal;
+ordinary travel arrivals/departures retain their shorter presentation.
 Two pale air boosters pulse downward to brake descent, cut out at contact, and finish with a small gear settle and
 surface dust. This is presentation only; landing slots, travel costs and progression remain unchanged.
+Ground structure foundation blocks are three times their original height, extended downward with their top surfaces
+and structure transforms unchanged. Model-library foundation depth is excluded from scale fitting and surface lift,
+so terrain absorbs the added depth instead of pushing the structure upward; orbital models remain untouched.
 The dock retains its four positions: Research / Map / Ship / Build. Ship always opens Cargo in one tap,
 with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
 and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.

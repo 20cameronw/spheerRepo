@@ -317,7 +317,8 @@ namespace Frontier.EditorTools
 
         static ModelLibrary.Entry CreateEntry(string key, GameObject prefab, Bounds bounds)
         {
-            float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+            float buriedDepth = Mathf.Max(0f, -bounds.min.y);
+            float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y - buriedDepth, bounds.size.z));
             if (diameter <= 0.0001f) throw new InvalidOperationException("Empty structure model: " + key);
             return new ModelLibrary.Entry
             {
@@ -325,7 +326,8 @@ namespace Frontier.EditorTools
                 prefab = prefab,
                 referenceDiameter = 0.75f,
                 scale = 0.75f / diameter,
-                groundScale = 1f
+                groundScale = 1f,
+                foundationDepth = buriedDepth
             };
         }
 
@@ -433,7 +435,7 @@ namespace Frontier.EditorTools
         {
             width *= 0.84f;
             depth *= 0.84f;
-            Box(g, Base, new Vector3(0f, 0.09f, 0f), new Vector3(width, 0.18f, depth));
+            Box(g, Base, new Vector3(0f, -0.09f, 0f), new Vector3(width, 0.54f, depth));
             foreach (Geometry materialGeometry in g)
                 if (materialGeometry.foundationVertexCount < 0)
                     materialGeometry.foundationVertexCount = materialGeometry.vertices.Count;
