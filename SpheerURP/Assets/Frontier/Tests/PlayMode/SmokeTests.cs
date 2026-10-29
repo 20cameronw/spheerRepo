@@ -1761,10 +1761,21 @@ namespace Frontier.Tests
             }
             Wheel(-3f, wheelTarget);
             Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f, "Scroll up zooms toward the surface.");
+            rt.Ui.DebugPollWorldWheel(1f, new Vector2(ScreenMetrics.Width / 2f, ScreenMetrics.Height / 2f));
+            Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f, "Native and polled input must not double-count a frame.");
+            yield return null;
+            rt.Ui.DebugPollWorldWheel(1f, new Vector2(ScreenMetrics.Width / 2f, ScreenMetrics.Height / 2f));
+            Assert.AreEqual(0.24f, rt.Planet.Zoom01, 0.001f,
+                "The active legacy mouse-input path works without any UI Toolkit wheel event.");
+            yield return null;
+            rt.Ui.DebugPollWorldWheel(-1f, new Vector2(ScreenMetrics.Width / 2f, ScreenMetrics.Height / 2f));
+            yield return null;
             Wheel(3f, wheelTarget);
             Assert.AreEqual(0f, rt.Planet.Zoom01, 0.001f, "Scroll down zooms toward orbit.");
+            yield return null;
             Wheel(3f, wheelTarget);
             Assert.IsFalse(rt.Ui.DebugMapOpen);
+            yield return null;
             Wheel(3f, wheelTarget);
             Assert.IsTrue(rt.Ui.DebugMapMinimal, "Continuing to scroll out opens the same minimal map as touch.");
             yield return new WaitForSecondsRealtime(0.8f);
@@ -1772,6 +1783,13 @@ namespace Frontier.Tests
             yield return new WaitForSecondsRealtime(1.4f);
             Assert.IsFalse(rt.Ui.DebugMapOpen, "Scroll up at the closest minimal map level returns to the world.");
             rt.Ui.DebugReset();
+            var placed = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            yield return null;
+            rt.Ui.DebugTapStructure(placed);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            rt.Ui.DebugWorldZoom(0.1f);
+            Assert.AreEqual(0.1f, rt.Planet.Zoom01, 0.001f, "A selected structure must not block world zoom.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q(className: "fr-popup"), "Zooming the world dismisses its anchored popup.");
             rt.Ui.DebugWorldZoom(4f);
             Assert.AreEqual(1f, rt.Planet.Zoom01, "The old surface endpoint is the closest boundary.");
             rt.Ui.DebugWorldZoom(-1f);
@@ -2957,8 +2975,10 @@ namespace Frontier.Tests
                     var track = card.Q<Button>("track-build-" + id);
                     var count = card.Q<Label>("shop-count-" + id);
                     Assert.IsNotNull(track, "Every Build card keeps its tracking star at top right.");
-                    Assert.AreEqual(card[0], track.parent);
-                    Assert.AreEqual(card[card.childCount - 1], count, "Build count is the bottom-right item.");
+                    var lockOverlay = card.Q("shop-research-lock");
+                    Assert.AreEqual(lockOverlay == null ? card[0] : card, track.parent);
+                    var content = lockOverlay == null ? card : card[0];
+                    Assert.AreEqual(content[content.childCount - 1], count, "Build count is the bottom-right item.");
                     Assert.AreEqual(Align.FlexEnd, count.resolvedStyle.alignSelf);
                     Assert.Less(track.worldBound.yMin, count.worldBound.yMin);
                     var place = card.Q<Button>("shop-place-" + id);
@@ -3003,6 +3023,54 @@ namespace Frontier.Tests
             }
             Assert.Greater(structureUnlocks, 0);
             Assert.Greater(recipeUnlocks, 0);
+        }
+
+        [UnityTest]
+        public IEnumerator BuildShopSortsUnlockedCardsFirstAndResearchLocksLinkToTheRequiredNode()
+        {
+            new GameObject("ShopResearchLocksBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.DebugSetLevel(1);
+            Button shortcut = null;
+            string prerequisite = null;
+            int overlays = 0;
+            for (int tab = 0; tab < 4; tab++)
+            {
+                rt.Ui.DebugShop(tab);
+                yield return null;
+                bool sawLocked = false;
+                foreach (var card in rt.Ui.DebugRoot.Query<VisualElement>().ToList()
+                    .Where(element => element.name != null && element.name.StartsWith("shop-structure-")))
+                {
+                    string id = card.name.Substring("shop-structure-".Length);
+                    var definition = rt.Db.FindStructure(id);
+                    bool locked = rt.State.BuildLockReason(definition) != null;
+                    if (locked) sawLocked = true;
+                    else Assert.IsFalse(sawLocked, "Unlocked structures must precede locked structures in every category.");
+                    var overlay = card.Q("shop-research-lock");
+                    bool needsResearch = !string.IsNullOrEmpty(definition.unlockResearch) &&
+                        !rt.State.IsResearched(definition.unlockResearch);
+                    Assert.AreEqual(needsResearch, overlay != null, id);
+                    if (!needsResearch) continue;
+                    overlays++;
+                    Assert.IsNotNull(overlay.Q(className: "fr-icon"));
+                    Assert.IsFalse(card.Q<Button>("shop-place-" + id).enabledInHierarchy);
+                    Assert.IsFalse(card.Q<Button>("shop-shards-" + id).enabledInHierarchy);
+                    Assert.IsTrue(card.Q<Button>("track-build-" + id).enabledInHierarchy);
+                    shortcut = overlay.Q<Button>("shop-required-research-" + id);
+                    prerequisite = definition.unlockResearch;
+                    Assert.IsTrue(shortcut.enabledInHierarchy);
+                }
+            }
+            Assert.Greater(overlays, 0);
+            Assert.IsNotNull(shortcut);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shortcut; shortcut.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("research-" + prerequisite), "The shortcut opens the actual required research.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shop-research-lock"));
         }
 
         [UnityTest]

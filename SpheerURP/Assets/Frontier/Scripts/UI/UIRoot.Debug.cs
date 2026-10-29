@@ -12,6 +12,7 @@ namespace Frontier
         public float DebugPanelScale { get { return panelSettings != null ? panelSettings.scale : 1f; } }
         public bool DebugBusy { get { return busy; } }
         public void DebugWorldZoom(float delta) { ApplyWorldZoom(delta); }
+        public void DebugPollWorldWheel(float delta, Vector2 position) { PollWorldWheel(delta, position); }
         public bool DebugMapMinimal { get { return mapOpen && mapMinimal; } }
         public bool DebugMapOpen { get { return mapOpen; } }
         public void DebugMapZoomStep(bool inward) { StepMapZoom(inward); }

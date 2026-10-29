@@ -92,7 +92,7 @@ namespace Frontier
             mapWorld.RegisterCallback<PointerCancelEvent>(e => ResetMapPointer());
             mapWorld.RegisterCallback<PointerCaptureOutEvent>(e => { dragPointer = -1; mapDragging = false; });
             mapWorld.RegisterCallback<ClickEvent>(e => PickMap(e.localPosition));
-            mapWorld.RegisterCallback<WheelEvent>(e => { if (e.delta.y != 0) StepMapZoom(e.delta.y < 0); e.StopPropagation(); });
+            mapWorld.RegisterCallback<WheelEvent>(e => { HandleMapWheel(-e.delta.y); e.StopPropagation(); });
 
             mapTools = UiKit.Div("fr-map-tools");
             mapTools.Add(Icons.IconButton("close", UiKit.Muted, ReturnFromMap));
@@ -320,6 +320,8 @@ namespace Frontier
                 lastPinch = 0f;
                 return;
             }
+            if (Input.mouseScrollDelta.y != 0f && ScreenPointInMap(Input.mousePosition))
+                HandleMapWheel(Input.mouseScrollDelta.y);
             if (mapPreview != null && selected != null && selected.Id != gs.planet.Id) mapWorld.MarkDirtyRepaint();
             if (Input.touchCount == 2)
             {
@@ -345,6 +347,15 @@ namespace Frontier
             var point = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screen.x, ScreenMetrics.Height - screen.y));
             var element = root.panel.Pick(point);
             return element == mapWorld || (element != null && mapWorld.Contains(element));
+        }
+
+        int lastMapWheelFrame = -1;
+        void HandleMapWheel(float delta)
+        {
+            if (!mapOpen || mapZoomTransition != null || delta == 0f ||
+                lastMapWheelFrame == Time.frameCount || lastWorldWheelFrame == Time.frameCount) return;
+            lastMapWheelFrame = Time.frameCount;
+            StepMapZoom(delta > 0f);
         }
 
         void RefreshMapSurvey()

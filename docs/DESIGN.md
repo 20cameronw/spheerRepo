@@ -32,8 +32,9 @@ Research has Tech and Improvements (global defense/logistics); completed researc
 XP-locked research has a gray overlay with a lock and required XP level. Its tracking star remains interactive;
 research cards omit prerequisite-navigation buttons and retain their written requirements.
 Pinch or mouse-wheel zoom interpolates between the original surface and orbit camera endpoints; neither boundary moves.
-The world receives native UI Toolkit wheel events: wheel up zooms in, wheel down zooms out, including map entry/return;
-scrolling over shop panels or HUD controls does not zoom the world.
+The world and map poll the project's active legacy mouse input as well as native UI Toolkit wheel events,
+deduplicated per frame: wheel up zooms in, wheel down zooms out, including map entry/return.
+Scrolling over shop panels or HUD controls does not zoom the world; zooming the exposed world dismisses a structure popup.
 Continuing outward by a small deliberate amount beyond orbit pulls the camera back while the orbital chart scales/fades in
 over 600 ms. There is no camera toggle. Pinching must start on the world, not a popup/HUD, and suppresses taps/rotation.
 The tutorial retains the full HUD width and overlays the crew button. Covered crew input and the corner project
@@ -78,6 +79,9 @@ its existing border. Cost chips use the same compact content-fitted height wheth
 Build cards keep tracking stars top right (including locked/built cards), and their built/limit counts bottom right.
 Every Build card keeps Place and shard-purchase actions visible on the same row; locked, built-at-limit and active-job
 cards disable those actions without bypassing research, planet, capacity or purchase rules.
+Unlocked structures sort before locked ones within every category, preserving their existing order within each group.
+Research-gated Build cards use a gray lock overlay with a compact shortcut to their required research;
+their tracking star remains interactive above the overlay.
 Contextual shortages first compare usable, locally stored and explicitly remote
 stock, then production and reachable discovered worlds. A shortfall names its actual quantity.
 Shortage panels do not inject previous-step or return-to controls into other panels.

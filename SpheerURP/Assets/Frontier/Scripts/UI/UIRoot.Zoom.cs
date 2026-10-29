@@ -8,11 +8,12 @@ namespace Frontier
     {
         const float WorldZoomSensitivity = 1.7f, MapOverzoomThreshold = 0.2f;
         float worldPinchDistance, worldOverzoom, lastWorldWheelAt;
+        int lastWorldWheelFrame = -1;
         bool worldPinchAccepted, mapGestureHeld;
         Coroutine mapZoomTransition;
 
         bool CanZoomWorld { get { return !mapOpen && !busy && !introActive && !defense.Active &&
-            modal == null && popup == null && buildDef == null && shortageOverlay == null; } }
+            modal == null && buildDef == null && shortageOverlay == null; } }
 
         void UpdateWorldZoomInput()
         {
@@ -34,6 +35,7 @@ namespace Frontier
             else
             {
                 worldPinchDistance = 0f; worldPinchAccepted = false;
+                PollWorldWheel(Input.mouseScrollDelta.y, Input.mousePosition);
                 if (Time.unscaledTime - lastWorldWheelAt > 0.35f) worldOverzoom = 0f;
             }
         }
@@ -41,16 +43,28 @@ namespace Frontier
         void OnWorldWheel(WheelEvent evt)
         {
             if (!CanZoomWorld || evt.delta.y == 0f) return;
+            HandleWorldWheel(-evt.delta.y / 3f);
+            evt.StopPropagation();
+        }
+
+        void PollWorldWheel(float delta, Vector2 position)
+        {
+            if (delta != 0f && !IsOverUi(position)) HandleWorldWheel(delta);
+        }
+
+        void HandleWorldWheel(float detents)
+        {
+            if (!CanZoomWorld || lastWorldWheelFrame == Time.frameCount) return;
+            lastWorldWheelFrame = Time.frameCount;
             if (Time.unscaledTime - lastWorldWheelAt > 0.35f) worldOverzoom = 0f;
             lastWorldWheelAt = Time.unscaledTime;
-            // UI Toolkit reports three delta units per wheel detent, opposite to legacy mouseScrollDelta.
-            ApplyWorldZoom(-evt.delta.y * 0.04f);
-            evt.StopPropagation();
+            ApplyWorldZoom(detents * 0.12f);
         }
 
         void ApplyWorldZoom(float delta)
         {
             if (!CanZoomWorld || float.IsNaN(delta) || float.IsInfinity(delta)) return;
+            if (popup != null) ClosePopup();
             float requested = planetView.Zoom01 + delta;
             planetView.Zoom01 = requested;
             worldOverzoom = delta < 0f ? worldOverzoom + Mathf.Max(0f, -requested) : 0f;

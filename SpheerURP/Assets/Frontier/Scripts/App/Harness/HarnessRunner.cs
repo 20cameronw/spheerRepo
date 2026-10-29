@@ -492,6 +492,17 @@ namespace Frontier
                     var scroll = card.GetFirstAncestorOfType<ScrollView>();
                     scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
                 });
+                yield return new Shot("player-shop-research-lock", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetLevel(1);
+                    ui.DebugShop(1);
+                    var overlay = ui.DebugRoot.Q("shop-research-lock");
+                    if (overlay == null) throw new InvalidOperationException("No research-locked structure in layout fixture.");
+                    var card = overlay.parent;
+                    var scroll = card.GetFirstAncestorOfType<ScrollView>();
+                    scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                });
                 void PrepareTrackedMap(float zoom)
                 {
                     PreparePlayerFlowFixture();

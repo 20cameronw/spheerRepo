@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Frontier.Economy;
 using Frontier.Services;
 using UnityEngine;
@@ -145,7 +146,8 @@ namespace Frontier
             foreach (var sd in gs.db.structures)
                 if (sd != null && Array.IndexOf(kinds, sd.kind) >= 0) list.Add(sd);
             if (list.Count == 0) { body.Add(UiKit.Text(UiText.Get("shop.empty"), "fr-muted")); return; }
-            int guideIndex = list.FindIndex(def => IsFirstSessionBuildTarget(def.kind));
+            list = list.OrderBy(def => gs.BuildLockReason(def) != null).ToList();
+            int guideIndex = list.FindIndex(def => IsFirstSessionBuildTarget(def.kind) && gs.BuildLockReason(def) == null);
             if (guideIndex > 0)
             {
                 var next = list[guideIndex];
@@ -213,6 +215,28 @@ namespace Frontier
                 count.style.alignSelf = Align.FlexEnd;
                 count.style.marginTop = UiKit.Space.S8;
                 card.Add(count);
+                if (!string.IsNullOrEmpty(def.unlockResearch) && !gs.IsResearched(def.unlockResearch))
+                {
+                    var content = UiKit.Div();
+                    foreach (var child in card.Children().ToList()) content.Add(child);
+                    content.SetEnabled(false);
+                    card.Add(content);
+                    var overlay = UiKit.Div("fr-research-xp-lock");
+                    overlay.name = "shop-research-lock";
+                    overlay.Add(Icons.Make("lock", Color.white));
+                    overlay.Add(UiKit.Text(gs.BuildLockReason(def), "fr-h2", Color.white));
+                    var research = Icons.IconButton("research", UiKit.Magenta,
+                        () => OpenProject(Project("research", def.unlockResearch)));
+                    research.name = "shop-required-research-" + def.id;
+                    research.tooltip = UiText.Get("project.prerequisite");
+                    overlay.Add(research);
+                    card.Add(overlay);
+                    track.RemoveFromHierarchy();
+                    track.style.position = Position.Absolute;
+                    track.style.top = UiKit.Space.S8;
+                    track.style.right = UiKit.Space.S8;
+                    card.Add(track);
+                }
                 body.Add(card);
             }
         }
