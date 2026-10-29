@@ -19,7 +19,7 @@ MonoBehaviour:
     tiers.
   kind: 23
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_research_lab
   buildCost:
   - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
     amount: 35

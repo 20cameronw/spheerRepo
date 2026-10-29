@@ -8,7 +8,10 @@ namespace Frontier
         VeinHarvestRun run;
         readonly Transform[,] rocks = new Transform[6, VeinHarvestRun.Columns];
         readonly Renderer[,] renderers = new Renderer[6, VeinHarvestRun.Columns];
+        readonly MeshFilter[,] filters = new MeshFilter[6, VeinHarvestRun.Columns];
+        readonly GameObject[,] crystals = new GameObject[6, VeinHarvestRun.Columns];
         Material ore, rich, unstable;
+        Mesh oreMesh, fracturedMesh, crystalMesh;
         Transform cutter;
         Label readout;
         bool dragging;
@@ -92,13 +95,25 @@ namespace Frontier
             ore = stage.Lit(new Color(0.25f, 0.38f, 0.48f), rawColor, 0.5f, 3f, 0f);
             rich = stage.Lit(new Color(0.22f, 0.65f, 0.72f), rawColor * 2f, 0.7f, 3f, 0f);
             unstable = stage.Lit(new Color(0.12f, 0.08f, 0.08f), new Color(0.4f, 0.08f, 0.03f), 0.2f, 3f, 0f);
+            oreMesh = stage.Own(MeshKit.Ico(2, d =>
+            {
+                float ridge = Mathf.Abs(d.x * d.z) * 0.12f;
+                float cleft = Mathf.Max(0f, d.y * d.z) * 0.08f;
+                return 0.38f * (0.90f + ridge - cleft);
+            }));
+            fracturedMesh = stage.Own(MeshKit.Shard(41));
+            crystalMesh = stage.Own(MeshKit.CrystalCluster());
             for (int row = 0; row < 6; row++)
                 for (int column = 0; column < VeinHarvestRun.Columns; column++)
                 {
-                    var rock = stage.AddMesh(MeshKit.Ico(1, d => 0.38f * (1f + d.x * d.y * 0.4f)),
-                        ore, stage.root, Vector3.zero);
+                    var rock = stage.AddMesh(oreMesh, ore, stage.root, Vector3.zero, false);
                     rocks[row, column] = rock.transform;
                     renderers[row, column] = rock.GetComponent<Renderer>();
+                    filters[row, column] = rock.GetComponent<MeshFilter>();
+                    var crystal = stage.AddMesh(crystalMesh, rich, rock.transform, new Vector3(0f, 0.02f, 0f), false);
+                    crystal.transform.localScale = Vector3.one * 0.72f;
+                    crystal.SetActive(false);
+                    crystals[row, column] = crystal;
                 }
             cutter = HarvestToolVisual.Build(stage, MinigameKind.Mine, toolLevel, rawColor, Vector3.zero);
         }
@@ -131,7 +146,9 @@ namespace Frontier
                     if (depth >= VeinHarvestRun.Rows) continue;
                     rocks[row, column].localPosition = new Vector3(column - 2, 1.8f - row * 1.25f + run.Progress * 1.25f, 0);
                     int value = run.Cell(depth, column);
-                    renderers[row, column].sharedMaterial = value < 0 ? unstable : value == 3 ? rich : ore;
+                    renderers[row, column].sharedMaterial = value < 0 ? unstable : ore;
+                    filters[row, column].sharedMesh = value < 0 ? fracturedMesh : oreMesh;
+                    crystals[row, column].SetActive(value == 3);
                     rocks[row, column].localScale = value == 3 ? new Vector3(0.75f, 1.15f, 0.75f)
                         : value < 0 ? new Vector3(1.1f, 0.6f, 1f) : Vector3.one;
                 }

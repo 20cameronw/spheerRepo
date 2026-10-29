@@ -105,6 +105,61 @@ namespace Frontier
             }
             return bd.ToMesh();
         }
+
+        public static Mesh Shard(int seed)
+        {
+            var bd = new Builder();
+            float phase = seed * 0.37f;
+            Vector3[] lower = new Vector3[5];
+            Vector3[] upper = new Vector3[5];
+            for (int i = 0; i < 5; i++)
+            {
+                float a = i * Mathf.PI * 2f / 5f + phase;
+                float r = 0.28f + 0.06f * Mathf.Sin(i * 2.7f + phase);
+                lower[i] = new Vector3(Mathf.Cos(a) * r, -0.18f + 0.04f * Mathf.Sin(i + phase), Mathf.Sin(a) * r);
+                upper[i] = new Vector3(Mathf.Cos(a + 0.14f) * r * 0.72f,
+                    0.07f + 0.12f * Mathf.Sin(i * 1.9f + phase), Mathf.Sin(a + 0.14f) * r * 0.72f);
+            }
+            Vector3 bottom = new Vector3(0f, -0.22f, 0f);
+            Vector3 crown = new Vector3(0.06f * Mathf.Sin(phase), 0.24f, -0.04f * Mathf.Cos(phase));
+            for (int i = 0; i < 5; i++)
+            {
+                int next = (i + 1) % 5;
+                bd.Tri(bottom, lower[next], lower[i], Vector3.down);
+                bd.Tri(lower[i], lower[next], upper[next], (lower[i] + upper[next]) * 0.5f);
+                bd.Tri(lower[i], upper[next], upper[i], (lower[i] + upper[i]) * 0.5f);
+                bd.Tri(upper[i], upper[next], crown, (upper[i] + upper[next] + crown) / 3f);
+            }
+            return bd.ToMesh();
+        }
+
+        public static Mesh CrystalCluster()
+        {
+            var bd = new Builder();
+            float[] heights = { 0.54f, 0.34f, 0.42f, 0.28f };
+            Vector2[] centers = { new Vector2(-0.12f, 0.02f), new Vector2(0.13f, 0.08f),
+                new Vector2(0.02f, -0.14f), new Vector2(-0.18f, -0.12f) };
+            for (int i = 0; i < heights.Length; i++)
+            {
+                float a = i * 1.73f;
+                float h = heights[i];
+                Vector3 center = new Vector3(centers[i].x, 0f, centers[i].y);
+                Vector3 tip = center + new Vector3(0.06f * Mathf.Sin(a), h, 0.05f * Mathf.Cos(a));
+                Vector3[] ring = new Vector3[4];
+                for (int j = 0; j < ring.Length; j++)
+                {
+                    float angle = a + j * Mathf.PI * 0.5f;
+                    ring[j] = center + new Vector3(Mathf.Cos(angle) * 0.105f, h * 0.38f, Mathf.Sin(angle) * 0.105f);
+                }
+                for (int j = 0; j < ring.Length; j++)
+                {
+                    int next = (j + 1) % ring.Length;
+                    bd.Tri(center, ring[next], ring[j], Vector3.down);
+                    bd.Tri(ring[j], ring[next], tip, (ring[j] + ring[next] + tip) / 3f);
+                }
+            }
+            return bd.ToMesh();
+        }
     }
 
     /// <summary>
@@ -199,12 +254,12 @@ namespace Frontier
 
         public Material Additive(Color c, Texture tex = null) { return Own(Fx.AddMat(c, tex)); }
 
-        public GameObject AddMesh(Mesh mesh, Material mat, Transform parent, Vector3 pos)
+        public GameObject AddMesh(Mesh mesh, Material mat, Transform parent, Vector3 pos, bool ownMesh = true)
         {
             var go = new GameObject("Mesh");
             go.transform.SetParent(parent, false);
             go.transform.localPosition = pos;
-            go.AddComponent<MeshFilter>().sharedMesh = Own(mesh);
+            go.AddComponent<MeshFilter>().sharedMesh = ownMesh ? Own(mesh) : mesh;
             go.AddComponent<MeshRenderer>().sharedMaterial = mat;
             return go;
         }

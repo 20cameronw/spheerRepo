@@ -18,7 +18,7 @@ MonoBehaviour:
   description: Tap it to drill ore, crystal and xeno cores. Higher levels yield more.
   kind: 4
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_driller
   buildCost:
   - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
     amount: 45

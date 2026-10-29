@@ -469,7 +469,7 @@ namespace Frontier
         readonly Transform[] blobs = new Transform[3];
         GameObject rockGo;
         Material rockMat, gemMat;
-        Mesh chunkMesh, gemMesh;
+        Mesh chunkMesh, woodChunkMesh, gemMesh;
         readonly List<Vector3> surf = new List<Vector3>();
         ToolRig tool;
         Vector3 spotLocal;
@@ -589,7 +589,8 @@ namespace Frontier
             nodeRoot = new GameObject("Node").transform;
             nodeRoot.SetParent(st.root, false);
 
-            chunkMesh = st.Own(MeshKit.Ico(0, d => 0.5f));
+            chunkMesh = st.Own(MeshKit.Shard(rockSeed));
+            woodChunkMesh = st.Own(MeshKit.Cyl(0.16f, 0.12f, 0.56f, 6));
             gemMesh = st.Own(MeshKit.Ico(1, d => 0.5f));
             gemMat = st.Lit(color * 0.5f, rim * 1.8f, 4f, 3f, 0f);
 
@@ -636,17 +637,39 @@ namespace Frontier
 
         void BuildTree(MinigameStage st, Color rim)
         {
-            var barkM = st.Lit(new Color(0.42f, 0.26f, 0.13f), new Color(0.35f, 0.18f, 0.05f), 0f, 10f, 0f);
-            var leafM = st.Lit(new Color(color.r * 0.5f + 0.1f, color.g * 0.5f + 0.1f, color.b * 0.5f + 0.1f), rim * 0.9f, 4f, 3f, 0f, rockSeed);
+            var barkM = st.Lit(new Color(0.30f, 0.17f, 0.09f), new Color(0.24f, 0.12f, 0.04f), 0f, 10f, 0f);
+            var woodM = st.Lit(new Color(0.56f, 0.34f, 0.16f), new Color(0.42f, 0.20f, 0.05f), 0f, 10f, 0f);
+            var leafM = st.Lit(new Color(color.r * 0.28f + 0.04f, color.g * 0.44f + 0.08f, color.b * 0.24f + 0.03f), rim * 0.55f, 4f, 3f, 0f, rockSeed);
+            var leafLightM = st.Lit(new Color(color.r * 0.34f + 0.08f, color.g * 0.54f + 0.12f, color.b * 0.30f + 0.04f), rim * 0.75f, 4f, 3f, 0f, rockSeed + 17);
             rockMat = barkM;
-            trunk = st.AddMesh(MeshKit.Cyl(0.5f, 0.34f, 3.2f, 9), barkM, nodeRoot, new Vector3(0f, -1.6f, 0f)).transform;
-            float[] ys = { 1.5f, 2.35f, 3.05f }, rs = { 1.25f, 0.98f, 0.7f };
+            trunk = st.AddMesh(MeshKit.Cyl(0.34f, 0.20f, 3.2f, 9), barkM, nodeRoot, new Vector3(0f, -1.6f, 0f)).transform;
+            AddTreeBranch(st, barkM, new Vector3(0f, -1.35f, 0f), new Vector3(-0.43f, -1.58f, 0.18f), 0.15f, 0.045f);
+            AddTreeBranch(st, barkM, new Vector3(0f, -1.38f, 0f), new Vector3(0.38f, -1.57f, -0.22f), 0.13f, 0.04f);
+            AddTreeBranch(st, barkM, new Vector3(-0.02f, -0.2f, 0f), new Vector3(-0.58f, 0.65f, -0.02f), 0.17f, 0.07f);
+            AddTreeBranch(st, barkM, new Vector3(-0.58f, 0.65f, -0.02f), new Vector3(-0.72f, 1.18f, -0.04f), 0.075f, 0.035f);
+            AddTreeBranch(st, woodM, new Vector3(0.02f, 0.25f, 0f), new Vector3(0.54f, 0.94f, 0.03f), 0.15f, 0.06f);
+            AddTreeBranch(st, woodM, new Vector3(0.54f, 0.94f, 0.03f), new Vector3(0.66f, 1.42f, 0.05f), 0.065f, 0.03f);
+            AddTreeBranch(st, barkM, new Vector3(0f, 0.72f, 0f), new Vector3(-0.18f, 1.55f, 0.05f), 0.12f, 0.045f);
+            float[] ys = { 1.55f, 2.38f, 3.05f }, rs = { 0.92f, 0.76f, 0.57f };
+            Vector3[] centers = { new Vector3(-0.08f, ys[0], 0f), new Vector3(-0.19f, ys[1], 0.09f), new Vector3(0.07f, ys[2], -0.03f) };
             for (int i = 0; i < 3; i++)
             {
                 int seed = rockSeed + i * 13;
                 float r = rs[i];
-                blobs[i] = st.AddMesh(MeshKit.Ico(1, d => r * (0.8f + 0.35f * Mathf.PerlinNoise(d.x * 2f + seed, d.y * 2f + d.z))), leafM, nodeRoot, new Vector3(0f, ys[i], 0f)).transform;
+                Material leaf = i == 1 ? leafLightM : leafM;
+                blobs[i] = st.AddMesh(MeshKit.Ico(1, d => r * (0.84f + 0.22f * Mathf.PerlinNoise(d.x * 2f + seed, d.y * 2f + d.z))), leaf, nodeRoot, centers[i]).transform;
             }
+            st.AddMesh(MeshKit.Ico(1, d => 0.46f * (0.86f + 0.18f * Mathf.PerlinNoise(d.x * 2f + rockSeed + 9, d.y * 2f + d.z))),
+                leafLightM, nodeRoot, new Vector3(-0.62f, 1.95f, 0.02f));
+            st.AddMesh(MeshKit.Ico(1, d => 0.42f * (0.86f + 0.18f * Mathf.PerlinNoise(d.x * 2f + rockSeed + 21, d.y * 2f + d.z))),
+                leafM, nodeRoot, new Vector3(0.60f, 1.84f, -0.03f));
+        }
+
+        void AddTreeBranch(MinigameStage st, Material material, Vector3 start, Vector3 end, float baseRadius, float tipRadius)
+        {
+            Vector3 delta = end - start;
+            Transform branch = st.AddMesh(MeshKit.Cyl(baseRadius, tipRadius, delta.magnitude, 6), material, nodeRoot, start).transform;
+            branch.localRotation = Quaternion.FromToRotation(Vector3.up, delta.normalized);
         }
 
         float TrunkR(float y) { return Mathf.Lerp(0.5f, 0.34f, Mathf.Clamp01((y + 1.6f) / 3.2f)); }
@@ -814,7 +837,7 @@ namespace Frontier
         {
             Vector3 c = nodeRoot.position + (tree ? Vector3.up * 0.3f : Vector3.zero);
             for (int i = 0; i < n; i++)
-                stage.Chunk(chunkMesh, rockMat, c + UnityEngine.Random.insideUnitSphere * 0.5f, size * UnityEngine.Random.Range(0.6f, 1.4f),
+                stage.Chunk(tree ? woodChunkMesh : chunkMesh, rockMat, c + UnityEngine.Random.insideUnitSphere * 0.5f, size * UnityEngine.Random.Range(0.6f, 1.4f),
                     new Vector3(UnityEngine.Random.Range(-1f, 1f) * speed, UnityEngine.Random.Range(0.4f, 1f) * speed, UnityEngine.Random.Range(-1f, 0.2f) * speed), 12f, UnityEngine.Random.Range(0.9f, 1.4f));
         }
 

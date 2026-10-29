@@ -18,7 +18,7 @@ MonoBehaviour:
   description: 'A spaceport hangar: cuts the fuel cost of every trip.'
   kind: 26
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_hangar
   buildCost:
   - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
     amount: 1800

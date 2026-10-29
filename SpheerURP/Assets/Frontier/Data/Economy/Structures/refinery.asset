@@ -15,11 +15,11 @@ MonoBehaviour:
   lockedFields: []
   id: refinery
   displayName: Refinery
-  description: Converts raw materials into fuel and planks. Higher levels unlock better
-    recipes and larger craft batches.
+  description: Converts raw materials into fuel and planks. Higher levels unlock
+    better recipes and larger craft batches.
   kind: 0
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_refinery
   buildCost:
   - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
     amount: 15

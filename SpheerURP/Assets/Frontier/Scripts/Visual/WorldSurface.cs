@@ -401,8 +401,11 @@ namespace Frontier
                     var src = source[i];
                     Color tint = src != null && src.HasProperty("_BaseColor") ? src.GetColor("_BaseColor")
                         : src != null && src.HasProperty("_Color") ? src.GetColor("_Color") : Color.gray;
-                    var material = Lit(Fx.Displayable(tint));
-                    if (src != null && src.HasProperty("_BaseMap"))
+                    bool preserveSurface = src != null &&
+                        (src.renderQueue >= (int)UnityEngine.Rendering.RenderQueue.Transparent ||
+                         src.IsKeywordEnabled("_EMISSION"));
+                    var material = preserveSurface ? new Material(src) : Lit(Fx.Displayable(tint));
+                    if (!preserveSurface && src != null && src.HasProperty("_BaseMap"))
                         material.SetTexture("_BaseMap", src.GetTexture("_BaseMap"));
                     material.SetFloat("_Smoothness", 0.25f);
                     materials[i] = material;
