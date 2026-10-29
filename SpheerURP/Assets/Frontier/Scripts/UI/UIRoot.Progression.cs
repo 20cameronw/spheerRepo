@@ -139,7 +139,7 @@ namespace Frontier
             if (!complete)
             {
                 card.Add(ProjectCosts(CatalogCost(node.data.cost), Project("research", node.data.id)));
-                AddProjectAction(card, Project("research", node.data.id));
+                AddProjectAction(card, Project("research", node.data.id), false);
             }
             if (complete)
                 card.Add(Note(UiText.Get("research.complete-help", UnlockSummary(node.data.unlocks)), UiKit.Lime));
@@ -156,6 +156,24 @@ namespace Frontier
                     card.Add(UiKit.Text(UiText.Get("research.unlocks", UnlockSummary(node.data.unlocks)), "fr-tiny"));
             }
             else card.Add(Note(lockReason, UiKit.Amber));
+            if (!complete && node.data.tier > gs.PlayerLevel)
+            {
+                var track = card.Q<Button>(className: "fr-project-track");
+                track.RemoveFromHierarchy();
+                var content = UiKit.Div();
+                foreach (var child in card.Children().ToList()) content.Add(child);
+                content.SetEnabled(false);
+                card.Add(content);
+                var overlay = UiKit.Div("fr-research-xp-lock");
+                overlay.name = "research-xp-lock";
+                overlay.Add(Icons.Make("lock", Color.white));
+                overlay.Add(UiKit.Text(UiText.Get("research.xp-lock", node.data.tier), "fr-h2", Color.white));
+                card.Add(overlay);
+                track.style.position = Position.Absolute;
+                track.style.top = UiKit.Space.S8;
+                track.style.right = UiKit.Space.S8;
+                card.Add(track);
+            }
             body.Add(card);
         }
 

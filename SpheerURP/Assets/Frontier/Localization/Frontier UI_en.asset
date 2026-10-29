@@ -1962,7 +1962,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336401
-    m_Localized: "Coordinates in light-years \xB7 zoom out to explore"
+    m_Localized: Coordinates in light-years
     m_Metadata:
       m_Items: []
   - m_Id: 1991336402
@@ -9400,6 +9400,26 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5026773145313280
     m_Localized: HOLD SPEED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578470436864
+    m_Localized: REQUIRES XP LEVEL {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379904
+    m_Localized: Nearby
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379905
+    m_Localized: Overview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379906
+    m_Localized: Outside known space. Showing the nearest scanned region.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379907
+    m_Localized: Neighboring systems
     m_Metadata:
       m_Items: []
   references:

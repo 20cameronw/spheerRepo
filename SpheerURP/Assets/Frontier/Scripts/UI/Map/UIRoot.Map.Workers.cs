@@ -27,9 +27,10 @@ namespace Frontier
                     foreach (var star in mapSnapshot.surveyedSystems) mapRememberedSystems.Add(star.Id);
                     RefreshMapProjectMatches();
                     if (mapNameIndex != null) mapNameIndex.AddSystems(gs.universe.Universe, mapSnapshot.surveyedSystems);
-                    PositionMapLabels();
+                    BuildMapNodes();
                     mapWorld.MarkDirtyRepaint();
                     string readout = SystemMapView ? UiText.Get("map.view.system")
+                        : NeighborMapView ? UiText.Get("map.view.neighbors")
                         : mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
                         : UiText.Get("map.view.sector", mapSnapshot.systems.Length);
                     mapReadout.text = mapSnapshot.truncated ? UiText.Get("map.view.truncated", readout) : readout;

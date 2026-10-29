@@ -176,7 +176,7 @@
     background-color: var(--fr-surface-1);
 }
 .fr-guide-heading { flex-direction: row; align-items: center; }
-.fr-guide-title { flex-grow: 1; flex-shrink: 1; min-width: 0; }
+.fr-guide-title { flex-grow: 1; flex-shrink: 1; min-width: 0; white-space: normal; }
 .fr-guide-progress { flex-shrink: 0; margin-right: var(--fr-sp-8); }
 .fr-guide-close { background-color: var(--fr-surface-2); border-color: var(--fr-outline-strong); }
 .fr-guide-description { margin-top: var(--fr-sp-8); }
@@ -232,7 +232,20 @@
 .fr-iconbtn-icon { width: 52px; height: 52px; margin: 0; }
 .fr-round { border-radius: 52px; }
 .fr-iconbtn-small { width: 88px; height: 88px; min-height: 88px; }
-.fr-project-track-on { background-color: var(--fr-acc-soft); border-color: var(--fr-acc); }
+.fr-star-action, .fr-star-action:hover, .fr-star-action:active,
+.fr-shortage .fr-modal-head .fr-star-action {
+    background-color: rgba(0, 0, 0, 0); border-color: rgba(0, 0, 0, 0); border-radius: 52px;
+}
+.fr-star-action:focus { border-color: var(--fr-cyan); }
+.fr-star-action:hover .fr-icon { opacity: 0.8; }
+.fr-research-xp-lock {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    background-color: rgba(40, 45, 54, 0.9); border-radius: var(--fr-r-md);
+    align-items: center; justify-content: center;
+    padding: var(--fr-sp-16);
+}
+.fr-research-xp-lock .fr-h2 { white-space: normal; -unity-text-align: middle-center; }
+.fr-research-xp-lock .fr-icon { margin-bottom: var(--fr-sp-8); }
 
 /* ---------- Modals ---------- */
 .fr-scrim {

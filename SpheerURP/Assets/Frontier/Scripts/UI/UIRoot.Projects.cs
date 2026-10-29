@@ -39,9 +39,9 @@ namespace Frontier
                 resource => gs.ProjectResourceCount(project, resource));
         }
 
-        void AddProjectAction(VisualElement body, PlayerProject project)
+        void AddProjectAction(VisualElement body, PlayerProject project, bool includeGates = true)
         {
-            BuildProjectGates(body, project);
+            if (includeGates) BuildProjectGates(body, project);
             var heading = body.childCount > 0 ? body.ElementAt(0) : null;
             bool inline = heading != null && (heading.ClassListContains("fr-row") || heading.ClassListContains("fr-card-head"));
             var track = ProjectTrackButton(project);
@@ -79,6 +79,7 @@ namespace Frontier
             });
             track.name = "track-" + project.kind + "-" + project.id;
             track.AddToClassList("fr-project-track");
+            track.AddToClassList("fr-star-action");
             track.userData = project;
             RefreshProjectTrackButton(track);
             return track;
@@ -97,7 +98,7 @@ namespace Frontier
             bool tracked = IsTrackedProject((PlayerProject)button.userData);
             button.EnableInClassList("fr-project-track-on", tracked);
             UiKit.SetAccent(button, tracked ? UiKit.Cyan : UiKit.Muted);
-            button.Q(className: "fr-iconbtn-icon").style.unityBackgroundImageTintColor = UiKit.Ui(tracked ? UiKit.Cyan : UiKit.Muted);
+            Icons.Apply(button.Q(className: "fr-iconbtn-icon"), tracked ? "star-filled" : "star", tracked ? UiKit.Cyan : UiKit.Muted);
             button.tooltip = UiText.Get(tracked ? "project.clear" : "project.track");
             button.SetEnabled(!gs.SaveIsReadOnly);
         }
@@ -397,7 +398,14 @@ namespace Frontier
                 if (project == null) body.Add(Note(UiText.Get("project.empty"), UiKit.Muted));
                 else
                 {
-                    body.Add(UiKit.Text(status.name ?? UiText.Get("project.missing"), "fr-h2"));
+                    var heading = UiKit.Div("fr-row");
+                    var title = UiKit.Text(status.name ?? UiText.Get("project.missing"), "fr-h2");
+                    title.style.flexShrink = 1;
+                    title.style.whiteSpace = WhiteSpace.Normal;
+                    heading.Add(title);
+                    heading.Add(UiKit.Div("fr-spacer"));
+                    heading.Add(ProjectTrackButton(project));
+                    body.Add(heading);
                     body.Add(Note(UiText.Get(status.complete ? "project.complete" : "project.remaining"), UiKit.Cyan));
                     if (status.blocker != null) body.Add(Note(status.blocker, UiKit.Amber));
                     if (gs.planet.Id == project.planetId) body.Add(ProjectCosts(status.costs, project));
@@ -405,10 +413,6 @@ namespace Frontier
                     open.name = "project-open";
                     UiKit.SetEnabledLook(open, status.name != null);
                     body.Add(open);
-                    body.Add(IconBtn(UiText.Get("project.clear"), "close", UiKit.Muted, () =>
-                    {
-                        if (!gs.TrackProject(null, out var error)) Toast(error, UiKit.Amber);
-                    }));
                 }
                 if (!returnSummaryDismissed && gs.ReturnItems.Count > 0)
                 {
@@ -445,6 +449,7 @@ namespace Frontier
         {
             projectResume = Icons.IconButton("star", UiKit.Cyan, OpenProjectPanel);
             projectResume.name = "project-resume";
+            projectResume.AddToClassList("fr-star-action");
             projectResume.tooltip = UiText.Get("project.resume");
             projectResume.style.position = Position.Absolute;
             projectResume.style.top = HudTopInset + UiKit.Space.S16;
@@ -464,9 +469,8 @@ namespace Frontier
             var reward = gs.GameplayReward;
             useful |= reward != null && reward.state != "settled" && reward.state != "cancelled";
             projectResume.style.display = useful && !busy && !defense.Active && modal == null && popup == null &&
-                !mapOpen && buildDef == null && shortageOverlay == null ? DisplayStyle.Flex : DisplayStyle.None;
-            if (firstSessionGuideCard != null)
-                firstSessionGuideCard.style.right = useful ? UiKit.Size.Touch + UiKit.Space.S32 : UiKit.Space.S16;
+                !mapOpen && buildDef == null && shortageOverlay == null && !firstSessionGuideVisible
+                ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }

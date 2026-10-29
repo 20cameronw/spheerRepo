@@ -28,14 +28,7 @@ namespace Frontier
             intro.style.justifyContent = Justify.Center;
             intro.style.alignItems = Align.Center;
             root.Add(intro);
-            bool skip = false;
-            skipShipMoment = () => skip = true;
-            var skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
-            skipButton.name = "intro-skip";
-            skipButton.style.position = Position.Absolute;
-            skipButton.style.right = inset.z + UiKit.Space.S16;
-            skipButton.style.top = inset.y + UiKit.Space.S16;
-            intro.Add(skipButton);
+            skipShipMoment = null;
             try
             {
                 if (firstLaunch)
@@ -46,7 +39,7 @@ namespace Frontier
                     logo.name = "intro-logo";
                     intro.Add(logo);
                     float elapsed = 0f;
-                    while (elapsed < 0.65f && !skip)
+                    while (elapsed < 0.65f)
                     {
                         elapsed += Time.unscaledDeltaTime;
                         yield return null;
@@ -56,7 +49,6 @@ namespace Frontier
                 world.gameObject.SetActive(surfaceVisible);
                 intro.RemoveFromHierarchy();
                 skipShipMoment = null;
-                if (skip) yield break;
                 yield return ShipMoment(true, firstLaunch ? 5.2f : 4.6f, true);
                 introActive = false;
                 float reveal = 0f;
@@ -274,13 +266,18 @@ namespace Frontier
             Vector3 sky = ground + up * (orbitalApproach ? 0.85f : 2f);
             ship.transform.rotation = Quaternion.LookRotation(cam.transform.right, up);
             bool skip = false;
-            skipShipMoment = () => skip = true;
-            var skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
-            skipButton.name = "travel-skip-cinematic";
-            skipButton.style.position = Position.Absolute;
-            skipButton.style.right = UiKit.Space.S16;
-            skipButton.style.top = UiKit.Space.S16;
-            overlayLayer.Add(skipButton);
+            Button skipButton = null;
+            skipShipMoment = null;
+            if (!orbitalApproach)
+            {
+                skipShipMoment = () => skip = true;
+                skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
+                skipButton.name = "travel-skip-cinematic";
+                skipButton.style.position = Position.Absolute;
+                skipButton.style.right = UiKit.Space.S16;
+                skipButton.style.top = UiKit.Space.S16;
+                overlayLayer.Add(skipButton);
+            }
             try
             {
                 Sfx.ShipIgnition();
@@ -342,7 +339,7 @@ namespace Frontier
             {
                 if (cameraTransform != null) cameraTransform.position = cameraOrigin;
                 skipShipMoment = null;
-                skipButton.RemoveFromHierarchy();
+                skipButton?.RemoveFromHierarchy();
                 if (ship != null) Destroy(ship.gameObject);
             }
         }

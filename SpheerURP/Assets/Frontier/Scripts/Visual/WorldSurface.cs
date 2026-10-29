@@ -355,8 +355,15 @@ namespace Frontier
             var kind = gs.ObstacleKind(obstacle);
             Transform model = kind != null ? SpawnModel(gs.db.obstacleKinds[obstacle.kind].modelKey, it.t, 0.72f) : null;
             if (model == null) BuildFallbackObstacle(it.t, obstacle.kind, it.materials);
+            GroundObstacle(it);
             it.phase = obstacle.pad * 0.31f;
             return it;
+        }
+
+        void GroundObstacle(Item item)
+        {
+            Vector3 direction = dirs[item.slot];
+            item.t.localPosition = view.TerrainPoint(direction) - direction * 0.05f;
         }
 
         static void BuildFallbackObstacle(Transform parent, int kind, List<Material> materials)
@@ -741,7 +748,7 @@ namespace Frontier
                 placedRadius = r;
                 foreach (var it in items) if (it.t != null && !it.orbit) it.t.localPosition = dirs[it.slot] * r;
                 foreach (var it in pads) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
-                foreach (var it in obstacles) if (it.t != null) it.t.localPosition = dirs[it.slot] * r;
+                foreach (var it in obstacles) if (it.t != null) GroundObstacle(it);
             }
             AnimateItems(items);
             AnimateItems(pads);

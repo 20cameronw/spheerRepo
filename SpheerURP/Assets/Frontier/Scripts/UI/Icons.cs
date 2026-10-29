@@ -22,7 +22,7 @@ namespace Frontier
         public static readonly string[][] Groups =
         {
             new[] { "research", "map", "pack", "build", "menu", "close", "plus", "minus", "up", "back", "check", "lock", "play" },
-            new[] { "fuel", "star", "bolt", "skull", "sound", "mute", "gear", "ranks", "tutorial", "about", "alien", "shield", "tools", "base", "warp", "ship" },
+            new[] { "fuel", "star", "star-filled", "camera", "bolt", "skull", "sound", "mute", "gear", "ranks", "tutorial", "about", "alien", "shield", "tools", "base", "warp", "ship" },
             new[] { "wood", "stone", "iron", "crystal", "fuel", "core", "scrap", "alloy", "plasma", "cube",
                 "biomass", "copper_ore", "silica", "ice", "titanium_ore", "methane", "helium3", "radium", "dark_matter",
                 "planks", "iron_plate", "copper_wire", "glass", "titanium_plate", "steel", "biocomposite", "thermal_alloy",

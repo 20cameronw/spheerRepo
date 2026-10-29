@@ -17,7 +17,7 @@ Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to 
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
 The top bar includes fuel, live Nova Shards and player level; carried capacity stays inside Cargo, not on the dock.
-The startup arrival makes a full, skippable orbital loop before its side-on descent at the screen-top silhouette.
+The startup arrival makes a full, unskippable orbital loop before its side-on descent at the screen-top silhouette.
 First-launch flight lasts 5.2 seconds and repeat-startup flight 4.6 seconds, plus touchdown/reveal;
 ordinary travel arrivals/departures retain their shorter presentation.
 Two pale air boosters pulse downward to brake descent, cut out at contact, and finish with a small gear settle and
@@ -29,6 +29,16 @@ The dock retains its four positions: Research / Map / Ship / Build. Ship always 
 with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
 and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
 Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
+XP-locked research has a gray overlay with a lock and required XP level. Its tracking star remains interactive;
+research cards omit prerequisite-navigation buttons and retain their written requirements.
+The world-view control sits at top left below the HUD bar and always uses a camera glyph; its tooltip names the destination view.
+The tutorial retains the full HUD width and overlays the camera button. Covered camera input and the corner project
+resume stay unavailable until the tutorial is dismissed or opens another screen.
+Debris is embedded slightly into the local rendered terrain at spawn, not placed on the approximate ground sphere.
+Sylva uses the authored split land/ocean meshes: raised land is green, the ocean sphere blue, with a white atmosphere.
+Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
+systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
+Panning stays near scanner coverage or remembered systems; coordinates outside that space clamp to its nearest edge.
 Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right.
 The route action stays in the destination card footer outside its scrolling details. Prerequisite actions share a
 right-aligned icon row (research, local lab, station upgrade or XP only when needed). Material costs use a bounded,
@@ -54,10 +64,11 @@ with localized tooltips. Back, close and backdrop dismiss only that overlay; cho
 All shortage source, capacity and manual actions share one compact horizontal strip below the explanations,
 wrapping only when needed; source-specific tooltips identify their destination.
 Project tracking is explicit; card headings use a small star action instead of an extra full-width button.
-Stars toggle tracking on/off, with a cyan selected state and action tooltip. Resume is a star in the top-right
-corner below the HUD bar; first-session guidance reserves that corner. Lab requirements use a lab icon that opens
+Stars are borderless glyphs with full touch targets: outlined when off, filled cyan when tracked, with an action tooltip.
+Resume is a star in the top-right
+corner below the HUD bar when full-width first-session guidance is not covering the world controls. Lab requirements use a lab icon that opens
 and scrolls to Build > Utility > Research Lab. All build-project routes share the same category-aware destination.
-Prerequisite icons sit in each card heading beside its tracking star, without a separate empty action row.
+Outside research, prerequisite icons sit in card headings beside the tracking star, without a separate empty action row.
 Map opens in Tracked needs mode when that project has missing costs. Green diamond markers identify known
 systems/planets with those raw deposits; matching resource chips are outlined. Filled costs and completed or
 untracked projects clear their highlights. The normal material filter remains available.
@@ -111,9 +122,9 @@ changes update the emitters. Offscreen Hyperspace uses camera-scoped mesh draws 
 of globally visible particle renderers. The stage reserves layer 31, also excluded from the world camera.
 Cached procedural ignition/touchdown cues route through the existing SFX bus and respect mute.
 Brief travel ship beats are skippable by the visible Skip button or Back, without skipping fuel payment or a run.
-Startup shares the same arrival: first launch holds the wordmark over the starfield for 0.65s, descends for 1.4s,
-then reveals the top bar/dock with a 220 ms transform-only slide. Later launches omit the logo and use a 0.7s
-arrival. Intro completion or skipping records only a local presentation preference, not progression. World/input
+Startup holds the wordmark over the starfield for 0.65s on first launch, flies a complete orbit and then descends,
+revealing the top bar/dock with a 220 ms transform-only slide. Later launches omit the logo, not the loop.
+Neither the loop nor its descent has a skip control or Back bypass. Intro completion records only a local presentation preference, not progression. World/input
 and transforms are restored before publishing runtime readiness. Arrival uses a pooled amber heat glow, dust
 burst and touchdown ripple, then a brief damped camera impulse that restores the exact camera origin on
 completion or skip; effects use the existing ownership paths.

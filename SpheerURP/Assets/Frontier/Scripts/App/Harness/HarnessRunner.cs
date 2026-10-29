@@ -483,19 +483,14 @@ namespace Frontier
                 yield return new Shot("player-project-research", () => ui.DebugResearch());
                 yield return new Shot("player-project-requirements", () =>
                 {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetLevel(1);
                     ui.DebugResearch();
-                    var action = ui.DebugRoot.Q<Button>("project-required-research");
-                    if (action == null) throw new InvalidOperationException("No research prerequisite in layout fixture.");
-                    var card = action.parent.parent;
+                    var overlay = ui.DebugRoot.Q("research-xp-lock");
+                    if (overlay == null) throw new InvalidOperationException("No XP-locked research in layout fixture.");
+                    var card = overlay.parent;
                     var scroll = card.GetFirstAncestorOfType<ScrollView>();
                     scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
-                });
-                yield return new Shot("player-project-lab-shop", () =>
-                {
-                    ui.DebugResearch();
-                    var lab = ui.DebugRoot.Q<Button>("project-local-lab");
-                    if (lab == null) throw new InvalidOperationException("No lab shortcut in research fixture.");
-                    using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = lab; lab.SendEvent(submit); }
                 });
                 void PrepareTrackedMap(float zoom)
                 {
@@ -508,7 +503,8 @@ namespace Frontier
                         throw new InvalidOperationException(error);
                     ui.DebugMap(null, zoom);
                 }
-                yield return new Shot("player-project-map-scanner", () => PrepareTrackedMap(6f), 1f);
+                yield return new Shot("player-project-map-scanner", () => PrepareTrackedMap(1f), 1f);
+                yield return new Shot("player-project-map-neighbors", () => PrepareTrackedMap(4f), 1f);
                 yield return new Shot("player-project-map-orbits", () => PrepareTrackedMap(12f), 1f);
                 yield return new Shot("player-return", () =>
                 {
@@ -769,6 +765,11 @@ namespace Frontier
             SaveV2 structureWorldBaseline = null;
             Quaternion structureWorldSpin = Quaternion.identity;
             bool structureWorldWasFrozen = false, structureWorldWasSpinning = false, structureWorldWasClose = false;
+            yield return new Shot("sylva-terrain-overview", () =>
+            {
+                GoTo("sylva");
+                ResetView();
+            }, 1f);
             yield return new Shot("structures-in-game", () =>
             {
                 ResetView();

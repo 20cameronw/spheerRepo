@@ -1437,6 +1437,8 @@ MonoBehaviour:
     text: COMPLETE
   - key: research.tier
     text: XP LV {0}
+  - key: research.xp-lock
+    text: REQUIRES XP LEVEL {0}
   - key: research.lab
     text: "{0}  \xB7  LAB {1}"
   - key: research.prerequisites
@@ -1947,10 +1949,16 @@ MonoBehaviour:
     text: Universe Map
   - key: map.mode.orbits
     text: Planet Orbits
+  - key: map.mode.neighbors
+    text: Nearby
+  - key: map.mode.overview
+    text: Overview
   - key: map.search.empty
     text: Enter a world name or x,y
   - key: map.search.coordinates
-    text: "Coordinates in light-years \xB7 zoom out to explore"
+    text: Coordinates in light-years
+  - key: map.search.outside
+    text: Outside known space. Showing the nearest scanned region.
   - key: map.search.not-found
     text: "Not found \xB7 search an exact surveyed world/system name or x,y"
   - key: map.unavailable
@@ -1959,6 +1967,8 @@ MonoBehaviour:
     text: "Galaxy \xB7 zoom in for stars"
   - key: map.view.system
     text: System
+  - key: map.view.neighbors
+    text: Neighboring systems
   - key: map.view.sector
     text: "Sector \xB7 {0} stars"
   - key: map.view.truncated

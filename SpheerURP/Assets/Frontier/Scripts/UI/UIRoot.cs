@@ -206,7 +206,7 @@ namespace Frontier
             menuBtn.name = "menu-button";
             top.Add(menuBtn);
             hud.Add(top);
-            surfaceViewButton = Icons.IconButton("base", UiKit.Cyan, () =>
+            surfaceViewButton = Icons.IconButton("camera", UiKit.Cyan, () =>
             {
                 if (busy || introActive || defense.Active) return;
                 CloseModal();
@@ -217,8 +217,8 @@ namespace Frontier
             surfaceViewIcon = surfaceViewButton.Q(className: "fr-icon");
             surfaceViewButton.name = "world-view-toggle";
             surfaceViewButton.style.position = Position.Absolute;
-            surfaceViewButton.style.right = UiKit.Space.S24;
-            surfaceViewButton.style.bottom = DockInset + UiKit.Space.S16;
+            surfaceViewButton.style.left = UiKit.Space.S16;
+            surfaceViewButton.style.top = HudTopInset + UiKit.Space.S16;
             RefreshViewButton();
             hud.Add(surfaceViewButton);
 
@@ -235,7 +235,7 @@ namespace Frontier
         {
             if (surfaceViewButton == null) return;
             surfaceViewButton.tooltip = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
-            if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, planetView.CloseView ? "map" : "base", UiKit.Cyan);
+            if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, "camera", UiKit.Cyan);
         }
 
         /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>

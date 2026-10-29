@@ -122,7 +122,7 @@ namespace Frontier
             DebugReset();
             OpenMap();
             if (pick != null) selected = pick;
-            mapZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
+            mapZoom = zoom >= SystemZoomThreshold ? SystemZoom : zoom >= NeighborZoom ? NeighborZoom : MinZoom;
             if (mapView == null) return;
             BuildMapNodes();
             InvalidateMapPreview();
@@ -135,6 +135,8 @@ namespace Frontier
         public int DebugMapSystemCount { get { return mapSnapshot == null ? 0 : mapSnapshot.systems.Length; } }
         public double DebugMapCenterX { get { return viewport.CenterX; } }
         public bool DebugMapInSystem { get { return SystemMapView; } }
+        public bool DebugMapInNeighbors { get { return NeighborMapView; } }
+        public void DebugMapPan(float x, float y) { viewport.Pan(x, y); ApplyMapTransform(); }
         public string DebugMapSelectedId { get { return selected == null ? null : selected.Id; } }
         public bool DebugMapProjectMatch(PlanetData planet) { return mapProjectWorlds.Contains(planet.Id); }
         public bool DebugMapSurveyed(PlanetData planet) { return Surveyed(planet.Star); }
