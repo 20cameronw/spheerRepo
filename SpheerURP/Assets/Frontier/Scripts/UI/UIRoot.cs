@@ -365,6 +365,8 @@ namespace Frontier
             RefreshPopup();
             if (mapOpen) { RefreshMapPinPlanets(); InvalidateMapPreview(); BuildMapCard(); }
             RefreshShortage();
+            foreach (var track in root.Query<Button>(className: "fr-project-track").ToList())
+                RefreshProjectTrackButton(track);
         }
 
         // ------------------------------------------------------------ frame

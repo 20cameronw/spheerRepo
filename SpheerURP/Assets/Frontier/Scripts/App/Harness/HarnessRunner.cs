@@ -345,6 +345,8 @@ namespace Frontier
             yield return new Shot("first-session-guide", () => ui.DebugFirstSessionGuide(0));
             yield return new Shot("first-session-guide-defense", () => ui.DebugFirstSessionGuide(4));
             yield return new Shot("first-session-guide-travel", () => ui.DebugFirstSessionGuide(5));
+            yield return new Shot("first-session-guide-research", () => ui.DebugFirstSessionGuide(6));
+            yield return new Shot("first-session-guide-upgrade", () => ui.DebugFirstSessionGuide(7));
             yield return new Shot("guide-cue-harvest", () =>
             {
                 ResetView();
@@ -411,6 +413,15 @@ namespace Frontier
                         throw new InvalidOperationException(error);
                     ui.DebugProject();
                 });
+                yield return new Shot("player-project-corner", () => { ui.DebugReset(); });
+                yield return new Shot("player-project-research", () => ui.DebugResearch());
+                yield return new Shot("player-project-lab-shop", () =>
+                {
+                    ui.DebugResearch();
+                    var lab = ui.DebugRoot.Q<Button>("project-local-lab");
+                    if (lab == null) throw new InvalidOperationException("No lab shortcut in research fixture.");
+                    using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = lab; lab.SendEvent(submit); }
+                });
                 yield return new Shot("player-return", () =>
                 {
                     PreparePlayerFlowFixture();
@@ -465,6 +476,15 @@ namespace Frontier
                 string pg = page;
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
             }
+            yield return new Shot("menu-tutorial-research", () =>
+            {
+                ui.DebugMenu("tutorial");
+                var heading = ui.DebugRoot.Query<Label>().ToList()
+                    .Find(label => label.text == UiText.Get("tutorial.research.title"));
+                var card = heading.GetFirstAncestorOfType<VisualElement>().parent.parent;
+                var scroll = heading.GetFirstAncestorOfType<ScrollView>();
+                scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+            });
             SaveV2 ascensionBaseline = null;
             var ascensionRules = Resources.Load<AscensionRulesSO>("Frontier/AscensionRules");
             bool ascensionWasEnabled = ascensionRules != null && ascensionRules.enableAscension;

@@ -41,6 +41,13 @@ Missing-resource chips open a smaller dimmed overlay without discarding the orig
 Keep exact quantities, source names and travel/storage warnings visible; source actions use icon buttons
 with localized tooltips. Back, close and backdrop dismiss only that overlay; choosing a source opens its real destination.
 Project tracking is explicit; card headings use a small star action instead of an extra full-width button.
+Stars toggle tracking on/off, with a cyan selected state and action tooltip. Resume is a star in the top-right
+corner below the HUD bar; first-session guidance reserves that corner. Lab requirements use a lab icon that opens
+and scrolls to Build > Utility > Research Lab. All build-project routes share the same category-aware destination.
+How to Play walks through harvesting, storage, crafting/fuel, XP waves, local-lab research, upgrades, exploration and expansion.
+The skippable live first-session guide also requires first research and an upgrade after travel; existing completed
+actions count immediately and dismissed guides stay dismissed. Research guidance opens the local lab shop card if
+missing, otherwise the Tech page. No XP, cost or prerequisite gates are bypassed.
 Locked/in-progress producers retain their real upgrade/research/job status; guidance never spends,
 teleports or starts a job. One explicitly tracked project provides live requirements and a resume action.
 The return summary links completed jobs and stored offline output to their real location, not ship cargo.

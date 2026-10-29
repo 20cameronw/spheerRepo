@@ -232,6 +232,7 @@
 .fr-iconbtn-icon { width: 52px; height: 52px; margin: 0; }
 .fr-round { border-radius: 52px; }
 .fr-iconbtn-small { width: 88px; height: 88px; min-height: 88px; }
+.fr-project-track-on { background-color: var(--fr-acc-soft); border-color: var(--fr-acc); }
 
 /* ---------- Modals ---------- */
 .fr-scrim {

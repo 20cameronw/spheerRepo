@@ -8903,6 +8903,46 @@ MonoBehaviour:
     m_Key: project.landing-blocked
     m_Metadata:
       m_Items: []
+  - m_Id: 4804056911536128
+    m_Key: tutorial.research.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284864
+    m_Key: tutorial.research.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284865
+    m_Key: tutorial.expand.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284866
+    m_Key: tutorial.expand.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934317989888
+    m_Key: guide.research.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932928
+    m_Key: guide.research.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932929
+    m_Key: guide.upgrade.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932930
+    m_Key: guide.upgrade.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932931
+    m_Key: guide.action.research
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932932
+    m_Key: guide.action.upgrade
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

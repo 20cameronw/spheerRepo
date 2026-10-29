@@ -507,12 +507,14 @@ namespace Frontier
         void BuildTutorial(VisualElement body)
         {
             TutorialStep(body, "build", UiKit.Lime, UiText.Get("tutorial.build.title"), UiText.Get("tutorial.build.body"));
-            TutorialStep(body, "pack", UiKit.Cyan, UiText.Get("tutorial.storage.title"), UiText.Get("tutorial.storage.body"));
             TutorialStep(body, "wood", UiKit.Amber, UiText.Get("tutorial.gather.title"), UiText.Get("tutorial.gather.body"));
+            TutorialStep(body, "pack", UiKit.Cyan, UiText.Get("tutorial.storage.title"), UiText.Get("tutorial.storage.body"));
             TutorialStep(body, "fuel", UiKit.Amber, UiText.Get("tutorial.refine.title"), UiText.Get("tutorial.refine.body"));
             TutorialStep(body, "alarm", UiKit.Magenta, UiText.Get("tutorial.defend.title"), UiText.Get("tutorial.defend.body"));
-            TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.travel.title"), UiText.Get("tutorial.travel.body"));
+            TutorialStep(body, "research_lab", UiKit.Magenta, UiText.Get("tutorial.research.title"), UiText.Get("tutorial.research.body"));
             TutorialStep(body, "research", UiKit.Magenta, UiText.Get("tutorial.upgrade.title"), UiText.Get("tutorial.upgrade.body"));
+            TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.travel.title"), UiText.Get("tutorial.travel.body"));
+            TutorialStep(body, "base", UiKit.Lime, UiText.Get("tutorial.expand.title"), UiText.Get("tutorial.expand.body"));
             TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.map.title"), UiText.Get("tutorial.map.body"));
             TutorialStep(body, "warp", UiKit.Cyan, UiText.Get("network.title"), UiText.Get("network.help"));
         }

@@ -932,30 +932,42 @@ MonoBehaviour:
       and a Warehouse. Tap a building to use or upgrade it. Its build icon opens
       construction jobs and crew recruitment. Jobs continue while you are away.
   - key: tutorial.storage.title
-    text: 2. Storage
+    text: 3. Store
   - key: tutorial.storage.body
-    text: Your starter backpack has only 9 slots. Build a Warehouse early to store
-      extra resources and drag stacks between grids.
+    text: Cargo space is limited. Tap a Warehouse to move stacks between local storage
+      and your ship. A working Cargo Depot connects local storage for eligible costs.
+      Stock on another world must still be retrieved or transferred.
   - key: tutorial.gather.title
-    text: 3. Gather
+    text: 2. Harvest
   - key: tutorial.gather.body
     text: Tap a Lumber Camp, Mining Rig or another harvester, then HARVEST a resource.
       Collect the result to bring it aboard. The Mining Rig also gathers surface
       scrap.
   - key: tutorial.refine.title
-    text: 4. Refine
+    text: 4. Craft and fuel up
   - key: tutorial.refine.body
-    text: Tap the Refinery to turn raw resources into fuel.
+    text: Tap a Refinery or crafting station to turn raw resources into fuel and
+      parts. Recipes may need research or a higher station level. Fuel powers flights
+      and called waves; keep a reserve before departing.
   - key: tutorial.defend.title
-    text: 5. Defend
+    text: 5. Defend and earn XP
   - key: tutorial.defend.body
     text: Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight
-      and bigger rewards. Gunners and Lasers defend automatically.
+      and bigger rewards. Gunners and Lasers defend automatically. Clearing waves
+      earns player XP; XP levels unlock higher research and equipment tiers.
+  - key: tutorial.research.title
+    text: 6. Research technology
+  - key: tutorial.research.body
+    text: Build a Research Lab from Build > Utility, then open Research > Tech. Each
+      technology shows its XP level, local lab level, prerequisites and material
+      cost. Upgrade the lab when required. Research unlocks buildings, recipes and
+      equipment; Research > Improvements holds global defense and logistics upgrades.
   - key: tutorial.travel.title
-    text: 6. Travel
+    text: 8. Explore
   - key: tutorial.travel.body
     text: Open Map on the bottom dock and spend fuel to visit new planets. Your bases
-      stay where you built them.
+      stay where you built them. Check deposits and landing hazards before departure;
+      upgrade range, scanner and hull protection in Ship > Systems when needed.
   - key: tutorial.map.title
     text: Reading the map
   - key: tutorial.map.body
@@ -967,8 +979,17 @@ MonoBehaviour:
   - key: tutorial.upgrade.title
     text: 7. Upgrade
   - key: tutorial.upgrade.body
-    text: Ship holds your cargo, tools and ship upgrades. Research unlocks technology
-      and global improvements. Tap a structure to manage it, or open Build for construction.
+    text: Ship > Cargo expands carried capacity, Tools improves harvesting, and Systems
+      upgrades fuel tanks, engine, range, scanner and hull protection. Tap buildings
+      to upgrade their output or services. Harvest and craft the materials for your
+      next upgrade.
+  - key: tutorial.expand.title
+    text: 9. Expand and repeat
+  - key: tutorial.expand.body
+    text: Establish harvesters, storage and crafting on new worlds for rarer materials.
+      Bring those materials back into research and upgrades to reach farther. Tap
+      a missing-material cost to find a source. Tap a project's star to track it,
+      tap again to stop, and use the star below the top bar to reopen your project.
   - key: about.title
     text: FRONTIER
   - key: about.body
@@ -1077,6 +1098,22 @@ MonoBehaviour:
     text: Clear an alien wave
   - key: guide.travel.title
     text: Land on a new world
+  - key: guide.research.title
+    text: Research your first technology
+  - key: guide.research.help
+    text: Build a Research Lab on this world, then open Research > Tech. Check each
+      technology's XP, lab and material requirements. Research opens new buildings,
+      recipes and equipment; upgrade your lab for deeper technology.
+  - key: guide.upgrade.title
+    text: Buy your first upgrade
+  - key: guide.upgrade.help
+    text: Open Ship for cargo, tools and systems upgrades, or Research > Improvements
+      for global defense and logistics. Harvest and craft what you need, upgrade,
+      then explore farther and build another base.
+  - key: guide.action.research
+    text: OPEN RESEARCH
+  - key: guide.action.upgrade
+    text: OPEN SHIP UPGRADES
   - key: guide.build.help
     text: Prepare for your first departure. A Lumber Camp supplies wood for your
       first base.
@@ -1100,8 +1137,8 @@ MonoBehaviour:
   - key: guide.complete.title
     text: Your frontier is open
   - key: guide.complete.help
-    text: You have built, gathered, crafted, defended, and traveled. Follow the Atlas
-      and grow outward at your own pace.
+    text: You have built, gathered, crafted, defended, traveled, researched and upgraded.
+      Find rarer materials, grow your bases and repeat the loop to reach farther.
   - key: guide.action.atlas
     text: OPEN ATLAS
   - key: guide.action.gather-shop

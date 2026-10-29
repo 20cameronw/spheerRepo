@@ -353,16 +353,17 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336016
-    m_Localized: 2. Storage
+    m_Localized: 3. Store
     m_Metadata:
       m_Items: []
   - m_Id: 1991336017
-    m_Localized: Your starter backpack has only 9 slots. Build a Warehouse early
-      to store extra resources and drag stacks between grids.
+    m_Localized: Cargo space is limited. Tap a Warehouse to move stacks between local
+      storage and your ship. A working Cargo Depot connects local storage for eligible
+      costs. Stock on another world must still be retrieved or transferred.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336018
-    m_Localized: 3. Gather
+    m_Localized: 2. Harvest
     m_Metadata:
       m_Items: []
   - m_Id: 1991336019
@@ -372,29 +373,34 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336020
-    m_Localized: 4. Refine
+    m_Localized: 4. Craft and fuel up
     m_Metadata:
       m_Items: []
   - m_Id: 1991336021
-    m_Localized: Tap the Refinery to turn raw resources into fuel.
+    m_Localized: Tap a Refinery or crafting station to turn raw resources into fuel
+      and parts. Recipes may need research or a higher station level. Fuel powers
+      flights and called waves; keep a reserve before departing.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336022
-    m_Localized: 5. Defend
+    m_Localized: 5. Defend and earn XP
     m_Metadata:
       m_Items: []
   - m_Id: 1991336023
     m_Localized: Tap the Alarm and spend fuel to call a wave. More fuel means a longer
-      fight and bigger rewards. Gunners and Lasers defend automatically.
+      fight and bigger rewards. Gunners and Lasers defend automatically. Clearing
+      waves earns player XP; XP levels unlock higher research and equipment tiers.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336024
-    m_Localized: 6. Travel
+    m_Localized: 8. Explore
     m_Metadata:
       m_Items: []
   - m_Id: 1991336025
     m_Localized: Open Map on the bottom dock and spend fuel to visit new planets.
-      Your bases stay where you built them.
+      Your bases stay where you built them. Check deposits and landing hazards before
+      departure; upgrade range, scanner and hull protection in Ship > Systems when
+      needed.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336026
@@ -402,9 +408,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336027
-    m_Localized: Ship holds your cargo, tools and ship upgrades. Research unlocks
-      technology and global improvements. Tap a structure to manage it, or open Build
-      for construction.
+    m_Localized: Ship > Cargo expands carried capacity, Tools improves harvesting,
+      and Systems upgrades fuel tanks, engine, range, scanner and hull protection.
+      Tap buildings to upgrade their output or services. Harvest and craft the materials
+      for your next upgrade.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336028
@@ -654,8 +661,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336086
-    m_Localized: You have built, gathered, crafted, defended, and traveled. Follow
-      the Atlas and grow outward at your own pace.
+    m_Localized: You have built, gathered, crafted, defended, traveled, researched
+      and upgraded. Find rarer materials, grow your bases and repeat the loop to
+      reach farther.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336087
@@ -9230,6 +9238,56 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4801657140502528
     m_Localized: Hull protection is required to land here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056911536128
+    m_Localized: 6. Research technology
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284864
+    m_Localized: Build a Research Lab from Build > Utility, then open Research >
+      Tech. Each technology shows its XP level, local lab level, prerequisites and
+      material cost. Upgrade the lab when required. Research unlocks buildings, recipes
+      and equipment; Research > Improvements holds global defense and logistics upgrades.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284865
+    m_Localized: 9. Expand and repeat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284866
+    m_Localized: Establish harvesters, storage and crafting on new worlds for rarer
+      materials. Bring those materials back into research and upgrades to reach farther.
+      Tap a missing-material cost to find a source. Tap a project's star to track
+      it, tap again to stop, and use the star below the top bar to reopen your project.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934317989888
+    m_Localized: Research your first technology
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932928
+    m_Localized: Build a Research Lab on this world, then open Research > Tech. Check
+      each technology's XP, lab and material requirements. Research opens new buildings,
+      recipes and equipment; upgrade your lab for deeper technology.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932929
+    m_Localized: Buy your first upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932930
+    m_Localized: Open Ship for cargo, tools and systems upgrades, or Research > Improvements
+      for global defense and logistics. Harvest and craft what you need, upgrade,
+      then explore farther and build another base.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932931
+    m_Localized: OPEN RESEARCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932932
+    m_Localized: OPEN SHIP UPGRADES
     m_Metadata:
       m_Items: []
   references:

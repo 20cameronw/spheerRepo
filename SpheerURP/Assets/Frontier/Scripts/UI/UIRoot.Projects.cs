@@ -61,12 +61,32 @@ namespace Frontier
         {
             var track = Icons.IconButton("star", UiKit.Muted, () =>
             {
-                if (!gs.TrackProject(project, out var error)) Toast(error, UiKit.Amber);
-                else Toast(UiText.Get("project.tracked", gs.ProjectState(project).name), UiKit.Cyan);
+                if (!gs.TrackProject(IsTrackedProject(project) ? null : project, out var error))
+                    Toast(error, UiKit.Amber);
             });
             track.name = "track-" + project.kind + "-" + project.id;
-            track.tooltip = UiText.Get("project.track");
+            track.AddToClassList("fr-project-track");
+            track.userData = project;
+            RefreshProjectTrackButton(track);
             return track;
+        }
+
+        bool IsTrackedProject(PlayerProject project)
+        {
+            var tracked = gs.TrackedProject;
+            return tracked != null && tracked.kind == project.kind && tracked.id == project.id &&
+                tracked.planetId == project.planetId && tracked.slot == project.slot &&
+                tracked.target == project.target && tracked.quantity == project.quantity;
+        }
+
+        void RefreshProjectTrackButton(Button button)
+        {
+            bool tracked = IsTrackedProject((PlayerProject)button.userData);
+            button.EnableInClassList("fr-project-track-on", tracked);
+            UiKit.SetAccent(button, tracked ? UiKit.Cyan : UiKit.Muted);
+            button.Q(className: "fr-iconbtn-icon").style.unityBackgroundImageTintColor = UiKit.Ui(tracked ? UiKit.Cyan : UiKit.Muted);
+            button.tooltip = UiText.Get(tracked ? "project.clear" : "project.track");
+            button.SetEnabled(!gs.SaveIsReadOnly);
         }
 
         void BuildProjectGates(VisualElement body, PlayerProject project)
@@ -113,15 +133,14 @@ namespace Frontier
                     () => OpenProject(Project("research", prerequisite))));
             var localLab = gs.StructureOfKind(gs.planet, StructureKind.ResearchLab);
             if (lab > 0 && (localLab == null || localLab.level < lab))
-                body.Add(IconBtn(UiText.Get("project.lab"), "research_lab", UiKit.Cyan, () =>
-                    {
-                        if (localLab != null) OpenSourceStructure(localLab);
-                        else
-                        {
-                            var definition = gs.db.StructureOfKind(StructureKind.ResearchLab);
-                            OpenProject(Project("build", definition.id));
-                        }
-                    }));
+            {
+                var labButton = Icons.IconButton("research_lab", UiKit.Cyan,
+                    () => OpenBuildDefinition(gs.db.StructureOfKind(StructureKind.ResearchLab)));
+                labButton.name = "project-local-lab";
+                labButton.tooltip = UiText.Get("project.lab");
+                labButton.style.alignSelf = Align.FlexEnd;
+                body.Add(labButton);
+            }
             if (xp > gs.PlayerLevel)
                 body.Add(IconBtn(UiText.Get("project.xp"), "alarm", UiKit.Cyan,
                     () => { CloseAll(); if (!OpenFirstSessionStructure(StructureKind.Alarm)) { shopTab = 0; OpenShop(); } }));
@@ -313,8 +332,7 @@ namespace Frontier
                     break;
                 case "tool": OpenShip(ShipPage.Tools); ScrollProject(modalScroll, "tool-" + project.id); break;
                 case "build":
-                    shopTab = gs.db.FindStructure(project.id).kind.IsGather() ? 1 : 0; OpenShop();
-                    ScrollProject(modalScroll, "shop-structure-" + project.id);
+                    OpenBuildDefinition(gs.db.FindStructure(project.id));
                     break;
                 case "network": OpenNetwork(); break;
                 case "link":
@@ -406,11 +424,12 @@ namespace Frontier
 
         void BuildProjectResume()
         {
-            projectResume = IconBtn(UiText.Get("project.resume"), "star", UiKit.Cyan, OpenProjectPanel);
+            projectResume = Icons.IconButton("star", UiKit.Cyan, OpenProjectPanel);
             projectResume.name = "project-resume";
+            projectResume.tooltip = UiText.Get("project.resume");
             projectResume.style.position = Position.Absolute;
-            projectResume.style.bottom = DockInset;
-            projectResume.style.left = UiKit.Space.S16;
+            projectResume.style.top = HudTopInset + UiKit.Space.S16;
+            projectResume.style.right = UiKit.Space.S16;
             hud.Add(projectResume);
         }
 
@@ -427,6 +446,8 @@ namespace Frontier
             useful |= reward != null && reward.state != "settled" && reward.state != "cancelled";
             projectResume.style.display = useful && !busy && !defense.Active && modal == null && popup == null &&
                 !mapOpen && buildDef == null && shortageOverlay == null ? DisplayStyle.Flex : DisplayStyle.None;
+            if (firstSessionGuideCard != null)
+                firstSessionGuideCard.style.right = useful ? UiKit.Size.Touch + UiKit.Space.S32 : UiKit.Space.S16;
         }
     }
 }

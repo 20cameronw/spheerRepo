@@ -1,5 +1,15 @@
 # Testing
 
+## Project icons and full-loop tutorial follow-up
+
+- Lab shortcut selects Utility and scrolls the Research Lab card into view; tracked Utility projects use the same route.
+- Track stars toggle saved state and selected styling, including the persistent shortage-overlay header.
+- Resume is icon-only in the safe-area HUD corner below the top bar, with first-session guidance beside it.
+- The live guide now ends with research and an upgrade, preserving its original six objective identities and skip state.
+  How to Play explains the full harvesting/storage/crafting/XP/research/upgrading/exploration/expansion loop.
+- Targeted validation: 63 EditMode and 5 PlayMode tests passed. Two-phone captures cover the lab, shop route,
+  project corner and tutorial; native touch playtesting remains a human-device check.
+
 Everything that can run without Unity does. Five layers, fastest first:
 
 | Layer | Covers | Needs | Run it | CI |

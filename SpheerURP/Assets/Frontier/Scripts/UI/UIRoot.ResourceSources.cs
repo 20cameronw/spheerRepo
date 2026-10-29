@@ -43,7 +43,20 @@ namespace Frontier
 
         void OpenBuildDefinition(StructureSO definition)
         {
-            shopTab = definition.kind.IsGather() ? 1 : 0;
+            CloseAll();
+            switch (definition.kind)
+            {
+                case StructureKind.ResearchLab:
+                case StructureKind.RadarTower:
+                case StructureKind.ColonyHub:
+                case StructureKind.Satellite:
+                case StructureKind.Terraformer:
+                case StructureKind.WarpGate:
+                case StructureKind.DysonCollector: shopTab = 3; break;
+                case StructureKind.Gunner:
+                case StructureKind.Laser: shopTab = 2; break;
+                default: shopTab = definition.kind.IsGather() ? 1 : 0; break;
+            }
             OpenShop();
             var scroll = modalScroll;
             scroll.schedule.Execute(() =>

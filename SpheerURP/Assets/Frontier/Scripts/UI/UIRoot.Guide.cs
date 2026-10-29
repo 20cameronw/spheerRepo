@@ -8,13 +8,15 @@ namespace Frontier
         static readonly string[] FirstSessionTitleKeys =
         {
             "guide.build.title", "guide.gather.title", "guide.store.title",
-            "guide.craft.title", "guide.defend.title", "guide.travel.title"
+            "guide.craft.title", "guide.defend.title", "guide.travel.title",
+            "guide.research.title", "guide.upgrade.title"
         };
 
         static readonly string[] FirstSessionDescriptionKeys =
         {
             "guide.build.help", "guide.gather.help", "guide.store.help",
-            "guide.craft.help", "guide.defend.help", "guide.travel.help"
+            "guide.craft.help", "guide.defend.help", "guide.travel.help",
+            "guide.research.help", "guide.upgrade.help"
         };
 
         VisualElement firstSessionGuideCard;
@@ -82,6 +84,7 @@ namespace Frontier
                 case 2: return kind == StructureKind.Warehouse;
                 case 3: return kind == StructureKind.Refinery;
                 case 4: return kind == StructureKind.Alarm;
+                case 6: return kind == StructureKind.ResearchLab;
                 default: return false;
             }
         }
@@ -140,6 +143,9 @@ namespace Frontier
                     ? "guide.action.refinery" : "guide.action.build-shop");
                 case 4: return UiText.Get(gs.StructureOfKind(gs.planet, StructureKind.Alarm) != null
                     ? "guide.action.alarm" : "guide.action.alarm-shop");
+                case 6: return UiText.Get(gs.StructureOfKind(gs.planet, StructureKind.ResearchLab) != null
+                    ? "guide.action.research" : "project.lab");
+                case 7: return UiText.Get("guide.action.upgrade");
                 default: return UiText.Get("guide.action.map");
             }
         }
@@ -190,6 +196,14 @@ namespace Frontier
             }
             else if (step == 5)
                 OpenMap();
+            else if (step == 6)
+            {
+                if (gs.StructureOfKind(gs.planet, StructureKind.ResearchLab) == null)
+                    OpenBuildDefinition(gs.db.StructureOfKind(StructureKind.ResearchLab));
+                else OpenResearch();
+            }
+            else if (step == 7)
+                OpenShip(ShipPage.Systems);
             else if (step >= FirstSessionObjectives.Count)
                 OpenGuideAtlas();
         }

@@ -46,7 +46,7 @@ namespace Frontier
         public void DebugFirstSessionGuideShop(int step)
         {
             DebugFirstSessionGuide(step);
-            shopTab = step == 0 ? 1 : 0;
+            shopTab = step == 0 ? 1 : step == 6 ? 3 : 0;
             OpenShop();
         }
 

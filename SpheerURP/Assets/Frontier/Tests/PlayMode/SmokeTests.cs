@@ -1900,6 +1900,16 @@ namespace Frontier.Tests
             rt.State.Notify();
             Assert.IsNull(rt.Ui.DebugRoot.Q("first-session-cue-4"), "Do not point at the disabled wave button.");
 
+            rt.Ui.DebugFirstSessionGuideAction(6);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.ResearchLab).id));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("first-session-cue-6"));
+            rt.Ui.DebugReset();
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.ResearchLab), 3);
+            rt.Ui.DebugFirstSessionGuideAction(6);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("research-navigation"), "An existing lab routes to technology research.");
+            rt.Ui.DebugFirstSessionGuideAction(7);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("ship-navigation"));
+
             rt.Ui.DebugReset();
             rt.State.DismissFirstSessionGuide();
             Assert.IsTrue(rt.Surface.SimulateTap(rt.State.StructureOfKind(rt.State.planet, StructureKind.Lumber)));
@@ -2441,6 +2451,11 @@ namespace Frontier.Tests
             Assert.IsTrue(track.parent.ClassListContains("fr-modal-head"), "Tracking uses the header, not another action row.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
             Assert.AreEqual("pack", rt.State.TrackedProject.id);
+            Assert.IsTrue(track.ClassListContains("fr-project-track-on"), "The overlay header refreshes without being rebuilt.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.IsFalse(rt.State.HasTrackedProject);
+            Assert.AreEqual(UiText.Get("project.track"), track.tooltip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
             rt.Ui.DebugShortage(rt.Db.FindResource("stone"), 17);
             yield return null;
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Need 17")));
@@ -2482,6 +2497,62 @@ namespace Frontier.Tests
             rt.Ui.DebugMenu("tutorial");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tutorial.map.body")));
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("network.help")));
+        }
+
+        [UnityTest]
+        public IEnumerator LabShortcutTrackingToggleAndCornerResumeUseLiveDestinations()
+        {
+            new GameObject("ProjectControlsBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Ui.DebugResearch();
+            yield return null;
+            var lab = rt.Ui.DebugRoot.Q<Button>("project-local-lab");
+            Assert.IsNotNull(lab);
+            Assert.AreEqual(0, lab.Query<Label>().ToList().Count);
+            Assert.AreEqual(UiText.Get("project.lab"), lab.tooltip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = lab; lab.SendEvent(submit); }
+            yield return null;
+            yield return null;
+            var definition = rt.Db.StructureOfKind(StructureKind.ResearchLab);
+            var card = rt.Ui.DebugRoot.Q("shop-structure-" + definition.id);
+            Assert.IsNotNull(card, "Lab shortcut must select Utility, not Economy.");
+            var scroll = card.GetFirstAncestorOfType<ScrollView>();
+            yield return null;
+            Assert.Less(card.worldBound.yMin, scroll.contentViewport.worldBound.yMax);
+            Assert.Greater(card.worldBound.yMax, scroll.contentViewport.worldBound.yMin);
+
+            var track = card.Q<Button>("track-build-" + definition.id);
+            Assert.IsNotNull(track);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.AreEqual(definition.id, rt.State.TrackedProject.id);
+            track = rt.Ui.DebugRoot.Q<Button>("track-build-" + definition.id);
+            Assert.IsTrue(track.ClassListContains("fr-project-track-on"));
+            Assert.AreEqual(UiText.Get("project.clear"), track.tooltip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.IsFalse(rt.State.HasTrackedProject);
+            track = rt.Ui.DebugRoot.Q<Button>("track-build-" + definition.id);
+            Assert.IsFalse(track.ClassListContains("fr-project-track-on"));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            rt.Ui.DebugReset();
+            yield return null;
+            yield return null;
+            var resume = rt.Ui.DebugRoot.Q<Button>("project-resume");
+            Assert.AreEqual(0, resume.Query<Label>().ToList().Count);
+            Assert.AreEqual(DisplayStyle.Flex, resume.resolvedStyle.display);
+            Assert.AreEqual(UIRoot.HudTopInset + UiKit.Space.S16, resume.resolvedStyle.top, 1);
+            Assert.AreEqual(UiKit.Space.S16, resume.style.right.value.value, 1);
+            Assert.AreEqual(UiKit.Space.S16, resume.parent.worldBound.xMax - resume.worldBound.xMax, 1);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = resume; resume.SendEvent(submit); }
+            var open = rt.Ui.DebugRoot.Q<Button>("project-open");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = open; open.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + definition.id), "Resuming a Utility project uses the same shop destination.");
+            rt.Ui.DebugMenu("tutorial");
+            var text = rt.Ui.DebugRoot.Query<Label>().ToList();
+            foreach (var key in new[] { "build", "gather", "storage", "refine", "defend", "research", "upgrade", "travel", "expand" })
+                Assert.IsTrue(text.Exists(label => label.text == UiText.Get("tutorial." + key + ".body")), key);
         }
 
         [UnityTest]
