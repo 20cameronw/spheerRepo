@@ -21,15 +21,15 @@ MonoBehaviour:
     tier: 2
     cost:
     - resourceId: iron_plate
-      amount: 90
+      amount: 85
     - resourceId: planks
-      amount: 380
+      amount: 350
     - resourceId: glass
       amount: 50
     - resourceId: copper_wire
-      amount: 110
+      amount: 100
     - resourceId: scrap
-      amount: 280
+      amount: 260
     prereqs:
     - steelmaking
     labLevel: 2

@@ -41,6 +41,13 @@ namespace Frontier
             firstSessionGuideProgress = UiKit.Text("", "fr-guide-progress fr-tiny", UiKit.Cyan);
             heading.Add(firstSessionGuideProgress);
 
+            var help = Icons.IconButton("tutorial", UiKit.Cyan, OpenHowToPlay, 0f, true);
+            help.name = "first-session-guide-help";
+            help.tooltip = UiText.Get("menu.tutorial");
+            help.style.marginLeft = UiKit.Space.S12;
+            help.style.marginRight = UiKit.Space.S8;
+            heading.Add(help);
+
             var skip = Icons.IconButton("close", UiKit.Muted, DismissFirstSessionGuide, 0f, true);
             skip.name = "first-session-guide-skip";
             skip.tooltip = UiText.Get("guide.skip");
@@ -127,7 +134,7 @@ namespace Frontier
             firstSessionGuideDescription.text = complete
                 ? UiText.Get("guide.complete.help")
                 : UiText.Get(FirstSessionDescriptionKeys[step]);
-            firstSessionGuideAction.text = complete ? UiText.Get("guide.action.atlas") : GuideActionLabel(step);
+            firstSessionGuideAction.text = complete ? UiText.Get("menu.tutorial") : GuideActionLabel(step);
             UpdateFirstSessionGuideVisibility();
         }
 
@@ -161,6 +168,7 @@ namespace Frontier
                 firstSessionGuideVisible = visible;
                 firstSessionGuideCard.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
                 surfaceViewButton?.SetEnabled(!visible);
+                constructionButton?.SetEnabled(!visible);
                 if (visible) firstSessionGuideCard.BringToFront();
                 RefreshProjectResume();
             }
@@ -203,12 +211,20 @@ namespace Frontier
             {
                 if (gs.StructureOfKind(gs.planet, StructureKind.ResearchLab) == null)
                     OpenBuildDefinition(gs.db.StructureOfKind(StructureKind.ResearchLab));
-                else OpenResearch();
+                else OpenFirstSessionStructure(StructureKind.ResearchLab);
             }
             else if (step == 7)
                 OpenShip(ShipPage.Systems);
             else if (step >= FirstSessionObjectives.Count)
-                OpenGuideAtlas();
+                OpenHowToPlay();
+        }
+
+        void OpenHowToPlay()
+        {
+            if (defense.Active || busy) return;
+            if (modalKey != "menu") OpenMenu();
+            menuPage = "tutorial";
+            RefreshModal();
         }
 
         void OpenGuideAtlas()

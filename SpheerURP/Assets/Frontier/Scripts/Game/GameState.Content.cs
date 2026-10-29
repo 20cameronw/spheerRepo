@@ -56,6 +56,8 @@ namespace Frontier
             if (upgrade == null || db.FindUpgrade(upgrade.id) != upgrade) return UiText.Get("gate.upgrade.unknown");
             int level = Level(upgrade);
             if (level >= upgrade.MaxLevel) return UiText.Get("gate.max-level");
+            if (db.UsesImportedEconomy && upgrade.effect == UpgradeEffect.ToolPower)
+                return UiText.Get("gate.upgrade.legacy-tool");
             if (!db.UsesImportedEconomy || !upgrade.HasLevelRows) return null;
             if (upgrade.effect == UpgradeEffect.StackMultiplier)
                 return UiText.Get("gate.upgrade.future");

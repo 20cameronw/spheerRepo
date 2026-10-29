@@ -45,12 +45,13 @@ right-aligned icon row (research, local lab, station upgrade or XP only when nee
 undecorated wrapping container inside cards, never a nested scroller; exact quantities remain readable.
 The planetary-network action is last in the details and disabled until a local Warp Gate is completed. Ship systems remain on
 the Ship dock rather than a duplicate readiness action. Build lists structures without jobs/harvest shortcut rows.
-Tap a harvester for resources; each building header's build icon opens construction jobs and crew recruitment.
+Tap a harvester for resources. One hammer below the camera opens construction jobs and crew recruitment;
+building headers no longer repeat that shortcut. The HUD shard balance opens the wallet and optional ad offer.
 General map/network instructions live in How to Play, not above the operational controls.
 Progression requirements use **player XP level**, not the highest planet tier visited. Research and Ship > Tools show
-the current XP level, XP remaining to the next level, and a wave shortcut that selects the local
-Alarm or its Build entry. Research badges say `XP LV`; locks name the required and current levels
-and explain that clearing alien waves earns XP. Actual tool tiers still describe equipment quality.
+the current XP level and XP remaining to the next level, without repeated XP lessons or a full-row wave shortcut.
+Research badges say `XP LV`; locks name the required and current levels. How to Play explains wave XP.
+Actual tool tiers still describe equipment quality.
 Planet tier remains a world difficulty/resource property, not a purchase requirement.
 Missing-material cost and network chips are a single native button containing the existing icon and
 quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
@@ -79,12 +80,16 @@ pinned destinations remain known across saves; legacy discoveries are retained r
 How to Play walks through harvesting, storage, crafting/fuel, XP waves, local-lab research, upgrades, exploration and expansion.
 The skippable live first-session guide also requires first research and an upgrade after travel; existing completed
 actions count immediately and dismissed guides stay dismissed. Research guidance opens the local lab shop card if
-missing, otherwise the Tech page. No XP, cost or prerequisite gates are bypassed.
+missing, otherwise the lab popup's Tech tab. That popup includes working Tech, Tools and Lab-upgrade tabs;
+branch filters and purchase refreshes stay inside the popup. No XP, cost or prerequisite gates are bypassed.
 Locked/in-progress producers retain their real upgrade/research/job status; guidance never spends,
 teleports or starts a job. One explicitly tracked project provides live requirements and a resume action.
 The return summary links completed jobs and stored offline output to their real location, not ship cargo.
 Reward offers use explicit ad labels and exact bonuses beside the normal action. iOS gameplay ads are enabled;
 watching remains player-initiated, with a contextual advertising-only consent prompt before the first request.
+Offers remain visible with a disabled button and explicit playback/cooldown reason when unavailable;
+Editor/desktop does not simulate ads or rewards. Construction's offer sits beside its timer, and harvest's
+exact bonus is visible from the first successful result. Ordinary collection/waiting remains available.
 Available Place buttons share one row with a compact crystal/price action. That action buys an unlocked
 structure instantly without materials or a builder, at twice its timer-skip price (minimum 10 shards).
 The pad-selection banner repeats the price; choosing a pad confirms the spend, while cancellation is free.
@@ -92,7 +97,8 @@ Map sampling includes an offscreen preload margin and refills before that margin
 The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
 Online ranks are available to all ages after explicit online opt-in, without name or birthday entry.
-Keep local era/score/record details on Records and put online ranks on their own Leaderboard page.
+Keep local score/record details on Stats and put online ranks on their own Leaderboard page.
+How to Play owns era requirements and the next-step action; the live tutorial links to it directly.
 Opening that page after opt-in explicitly submits the current Frontier Score and loads the top 20; it
 never uploads at launch or during normal play. Before opt-in, explain anonymous Unity authentication
 and score/connection-data sharing and require a deliberate enable action. Show the player's returned rank

@@ -101,6 +101,7 @@ namespace Frontier
         Func<Task<ServiceResult<RewardedAdResult>>> doubleYieldOffer;
         Func<MinigameResult, bool> canOfferDoubleYield;
         Func<MinigameResult, string> doubleYieldQuote;
+        Func<string> doubleYieldUnavailable;
         string doubleYieldLabel;
         Button doubleYieldButton, collectButton;
         Label doubleYieldStatus;
@@ -128,7 +129,8 @@ namespace Frontier
         public void Run(VisualElement host, Color accent, float tol, float diff, Action<MinigameResult> done,
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield = null,
             Func<MinigameResult, bool> canOfferDoubleYield = null,
-            Func<MinigameResult, string> doubleYieldQuote = null)
+            Func<MinigameResult, string> doubleYieldQuote = null,
+            Func<string> doubleYieldUnavailable = null)
         {
             HarvestFeedback.Warmup();
             rawColor = accent;
@@ -136,6 +138,7 @@ namespace Frontier
             doubleYieldOffer = offerDoubleYield;
             this.canOfferDoubleYield = canOfferDoubleYield;
             this.doubleYieldQuote = doubleYieldQuote;
+            this.doubleYieldUnavailable = doubleYieldUnavailable;
 
             overlay = UiKit.Div("fr-overlay");
             titleLabel = UiKit.Text(Title, "fr-title", color);
@@ -335,8 +338,7 @@ namespace Frontier
                 "fr-minigame-result-detail", UiKit.Muted));
             pendingResult = result;
             resultAwaitingConfirmation = true;
-            if (doubleYieldOffer != null && result.quality > 0.05f &&
-                (canOfferDoubleYield == null || canOfferDoubleYield(result)))
+            if (doubleYieldOffer != null && result.quality > 0.05f)
             {
                 doubleYieldLabel = doubleYieldQuote != null ? doubleYieldQuote(result) : UiText.Get("harvest.ad.double-yield");
                 doubleYieldButton = PauseAction(doubleYieldLabel, UiKit.Magenta,
@@ -345,6 +347,10 @@ namespace Frontier
                 doubleYieldStatus = UiKit.Text("", "fr-tiny");
                 doubleYieldStatus.name = "minigame-double-yield-status";
                 panel.Add(doubleYieldStatus);
+                string unavailable = canOfferDoubleYield != null && !canOfferDoubleYield(result)
+                    ? UiText.Get("reward.harvest-space") : doubleYieldUnavailable?.Invoke();
+                doubleYieldStatus.text = unavailable ?? "";
+                doubleYieldButton.SetEnabled(unavailable == null);
             }
             collectButton = PauseAction(UiText.Get("harvest.collect"), UiKit.Cyan, ContinueResult,
                 "minigame-collect-resources", true);
@@ -370,7 +376,7 @@ namespace Frontier
                 {
                     doubleYieldStatus.text = result.status == ServiceStatus.ConsentRequired
                         ? UiText.Get("harvest.ad.consent-required")
-                        : UiText.Get("harvest.ad.failed");
+                        : result.text.Resolve(UiText.Get);
                     return;
                 }
                 if (!result.value.rewardEarned || result.value.placementId != "double-yield")

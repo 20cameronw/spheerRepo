@@ -14,17 +14,47 @@ namespace Frontier
         VisualElement adConsentDialog;
         TaskCompletionSource<bool> adConsentDecision;
 
-        bool GameplayOfferAllowed(bool placementEnabled, string placement, bool requireConsent = true)
+        bool GameplayOfferAllowed(bool placementEnabled, string placement)
         {
             var ticket = gs.GameplayReward;
-            var available = services?.Ads is IRewardedAdAvailability availability
-                ? availability.RewardedAvailability(placement) : ServiceResult.Success();
-            return placementEnabled && services != null && services.Ads != null && services.Consent != null &&
-                services.Ads.IsConfigured &&
-                (!requireConsent || (services.Consent.Current.hasDecision && services.Consent.Current.adsAllowed)) &&
-                (available.succeeded || (!requireConsent && available.status == ServiceStatus.ConsentRequired)) &&
-                !gs.SaveIsReadOnly && !gameplayAdShowing &&
+            bool idle = !gs.SaveIsReadOnly && !gameplayAdShowing &&
                 (ticket == null || ticket.state == "settled" || ticket.state == "cancelled");
+            if (!placementEnabled || !idle) return false;
+            return services != null && services.Ads != null && services.Ads.IsConfigured && services.Consent != null &&
+                services.Consent.Current.hasDecision && services.Consent.Current.adsAllowed &&
+                GameplayAdUnavailable(placement) == null;
+        }
+
+        string GameplayAdUnavailable(string placement)
+        {
+            if (gs.SaveIsReadOnly) return UiText.Get("shards.ad.read-only");
+            if (gameplayAdShowing) return UiText.Get("shards.ad.loading");
+            var ticket = gs.GameplayReward;
+            if (ticket != null && ticket.state != "settled" && ticket.state != "cancelled")
+                return UiText.Get(ticket.state == "earned" ? "reward.recovery-earned" : "reward.recovery-pending");
+            if (services == null || services.Ads == null || services.Consent == null || !services.Ads.IsConfigured)
+                return UiText.Get(Application.platform == RuntimePlatform.IPhonePlayer
+                    ? "reward.failed" : "reward.platform");
+            var available = services.Ads is IRewardedAdAvailability availability
+                ? availability.RewardedAvailability(placement) : ServiceResult.Success();
+            return available.succeeded || available.status == ServiceStatus.ConsentRequired
+                ? null : available.text.Resolve(UiText.Get);
+        }
+
+        void BuildAdAvailability(VisualElement body, Button watch, string placement, Func<bool> eligible = null)
+        {
+            var status = UiKit.Text("", "fr-tiny", UiKit.Muted);
+            status.name = placement + "-ad-status";
+            body.Add(status);
+            void RefreshAvailability()
+            {
+                string reason = GameplayAdUnavailable(placement);
+                status.text = reason ?? "";
+                status.style.display = reason == null ? DisplayStyle.None : DisplayStyle.Flex;
+                UiKit.SetEnabledLook(watch, reason == null && (eligible == null || eligible()));
+            }
+            RefreshAvailability();
+            watch.schedule.Execute(RefreshAvailability).Every(1000);
         }
 
         Task<bool> RequestRewardedConsent()
@@ -89,31 +119,12 @@ namespace Frontier
                 body.Add(card);
                 return;
             }
-            if (services == null || services.Consent == null || services.Ads == null || !services.Ads.IsConfigured)
-            {
-                card.Add(Note(UiText.Get("shards.ad.unavailable"), UiKit.Amber));
-                body.Add(card);
-                return;
-            }
-            if (!services.Consent.Current.hasDecision || !services.Consent.Current.adsAllowed)
-            {
-                card.Add(Note(UiText.Get("shards.ad.consent"), UiKit.Muted));
-            }
             if (gs.SaveIsReadOnly || (long)gs.ShardBalance + amount > int.MaxValue)
             {
                 card.Add(Note(UiText.Get(gs.SaveIsReadOnly ? "shards.ad.read-only" : "shards.ad.wallet-full"), UiKit.Amber));
                 body.Add(card);
                 return;
             }
-            ServiceResult available = services.Ads is IRewardedAdAvailability availability
-                ? availability.RewardedAvailability("free-shards") : ServiceResult.Success();
-            if (!available.succeeded && available.status != ServiceStatus.ConsentRequired)
-            {
-                card.Add(Note(available.text.Resolve(UiText.Get), UiKit.Amber));
-                body.Add(card);
-                return;
-            }
-
             Button watch = null;
             watch = IconBtn(UiText.Get("shards.ad.watch", amount), "play", UiKit.Cyan, async () =>
             {
@@ -140,6 +151,7 @@ namespace Frontier
             });
             watch.name = "shards-watch-ad";
             card.Add(watch);
+            BuildAdAvailability(card, watch, "free-shards");
             body.Add(card);
         }
 
@@ -192,16 +204,17 @@ namespace Frontier
 
         void BuildConstructionOffer(VisualElement body, PlacedStructure job)
         {
-            if (gameplayRewardRules == null || !GameplayOfferAllowed(gameplayRewardRules.constructionEnabled, "timer-skip", false)) return;
+            if (gameplayRewardRules == null || !gameplayRewardRules.constructionEnabled) return;
             int seconds = Math.Min(gameplayRewardRules.constructionSeconds, gs.BuilderJobSecondsRemaining(job));
-            if (seconds <= 0) return;
+            if (seconds <= 0 || gs.BuilderSkipCost(job) == 0) return;
+            var offer = UiKit.Div();
             Button watch = null;
             watch = IconBtn(UiText.Get("reward.construction", FormatJobDuration(seconds)), "play", UiKit.Cyan, async () =>
             {
                 if (!await RequestRewardedConsent() || this == null) return;
                 int current = Math.Min(gameplayRewardRules.constructionSeconds, gs.BuilderJobSecondsRemaining(job));
                 if (current <= 0 || !GameplayOfferAllowed(gameplayRewardRules.constructionEnabled, "timer-skip"))
-                { Toast(UiText.Get("reward.changed"), UiKit.Amber); RefreshModal(); return; }
+                { Toast(GameplayAdUnavailable("timer-skip") ?? UiText.Get("reward.changed"), UiKit.Amber); RefreshModal(); RefreshPopup(); return; }
                 if (!gs.PrepareGameplayReward("timer-skip", null, current, job, out var ticket, out var error))
                 { Toast(error, UiKit.Amber); return; }
                 UiKit.SetEnabledLook(watch, false);
@@ -210,9 +223,19 @@ namespace Frontier
                 Toast(result.succeeded && result.value.rewardEarned ? UiText.Get("reward.saved") :
                     result.succeeded ? UiText.Get("reward.not-earned") : result.text.Resolve(UiText.Get), UiKit.Cyan);
                 RefreshModal();
+                RefreshPopup();
             });
             watch.name = "construction-reward";
-            body.Add(watch);
+            offer.Add(watch);
+            BuildAdAvailability(offer, watch, "timer-skip", () => gs.BuilderSkipCost(job) > 0);
+            body.Add(offer);
+            var caption = watch.Q<Label>(className: "fr-btn-label");
+            watch.schedule.Execute(() =>
+            {
+                int current = Math.Min(gameplayRewardRules.constructionSeconds, gs.BuilderJobSecondsRemaining(job));
+                caption.text = UiText.Get("reward.construction", FormatJobDuration(current));
+                offer.style.display = current > 0 && gs.BuilderSkipCost(job) > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            }).Every(1000);
         }
 
         void BuildRewardRecovery(VisualElement body)

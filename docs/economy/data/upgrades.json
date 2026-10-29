@@ -59,19 +59,19 @@
           "cost": [
             {
               "resourceId": "wood",
-              "amount": 240
+              "amount": 190
             },
             {
               "resourceId": "stone",
-              "amount": 240
+              "amount": 190
             },
             {
               "resourceId": "planks",
-              "amount": 110
+              "amount": 90
             },
             {
               "resourceId": "iron_plate",
-              "amount": 40
+              "amount": 30
             }
           ],
           "value": 36,

@@ -24,6 +24,7 @@ namespace Frontier.Economy
             t.Register("cost", "cost.scale.structure", 1.0, 0.05, 20, "Global multiplier on every structure value budget.");
             t.Register("cost", "cost.scale.tool", 1.0, 0.05, 20, "Global multiplier on tool ladder value budgets.");
             t.Register("cost", "cost.scale.ship", 1.0, 0.05, 20, "Global multiplier on ship and logistics upgrade value budgets.");
+            t.Register("cost", "cost.bootstrap.pack3_mult", 0.8, 0.05, 1, "Multiplier only on Backpack level 3's cost, so it fits the level-2 backpack before Cargo Logistics.");
             t.Register("cost", "cost.scale.defense", 1.0, 0.05, 20, "Global multiplier on defense upgrade value budgets.");
             t.Register("cost", "cost.scale.research", 1.0, 0.05, 20, "Global multiplier on research value budgets.");
             t.Register("cost", "cost.scale.mega", 0.7, 0.05, 20, "Global multiplier on megaproject stage budgets (tuned by the simulator: late stages are weeks of play, not months).");
@@ -222,7 +223,8 @@ namespace Frontier.Economy
                     d.researchPrereq = s.research == null ? null : s.research[level - 1];
                     d.requiresReachTier = reach;
                     d.eraTier = Math.Max(reach, ResearchTier(d.researchPrereq));
-                    d.cost = bundle.Cost(v1 * DetMath.Pow(g, level - 1) * scale * EraScale(t, d.eraTier), level, price, stack, CapSlots(t, d.eraTier));
+                    double bootstrap = s.id == "pack" && level == 3 ? t.D("cost.bootstrap.pack3_mult") : 1.0;
+                    d.cost = bundle.Cost(v1 * DetMath.Pow(g, level - 1) * scale * EraScale(t, d.eraTier) * bootstrap, level, price, stack, CapSlots(t, d.eraTier));
                     d.value = CostMath.F(t.D("upg." + s.id + "." + level), 4);
                     levels[level - 1] = d;
                 }

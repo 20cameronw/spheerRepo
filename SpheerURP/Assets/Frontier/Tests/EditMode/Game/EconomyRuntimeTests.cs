@@ -277,6 +277,109 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void BackpackAndCargoBootstrapCanBeFundedFromCarriedCargoWithoutAds()
+        {
+            var clock = new FakeClock();
+            var state = new GameState(db, false, clock);
+            var pack = db.FindUpgrade("pack");
+            state.backpack.Clear();
+            for (int level = 0; level < 3; level++)
+            {
+                if (level == 2)
+                {
+                    BuildCarriedBootstrapStructure(state, clock, "refinery");
+                    BuildCarriedBootstrapStructure(state, clock, "research_lab");
+                    ResearchCarriedPrerequisites(state, db.research.First(node => node.data.id == "smelting"));
+                    ResearchCarriedPrerequisites(state, db.research.First(node => node.data.id == "fabrication"));
+                    BuildCarriedBootstrapStructure(state, clock, "foundry");
+                    BuildCarriedBootstrapStructure(state, clock, "fabricator");
+                }
+                FundCarriedCostWithinCapacity(state, pack.CostAt(level));
+                Assert.IsTrue(state.CanBuy(pack), state.UpgradeLockReason(pack));
+                Assert.IsTrue(state.Buy(pack));
+                Assert.AreEqual(level + 1, state.Level(pack));
+            }
+            Assert.AreEqual(36, state.Slots);
+
+            var cargo = db.research.First(node => node.data.id == "cargo_logistics");
+            var lab = state.StructureOfKind(state.planet, StructureKind.ResearchLab);
+            FundCarriedCostWithinCapacity(state, lab.def.UpgradeCost(lab.level));
+            Assert.IsTrue(state.UpgradeStructure(lab));
+            clock.Advance(state.BuilderJobSecondsRemaining(lab));
+            state.Tick();
+            state.DebugSetLevel(2);
+            ResearchCarriedPrerequisites(state, cargo);
+            FundCarriedCostWithinCapacity(state, db.FindStructure("cargo_depot").buildCost);
+            Assert.IsFalse(state.CargoDepotActive);
+            int openPad = Enumerable.Range(0, state.planet.BuildingSlots).First(pad =>
+                state.StructureAt(state.planet, pad) == null && !state.ObstacleAt(state.planet, pad).HasValue);
+            Assert.IsTrue(state.Place(db.FindStructure("cargo_depot"), openPad),
+                "constructing the first Depot must not depend on its own storage pool");
+            Assert.IsTrue(state.Save());
+            var loaded = new GameState(db, true);
+            Assert.AreEqual(3, loaded.Level(pack));
+            Assert.IsTrue(loaded.IsResearched(cargo.data.id));
+            Assert.AreEqual(0, loaded.SlotsUsed);
+            Assert.IsNotNull(lab);
+        }
+
+        static void BuildCarriedBootstrapStructure(GameState state, FakeClock clock, string id)
+        {
+            var definition = state.db.FindStructure(id);
+            FundCarriedCostWithinCapacity(state, definition.buildCost);
+            int pad = Enumerable.Range(0, state.planet.BuildingSlots).First(index =>
+                state.StructureAt(state.planet, index) == null && !state.ObstacleAt(state.planet, index).HasValue);
+            Assert.IsTrue(state.Place(definition, pad), state.BuildLockReason(definition));
+            clock.Advance(state.StructureJobSeconds(definition, 1));
+            state.Tick();
+            Assert.IsNotNull(state.StructureOfKind(state.planet, definition.kind));
+        }
+
+        static void ResearchCarriedPrerequisites(GameState state, ResearchNodeSO node)
+        {
+            if (state.IsResearched(node.data.id)) return;
+            foreach (string prerequisite in node.data.prereqs)
+                ResearchCarriedPrerequisites(state, state.db.research.First(n => n.data.id == prerequisite));
+            FundCarriedCostWithinCapacity(state, node.data.cost.Select(item =>
+                new ItemAmount(state.db.ResolveResource(item.resourceId), item.amount)).ToList());
+            Assert.IsTrue(state.Research(node), node.data.id + ": " + state.ResearchLockReason(node));
+        }
+
+        static void FundCarriedCostWithinCapacity(GameState state, List<ItemAmount> cost)
+        {
+            Assert.AreEqual(0, state.SlotsUsed);
+            foreach (var item in cost)
+                Assert.AreEqual(item.amount, state.backpack.Add(item.resource.id, item.amount),
+                    "the test must not use over-capacity debug inventory");
+            Assert.LessOrEqual(state.SlotsUsed, state.Slots);
+        }
+
+        [Test]
+        public void ImportedLegacyToolsCannotBePurchasedButOwnedEffectsSurviveReload()
+        {
+            var state = new GameState(db, false);
+            foreach (var upgrade in db.upgrades.Where(u => u.effect == UpgradeEffect.ToolPower))
+            {
+                state.backpack.Clear();
+                FundCarriedCostWithinCapacity(state, upgrade.CostAt(0));
+                Assert.IsFalse(state.CanBuy(upgrade), upgrade.id);
+                Assert.IsFalse(state.Buy(upgrade), upgrade.id);
+                Assert.AreEqual(0, state.Level(upgrade));
+                state.DebugSetUpgrade(upgrade, 2);
+            }
+            float axe = state.ToolMultiplier(MinigameKind.Chop);
+            float mining = state.ToolMultiplier(MinigameKind.Mine);
+            Assert.Greater(axe, 1f);
+            Assert.Greater(mining, 1f);
+            Assert.IsTrue(state.Save());
+            var loaded = new GameState(db, true);
+            Assert.AreEqual(axe, loaded.ToolMultiplier(MinigameKind.Chop));
+            Assert.AreEqual(mining, loaded.ToolMultiplier(MinigameKind.Mine));
+            foreach (var upgrade in db.upgrades.Where(u => u.effect == UpgradeEffect.ToolPower))
+                Assert.AreEqual(2, loaded.Level(upgrade));
+        }
+
+        [Test]
         public void OrbitalRelay_WithdrawsFromVisitedSameSystemStorageForCarriedEnergy()
         {
             var state = new GameState(db, false);

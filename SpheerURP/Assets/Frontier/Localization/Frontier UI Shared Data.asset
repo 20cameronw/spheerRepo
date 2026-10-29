@@ -9103,6 +9103,38 @@ MonoBehaviour:
     m_Key: reward.consent.cancel
     m_Metadata:
       m_Items: []
+  - m_Id: 5064113704230912
+    m_Key: reward.platform
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785344
+    m_Key: reward.harvest-space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785345
+    m_Key: shards.open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785346
+    m_Key: tutorial.ads.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785347
+    m_Key: tutorial.ads.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785348
+    m_Key: lab.tab.upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785349
+    m_Key: ranks.era-label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5067001465757696
+    m_Key: gate.upgrade.legacy-tool
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

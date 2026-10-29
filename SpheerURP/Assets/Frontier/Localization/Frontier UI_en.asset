@@ -347,9 +347,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336015
-    m_Localized: Open Build on the bottom dock and place a Lumber Camp, then a Refinery
-      and a Warehouse. Tap a building to use or upgrade it. Its build icon opens
-      construction jobs and crew recruitment. Jobs continue while you are away.
+    m_Localized: Place buildings from Build; tap them to use or upgrade. The hammer
+      below the camera opens jobs and crews. Timers continue while you are away.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336016
@@ -357,9 +356,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336017
-    m_Localized: Cargo space is limited. Tap a Warehouse to move stacks between local
-      storage and your ship. A working Cargo Depot connects local storage for eligible
-      costs. Stock on another world must still be retrieved or transferred.
+    m_Localized: Warehouses hold local stock, not ship cargo. A Cargo Depot connects
+      local storage for costs. Retrieve or transfer resources from other worlds.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336018
@@ -368,8 +366,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1991336019
     m_Localized: Tap a Lumber Camp, Mining Rig or another harvester, then HARVEST
-      a resource. Collect the result to bring it aboard. The Mining Rig also gathers
-      surface scrap.
+      a resource. Collect brings the result aboard; better timing earns more.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336020
@@ -377,9 +374,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336021
-    m_Localized: Tap a Refinery or crafting station to turn raw resources into fuel
-      and parts. Recipes may need research or a higher station level. Fuel powers
-      flights and called waves; keep a reserve before departing.
+    m_Localized: Refineries and crafting stations turn raw resources into fuel and
+      parts. Keep fuel for flights and waves. Locked recipes show their requirements.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336022
@@ -387,9 +383,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336023
-    m_Localized: Tap the Alarm and spend fuel to call a wave. More fuel means a longer
-      fight and bigger rewards. Gunners and Lasers defend automatically. Clearing
-      waves earns player XP; XP levels unlock higher research and equipment tiers.
+    m_Localized: Build defenses, then call waves from an Alarm to earn XP. More fuel
+      means longer, tougher fights and bigger rewards. XP unlocks research and equipment.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336024
@@ -397,10 +392,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336025
-    m_Localized: Open Map on the bottom dock and spend fuel to visit new planets.
-      Your bases stay where you built them. Check deposits and landing hazards before
-      departure; upgrade range, scanner and hull protection in Ship > Systems when
-      needed.
+    m_Localized: Use Map to visit new planets. Check fuel, deposits and landing hazards
+      before leaving. Your bases stay on their worlds.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336026
@@ -408,10 +401,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336027
-    m_Localized: Ship > Cargo expands carried capacity, Tools improves harvesting,
-      and Systems upgrades fuel tanks, engine, range, scanner and hull protection.
-      Tap buildings to upgrade their output or services. Harvest and craft the materials
-      for your next upgrade.
+    m_Localized: Ship holds cargo, tools and flight upgrades. Research holds global
+      improvements. Tap buildings to upgrade their output or services.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336028
@@ -662,8 +653,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1991336086
     m_Localized: You have built, gathered, crafted, defended, traveled, researched
-      and upgraded. Find rarer materials, grow your bases and repeat the loop to
-      reach farther.
+      and upgraded. Find your next milestone in Menu > How to Play.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336087
@@ -1702,8 +1692,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336339
-    m_Localized: Enables technology in Research and tool upgrades in Ship. Higher
-      lab levels open advanced research.
+    m_Localized: Research technology and improve tools here. Upgrade this lab for
+      advanced technology.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336340
@@ -1824,9 +1814,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336368
-    m_Localized: Construction, upgrades and clearance use your shared builder crews.
-      Timers use local device time. Finish a structure job with Nova Shards or for
-      free near completion; review and confirm before spending.
+    m_Localized: Crews build, upgrade and clear debris. Wait, finish with shards,
+      or watch an optional ad to save time. Short structure timers finish free.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336369
@@ -2716,8 +2705,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1995530394
     m_Localized: Opening this page uploads your current Frontier Score and loads
-      the top 20 automatically. Your own rank is shown even outside the top 20. Pilot
-      labels are anonymous; scores are casual client-reported rankings.
+      the top 20. Pilot labels are anonymous; scores are client-reported.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530395
@@ -9225,13 +9213,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4798174068826113
-    m_Localized: Tap a world to see its resources, landing hazards and travel cost.
-      Drag or pinch to explore. Move within scanner range to reveal deposits. Pin
-      location keeps a world in your saved list. Manual flight rewards good piloting;
-      Autopilot skips the flight at a higher fuel cost with no refund. Ship > Systems
-      has range, scanner       and hull upgrades. Dashed cyan rings show scanner
-      coverage; Radar Towers extend it around their planets. With a tracked project,
-      green diamonds mark known worlds with materials you still need.
+    m_Localized: Drag or pinch to explore; tap a world for details and Pin to save
+      it. Dashed rings show scanner coverage; green diamonds mark tracked materials.
+      Autopilot skips piloting for extra fuel, with no refund.
     m_Metadata:
       m_Items: []
   - m_Id: 4800388132855808
@@ -9247,10 +9231,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4804056949284864
-    m_Localized: Build a Research Lab from Build > Utility, then open Research >
-      Tech. Each technology shows its XP level, local lab level, prerequisites and
-      material cost. Upgrade the lab when required. Research unlocks buildings, recipes
-      and equipment; Research > Improvements holds global defense and logistics upgrades.
+    m_Localized: Tap a Research Lab for technology and tools. Each card shows its
+      XP, lab and material requirements. Global defense and logistics are in Research
+      > Improvements.
     m_Metadata:
       m_Items: []
   - m_Id: 4804056949284865
@@ -9258,10 +9241,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4804056949284866
-    m_Localized: Establish harvesters, storage and crafting on new worlds for rarer
-      materials. Bring those materials back into research and upgrades to reach farther.
-      Tap a missing-material cost to find a source. Tap a project's star to track
-      it, tap again to stop, and use the star below the top bar to reopen your project.
+    m_Localized: Build on new worlds for rarer materials. Tap a missing cost to find
+      supplies. Toggle a card's star to track it; the HUD star reopens your project.
     m_Metadata:
       m_Items: []
   - m_Id: 4804934317989888
@@ -9269,9 +9250,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4804934359932928
-    m_Localized: Build a Research Lab on this world, then open Research > Tech. Check
-      each technology's XP, lab and material requirements. Research opens new buildings,
-      recipes and equipment; upgrade your lab for deeper technology.
+    m_Localized: Tap your local Research Lab to unlock new technology and upgrade
+      tools.
     m_Metadata:
       m_Items: []
   - m_Id: 4804934359932929
@@ -9279,9 +9259,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4804934359932930
-    m_Localized: Open Ship for cargo, tools and systems upgrades, or Research > Improvements
-      for global defense and logistics. Harvest and craft what you need, upgrade,
-      then explore farther and build another base.
+    m_Localized: Upgrade cargo, tools or flight systems in Ship to prepare for your
+      next world.
     m_Metadata:
       m_Items: []
   - m_Id: 4804934359932931
@@ -9322,9 +9301,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523969
-    m_Localized: Buy unlocked structures instantly beside Place in Build, recruit
-      an extra builder or finish active work. Shorten an obstacle clearance from
-      its world, or revive a failed Hyperspace run. Rewarded videos are optional.
+    m_Localized: Spend shards on instant builds, timer finishes, extra crews, debris
+      clearance or a Hyperspace revive.
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523970
@@ -9332,13 +9310,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523971
-    m_Localized: Tap only if you want to watch a video for {0} shards. Videos never
-      start automatically.
+    m_Localized: An optional video earns {0} shards. No automatic ads.
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523972
-    m_Localized: Rewarded videos are unavailable in this build until iOS audience
-      and privacy review and a physical test-device check are complete.
+    m_Localized: No rewarded video is available right now.
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523973
@@ -9371,7 +9347,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523980
-    m_Localized: RECORDS
+    m_Localized: STATS
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523981
@@ -9461,6 +9437,40 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5049134984814599
     m_Localized: NOT NOW
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113704230912
+    m_Localized: Videos play on iPhone. No ad or bonus is simulated in this build.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785344
+    m_Localized: Make room for the full double harvest to use this offer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785345
+    m_Localized: Nova Shards and optional ad rewards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785346
+    m_Localized: Optional boosts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785347
+    m_Localized: Watch an ad after harvesting for double resources, on a construction
+      timer to save time, or in Nova Shards for free shards. All progression is playable
+      without ads.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785348
+    m_Localized: LAB
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785349
+    m_Localized: ERA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5067001465757696
+    m_Localized: Upgrade this tool from Tools. Existing equipment bonuses are kept.
     m_Metadata:
       m_Items: []
   references:

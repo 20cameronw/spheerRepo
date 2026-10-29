@@ -5,7 +5,7 @@
   "family": "tuning",
   "items": {
     "schemaVersion": 1,
-    "digest": "f7b3888e49b20760",
+    "digest": "1c0c735faed632a4",
     "keys": [
       {
         "key": "value.premium.refinery",
@@ -614,6 +614,14 @@
         "defaultValue": 1,
         "min": 0.05,
         "max": 20
+      },
+      {
+        "key": "cost.bootstrap.pack3_mult",
+        "group": "cost",
+        "description": "Multiplier only on Backpack level 3's cost, so it fits the level-2 backpack before Cargo Logistics.",
+        "defaultValue": 0.8,
+        "min": 0.05,
+        "max": 1
       },
       {
         "key": "cost.scale.defense",
@@ -3171,7 +3179,7 @@
         "key": "cost.v.cargo_logistics",
         "group": "cost",
         "description": "Value budget of research node Cargo Logistics.",
-        "defaultValue": 700,
+        "defaultValue": 650,
         "min": 0,
         "max": 1E+09
       },

@@ -30,7 +30,7 @@ namespace Frontier
         Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, levelLabel, planetLabel;
         WaveInfo waveHudInfo;
         VisualElement planetTag;
-        Button surfaceViewButton;
+        Button surfaceViewButton, constructionButton;
         VisualElement surfaceViewIcon;
         bool busy, introActive;
         public bool IsTravelling { get; private set; }
@@ -198,7 +198,7 @@ namespace Frontier
             planetLabel = UiKit.Text("", "fr-planet-name");
             planetTag.Add(planetLabel);
             fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
-            shardLabel = Chip(planetTag, "crystal", UiKit.Cyan, null);
+            shardLabel = Chip(planetTag, "crystal", UiKit.Cyan, null, OpenShardWallet);
             shardLabel.name = "hud-nova-shards";
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
@@ -222,6 +222,13 @@ namespace Frontier
             surfaceViewButton.style.top = HudTopInset + UiKit.Space.S16;
             RefreshViewButton();
             hud.Add(surfaceViewButton);
+            constructionButton = Icons.IconButton("build", UiKit.Lime, OpenBuilders);
+            constructionButton.name = "world-open-jobs";
+            constructionButton.tooltip = UiText.Get("builders.jobs-title");
+            constructionButton.style.position = Position.Absolute;
+            constructionButton.style.left = UiKit.Space.S16;
+            constructionButton.style.top = HudTopInset + UiKit.Space.S16 + UiKit.Size.Touch + UiKit.Space.S12;
+            hud.Add(constructionButton);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
             dock.usageHints = UsageHints.DynamicTransform;
@@ -251,9 +258,23 @@ namespace Frontier
             return b;
         }
 
-        Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp)
+        Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp, Action onClick = null)
         {
-            var chip = UiKit.Div("fr-chip"); chip.pickingMode = PickingMode.Ignore;
+            VisualElement chip;
+            if (onClick == null)
+            {
+                chip = UiKit.Div("fr-chip");
+                chip.pickingMode = PickingMode.Ignore;
+            }
+            else
+            {
+                var button = new Button(() => { Sfx.Click(); onClick(); });
+                button.name = "hud-open-shards";
+                button.tooltip = UiText.Get("shards.open");
+                button.AddToClassList("fr-chip");
+                button.AddToClassList("fr-chip-action");
+                chip = button;
+            }
             Color c = UiKit.Ui(color);
             chip.Add(Icons.Make(icon, c));
             var l = UiKit.Text("0", "fr-chip-text");
@@ -517,14 +538,14 @@ namespace Frontier
             MinigameResult previewResult = default;
             bool baseCommitted = false;
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield =
-                gameplayRewardRules != null && gs.stats.harvestRunsCompleted > 0 &&
-                GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield", false)
+                gameplayRewardRules != null && gameplayRewardRules.harvestEnabled
                     ? (Func<Task<ServiceResult<RewardedAdResult>>>) (async () =>
                     {
                         if (!await RequestRewardedConsent() || this == null)
                             return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.not-earned"));
                         if (baseCommitted || !GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield"))
-                            return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.changed"));
+                            return ServiceResult<RewardedAdResult>.Failed(GameplayAdUnavailable("double-yield") ??
+                                UiText.Get("reward.changed"));
                         int quote = HarvestAmount(spot, bonus, previewResult);
                         if (!gs.PrepareGameplayReward("double-yield", spot.resource, quote, null, out var ticket, out var error))
                             return ServiceResult<RewardedAdResult>.Failed(error);
@@ -562,7 +583,8 @@ namespace Frontier
                 int expected = HarvestAmount(spot, bonus, r);
                 int free = gs.FreeSpace(spot.resource);
                 return expected > 0 && (long)free >= (long)expected * 2;
-            }, r => UiText.Get("reward.harvest", HarvestAmount(spot, bonus, r), spot.resource.LocalizedName));
+            }, r => UiText.Get("reward.harvest", HarvestAmount(spot, bonus, r), spot.resource.LocalizedName),
+                () => GameplayAdUnavailable("double-yield"));
         }
 
         int HarvestAmount(GatherSpot spot, float bonus, MinigameResult result)

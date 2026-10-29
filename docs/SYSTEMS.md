@@ -5,12 +5,16 @@ Behaviour notes for the systems that exist today. The long-term direction lives 
 ## Player navigation and purchase resources
 
 The dock is **Research / Map / Ship / Build**, in the existing positions. Ship always opens Cargo in one tap,
-with the capacity gauge and used/total count on its dock button. Cargo contains carried items and its capacity
+with its capacity gauge and used/total count inside Cargo, not on the dock. Cargo contains carried items and its capacity
 upgrade; surface salvage is explicitly unclaimed and not aboard. Tools contains harvest equipment. Systems contains
 ship fuel reserves and tank upgrades, engine efficiency, jump/scanner range and hull protection with their upgrades.
 Research contains Tech (available work first, completed nodes in a foldout) and Improvements (global defense and logistics).
-Map exposes the planetary network from every selected world, plus ship-readiness access. Build retains local structures
-and Construction Jobs. Tapping world structures still manages them; the lab links to Research and Ship tools.
+Map exposes the planetary network from every selected world. Build retains local structures;
+the single hammer below the camera opens Construction Jobs and crews. Tapping a Research Lab opens
+working Tech, Tools and Lab-upgrade tabs inside its popup; the dock destinations remain available.
+Research and tools retain compact XP counts without repeated XP paragraphs or full-row wave shortcuts.
+How to Play owns era requirements and the next-step action; Stats contains the score and actual records.
+The live tutorial links to How to Play and covers/disables both world controls while visible.
 
 Research, tool tiers and ship/defense/global upgrades use the same resource pool as construction: carried cargo plus
 operational storage on the current planet connected by an operational Cargo Depot. Cost chips, eligibility and spending
@@ -18,6 +22,13 @@ share this rule. Cargo is spent first, then connected storage; insufficient tota
 under-construction and remote storage, unclaimed salvage and Fuel Depot reserves are excluded. Remote resources still
 require transfer or retrieval. XP, research prerequisites, local labs and other gates are unchanged.
 No save schema, stable content IDs or inventory capacity changes are needed.
+
+The carried-only bootstrap is capacity-checked against the imported costs: Backpack 3 uses 26 slots
+within Backpack 2's 27, Cargo Logistics uses 36 within Backpack 3's 36, and the first Cargo Depot uses 25.
+Disconnected storage remains unspendable until that Depot is operational. Compatibility-only ToolPower
+upgrades cannot be newly purchased in the imported economy; effects already owned in saves remain intact.
+These checks prevent capacity deadlocks, not prove real-session pacing or retention. The catalog simulator's
+historical day counts do not model today's XP gates/shared mining and must not be presented as playtest results.
 
 Each available Place action has a compact shard-price button beside it. Shards buy an immediately operational
 level-1 structure without materials or a builder: twice the full build timer's skip price, with a 10-shard minimum.
@@ -63,14 +74,20 @@ not repeat the elapsed interval. Real native lifecycle timing remains a device-t
 `Resources/Frontier/GameplayRewardRules` enables harvest double-yield, construction reductions of up to
 300 seconds and free shards. The configured iOS gameplay provider is enabled at the user's direction.
 Missing rules still fail closed. Provider/platform configuration, explicit player consent and per-placement
-limits remain required. Tapping an optional offer without consent opens an Allow & Watch / Not Now prompt;
+limits remain required for playback. Offers no longer disappear when the native provider is unsupported,
+unconfigured or cooling down: buttons stay visible with their real unavailable reason and cannot grant a bonus.
+Editor/desktop displays the full flow but explicitly does not simulate a video or reward. Availability refreshes
+once per second without replacing the button. The HUD shard balance opens the wallet and its ad offer.
+Tapping an available optional offer without consent opens an Allow & Watch / Not Now prompt;
 no ad request or reward ticket is created before acceptance. Back cancels without changing consent or progress.
 No banners, interstitials, automatic requests or shortage-to-ad shortcuts are added.
 
 The staged placements reuse stable service IDs `double-yield` and `timer-skip`. Harvest quotes the exact
-additional output, requires space for both base and bonus, and does not appear on the first successful
-harvest. Its normal Collect action remains available. Construction quotes the exact reduction on one job;
-ordinary waiting and shard completion remain available. Eligibility checks share the service policy's
+additional output from the first successful harvest onward and requires space for both base and bonus.
+Insufficient space leaves the offer visible with an explanation. Its normal Collect action remains available.
+Construction quotes the exact reduction directly on the tapped job and in Construction Jobs;
+the offer disappears once the same timer can be finished free, rather than asking for an unnecessary video.
+Ordinary waiting and shard completion remain available. Eligibility checks share the service policy's
 caps/cooldowns without consuming quota or showing an ad.
 
 `player.reward-ticket` journals one request in existing settings. A detached snapshot secures base harvest
@@ -100,8 +117,8 @@ Child-inclusive review and physical iOS verification remain public-release requi
 revive, targeted-supply and missing-resource offers remain inactive.
 
 Not annoying means passive contextual buttons, never automatic ad screens, notifications or repeat
-decline dialogs. Normal Collect/wait/finish actions remain; harvest offers once per completed result,
-does not retry after no-fill on that result, and does not appear on the first successful harvest.
+decline dialogs. Normal Collect/wait/finish actions remain; harvest offers once per completed result
+and does not retry after no-fill on that result.
 High availability is not permission to nag or remove the no-ad path. Native experience and child-inclusive
 review are still mandatory. The following table records the current authored rewards.
 
@@ -117,10 +134,11 @@ N run-units; K accepted bonuses give N+K, with K no greater than eligible comple
 cooldown. Twenty runs with five accepted bonuses give 25 units (25% extra); accepting a bonus for every
 eligible run approaches twice the normal output. There is no longer a three-yield or six-crew-minute
 daily ceiling. Under proposed cooldowns, the sustained rate is at most 20 harvest acceptances/hour and
-6 construction acceptances/hour (up to 12 crew-minutes/hour), also bounded by real runs/jobs/ad availability.
+12 construction acceptances/hour (up to 60 crew-minutes/hour), also bounded by real runs/jobs/ad availability.
 An initial immediately available offer can add one at an interval boundary. This is a material
 economy acceleration risk to evaluate, not a reason to make the ordinary path punitive. Actual harvest
-rewards scale with tool/quality output. No direct fuel, shard, research, XP or hazard bypass is introduced.
+rewards scale with tool/quality output. No direct fuel, research, XP or hazard bypass is introduced;
+the separate free-shard offer retains its approved limit.
 Model low/mid/late-game bottlenecks and interactions
 using observed no-ad/ad-assisted journeys before approving any activation or adding fuel/revive/supplies.
 Existing nonzero policy entries remain historical development configuration, not this proposal's approval.

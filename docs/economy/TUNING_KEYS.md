@@ -1,13 +1,13 @@
-# Tuning keys (606)
+# Tuning keys (607)
 
-Every number of the economy is one key of the single `Tuning` object (string key -> float with default, min, max). Keys that should be exposed through Remote Config are marked in INTEGRATION.md; the rest are design-time knobs. Digest of the defaults: `f7b3888e49b20760`.
+Every number of the economy is one key of the single `Tuning` object (string key -> float with default, min, max). Keys that should be exposed through Remote Config are marked in INTEGRATION.md; the rest are design-time knobs. Digest of the defaults: `1c0c735faed632a4`.
 
 | group | keys |
 |---|---|
 | value | 23 |
 | time | 82 |
 | yield | 30 |
-| cost | 185 |
+| cost | 186 |
 | tool | 14 |
 | upgrade | 107 |
 | start | 5 |
@@ -175,6 +175,7 @@ Every number of the economy is one key of the single `Tuning` object (string key
 | `cost.scale.structure` | 1 | 0.05 .. 20 | Global multiplier on every structure value budget. |
 | `cost.scale.tool` | 1 | 0.05 .. 20 | Global multiplier on tool ladder value budgets. |
 | `cost.scale.ship` | 1 | 0.05 .. 20 | Global multiplier on ship and logistics upgrade value budgets. |
+| `cost.bootstrap.pack3_mult` | 0.8 | 0.05 .. 1 | Multiplier only on Backpack level 3's cost, so it fits the level-2 backpack before Cargo Logistics. |
 | `cost.scale.defense` | 1 | 0.05 .. 20 | Global multiplier on defense upgrade value budgets. |
 | `cost.scale.research` | 1 | 0.05 .. 20 | Global multiplier on research value budgets. |
 | `cost.scale.mega` | 0.7 | 0.05 .. 20 | Global multiplier on megaproject stage budgets (tuned by the simulator: late stages are weeks of play, not months). |
@@ -311,7 +312,7 @@ Every number of the economy is one key of the single `Tuning` object (string key
 | `cost.v.geo_survey` | 650 | 0 .. 1000000000 | Value budget of research node Geo-Survey. |
 | `cost.v.salvage_ops` | 550 | 0 .. 1000000000 | Value budget of research node Salvage Operations. |
 | `cost.v.fuel_logistics` | 550 | 0 .. 1000000000 | Value budget of research node Fuel Logistics. |
-| `cost.v.cargo_logistics` | 700 | 0 .. 1000000000 | Value budget of research node Cargo Logistics. |
+| `cost.v.cargo_logistics` | 650 | 0 .. 1000000000 | Value budget of research node Cargo Logistics. |
 | `cost.v.ballistics` | 600 | 0 .. 1000000000 | Value budget of research node Ballistics. |
 | `cost.v.shield_tech` | 600 | 0 .. 1000000000 | Value budget of research node Shield Tech. |
 | `cost.v.hazmat_toxic` | 800 | 0 .. 1000000000 | Value budget of research node Hazmat: Toxic. |

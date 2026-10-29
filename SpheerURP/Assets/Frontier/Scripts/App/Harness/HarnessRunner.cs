@@ -556,6 +556,70 @@ namespace Frontier
             }
             yield return new Shot("menu", () => ui.DebugMenu(""));
             yield return new Shot("rewarded-consent", () => ui.DebugRewardedConsent());
+            SaveV2 flowReviewBaseline = null;
+            void PrepareFlowReview()
+            {
+                ui.DebugReset();
+                if (flowReviewBaseline == null)
+                {
+                    if (!gs.TryCreateCloudSaveSnapshot(out flowReviewBaseline, out var error))
+                        throw new InvalidOperationException(error);
+                }
+                else if (!gs.TryRestoreCloudSave(flowReviewBaseline, out var restoreError))
+                    throw new InvalidOperationException(restoreError);
+                GoTo("sylva");
+                gs.DismissFirstSessionGuide();
+            }
+            void PrepareFlowLab()
+            {
+                PrepareFlowReview();
+                if (!gs.TryCreateCloudSaveSnapshot(out var candidate, out var error))
+                    throw new InvalidOperationException(error);
+                var home = candidate.worlds.Find(delta => delta.planetId == gs.planet.Id);
+                if (home == null) throw new InvalidOperationException("Lab fixture requires a visited world.");
+                home.structures.RemoveAll(s => s.slot == 1);
+                home.structures.Add(new StructureRecord
+                    { defId = db.StructureOfKind(StructureKind.ResearchLab).id, slot = 1, level = 3 });
+                if (!gs.TryRestoreCloudSave(candidate, out error)) throw new InvalidOperationException(error);
+                ui.DebugTapStructure(At(StructureKind.ResearchLab));
+            }
+            try
+            {
+                yield return new Shot("flow-review-world", PrepareFlowReview);
+                yield return new Shot("flow-review-guide", () => { PrepareFlowReview(); ui.DebugFirstSessionGuide(0); });
+                yield return new Shot("flow-review-lab-tech", () =>
+                {
+                    PrepareFlowLab();
+                });
+                yield return new Shot("flow-review-lab-tools", () =>
+                {
+                    PrepareFlowLab();
+                    var tab = ui.DebugRoot.Q("lab-navigation").Query<FrontierTab>().ToList()[1];
+                    using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = tab; tab.SendEvent(submit); }
+                });
+                yield return new Shot("flow-review-construction-ad", () =>
+                {
+                    PrepareFlowReview();
+                    var job = At(StructureKind.Refinery);
+                    gs.DebugSetBuilderJob(job, 3600);
+                    ui.DebugTapStructure(job);
+                });
+                yield return new Shot("flow-review-harvest-ad", () =>
+                {
+                    PrepareFlowReview();
+                    gs.backpack.Clear();
+                    if (!ui.DebugGatherResult(MinigameKind.Chop))
+                        throw new InvalidOperationException("Missing harvest for player-flow review.");
+                }, 1.6f);
+                yield return new Shot("flow-review-shards-ad", () => { PrepareFlowReview(); ui.DebugMenu("shards"); });
+                yield return new Shot("flow-review-how-to-play", () => { PrepareFlowReview(); ui.DebugMenu("tutorial"); });
+            }
+            finally
+            {
+                ui.DebugReset();
+                if (flowReviewBaseline != null && !gs.TryRestoreCloudSave(flowReviewBaseline, out var error))
+                    throw new InvalidOperationException(error);
+            }
             SaveV2 shardShopBaseline = null;
             try
             {

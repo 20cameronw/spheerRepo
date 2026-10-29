@@ -75,6 +75,7 @@ namespace Frontier
             // Selecting a structure holds the world still until it's tapped again (or closed).
             planetView.Frozen = true;
             world.Selected = anchor;
+            UpdateFirstSessionGuideVisibility();
             Sfx.Click();
         }
 
@@ -187,6 +188,7 @@ namespace Frontier
                         if (gs.IsBuilderBusy(s)) RefreshPopup();
                         else ClosePopup();
                     });
+                    BuildConstructionOffer(body, s);
                     if (s.def.kind == StructureKind.Terraformer)
                     {
                         int stage = s.record.pendingUpgradeLevel > s.level ? s.record.pendingUpgradeLevel : s.level;
@@ -304,11 +306,6 @@ namespace Frontier
             col.Add(UiKit.Text(UiText.Get("structure.header", s.def.LocalizedName.ToUpper(), s.level), "fr-h2"));
             if (!string.IsNullOrEmpty(subtitle)) col.Add(UiKit.Text(subtitle, "fr-tiny"));
             head.Add(col);
-            var crews = Icons.IconButton("build", UiKit.Muted, OpenBuilders);
-            crews.name = "structure-open-jobs";
-            crews.tooltip = UiText.Get("builders.jobs-title");
-            crews.style.marginLeft = UiKit.Space.S8;
-            head.Add(crews);
             body.Add(head);
         }
 
@@ -429,16 +426,31 @@ namespace Frontier
             });
         }
 
+        int labPage;
+
         void OpenResearchLab(PlacedStructure s, Transform t)
         {
+            labPage = 0;
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("researchlab" + s.slot, t, c, body =>
             {
                 StructureHeader(body, s, c, UiText.Get("structure.lab.subtitle"));
-                body.Add(UiKit.Text(UiText.Get("structure.lab.help"), "fr-tiny"));
-                body.Add(IconBtn(UiText.Get("goals.action.command"), "research", UiKit.Magenta, OpenResearch));
-                body.Add(IconBtn(UiText.Get("command.tools"), "tools", UiKit.Amber, () => OpenShip(ShipPage.Tools)));
-                UpgradeButton(body, s, c);
+                var tabs = UiKit.Div("fr-tabs");
+                tabs.name = "lab-navigation";
+                tabs.Add(TabButton("research", UiText.Get("research.tab.tech"), labPage == 0, c,
+                    () => labPage = 0, RefreshPopup));
+                tabs.Add(TabButton("tools", UiText.Get("command.tools"), labPage == 1, c,
+                    () => labPage = 1, RefreshPopup));
+                tabs.Add(TabButton("up", UiText.Get("lab.tab.upgrade"), labPage == 2, c,
+                    () => labPage = 2, RefreshPopup));
+                body.Add(tabs);
+                if (labPage == 2) UpgradeButton(body, s, c);
+                else
+                {
+                    BuildXpProgress(body);
+                    if (labPage == 0) BuildTech(body);
+                    else BuildTools(body);
+                }
             });
         }
 
@@ -702,7 +714,7 @@ namespace Frontier
                 int have = gs.Count(gs.db.fuel);
                 alarmFuel = Mathf.Clamp(alarmFuel, 1, Mathf.Max(1, Mathf.Min(have, 40)));
                 StructureHeader(body, s, c, UiText.Get("wave.call-help"));
-                BuildXpProgress(body, false);
+                BuildXpProgress(body);
 
                 var stepper = UiKit.Div("fr-stepper");
                 var minus = Icons.IconButton("minus", UiKit.Amber, () => { alarmFuel = Mathf.Max(1, alarmFuel - 1); RefreshPopup(); });

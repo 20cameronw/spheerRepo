@@ -52,6 +52,7 @@ namespace Frontier
             modalLayer.Add(backdropEl);
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             build(modalScroll.contentContainer);
+            UpdateFirstSessionGuideVisibility();
         }
 
         void CloseModal()
@@ -106,10 +107,10 @@ namespace Frontier
         // ------------------------------------------------------------ build shop
         int shopTab;
 
-        VisualElement TabButton(string icon, string label, bool on, Color accent, Action onClick)
+        VisualElement TabButton(string icon, string label, bool on, Color accent, Action onClick, Action refresh = null)
         {
             var t = new FrontierTab { Accent = accent, Selected = on, Icon = icon, Caption = label };
-            t.clicked += () => { confirmBuilderFinish = null; confirmBuilderPurchaseOwned = -1; onClick(); RefreshModal(); };
+            t.clicked += () => { confirmBuilderFinish = null; confirmBuilderPurchaseOwned = -1; onClick(); (refresh ?? RefreshModal)(); };
             return t;
         }
 
@@ -313,7 +314,7 @@ namespace Frontier
 
         void BuildLeaderboard(VisualElement body)
         {
-            BuildEraProgress(body);
+            StatRow(body, "map", UiKit.Cyan, UiText.Get("ranks.era-label"), ContentText.EraName(gs.Era));
             if (gs.AscensionAvailable)
                 body.Add(IconBtn(UiText.Get("ranks.ascension"), "play", UiKit.Magenta, () => { menuPage = "ascension"; RefreshModal(); }));
             body.Add(IconBtn(UiText.Get("ranks.goals"), "star", UiKit.Amber, () => { menuPage = "goals"; RefreshModal(); }));
@@ -350,7 +351,15 @@ namespace Frontier
             balance.Add(UiKit.Text(UiText.Get("shards.uses-help"), "fr-muted"));
             body.Add(balance);
             BuildShardAdOffer(body);
-            BuildBuilders(body);
+            BuildRewardRecovery(body);
+        }
+
+        void OpenShardWallet()
+        {
+            if (busy || defense.Active) return;
+            if (modalKey != "menu") OpenMenu();
+            menuPage = "shards";
+            RefreshModal();
         }
 
         void BuildOnlineLeaderboard(VisualElement body)
@@ -450,7 +459,6 @@ namespace Frontier
             var card = Card(UiKit.Cyan);
             card.name = "era-progress";
             card.Add(UiKit.Text(UiText.Get("ranks.era", ContentText.EraName(era).ToUpperInvariant()), "fr-h2"));
-            card.Add(UiKit.Text(UiText.Get("ranks.era.help"), "fr-tiny"));
             if (era == FrontierEra.Ascension)
             {
                 card.Add(UiKit.Text(UiText.Get("ranks.era.mastery"), "fr-muted"));
@@ -586,6 +594,7 @@ namespace Frontier
 
         void BuildTutorial(VisualElement body)
         {
+            BuildEraProgress(body);
             TutorialStep(body, "build", UiKit.Lime, UiText.Get("tutorial.build.title"), UiText.Get("tutorial.build.body"));
             TutorialStep(body, "wood", UiKit.Amber, UiText.Get("tutorial.gather.title"), UiText.Get("tutorial.gather.body"));
             TutorialStep(body, "pack", UiKit.Cyan, UiText.Get("tutorial.storage.title"), UiText.Get("tutorial.storage.body"));
@@ -597,6 +606,7 @@ namespace Frontier
             TutorialStep(body, "base", UiKit.Lime, UiText.Get("tutorial.expand.title"), UiText.Get("tutorial.expand.body"));
             TutorialStep(body, "map", UiKit.Cyan, UiText.Get("tutorial.map.title"), UiText.Get("tutorial.map.body"));
             TutorialStep(body, "warp", UiKit.Cyan, UiText.Get("network.title"), UiText.Get("network.help"));
+            TutorialStep(body, "play", UiKit.Cyan, UiText.Get("tutorial.ads.title"), UiText.Get("tutorial.ads.body"));
         }
 
         void TutorialStep(VisualElement body, string icon, Color color, string title, string text)
@@ -1431,8 +1441,7 @@ namespace Frontier
             tabs.Add(TabButton("shield", UiText.Get("research.tab.improvements"), researchPage == ResearchPage.Improvements, UiKit.Magenta,
                 () => researchPage = ResearchPage.Improvements));
             body.Add(tabs);
-            BuildXpProgress(body, true);
-            BuildProgressionResourceHelp(body);
+            BuildXpProgress(body);
             if (researchPage == ResearchPage.Tech) BuildTech(body);
             else
             {
@@ -1455,33 +1464,24 @@ namespace Frontier
             if (shipPage == ShipPage.Cargo)
             {
                 BuildPack(body);
-                BuildProgressionResourceHelp(body);
                 BuildUpgrades(body, UpgradeCategory.Ship, u => u.effect == UpgradeEffect.BackpackSlots);
             }
             else if (shipPage == ShipPage.Tools)
             {
-                BuildXpProgress(body, true);
-                BuildProgressionResourceHelp(body);
+                BuildXpProgress(body);
                 BuildTools(body);
             }
             else
             {
                 BuildFuelReserves(body);
-                body.Add(UiKit.Text(UiText.Get("fuel.help"), "fr-muted"));
-                BuildProgressionResourceHelp(body);
                 BuildUpgrades(body, UpgradeCategory.Ship, u => u.effect == UpgradeEffect.FuelTankSlots);
                 BuildUpgrades(body, UpgradeCategory.Ship, u => u.effect != UpgradeEffect.BackpackSlots && u.effect != UpgradeEffect.FuelTankSlots);
             }
         }
 
-        void BuildProgressionResourceHelp(VisualElement body)
-        {
-            body.Add(UiKit.Text(UiText.Get(gs.CargoDepotActive ? "progression.resources.connected" :
-                "progression.resources.cargo"), "fr-tiny"));
-        }
-
         void BuildBuilders(VisualElement body)
         {
+            BuildRewardRecovery(body);
             body.Add(UiKit.Text(UiText.Get("builders.help"), "fr-muted"));
             var jobs = UiKit.Div();
             jobs.name = "builder-jobs";

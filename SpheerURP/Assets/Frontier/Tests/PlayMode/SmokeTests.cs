@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Frontier.Services;
 using NUnit.Framework;
@@ -392,8 +393,9 @@ namespace Frontier.Tests
             rt.Ui.DebugReset();
             Assert.IsTrue(rt.Surface.SelectStructure(mine));
             Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine"));
-            var pending = rt.Ui.DebugRoot.Q<Button>("structure-open-jobs");
-            Assert.IsNotNull(pending, "Tapping an upgrading building must retain access to job controls and crews.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("structure-open-jobs"));
+            var pending = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.IsNotNull(pending, "Crews are available from the single HUD construction shortcut.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pending; pending.SendEvent(submit); }
             Assert.IsFalse(rt.Ui.DebugBusy);
             Assert.AreEqual(earned, rt.State.Count(scrap));
@@ -482,7 +484,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator ResearchAndShipExplainXpLevelsAndRouteToWaveCaller()
+        public IEnumerator ResearchAndShipShowConciseXpAndKeepLearningInHowToPlay()
         {
             new GameObject("XpProgressionBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -495,27 +497,21 @@ namespace Frontier.Tests
             Assert.IsNotNull(progress);
             Assert.IsTrue(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-status",
                 rt.State.PlayerLevel, rt.State.XpToNextLevel, rt.State.PlayerLevel + 1)));
-            Assert.IsTrue(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-help")));
+            Assert.IsFalse(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-help")));
             var waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
-            Assert.IsNotNull(waves);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
-            yield return null;
-            var alarm = rt.State.StructureOfKind(rt.State.planet, StructureKind.Alarm);
-            if (alarm == null)
-            {
-                var def = rt.Db.StructureOfKind(StructureKind.Alarm);
-                Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + def.id),
-                    "Players without an Alarm must be sent to its Build entry.");
-                alarm = rt.State.DebugPlace(def, 0);
-                Assert.IsNotNull(alarm);
-                yield return null;
-            }
+            Assert.IsNull(waves, "Research should not repeat a full-row XP tutorial action.");
             rt.Ui.DebugShip(1);
-            waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
-            yield return null;
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("player-xp-progression"), "The Alarm preview should also explain XP.");
-            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("wave.call-help")));
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("progression-open-waves"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("player-xp-progression"));
+            rt.Ui.DebugMenu("ranks");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("era-progress"));
+            rt.Ui.DebugMenu("tutorial");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("era-progress"));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tutorial.defend.body")));
+            rt.Ui.DebugFirstSessionGuide(0);
+            var help = rt.Ui.DebugRoot.Q<Button>("first-session-guide-help");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = help; help.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("era-progress"));
         }
 
         [Test]
@@ -860,7 +856,7 @@ namespace Frontier.Tests
                     .Exists(label => label.text == ladder.LocalizedName.ToUpper()));
                 runtime.Ui.DebugMenu("goals");
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == objective.LocalizedTitle));
-                runtime.Ui.DebugMenu("ranks");
+                runtime.Ui.DebugMenu("tutorial");
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text ==
                     "YOUR FRONTIER: LOCALIZED CONTENT.ERA." + runtime.State.Era.ToString().ToUpperInvariant() + ".NAME"));
                 foreach (var requirement in Frontier.Economy.EraRules.NextRequirements(runtime.State.Era, runtime.State.EraProgress))
@@ -1024,9 +1020,9 @@ namespace Frontier.Tests
             Assert.IsFalse(haptics.enabledSelf, "The editor must not claim native vibration support.");
             runtime.Ui.DebugReset();
             runtime.Ui.DebugMenu("ranks");
-            Assert.IsNotNull(runtime.Ui.DebugRoot.Q("era-progress"));
+            Assert.IsNull(runtime.Ui.DebugRoot.Q("era-progress"));
             Assert.AreEqual(Frontier.Economy.FrontierEra.Landfall, runtime.State.Era);
-            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help" })
+            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era-label" })
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get(key)), key);
             Assert.IsFalse(runtime.Ui.DebugRoot.Query<Label>().ToList()
                 .Exists(label => label.text == UiText.Get("ranks.enable")),
@@ -1040,8 +1036,9 @@ namespace Frontier.Tests
                 label.text == UiText.Get("shards.balance", runtime.State.ShardBalance.ToString("N0"))));
             Assert.IsNotNull(runtime.Ui.DebugRoot.Query<Label>().ToList()
                 .Find(label => label.text == UiText.Get("shards.ad.title")));
-            Assert.IsNull(runtime.Ui.DebugRoot.Q<Button>("shards-watch-ad"),
-                "The Shards page must not expose an ad action before the provider is release-ready and opted into.");
+            Assert.IsNotNull(runtime.Ui.DebugRoot.Q<Button>("shards-watch-ad"),
+                "Offers remain visible even when native playback is unavailable.");
+            Assert.IsFalse(runtime.Ui.DebugRoot.Q<Button>("shards-watch-ad").enabledInHierarchy);
             runtime.Ui.DebugMenu("ranks");
             runtime.Ui.DebugMenu("ranks");
             var score = runtime.State.FrontierScore;
@@ -1058,6 +1055,7 @@ namespace Frontier.Tests
                 Assert.IsNotNull(row, pair.Key);
                 Assert.AreEqual(pair.Value, row.Value, pair.Key);
             }
+            runtime.Ui.DebugMenu("tutorial");
             var eraAction = runtime.Ui.DebugRoot.Q<Button>("era-next-action");
             Assert.IsNotNull(eraAction);
             Assert.IsTrue(eraAction.Query<Label>().ToList().Exists(label => label.text == UiText.Get("guide.action.map")));
@@ -2123,7 +2121,7 @@ namespace Frontier.Tests
             rt.Ui.DebugReset();
             rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.ResearchLab), 3);
             rt.Ui.DebugFirstSessionGuideAction(6);
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("research-navigation"), "An existing lab routes to technology research.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"), "An existing lab opens technology in its popup.");
             rt.Ui.DebugFirstSessionGuideAction(7);
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("ship-navigation"));
 
@@ -2344,6 +2342,8 @@ namespace Frontier.Tests
                 var structure = rt.State.StructureAt(rt.State.planet, 0);
                 Assert.IsTrue(rt.State.IsBuilderBusy(structure));
                 rt.Ui.DebugBuilders();
+                Assert.IsNull(rt.Ui.DebugRoot.Q("construction-reward"),
+                    "Do not offer an ad for a timer the player can already finish free.");
                 string buttonName = "builder-finish-" + structure.planetId + "-" + structure.slot;
                 var finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
                 Assert.IsNotNull(finish);
@@ -2725,13 +2725,149 @@ namespace Frontier.Tests
             finally { Object.Destroy(rules); }
         }
 
-        sealed class GameplayAdsFixture : IAdsService
+        [UnityTest]
+        public IEnumerator RewardedOffersStayVisibleWithoutNativeAdsAndNeverSimulateRewards()
+        {
+            new GameObject("VisibleRewardOffersBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            Assert.IsTrue(Resources.Load<GameplayRewardRules>("Frontier/GameplayRewardRules").harvestEnabled);
+            rt.State.DismissFirstSessionGuide();
+            rt.Ui.DebugReset();
+            yield return null;
+            var camera = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
+            var jobs = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.Greater(jobs.worldBound.yMin, camera.worldBound.yMax);
+            Assert.AreEqual(camera.worldBound.xMin, jobs.worldBound.xMin, 1);
+            var wallet = rt.Ui.DebugRoot.Q<Button>("hud-open-shards");
+            Assert.IsNotNull(wallet);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = wallet; wallet.SendEvent(submit); }
+            var watch = rt.Ui.DebugRoot.Q<Button>("shards-watch-ad");
+            Assert.IsNotNull(watch, "Unavailable playback must not hide the offer.");
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.AreEqual(UiText.Get("reward.platform"), rt.Ui.DebugRoot.Q<Label>("free-shards-ad-status").text);
+            int shards = rt.State.ShardBalance;
+            Assert.IsNull(rt.State.GameplayReward);
+
+            var refinery = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Refinery), 0);
+            rt.State.DebugSetBuilderJob(refinery, 600);
+            yield return null;
+            rt.Ui.DebugTapStructure(refinery);
+            watch = rt.Ui.DebugRoot.Q<Button>("construction-reward");
+            Assert.IsNotNull(watch, "Construction ads belong beside the timer, not only in the crew page.");
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("builder-finish-" + refinery.planetId + "-" + refinery.slot));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("structure-open-jobs"));
+            int remaining = rt.State.BuilderJobSecondsRemaining(refinery);
+            Assert.Greater(remaining, 590);
+            Assert.AreEqual(shards, rt.State.ShardBalance);
+            rt.Ui.DebugGather(MinigameKind.Chop);
+            rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
+            deadline = Time.realtimeSinceStartup + 5;
+            while (rt.Ui.DebugRoot.Q("minigame-result") == null && Time.realtimeSinceStartup < deadline) yield return null;
+            watch = rt.Ui.DebugRoot.Q<Button>("minigame-double-yield");
+            Assert.IsNotNull(watch, "The first harvest should expose the optional bonus, including in Editor.");
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources"));
+            Assert.IsNull(rt.State.GameplayReward);
+            Assert.AreEqual(shards, rt.State.ShardBalance);
+        }
+
+        [UnityTest]
+        public IEnumerator ResearchLabContainsWorkingTechToolsAndLabTabs()
+        {
+            new GameObject("InlineLabBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var lab = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.ResearchLab), 0);
+            rt.State.DebugSetStructureLevel(lab, 10);
+            rt.State.DebugSetLevel(10);
+            foreach (var resource in rt.Db.resources) rt.State.backpack.Set(resource.id, 100000);
+            yield return null;
+            rt.Ui.DebugTapStructure(lab);
+            var nav = rt.Ui.DebugRoot.Q("lab-navigation");
+            Assert.IsNotNull(nav);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            var filter = rt.Ui.DebugRoot.Q<DropdownField>();
+            Assert.IsNotNull(filter);
+            if (filter.choices.Count > 1)
+            {
+                filter.index = 1;
+                Assert.AreEqual(1, rt.Ui.DebugRoot.Q<DropdownField>().index, "Branch filters refresh the lab popup.");
+                rt.Ui.DebugRoot.Q<DropdownField>().index = 0;
+            }
+            var node = rt.Db.research.First(n => n != null && rt.State.CanResearch(n));
+            var card = rt.Ui.DebugRoot.Q("research-" + node.data.id);
+            Assert.IsFalse(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text != null && label.text.Contains("Structure:")), "Unlock copy must not expose catalog identifiers.");
+            var research = card.Query<Button>().ToList().First(b =>
+                b.Query<Label>().ToList().Exists(l => l.text == UiText.Get("research.buy")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = research; research.SendEvent(submit); }
+            Assert.IsTrue(rt.State.IsResearched(node.data.id));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"));
+            nav = rt.Ui.DebugRoot.Q("lab-navigation");
+            var tools = nav.Query<FrontierTab>().ToList()[1];
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = tools; tools.SendEvent(submit); }
+            var ladder = rt.Db.toolLadders.First(l => rt.State.ToolTierLockReason(l) == null);
+            int tier = rt.State.ToolTier(ladder);
+            var toolCard = rt.Ui.DebugRoot.Q("tool-" + ladder.data.id);
+            var upgrade = toolCard.Query<Button>().ToList().First(b =>
+                b.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tools.upgrade")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = upgrade; upgrade.SendEvent(submit); }
+            Assert.AreEqual(tier + 1, rt.State.ToolTier(ladder));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"));
+            nav = rt.Ui.DebugRoot.Q("lab-navigation");
+            var labTab = nav.Query<FrontierTab>().ToList()[2];
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = labTab; labTab.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q<DropdownField>());
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("ship-navigation"));
+        }
+
+        sealed class GameplayAdsFixture : IAdsService, IRewardedAdAvailability
         {
             public bool IsConfigured { get { return true; } }
             public int calls;
+            public string unavailable;
+            public ServiceResult RewardedAvailability(string placement)
+            {
+                return unavailable == null ? ServiceResult.Success() : ServiceResult.InvalidRequest(unavailable);
+            }
             public TaskCompletionSource<ServiceResult<RewardedAdResult>> pending = new TaskCompletionSource<ServiceResult<RewardedAdResult>>();
             public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
             public Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placement) { calls++; return pending.Task; }
+        }
+
+        [UnityTest]
+        public IEnumerator CooldownOffersRemainVisibleAndReenableWithoutReopening()
+        {
+            new GameObject("AdCooldownVisibilityBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var consent = new ConsentService(new DeletionConsentStore());
+            consent.SavePreferences(false, true, false);
+            var ads = new GameplayAdsFixture { unavailable = "Cooldown fixture" };
+            var unavailable = new UnavailableFrontierProvider();
+            rt.Ui.DebugSetServices(new FrontierServices(consent, ads, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable));
+            rt.Ui.DebugMenu("shards");
+            var watch = rt.Ui.DebugRoot.Q<Button>("shards-watch-ad");
+            Assert.IsNotNull(watch);
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.AreEqual("Cooldown fixture", rt.Ui.DebugRoot.Q<Label>("free-shards-ad-status").text);
+            ads.unavailable = null;
+            yield return new WaitForSecondsRealtime(1.1f);
+            Assert.AreSame(watch, rt.Ui.DebugRoot.Q<Button>("shards-watch-ad"));
+            Assert.IsTrue(watch.enabledInHierarchy);
+            Assert.AreEqual(0, ads.calls);
+            Assert.IsNull(rt.State.GameplayReward);
         }
 
         [UnityTest]
@@ -3179,8 +3315,9 @@ namespace Frontier.Tests
             Assert.IsNull(rt.Ui.DebugRoot.Q("build-harvest"));
             rt.Ui.DebugReset();
             Assert.IsTrue(rt.Surface.SelectStructure(gate));
-            var jobs = rt.Ui.DebugRoot.Q<Button>("structure-open-jobs");
-            Assert.IsNotNull(jobs, "Construction jobs and recruitment remain accessible from buildings.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("structure-open-jobs"));
+            var jobs = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.IsNotNull(jobs, "Construction jobs and recruitment remain accessible below the camera.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = jobs; jobs.SendEvent(submit); }
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
             Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));

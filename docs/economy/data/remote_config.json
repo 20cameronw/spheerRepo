@@ -615,6 +615,14 @@
         "max": 20
       },
       {
+        "key": "cost.bootstrap.pack3_mult",
+        "exposure": "Remote",
+        "group": "cost",
+        "defaultValue": 0.8,
+        "min": 0.05,
+        "max": 1
+      },
+      {
         "key": "cost.scale.defense",
         "exposure": "Remote",
         "group": "cost",
@@ -3170,7 +3178,7 @@
         "key": "cost.v.cargo_logistics",
         "exposure": "Content",
         "group": "cost",
-        "defaultValue": 700,
+        "defaultValue": 650,
         "min": 0,
         "max": 1E+09
       },

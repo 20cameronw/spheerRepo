@@ -12,42 +12,13 @@ namespace Frontier
         string researchBranch = "";
         bool showCompletedResearch;
 
-        void BuildXpProgress(VisualElement body, bool showWaveAction)
+        void BuildXpProgress(VisualElement body)
         {
             var progress = UiKit.Div();
             progress.name = "player-xp-progression";
             progress.Add(UiKit.Text(UiText.Get("progression.xp-status", gs.PlayerLevel, gs.XpToNextLevel,
                 gs.PlayerLevel + 1), "fr-muted"));
-            progress.Add(UiKit.Text(UiText.Get("progression.xp-help"), "fr-tiny"));
             body.Add(progress);
-            if (showWaveAction)
-            {
-                var waves = IconBtn(UiText.Get("progression.waves"), "alien", UiKit.Magenta, OpenProgressionWaves);
-                waves.name = "progression-open-waves";
-                body.Add(waves);
-            }
-        }
-
-        void OpenProgressionWaves()
-        {
-            if (busy || defense.Active) return;
-            CloseAll();
-            var alarm = gs.StructureOfKind(gs.planet, StructureKind.Alarm);
-            if (alarm != null)
-            {
-                if (world.SelectStructure(alarm)) return;
-                Debug.LogError("Frontier: Alarm has no world anchor: " + alarm.def.id);
-                return;
-            }
-            shopTab = 0;
-            OpenShop();
-            var def = gs.db.StructureOfKind(StructureKind.Alarm);
-            var scroll = modalScroll;
-            var card = def != null ? scroll.Q("shop-structure-" + def.id) : null;
-            if (card != null) scroll.schedule.Execute(() =>
-            {
-                if (scroll.contentContainer.Contains(card)) scroll.ScrollTo(card);
-            }).StartingIn(1);
         }
 
         void BuildTech(VisualElement body)
@@ -96,6 +67,7 @@ namespace Frontier
                 if (index < 0) return;
                 researchBranch = index == 0 ? "" : branches[index];
                 RefreshModal();
+                RefreshPopup();
             });
             body.Add(UiKit.Text(UiText.Get("research.branch"), "fr-tiny"));
             body.Add(filter);
@@ -181,7 +153,6 @@ namespace Frontier
         {
             if (!gs.db.UsesImportedEconomy || gs.db.toolLadders == null) return;
             body.Add(SectionLabel(UiText.Get("tools.title")));
-            body.Add(UiKit.Text(UiText.Get("tools.help"), "fr-muted"));
             foreach (var ladder in gs.db.toolLadders)
             {
                 if (ladder == null || ladder.data == null || ladder.data.tiers == null || ladder.data.tiers.Length == 0) continue;
@@ -242,10 +213,26 @@ namespace Frontier
             return ItemAmounts.FromIds(cost, gs.db.ResolveResource);
         }
 
-        static string UnlockSummary(string[] unlocks)
+        string UnlockSummary(string[] unlocks)
         {
             if (unlocks == null || unlocks.Length == 0) return UiText.Get("research.progression");
-            return string.Join(", ", unlocks.Select(PrettyName));
+            return string.Join(", ", unlocks.Select(unlock =>
+            {
+                int separator = unlock.IndexOf(':');
+                if (separator < 0) return PrettyName(unlock);
+                string kind = unlock.Substring(0, separator), id = unlock.Substring(separator + 1);
+                if (kind == "structure")
+                {
+                    var definition = gs.db.FindStructure(id);
+                    if (definition != null) return definition.LocalizedName;
+                }
+                if (kind == "recipe")
+                {
+                    var recipe = gs.db.recipes.FirstOrDefault(item => item != null && item.id == id);
+                    if (recipe != null) return recipe.LocalizedName;
+                }
+                return PrettyName(id.Replace(':', ' '));
+            }));
         }
     }
 }

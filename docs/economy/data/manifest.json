@@ -3,8 +3,8 @@
   "contentVersion": 1,
   "tuningSchemaVersion": 1,
   "generator": "frontier-economy-dev",
-  "tuningKeys": 606,
-  "tuningDigest": "f7b3888e49b20760",
+  "tuningKeys": 607,
+  "tuningDigest": "1c0c735faed632a4",
   "counts": {
     "resources": 34,
     "recipes": 24,

@@ -109,6 +109,12 @@
 .fr-topbar .fr-chip-text { font-size: var(--fr-fs-caption); }
 .fr-chip { flex-direction: row; align-items: center; margin-left: var(--fr-sp-16); flex-shrink: 0; }
 .fr-chip .fr-icon { margin-right: var(--fr-sp-8); }
+.fr-chip-action {
+    background-color: transparent; border-width: 0; border-radius: var(--fr-sp-12);
+    padding: 0; margin-top: 0; margin-bottom: 0; margin-right: 0;
+    min-height: var(--fr-touch); min-width: var(--fr-touch);
+}
+.fr-chip-action:hover, .fr-chip-action:focus { background-color: var(--fr-surface-2); }
 .fr-chip-col { flex-direction: column; justify-content: center; }
 .fr-chip-text {
     font-size: var(--fr-fs-body);
