@@ -17,7 +17,15 @@ operational storage on the current planet connected by an operational Cargo Depo
 share this rule. Cargo is spent first, then connected storage; insufficient totals spend nothing. Disconnected,
 under-construction and remote storage, unclaimed salvage and Fuel Depot reserves are excluded. Remote resources still
 require transfer or retrieval. XP, research prerequisites, local labs and other gates are unchanged.
-No save schema, stable content IDs, inventory capacity, job timing or production-ad settings change with this navigation release.
+No save schema, stable content IDs or inventory capacity changes are needed.
+
+Each available Place action has a compact shard-price button beside it. Shards buy an immediately operational
+level-1 structure without materials or a builder: twice the full build timer's skip price, with a 10-shard minimum.
+Research, XP, local lab, matching planet resources, free pads and per-planet limits remain mandatory.
+Selecting the shard button spends nothing; selecting a free pad confirms the displayed price. Cancellation is free.
+The structure and wallet are saved together; a failed write explicitly reports pending saving and cannot charge the same pad twice.
+Map queries preload at least 192 UI pixels beyond each edge (25% of the larger viewport dimension), refreshing
+at half that margin so small pans reuse already loaded systems. Scanner, discovery and resource filters still apply.
 
 ## Shortage journeys, projects and returning sessions
 
@@ -47,11 +55,13 @@ Load and same-process background/resume share the existing offline production an
 saves establish an elapsed-time watermark so active play is not credited again. Repeated resume signals do
 not repeat the elapsed interval. Real native lifecycle timing remains a device-test requirement.
 
-## Gated gameplay rewards
+## Optional gameplay rewards
 
-`Resources/Frontier/GameplayRewardRules` ships with harvest/construction flags **off** and construction
-seconds **zero**. Missing rules also fail closed. These flags are additional to provider/platform configuration,
-consent and the existing per-placement policy; historical policy caps are not newly approved tuning.
+`Resources/Frontier/GameplayRewardRules` enables harvest double-yield, construction reductions of up to
+300 seconds and free shards. The configured iOS gameplay provider is enabled at the user's direction.
+Missing rules still fail closed. Provider/platform configuration, explicit player consent and per-placement
+limits remain required. Tapping an optional offer without consent opens an Allow & Watch / Not Now prompt;
+no ad request or reward ticket is created before acceptance. Back cancels without changing consent or progress.
 No banners, interstitials, automatic requests or shortage-to-ad shortcuts are added.
 
 The staged placements reuse stable service IDs `double-yield` and `timer-skip`. Harvest quotes the exact
@@ -82,22 +92,21 @@ small daily allowance. `unlimitedDaily` is explicit, so old saves/assets with om
 existing finite-cap behavior and zero still disables a placement unless unlimited is explicitly set.
 Persisted counts saturate safely; cooldown, consent, request overlap and reward settlement checks remain.
 That decision applies to `double-yield` and `timer-skip`. The separate `free-shards` wallet offer is now
-authored at +2 shards, capped at two per day with a four-hour cooldown; the production ad gate remains
-closed pending child-inclusive review, privacy setup and physical iOS verification. Emergency-fuel,
+authored at +2 shards, capped at two per day with a four-hour cooldown; the iOS gameplay gate is now enabled.
+Child-inclusive review and physical iOS verification remain public-release requirements. Emergency-fuel,
 revive, targeted-supply and missing-resource offers remain inactive.
 
 Not annoying means passive contextual buttons, never automatic ad screens, notifications or repeat
 decline dialogs. Normal Collect/wait/finish actions remain; harvest offers once per completed result,
 does not retry after no-fill on that result, and does not appear on the first successful harvest.
 High availability is not permission to nag or remove the no-ad path. Native experience and child-inclusive
-review are still mandatory. Harvest/construction benefit sizes below remain proposals; only the separately
-authored free-shards amount/cap/cooldown are current, and its provider is still gated.
+review are still mandatory. The following table records the current authored rewards.
 
-| Placement | Benefit (proposed unless noted) | Daily cap decision | Cooldown (proposed unless noted) |
+| Placement | Benefit | Daily cap | Cooldown |
 |---|---|---|---|
 | Harvest | +100% of that completed run, only when all output fits | None | 180 seconds |
-| Construction | Up to 120 seconds on the selected job | None | 600 seconds |
-| Free shards | +2 shards after a player-started, provider-confirmed video on the Shards page | 2/day | 4 hours; current iOS release gate remains closed |
+| Construction | Up to 300 seconds on the selected job | None | 300 seconds |
+| Free shards | +2 shards after a player-started, provider-confirmed video on the Shards page | 2/day | 4 hours |
 | Emergency fuel / revive / targeted supplies / missing-resource assistance | No offer or grant in this stage | 0 | N/A |
 
 This is not measured retention or a balance certification. With equal-yield harvests, N normal runs give

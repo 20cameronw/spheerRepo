@@ -44,6 +44,18 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void OffscreenPreloadDoesNotSwitchAWideDetailedViewportToDensityOnly()
+        {
+            var snapshot = MapQuery.Build(universe, -1300, -1300, 1300, 1300, "",
+                new[] { new MapSurveyPoint(0, 0, 40) }, new string[0], 1800);
+            Assert.IsFalse(snapshot.densityOnly, "Only the visible span chooses the detail level, not the preload margin.");
+            Assert.IsNotEmpty(snapshot.systems);
+            Assert.LessOrEqual(snapshot.systems.Length, MapQuery.MaxSystems);
+            foreach (var system in snapshot.systems)
+                Assert.IsTrue(MapQuery.Surveyed(system, new[] { new MapPoint(0, 0) }, 40));
+        }
+
+        [Test]
         public void SurveyRadius_RevealsWorldsFromEveryVisitedSystem()
         {
             var star = universe.SystemsInRect(-200, -200, 200, 200)[0];

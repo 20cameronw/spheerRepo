@@ -2655,6 +2655,87 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator RewardedOffersAskForConsentAndNeverRequestAdsOnDismissal()
+        {
+            new GameObject("RewardConsentBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var consent = new ConsentService(new DeletionConsentStore());
+            var ads = new GameplayAdsFixture();
+            var unavailable = new UnavailableFrontierProvider();
+            rt.Ui.DebugSetServices(new FrontierServices(consent, ads, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable));
+            rt.Ui.DebugMenu("shards");
+            yield return null;
+            var watch = rt.Ui.DebugRoot.Q<Button>("shards-watch-ad");
+            Assert.IsNotNull(watch, "An optional offer must be discoverable before advertising opt-in.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = watch; watch.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("rewarded-consent"));
+            Assert.AreEqual(0, ads.calls);
+            Assert.IsTrue(rt.Ui.HandleBack());
+            Assert.IsFalse(consent.Current.adsAllowed);
+            Assert.AreEqual(0, ads.calls);
+            Assert.IsNull(rt.State.GameplayReward);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = watch; watch.SendEvent(submit); }
+            var allow = rt.Ui.DebugRoot.Q<Button>("rewarded-consent-allow");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = allow; allow.SendEvent(submit); }
+            Assert.IsTrue(consent.Current.adsAllowed);
+            Assert.IsFalse(consent.Current.analyticsAllowed);
+            Assert.IsFalse(consent.Current.onlineServicesAllowed);
+            Assert.AreEqual(1, ads.calls);
+            ads.pending.SetResult(ServiceResult<RewardedAdResult>.Failed("No fill"));
+            yield return null;
+            Assert.AreEqual("cancelled", rt.State.GameplayReward.state);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("shards-watch-ad"));
+        }
+
+        [UnityTest]
+        public IEnumerator PlaceAndShardPurchaseShareOneRowAndSelectingShardsDoesNotSpendBeforePlacement()
+        {
+            var seed = new GameState(GameDatabase.Load(), false);
+            Assert.IsTrue(seed.Save());
+            string savePath = Path.Combine(saveDir, "frontier_save.json");
+            var save = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(savePath)).Normalize();
+            save.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+            File.WriteAllText(savePath, SaveSerializer.Instance.Serialize(save));
+            new GameObject("ShardBuildBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Ui.DebugShop(0);
+            yield return null;
+            var card = rt.Ui.DebugRoot.Q("shop-structure-refinery");
+            var place = card.Q<Button>("shop-place-refinery");
+            var buy = card.Q<Button>("shop-shards-refinery");
+            Assert.IsNotNull(place);
+            Assert.IsNotNull(buy);
+            Assert.AreSame(place.parent, buy.parent);
+            Assert.AreEqual(FlexDirection.Row, place.parent.resolvedStyle.flexDirection);
+            Assert.AreEqual(place.worldBound.y, buy.worldBound.y, 1);
+            Assert.LessOrEqual(buy.worldBound.xMax, card.worldBound.xMax);
+            Assert.GreaterOrEqual(buy.worldBound.height, UiKit.Size.Touch - 1, "Allow panel-scale pixel rounding.");
+            int before = rt.State.ShardBalance, count = rt.State.structures.Count;
+            Assert.IsTrue(buy.enabledInHierarchy);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = buy; buy.SendEvent(submit); }
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            Assert.AreEqual(count, rt.State.structures.Count);
+            Assert.IsTrue(rt.Ui.HandleBack());
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            rt.Ui.DebugShop(0);
+            buy = rt.Ui.DebugRoot.Q<Button>("shop-shards-refinery");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = buy; buy.SendEvent(submit); }
+            int cost = rt.State.StructureShardCost(rt.Db.FindStructure("refinery"));
+            rt.Ui.DebugTapBuildSlot(0);
+            Assert.IsTrue(rt.State.IsOperational(rt.State.StructureAt(rt.State.planet, 0)));
+            Assert.AreEqual(before - cost + rt.Db.shardRules.data.atlasStructureShards, rt.State.ShardBalance);
+            rt.Ui.DebugTapBuildSlot(0);
+            Assert.AreEqual(before - cost + rt.Db.shardRules.data.atlasStructureShards, rt.State.ShardBalance);
+        }
+
+        [UnityTest]
         public IEnumerator ShortagesKeepQuantitiesAndTrackedProjectsWithoutHistoryButtons()
         {
             new GameObject("ShortageBootstrap").AddComponent<FrontierBootstrap>();

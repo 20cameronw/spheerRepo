@@ -15,7 +15,7 @@ MonoBehaviour:
   enableRewardedAds: 1
   iosAppKey: 28e95b2f5
   iosRewardedAdUnitId: eurexbly1unznz2g
-  iosSetupVerified: 0
+  enableIosGameplayAds: 1
   enableIosDevelopmentTests: 1
   placements:
   - id: double-yield

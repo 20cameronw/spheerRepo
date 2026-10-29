@@ -298,12 +298,12 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void AuthoredHarvestAndConstructionHaveNoDailyCapButIosRemainsGated()
+        public void AuthoredIosAdsAreEnabledAndHarvestAndConstructionKeepTheirCooldowns()
         {
             var policy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
             Assert.IsNotNull(policy);
             Assert.IsTrue(policy.enableRewardedAds);
-            Assert.IsFalse(policy.iosSetupVerified);
+            Assert.IsTrue(policy.enableIosGameplayAds);
             Assert.AreEqual("28e95b2f5", policy.iosAppKey);
             Assert.AreEqual("eurexbly1unznz2g", policy.iosRewardedAdUnitId);
             CollectionAssert.AreEquivalent(new[] { "double-yield", "emergency-fuel", "timer-skip", "revive", "daily-supply", "free-shards" },
@@ -315,7 +315,7 @@ namespace Frontier.Tests
                     Assert.AreEqual(0, placement.dailyCap);
                 }
                 else Assert.Greater(placement.dailyCap, 0, "Other staged placements retain their existing policy.");
-            Assert.IsFalse(policy.CanUseIos(Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig")));
+            Assert.IsTrue(policy.CanUseIos(Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig")));
         }
 
         [Test]

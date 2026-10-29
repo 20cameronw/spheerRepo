@@ -763,10 +763,13 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ build mode
-        void EnterBuild(StructureSO def)
+        int buildShardQuote = -1;
+
+        void EnterBuild(StructureSO def, int shardQuote = -1)
         {
             ExitBuild();
             buildDef = def;
+            buildShardQuote = shardQuote;
             world.BuildMode = true;
             Color c = UiKit.Ui(def.color);
             banner = UiKit.Div("fr-banner"); banner.pickingMode = PickingMode.Ignore;
@@ -774,7 +777,10 @@ namespace Frontier
             UiKit.SetAccent(box, c);
             UiKit.Halo(box, c, 26f, 0.14f);
             box.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconLg));
-            box.Add(UiKit.Text(UiText.Get("build.pad-help"), "fr-h2", c));
+            var prompt = UiKit.Text(UiText.Get(shardQuote >= 0 ? "shop.shards.pad-help" : "build.pad-help", shardQuote), "fr-h2", c);
+            prompt.style.whiteSpace = WhiteSpace.Normal;
+            prompt.style.flexShrink = 1;
+            box.Add(prompt);
             var cancel = Icons.IconButton("close", UiKit.Muted, ExitBuild, 0f, true);
             cancel.style.marginLeft = UiKit.Space.S16;
             box.Add(cancel);
@@ -785,6 +791,7 @@ namespace Frontier
         void ExitBuild()
         {
             buildDef = null;
+            buildShardQuote = -1;
             if (world != null) world.BuildMode = false;
             if (banner != null) banner.RemoveFromHierarchy();
             banner = null;
@@ -794,21 +801,29 @@ namespace Frontier
         {
             if (buildDef == null) return;
             var def = buildDef;
-            if (!gs.Place(def, slot)) { }
-            else
+            string purchaseMessage = null;
+            StructurePurchaseResult purchase = StructurePurchaseResult.Rejected;
+            bool placedSuccessfully;
+            if (buildShardQuote >= 0)
+            {
+                purchase = gs.PurchaseStructure(def, slot, buildShardQuote, out purchaseMessage);
+                placedSuccessfully = purchase != StructurePurchaseResult.Rejected;
+            }
+            else placedSuccessfully = gs.Place(def, slot);
+            if (placedSuccessfully)
             {
                 var placed = gs.StructureAt(gs.planet, slot);
                 Sfx.Good();
                 Fx.Burst(t.position, def.color, 50, 5f, 0.25f);
                 planetView.Punch();
-                Toast(UiText.Get(gs.IsUnderConstruction(placed) ? "build.started" : "build.completed",
-                    def.LocalizedName), UiKit.Ui(def.color));
+                Toast(purchaseMessage ?? UiText.Get(gs.IsUnderConstruction(placed) ? "build.started" : "build.completed",
+                    def.LocalizedName), purchase == StructurePurchaseResult.PendingSave ? UiKit.Amber : UiKit.Ui(def.color));
                 ExitBuild();
                 return;
             }
             Sfx.Bad();
-            Toast(gs.AvailableBuilderCount <= 0 && gs.StructureJobSeconds(def, 1) > 0
-                ? gs.BuilderAvailabilityReason() : UiText.Get("build.resources-missing"), UiKit.Red);
+            Toast(purchaseMessage ?? (gs.AvailableBuilderCount <= 0 && gs.StructureJobSeconds(def, 1) > 0
+                ? gs.BuilderAvailabilityReason() : UiText.Get("build.resources-missing")), UiKit.Red);
         }
     }
 }

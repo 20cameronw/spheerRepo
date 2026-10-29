@@ -167,7 +167,7 @@ namespace Frontier
         }
 
         public static MapSnapshot Build(Uni universe, double x0, double y0, double x1, double y1, string resource,
-            MapSurveyPoint[] centers, string[] discoveredSystemIds)
+            MapSurveyPoint[] centers, string[] discoveredSystemIds, double viewportSpanLy = 0)
         {
             var discovered = new HashSet<string>(discoveredSystemIds ?? new string[0], StringComparer.Ordinal);
             double width = x1 - x0, height = y1 - y0;
@@ -183,7 +183,8 @@ namespace Frontier
                     result.density[y * Columns + x] = new MapDensityCell(px, py, dx, dy, (float)universe.Density(px + dx * 0.5, py + dy * 0.5));
                 }
             var systems = new List<StarSystem>();
-            result.densityOnly = width > MaxSystemSpanLy || height > MaxSystemSpanLy;
+            result.densityOnly = viewportSpanLy > 0 ? viewportSpanLy > MaxSystemSpanLy :
+                width > MaxSystemSpanLy || height > MaxSystemSpanLy;
             if (!result.densityOnly) universe.SystemsInRect(x0, y0, x1, y1, systems);
             else
                 foreach (var id in discovered)

@@ -7,11 +7,57 @@ namespace Frontier
 {
     public enum BuilderFinishResult { Rejected, Saved, PendingSave }
     public enum BuilderPurchaseResult { Rejected, Saved, PendingSave }
+    public enum StructurePurchaseResult { Rejected, Saved, PendingSave }
 
     public partial class GameState
     {
         const string ThirdCrewPurchasedKey = "builder_third_purchased";
         const string FourthCrewPurchasedKey = "builder_fourth_purchased";
+
+        public int StructureShardCost(StructureSO definition)
+        {
+            if (definition == null || db.FindStructure(definition.id) != definition ||
+                db.shardRules == null || db.shardRules.data == null) return -1;
+            return ShardCurve.StructureCost(db.shardRules.data, StructureJobSeconds(definition, 1));
+        }
+
+        public StructurePurchaseResult PurchaseStructure(StructureSO definition, int slot, int maximumCost, out string message)
+        {
+            int cost = StructureShardCost(definition);
+            if (SaveIsReadOnly || cost < 0 || !CanBuildHere(definition) || AtLimit(planet, definition) ||
+                slot < 0 || slot >= planet.BuildingSlots || StructureAt(planet, slot) != null ||
+                ObstacleAt(planet, slot).HasValue)
+            {
+                message = UiText.Get("shop.shards.unavailable");
+                return StructurePurchaseResult.Rejected;
+            }
+            if (maximumCost < cost)
+            {
+                message = UiText.Get("crew.finish.price-changed");
+                return StructurePurchaseResult.Rejected;
+            }
+            if (ShardBalance < cost)
+            {
+                message = UiText.Get("crew.purchase.shards-missing");
+                return StructurePurchaseResult.Rejected;
+            }
+            if (world.Place(planet.Id, definition.id, slot) == null)
+            {
+                message = UiText.Get("shop.shards.unavailable");
+                return StructurePurchaseResult.Rejected;
+            }
+            SpendShards(cost);
+            RecordAtlasStructureBuilt(definition);
+            RecordMegaprojectStage(definition);
+            Notify();
+            if (!saves.Save())
+            {
+                message = UiText.Get("shop.shards.pending-save", saves.LastError);
+                return StructurePurchaseResult.PendingSave;
+            }
+            message = UiText.Get("build.completed", definition.LocalizedName);
+            return StructurePurchaseResult.Saved;
+        }
 
         public int PurchasedBuilderCount
         {

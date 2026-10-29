@@ -11,16 +11,68 @@ namespace Frontier
         GameplayRewardRules gameplayRewardRules;
         bool gameplayAdShowing;
         string rewardDiscardArmed;
+        VisualElement adConsentDialog;
+        TaskCompletionSource<bool> adConsentDecision;
 
-        bool GameplayOfferAllowed(bool placementEnabled, string placement)
+        bool GameplayOfferAllowed(bool placementEnabled, string placement, bool requireConsent = true)
         {
             var ticket = gs.GameplayReward;
+            var available = services?.Ads is IRewardedAdAvailability availability
+                ? availability.RewardedAvailability(placement) : ServiceResult.Success();
             return placementEnabled && services != null && services.Ads != null && services.Consent != null &&
                 services.Ads.IsConfigured &&
-                services.Consent.Current.hasDecision && services.Consent.Current.adsAllowed &&
-                (!(services.Ads is IRewardedAdAvailability availability) || availability.RewardedAvailability(placement).succeeded) &&
+                (!requireConsent || (services.Consent.Current.hasDecision && services.Consent.Current.adsAllowed)) &&
+                (available.succeeded || (!requireConsent && available.status == ServiceStatus.ConsentRequired)) &&
                 !gs.SaveIsReadOnly && !gameplayAdShowing &&
                 (ticket == null || ticket.state == "settled" || ticket.state == "cancelled");
+        }
+
+        Task<bool> RequestRewardedConsent()
+        {
+            if (services.Consent.Current.hasDecision && services.Consent.Current.adsAllowed)
+                return Task.FromResult(true);
+            if (adConsentDecision != null) return adConsentDecision.Task;
+            adConsentDecision = new TaskCompletionSource<bool>();
+            var decision = adConsentDecision.Task;
+            adConsentDialog = UiKit.Div("fr-backdrop");
+            adConsentDialog.name = "rewarded-consent";
+            adConsentDialog.pickingMode = PickingMode.Position;
+            adConsentDialog.RegisterCallback<PointerDownEvent>(e =>
+            {
+                if (e.target == adConsentDialog) CompleteRewardedConsent(false);
+            });
+            var panel = new FrontierModal();
+            panel.Add(UiKit.Text(UiText.Get("reward.consent.title"), "fr-h2"));
+            panel.Add(UiKit.Text(UiText.Get("reward.consent.help"), "fr-muted"));
+            if (!string.IsNullOrEmpty(services.PrivacyPolicyUrl))
+                panel.Add(IconBtn(UiText.Get("privacy.policy"), "about", UiKit.Cyan,
+                    () => Application.OpenURL(services.PrivacyPolicyUrl)));
+            var allow = IconBtn(UiText.Get("reward.consent.allow"), "play", UiKit.Cyan,
+                () => CompleteRewardedConsent(true));
+            allow.name = "rewarded-consent-allow";
+            panel.Add(allow);
+            var cancel = IconBtn(UiText.Get("reward.consent.cancel"), "close", UiKit.Muted,
+                () => CompleteRewardedConsent(false));
+            cancel.name = "rewarded-consent-cancel";
+            panel.Add(cancel);
+            adConsentDialog.Add(panel);
+            overlayLayer.Add(adConsentDialog);
+            return decision;
+        }
+
+        void CompleteRewardedConsent(bool allow)
+        {
+            if (adConsentDecision == null) return;
+            var decision = adConsentDecision;
+            adConsentDecision = null;
+            adConsentDialog.RemoveFromHierarchy();
+            adConsentDialog = null;
+            if (allow)
+            {
+                var current = services.Consent.Current;
+                services.Consent.SavePreferences(current.analyticsAllowed, true, current.onlineServicesAllowed);
+            }
+            decision.TrySetResult(allow);
         }
 
         void BuildShardAdOffer(VisualElement body)
@@ -46,13 +98,6 @@ namespace Frontier
             if (!services.Consent.Current.hasDecision || !services.Consent.Current.adsAllowed)
             {
                 card.Add(Note(UiText.Get("shards.ad.consent"), UiKit.Muted));
-                card.Add(IconBtn(UiText.Get("shards.ad.settings"), "gear", UiKit.Cyan, () =>
-                {
-                    menuPage = "settings";
-                    RefreshModal();
-                }));
-                body.Add(card);
-                return;
             }
             if (gs.SaveIsReadOnly || (long)gs.ShardBalance + amount > int.MaxValue)
             {
@@ -62,7 +107,7 @@ namespace Frontier
             }
             ServiceResult available = services.Ads is IRewardedAdAvailability availability
                 ? availability.RewardedAvailability("free-shards") : ServiceResult.Success();
-            if (!available.succeeded)
+            if (!available.succeeded && available.status != ServiceStatus.ConsentRequired)
             {
                 card.Add(Note(available.text.Resolve(UiText.Get), UiKit.Amber));
                 body.Add(card);
@@ -72,6 +117,7 @@ namespace Frontier
             Button watch = null;
             watch = IconBtn(UiText.Get("shards.ad.watch", amount), "play", UiKit.Cyan, async () =>
             {
+                if (!await RequestRewardedConsent() || this == null) return;
                 if (!GameplayOfferAllowed(gameplayRewardRules.shardsEnabled, "free-shards") ||
                     (long)gs.ShardBalance + amount > int.MaxValue)
                 {
@@ -146,16 +192,17 @@ namespace Frontier
 
         void BuildConstructionOffer(VisualElement body, PlacedStructure job)
         {
-            if (gameplayRewardRules == null || !GameplayOfferAllowed(gameplayRewardRules.constructionEnabled, "timer-skip")) return;
+            if (gameplayRewardRules == null || !GameplayOfferAllowed(gameplayRewardRules.constructionEnabled, "timer-skip", false)) return;
             int seconds = Math.Min(gameplayRewardRules.constructionSeconds, gs.BuilderJobSecondsRemaining(job));
             if (seconds <= 0) return;
             Button watch = null;
             watch = IconBtn(UiText.Get("reward.construction", FormatJobDuration(seconds)), "play", UiKit.Cyan, async () =>
             {
+                if (!await RequestRewardedConsent() || this == null) return;
                 int current = Math.Min(gameplayRewardRules.constructionSeconds, gs.BuilderJobSecondsRemaining(job));
-                if (current != seconds || !GameplayOfferAllowed(gameplayRewardRules.constructionEnabled, "timer-skip"))
+                if (current <= 0 || !GameplayOfferAllowed(gameplayRewardRules.constructionEnabled, "timer-skip"))
                 { Toast(UiText.Get("reward.changed"), UiKit.Amber); RefreshModal(); return; }
-                if (!gs.PrepareGameplayReward("timer-skip", null, seconds, job, out var ticket, out var error))
+                if (!gs.PrepareGameplayReward("timer-skip", null, current, job, out var ticket, out var error))
                 { Toast(error, UiKit.Amber); return; }
                 UiKit.SetEnabledLook(watch, false);
                 var result = await ShowGameplayReward(ticket);

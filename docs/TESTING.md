@@ -136,7 +136,8 @@ passes, and the final capture did not reproduce the Analytics/Search exceptions 
 This does not certify Unity package internals or production SDK lifecycle.
 
 `player-shortage`, `player-project`, `player-return` and `player-reward-recovery` are isolated harness
-fixtures. Gameplay reward flags ship off; transient fake services/rules exercise offers without live ads.
+fixtures. Gameplay reward flags and the iOS provider are enabled; Editor/desktop still never request native ads.
+Transient fake services exercise offers, explicit consent acceptance/cancellation and no-fill without live ads.
 Approval, child-inclusive policy/legal/SDK/platform setup, approved telemetry schemas, real-device
 touch/accessibility/background/termination/ad tests and observed new-player journeys remain release
 gates, detailed with unactivated tuning proposals in [SYSTEMS.md](SYSTEMS.md).

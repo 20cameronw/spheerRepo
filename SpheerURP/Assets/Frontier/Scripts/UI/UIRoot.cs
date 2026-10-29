@@ -126,6 +126,7 @@ namespace Frontier
 
         void OnDestroy()
         {
+            CompleteRewardedConsent(false);
             PresentationQuality.Changed -= ApplyPanelBudget;
             NotificationPreferences.StatusChanged -= OnNotificationStatusChanged;
             if (gs != null) gs.Changed -= OnStateChanged;
@@ -389,6 +390,7 @@ namespace Frontier
 
         void CloseAll()
         {
+            CompleteRewardedConsent(false);
             CloseShortage();
             ClosePopup();
             CloseModal();
@@ -398,6 +400,7 @@ namespace Frontier
 
         public bool HandleBack()
         {
+            if (adConsentDialog != null) { CompleteRewardedConsent(false); return true; }
             if (skipShipMoment != null) { skipShipMoment(); return true; }
             if (activeGatherMinigame != null) return activeGatherMinigame.HandleBack();
             if (activeTravelMinigame is ITravelBackHandler travel) return travel.HandleBack();
@@ -515,9 +518,11 @@ namespace Frontier
             bool baseCommitted = false;
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield =
                 gameplayRewardRules != null && gs.stats.harvestRunsCompleted > 0 &&
-                GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield")
+                GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield", false)
                     ? (Func<Task<ServiceResult<RewardedAdResult>>>) (async () =>
                     {
+                        if (!await RequestRewardedConsent() || this == null)
+                            return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.not-earned"));
                         if (baseCommitted || !GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield"))
                             return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.changed"));
                         int quote = HarvestAmount(spot, bonus, previewResult);

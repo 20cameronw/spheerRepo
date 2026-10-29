@@ -15,7 +15,9 @@ Contents: 34 resources, 24 recipes, 31 structures, 6 tool ladders x 7 tiers, 16 
 
 ## 2. Decisions kept and changes against the plan
 
-Kept (ROADMAP section 0): no attacking other planets; shards buy time, convenience and cosmetics only; clutter is cleared Clash-of-Clans style (resources, short builder timer, about 5 % shard pods); timers only on build, upgrade and clear jobs; rewarded ads are opt-in; aliens come in waves the player calls by burning fuel into the Alarm Beacon.
+Kept (ROADMAP section 0): no attacking other planets; clutter is cleared Clash-of-Clans style (resources, short builder timer, about 5 % shard pods); timers only on build, upgrade and clear jobs; rewarded ads are opt-in; aliens come in waves the player calls by burning fuel into the Alarm Beacon.
+User-directed update: shards also buy already-unlocked structures without ingredients or a builder, ready immediately.
+Price is twice the full build timer's skip cost, with a 10-shard minimum. Progression and planet requirements remain.
 
 Changes and refinements (each one is a tuning key or a data row, so it can be reversed):
 
@@ -728,4 +730,3 @@ The complete list with ranges and descriptions is `TUNING_KEYS.md` (and `data\tu
 - **Score term balance.** Atlas via megaproject stages (about 40 % of a finished profile) and Worlds (about a third) dominate late; Defense is nearly empty in the simulation. The weights are data and the Rank screen shows the breakdown, so rebalance after the first leaderboard data.
 - **Obstacles and pads are not simulated** (the simulator ignores pad counts and clutter), so remote-base build-out is slightly optimistic; the rules keep clutter cheap (a few percent of a structure's cost) to bound the error.
 - **Universe generator coupling.** Resource availability uses the generator's tier formula and resource table; the Monte-Carlo test proves coverage within 576 ly for generator version 1. A generator change must rerun the coverage tests.
-

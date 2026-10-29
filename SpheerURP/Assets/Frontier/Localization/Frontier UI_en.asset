@@ -9322,9 +9322,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523969
-    m_Localized: Use shards to recruit an extra builder or finish active work. Shorten
-      an obstacle clearance from its world, or revive a failed Hyperspace run. Rewarded
-      videos are optional.
+    m_Localized: Buy unlocked structures instantly beside Place in Build, recruit
+      an extra builder or finish active work. Shorten an obstacle clearance from
+      its world, or revive a failed Hyperspace run. Rewarded videos are optional.
     m_Metadata:
       m_Items: []
   - m_Id: 4886970269523970
@@ -9420,6 +9420,47 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5040578512379907
     m_Localized: Neighboring systems
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134947065856
+    m_Localized: '{0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814592
+    m_Localized: Buy ready to use for {0} shards. No materials or builder needed.
+      Choose a pad to confirm.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814593
+    m_Localized: 'CHOOSE A PAD: SPEND {0} SHARDS'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814594
+    m_Localized: This structure cannot be purchased here. Check requirements and
+      choose a free pad.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814595
+    m_Localized: 'Structure purchased, but saving failed: {0}. Keep the game open
+      while saving retries.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814596
+    m_Localized: OPTIONAL REWARDED ADS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814597
+    m_Localized: Allow contextual rewarded ads on this device? The ad provider receives
+      connection and ad-delivery data. Ads are never automatic. You can turn this
+      off in Settings. Analytics and online services stay unchanged.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814598
+    m_Localized: ALLOW & WATCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814599
+    m_Localized: NOT NOW
     m_Metadata:
       m_Items: []
   references:

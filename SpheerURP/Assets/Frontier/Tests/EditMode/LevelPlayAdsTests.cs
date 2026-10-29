@@ -72,7 +72,7 @@ namespace Frontier.Tests
         {
             policy = ScriptableObject.CreateInstance<RewardedAdsPolicy>();
             policy.enableRewardedAds = true;
-            policy.iosSetupVerified = true;
+            policy.enableIosGameplayAds = true;
             policy.iosAppKey = "app";
             policy.iosRewardedAdUnitId = "unit";
             policy.placements = new[] { new RewardedAdPlacement { id = "double-yield", dailyCap = 2 } };
@@ -94,10 +94,10 @@ namespace Frontier.Tests
         [Test]
         public async Task GatesPreventSdkRequests()
         {
-            policy.iosSetupVerified = false;
+            policy.enableIosGameplayAds = false;
             Assert.IsFalse(provider.IsConfigured);
             Assert.AreEqual(ServiceStatus.NotConfigured, (await provider.InitializeAsync()).status);
-            policy.iosSetupVerified = true;
+            policy.enableIosGameplayAds = true;
             config.privacyPolicyUrl = "";
             Assert.IsFalse(provider.IsConfigured);
             config.privacyPolicyUrl = "https://example.com/privacy";
@@ -114,7 +114,7 @@ namespace Frontier.Tests
         [Test]
         public async Task DevelopmentTestGateNeverEnablesProductionOrUnsupportedPlatforms()
         {
-            policy.iosSetupVerified = false;
+            policy.enableIosGameplayAds = false;
             policy.enableIosDevelopmentTests = true;
             Assert.IsTrue(policy.CanTestIos(config, RuntimePlatform.IPhonePlayer, true));
             Assert.IsFalse(policy.CanUseIos(config));

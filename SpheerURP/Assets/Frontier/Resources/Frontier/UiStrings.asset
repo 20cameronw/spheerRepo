@@ -70,9 +70,9 @@ MonoBehaviour:
   - key: shards.balance
     text: 'AVAILABLE: {0}'
   - key: shards.uses-help
-    text: Use shards to recruit an extra builder or finish active work. Shorten an
-      obstacle clearance from its world, or revive a failed Hyperspace run. Rewarded
-      videos are optional.
+    text: Buy unlocked structures instantly beside Place in Build, recruit an extra
+      builder or finish active work. Shorten an obstacle clearance from its world,
+      or revive a failed Hyperspace run. Rewarded videos are optional.
   - key: shards.ad.title
     text: OPTIONAL REWARDED VIDEO
   - key: shards.ad.help
@@ -972,6 +972,29 @@ MonoBehaviour:
     text: Nothing to harvest on this planet
   - key: shop.place
     text: PLACE
+  - key: shop.shards.price
+    text: '{0}'
+  - key: shop.shards.help
+    text: Buy ready to use for {0} shards. No materials or builder needed. Choose
+      a pad to confirm.
+  - key: shop.shards.pad-help
+    text: 'CHOOSE A PAD: SPEND {0} SHARDS'
+  - key: shop.shards.unavailable
+    text: This structure cannot be purchased here. Check requirements and choose
+      a free pad.
+  - key: shop.shards.pending-save
+    text: 'Structure purchased, but saving failed: {0}. Keep the game open while
+      saving retries.'
+  - key: reward.consent.title
+    text: OPTIONAL REWARDED ADS
+  - key: reward.consent.help
+    text: Allow contextual rewarded ads on this device? The ad provider receives
+      connection and ad-delivery data. Ads are never automatic. You can turn this
+      off in Settings. Analytics and online services stay unchanged.
+  - key: reward.consent.allow
+    text: ALLOW & WATCH
+  - key: reward.consent.cancel
+    text: NOT NOW
   - key: tutorial.build.title
     text: 1. Build
   - key: tutorial.build.body

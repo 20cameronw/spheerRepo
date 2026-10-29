@@ -80,6 +80,7 @@ namespace Frontier
         }
         public void DebugShip(int tab) { DebugReset(); OpenShip((ShipPage)Mathf.Clamp(tab, 0, 2)); }
         public void DebugBuilders() { DebugReset(); OpenBuilders(); }
+        public void DebugRewardedConsent() { DebugReset(); _ = RequestRewardedConsent(); }
         public void DebugNetwork() { DebugReset(); OpenNetwork(); }
         public void DebugFuelTanks() { DebugReset(); OpenFuelTanks(); }
         public void DebugNetworkFinale() { DebugReset(); PlayNetworkFinale(); }
@@ -161,6 +162,7 @@ namespace Frontier
         }
 
         public void DebugBuild(StructureSO def) { DebugReset(); EnterBuild(def); }
+        public void DebugTapBuildSlot(int slot) { OnSlotTapped(slot, planetView.transform); }
 
         public void DebugToast(string text, Color color) { Toast(text, color); }
 

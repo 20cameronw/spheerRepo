@@ -9067,6 +9067,42 @@ MonoBehaviour:
     m_Key: map.view.neighbors
     m_Metadata:
       m_Items: []
+  - m_Id: 5049134947065856
+    m_Key: shop.shards.price
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814592
+    m_Key: shop.shards.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814593
+    m_Key: shop.shards.pad-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814594
+    m_Key: shop.shards.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814595
+    m_Key: shop.shards.pending-save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814596
+    m_Key: reward.consent.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814597
+    m_Key: reward.consent.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814598
+    m_Key: reward.consent.allow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814599
+    m_Key: reward.consent.cancel
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

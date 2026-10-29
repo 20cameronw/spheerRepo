@@ -86,8 +86,9 @@ player consent or OS permission.
   This is local notification functionality, not a push service or server-authoritative timer system.
 - Rewarded ads use the LevelPlay 9.3.2 package, native LevelPlay 9.3.0 and Unity Ads adapter 5.4.0.0.
   iOS identifiers are configured in `RewardedAdsPolicy`; Android is not configured. Real ad requests
-  remain disabled until `iosSetupVerified` is explicitly enabled after the release steps below and a
-  valid public HTTPS `FrontierUnityServicesConfig.privacyPolicyUrl` exists. Editor/desktop never
+  are enabled at the developer's direction through `enableIosGameplayAds`, with a valid public HTTPS
+  `FrontierUnityServicesConfig.privacyPolicyUrl`. The renamed flag preserves serialized configuration from
+  `iosSetupVerified` but does not claim that physical-device or legal review has passed. Editor/desktop never
   initialize the live provider. The service persists per-placement counts/cooldowns in device preferences
   (not the progression save), rejects invalid stored usage and observed clock rewind, and does not deliver
   a provider reward until its usage write succeeds. Withdrawal during playback discards the pending reward,
@@ -103,9 +104,11 @@ player consent or OS permission.
   Device UTC and preferences are not server authority or cross-device anti-cheat; forward clock changes
   and cleared preferences are outside this local protection. The Shards offer explains why it is
   unavailable and hides the watch action while the provider is unavailable. Authored daily caps/cooldowns
-  are double-yield 8/180s, emergency-fuel 3/600s,
-  timer-skip 5/300s, revive 3/0s, daily-supply 1/0s and free-shards 2/14400s.
-  Harvest double-yield and the optional Shards-page free-shards placement have gameplay reward wiring.
+  are double-yield unlimited/180s, emergency-fuel 3/600s,
+  timer-skip unlimited/300s, revive 3/0s, daily-supply 1/0s and free-shards 2/14400s.
+  Harvest double-yield, construction (up to 300 seconds) and Shards-page free-shards have gameplay reward wiring.
+  Optional watch buttons can open an explicit advertising-only consent prompt. Dismissing it requests no ad,
+  grants no reward and does not change analytics or online-service preferences.
   Shards are granted only after provider-confirmed completion and the durable reward journal succeeds.
   Other placements, including missing-resource assistance, remain unexposed. Positive policy caps alone
   do not implement gameplay rewards.
@@ -125,7 +128,7 @@ player consent or OS permission.
   This path sets child-directed treatment, device-ID opt-out, no personalized consent and do-not-sell.
   Native initialization still requires the local ad opt-in and policy URL. No automatic ad request
   or reward grant is made by opening the diagnostic action. It does not verify the production setup
-  or enable other online services; `iosSetupVerified` remains false.
+  or enable other online services. Gameplay and test-suite activation remain separate switches.
 
 - The bundle ID is `com.GameDevBois.spheer`. Keep App Keys/ad unit IDs in Frontier's policy asset,
   not LevelPlay's auto-initialize settings: initialization must remain behind Frontier consent.
@@ -137,7 +140,8 @@ player consent or OS permission.
   requesting ads. Setting an App Key does not enable test ads. Verify loading, full completion, early close,
   offline/no fill, consent withdrawal and return-from-background on the iPhone.
 - Publish the real HTTPS privacy policy and complete audience/region-specific consent review before
-  changing `iosSetupVerified`. This adapter deliberately sends GDPR consent false, do-not-sell true and
+  public distribution. Enabling the provider is not evidence that these reviews passed.
+  This adapter deliberately sends GDPR consent false, do-not-sell true and
   device-ID opt-out true before initialization; an ad opt-in is not tracking consent. No ATT request or
   personalized tracking is enabled. Any move to personalized ads needs appropriate CMP/ATT handling first.
 - Set the LevelPlay rewarded unit's default reward to `Reward` / `1`, with dashboard pacing/capping off.

@@ -45,14 +45,14 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void GameplayFlagsShipDisabledAndWithoutUnapprovedTimerTuning()
+        public void GameplayAdsAreEnabledWithBoundedTimerReduction()
         {
             var rules = Resources.Load<GameplayRewardRules>("Frontier/GameplayRewardRules");
             Assert.IsNotNull(rules);
-            Assert.IsFalse(rules.harvestEnabled);
-            Assert.IsFalse(rules.constructionEnabled);
+            Assert.IsTrue(rules.harvestEnabled);
+            Assert.IsTrue(rules.constructionEnabled);
             Assert.IsTrue(rules.shardsEnabled);
-            Assert.AreEqual(0, rules.constructionSeconds);
+            Assert.AreEqual(300, rules.constructionSeconds);
         }
 
         [TestCase(true)]

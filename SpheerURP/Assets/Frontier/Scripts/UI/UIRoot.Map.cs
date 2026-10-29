@@ -28,6 +28,9 @@ namespace Frontier
         float lastPinch, mapQueryAt;
         int mapVersion, queryVersion, previewVersion, runningPreviewVersion;
         MapSnapshot mapSnapshot;
+        MapQueryBounds mapQueryBounds;
+        double mapQueryScale;
+        bool mapQueryBoundsKnown;
         MapNameIndex mapNameIndex;
         string mapNextStopPlanetId;
         Task<MapSnapshot> mapQuery;
@@ -140,6 +143,7 @@ namespace Frontier
             if (mapView != null) mapView.RemoveFromHierarchy();
             mapView = null; mapWorld = null; mapCard = null; mapTools = null;
             mapOpen = false; lastPinch = 0f; mapSnapshot = null;
+            mapQueryBoundsKnown = false;
             mapNameIndex = null;
             mapViewMode = null;
             mapFilter = null;
@@ -196,8 +200,12 @@ namespace Frontier
             viewport.ZoomAt(w * 0.5, h * 0.5, mapZoom / viewport.Scale);
             if (previousScale != viewport.Scale) mapOrbitRadii.Clear();
             ClampMapCenter();
-            mapVersion++;
-            mapQueryAt = Time.unscaledTime + 0.12f;
+            if ((!mapQueryBoundsKnown || mapQueryScale != viewport.Scale || !mapQueryBounds.Covers(viewport)) &&
+                queryVersion == mapVersion)
+            {
+                mapVersion++;
+                mapQueryAt = Time.unscaledTime + 0.04f;
+            }
             if (mapViewMode != null)
                 mapViewMode.text = UiText.Get(SystemMapView ? "map.mode.neighbors" :
                     NeighborMapView ? "map.mode.overview" : "map.mode.orbits");

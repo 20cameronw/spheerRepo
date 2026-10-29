@@ -83,7 +83,12 @@ missing, otherwise the Tech page. No XP, cost or prerequisite gates are bypassed
 Locked/in-progress producers retain their real upgrade/research/job status; guidance never spends,
 teleports or starts a job. One explicitly tracked project provides live requirements and a resume action.
 The return summary links completed jobs and stored offline output to their real location, not ship cargo.
-Reward offers use explicit ad labels and exact bonuses beside the normal action; gameplay flags ship off.
+Reward offers use explicit ad labels and exact bonuses beside the normal action. iOS gameplay ads are enabled;
+watching remains player-initiated, with a contextual advertising-only consent prompt before the first request.
+Available Place buttons share one row with a compact crystal/price action. That action buys an unlocked
+structure instantly without materials or a builder, at twice its timer-skip price (minimum 10 shards).
+The pad-selection banner repeats the price; choosing a pad confirms the spend, while cancellation is free.
+Map sampling includes an offscreen preload margin and refills before that margin reaches the viewport.
 The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
 Online ranks are available to all ages after explicit online opt-in, without name or birthday entry.

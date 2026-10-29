@@ -555,6 +555,30 @@ namespace Frontier
                 gs.Notify();
             }
             yield return new Shot("menu", () => ui.DebugMenu(""));
+            yield return new Shot("rewarded-consent", () => ui.DebugRewardedConsent());
+            SaveV2 shardShopBaseline = null;
+            try
+            {
+                yield return new Shot("shop-shard-purchase", () =>
+                {
+                    if (!gs.TryCreateCloudSaveSnapshot(out shardShopBaseline, out var error))
+                        throw new InvalidOperationException(error);
+                    var candidate = JsonUtility.FromJson<SaveV2>(JsonUtility.ToJson(shardShopBaseline)).Normalize();
+                    foreach (var world in candidate.worlds)
+                        if (world.planetId == gs.planet.Id) world.structures.Clear();
+                    candidate.wallet.Clear();
+                    candidate.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+                    if (!gs.TryRestoreCloudSave(candidate, out error)) throw new InvalidOperationException(error);
+                    ui.DebugShop(0);
+                    if (ui.DebugRoot.Q("shop-shards-refinery") == null)
+                        throw new InvalidOperationException("The shard purchase action was not rendered.");
+                });
+            }
+            finally
+            {
+                if (shardShopBaseline != null && !gs.TryRestoreCloudSave(shardShopBaseline, out var error))
+                    throw new InvalidOperationException(error);
+            }
             foreach (var page in new[] { "ranks", "leaderboard", "shards", "goals", "ascension", "tutorial", "about", "settings", "debug" })
             {
                 string pg = page;

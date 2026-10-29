@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cac0ed3f3ad10b4d8fc010424b2e0f0, type: 3}
   m_Name: GameplayRewardRules
   m_EditorClassIdentifier:
-  harvestEnabled: 0
-  constructionEnabled: 0
+  harvestEnabled: 1
+  constructionEnabled: 1
   shardsEnabled: 1
-  constructionSeconds: 0
+  constructionSeconds: 300

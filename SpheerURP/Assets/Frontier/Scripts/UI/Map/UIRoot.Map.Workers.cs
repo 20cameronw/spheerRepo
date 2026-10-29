@@ -40,12 +40,16 @@ namespace Frontier
             if (mapQuery == null && queryVersion != mapVersion && Time.unscaledTime >= mapQueryAt && viewport.Width > 0 && viewport.Height > 0)
             {
                 queryVersion = mapVersion;
-                MapPoint a = viewport.Unproject(0, viewport.Height), b = viewport.Unproject(viewport.Width, 0);
+                mapQueryBounds = new MapQueryBounds(viewport);
+                mapQueryScale = viewport.Scale;
+                mapQueryBoundsKnown = true;
+                MapPoint a = mapQueryBounds.min, b = mapQueryBounds.max;
                 var universe = gs.universe.Universe;
                 var points = SurveyPoints();
                 var discovered = KnownMapSystems();
                 string resource = mapResource == ProjectMapFilter ? "" : mapResource;
-                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, discovered));
+                double visibleSpan = System.Math.Max(viewport.Width, viewport.Height) / viewport.Scale;
+                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, discovered, visibleSpan));
             }
             if (mapPreviewTask != null && mapPreviewTask.IsCompleted)
             {

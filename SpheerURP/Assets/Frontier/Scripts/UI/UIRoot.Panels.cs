@@ -184,10 +184,25 @@ namespace Frontier
                     if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
                     bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
                     var place = IconBtn(UiText.Get("shop.place"), "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
-                    UiKit.SetEnabledLook(place, can);
+                    place.name = "shop-place-" + def.id;
+                    UiKit.SetEnabledLook(place, can && !gs.SaveIsReadOnly && gs.FreePads(gs.planet) > 0);
+                    var actions = UiKit.Div("fr-row");
+                    place.style.flexGrow = 1;
+                    place.style.flexBasis = 0;
+                    actions.Add(place);
+                    int shardCost = gs.StructureShardCost(def);
+                    var buy = IconBtn(UiText.Get("shop.shards.price", shardCost), "crystal", UiKit.Magenta,
+                        () => { CloseModal(); EnterBuild(def, shardCost); });
+                    buy.name = "shop-shards-" + def.id;
+                    buy.tooltip = UiText.Get("shop.shards.help", shardCost);
+                    buy.style.marginLeft = UiKit.Space.S8;
+                    buy.style.flexShrink = 0;
+                    UiKit.SetEnabledLook(buy, !gs.SaveIsReadOnly && shardCost >= 0 &&
+                        gs.ShardBalance >= shardCost && gs.FreePads(gs.planet) > 0);
+                    actions.Add(buy);
                     if (can && IsFirstSessionBuildTarget(def.kind))
                         AddFirstSessionCue(card, CurrentFirstSessionGuideStep);
-                    card.Add(place);
+                    card.Add(actions);
                 }
                 body.Add(card);
             }
