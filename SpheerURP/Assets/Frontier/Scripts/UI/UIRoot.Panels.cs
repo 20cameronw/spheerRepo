@@ -184,33 +184,31 @@ namespace Frontier
                 else if (gs.AtLimit(gs.planet, def)) card.Add(Note(UiText.Get("shop.built"), UiKit.Lime));
                 else if (gs.BuildLockReason(def) != null) card.Add(Note(gs.BuildLockReason(def), UiKit.Amber));
                 else if (!gs.CanBuildHere(def)) card.Add(Note(UiText.Get("shop.no-harvest"), UiKit.Amber));
-                else
-                {
-                    card.Add(ProjectCosts(def.buildCost, Project("build", def.id)));
-                    bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
-                    if (!crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
-                    bool can = gs.HasPlanetResources(def.buildCost) && crewAvailable;
-                    var place = IconBtn(UiText.Get("shop.place"), "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
-                    place.name = "shop-place-" + def.id;
-                    UiKit.SetEnabledLook(place, can && !gs.SaveIsReadOnly && gs.FreePads(gs.planet) > 0);
-                    var actions = UiKit.Div("fr-row");
-                    place.style.flexGrow = 1;
-                    place.style.flexBasis = 0;
-                    actions.Add(place);
-                    int shardCost = gs.StructureShardCost(def);
-                    var buy = IconBtn(UiText.Get("shop.shards.price", shardCost), "crystal", UiKit.Magenta,
-                        () => { CloseModal(); EnterBuild(def, shardCost); });
-                    buy.name = "shop-shards-" + def.id;
-                    buy.tooltip = UiText.Get("shop.shards.help", shardCost);
-                    buy.style.marginLeft = UiKit.Space.S8;
-                    buy.style.flexShrink = 0;
-                    UiKit.SetEnabledLook(buy, !gs.SaveIsReadOnly && shardCost >= 0 &&
-                        gs.ShardBalance >= shardCost && gs.FreePads(gs.planet) > 0);
-                    actions.Add(buy);
-                    if (can && IsFirstSessionBuildTarget(def.kind))
-                        AddFirstSessionCue(card, CurrentFirstSessionGuideStep);
-                    card.Add(actions);
-                }
+                card.Add(ProjectCosts(def.buildCost, Project("build", def.id)));
+                bool crewAvailable = gs.StructureJobSeconds(def, 1) <= 0 || gs.AvailableBuilderCount > 0;
+                bool available = activeJob == null && !gs.AtLimit(gs.planet, def) && gs.CanBuildHere(def) &&
+                    !gs.SaveIsReadOnly && gs.FreePads(gs.planet) > 0;
+                if (available && !crewAvailable) card.Add(Note(gs.BuilderAvailabilityReason(), UiKit.Amber));
+                bool can = available && gs.HasPlanetResources(def.buildCost) && crewAvailable;
+                var place = IconBtn(UiText.Get("shop.place"), "build", UiKit.Lime, () => { CloseModal(); EnterBuild(def); });
+                place.name = "shop-place-" + def.id;
+                UiKit.SetEnabledLook(place, can);
+                var actions = UiKit.Div("fr-row");
+                place.style.flexGrow = 1;
+                place.style.flexBasis = 0;
+                actions.Add(place);
+                int shardCost = gs.StructureShardCost(def);
+                var buy = IconBtn(UiText.Get("shop.shards.price", shardCost), "crystal", UiKit.Magenta,
+                    () => { CloseModal(); EnterBuild(def, shardCost); });
+                buy.name = "shop-shards-" + def.id;
+                buy.tooltip = UiText.Get("shop.shards.help", shardCost);
+                buy.style.marginLeft = UiKit.Space.S8;
+                buy.style.flexShrink = 0;
+                UiKit.SetEnabledLook(buy, available && shardCost >= 0 && gs.ShardBalance >= shardCost);
+                actions.Add(buy);
+                if (can && IsFirstSessionBuildTarget(def.kind))
+                    AddFirstSessionCue(card, CurrentFirstSessionGuideStep);
+                card.Add(actions);
                 count.name = "shop-count-" + def.id;
                 count.style.alignSelf = Align.FlexEnd;
                 count.style.marginTop = UiKit.Space.S8;

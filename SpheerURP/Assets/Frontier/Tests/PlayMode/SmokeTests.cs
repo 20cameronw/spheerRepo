@@ -285,9 +285,10 @@ namespace Frontier.Tests
             Assert.AreEqual(1, costs.Query<Button>().ToList().Count);
             Assert.AreSame(find, find.panel.Pick(find.Q<Label>().worldBound.center),
                 "Tapping the balance must hit the same button as the resource icon.");
-            Assert.AreEqual(UiKit.Size.Touch, find.resolvedStyle.minHeight.value);
-            Assert.That(find.resolvedStyle.height, Is.EqualTo(UiKit.Size.Touch).Within(1f / rt.Ui.DebugPanelScale),
-                "Touch targets may round by at most one rendered pixel at the current panel scale.");
+            Assert.AreEqual(0f, find.resolvedStyle.minHeight.value);
+            float compactHeight = find.resolvedStyle.height;
+            Assert.Greater(compactHeight, 0f);
+            Assert.Less(compactHeight, UiKit.Size.Touch, "Costs retain their tighter chip size.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = find; find.SendEvent(submit); }
             Assert.IsTrue(found, "native keyboard activation must still find the resource");
             costs.RemoveFromHierarchy();
@@ -300,7 +301,7 @@ namespace Frontier.Tests
             affordable.style.top = 300;
             rt.Ui.DebugRoot.Add(affordable);
             yield return null;
-            Assert.That(affordable[0].resolvedStyle.height, Is.EqualTo(UiKit.Size.Touch).Within(1f / rt.Ui.DebugPanelScale),
+            Assert.That(affordable[0].resolvedStyle.height, Is.EqualTo(compactHeight).Within(1f / rt.Ui.DebugPanelScale),
                 "Owned and missing resource chips must use the same height.");
             affordable.RemoveFromHierarchy();
             rt.Ui.DebugWorldZoom(1f);
@@ -1749,6 +1750,28 @@ namespace Frontier.Tests
             rt.Planet.Zoom01 = 0f;
             yield return new WaitForSecondsRealtime(0.7f);
             Vector3 orbit = rt.Camera.transform.position;
+            var wheelTarget = rt.Ui.DebugRoot.Q("world-zoom-input");
+            Assert.IsNotNull(wheelTarget);
+            Assert.AreSame(wheelTarget, rt.Ui.DebugRoot.panel.Pick(rt.Ui.DebugRoot.worldBound.center),
+                "The world background must receive real pointer wheel events, not only direct debug calls.");
+            void Wheel(float delta, VisualElement target)
+            {
+                using (var evt = WheelEvent.GetPooled(new Event { type = EventType.ScrollWheel, delta = new Vector2(0, delta) }))
+                { evt.target = target; target.SendEvent(evt); }
+            }
+            Wheel(-3f, wheelTarget);
+            Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f, "Scroll up zooms toward the surface.");
+            Wheel(3f, wheelTarget);
+            Assert.AreEqual(0f, rt.Planet.Zoom01, 0.001f, "Scroll down zooms toward orbit.");
+            Wheel(3f, wheelTarget);
+            Assert.IsFalse(rt.Ui.DebugMapOpen);
+            Wheel(3f, wheelTarget);
+            Assert.IsTrue(rt.Ui.DebugMapMinimal, "Continuing to scroll out opens the same minimal map as touch.");
+            yield return new WaitForSecondsRealtime(0.8f);
+            Wheel(-3f, rt.Ui.DebugRoot.Q("map-viewport"));
+            yield return new WaitForSecondsRealtime(1.4f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Scroll up at the closest minimal map level returns to the world.");
+            rt.Ui.DebugReset();
             rt.Ui.DebugWorldZoom(4f);
             Assert.AreEqual(1f, rt.Planet.Zoom01, "The old surface endpoint is the closest boundary.");
             rt.Ui.DebugWorldZoom(-1f);
@@ -1794,6 +1817,8 @@ namespace Frontier.Tests
             Assert.AreEqual(0f, rt.Planet.MapZoomBlend);
             Assert.AreEqual(orbit, rt.Camera.transform.position);
             rt.Ui.DebugShop(0);
+            Wheel(30f, wheelTarget);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Shop scrolling must not trigger the wheel-to-map transition.");
             rt.Ui.DebugWorldZoom(-1f);
             Assert.IsFalse(rt.Ui.DebugMapOpen, "Scrolling a shop cannot trigger world zoom.");
             rt.Ui.DebugReset();
@@ -2936,6 +2961,17 @@ namespace Frontier.Tests
                     Assert.AreEqual(card[card.childCount - 1], count, "Build count is the bottom-right item.");
                     Assert.AreEqual(Align.FlexEnd, count.resolvedStyle.alignSelf);
                     Assert.Less(track.worldBound.yMin, count.worldBound.yMin);
+                    var place = card.Q<Button>("shop-place-" + id);
+                    var shardBuy = card.Q<Button>("shop-shards-" + id);
+                    Assert.IsNotNull(place, "All Build cards expose their normal purchase action.");
+                    Assert.IsNotNull(shardBuy, "All Build cards expose their shard purchase action.");
+                    Assert.AreSame(place.parent, shardBuy.parent, "Both purchase options stay on the same row.");
+                    var definition = rt.Db.FindStructure(id);
+                    if (rt.State.AtLimit(rt.State.planet, definition) || !rt.State.CanBuildHere(definition))
+                    {
+                        Assert.IsFalse(place.enabledInHierarchy, "Visible actions cannot bypass a build gate.");
+                        Assert.IsFalse(shardBuy.enabledInHierarchy, "Shards cannot bypass a build gate.");
+                    }
                     buildWidth = image.resolvedStyle.width;
                 }
             }
@@ -3424,6 +3460,8 @@ namespace Frontier.Tests
             for (int i = 0; i < 3; i++) yield return null;
             Assert.AreEqual(owned[0].resolvedStyle.height, missing[0].resolvedStyle.height, 0.1f,
                 "Missing-resource buttons and owned-resource chips keep the same height.");
+            Assert.Less(missing[0].resolvedStyle.height, UiKit.Size.Touch,
+                "Costs use the tighter chip height, not a full-size action button.");
             container.RemoveFromHierarchy();
         }
 

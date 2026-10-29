@@ -58,7 +58,8 @@ namespace Frontier
         {
             if (root == null || root.panel == null) return false;
             var p = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screenPos.x, ScreenMetrics.Height - screenPos.y));
-            return root.panel.Pick(p) != null;
+            var picked = root.panel.Pick(p);
+            return picked != null && picked.name != "world-zoom-input";
         }
 
         public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd, WorldSurface ws, Camera camera, FrontierServices serviceSet)
@@ -78,6 +79,11 @@ namespace Frontier
             root.pickingMode = PickingMode.Ignore;
             root.AddToClassList("fr-root");
             UiKit.ApplyStyles(root);
+            var worldZoomInput = Layer();
+            worldZoomInput.name = "world-zoom-input";
+            worldZoomInput.pickingMode = PickingMode.Position;
+            worldZoomInput.RegisterCallback<WheelEvent>(OnWorldWheel);
+            root.Add(worldZoomInput);
 
             // Full-screen dim under the HUD: modals keep the top bar and dock live while the world behind them is dimmed evenly.
             scrimLayer = Layer();

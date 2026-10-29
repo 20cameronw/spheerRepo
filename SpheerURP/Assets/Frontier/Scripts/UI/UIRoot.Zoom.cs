@@ -34,15 +34,18 @@ namespace Frontier
             else
             {
                 worldPinchDistance = 0f; worldPinchAccepted = false;
-                float wheel = Input.mouseScrollDelta.y;
-                if (wheel != 0f && !IsOverUi(Input.mousePosition))
-                {
-                    if (Time.unscaledTime - lastWorldWheelAt > 0.35f) worldOverzoom = 0f;
-                    lastWorldWheelAt = Time.unscaledTime;
-                    ApplyWorldZoom(wheel * 0.12f);
-                }
-                else if (Time.unscaledTime - lastWorldWheelAt > 0.35f) worldOverzoom = 0f;
+                if (Time.unscaledTime - lastWorldWheelAt > 0.35f) worldOverzoom = 0f;
             }
+        }
+
+        void OnWorldWheel(WheelEvent evt)
+        {
+            if (!CanZoomWorld || evt.delta.y == 0f) return;
+            if (Time.unscaledTime - lastWorldWheelAt > 0.35f) worldOverzoom = 0f;
+            lastWorldWheelAt = Time.unscaledTime;
+            // UI Toolkit reports three delta units per wheel detent, opposite to legacy mouseScrollDelta.
+            ApplyWorldZoom(-evt.delta.y * 0.04f);
+            evt.StopPropagation();
         }
 
         void ApplyWorldZoom(float delta)
