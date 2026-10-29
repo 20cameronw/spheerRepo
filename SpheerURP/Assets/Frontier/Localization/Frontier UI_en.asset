@@ -2708,16 +2708,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530393
-    m_Localized: Anyone can rank. Enabling online ranks connects to Unity using an
-      anonymous player ID and posts your Frontier Score. No public name, email or
-      birthday is needed. Unity also receives connection data such as your IP address.
-      You can turn online services off in Privacy Settings.
+    m_Localized: Online rankings are optional. Enabling them connects through an
+      anonymous player ID; opening the leaderboard uploads your Frontier Score. No
+      public name, email or birthday is needed. Unity receives connection data such
+      as your IP address. You can turn online services off in Privacy Settings.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530394
-    m_Localized: Post your current Frontier Score and load the top 20. Your own rank
-      is shown even outside the top 20. All players use anonymous pilot labels. These
-      are casual, client-reported scores, not cheat-proof competitive rankings.
+    m_Localized: Opening this page uploads your current Frontier Score and loads
+      the top 20 automatically. Your own rank is shown even outside the top 20. Pilot
+      labels are anonymous; scores are casual client-reported rankings.
     m_Metadata:
       m_Items: []
   - m_Id: 1995530395
@@ -2733,7 +2733,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1995530398
-    m_Localized: POST SCORE & LOAD RANKS
+    m_Localized: LEADERBOARD UPDATES WHEN OPENED
     m_Metadata:
       m_Items: []
   - m_Id: 1995530399
@@ -9311,6 +9311,91 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 4810459235573761
     m_Localized: Outside scanner coverage. Explore closer or extend your scanners.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970231775232
+    m_Localized: NOVA SHARDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523968
+    m_Localized: 'AVAILABLE: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523969
+    m_Localized: Use shards to recruit an extra builder or finish active work. Shorten
+      an obstacle clearance from its world, or revive a failed Hyperspace run. Rewarded
+      videos are optional.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523970
+    m_Localized: OPTIONAL REWARDED VIDEO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523971
+    m_Localized: Tap only if you want to watch a video for {0} shards. Videos never
+      start automatically.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523972
+    m_Localized: Rewarded videos are unavailable in this build until iOS audience
+      and privacy review and a physical test-device check are complete.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523973
+    m_Localized: Optional videos require your advertising choice in Privacy Settings.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523974
+    m_Localized: REVIEW AD SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523975
+    m_Localized: This save is read-only, so shards cannot be granted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523976
+    m_Localized: Your shard wallet is full. Spend shards before claiming another
+      reward.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523977
+    m_Localized: 'WATCH VIDEO: +{0} SHARDS'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523978
+    m_Localized: Opening rewarded video...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523979
+    m_Localized: Received {0} shards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523980
+    m_Localized: RECORDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523981
+    m_Localized: LEADERBOARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523982
+    m_Localized: NOVA SHARDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718272
+    m_Localized: TOP PILOTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718273
+    m_Localized: '#{0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718274
+    m_Localized: TOP 20
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718275
+    m_Localized: RETRY LEADERBOARD
     m_Metadata:
       m_Items: []
   references:

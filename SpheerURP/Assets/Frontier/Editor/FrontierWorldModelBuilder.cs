@@ -18,10 +18,9 @@ namespace Frontier.EditorTools
         const string LibraryPath = "Assets/Frontier/Resources/Frontier/ModelLibrary.asset";
         const string ObstacleDir = "Assets/Frontier/Data/Economy/Obstacles";
 
-        static readonly string[] PlanetIds =
+        static readonly string[] ProceduralPlanetIds =
         {
-            "sylva", "ferrum", "glacia", "cinder", "arbor", "nyx", "aurum", "tide", "zephyr",
-            "pyre", "halcyon", "mire", "obsidian", "vesper", "prism", "kaos", "tundra", "coral"
+            "arbor", "mire", "kaos"
         };
 
         sealed class Geometry
@@ -96,6 +95,46 @@ namespace Frontier.EditorTools
                 }
             }
 
+            public void MushroomCap(Vector3 baseCenter, float radius, float height, int sides, int material)
+            {
+                var outer = new Vector3[sides];
+                var middle = new Vector3[sides];
+                var crown = new Vector3[sides];
+                for (int i = 0; i < sides; i++)
+                {
+                    float angle = i * Mathf.PI * 2f / sides;
+                    Vector3 radial = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+                    outer[i] = baseCenter + radial * radius;
+                    middle[i] = baseCenter + Vector3.up * (height * 0.42f) + radial * (radius * 0.68f);
+                    crown[i] = baseCenter + Vector3.up * (height * 0.78f) + radial * (radius * 0.28f);
+                    int next = (i + 1) % sides;
+                    Vector3 outward = radial + Vector3.up * 0.3f;
+                    Tri(baseCenter, outer[next], outer[i], material, Vector3.down);
+                    Tri(outer[i], outer[next], middle[next], material, outward);
+                    Tri(outer[i], middle[next], middle[i], material, outward);
+                    Tri(middle[i], middle[next], crown[next], material, outward + Vector3.up);
+                    Tri(middle[i], crown[next], crown[i], material, outward + Vector3.up);
+                    Tri(baseCenter + Vector3.up * height, crown[i], crown[next], material, Vector3.up);
+                }
+            }
+
+            public void Octahedron(Vector3 center, Vector3 size, int material)
+            {
+                Vector3 top = center + Vector3.up * size.y * 0.5f;
+                Vector3 bottom = center + Vector3.down * size.y * 0.5f;
+                Vector3 left = center + Vector3.left * size.x * 0.5f;
+                Vector3 right = center + Vector3.right * size.x * 0.5f;
+                Vector3 front = center + Vector3.forward * size.z * 0.5f;
+                Vector3 back = center + Vector3.back * size.z * 0.5f;
+                Face(top, front, right); Face(top, right, back); Face(top, back, left); Face(top, left, front);
+                Face(bottom, right, front); Face(bottom, back, right); Face(bottom, left, back); Face(bottom, front, left);
+
+                void Face(Vector3 a, Vector3 b, Vector3 c)
+                {
+                    Tri(a, b, c, material, (a + b + c) / 3f - center);
+                }
+            }
+
             public Mesh ToMesh(string name)
             {
                 var mesh = new Mesh { name = name };
@@ -130,12 +169,49 @@ namespace Frontier.EditorTools
                 SaveMaterial("World_DebrisMetal", new Color32(128, 141, 150, 255), 0.22f),
                 SaveMaterial("World_DebrisAccent", new Color32(193, 77, 26, 255), 0.14f)
             };
+            Material[] fungalMaterials =
+            {
+                SaveMaterial("World_FungalStem", new Color32(94, 78, 111, 255), 0.03f),
+                SaveMaterial("World_FungalCap", new Color32(115, 77, 148, 255), 0.02f),
+                SaveMaterial("World_FungalSpore", new Color32(190, 188, 124, 255), 0.02f)
+            };
+            Material[] voidMaterials =
+            {
+                SaveMaterial("World_VoidRock", new Color32(34, 30, 50, 255), 0.18f),
+                SaveMaterial("World_VoidRift", new Color32(109, 49, 142, 255), 0.12f),
+                SaveMaterial("World_VoidEdge", new Color32(73, 56, 95, 255), 0.2f)
+            };
+            Material[] magmaMaterials =
+            {
+                SaveMaterial("World_MagmaBasalt", new Color32(52, 39, 38, 255), 0.2f),
+                SaveMaterial("World_MagmaCrust", new Color32(108, 55, 37, 255), 0.12f),
+                SaveMaterial("World_MagmaSeam", new Color32(225, 85, 30, 255), 0.06f)
+            };
+            Material[] iceMaterials =
+            {
+                SaveMaterial("World_IceBody", new Color32(137, 197, 213, 255), 0.16f),
+                SaveMaterial("World_IceFacet", new Color32(211, 239, 244, 255), 0.24f),
+                SaveMaterial("World_IceShadow", new Color32(76, 134, 168, 255), 0.18f)
+            };
+            Material[] crystalMaterials =
+            {
+                SaveMaterial("World_CrystalBody", new Color32(75, 156, 177, 255), 0.25f),
+                SaveMaterial("World_CrystalFacet", new Color32(134, 205, 218, 255), 0.3f),
+                SaveMaterial("World_CrystalCore", new Color32(106, 115, 207, 255), 0.24f)
+            };
+            Material[] boulderMaterials =
+            {
+                SaveMaterial("World_BoulderBody", new Color32(92, 82, 72, 255), 0.18f),
+                SaveMaterial("World_BoulderFacet", new Color32(132, 117, 97, 255), 0.14f),
+                SaveMaterial("World_BoulderShadow", new Color32(59, 54, 51, 255), 0.2f)
+            };
 
             ModelLibrary library = AssetDatabase.LoadAssetAtPath<ModelLibrary>(LibraryPath);
             if (library == null) throw new InvalidOperationException("ModelLibrary asset is missing: " + LibraryPath);
             var entries = new List<ModelLibrary.Entry>(library.entries ?? new ModelLibrary.Entry[0]);
+            RestoreAuthoredPlanetModels(entries);
             int planetTriangles = 0;
-            foreach (string id in PlanetIds)
+            foreach (string id in ProceduralPlanetIds)
             {
                 Mesh mesh = SaveMesh("planet_" + id, CreatePlanetMesh(id));
                 planetTriangles += mesh.triangles.Length / 3;
@@ -157,18 +233,65 @@ namespace Frontier.EditorTools
             Upsert(entries, Entry("world_dead_tree", treePrefab, tree.bounds, 0.72f));
             Upsert(entries, Entry("world_wreckage", wreckagePrefab, wreckage.bounds, 0.72f));
 
+            BuildObstacle(entries, "fungal_growth", CreateFungalGrowth(), fungalMaterials);
+            BuildObstacle(entries, "void_scar", CreateVoidScar(), voidMaterials);
+            BuildObstacle(entries, "magma_crust", CreateMagmaCrust(), magmaMaterials);
+            BuildObstacle(entries, "ice_spire", CreateIceSpire(), iceMaterials);
+            BuildObstacle(entries, "crystal_cluster", CreateCrystalCluster(), crystalMaterials);
+            BuildObstacle(entries, "boulder", CreateBoulder(), boulderMaterials);
+
             library.entries = entries.ToArray();
             EditorUtility.SetDirty(library);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Frontier: built " + PlanetIds.Length + " low-poly planet meshes (" + planetTriangles +
-                " triangles total), plus dead-tree and wreckage world models; preserved all other model-library entries.");
+            Debug.Log("Frontier: restored 15 authored planet models, built " + ProceduralPlanetIds.Length +
+                " distinct terrain meshes (" + planetTriangles + " triangles total), and built eight obstacle models.");
+        }
+
+        static void RestoreAuthoredPlanetModels(List<ModelLibrary.Entry> entries)
+        {
+            AddPlanetModel(entries, "sylva", "Prefabs/lerth.prefab", 0.07099946f, 1f);
+            AddPlanetModel(entries, "tide", "Prefabs/lerth.prefab", 0.07099946f, 1f);
+            AddPlanetModel(entries, "coral", "Prefabs/lerth.prefab", 0.07099946f, 1f);
+            AddPlanetModel(entries, "ferrum", "Source/planet_2.fbx", 2.9999993f, 0.7f);
+            AddPlanetModel(entries, "cinder", "Source/planet_2.fbx", 2.9999993f, 0.7f);
+            AddPlanetModel(entries, "vesper", "Source/planet_2.fbx", 2.9999993f, 0.7f);
+            AddPlanetModel(entries, "glacia", "Prefabs/purp.prefab", 0.066935815f, 1f);
+            AddPlanetModel(entries, "halcyon", "Prefabs/purp.prefab", 0.066935815f, 1f);
+            AddPlanetModel(entries, "nyx", "Prefabs/domny.prefab", 0.0368842f, 0.7f);
+            AddPlanetModel(entries, "obsidian", "Prefabs/domny.prefab", 0.0368842f, 0.7f);
+            AddPlanetModel(entries, "aurum", "Source/planet_1.fbx", 3f, 1f);
+            AddPlanetModel(entries, "prism", "Source/planet_1.fbx", 3f, 1f);
+            AddPlanetModel(entries, "zephyr", "Source/tiny world.fbx", 3f, 1f);
+            AddPlanetModel(entries, "pyre", "Source/tiny world.fbx", 3f, 1f);
+            AddPlanetModel(entries, "tundra", "Source/tiny world.fbx", 3f, 1f);
+        }
+
+        static void AddPlanetModel(List<ModelLibrary.Entry> entries, string id, string relativePath,
+            float scale, float groundScale)
+        {
+            string path = "Assets/Frontier/Art/Models/" + relativePath;
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab == null) throw new InvalidOperationException("Missing authored planet model: " + path);
+            Upsert(entries, new ModelLibrary.Entry
+            {
+                key = id, prefab = prefab, referenceDiameter = 3f, scale = scale, groundScale = groundScale
+            });
+        }
+
+        static void BuildObstacle(List<ModelLibrary.Entry> entries, string id, Mesh generated, Material[] materials)
+        {
+            string key = "world_obstacle_" + id;
+            Mesh mesh = SaveMesh(key, generated);
+            GameObject prefab = SavePrefab(key, mesh, materials);
+            SetObstacleModel(id, key);
+            Upsert(entries, Entry(key, prefab, mesh.bounds, 0.72f));
         }
 
         static Mesh CreatePlanetMesh(string id)
         {
             int seed = StableSeed(id);
-            int subdivisions = 2;
+            int subdivisions = 3;
             List<Vector3> vertices = new List<Vector3>
             {
                 new Vector3(-1, (1f + Mathf.Sqrt(5f)) * 0.5f, 0), new Vector3(1, (1f + Mathf.Sqrt(5f)) * 0.5f, 0),
@@ -218,7 +341,8 @@ namespace Frontier.EditorTools
                     float detail = Mathf.Sin(direction.x * 12.4f - phase * 0.2f) *
                         Mathf.Cos(direction.y * 10.1f + phase * 0.43f) *
                         Mathf.Sin(direction.z * 11.6f - phase * 0.33f);
-                    float radius = 1f + roughness * (broad * 0.64f + detail * 0.36f);
+                    float radius = 1f + roughness * (broad * 0.55f + detail * 0.2f) +
+                        PlanetRelief(id, direction);
                     meshVertices.Add(direction * radius);
                     triangles.Add(triangles.Count);
                 }
@@ -246,12 +370,40 @@ namespace Frontier.EditorTools
         {
             switch (id)
             {
-                case "zephyr": return 0.012f;
-                case "sylva": case "tide": case "coral": case "halcyon": return 0.022f;
-                case "ferrum": case "cinder": case "aurum": case "pyre": case "mire": case "vesper": return 0.04f;
-                case "glacia": case "arbor": case "nyx": case "obsidian": case "prism": case "kaos": case "tundra": return 0.048f;
+                case "arbor": case "mire": case "kaos": return 0.045f;
                 default: return 0.03f;
             }
+        }
+
+        static float PlanetRelief(string id, Vector3 direction)
+        {
+            if (id == "arbor")
+                return Mathf.Max(
+                    Peak(direction, new Vector3(0.25f, 0.8f, 0.45f), 18f, 0.16f),
+                    Mathf.Max(Peak(direction, new Vector3(-0.65f, 0.25f, -0.5f), 20f, 0.12f),
+                        Peak(direction, new Vector3(0.5f, -0.55f, -0.4f), 22f, 0.1f)));
+            if (id == "mire")
+            {
+                float shelf = Peak(direction, new Vector3(0.5f, 0.25f, 0.82f), 28f, 0.15f);
+                shelf = Mathf.Max(shelf, Peak(direction, new Vector3(-0.75f, -0.15f, 0.64f), 34f, 0.12f));
+                shelf = Mathf.Max(shelf, Peak(direction, new Vector3(0.3f, -0.78f, -0.55f), 32f, 0.1f));
+                return shelf;
+            }
+            if (id == "kaos")
+            {
+                float shards = Peak(direction, new Vector3(0.1f, 0.95f, 0.2f), 22f, 0.2f);
+                shards = Mathf.Max(shards, Peak(direction, new Vector3(-0.85f, 0.2f, 0.4f), 26f, 0.17f));
+                shards = Mathf.Max(shards, Peak(direction, new Vector3(0.5f, -0.2f, -0.84f), 24f, 0.16f));
+                shards = Mathf.Max(shards, Peak(direction, new Vector3(0.75f, -0.65f, 0.05f), 28f, 0.14f));
+                return shards;
+            }
+            return 0f;
+        }
+
+        static float Peak(Vector3 direction, Vector3 center, float sharpness, float height)
+        {
+            float distance = 1f - Vector3.Dot(direction, center.normalized);
+            return Mathf.Exp(-distance * sharpness) * height;
         }
 
         static Mesh CreateDeadTree()
@@ -292,6 +444,79 @@ namespace Frontier.EditorTools
             g.Box(new Vector3(0.45f, 0.51f, -0.17f), new Vector3(0.08f, 0.03f, 0.06f),
                 Quaternion.Euler(0f, 0f, -28f), 1);
             return g.ToMesh("world_wreckage_mesh");
+        }
+
+        static Mesh CreateFungalGrowth()
+        {
+            var g = new Geometry();
+            AddMushroom(g, 0f, 0.02f, 0.36f, 0.32f, 0.3f, 0.2f);
+            AddMushroom(g, -0.08f, 0.025f, 0.66f, 0.22f, 0.23f, 0.16f);
+            AddMushroom(g, 0.04f, -0.035f, 0.86f, 0.14f, 0.17f, 0.14f);
+            AddMushroom(g, 0.24f, -0.07f, 0.15f, 0.2f, 0.16f, 0.12f);
+            AddMushroom(g, -0.23f, 0.1f, 0.2f, 0.17f, 0.14f, 0.12f);
+            return g.ToMesh("world_obstacle_fungal_growth_mesh");
+        }
+
+        static void AddMushroom(Geometry g, float x, float z, float capY, float stemHeight,
+            float capRadius, float capHeight)
+        {
+            float stemBase = Mathf.Max(0.025f, capY - stemHeight);
+            g.Cylinder(new Vector3(x, stemBase, z), new Vector3(x, capY + 0.015f, z),
+                capRadius * 0.18f, capRadius * 0.22f, 7, 0);
+            g.MushroomCap(new Vector3(x, capY, z), capRadius, capHeight, 9, 1);
+            g.Box(new Vector3(x + capRadius * 0.24f, capY + capHeight * 0.48f, z + capRadius * 0.14f),
+                new Vector3(capRadius * 0.2f, 0.025f, capRadius * 0.16f), Quaternion.Euler(0f, 27f, -12f), 2);
+            g.Box(new Vector3(x - capRadius * 0.3f, capY + capHeight * 0.38f, z - capRadius * 0.12f),
+                new Vector3(capRadius * 0.15f, 0.02f, capRadius * 0.12f), Quaternion.Euler(0f, -18f, 8f), 2);
+        }
+
+        static Mesh CreateVoidScar()
+        {
+            var g = new Geometry();
+            g.Box(new Vector3(0f, 0.08f, 0f), new Vector3(0.66f, 0.12f, 0.42f), Quaternion.Euler(0f, 8f, -4f), 0);
+            g.Box(new Vector3(0.02f, 0.15f, 0f), new Vector3(0.52f, 0.035f, 0.06f), Quaternion.Euler(0f, -22f, 0f), 1);
+            g.Beam(new Vector3(-0.2f, 0.1f, -0.12f), new Vector3(-0.42f, 0.49f, -0.16f), 0.12f, 0.11f, 2);
+            g.Beam(new Vector3(0.16f, 0.1f, 0.12f), new Vector3(0.38f, 0.42f, 0.16f), 0.1f, 0.09f, 0);
+            return g.ToMesh("world_obstacle_void_scar_mesh");
+        }
+
+        static Mesh CreateMagmaCrust()
+        {
+            var g = new Geometry();
+            g.Box(new Vector3(-0.19f, 0.1f, 0f), new Vector3(0.38f, 0.15f, 0.4f), Quaternion.Euler(4f, -12f, 8f), 0);
+            g.Box(new Vector3(0.16f, 0.12f, 0.04f), new Vector3(0.43f, 0.12f, 0.34f), Quaternion.Euler(-5f, 18f, -9f), 1);
+            g.Box(new Vector3(-0.04f, 0.19f, 0.01f), new Vector3(0.045f, 0.02f, 0.4f), Quaternion.Euler(0f, 22f, 0f), 2);
+            g.Box(new Vector3(0.16f, 0.18f, -0.08f), new Vector3(0.29f, 0.018f, 0.035f), Quaternion.Euler(0f, -32f, 0f), 2);
+            return g.ToMesh("world_obstacle_magma_crust_mesh");
+        }
+
+        static Mesh CreateIceSpire()
+        {
+            var g = new Geometry();
+            g.Cylinder(new Vector3(0f, 0.02f, 0f), new Vector3(-0.04f, 0.85f, 0.02f), 0.2f, 0.015f, 6, 0);
+            g.Cylinder(new Vector3(-0.17f, 0.02f, 0.07f), new Vector3(-0.23f, 0.48f, 0.05f), 0.12f, 0.01f, 5, 1);
+            g.Cylinder(new Vector3(0.16f, 0.02f, -0.08f), new Vector3(0.21f, 0.38f, -0.1f), 0.1f, 0.012f, 5, 2);
+            return g.ToMesh("world_obstacle_ice_spire_mesh");
+        }
+
+        static Mesh CreateCrystalCluster()
+        {
+            var g = new Geometry();
+            g.Cylinder(new Vector3(-0.08f, 0.02f, 0f), new Vector3(-0.12f, 0.67f, -0.02f), 0.13f, 0.008f, 5, 0);
+            g.Cylinder(new Vector3(0.09f, 0.02f, 0.03f), new Vector3(0.21f, 0.48f, 0.08f), 0.11f, 0.008f, 5, 1);
+            g.Cylinder(new Vector3(0.01f, 0.02f, -0.13f), new Vector3(0.02f, 0.39f, -0.2f), 0.09f, 0.006f, 5, 2);
+            g.Cylinder(new Vector3(-0.25f, 0.02f, -0.11f), new Vector3(-0.35f, 0.31f, -0.14f), 0.08f, 0.006f, 5, 1);
+            g.Cylinder(new Vector3(0.2f, 0.02f, -0.17f), new Vector3(0.36f, 0.27f, -0.21f), 0.075f, 0.005f, 5, 0);
+            return g.ToMesh("world_obstacle_crystal_cluster_mesh");
+        }
+
+        static Mesh CreateBoulder()
+        {
+            var g = new Geometry();
+            g.Octahedron(new Vector3(-0.11f, 0.19f, 0f), new Vector3(0.48f, 0.38f, 0.45f), 0);
+            g.Octahedron(new Vector3(0.18f, 0.14f, 0.08f), new Vector3(0.34f, 0.28f, 0.32f), 1);
+            g.Octahedron(new Vector3(0.02f, 0.09f, -0.22f), new Vector3(0.27f, 0.18f, 0.24f), 2);
+            return g.ToMesh("world_obstacle_boulder_mesh");
         }
 
         static GameObject SavePrefab(string key, Mesh mesh, Material[] materials)

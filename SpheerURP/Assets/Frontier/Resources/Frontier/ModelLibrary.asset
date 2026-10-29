@@ -14,110 +14,103 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Frontier.ModelLibrary
   entries:
   - key: sylva
-    prefab: {fileID: 6297727935142794110, guid: f6701780bcf4f1a45a4042dad1ea5196,
+    prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
       type: 3}
-    scale: 1.5015486
+    scale: 0.07099946
     referenceDiameter: 3
     groundScale: 1
   - key: ferrum
-    prefab: {fileID: 2207633736794142971, guid: 41cfd9b7e0310f74ca94a202e3e4cf80,
-      type: 3}
-    scale: 1.4953146
+    prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
+    scale: 2.9999993
     referenceDiameter: 3
-    groundScale: 1
+    groundScale: 0.7
   - key: glacia
-    prefab: {fileID: 1753900663264622359, guid: c5ffe2a91db13414f825480348e0cb0c,
+    prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
       type: 3}
-    scale: 1.4724668
+    scale: 0.066935815
     referenceDiameter: 3
     groundScale: 1
   - key: cinder
-    prefab: {fileID: 3516315693498632481, guid: 452e3d0971adb0244aef4162c563209c,
-      type: 3}
-    scale: 1.4933006
+    prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
+    scale: 2.9999993
     referenceDiameter: 3
-    groundScale: 1
+    groundScale: 0.7
   - key: arbor
     prefab: {fileID: 3870265651344317663, guid: 5be3ffd9efdb4454db79568739d3f232,
       type: 3}
-    scale: 1.4936664
+    scale: 1.4817846
     referenceDiameter: 3
     groundScale: 1
   - key: nyx
-    prefab: {fileID: 8574272893388833159, guid: 281d5c1282955d84688df398b74c0b81,
+    prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
       type: 3}
-    scale: 1.4623002
+    scale: 0.0368842
     referenceDiameter: 3
-    groundScale: 1
+    groundScale: 0.7
   - key: aurum
-    prefab: {fileID: 6663748678760702634, guid: a5b762c0c0eafa54b91bac786933a981,
-      type: 3}
-    scale: 1.5059888
+    prefab: {fileID: 919132149155446097, guid: 6b210a7be80fc43ceb72f03a8ac92928, type: 3}
+    scale: 3
     referenceDiameter: 3
     groundScale: 1
   - key: tide
-    prefab: {fileID: 604446077495194694, guid: 30eb58022e7300349bbce52c9762b392, type: 3}
-    scale: 1.4929328
+    prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
+      type: 3}
+    scale: 0.07099946
     referenceDiameter: 3
     groundScale: 1
   - key: zephyr
-    prefab: {fileID: 4321060430624661669, guid: a5043518a765d75429fbbbb1fc948861,
-      type: 3}
-    scale: 1.4976826
+    prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
+    scale: 3
     referenceDiameter: 3
     groundScale: 1
   - key: pyre
-    prefab: {fileID: 3686579255328990855, guid: 5d22a74d310130e49805a99d37bb064f,
-      type: 3}
-    scale: 1.4916482
+    prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
+    scale: 3
     referenceDiameter: 3
     groundScale: 1
   - key: halcyon
-    prefab: {fileID: 1054184296426482381, guid: d299cdee4515296408ea87fb1c295af1,
+    prefab: {fileID: 1300039213747465621, guid: b4d791fcba519ae42ab3662b9e10a61d,
       type: 3}
-    scale: 1.4963518
+    scale: 0.066935815
     referenceDiameter: 3
     groundScale: 1
   - key: mire
     prefab: {fileID: 2426904475358778699, guid: d74699103a33c024d95f4d8f34379cbe,
       type: 3}
-    scale: 1.498865
+    scale: 1.4979275
     referenceDiameter: 3
     groundScale: 1
   - key: obsidian
-    prefab: {fileID: 1193095682461752629, guid: 0c2b26f26de1cb4488f69b74daa35d67,
+    prefab: {fileID: 3481375979037789932, guid: 28934986bda650f43b87ea3aba6335e9,
       type: 3}
-    scale: 1.4828303
+    scale: 0.0368842
     referenceDiameter: 3
-    groundScale: 1
+    groundScale: 0.7
   - key: vesper
-    prefab: {fileID: 2508234818026221433, guid: 03fc656a942027440bbb3b5daf787fa5,
-      type: 3}
-    scale: 1.4986712
+    prefab: {fileID: 919132149155446097, guid: 185a7a4abee944251bfca079cfe42fed, type: 3}
+    scale: 2.9999993
     referenceDiameter: 3
-    groundScale: 1
+    groundScale: 0.7
   - key: prism
-    prefab: {fileID: 8374607874411036531, guid: cd57088f36847e44288190ad7cca393a,
-      type: 3}
-    scale: 1.5032283
+    prefab: {fileID: 919132149155446097, guid: 6b210a7be80fc43ceb72f03a8ac92928, type: 3}
+    scale: 3
     referenceDiameter: 3
     groundScale: 1
   - key: kaos
     prefab: {fileID: 2388783613425308486, guid: 4358cdf04578d074eb1118dff592094a,
       type: 3}
-    scale: 1.4966061
+    scale: 1.3832036
     referenceDiameter: 3
-    groundScale: 1
+    groundScale: 0.92
   - key: tundra
-    prefab: {fileID: 3150251275853785455, guid: 6a6d92761cf841b419254602a13c4899,
-      type: 3}
-    scale: 1.4904432
+    prefab: {fileID: 919132149155446097, guid: 1f0b454c4ac4e424f87e38162f52d7e4, type: 3}
+    scale: 3
     referenceDiameter: 3
     groundScale: 1
   - key: coral
-    prefab: {fileID: 1980757203969213691, guid: 581c9f7f2ddeaa146b465ea500d13b2c,
+    prefab: {fileID: 7412746015058257238, guid: 442e60ba7455ea34c8163849e46638a3,
       type: 3}
-    scale: 1.494216
+    scale: 0.07099946
     referenceDiameter: 3
     groundScale: 1
   - key: scout
@@ -351,5 +344,39 @@ MonoBehaviour:
     prefab: {fileID: 4564740321950057403, guid: 2dcf13589df8490439bd5dab6f6481be,
       type: 3}
     scale: 0.68749505
+    referenceDiameter: 0.72
+    groundScale: 1
+  - key: world_obstacle_fungal_growth
+    prefab: {fileID: 8556749342875086426, guid: 652220cf6481d1449838ed3e63bbd86e,
+      type: 3}
+    scale: 0.72
+    referenceDiameter: 0.72
+    groundScale: 1
+  - key: world_obstacle_void_scar
+    prefab: {fileID: 4665429367421180023, guid: c1687aa4c5417da44b4b3f3ac362bffa,
+      type: 3}
+    scale: 0.80331165
+    referenceDiameter: 0.72
+    groundScale: 1
+  - key: world_obstacle_magma_crust
+    prefab: {fileID: 865163652457591079, guid: ab35b6603f3b0e64fae880da9eb01c74, type: 3}
+    scale: 0.8481034
+    referenceDiameter: 0.72
+    groundScale: 1
+  - key: world_obstacle_ice_spire
+    prefab: {fileID: 137063071172931612, guid: 14b0bf912c3089d4c9925a218164ed48, type: 3}
+    scale: 0.850771
+    referenceDiameter: 0.72
+    groundScale: 1
+  - key: world_obstacle_crystal_cluster
+    prefab: {fileID: 6266288717778804433, guid: a7e184194df7f9a469b41fb899bce831,
+      type: 3}
+    scale: 1.0014933
+    referenceDiameter: 0.72
+    groundScale: 1
+  - key: world_obstacle_boulder
+    prefab: {fileID: 5627443918521232191, guid: 114c14107729fa646b35b6e4e64f9c78,
+      type: 3}
+    scale: 1.0285714
     referenceDiameter: 0.72
     groundScale: 1

@@ -143,14 +143,14 @@ namespace Frontier.Tests
             Assert.AreEqual("Version 1.0", UiText.Get("about.version", "1.0"));
             Assert.AreEqual("Arrived at Sylva", UiText.Get("travel.arrived", "Sylva"));
             Assert.AreEqual("Need 3,000 more gal · craft fuel", UiText.Get("route.fuel-short", 3000));
-            Assert.AreEqual("Build on Sylva  -  2 / 12 free slots  ·  CREWS 1/2 busy. Tap a structure on the planet to use it.",
+            Assert.AreEqual("Sylva · 2/12 free slots · crews 1/2 busy",
                 UiText.Get("shop.summary", "Sylva", 2, 12, 1, 2));
             Assert.AreEqual("HULL 85   SHIELD 1/2", UiText.Get("hyperspace.status", 85, 1, 2));
             Assert.AreEqual("9 kills  ·  best combo x3\n2 hits  ·  1 revives",
                 UiText.Get("hyperspace.result.summary", 9, 3, 2, 1));
             Assert.AreEqual("+5,000 gal refunded  ·  +12 XP", UiText.Get("hyperspace.result.rewards", 5000, 12));
             Assert.AreEqual("1 / 6", UiText.Get("guide.progress", 1, 6));
-            StringAssert.Contains("planets cannot be attacked", UiText.Get("guide.defend.help"));
+            StringAssert.Contains("Call a wave from an Alarm", UiText.Get("guide.defend.help"));
             Assert.AreEqual("2 / 9 slots used  -  drag to rearrange", UiText.Get("pack.capacity.rearrange", 2, 9));
             Assert.AreEqual("In this slot: 4 / 20", UiText.Get("pack.slot-count", 4, 20));
             Assert.AreEqual("8 waiting on Sylva", UiText.Get("pack.salvage.waiting", 8, "Sylva"));

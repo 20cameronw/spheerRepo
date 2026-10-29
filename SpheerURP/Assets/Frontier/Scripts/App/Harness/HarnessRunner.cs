@@ -558,7 +558,7 @@ namespace Frontier
                 gs.Notify();
             }
             yield return new Shot("menu", () => ui.DebugMenu(""));
-            foreach (var page in new[] { "ranks", "goals", "ascension", "tutorial", "about", "settings", "debug" })
+            foreach (var page in new[] { "ranks", "leaderboard", "shards", "goals", "ascension", "tutorial", "about", "settings", "debug" })
             {
                 string pg = page;
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
@@ -1149,6 +1149,28 @@ namespace Frontier
                 if (!ui.DebugGather(MinigameKind.Salvage)) throw new InvalidOperationException("world has no salvage gather spot");
                 ui.DebugHarvestPreview(MinigameKind.Salvage);
             }, 1.8f);
+            yield return new Shot("obstacle-fungal-surface", () =>
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    if (d.Biome != UBiome.Fungal) return false;
+                    foreach (var obstacle in gs.ObstaclesOn(gs.universe.Get(d)))
+                        if (obstacle.seconds > 0 && obstacle.kind >= 0 && obstacle.kind < db.obstacleKinds.Length &&
+                            db.obstacleKinds[obstacle.kind].data.id == "fungal_growth") return true;
+                    return false;
+                }, 1, 0, 10000);
+                if (world == null) throw new InvalidOperationException("no generated fungal world has a fungal-growth obstruction");
+                var obstacles = gs.ObstaclesOn(world);
+                int index = obstacles.FindIndex(o => o.seconds > 0 && o.kind >= 0 && o.kind < db.obstacleKinds.Length &&
+                    db.obstacleKinds[o.kind].data.id == "fungal_growth");
+                if (index < 0) throw new InvalidOperationException("fungal obstacle showcase has no obstruction instance");
+                GoTo(world);
+                ResetView();
+                rt.Planet.CloseView = true;
+                gs.DismissFirstSessionGuide();
+                gs.Notify();
+                StartCoroutine(CenterObstacleForCapture(obstacles[index].pad, new Vector2(0.5f, 0.3f)));
+            }, 1.0f);
             yield return new Shot("obstacle-surface", () =>
             {
                 obstacleShowcase = gs.universe.FindGenerated(d =>

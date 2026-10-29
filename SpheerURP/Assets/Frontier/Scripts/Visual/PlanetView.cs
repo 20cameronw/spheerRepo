@@ -160,7 +160,7 @@ namespace Frontier
             atmo.transform.SetParent(root, false);
             atmosphere = atmo.transform;
             atmo.transform.localScale = Vector3.one * p.AtmosphereScale;
-            Color atmosphereColor = rim * (1.2f * p.AtmosphereIntensity);
+            Color atmosphereColor = PlanetSurfaceStyle.AtmosphereColor(p, rim) * (1.2f * p.AtmosphereIntensity);
             atmosphereMat = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
             atmo.GetComponent<MeshRenderer>().sharedMaterial = atmosphereMat;
 
@@ -202,7 +202,7 @@ namespace Frontier
                 coreMat.SetColor("_BaseColor", primary);
                 coreMat.SetColor("_AltColor", secondary);
                 coreMat.SetColor("_RimColor", baseRim);
-                coreMat.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
+                coreMat.SetColor("_CloudColor", PlanetSurfaceStyle.CloudColor(Current, primary));
             }
             if (modelMats != null)
             {
@@ -212,11 +212,11 @@ namespace Frontier
                     material.SetColor("_BaseColor", primary);
                     material.SetColor("_AltColor", secondary);
                     material.SetColor("_RimColor", baseRim);
-                    material.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
+                    material.SetColor("_CloudColor", PlanetSurfaceStyle.CloudColor(Current, primary));
                 }
             }
 
-            Color atmosphereColor = rim * (1.2f * Current.AtmosphereIntensity);
+            Color atmosphereColor = PlanetSurfaceStyle.AtmosphereColor(Current, rim) * (1.2f * Current.AtmosphereIntensity);
             if (atmosphereMat != null)
                 atmosphereMat.SetColor("_Color", new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
             if (glowRenderer != null)

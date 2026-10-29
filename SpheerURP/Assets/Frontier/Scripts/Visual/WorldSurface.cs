@@ -298,6 +298,7 @@ namespace Frontier
             it.pending = !string.IsNullOrEmpty(s.record.buildEndUtc) || !string.IsNullOrEmpty(s.record.upgradeEndUtc);
             it.visual = new GameObject("StructureVisualRoot").transform;
             it.visual.SetParent(it.t, false);
+            it.visual.localPosition = Vector3.down * 0.045f;
             Color c = s.def.color;
             var model = SpawnModel(s.def.modelKey, it.visual, 0.75f);
             if (model == null)

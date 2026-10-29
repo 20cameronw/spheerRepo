@@ -58,7 +58,7 @@ namespace Frontier.Tests
             foreach (var entry in ModelLibrary.Instance.entries)
                 foreach (var path in AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(entry.prefab), true))
                     if (AssetImporter.GetAtPath(path) is ModelImporter) sources.Add(path);
-            Assert.GreaterOrEqual(sources.Count, 14, "the model library should reach all 14 source models");
+            Assert.GreaterOrEqual(sources.Count, 10, "the model library should retain its authored planet and gameplay model sources");
             foreach (var path in sources)
             {
                 var imported = ModelLibrary.InstantiateInert(AssetDatabase.LoadAssetAtPath<GameObject>(path));

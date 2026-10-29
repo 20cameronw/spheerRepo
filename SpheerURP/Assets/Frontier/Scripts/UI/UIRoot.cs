@@ -27,14 +27,11 @@ namespace Frontier
 
         VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
-        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, packLabel, levelLabel, planetLabel;
+        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, levelLabel, planetLabel;
         WaveInfo waveHudInfo;
         VisualElement planetTag;
         Button surfaceViewButton;
         VisualElement surfaceViewIcon;
-        Button packDock;
-        readonly List<VisualElement> packSegments = new List<VisualElement>();
-
         bool busy, introActive;
         public bool IsTravelling { get; private set; }
         Minigame activeGatherMinigame;
@@ -229,22 +226,7 @@ namespace Frontier
             dock.usageHints = UsageHints.DynamicTransform;
             dock.Add(DockButton("research", UiText.Get("nav.command"), UiKit.Magenta, OpenResearch));
             dock.Add(DockButton("map", UiText.Get("nav.map"), UiKit.Cyan, OpenMap));
-            packDock = DockButton("ship", UiText.Get("nav.pack"), UiKit.Amber, OpenPack);
-            var capacity = UiKit.Div("fr-pack-capacity");
-            capacity.name = "pack-capacity-gauge";
-            capacity.pickingMode = PickingMode.Ignore;
-            for (int i = 0; i < 8; i++)
-            {
-                var segment = UiKit.Div("fr-pack-segment");
-                segment.pickingMode = PickingMode.Ignore;
-                packSegments.Add(segment);
-                capacity.Add(segment);
-            }
-            packDock.Add(capacity);
-            packLabel = UiKit.Text("", "fr-pack-capacity-text");
-            packLabel.name = "pack-capacity-text";
-            packDock.Add(packLabel);
-            dock.Add(packDock);
+            dock.Add(DockButton("ship", UiText.Get("nav.pack"), UiKit.Amber, OpenPack));
             dock.Add(DockButton("build", UiText.Get("nav.build"), UiKit.Lime, OpenShop));
             hud.Add(dock);
         }
@@ -254,22 +236,6 @@ namespace Frontier
             if (surfaceViewButton == null) return;
             surfaceViewButton.tooltip = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
             if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, planetView.CloseView ? "map" : "base", UiKit.Cyan);
-        }
-
-        void RefreshPackCapacity()
-        {
-            packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
-            packDock.tooltip = UiText.Get("pack.capacity", gs.SlotsUsed, gs.Slots);
-            float fullness = gs.Slots <= 0 ? 1 : Mathf.Clamp01(gs.SlotsUsed / (float)gs.Slots);
-            int filled = Mathf.CeilToInt(fullness * packSegments.Count);
-            for (int i = 0; i < packSegments.Count; i++)
-            {
-                float fraction = i / (float)(packSegments.Count - 1);
-                Color color = fraction < 0.5f ? Color.Lerp(UiKit.Lime, UiKit.Amber, fraction * 2)
-                    : Color.Lerp(UiKit.Amber, UiKit.Red, (fraction - 0.5f) * 2);
-                packSegments[i].style.backgroundColor = i < filled ? color : UiKit.Tint(UiKit.Muted, 0.18f);
-                packSegments[i].EnableInClassList("fr-pack-segment-filled", i < filled);
-            }
         }
 
         /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>
@@ -354,7 +320,6 @@ namespace Frontier
             fuelLabel.tooltip = UiText.Get("fuel.summary", gs.FuelTankUsed, gs.FuelTankSlots);
             shardLabel.text = gs.ShardBalance.ToString("N0");
             shardLabel.tooltip = UiText.Get("hyperspace.revive.balance", gs.ShardBalance);
-            RefreshPackCapacity();
             levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
             planetLabel.text = gs.planet.Name.ToUpper();
             planetLabel.style.color = UiKit.Ui(gs.planet.Rim);

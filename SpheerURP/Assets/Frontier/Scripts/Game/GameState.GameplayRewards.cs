@@ -38,6 +38,8 @@ namespace Frontier
                 if (ticket != null && !string.IsNullOrEmpty(ticket.id) && (final ||
                     (ticket.state == "pending" || ticket.state == "earned") && ticket.amount > 0 &&
                     (ticket.placement == "double-yield" && !string.IsNullOrEmpty(ticket.resourceId) ||
+                    ticket.placement == "free-shards" && string.IsNullOrEmpty(ticket.resourceId) &&
+                    string.IsNullOrEmpty(ticket.planetId) ||
                     ticket.placement == "timer-skip" && !string.IsNullOrEmpty(ticket.planetId) && ticket.slot >= 0 &&
                     UtcText.TryParse(ticket.endUtc, out var end) && UtcText.TryParse(ticket.changedEndUtc, out var changed) &&
                     (end - changed).TotalSeconds == ticket.amount))) return ticket;
@@ -102,6 +104,12 @@ namespace Frontier
                 if (!UtcText.TryParse(quote.endUtc, out var end)) return false;
                 quote.changedEndUtc = UtcText.Format(end.AddSeconds(-amount));
             }
+            else if (placement == "free-shards")
+            {
+                if (resource != null || job != null || db.shardRules == null || db.shardRules.data == null ||
+                    amount != db.shardRules.data.adReward || amount <= 0 ||
+                    (long)ShardBalance + amount > int.MaxValue) return false;
+            }
             else return false;
             var candidate = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(BuildSave())).Normalize();
             if (placement == "double-yield")
@@ -143,6 +151,7 @@ namespace Frontier
             var ticket = GameplayReward;
             if (context != rewardRequestContext || ticket == null || ticket.id != id || SaveIsReadOnly) return false;
             if (ticket.state == "settled") return true;
+            if (ticket.state == "cancelled") return !earned;
             if (ticket.state != "pending") return false;
             ticket.state = earned ? "earned" : "cancelled";
             var candidate = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(BuildSave())).Normalize();
@@ -163,6 +172,12 @@ namespace Frontier
                 if (resource == null || ticket.amount <= 0 || IsTankFuel(resource.id) || FreeSpace(resource) < ticket.amount)
                 { error = UiText.Get("reward.space"); return false; }
                 AddRewardInventory(candidate, resource.id, ticket.amount);
+            }
+            else if (ticket.placement == "free-shards")
+            {
+                if (db.shardRules == null || db.shardRules.data == null ||
+                    ticket.amount != db.shardRules.data.adReward || !AddRewardShards(candidate, ticket.amount))
+                { error = UiText.Get("shards.ad.wallet-full"); return false; }
             }
             else if (ticket.placement == "timer-skip")
             {
@@ -188,13 +203,35 @@ namespace Frontier
                 world.Touch();
                 CompleteBuilderJobs();
             }
-            else
+            else if (ticket.placement == "double-yield")
             {
                 int granted = backpack.Add(ticket.resourceId, ticket.amount);
                 if (granted != ticket.amount) throw new InvalidOperationException("Persisted ad reward no longer fits.");
                 RecordAtlasResourceAcquired(ticket.resourceId);
             }
+            else AddShards(ticket.amount);
             Notify();
+            return true;
+        }
+
+        static bool AddRewardShards(SaveV2 candidate, int amount)
+        {
+            if (candidate == null || candidate.wallet == null || amount <= 0) return false;
+            long total = 0;
+            WalletEntry destination = null;
+            foreach (var entry in candidate.wallet)
+            {
+                if (entry == null || entry.currency != ShardCurrency) continue;
+                if (entry.amount > 0) total += entry.amount;
+                if (destination == null) destination = entry;
+            }
+            if (total + amount > int.MaxValue) return false;
+            if (destination == null)
+            {
+                destination = new WalletEntry { currency = ShardCurrency };
+                candidate.wallet.Add(destination);
+            }
+            destination.amount = checked(Math.Max(0, destination.amount) + amount);
             return true;
         }
 

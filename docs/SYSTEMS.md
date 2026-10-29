@@ -81,20 +81,24 @@ User-directed update: no daily cap on the first-stage harvest/construction place
 small daily allowance. `unlimitedDaily` is explicit, so old saves/assets with omitted flags retain their
 existing finite-cap behavior and zero still disables a placement unless unlimited is explicitly set.
 Persisted counts saturate safely; cooldown, consent, request overlap and reward settlement checks remain.
-Only `double-yield` and `timer-skip` change now; later placements retain their historical inactive-stage
-configuration pending their separate evaluation. Gameplay flags and production platform gates remain off.
+That decision applies to `double-yield` and `timer-skip`. The separate `free-shards` wallet offer is now
+authored at +2 shards, capped at two per day with a four-hour cooldown; the production ad gate remains
+closed pending child-inclusive review, privacy setup and physical iOS verification. Emergency-fuel,
+revive, targeted-supply and missing-resource offers remain inactive.
 
 Not annoying means passive contextual buttons, never automatic ad screens, notifications or repeat
 decline dialogs. Normal Collect/wait/finish actions remain; harvest offers once per completed result,
 does not retry after no-fill on that result, and does not appear on the first successful harvest.
 High availability is not permission to nag or remove the no-ad path. Native experience and child-inclusive
-review are still mandatory. Benefit sizes and cooldown tuning below remain proposals, not activation.
+review are still mandatory. Harvest/construction benefit sizes below remain proposals; only the separately
+authored free-shards amount/cap/cooldown are current, and its provider is still gated.
 
-| Placement | Proposed benefit | Daily cap decision | Proposed cooldown |
+| Placement | Benefit (proposed unless noted) | Daily cap decision | Cooldown (proposed unless noted) |
 |---|---|---|---|
 | Harvest | +100% of that completed run, only when all output fits | None | 180 seconds |
 | Construction | Up to 120 seconds on the selected job | None | 600 seconds |
-| Emergency fuel / revive / targeted supplies / bonus shards | No new placement or grant in this stage | 0 for staged activation | N/A |
+| Free shards | +2 shards after a player-started, provider-confirmed video on the Shards page | 2/day | 4 hours; current iOS release gate remains closed |
+| Emergency fuel / revive / targeted supplies / missing-resource assistance | No offer or grant in this stage | 0 | N/A |
 
 This is not measured retention or a balance certification. With equal-yield harvests, N normal runs give
 N run-units; K accepted bonuses give N+K, with K no greater than eligible completed runs and subject to

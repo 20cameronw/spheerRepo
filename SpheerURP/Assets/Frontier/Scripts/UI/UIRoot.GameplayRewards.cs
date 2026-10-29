@@ -15,11 +15,86 @@ namespace Frontier
         bool GameplayOfferAllowed(bool placementEnabled, string placement)
         {
             var ticket = gs.GameplayReward;
-            return placementEnabled && services != null && services.Ads.IsConfigured &&
+            return placementEnabled && services != null && services.Ads != null && services.Consent != null &&
+                services.Ads.IsConfigured &&
                 services.Consent.Current.hasDecision && services.Consent.Current.adsAllowed &&
                 (!(services.Ads is IRewardedAdAvailability availability) || availability.RewardedAvailability(placement).succeeded) &&
                 !gs.SaveIsReadOnly && !gameplayAdShowing &&
                 (ticket == null || ticket.state == "settled" || ticket.state == "cancelled");
+        }
+
+        void BuildShardAdOffer(VisualElement body)
+        {
+            if (gameplayRewardRules == null || !gameplayRewardRules.shardsEnabled) return;
+            var rules = gs.db.shardRules != null ? gs.db.shardRules.data : null;
+            int amount = rules != null ? rules.adReward : 0;
+            var card = Card(UiKit.Cyan);
+            card.Add(UiKit.Text(UiText.Get("shards.ad.title"), "fr-h2"));
+            card.Add(UiKit.Text(UiText.Get("shards.ad.help", amount), "fr-muted"));
+            if (amount <= 0)
+            {
+                card.Add(Note(UiText.Get("shards.ad.unavailable"), UiKit.Muted));
+                body.Add(card);
+                return;
+            }
+            if (services == null || services.Consent == null || services.Ads == null || !services.Ads.IsConfigured)
+            {
+                card.Add(Note(UiText.Get("shards.ad.unavailable"), UiKit.Amber));
+                body.Add(card);
+                return;
+            }
+            if (!services.Consent.Current.hasDecision || !services.Consent.Current.adsAllowed)
+            {
+                card.Add(Note(UiText.Get("shards.ad.consent"), UiKit.Muted));
+                card.Add(IconBtn(UiText.Get("shards.ad.settings"), "gear", UiKit.Cyan, () =>
+                {
+                    menuPage = "settings";
+                    RefreshModal();
+                }));
+                body.Add(card);
+                return;
+            }
+            if (gs.SaveIsReadOnly || (long)gs.ShardBalance + amount > int.MaxValue)
+            {
+                card.Add(Note(UiText.Get(gs.SaveIsReadOnly ? "shards.ad.read-only" : "shards.ad.wallet-full"), UiKit.Amber));
+                body.Add(card);
+                return;
+            }
+            ServiceResult available = services.Ads is IRewardedAdAvailability availability
+                ? availability.RewardedAvailability("free-shards") : ServiceResult.Success();
+            if (!available.succeeded)
+            {
+                card.Add(Note(available.text.Resolve(UiText.Get), UiKit.Amber));
+                body.Add(card);
+                return;
+            }
+
+            Button watch = null;
+            watch = IconBtn(UiText.Get("shards.ad.watch", amount), "play", UiKit.Cyan, async () =>
+            {
+                if (!GameplayOfferAllowed(gameplayRewardRules.shardsEnabled, "free-shards") ||
+                    (long)gs.ShardBalance + amount > int.MaxValue)
+                {
+                    Toast(UiText.Get("reward.changed"), UiKit.Amber);
+                    RefreshModal();
+                    return;
+                }
+                if (!gs.PrepareGameplayReward("free-shards", null, amount, null, out var ticket, out var error))
+                {
+                    Toast(error, UiKit.Amber);
+                    return;
+                }
+                UiKit.SetEnabledLook(watch, false);
+                Toast(UiText.Get("shards.ad.loading"), UiKit.Cyan);
+                var result = await ShowGameplayReward(ticket);
+                if (this == null) return;
+                Toast(result.succeeded && result.value.rewardEarned ? UiText.Get("shards.ad.claimed", amount) :
+                    result.succeeded ? UiText.Get("reward.not-earned") : result.text.Resolve(UiText.Get), UiKit.Cyan);
+                RefreshModal();
+            });
+            watch.name = "shards-watch-ad";
+            card.Add(watch);
+            body.Add(card);
         }
 
         async Task<ServiceResult<RewardedAdResult>> ShowGameplayReward(GameplayRewardTicket ticket)

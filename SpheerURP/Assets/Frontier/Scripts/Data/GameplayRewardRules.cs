@@ -8,6 +8,7 @@ namespace Frontier
         [Tooltip("Keep disabled until reward tuning, child-inclusive policy and native-device review are approved.")]
         public bool harvestEnabled;
         public bool constructionEnabled;
+        public bool shardsEnabled;
         [Min(0)] public int constructionSeconds;
     }
 }

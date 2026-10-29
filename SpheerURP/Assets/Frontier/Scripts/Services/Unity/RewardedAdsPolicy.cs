@@ -9,7 +9,7 @@ namespace Frontier.Services.Unity
         public bool enableRewardedAds;
         public string iosAppKey;
         public string iosRewardedAdUnitId;
-        [Tooltip("Enable only after audience/privacy review and physical iOS test-device verification. Requires a public HTTPS privacy policy.")]
+        [Tooltip("Enable only after child-inclusive audience/privacy review and physical iOS test-device verification. Requires a public HTTPS privacy policy.")]
         public bool iosSetupVerified;
         [Tooltip("Expose the LevelPlay test suite in iOS development builds only. Does not enable gameplay ads.")]
         public bool enableIosDevelopmentTests;

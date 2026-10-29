@@ -235,7 +235,6 @@ namespace Frontier
                 var cost = gs.ObstacleClearCost(gs.planet, pad);
                 var project = Project("obstacle", "clear", slot: pad);
                 body.Add(cost.Count == 0 ? UiKit.Text(UiText.Get("obstacle.free"), "fr-small") : ProjectCosts(cost, project));
-                AddProjectAction(body, project);
 
                 body.Add(SectionLabel(UiText.Get("obstacle.salvage")));
                 ResourceSO salvage = gs.db.FindResource(obstacle.Value.reward.resourceId);

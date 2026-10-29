@@ -159,9 +159,9 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
                 label.text == UiText.Get("service.ads.test-editor")));
             rt.Ui.DebugReset();
-            rt.Ui.DebugMenu("ranks");
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable") ?? rt.Ui.DebugRoot.Q("leaderboard-publish"),
-                "Ranks must offer opt-in or publishing according to the existing online preference.");
+            rt.Ui.DebugMenu("leaderboard");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable"),
+                "The dedicated leaderboard page must preserve explicit online-services opt-in.");
         }
 
         static int ActiveRippleCount()
@@ -616,6 +616,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(anchor);
             yield return null;
             Assert.Less(anchor.Find("StructureVisualRoot").localScale.x, 1f);
+            Assert.AreEqual(Vector3.down * 0.045f, anchor.Find("StructureVisualRoot").localPosition);
             state.DebugPlace(state.db.FindStructure("gunner"), 1);
             Assert.AreSame(anchor, rt.Planet.Spin.Find("Struct_warehouse"), "Unrelated builds must not recreate or reanimate existing models.");
             first.record.buildEndUtc = UtcText.Format(DateTime.UtcNow.AddHours(1));
@@ -634,7 +635,8 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
                 .Exists(label => label.text == UiText.Get("structure.builder")));
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
-                .Exists(label => label.text == UiText.Get("structure.offline-time")));
+                .Exists(label => label.text == state.BuilderJobStatus(first)),
+                "The tapped structure keeps its live job status.");
             rt.Ui.DebugReset();
             first.record.buildEndUtc = "";
             state.Notify();
@@ -642,12 +644,16 @@ namespace Frontier.Tests
             anchor = rt.Planet.Spin.Find("Struct_warehouse");
             Assert.IsNull(anchor.Find("ConstructionScan"));
             Assert.Greater(anchor.Find("StructureVisualRoot").localScale.x, 1f, "Completion should pulse, not replay the small build-in.");
-            yield return new WaitForSecondsRealtime(0.7f);
-            Assert.AreEqual(Vector3.one, anchor.Find("StructureVisualRoot").localScale);
+            yield return new WaitForSecondsRealtime(0.8f);
+            Assert.Less(Vector3.Distance(Vector3.one, anchor.Find("StructureVisualRoot").localScale), 0.01f);
             var home = state.planet;
             rt.Planet.Show(home, false, state.TerraformerStageOn(home));
             yield return null;
-            Assert.AreEqual(Vector3.one, rt.Planet.Spin.Find("Struct_warehouse/StructureVisualRoot").localScale,
+            Assert.AreEqual(Vector3.down * 0.045f,
+                rt.Planet.Spin.Find("Struct_warehouse/StructureVisualRoot").localPosition,
+                "Returning to the world keeps the small placement offset.");
+            Assert.Less(Vector3.Distance(Vector3.one,
+                rt.Planet.Spin.Find("Struct_warehouse/StructureVisualRoot").localScale), 0.01f,
                 "Loading or revisiting a world must not replay construction effects.");
         }
 
@@ -995,8 +1001,24 @@ namespace Frontier.Tests
             runtime.Ui.DebugMenu("ranks");
             Assert.IsNotNull(runtime.Ui.DebugRoot.Q("era-progress"));
             Assert.AreEqual(Frontier.Economy.FrontierEra.Landfall, runtime.State.Era);
-            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help", "ranks.enable" })
+            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help" })
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get(key)), key);
+            Assert.IsFalse(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                .Exists(label => label.text == UiText.Get("ranks.enable")),
+                "Local Records must not contain online leaderboard controls.");
+            runtime.Ui.DebugMenu("leaderboard");
+            Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                .Exists(label => label.text == UiText.Get("ranks.enable")),
+                "Online consent belongs on the separate Leaderboard page.");
+            runtime.Ui.DebugMenu("shards");
+            Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("shards.balance", runtime.State.ShardBalance.ToString("N0"))));
+            Assert.IsNotNull(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                .Find(label => label.text == UiText.Get("shards.ad.title")));
+            Assert.IsNull(runtime.Ui.DebugRoot.Q<Button>("shards-watch-ad"),
+                "The Shards page must not expose an ad action before the provider is release-ready and opted into.");
+            runtime.Ui.DebugMenu("ranks");
+            runtime.Ui.DebugMenu("ranks");
             var score = runtime.State.FrontierScore;
             foreach (var pair in new Dictionary<string, string>
             {
@@ -1204,7 +1226,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator OnlineRanksOptInPostsTheActualScoreShowsOwnRankAndAllowsRetry()
+        public IEnumerator OnlineLeaderboardOptInAndPageOpeningUploadTheActualScore()
         {
             new GameObject("RanksBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -1218,7 +1240,7 @@ namespace Frontier.Tests
             var services = new FrontierServices(consent, unavailable, unavailable, provider, provider,
                 unavailable, unavailable, unavailable, new LocalTimeService(), unavailable, "Lifetime_Earnings_Leaderboard");
             rt.Ui.DebugSetServices(services);
-            rt.Ui.DebugMenu("ranks");
+            rt.Ui.DebugMenu("");
             void Press(string name)
             {
                 var button = rt.Ui.DebugRoot.Q<Button>(name);
@@ -1226,6 +1248,9 @@ namespace Frontier.Tests
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = button; button.SendEvent(submit); }
             }
             Assert.AreEqual(0, provider.signIns + provider.submissions + provider.reads);
+            Press("menu-leaderboard");
+            Assert.AreEqual(0, provider.signIns + provider.submissions + provider.reads,
+                "Opening the page does not bypass online-services opt-in.");
             Press("leaderboard-enable");
             yield return null;
             Assert.IsTrue(consent.Current.onlineServicesAllowed);
@@ -1237,24 +1262,30 @@ namespace Frontier.Tests
             Assert.AreEqual(1, provider.reads);
             Assert.AreEqual(UiText.Get("ranks.your-rank", 27, provider.score.ToString("N0")),
                 rt.Ui.DebugRoot.Q<Label>("leaderboard-player-rank").text);
-            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l =>
-                l.text == UiText.Get("ranks.entry", 1, UiText.Get("service.leaderboard.unknown-pilot"))));
+            var podium = rt.Ui.DebugRoot.Q("leaderboard-podium");
+            Assert.IsNotNull(podium, "The top three have a distinct podium.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("leaderboard-publish"), "Opening the page replaces manual posting.");
+            Assert.IsTrue(podium.Query<Label>().ToList().Exists(l =>
+                l.text == UiText.Get("service.leaderboard.unknown-pilot")));
 
             provider.pending = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
-            Press("leaderboard-publish");
-            Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>("leaderboard-publish").enabledSelf);
+            rt.Ui.DebugMenu("");
+            Press("menu-leaderboard");
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("leaderboard-retry"), "Loading starts automatically and exposes no extra upload action.");
             Assert.AreEqual(2, provider.submissions);
             provider.pending.SetResult(ServiceResult<LeaderboardEntry>.Failed("Network unavailable"));
             yield return null;
-            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("leaderboard-publish").enabledSelf);
+            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("leaderboard-retry").enabledSelf);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text.Contains("Network unavailable")));
             Assert.AreEqual(1, provider.reads, "A failed submission cannot claim a successful refresh.");
             provider.pending = null;
-            Press("leaderboard-publish");
+            Press("leaderboard-retry");
             yield return null;
             Assert.AreEqual(2, provider.reads);
+
             provider.pending = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
-            Press("leaderboard-publish");
+            rt.Ui.DebugMenu("");
+            Press("menu-leaderboard");
             consent.SavePreferences(false, false, false);
             consent.SavePreferences(false, false, true);
             provider.pending.SetResult(ServiceResult<LeaderboardEntry>.Success(
@@ -2715,17 +2746,18 @@ namespace Frontier.Tests
             var dockLabels = rt.Ui.DebugRoot.Q(className: "fr-dock").Query<Label>(className: "fr-dock-label").ToList();
             CollectionAssert.AreEqual(new[] { "RESEARCH", "MAP", "SHIP", "BUILD" }, dockLabels.ConvertAll(label => label.text));
             var pack = rt.Ui.DebugRoot.Q<Button>("dock-ship");
-            var gauge = pack.Q("pack-capacity-gauge");
-            Assert.AreEqual(8, gauge.childCount);
+            Assert.IsNull(pack.Q("pack-capacity-gauge"));
+            Assert.IsNull(pack.Q<Label>("pack-capacity-text"));
             rt.Ui.DebugEmptyPack();
-            Assert.AreEqual("0/" + rt.State.Slots, pack.Q<Label>("pack-capacity-text").text);
-            Assert.AreEqual(0, gauge.Query(className: "fr-pack-segment-filled").ToList().Count);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("pack.capacity", 0, rt.State.Slots)),
+                "Cargo retains its capacity information.");
             string resourceId = rt.Db.resources[0].id;
             rt.State.backpack.Set(resourceId, rt.State.backpack.StackSizeOf(resourceId) * rt.State.Slots);
             rt.State.Notify();
-            Assert.AreEqual(rt.State.Slots + "/" + rt.State.Slots, pack.Q<Label>("pack-capacity-text").text);
-            Assert.AreEqual(8, gauge.Query(className: "fr-pack-segment-filled").ToList().Count);
-            Assert.AreEqual(UiText.Get("pack.capacity", rt.State.SlotsUsed, rt.State.Slots), pack.tooltip);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("pack.capacity.rearrange", rt.State.SlotsUsed, rt.State.Slots)),
+                "Cargo still reports a full hold after it changes.");
 
             rt.Ui.DebugResearch();
             var navigation = rt.Ui.DebugRoot.Q("research-navigation");

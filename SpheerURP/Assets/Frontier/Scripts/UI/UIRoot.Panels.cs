@@ -197,6 +197,9 @@ namespace Frontier
         static Label Note(string text, Color color)
         {
             var l = UiKit.Text(text, "fr-small", color);
+            l.style.whiteSpace = WhiteSpace.Normal;
+            l.style.flexShrink = 1f;
+            l.style.minWidth = 0f;
             l.style.marginTop = UiKit.Space.S8;
             return l;
         }
@@ -237,6 +240,8 @@ namespace Frontier
                 {
                     case "debug": BuildDebug(body); break;
                     case "ranks": BuildLeaderboard(body); break;
+                    case "leaderboard": BuildOnlineLeaderboard(body); break;
+                    case "shards": BuildShardWallet(body); break;
                     case "goals": BuildGoals(body); break;
                     case "ascension": BuildAscension(body); break;
                     case "tutorial": BuildTutorial(body); break;
@@ -247,7 +252,9 @@ namespace Frontier
                 return;
             }
             var grid = UiKit.Div("fr-menu-grid");
-            grid.Add(MenuTile("ranks", UiText.Get("menu.ranks"), UiKit.Lime, "ranks"));
+            grid.Add(MenuTile("star", UiText.Get("menu.records"), UiKit.Lime, "ranks"));
+            grid.Add(MenuTile("ranks", UiText.Get("menu.leaderboard"), UiKit.Cyan, "leaderboard"));
+            grid.Add(MenuTile("crystal", UiText.Get("menu.shards"), UiKit.Magenta, "shards"));
             grid.Add(MenuTile("star", UiText.Get("menu.goals"), UiKit.Amber, "goals"));
             if (gs.AscensionAvailable) grid.Add(MenuTile("play", UiText.Get("menu.ascension"), UiKit.Magenta, "ascension"));
             grid.Add(MenuTile("map", UiText.Get("menu.atlas"), UiKit.Cyan, "atlas"));
@@ -263,11 +270,20 @@ namespace Frontier
         {
             Color c = UiKit.Ui(color);
             var b = new Button();
+            b.name = "menu-" + page;
             b.AddToClassList("fr-menu-tile");
             UiKit.SetAccent(b, c);
             b.Add(Icons.Make(icon, c));
             b.Add(UiKit.Text(label, "fr-menu-tile-label"));
-            b.clicked += () => { Sfx.Click(); menuPage = page; RefreshModal(); };
+            b.clicked += () =>
+            {
+                Sfx.Click();
+                menuPage = page;
+                RefreshModal();
+                if (page == "leaderboard" && services != null && services.Consent.Current.hasDecision &&
+                    services.Consent.Current.onlineServicesAllowed)
+                    LoadOnlineLeaderboard();
+            };
             return b;
         }
 
@@ -278,7 +294,6 @@ namespace Frontier
 
         void BuildLeaderboard(VisualElement body)
         {
-            BuildOnlineLeaderboard(body);
             BuildEraProgress(body);
             if (gs.AscensionAvailable)
                 body.Add(IconBtn(UiText.Get("ranks.ascension"), "play", UiKit.Magenta, () => { menuPage = "ascension"; RefreshModal(); }));
@@ -306,6 +321,17 @@ namespace Frontier
             foreach (var s in gs.structures) planets.Add(s.planetId);
             StatRow(card, "map", UiKit.Amber, UiText.Get("ranks.bases"), planets.Count.ToString());
             body.Add(card);
+        }
+
+        void BuildShardWallet(VisualElement body)
+        {
+            var balance = Card(UiKit.Magenta);
+            balance.Add(UiKit.Text(UiText.Get("shards.title"), "fr-h2"));
+            balance.Add(UiKit.Text(UiText.Get("shards.balance", gs.ShardBalance.ToString("N0")), "fr-h1", UiKit.Magenta));
+            balance.Add(UiKit.Text(UiText.Get("shards.uses-help"), "fr-muted"));
+            body.Add(balance);
+            BuildShardAdOffer(body);
+            BuildBuilders(body);
         }
 
         void BuildOnlineLeaderboard(VisualElement body)
@@ -345,8 +371,12 @@ namespace Frontier
 
             if (onlineLeaderboardEntries != null)
             {
-                foreach (LeaderboardEntry entry in onlineLeaderboardEntries)
+                BuildLeaderboardPodium(body);
+                body.Add(SectionLabel(UiText.Get("ranks.top20")));
+                for (int i = 0; i < onlineLeaderboardEntries.Count; i++)
                 {
+                    LeaderboardEntry entry = onlineLeaderboardEntries[i];
+                    if (entry.rank <= 3) continue;
                     var row = UiKit.Div("fr-stat-row");
                     row.Add(UiKit.Text(UiText.Get("ranks.entry", entry.rank, entry.usesFallbackName
                         ? UiText.Get("service.leaderboard.unknown-pilot") : entry.displayName), "fr-small"));
@@ -358,11 +388,41 @@ namespace Frontier
                     body.Add(UiKit.Text(UiText.Get("ranks.empty"), "fr-muted"));
             }
 
-            var load = IconBtn(UiText.Get(leaderboardLoading ? "ranks.loading" : "ranks.load"),
-                "ranks", UiKit.Cyan, LoadOnlineLeaderboard);
-            load.name = "leaderboard-publish";
-            UiKit.SetEnabledLook(load, !leaderboardLoading);
-            body.Add(load);
+            if (leaderboardFailure.HasValue)
+            {
+                var retry = IconBtn(UiText.Get("ranks.retry"), "ranks", UiKit.Cyan, LoadOnlineLeaderboard);
+                retry.name = "leaderboard-retry";
+                UiKit.SetEnabledLook(retry, !leaderboardLoading);
+                body.Add(retry);
+            }
+        }
+
+        void BuildLeaderboardPodium(VisualElement body)
+        {
+            if (onlineLeaderboardEntries == null || onlineLeaderboardEntries.Count == 0) return;
+            body.Add(SectionLabel(UiText.Get("ranks.podium.title")));
+            var podium = UiKit.Div("fr-row");
+            podium.name = "leaderboard-podium";
+            podium.style.alignItems = Align.FlexEnd;
+            podium.style.justifyContent = Justify.Center;
+            int[] order = { 1, 0, 2 };
+            foreach (int index in order)
+            {
+                if (index >= onlineLeaderboardEntries.Count) continue;
+                LeaderboardEntry entry = onlineLeaderboardEntries[index];
+                Color accent = entry.rank == 1 ? UiKit.Amber : UiKit.Cyan;
+                var card = Card(accent);
+                card.style.flexGrow = 1f;
+                card.style.minWidth = 0f;
+                card.style.marginLeft = UiKit.Space.S4;
+                card.style.marginRight = UiKit.Space.S4;
+                card.style.minHeight = entry.rank == 1 ? 112f : 88f;
+                card.Add(UiKit.Text(UiText.Get("ranks.podium.place", entry.rank), "fr-small", accent));
+                card.Add(UiKit.Text(entry.usesFallbackName ? UiText.Get("service.leaderboard.unknown-pilot") : entry.displayName, "fr-tiny"));
+                card.Add(UiKit.Text(entry.score.ToString("N0"), "fr-h2"));
+                podium.Add(card);
+            }
+            body.Add(podium);
         }
 
         void BuildEraProgress(VisualElement body)
@@ -422,7 +482,8 @@ namespace Frontier
 
         async void LoadOnlineLeaderboard()
         {
-            if (leaderboardLoading || services == null || services.AccountDeletionBusy) return;
+            if (leaderboardLoading || services == null || services.AccountDeletionBusy ||
+                !services.Consent.Current.hasDecision || !services.Consent.Current.onlineServicesAllowed) return;
             var activeServices = services;
             long score = gs.FrontierScore.total;
             leaderboardLoading = true;
@@ -483,7 +544,7 @@ namespace Frontier
                 activeServices.Consent.PreferencesChanged -= Observe;
                 leaderboardLoading = false;
                 if (withdrawn) { onlineLeaderboardEntries = null; onlinePlayerEntry = null; leaderboardStatus = null; }
-                if (this != null && menuPage == "ranks") RefreshModal();
+                if (this != null && menuPage == "leaderboard") RefreshModal();
             }
         }
 

@@ -51,7 +51,47 @@ namespace Frontier.Tests
             Assert.IsNotNull(rules);
             Assert.IsFalse(rules.harvestEnabled);
             Assert.IsFalse(rules.constructionEnabled);
+            Assert.IsTrue(rules.shardsEnabled);
             Assert.AreEqual(0, rules.constructionSeconds);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void OptionalShardAdRewardUsesTheSaveJournalAndCannotBeReplayed(bool earned)
+        {
+            var state = new GameState(db, false, clock);
+            int amount = db.shardRules.data.adReward;
+            int startingBalance = state.ShardBalance;
+            Assert.IsFalse(state.PrepareGameplayReward("free-shards", null, amount + 1, null, out _, out _),
+                "The grant must match the authored shard reward.");
+            Assert.IsFalse(state.SaveIsReadOnly);
+            Assert.IsNull(state.PendingTravel);
+            Assert.AreEqual(amount, state.db.shardRules.data.adReward);
+            Assert.IsTrue(state.PrepareGameplayReward("free-shards", null, amount, null, out var ticket, out var error),
+                error);
+            Assert.AreEqual(startingBalance, state.ShardBalance, "No shards are granted before the ad is verified.");
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            Assert.AreEqual(startingBalance + (earned ? amount : 0), state.ShardBalance);
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            if (!earned)
+                Assert.IsFalse(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out error),
+                    "A late earned callback cannot revive a cancelled reward.");
+            Assert.AreEqual(startingBalance + (earned ? amount : 0), state.ShardBalance,
+                "Repeating the callback cannot grant a second reward.");
+            Assert.AreEqual(startingBalance + (earned ? amount : 0), new GameState(db, true, clock).ShardBalance);
+        }
+
+        [Test]
+        public void OptionalShardAdRewardCannotOverflowTheWallet()
+        {
+            var state = new GameState(db, false, clock);
+            Assert.IsTrue(state.TryCreateCloudSaveSnapshot(out var save, out var error), error);
+            save.wallet.Clear();
+            save.wallet.Add(new WalletEntry { currency = "shards", amount = int.MaxValue });
+            Assert.IsTrue(state.TryRestoreCloudSave(save, out error), error);
+            Assert.IsFalse(state.PrepareGameplayReward("free-shards", null, db.shardRules.data.adReward,
+                null, out _, out _));
+            Assert.AreEqual(int.MaxValue, state.ShardBalance);
         }
 
         [Test]

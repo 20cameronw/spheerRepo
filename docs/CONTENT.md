@@ -2,14 +2,16 @@
 
 ## Player-flow reward authoring
 
-`Resources/Frontier/GameplayRewardRules.asset` is the explicit gameplay placement gate. Harvest and
-construction ship disabled; construction seconds remains zero until tuning is approved. Do not copy
-historical `RewardedAdsPolicy` caps into approved gameplay tuning. Construction uses existing service
-placement ID `timer-skip`; harvest uses `double-yield`. The proposed values and child-inclusive activation
-gates are documented in [SYSTEMS.md](SYSTEMS.md), not activated by this content.
-The user's subsequent frequency decision removes daily caps for these two placements via explicit
-`unlimitedDaily` flags. A zero numeric cap without that flag still means disabled. Cooldowns remain in
-force; flags do not enable gameplay or native providers. Other staged placements are unchanged.
+`Resources/Frontier/GameplayRewardRules.asset` gates gameplay reward offers. Harvest and construction
+remain disabled; construction seconds stays zero until tuning is approved. Construction uses service
+placement `timer-skip`; harvest uses `double-yield`. The optional `free-shards` reward is separately
+enabled in the Shards page, but can only proceed after explicit ad consent and provider-confirmed video
+completion; the current iOS provider release gate still prevents real requests. Its amount comes from
+`ShardRulesSO.data.adReward`, while its 2/day cap and four-hour cooldown come from `RewardedAdsPolicy`.
+Do not copy policy caps into gameplay tuning. The user's frequency decision removes daily caps for harvest
+and construction via explicit `unlimitedDaily` flags. A zero numeric cap without that flag still means
+disabled; cooldowns and platform/provider gates remain. Missing-resource assistance and other staged
+placements remain unexposed.
 
 Player-flow copy lives in `UiStrings.asset` (`project.*`, `reward.*` and first-departure guidance).
 Use `FrontierLocalization.SyncEnglishCatalog` after canonical edits; generated locale tables must not
@@ -102,9 +104,9 @@ coordinate searches stay in universe view. Search, resource filters, pins and ro
 ## World interaction and shared mining
 
 Orbit/Surface framing uses an interruptible 0.6-second eased camera move and an icon-only
-world-view button with a localized action tooltip. Carried cargo usage lives on the Ship dock action
-as eight segmented green-to-amber-to-red bars and an exact used/total count, not a second top-bar
-chip. The dock is Research / Map / Ship / Build. Ship opens Cargo and also owns Tools and Systems;
+world-view button with a localized action tooltip. Carried cargo usage lives inside Cargo, not on
+the Ship dock action or a duplicate top-bar chip. The dock is Research / Map / Ship / Build.
+Ship opens Cargo and also owns Tools and Systems;
 Research owns Tech and global Improvements. Buildings are managed by tapping them. Existing construction timers, finish
 confirmations and recruitment remain accessible through Build > Construction Jobs, without
 changing saved crews or progression. Map pinning is a compact native checkbox.

@@ -201,14 +201,14 @@ namespace Frontier.Services.Unity
             LevelPlay.OnInitFailed += Failed;
             try
             {
-                // An ad opt-in is not consent to tracking, personalization, or sale/sharing.
+                // This is a child-inclusive game; opt-in only permits contextual rewarded ads.
                 LevelPlay.SetConsent(false);
                 LevelPlay.SetMetaData("do_not_sell", "true");
                 LevelPlay.SetMetaData("is_deviceid_optout", "true");
+                LevelPlay.SetMetaData("is_child_directed", "true");
                 if (testSuite)
                 {
                     LevelPlay.SetMetaData("is_test_suite", "enable");
-                    LevelPlay.SetMetaData("is_child_directed", "true");
                 }
                 LevelPlay.SetPauseGame(true);
                 LevelPlay.Init(appKey);

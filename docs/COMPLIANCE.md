@@ -9,11 +9,13 @@ player consent or OS permission.
 ## Current behavior
 
 - Gameplay works offline. Analytics, rewarded ads and online account/cloud/leaderboard access are separate,
-  policy-versioned local opt-ins. No automatic cloud upload exists. Online ranks accept all players,
-  without an age gate, after online opt-in. The Ranks screen explains that Unity receives a pseudonymous
-  player ID, Frontier Score and normal connection data, not a chosen public name/email/birthday.
-  Posting a score is explicit, never triggered by launch or normal progression. Consent policy version 3
-  requires a fresh decision for this changed behavior. This is data minimization, not a certification
+  policy-versioned local opt-ins. No upload occurs on launch or during normal play. Opening the dedicated
+  Leaderboard page after online opt-in explicitly submits the current score and loads the top 20.
+  Online ranks accept all players, without an age gate, after online opt-in. The consent screen explains
+  that Unity receives a pseudonymous player ID, Frontier Score and normal connection data, not a chosen
+  public name/email/birthday. Posting a score is explicit to opening that page, never triggered by launch
+  or normal progression. Consent policy version 3 requires a fresh decision for this data-sharing scope.
+  This is data minimization, not a certification
   that anonymous authentication is exempt from children's privacy requirements; publish the actual
   behavior and retention/support details in the public policy before distributing this build.
 - `Lifetime_Earnings_Leaderboard` is the configured UGS board ID. The rebuilt game submits its existing
@@ -99,11 +101,14 @@ player consent or OS permission.
   settlement: app termination or callbacks after those deadlines need a future server reward journal.
   This cannot undo an SDK request already in progress.
   Device UTC and preferences are not server authority or cross-device anti-cheat; forward clock changes
-  and cleared preferences are outside this local protection. The UI remains hidden while the provider is
-  unavailable. Authored daily caps/cooldowns are double-yield 8/180s, emergency-fuel 3/600s,
+  and cleared preferences are outside this local protection. The Shards offer explains why it is
+  unavailable and hides the watch action while the provider is unavailable. Authored daily caps/cooldowns
+  are double-yield 8/180s, emergency-fuel 3/600s,
   timer-skip 5/300s, revive 3/0s, daily-supply 1/0s and free-shards 2/14400s.
-  Only harvest double-yield has gameplay reward wiring today. Other placements and the requested
-  missing-resource ad offer are not exposed yet; positive policy caps do not implement their gameplay rewards.
+  Harvest double-yield and the optional Shards-page free-shards placement have gameplay reward wiring.
+  Shards are granted only after provider-confirmed completion and the durable reward journal succeeds.
+  Other placements, including missing-resource assistance, remain unexposed. Positive policy caps alone
+  do not implement gameplay rewards.
 
 ## iOS LevelPlay activation
 
@@ -139,7 +144,7 @@ player consent or OS permission.
   The provider uses that default placement and returns the requested game placement ID;
   Frontier applies the game's limits and reward amounts. Dashboard placement-level reporting is not wired.
 - Keep banners and forced interstitials off. Leaderboards are independent of ad activation:
-  anonymous authentication and explicit Frontier Score posting are enabled as described above.
+  anonymous authentication and explicit page-open Frontier Score posting are enabled as described above.
 
 ## Required before public release or enabling additional providers
 

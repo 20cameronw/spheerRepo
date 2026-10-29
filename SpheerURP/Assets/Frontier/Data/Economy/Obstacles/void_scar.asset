@@ -144,4 +144,4 @@ MonoBehaviour:
       reward:
         resourceId: steel
         amount: 288
-  modelKey: 
+  modelKey: world_obstacle_void_scar

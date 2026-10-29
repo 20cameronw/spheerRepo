@@ -16,7 +16,7 @@ Declare `xmlns:frontier="Frontier"` in UXML and use tags such as `<frontier:Fron
 Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to load tokens/fonts.
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
-The top bar includes fuel, live Nova Shards and player level; carried capacity stays on the Ship dock.
+The top bar includes fuel, live Nova Shards and player level; carried capacity stays inside Cargo, not on the dock.
 Ship arrivals and departures are staged side-on at the screen-top silhouette of the planet, not on its front face.
 Two pale air boosters pulse downward to brake descent, cut out at contact, and finish with a small gear settle and
 surface dust. This is presentation only; landing slots, travel costs and progression remain unchanged.
@@ -69,11 +69,13 @@ Reward offers use explicit ad labels and exact bonuses beside the normal action;
 The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
 Online ranks are available to all ages after explicit online opt-in, without name or birthday entry.
-Put the online section first on Ranks, followed by the existing local era/score/record breakdown.
-The first action explains anonymous Unity authentication and score/connection-data sharing; subsequent
-actions explicitly post the current Frontier Score and load the top 20. Show the player's returned rank
-outside that list too. Display anonymous Pilot labels rather than UGS profile names. Keep real network
-errors visible and retryable; never substitute local sample scores for a failed server response.
+Keep local era/score/record details on Records and put online ranks on their own Leaderboard page.
+Opening that page after opt-in explicitly submits the current Frontier Score and loads the top 20; it
+never uploads at launch or during normal play. Before opt-in, explain anonymous Unity authentication
+and score/connection-data sharing and require a deliberate enable action. Show the player's returned rank
+outside the list too, with a distinct top-three podium. Display anonymous Pilot labels rather than UGS
+profile names. Keep real network errors visible and retryable; never substitute local sample scores for a
+failed server response.
 These client-reported casual ranks are not a claim of server-validated anti-cheat.
 
 Modal, popup and toast shells enter with a 160 ms ease-out translation (16 px, 6 px and -8 px respectively);

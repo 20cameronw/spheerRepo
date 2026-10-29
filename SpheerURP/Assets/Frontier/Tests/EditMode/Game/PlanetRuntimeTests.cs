@@ -349,8 +349,10 @@ namespace Frontier.Tests
                 Assert.AreEqual(1f, ModelLibrary.GroundScale(round), round);
             foreach (string core in new[] { "ferrum", "cinder", "nyx", "obsidian", "vesper" })
                 Assert.AreEqual(0.70f, ModelLibrary.GroundScale(core), 0.011f, core + " is a 1.05 body with spikes out to 1.3");
-            foreach (string lens in new[] { "arbor", "mire", "kaos" })
-                Assert.AreEqual(0.87f, ModelLibrary.GroundScale(lens), 0.011f, lens + " is a flattened body");
+            foreach (string terrain in new[] { "arbor", "mire" })
+                Assert.AreEqual(1f, ModelLibrary.GroundScale(terrain), terrain + " uses its full procedural terrain mesh as the body");
+            Assert.AreEqual(0.92f, ModelLibrary.GroundScale("kaos"), 0.011f,
+                "kaos's protruding shards narrow the measured body radius");
             Assert.AreEqual(1f, ModelLibrary.GroundScale("no-such-model"));
             Assert.AreEqual(1f, ModelLibrary.GroundScale("struct_drill"));
         }

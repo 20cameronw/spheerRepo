@@ -65,6 +65,36 @@ MonoBehaviour:
     text: DISMISS INTERRUPTED REQUEST
   - key: reward.discard
     text: DISCARD THIS UNCLAIMED BONUS
+  - key: shards.title
+    text: NOVA SHARDS
+  - key: shards.balance
+    text: 'AVAILABLE: {0}'
+  - key: shards.uses-help
+    text: Use shards to recruit an extra builder or finish active work. Shorten an
+      obstacle clearance from its world, or revive a failed Hyperspace run. Rewarded
+      videos are optional.
+  - key: shards.ad.title
+    text: OPTIONAL REWARDED VIDEO
+  - key: shards.ad.help
+    text: Tap only if you want to watch a video for {0} shards. Videos never start
+      automatically.
+  - key: shards.ad.unavailable
+    text: Rewarded videos are unavailable in this build until iOS audience and privacy
+      review and a physical test-device check are complete.
+  - key: shards.ad.consent
+    text: Optional videos require your advertising choice in Privacy Settings.
+  - key: shards.ad.settings
+    text: REVIEW AD SETTINGS
+  - key: shards.ad.read-only
+    text: This save is read-only, so shards cannot be granted.
+  - key: shards.ad.wallet-full
+    text: Your shard wallet is full. Spend shards before claiming another reward.
+  - key: shards.ad.watch
+    text: 'WATCH VIDEO: +{0} SHARDS'
+  - key: shards.ad.loading
+    text: Opening rewarded video...
+  - key: shards.ad.claimed
+    text: Received {0} shards.
   - key: project.prerequisite
     text: OPEN REQUIRED RESEARCH
   - key: project.lab
@@ -904,6 +934,12 @@ MonoBehaviour:
     text: BACK
   - key: menu.ranks
     text: RANKS
+  - key: menu.records
+    text: RECORDS
+  - key: menu.leaderboard
+    text: LEADERBOARD
+  - key: menu.shards
+    text: NOVA SHARDS
   - key: menu.goals
     text: GOALS
   - key: menu.ascension
@@ -2295,14 +2331,20 @@ MonoBehaviour:
       HTTPS privacy policy are configured and approved. Your local record remains
       available above.
   - key: ranks.enable
-    text: Anyone can rank. Enabling online ranks connects to Unity using an anonymous
-      player ID and posts your Frontier Score. No public name, email or birthday
-      is needed. Unity also receives connection data such as your IP address. You
-      can turn online services off in Privacy Settings.
+    text: Online rankings are optional. Enabling them connects through an anonymous
+      player ID; opening the leaderboard uploads your Frontier Score. No public name,
+      email or birthday is needed. Unity receives connection data such as your IP
+      address. You can turn online services off in Privacy Settings.
   - key: ranks.online.help
-    text: Post your current Frontier Score and load the top 20. Your own rank is
-      shown even outside the top 20. All players use anonymous pilot labels. These
-      are casual, client-reported scores, not cheat-proof competitive rankings.
+    text: Opening this page uploads your current Frontier Score and loads the top
+      20 automatically. Your own rank is shown even outside the top 20. Pilot labels
+      are anonymous; scores are casual client-reported rankings.
+  - key: ranks.podium.title
+    text: TOP PILOTS
+  - key: ranks.podium.place
+    text: '#{0}'
+  - key: ranks.top20
+    text: TOP 20
   - key: ranks.entry
     text: '#{0}  {1}'
   - key: ranks.empty
@@ -2310,7 +2352,9 @@ MonoBehaviour:
   - key: ranks.loading
     text: LOADING RANKS
   - key: ranks.load
-    text: POST SCORE & LOAD RANKS
+    text: LEADERBOARD UPDATES WHEN OPENED
+  - key: ranks.retry
+    text: RETRY LEADERBOARD
   - key: ranks.era
     text: 'YOUR FRONTIER: {0}'
   - key: ranks.era.help
