@@ -1944,7 +1944,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1991336399
     m_Localized: Pinch to move between the surface and orbit. Keep zooming out to
-      enter the map. Controls opens search, routes and travel. Drag or pinch to explore
+      enter the map. Info opens search, routes and travel. Drag or pinch to explore
       known space.
     m_Metadata:
       m_Items: []
@@ -9476,11 +9476,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5105920542597120
-    m_Localized: Controls
+    m_Localized: Info
     m_Metadata:
       m_Items: []
   - m_Id: 5105920580345856
-    m_Localized: Hide map controls
+    m_Localized: Hide map info
     m_Metadata:
       m_Items: []
   - m_Id: 5105920580345857

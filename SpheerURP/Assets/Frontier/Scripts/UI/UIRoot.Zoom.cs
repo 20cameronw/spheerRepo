@@ -15,6 +15,24 @@ namespace Frontier
         bool CanZoomWorld { get { return !mapOpen && !busy && !introActive && !defense.Active &&
             modal == null && buildDef == null && shortageOverlay == null; } }
 
+#if UNITY_EDITOR
+        public bool EditorSendWheel(Vector2 screenPosition, Vector2 delta)
+        {
+            if (root == null || root.panel == null || delta == Vector2.zero) return false;
+            var point = RuntimePanelUtils.ScreenToPanel(root.panel,
+                new Vector2(screenPosition.x, ScreenMetrics.Height - screenPosition.y));
+            var target = root.panel.Pick(point);
+            if (target == null) return false;
+            using (var evt = WheelEvent.GetPooled(new Event
+                { type = EventType.ScrollWheel, mousePosition = point, delta = delta }))
+            {
+                evt.target = target;
+                target.SendEvent(evt);
+            }
+            return true;
+        }
+#endif
+
         void UpdateWorldZoomInput()
         {
             if (!CanZoomWorld)

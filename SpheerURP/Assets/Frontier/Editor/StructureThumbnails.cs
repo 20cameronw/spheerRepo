@@ -32,7 +32,8 @@ namespace Frontier.EditorTools
                 var prefab = ModelLibrary.Prefab(definition.modelKey);
                 if (prefab == null)
                     throw new InvalidOperationException("No thumbnail model for structure " + definition.id);
-                Render(prefab, Folder + "/" + definition.id + ".png");
+                Render(prefab, Folder + "/" + definition.id + ".png",
+                    definition.id == "warehouse" || definition.id == "fabricator" ? 180f : 0f);
             }
             AssetDatabase.Refresh();
             foreach (var definition in GameDatabase.Load().structures)
@@ -50,7 +51,7 @@ namespace Frontier.EditorTools
             Debug.Log("Frontier: baked structure thumbnails from the in-game ModelLibrary.");
         }
 
-        static void Render(GameObject prefab, string path)
+        static void Render(GameObject prefab, string path, float yaw)
         {
             var scene = EditorSceneManager.NewPreviewScene();
             var target = new RenderTexture(Resolution, Resolution, 24, RenderTextureFormat.ARGB32);
@@ -60,6 +61,7 @@ namespace Frontier.EditorTools
             {
                 var model = ModelLibrary.InstantiateInert(prefab);
                 SceneManager.MoveGameObjectToScene(model, scene);
+                model.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
                 if (!ModelLibrary.MeshBounds(model, out var bounds))
                     throw new InvalidOperationException("No mesh bounds for thumbnail " + prefab.name);
 

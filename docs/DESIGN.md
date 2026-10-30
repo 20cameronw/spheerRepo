@@ -28,12 +28,17 @@ so terrain absorbs the added depth instead of pushing the structure upward; orbi
 The dock retains its four positions: Research / Map / Ship / Build. Ship always opens Cargo in one tap,
 with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
 and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
+Cargo Compression, including its Quantum Compression tier, is authored future content: it does not yet change
+resource stack sizes, and purchases remain blocked rather than charging for a nonfunctional effect.
 Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
 XP-locked research has a gray overlay with a lock and required XP level. Its tracking star remains interactive;
 research cards omit prerequisite-navigation buttons and retain their written requirements.
 Pinch or mouse-wheel zoom interpolates between the original surface and orbit camera endpoints; neither boundary moves.
 The world and map poll the project's active legacy mouse input as well as native UI Toolkit wheel events,
 deduplicated per frame: wheel up zooms in, wheel down zooms out, including map entry/return.
+Unity's Device Simulator does not forward wheel input to the player. An Editor-only Simulator plugin forwards
+wheel events over the rendered device screen into the runtime panel, preserving menu scrolling and UI hit testing.
+Its isolated preview-coordinate adapter accounts for device rotation, bezel, insets and rendering scale.
 Scrolling over shop panels or HUD controls does not zoom the world; zooming the exposed world dismisses a structure popup.
 Continuing outward by a small deliberate amount beyond orbit pulls the camera back while the orbital chart scales/fades in
 over 600 ms. There is no camera toggle. Pinching must start on the world, not a popup/HUD, and suppresses taps/rotation.
@@ -52,11 +57,13 @@ After model revisions, regenerate these textures with `Frontier/Models/Bake Stru
 (`Frontier.EditorTools.StructureThumbnails.Bake` in the Unity runner); no live preview cameras run during gameplay.
 Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
 systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
-World overzoom enters a minimal map: only a safe-area location bar, return arrow and Controls action remain.
+World overzoom enters a minimal map: only a safe-area location bar, return arrow and Info action remain.
 The location broadens from current planet/system to nearby systems to the current system's sector coordinates.
-Controls reveals the existing search/filter/destination/travel interface without changing zoom or selection;
+Info reveals the existing search/filter/destination/travel interface without changing zoom or selection;
 the eye action hides it again. The Map dock still opens the full controls directly. Further inward zoom at the
 current planet's local-system level returns smoothly to orbit; another world's selection opens its controls, never teleports.
+Local orbits retain a fixed 0.65 height/width ratio, fitting both viewport bounds with one radius;
+hiding info reveals more chart space without stretching orbits vertically.
 Panning stays near scanner coverage or remembered systems; coordinates outside that space clamp to its nearest edge.
 Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right.
 The route action stays in the destination card footer outside its scrolling details. Prerequisite actions share a
@@ -76,7 +83,9 @@ Missing-material cost and network chips are a single native button containing th
 quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
 FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses
 its existing border. Cost chips use the same compact content-fitted height whether owned or missing, not the action-button minimum.
-Build cards keep tracking stars top right (including locked/built cards), and their built/limit counts bottom right.
+Build cards keep tracking stars top right (including locked/built cards), and their built/limit counts right-aligned
+just above the Place/shard purchase row. Warehouse and Fabricator previews use a 180-degree model turn for a clearer face;
+in-world model orientation is unchanged.
 Every Build card keeps Place and shard-purchase actions visible on the same row; locked, built-at-limit and active-job
 cards disable those actions without bypassing research, planet, capacity or purchase rules.
 Unlocked structures sort before locked ones within every category, preserving their existing order within each group.

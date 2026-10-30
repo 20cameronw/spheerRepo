@@ -132,7 +132,7 @@ namespace Frontier
             mapLocation = UiKit.Text("", "fr-small");
             mapLocation.name = "map-location";
             mapLocationBar.Add(mapLocation);
-            var controls = IconBtn(UiText.Get("map.controls"), "gear", UiKit.Cyan, () => SetMapMinimal(false));
+            var controls = IconBtn(UiText.Get("map.controls"), "about", UiKit.Cyan, () => SetMapMinimal(false));
             controls.name = "map-show-controls";
             mapLocationBar.Add(controls);
             mapView.Add(mapLocationBar);
@@ -607,9 +607,11 @@ namespace Frontier
             int index = mapPlanets.FindIndex(p => p.Id == planet.Id);
             // The chart is deliberately schematic: evenly spaced lanes keep inner planets readable.
             float fraction = (index + 1f) / Mathf.Max(1, mapPlanets.Count);
-            float outerX = Mathf.Max(80, (float)viewport.Width * 0.5f - 100);
-            float outerY = Mathf.Max(64, (float)viewport.Height * 0.5f - 72);
-            return new Vector2(Mathf.Lerp(64, outerX, fraction), Mathf.Lerp(48, outerY, fraction));
+            const float orbitAspect = 0.65f;
+            float outerX = Mathf.Max(80, Mathf.Min((float)viewport.Width * 0.5f - 100,
+                ((float)viewport.Height * 0.5f - 72) / orbitAspect));
+            float radiusX = Mathf.Lerp(64, outerX, fraction);
+            return new Vector2(radiusX, radiusX * orbitAspect);
         }
 
         float NeighborOrbitRadius(StarSystem star)

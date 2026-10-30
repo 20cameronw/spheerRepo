@@ -16,6 +16,7 @@ namespace Frontier
         public bool DebugMapMinimal { get { return mapOpen && mapMinimal; } }
         public bool DebugMapOpen { get { return mapOpen; } }
         public void DebugMapZoomStep(bool inward) { StepMapZoom(inward); }
+        public Vector2 DebugMapOrbitAxes(PlanetData planet) { return PlanetOrbitAxes(planet); }
         public void DebugMinimalMap(float zoom = SystemZoom)
         {
             DebugMap(gs.planet, zoom);

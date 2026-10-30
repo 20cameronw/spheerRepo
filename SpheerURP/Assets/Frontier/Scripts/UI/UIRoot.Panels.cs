@@ -210,11 +210,11 @@ namespace Frontier
                 actions.Add(buy);
                 if (can && IsFirstSessionBuildTarget(def.kind))
                     AddFirstSessionCue(card, CurrentFirstSessionGuideStep);
-                card.Add(actions);
                 count.name = "shop-count-" + def.id;
                 count.style.alignSelf = Align.FlexEnd;
                 count.style.marginTop = UiKit.Space.S8;
                 card.Add(count);
+                card.Add(actions);
                 if (!string.IsNullOrEmpty(def.unlockResearch) && !gs.IsResearched(def.unlockResearch))
                 {
                     var content = UiKit.Div();

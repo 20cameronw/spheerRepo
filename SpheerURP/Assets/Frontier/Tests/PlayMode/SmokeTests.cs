@@ -1731,6 +1731,80 @@ namespace Frontier.Tests
             runtime.Ui.DebugReset();
         }
 
+#if UNITY_EDITOR
+        [UnityTest]
+        public IEnumerator DeviceSimulatorPreviewWheelReachesWorldAndMapWithoutLegacyMouseInput()
+        {
+            var simulatorType = typeof(UnityEditor.DeviceSimulation.DeviceSimulatorPlugin).Assembly
+                .GetType("UnityEditor.DeviceSimulation.SimulatorWindow", true);
+            var window = UnityEditor.EditorWindow.GetWindow(simulatorType);
+            window.Show();
+            window.Focus();
+            try
+            {
+                new GameObject("SimulatorWheelBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                deadline = Time.realtimeSinceStartup + 20;
+                while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+                rt.State.DismissFirstSessionGuide();
+                rt.Ui.DebugReset();
+                rt.Planet.Zoom01 = 0f;
+                yield return new WaitForSecondsRealtime(1f);
+                var view = window.rootVisualElement.Query<VisualElement>().ToList()
+                    .FirstOrDefault(element => element.GetType().FullName == "UnityEditor.DeviceSimulation.DeviceView");
+                Assert.IsNotNull(view, "Exercise Unity's actual Simulator preview, not a stand-in panel.");
+                Assert.Greater(view.worldBound.width, 0f);
+                string lastTarget = "";
+                Assert.IsTrue(window.rootVisualElement.Query<Label>().ToList()
+                    .Any(label => label.text.StartsWith("Scroll over the simulated screen")),
+                    "Unity must discover and attach the Frontier Simulator plugin.");
+                rt.Ui.DebugRoot.RegisterCallback<WheelEvent>(evt =>
+                {
+                    var target = evt.target as VisualElement;
+                    lastTarget = target == null ? "(none)" : target.name + " at " + evt.mousePosition;
+                }, TrickleDown.TrickleDown);
+                void Wheel(float delta)
+                {
+                    using (var evt = WheelEvent.GetPooled(new Event { type = EventType.ScrollWheel,
+                        mousePosition = view.worldBound.center, delta = new Vector2(0f, delta) }))
+                    {
+                        evt.target = view;
+                        view.SendEvent(evt);
+                    }
+                }
+                Wheel(-3f);
+                yield return null;
+                Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f,
+                    "The actual Simulator preview tree must forward wheel events to the runtime panel.");
+                Wheel(3f);
+                yield return null;
+                Assert.AreEqual(0f, rt.Planet.Zoom01, 0.001f);
+                Wheel(3f);
+                yield return null;
+                Wheel(3f);
+                Assert.IsTrue(rt.Ui.DebugMapMinimal, "Outward Simulator scrolling must enter the minimal map.");
+                yield return new WaitForSecondsRealtime(0.8f);
+                Wheel(-3f);
+                yield return new WaitForSecondsRealtime(1.4f);
+                Assert.IsFalse(rt.Ui.DebugMapOpen, "Simulator scrolling must also reach the map's return gesture. Last target: " + lastTarget);
+                rt.Ui.DebugShop(0);
+                yield return null;
+                var shopScroll = rt.Ui.DebugRoot.Q<FrontierModal>().Q<ScrollView>();
+                Assert.IsNotNull(shopScroll);
+                float scrollBefore = shopScroll.scrollOffset.y;
+                Wheel(30f);
+                yield return null;
+                Assert.Greater(shopScroll.scrollOffset.y, scrollBefore,
+                    "Simulator wheel input over a shop must scroll its real content, not only be ignored by zoom.");
+                Assert.IsFalse(rt.Ui.DebugMapOpen, "Wheel events over the shop must not leak into world zoom.");
+            }
+            finally { window.Close(); }
+        }
+#endif
+
         [UnityTest]
         public IEnumerator WorldOverzoomTransitionsToMinimalMapAndControlsStayOptional()
         {
@@ -1808,6 +1882,18 @@ namespace Frontier.Tests
             Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-map-card").resolvedStyle.display);
             Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-map-search").resolvedStyle.display);
             Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q("map-location-bar").resolvedStyle.display);
+            var minimalAxes = rt.Ui.DebugMapOrbitAxes(rt.State.planet);
+            Assert.AreEqual(0.65f, minimalAxes.y / minimalAxes.x, 0.0001f);
+            var info = rt.Ui.DebugRoot.Q<Button>("map-show-controls");
+            Assert.IsTrue(info.Query<Label>().ToList().Any(label => label.text == "Info"));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = info; info.SendEvent(submit); }
+            yield return null;
+            var fullAxes = rt.Ui.DebugMapOrbitAxes(rt.State.planet);
+            Assert.AreEqual(minimalAxes.y / minimalAxes.x, fullAxes.y / fullAxes.x, 0.0001f,
+                "Showing or hiding map info may resize the chart uniformly, never stretch its orbits vertically.");
+            var hideInfo = rt.Ui.DebugRoot.Q<Button>("map-hide-controls");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = hideInfo; hideInfo.SendEvent(submit); }
+            yield return null;
             var location = rt.Ui.DebugRoot.Q<Label>("map-location");
             Assert.AreEqual(UiText.Get("map.location.planet", rt.State.planet.Name, rt.State.planet.Star.Name), location.text);
             rt.Ui.DebugMapZoomStep(false);
@@ -2978,7 +3064,7 @@ namespace Frontier.Tests
                     var lockOverlay = card.Q("shop-research-lock");
                     Assert.AreEqual(lockOverlay == null ? card[0] : card, track.parent);
                     var content = lockOverlay == null ? card : card[0];
-                    Assert.AreEqual(content[content.childCount - 1], count, "Build count is the bottom-right item.");
+                    Assert.AreEqual(content[content.childCount - 2], count, "Build count sits just above the purchase row.");
                     Assert.AreEqual(Align.FlexEnd, count.resolvedStyle.alignSelf);
                     Assert.Less(track.worldBound.yMin, count.worldBound.yMin);
                     var place = card.Q<Button>("shop-place-" + id);
@@ -2986,6 +3072,8 @@ namespace Frontier.Tests
                     Assert.IsNotNull(place, "All Build cards expose their normal purchase action.");
                     Assert.IsNotNull(shardBuy, "All Build cards expose their shard purchase action.");
                     Assert.AreSame(place.parent, shardBuy.parent, "Both purchase options stay on the same row.");
+                    Assert.LessOrEqual(count.worldBound.yMax, place.worldBound.yMin + 1f,
+                        "The right-aligned count belongs above Place/shards, not below them.");
                     var definition = rt.Db.FindStructure(id);
                     if (rt.State.AtLimit(rt.State.planet, definition) || !rt.State.CanBuildHere(definition))
                     {

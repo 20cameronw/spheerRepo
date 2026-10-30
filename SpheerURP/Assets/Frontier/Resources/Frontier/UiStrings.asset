@@ -1961,8 +1961,8 @@ MonoBehaviour:
     text: All deposits
   - key: map.help
     text: Pinch to move between the surface and orbit. Keep zooming out to enter
-      the map. Controls opens search, routes and travel. Drag or pinch to explore
-      known space.
+      the map. Info opens search, routes and travel. Drag or pinch to explore known
+      space.
   - key: map.mode.universe
     text: Universe Map
   - key: map.mode.orbits
@@ -1994,9 +1994,9 @@ MonoBehaviour:
   - key: map.here
     text: YOU ARE HERE
   - key: map.controls
-    text: Controls
+    text: Info
   - key: map.hide-controls
-    text: Hide map controls
+    text: Hide map info
   - key: map.return-world
     text: Return to {0}
   - key: map.location.planet
