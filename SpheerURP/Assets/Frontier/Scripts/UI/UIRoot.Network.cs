@@ -17,7 +17,7 @@ namespace Frontier
                 BuildFuelReserves(body);
                 body.Add(UiKit.Text(UiText.Get("fuel.help"), "fr-muted"));
                 var upgrade = IconBtn(UiText.Get("fuel.upgrade"), "up", UiKit.Amber,
-                    () => { researchTab = 2; progressionTab = 1; OpenResearch(); });
+                    () => OpenShip(ShipPage.Systems));
                 upgrade.name = "fuel-open-upgrades";
                 body.Add(upgrade);
             }, true);
@@ -47,7 +47,6 @@ namespace Frontier
 
         void BuildNetwork(VisualElement body)
         {
-            body.Add(UiKit.Text(UiText.Get("network.help"), "fr-muted"));
             if (gs.NetworkRules == null)
             {
                 body.Add(Note(UiText.Get("network.lock.unavailable"), UiKit.Amber));
@@ -68,6 +67,7 @@ namespace Frontier
             else
             {
                 body.Add(SectionLabel(UiText.Get("network.project.title")));
+                AddProjectAction(body, Project("network", "grand_archive"));
                 var projectHelp = UiKit.Text(UiText.Get("network.project.help"), "fr-small");
                 projectHelp.style.whiteSpace = WhiteSpace.Normal;
                 body.Add(projectHelp);
@@ -96,7 +96,7 @@ namespace Frontier
                 archiveStatus.style.whiteSpace = WhiteSpace.Normal;
                 body.Add(archiveStatus);
                 body.Add(UiKit.Text(UiText.Get("network.archive.help"), "fr-muted"));
-                body.Add(NetworkCostRow(gs.NetworkCosts(true)));
+                body.Add(ProjectCosts(gs.NetworkCosts(true), Project("network", "grand_archive")));
                 string reason = gs.NetworkCompletionLockReason();
                 if (reason != null) body.Add(Note(reason, UiKit.Amber));
                 var complete = IconBtn(UiText.Get("network.complete"), "warp", UiKit.Lime, () =>
@@ -110,7 +110,6 @@ namespace Frontier
                 body.Add(complete);
             }
             body.Add(SectionLabel(UiText.Get("network.destinations")));
-            body.Add(NetworkCostRow(gs.NetworkCosts(false)));
             var destinations = new List<PlanetData>();
             foreach (var delta in gs.world.All)
             {
@@ -134,6 +133,9 @@ namespace Frontier
                     continue;
                 }
                 string reason = gs.PlanetLinkLockReason(destination);
+                var project = Project("link", destination.Id);
+                body.Add(ProjectCosts(gs.NetworkCosts(false), project));
+                AddProjectAction(body, project);
                 var link = IconBtn(UiText.Get("network.link", destination.Name), "warp", UiKit.Cyan, () =>
                 {
                     if (busy || defense.Active) return;
@@ -145,23 +147,6 @@ namespace Frontier
                 body.Add(link);
                 if (reason != null) body.Add(Note(reason, UiKit.Amber));
             }
-            var map = IconBtn(UiText.Get("network.open-map"), "map", UiKit.Cyan, () => { CloseModal(); OpenMap(); });
-            map.name = "network-open-map";
-            body.Add(map);
-        }
-
-        VisualElement NetworkCostRow(List<ItemAmount> costs)
-        {
-            var row = UiKit.Div("fr-row-wrap");
-            foreach (var cost in costs)
-            {
-                var chip = UiKit.ItemChip(cost.resource, cost.amount, gs.PlanetCount(cost.resource));
-                var resource = cost.resource;
-                if (gs.PlanetCount(resource) < cost.amount)
-                    chip = UiKit.BindResourceFind(chip, resource, OpenResourceSource);
-                row.Add(chip);
-            }
-            return row;
         }
 
         void PlayNetworkFinale()

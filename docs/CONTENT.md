@@ -1,5 +1,23 @@
 # Economy content pipeline
 
+## Player-flow reward authoring
+
+`Resources/Frontier/GameplayRewardRules.asset` gates gameplay reward offers. Harvest and construction
+remain disabled; construction seconds stays zero until tuning is approved. Construction uses service
+placement `timer-skip`; harvest uses `double-yield`. The optional `free-shards` reward is separately
+enabled in the Shards page, but can only proceed after explicit ad consent and provider-confirmed video
+completion; the current iOS provider release gate still prevents real requests. Its amount comes from
+`ShardRulesSO.data.adReward`, while its 2/day cap and four-hour cooldown come from `RewardedAdsPolicy`.
+Do not copy policy caps into gameplay tuning. The user's frequency decision removes daily caps for harvest
+and construction via explicit `unlimitedDaily` flags. A zero numeric cap without that flag still means
+disabled; cooldowns and platform/provider gates remain. Missing-resource assistance and other staged
+placements remain unexposed.
+
+Player-flow copy lives in `UiStrings.asset` (`project.*`, `reward.*` and first-departure guidance).
+Use `FrontierLocalization.SyncEnglishCatalog` after canonical edits; generated locale tables must not
+be edited manually. Stable project content/world/slot IDs live in existing save settings; do not rename
+content to change navigation. Tracked quantities and availability use the originating action's pool.
+
 ## XP-level progression requirements
 
 Building, structure/ship/defense upgrades, research, tool tiers and recipes now use player XP
@@ -19,7 +37,7 @@ and it never authorizes live purchases.
 `Resources/Frontier/NetworkRules.asset` is the editable, validated ScriptableObject for the new
 network progression; it sits alongside, and does not rewrite, the imported economy catalog.
 After Warp Gate Engineering, visit and build an operational gate on each endpoint, then pay
-the local link cost through a gate, Command > Ship > Planet Network, or a selected map world.
+the local link cost through a gate or Map > Planet Network.
 Links are permanent, undirected, transitive and saved as canonical planet ids. They remain
 after dismantling a gate. Solid green lines connect worlds on the local orbital chart and
 systems on the universe chart. Connected worlds use zero fuel and have no flight legs,
@@ -86,27 +104,55 @@ coordinate searches stay in universe view. Search, resource filters, pins and ro
 ## World interaction and shared mining
 
 Orbit/Surface framing uses an interruptible 0.6-second eased camera move and an icon-only
-world-view button with a localized action tooltip. Backpack usage lives on the Pack dock action
-as eight segmented green-to-amber-to-red bars and an exact used/total count, not a second top-bar
-chip. Command has one Tools / Tech / Ship / Defense navigation; Bases and Crews are no longer
-Command tabs. Buildings are managed by tapping them. Existing construction timers, finish
+world-view button with a localized action tooltip. Carried cargo usage lives inside Cargo, not on
+the Ship dock action or a duplicate top-bar chip. The dock is Research / Map / Ship / Build.
+Ship opens Cargo and also owns Tools and Systems;
+Research owns Tech and global Improvements. Buildings are managed by tapping them. Existing construction timers, finish
 confirmations and recruitment remain accessible through Build > Construction Jobs, without
 changing saved crews or progression. Map pinning is a compact native checkbox.
 
-Command > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed
+Ship > Tools uses one catalog upgrade list rather than the old axe/pick/drill tabbed
 legacy shop. The Mining entry uses the existing Pick ladder's costs, research and reach gates;
 both Mine and Drill receive its tier. The highest previously owned Pick or Drill tier is retained
 without deleting either saved entry. Old legacy pick/drill power bonuses remain effective for both
 games; new purchases use the catalog rather than requiring two parallel upgrade tracks.
 
-Mine now runs a five-lane descending vein cutter: read six upcoming rows, steer into bright elongated
-rich seams, and avoid dark flattened unstable rock. Four hull points and eighteen rows bound a run.
+Mine now runs a five-lane descending vein cutter: read six upcoming rows, steer into gold crystal crowns,
+distinguish ordinary blue-grey ore chunks with small metal inclusions, and avoid the unchanged dark flattened unstable rock.
+Four hull points and eighteen rows bound a run.
 Rich seams yield three ore versus one from ordinary rock; accumulated ore determines quality.
-Stronger tools preserve existing yield benefits and add reaction time. Pressure-band drilling stays unchanged.
+Stronger tools preserve existing yield benefits and add reaction time. Hold SPEED (Space) doubles the real row speed;
+each three consecutive rich seams restores one lost integrity point, never multiplying ore or exceeding four integrity.
+The bit spins faster under speed control; continuous cutting chips and larger per-row break bursts reuse a
+32-piece, quality-scaled mesh pool that freezes with the minigame.
 
-Natural trees and mineral seams are tappable on the planet. Their resource panels launch the existing
-gather/reward flow through an operational matching structure, preserving method restrictions, hazard
-gates and structure bonuses. Sites do not consume or move persisted building pads. Surface View crops
+Chopping uses a moving timing marker and a central good zone with a narrower perfect center. Tap SWING or press Space;
+the existing axe cooldown, four stages and perfect/good/miss damage remain. Difficulty changes marker speed, and tool power
+and tolerance widen the forgiving zone. Axe/tree impacts still reflect the actual swing result.
+
+Drilling retains independent pressure control (Space) and adds hold BOOST (left Shift): productive progress is 2.2x,
+with slightly stronger pressure rise. Heat gains 28 percentage points/second during boost and cools at 35/second otherwise.
+At 100% it pauses cutting until 35%, preserving all earned depth; releasing boost early avoids the lockout.
+The bit and ore surface follow real progress, not an accelerated cosmetic timer. A 90-second safety finish keeps earned
+partial quality proportional to depth (idle timeout yields zero).
+
+Siphoning adds pressure management: pumping adds 28% pressure, narrowing the capture window by up to 35%.
+Hold VENT (left Shift) to cool pressure at 50%/second rather than passive 5.5%; pumping is blocked while venting.
+Consecutive clean pumps stabilize the next window, capped at 16% extra width; seven pulses and averaged quality remain.
+Excavation now gives grid direction plus Manhattan steps from the last ping, rather than only vague echo strength;
+three seams and eighteen pings remain. Salvage selects a moving target, then holds TETHER (Space) and releases between
+0.55 and 1.4 seconds. Early/late releases spend a cast but never remove previous captures; cancellation or pause spends
+nothing. Six fragments/ten casts and all quality ceilings and harvest/reward settlement remain unchanged.
+
+The planet surface shows placed structures and removable debris, plus empty pads only in build mode.
+Resources have no separate surface model, label, collider or tap target. Tap a harvester and choose HARVEST.
+Ready structures launch the same gather/reward flow; pending structures show their job instead.
+Gather objectives and empty Cargo select a ready local harvester or open the gatherer construction tab when missing.
+Building headers retain construction-job/crew access via their build icon, without a Build-panel shortcut row.
+Method restrictions, hazard/research gates and structure bonuses remain.
+Surface scrap stays in the existing Mine opportunities and is obtainable from the Mining Rig;
+it has not been merged into debris rewards or removed. GatherSpot yields/difficulty and auto-harvesting are unchanged.
+The stable slot-direction prefix and saved pads/structures/obstacles do not move. Surface View crops
 into the upper hemisphere for rotation and selection; Orbit View restores the overview. Called waves
 return to the overview so enemies remain visible. Missing-resource
 cost chips are native buttons with localized find tooltips, not separate FIND actions. Debris has no
@@ -202,7 +248,9 @@ are persisted alongside them in v2. The save schema stays v2, v1 originals are b
 
 Imported recipes are filtered by exact station id, station level, XP level and research, including the authoritative craft
 action. Purchased research now passes authored research gates; node prerequisites, current-world lab level, XP level,
-catalog identity and resource costs are checked by the runtime. The Command panel exposes research and tool ladders.
+catalog identity and resource costs are checked by the runtime. Research exposes technology; Ship exposes tool ladders.
+Research, tools and upgrades spend carried cargo plus operational current-world storage connected by a Cargo Depot,
+using the same atomic spending helper as construction. Cost chips show that same pool; remote stock is never included.
 Only Axe/Pick/Drill tiers can be purchased; their yield and active tool level are reflected in harvest rewards and tool feedback.
 Other ladder game types remain visibly unavailable until their minigames exist.
 Unsupported structures/effects cannot be purchased. Supported legacy actions remain synchronous: batch size is not treated

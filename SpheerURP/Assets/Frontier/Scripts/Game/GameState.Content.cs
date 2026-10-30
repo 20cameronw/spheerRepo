@@ -49,16 +49,16 @@ namespace Frontier
             return GateReason(def.unlockResearch, Math.Max(def.unlockTier, row.requiresReachTier), row.requiresLabLevel);
         }
 
-        public bool CanBuy(UpgradeSO upgrade) { return UpgradeLockReason(upgrade) == null && Has(upgrade.CostAt(Level(upgrade))); }
+        public bool CanBuy(UpgradeSO upgrade) { return UpgradeLockReason(upgrade) == null && HasPlanetResources(upgrade.CostAt(Level(upgrade))); }
 
         public string UpgradeLockReason(UpgradeSO upgrade)
         {
             if (upgrade == null || db.FindUpgrade(upgrade.id) != upgrade) return UiText.Get("gate.upgrade.unknown");
             int level = Level(upgrade);
             if (level >= upgrade.MaxLevel) return UiText.Get("gate.max-level");
+            if (db.UsesImportedEconomy && upgrade.effect == UpgradeEffect.ToolPower)
+                return UiText.Get("gate.upgrade.legacy-tool");
             if (!db.UsesImportedEconomy || !upgrade.HasLevelRows) return null;
-            if (upgrade.effect == UpgradeEffect.StackMultiplier)
-                return UiText.Get("gate.upgrade.future");
             var row = upgrade.NextRow(level);
             return GateReason(row.researchPrereq, row.requiresReachTier);
         }

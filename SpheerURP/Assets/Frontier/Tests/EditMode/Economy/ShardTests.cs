@@ -60,10 +60,10 @@ namespace Frontier.Economy.Tests
         }
 
         [Test]
-        public void ShardsBuyTimeConvenienceAndCosmeticsOnly_NeverResourcesOrPower()
+        public void ShardsCanBuyUnlockedStructuresButNeverInventoryResources()
         {
             var names = new List<string>(Enum.GetNames(typeof(ShardSpendKind)));
-            CollectionAssert.AreEquivalent(new[] { "SkipTimer", "BuilderSlot", "Revive", "Cosmetic" }, names, "the only things shards can be spent on");
+            CollectionAssert.AreEquivalent(new[] { "SkipTimer", "BuilderSlot", "Revive", "Cosmetic", "Structure" }, names);
             foreach (Type t in new[] { typeof(ShardRulesDef), typeof(ShardCurve), typeof(BuilderPlan), typeof(ShardLedger), typeof(ShardEarnings), typeof(ShardWeek) })
             {
                 foreach (FieldInfo f in t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
@@ -79,6 +79,15 @@ namespace Frontier.Economy.Tests
             foreach (ResourceDef r in _c.resources) if (r.category == ResourceCategory.Raw) dear.Set("value.raw." + r.id, dear.D("value.raw." + r.id) * 3.0);
             ShardRulesDef other = CatalogBuilder.Build(dear).shards;
             foreach (double seconds in new[] { 45.0, 600.0, 3600.0, 86400.0, 604800.0 }) Assert.AreEqual(ShardCurve.SkipCost(_r, seconds), ShardCurve.SkipCost(other, seconds));
+        }
+
+        [Test]
+        public void StructurePriceIsTwiceSkipCostWithTenShardMinimumAndNoOverflow()
+        {
+            foreach (double seconds in new[] { 0.0, 30, 60, 600, 3600, 86400 })
+                Assert.AreEqual(Math.Max(10, 2 * ShardCurve.SkipCost(_r, seconds)),
+                    ShardCurve.StructureCost(_r, seconds));
+            Assert.AreEqual(int.MaxValue, ShardCurve.StructureCost(_r, double.MaxValue));
         }
 
         static bool Mentions(Type t)

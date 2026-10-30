@@ -176,4 +176,4 @@ MonoBehaviour:
       reward:
         resourceId: scrap
         amount: 180
-  modelKey: 
+  modelKey: world_wreckage

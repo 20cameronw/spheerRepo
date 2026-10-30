@@ -175,7 +175,17 @@ namespace Frontier.Tests
             Assert.AreEqual(5, FirstSessionObjectives.CurrentStep(state));
 
             state.stats.RecordLanding(1.0, true);
+            Assert.AreEqual(6, FirstSessionObjectives.CurrentStep(state), "Travel alone no longer completes the game-loop tutorial.");
+            state.DebugPlace(db.StructureOfKind(StructureKind.ResearchLab), 3);
+            foreach (var resource in db.resources) state.backpack.Set(resource.id, 10000);
+            var research = db.research.First(node => node.data.tier == 1 &&
+                (node.data.prereqs == null || node.data.prereqs.Length == 0) && node.data.labLevel <= 1);
+            Assert.IsTrue(state.Research(research), state.ResearchLockReason(research));
+            Assert.AreEqual(7, FirstSessionObjectives.CurrentStep(state));
+            state.DebugSetUpgrade(db.FindUpgrade("pack"), 1);
             Assert.AreEqual(FirstSessionObjectives.Count, FirstSessionObjectives.CurrentStep(state));
+            state.Save();
+            Assert.AreEqual(FirstSessionObjectives.Count, FirstSessionObjectives.CurrentStep(new GameState(db, true)));
         }
 
         [Test]

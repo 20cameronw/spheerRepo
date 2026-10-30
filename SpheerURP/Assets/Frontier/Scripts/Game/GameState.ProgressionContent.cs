@@ -36,7 +36,7 @@ namespace Frontier
                 foreach (string prereq in node.data.prereqs)
                     if (!IsResearched(prereq)) return UiText.Get("gate.requires", DisplayId(prereq));
             if (!TryBuildCost(node.data.cost, out var cost)) return UiText.Get("gate.research.invalid-cost");
-            return Has(cost) ? null : UiText.Get("gate.research.materials");
+            return HasPlanetResources(cost) ? null : UiText.Get("gate.research.materials");
         }
 
         public bool CanResearch(ResearchNodeSO node)
@@ -46,7 +46,8 @@ namespace Frontier
 
         public bool Research(ResearchNodeSO node)
         {
-            if (!CanResearch(node) || !TryBuildCost(node.data.cost, out var cost) || !SpendQuietly(cost)) return false;
+            if (!CanResearch(node) || !TryBuildCost(node.data.cost, out var cost) ||
+                !SpendPlanetResourcesQuietly(ToIds(cost))) return false;
             researched.Add(node.data.id);
             Notify();
             return true;
@@ -96,7 +97,7 @@ namespace Frontier
                     return UiText.Get("gate.lab-world", next.requiresLabLevel);
             }
             if (!TryBuildCost(next.cost, out var cost)) return UiText.Get("gate.tool.invalid-cost");
-            return Has(cost) ? null : UiText.Get("gate.tool.materials");
+            return HasPlanetResources(cost) ? null : UiText.Get("gate.tool.materials");
         }
 
         public bool BuyToolTier(ToolLadderSO ladder)
@@ -105,7 +106,7 @@ namespace Frontier
             if (ToolTierLockReason(ladder) != null) return false;
             int nextTier = ToolTier(ladder) + 1;
             var row = FindToolTier(ladder, nextTier);
-            if (!TryBuildCost(row.cost, out var cost) || !SpendQuietly(cost)) return false;
+            if (!TryBuildCost(row.cost, out var cost) || !SpendPlanetResourcesQuietly(ToIds(cost))) return false;
             toolTiers[ladder.data.id] = nextTier;
             Notify();
             return true;

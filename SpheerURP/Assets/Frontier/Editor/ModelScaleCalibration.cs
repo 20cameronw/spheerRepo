@@ -111,7 +111,9 @@ namespace Frontier.EditorTools
                     instance.transform.localScale = Vector3.one;
                     Bounds bounds;
                     if (!ModelLibrary.MeshBounds(instance, out bounds)) throw new InvalidOperationException("No mesh for " + entry.key);
-                    float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+                    if (entry.key == "colony_hub") entry.foundationDepth = Mathf.Max(0f, -bounds.min.y);
+                    float diameter = Mathf.Max(bounds.size.x,
+                        Mathf.Max(bounds.size.y - entry.foundationDepth, bounds.size.z));
                     if (diameter <= 0.0001f) throw new InvalidOperationException("Empty mesh for " + entry.key);
                     entry.referenceDiameter = entry.key.StartsWith("struct_", StringComparison.Ordinal) ? 0.75f : 3f;
                     entry.scale = entry.referenceDiameter / diameter;

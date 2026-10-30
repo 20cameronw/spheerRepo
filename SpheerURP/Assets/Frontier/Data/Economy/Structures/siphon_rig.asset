@@ -18,7 +18,7 @@ MonoBehaviour:
   description: Tap it to siphon gas from the atmosphere. Higher levels yield more.
   kind: 16
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_siphon_rig
   buildCost:
   - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
     amount: 130

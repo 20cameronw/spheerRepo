@@ -53,11 +53,11 @@ MonoBehaviour:
     route: 1
   - id: jump_range_1
     title: A longer reach
-    description: Purchase the first Jump Range upgrade. Temporary debug settings do not count.
+    description: Purchase the first Jump Range upgrade to reach more distant worlds.
     metric: 6
     targetId: jump
     target: 1
-    route: 3
+    route: 5
   - id: first_steel
     title: Stronger foundations
     description: Craft steel at a Foundry.
@@ -70,7 +70,7 @@ MonoBehaviour:
     description: Purchase any hazard plating to prepare for hostile worlds.
     metric: 7
     target: 1
-    route: 3
+    route: 5
   - id: mega_first_stage
     title: Think on a planetary scale
     description: Complete the first stage of a megaproject.

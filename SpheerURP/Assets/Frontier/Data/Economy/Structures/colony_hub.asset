@@ -15,10 +15,11 @@ MonoBehaviour:
   lockedFields: []
   id: colony_hub
   displayName: Colony Hub
-  description: Adds builder crews at levels 3 and 7 and discounts planetary obstacle clearance.
+  description: Adds builder crews at levels 3 and 7 and discounts planetary obstacle
+    clearance.
   kind: 25
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: colony_hub
   buildCost:
   - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
     amount: 650

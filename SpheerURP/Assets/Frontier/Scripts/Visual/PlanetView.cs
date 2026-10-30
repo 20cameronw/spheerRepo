@@ -20,7 +20,10 @@ namespace Frontier
         public event System.Action<PlanetData> Rebuilt;
         float punch;
         public bool IdleSpin = true;
-        public bool CloseView;
+        float zoom01;
+        public float Zoom01 { get { return zoom01; } set { zoom01 = Mathf.Clamp01(value); } }
+        public bool CloseView { get { return zoom01 >= 0.5f; } set { Zoom01 = value ? 1f : 0f; } }
+        public float MapZoomBlend { get; set; }
         /// <summary>Holds the planet completely still (used while a structure is selected).</summary>
         public bool Frozen;
         float appear = 1f;
@@ -36,6 +39,28 @@ namespace Frontier
         float displayedRadius, displayedModelScale, lastRadius;
 
         List<MeshRenderer> solids = new List<MeshRenderer>();
+        readonly List<MeshCollider> terrainQueries = new List<MeshCollider>();
+
+        /// <summary>Samples only the displayed terrain, in Spin space, without hitting structures or debris.</summary>
+        public Vector3 TerrainPoint(Vector3 direction)
+        {
+            direction.Normalize();
+            if (terrainQueries.Count == 0) return direction * SurfaceRadius();
+            Physics.SyncTransforms();
+            Vector3 center = Spin.position;
+            Vector3 outward = Spin.TransformDirection(direction);
+            float reach = SurfaceRadius() * Spin.lossyScale.x * 4f;
+            var ray = new Ray(center + outward * reach, -outward);
+            float nearest = float.PositiveInfinity;
+            Vector3 point = direction * SurfaceRadius();
+            foreach (var terrain in terrainQueries)
+                if (terrain != null && terrain.Raycast(ray, out var hit, reach * 2f) && hit.distance < nearest)
+                {
+                    nearest = hit.distance;
+                    point = Spin.InverseTransformPoint(hit.point);
+                }
+            return point;
+        }
 
         /// <summary>The planet's ground. Its radius is the single source of truth for where structures sit.</summary>
         public SphereCollider Surface { get; private set; }
@@ -84,6 +109,7 @@ namespace Frontier
                 mat.SetFloat("_Seed", seed);
                 mat.SetFloat("_Style", p.Style);
                 mat.SetFloat("_CraterSoft", CraterSoftness(p));
+                ApplyAuthoredTerrainPalette(mat, r, p);
                 var lb = r.localBounds.center;
                 mat.SetVector("_Center", new Vector4(lb.x, lb.y, lb.z, 0f));
                 var arr = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
@@ -94,10 +120,24 @@ namespace Frontier
             modelMats = mats;
         }
 
+        void ApplyAuthoredTerrainPalette(Material material, MeshRenderer renderer, PlanetData planet)
+        {
+            if (planet.ModelKey != "sylva" || planet.Biome != Biome.Lush) return;
+            // The authored lerth model uses Icosphere for raised land and Icosphere.001 for its ocean sphere.
+            bool ocean = renderer.name == "Icosphere.001";
+            Color color = ocean ? new Color(0.035f, 0.27f, 0.68f) : new Color(0.13f, 0.48f, 0.2f);
+            if (!ocean) color = Color.Lerp(color, new Color(0.13f, 0.72f, 0.45f), terraformingStage / 5f * 0.35f);
+            material.SetColor("_BaseColor", color);
+            material.SetColor("_AltColor", color);
+            material.SetFloat("_Style", 0f);
+            material.SetFloat("_LandMix", 0f);
+        }
+
         public void Show(PlanetData p, bool animate, int terraformingLevel = 0)
         {
             if (root != null) Destroy(root.gameObject);
             orbiters.Clear(); orbiterSpeed.Clear();
+            terrainQueries.Clear();
 
             Current = p;
             root = new GameObject("PlanetRoot").transform;
@@ -114,7 +154,7 @@ namespace Frontier
             core = sphere.transform;
             Color primary, secondary, rim;
             TerraformPalette(p, terraformingStage, out primary, out secondary, out rim);
-            baseRim = rim * p.GlowIntensity;
+            baseRim = PlanetSurfaceStyle.AtmosphereColor(p, rim) * p.GlowIntensity;
             coreMat = null; modelMats = null;
             float ground = p.SurfaceRadius > 0.01f ? p.SurfaceRadius : Radius;
             // The model is fitted to its own radius (the standard 1.5 for generated worlds, whatever their ground radius), so every planet is the same size on screen.
@@ -127,6 +167,15 @@ namespace Frontier
                 solids.Clear();
                 solids.AddRange(model.GetComponentsInChildren<MeshRenderer>());
                 StyleModel(model, p, rng, primary, secondary);
+                foreach (var renderer in solids)
+                {
+                    var filter = renderer.GetComponent<MeshFilter>();
+                    if (filter == null || filter.sharedMesh == null) continue;
+                    renderer.gameObject.layer = 2;
+                    var terrain = renderer.gameObject.AddComponent<MeshCollider>();
+                    terrain.sharedMesh = filter.sharedMesh;
+                    terrainQueries.Add(terrain);
+                }
             }
             if (model == null)
             {
@@ -148,6 +197,7 @@ namespace Frontier
                 sphere.GetComponent<MeshRenderer>().sharedMaterial = coreMat;
             }
             usesModel = model != null;
+            if (usesModel) core.localScale = Vector3.one * (p.IsAuthored ? ground / displayedRadius : 1f);
 
             var surfGo = new GameObject("Surface");
             surfGo.transform.SetParent(Spin, false);
@@ -160,7 +210,7 @@ namespace Frontier
             atmo.transform.SetParent(root, false);
             atmosphere = atmo.transform;
             atmo.transform.localScale = Vector3.one * p.AtmosphereScale;
-            Color atmosphereColor = rim * (1.2f * p.AtmosphereIntensity);
+            Color atmosphereColor = PlanetSurfaceStyle.AtmosphereColor(p, rim) * (1.2f * p.AtmosphereIntensity);
             atmosphereMat = Fx.AtmoMat(new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
             atmo.GetComponent<MeshRenderer>().sharedMaterial = atmosphereMat;
 
@@ -196,27 +246,29 @@ namespace Frontier
 
             Color primary, secondary, rim;
             TerraformPalette(Current, terraformingStage, out primary, out secondary, out rim);
-            baseRim = rim * Current.GlowIntensity;
+            baseRim = PlanetSurfaceStyle.AtmosphereColor(Current, rim) * Current.GlowIntensity;
             if (coreMat != null)
             {
                 coreMat.SetColor("_BaseColor", primary);
                 coreMat.SetColor("_AltColor", secondary);
                 coreMat.SetColor("_RimColor", baseRim);
-                coreMat.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
+                coreMat.SetColor("_CloudColor", PlanetSurfaceStyle.CloudColor(Current, primary));
             }
             if (modelMats != null)
             {
-                foreach (var material in modelMats)
+                for (int i = 0; i < modelMats.Count; i++)
                 {
+                    var material = modelMats[i];
                     if (material == null) continue;
                     material.SetColor("_BaseColor", primary);
                     material.SetColor("_AltColor", secondary);
                     material.SetColor("_RimColor", baseRim);
-                    material.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
+                    material.SetColor("_CloudColor", PlanetSurfaceStyle.CloudColor(Current, primary));
+                    ApplyAuthoredTerrainPalette(material, solids[i], Current);
                 }
             }
 
-            Color atmosphereColor = rim * (1.2f * Current.AtmosphereIntensity);
+            Color atmosphereColor = PlanetSurfaceStyle.AtmosphereColor(Current, rim) * (1.2f * Current.AtmosphereIntensity);
             if (atmosphereMat != null)
                 atmosphereMat.SetColor("_Color", new Color(atmosphereColor.r, atmosphereColor.g, atmosphereColor.b, 1f));
             if (glowRenderer != null)

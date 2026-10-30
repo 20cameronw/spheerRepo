@@ -92,6 +92,8 @@ namespace Frontier
                 case 3: return "craft";
                 case 4: return "defense";
                 case 5: return "travel";
+                case 6: return "research";
+                case 7: return "upgrade";
                 default: return "complete";
             }
         }

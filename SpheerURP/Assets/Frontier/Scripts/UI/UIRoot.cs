@@ -27,14 +27,10 @@ namespace Frontier
 
         VisualElement root, safe, hud, waveHud, toastLayer, overlayLayer, travelLayer, flash, popupLayer, modalLayer, mapLayer, bannerLayer, scrimLayer;
         VisualElement waveFill, reactorFill, xpFill;
-        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, packLabel, levelLabel, planetLabel;
+        Label waveLabel, waveModifierLabel, reactorLabel, fuelLabel, shardLabel, levelLabel, planetLabel;
         WaveInfo waveHudInfo;
         VisualElement planetTag;
-        Button surfaceViewButton;
-        VisualElement surfaceViewIcon;
-        Button packDock;
-        readonly List<VisualElement> packSegments = new List<VisualElement>();
-
+        Button constructionButton;
         bool busy, introActive;
         public bool IsTravelling { get; private set; }
         Minigame activeGatherMinigame;
@@ -62,13 +58,15 @@ namespace Frontier
         {
             if (root == null || root.panel == null) return false;
             var p = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screenPos.x, ScreenMetrics.Height - screenPos.y));
-            return root.panel.Pick(p) != null;
+            var picked = root.panel.Pick(p);
+            return picked != null && picked.name != "world-zoom-input";
         }
 
         public void Init(UIDocument document, GameState state, DefenseController def, PlanetView pv, SpaceBackdrop bd, WorldSurface ws, Camera camera, FrontierServices serviceSet)
         {
             doc = document; gs = state; defense = def; planetView = pv; backdrop = bd; world = ws; cam = camera;
             services = serviceSet;
+            gameplayRewardRules = Resources.Load<GameplayRewardRules>("Frontier/GameplayRewardRules");
             observedUniverse = gs.universe;
             LoadPrefs();
             panelSettings = doc.panelSettings;
@@ -81,6 +79,11 @@ namespace Frontier
             root.pickingMode = PickingMode.Ignore;
             root.AddToClassList("fr-root");
             UiKit.ApplyStyles(root);
+            var worldZoomInput = Layer();
+            worldZoomInput.name = "world-zoom-input";
+            worldZoomInput.pickingMode = PickingMode.Position;
+            worldZoomInput.RegisterCallback<WheelEvent>(OnWorldWheel);
+            root.Add(worldZoomInput);
 
             // Full-screen dim under the HUD: modals keep the top bar and dock live while the world behind them is dimmed evenly.
             scrimLayer = Layer();
@@ -115,8 +118,8 @@ namespace Frontier
             world.StructureTapped += OnStructureTapped;
             world.SlotTapped += OnSlotTapped;
             world.ObstacleTapped += OnObstacleTapped;
-            world.GatherTapped += OnGatherTapped;
             OnStateChanged();
+            BuildProjectResume();
         }
 
         VisualElement Layer()
@@ -128,6 +131,7 @@ namespace Frontier
 
         void OnDestroy()
         {
+            CompleteRewardedConsent(false);
             PresentationQuality.Changed -= ApplyPanelBudget;
             NotificationPreferences.StatusChanged -= OnNotificationStatusChanged;
             if (gs != null) gs.Changed -= OnStateChanged;
@@ -137,7 +141,6 @@ namespace Frontier
                 world.StructureTapped -= OnStructureTapped;
                 world.SlotTapped -= OnSlotTapped;
                 world.ObstacleTapped -= OnObstacleTapped;
-                world.GatherTapped -= OnGatherTapped;
             }
 
         }
@@ -200,7 +203,7 @@ namespace Frontier
             planetLabel = UiKit.Text("", "fr-planet-name");
             planetTag.Add(planetLabel);
             fuelLabel = Chip(planetTag, "fuel", UiKit.Amber, null);
-            shardLabel = Chip(planetTag, "crystal", UiKit.Cyan, null);
+            shardLabel = Chip(planetTag, "crystal", UiKit.Cyan, null, OpenShardWallet);
             shardLabel.name = "hud-nova-shards";
             levelLabel = Chip(planetTag, "star", UiKit.Magenta, f => xpFill = f);
             top.Add(planetTag);
@@ -209,67 +212,21 @@ namespace Frontier
             menuBtn.name = "menu-button";
             top.Add(menuBtn);
             hud.Add(top);
-            surfaceViewButton = Icons.IconButton("base", UiKit.Cyan, () =>
-            {
-                if (busy || introActive || defense.Active) return;
-                CloseModal();
-                ClosePopup();
-                planetView.CloseView = !planetView.CloseView;
-                RefreshViewButton();
-            });
-            surfaceViewIcon = surfaceViewButton.Q(className: "fr-icon");
-            surfaceViewButton.name = "world-view-toggle";
-            surfaceViewButton.style.position = Position.Absolute;
-            surfaceViewButton.style.right = UiKit.Space.S24;
-            surfaceViewButton.style.bottom = DockInset + UiKit.Space.S16;
-            RefreshViewButton();
-            hud.Add(surfaceViewButton);
+            constructionButton = Icons.IconButton("builders", UiKit.Lime, OpenBuilders);
+            constructionButton.name = "world-open-jobs";
+            constructionButton.tooltip = UiText.Get("builders.jobs-title");
+            constructionButton.style.position = Position.Absolute;
+            constructionButton.style.left = UiKit.Space.S16;
+            constructionButton.style.top = HudTopInset + UiKit.Space.S16;
+            hud.Add(constructionButton);
 
             var dock = UiKit.Div("fr-dock"); dock.pickingMode = PickingMode.Ignore;
             dock.usageHints = UsageHints.DynamicTransform;
             dock.Add(DockButton("research", UiText.Get("nav.command"), UiKit.Magenta, OpenResearch));
             dock.Add(DockButton("map", UiText.Get("nav.map"), UiKit.Cyan, OpenMap));
-            packDock = DockButton("pack", UiText.Get("nav.pack"), UiKit.Amber, OpenPack);
-            var capacity = UiKit.Div("fr-pack-capacity");
-            capacity.name = "pack-capacity-gauge";
-            capacity.pickingMode = PickingMode.Ignore;
-            for (int i = 0; i < 8; i++)
-            {
-                var segment = UiKit.Div("fr-pack-segment");
-                segment.pickingMode = PickingMode.Ignore;
-                packSegments.Add(segment);
-                capacity.Add(segment);
-            }
-            packDock.Add(capacity);
-            packLabel = UiKit.Text("", "fr-pack-capacity-text");
-            packLabel.name = "pack-capacity-text";
-            packDock.Add(packLabel);
-            dock.Add(packDock);
+            dock.Add(DockButton("ship", UiText.Get("nav.pack"), UiKit.Amber, OpenPack));
             dock.Add(DockButton("build", UiText.Get("nav.build"), UiKit.Lime, OpenShop));
             hud.Add(dock);
-        }
-
-        void RefreshViewButton()
-        {
-            if (surfaceViewButton == null) return;
-            surfaceViewButton.tooltip = UiText.Get(planetView.CloseView ? "world.view.orbit" : "world.view.close");
-            if (surfaceViewIcon != null) Icons.Apply(surfaceViewIcon, planetView.CloseView ? "map" : "base", UiKit.Cyan);
-        }
-
-        void RefreshPackCapacity()
-        {
-            packLabel.text = gs.SlotsUsed + "/" + gs.Slots;
-            packDock.tooltip = UiText.Get("pack.capacity", gs.SlotsUsed, gs.Slots);
-            float fullness = gs.Slots <= 0 ? 1 : Mathf.Clamp01(gs.SlotsUsed / (float)gs.Slots);
-            int filled = Mathf.CeilToInt(fullness * packSegments.Count);
-            for (int i = 0; i < packSegments.Count; i++)
-            {
-                float fraction = i / (float)(packSegments.Count - 1);
-                Color color = fraction < 0.5f ? Color.Lerp(UiKit.Lime, UiKit.Amber, fraction * 2)
-                    : Color.Lerp(UiKit.Amber, UiKit.Red, (fraction - 0.5f) * 2);
-                packSegments[i].style.backgroundColor = i < filled ? color : UiKit.Tint(UiKit.Muted, 0.18f);
-                packSegments[i].EnableInClassList("fr-pack-segment-filled", i < filled);
-            }
         }
 
         /// <summary>A dock button: tonal glass, thin accent outline, icon with a short caption. Accent fill only while pressed.</summary>
@@ -284,9 +241,23 @@ namespace Frontier
             return b;
         }
 
-        Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp)
+        Label Chip(VisualElement parent, string icon, Color color, Action<VisualElement> xp, Action onClick = null)
         {
-            var chip = UiKit.Div("fr-chip"); chip.pickingMode = PickingMode.Ignore;
+            VisualElement chip;
+            if (onClick == null)
+            {
+                chip = UiKit.Div("fr-chip");
+                chip.pickingMode = PickingMode.Ignore;
+            }
+            else
+            {
+                var button = new Button(() => { Sfx.Click(); onClick(); });
+                button.name = "hud-open-shards";
+                button.tooltip = UiText.Get("shards.open");
+                button.AddToClassList("fr-chip");
+                button.AddToClassList("fr-chip-action");
+                chip = button;
+            }
             Color c = UiKit.Ui(color);
             chip.Add(Icons.Make(icon, c));
             var l = UiKit.Text("0", "fr-chip-text");
@@ -337,7 +308,7 @@ namespace Frontier
         void OnStateChanged()
         {
             if (batching) return;
-            RefreshViewButton();
+            ResetProjectContextIfNeeded();
             if (observedUniverse != gs.universe)
             {
                 observedUniverse = gs.universe;
@@ -353,7 +324,6 @@ namespace Frontier
             fuelLabel.tooltip = UiText.Get("fuel.summary", gs.FuelTankUsed, gs.FuelTankSlots);
             shardLabel.text = gs.ShardBalance.ToString("N0");
             shardLabel.tooltip = UiText.Get("hyperspace.revive.balance", gs.ShardBalance);
-            RefreshPackCapacity();
             levelLabel.text = UiText.Get("hud.player-level", gs.PlayerLevel);
             planetLabel.text = gs.planet.Name.ToUpper();
             planetLabel.style.color = UiKit.Ui(gs.planet.Rim);
@@ -362,7 +332,16 @@ namespace Frontier
             RefreshFirstSessionGuide();
             RefreshModal();
             RefreshPopup();
-            if (mapOpen) { RefreshMapPinPlanets(); InvalidateMapPreview(); BuildMapCard(); }
+            if (mapOpen)
+            {
+                RefreshMapSurvey(); RefreshMapPinPlanets(); RefreshMapProjectResources();
+                mapNameIndex = MapNameIndex.Build(gs.universe.Universe, KnownMapSystems(), gs.MapPins);
+                mapVersion++; mapQueryAt = 0;
+                InvalidateMapPreview(); BuildMapCard();
+            }
+            RefreshShortage();
+            foreach (var track in root.Query<Button>(className: "fr-project-track").ToList())
+                RefreshProjectTrackButton(track);
         }
 
         // ------------------------------------------------------------ frame
@@ -373,13 +352,13 @@ namespace Frontier
             ApplyLayout(false);
 
             bool wave = defense.Active;
-            if (wave && planetView.CloseView)
+            if (wave && planetView.Zoom01 > 0f)
             {
                 planetView.CloseView = false;
-                RefreshViewButton();
             }
-            world.Locked = wave || busy;
+            world.Locked = wave || busy || mapOpen;
             UpdateFirstSessionGuideVisibility();
+            RefreshProjectResume();
             if (waveHud != null)
             {
                 waveHud.style.display = wave ? DisplayStyle.Flex : DisplayStyle.None;
@@ -402,17 +381,20 @@ namespace Frontier
                     reactorFill.style.backgroundColor = Color.Lerp(UiKit.Red, UiKit.Lime, hp);
                 }
             }
-            hud.style.display = wave || introActive || networkFinaleActive ? DisplayStyle.None : DisplayStyle.Flex;
-            if (wave && (popup != null || modal != null || buildDef != null)) { CloseAll(); }
+            hud.style.display = wave || introActive || networkFinaleActive || mapOpen ? DisplayStyle.None : DisplayStyle.Flex;
+            if (wave && (popup != null || modal != null || buildDef != null || shortageOverlay != null)) { CloseAll(); }
 
             UpdatePopupPosition();
             RefreshBuilderStatus();
             RefreshObstacleStatus();
+            UpdateWorldZoomInput();
             UpdateMapInput();
         }
 
         void CloseAll()
         {
+            CompleteRewardedConsent(false);
+            CloseShortage();
             ClosePopup();
             CloseModal();
             CloseMap();
@@ -421,11 +403,13 @@ namespace Frontier
 
         public bool HandleBack()
         {
+            if (adConsentDialog != null) { CompleteRewardedConsent(false); return true; }
             if (skipShipMoment != null) { skipShipMoment(); return true; }
             if (activeGatherMinigame != null) return activeGatherMinigame.HandleBack();
             if (activeTravelMinigame is ITravelBackHandler travel) return travel.HandleBack();
             if (busy || defense.Active) return true;
             if (waveResultPanel != null) { CloseWaveResult(); return true; }
+            if (shortageOverlay != null) { CloseShortage(); return true; }
             if (popup != null) { ClosePopup(); return true; }
             if (modal != null)
             {
@@ -437,7 +421,7 @@ namespace Frontier
                 else CloseModal();
                 return true;
             }
-            if (mapOpen) { CloseMap(); return true; }
+            if (mapOpen) { ReturnFromMap(); return true; }
             if (buildDef != null) { ExitBuild(); return true; }
             return false;
         }
@@ -533,9 +517,23 @@ namespace Frontier
             g.toolLevel = gs.ToolLevel(spot.game);
             g.toolName = gs.ToolName(spot.game);
             activeGatherMinigame = g;
+            MinigameResult previewResult = default;
+            bool baseCommitted = false;
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield =
-                services != null && services.Ads.IsConfigured
-                    ? (Func<Task<ServiceResult<RewardedAdResult>>>) (() => services.Ads.ShowRewardedAsync("double-yield"))
+                gameplayRewardRules != null && gameplayRewardRules.harvestEnabled
+                    ? (Func<Task<ServiceResult<RewardedAdResult>>>) (async () =>
+                    {
+                        if (!await RequestRewardedConsent() || this == null)
+                            return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.not-earned"));
+                        if (baseCommitted || !GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield"))
+                            return ServiceResult<RewardedAdResult>.Failed(GameplayAdUnavailable("double-yield") ??
+                                UiText.Get("reward.changed"));
+                        int quote = HarvestAmount(spot, bonus, previewResult);
+                        if (!gs.PrepareGameplayReward("double-yield", spot.resource, quote, null, out var ticket, out var error))
+                            return ServiceResult<RewardedAdResult>.Failed(error);
+                        baseCommitted = true;
+                        return await ShowGameplayReward(ticket);
+                    })
                     : null;
             g.Run(overlayLayer, spot.resource.color, gs.ToolTolerance(spot.game), spot.difficulty, r =>
             {
@@ -547,8 +545,8 @@ namespace Frontier
                     return;
                 }
                 int n = HarvestAmount(spot, bonus, r);
-                if (r.quality > 0.05f) gs.RecordHarvestRunCompleted();
-                int got = gs.Add(spot.resource, n);
+                if (!baseCommitted && r.quality > 0.05f) gs.RecordHarvestRunCompleted();
+                int got = baseCommitted ? n : gs.Add(spot.resource, n);
                 Color ui = UiKit.Ui(spot.resource.color);
                 if (got > 0)
                 {
@@ -559,26 +557,16 @@ namespace Frontier
                 }
                 else Toast(UiText.Get(n > 0 ? "harvest.backpack-full" : "harvest.missed"), UiKit.Red);
                 if (got < n) Toast(UiText.Get("harvest.overflow", n - got), UiKit.Amber);
-                if (r.rewardedDoubleYield && got > 0)
-                {
-                    if (gs.TryCommitHarvestBonus(spot.resource, got, out int bonusGot, out string error))
-                    {
-                        if (bonusGot > 0)
-                        {
-                            Toast(UiText.Get("harvest.reward", bonusGot, spot.resource.LocalizedName), ui);
-                            Fx.Burst(fxPos, spot.resource.color, 40, 5f, 0.25f);
-                            planetView.Punch();
-                            Sfx.Good();
-                        }
-                    }
-                    else Toast(UiText.Get("harvest.ad.save-failed", error), UiKit.Red);
-                }
+                if (r.rewardedDoubleYield && baseCommitted)
+                    Toast(UiText.Get("reward.saved"), UiKit.Lime);
             }, offerDoubleYield, r =>
             {
+                previewResult = r;
                 int expected = HarvestAmount(spot, bonus, r);
                 int free = gs.FreeSpace(spot.resource);
                 return expected > 0 && (long)free >= (long)expected * 2;
-            });
+            }, r => UiText.Get("reward.harvest", HarvestAmount(spot, bonus, r), spot.resource.LocalizedName),
+                () => GameplayAdUnavailable("double-yield"));
         }
 
         int HarvestAmount(GatherSpot spot, float bonus, MinigameResult result)
@@ -600,23 +588,27 @@ namespace Frontier
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             Color c = r.victory ? UiKit.Lime : UiKit.Red;
             UiKit.SetAccent(panel, c);
-            panel.Add(UiKit.Text(UiText.Get(r.victory ? "wave.victory" : "wave.defeat"), "fr-title", c));
+            var card = UiKit.Div("fr-wave-result");
+            UiKit.Border(card, c, 2f);
+            card.style.backgroundColor = new Color(0.016f, 0.03f, 0.094f, 0.94f);
+            panel.Add(card);
+            card.Add(UiKit.Text(UiText.Get(r.victory ? "wave.victory" : "wave.defeat"), "fr-title", c));
             if (r.victory)
             {
-                panel.Add(UiKit.Text(UiText.Get("wave.salvage"), "fr-muted"));
-                panel.Add(UiKit.CostRow(r.granted, gs, false));
-                if (defense.Current != null) panel.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("wave.xp", defense.Current.xp)));
+                card.Add(UiKit.Text(UiText.Get("wave.salvage"), "fr-muted"));
+                card.Add(UiKit.CostRow(r.granted, gs, false));
+                if (defense.Current != null) card.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("wave.xp", defense.Current.xp)));
                 if (r.lost.Count > 0)
                 {
-                    panel.Add(UiKit.Text(UiText.Get("wave.overflow"), "fr-muted", UiKit.Amber));
-                    panel.Add(UiKit.CostRow(r.lost, gs, false));
+                    card.Add(UiKit.Text(UiText.Get("wave.overflow"), "fr-muted", UiKit.Amber));
+                    card.Add(UiKit.CostRow(r.lost, gs, false));
                 }
             }
-            else panel.Add(UiKit.Text(UiText.Get("wave.defeat.help"), "fr-muted"));
+            else card.Add(UiKit.Text(UiText.Get("wave.defeat.help"), "fr-muted"));
             var b = UiKit.Btn(UiText.Get("common.continue"), c, null, true, true);
             b.clicked += CloseWaveResult;
-            b.style.marginTop = UiKit.Space.S32;
-            panel.Add(b);
+            b.style.marginTop = UiKit.Space.S24;
+            card.Add(b);
             overlayLayer.Add(panel);
             OnStateChanged();
         }

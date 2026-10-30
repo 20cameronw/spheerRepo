@@ -71,8 +71,8 @@ namespace Frontier.EditorTools
             UIRoot.LayoutContentLayer(popupLayer, insets, false);
             UIRoot.LayoutContentLayer(modalLayer, insets, false);
             UIRoot.LayoutContentLayer(overlayLayer, insets, true);
-            Call("OpenModal", "pack", "pack", "BACKPACK", UiKit.Amber,
-                (Action<VisualElement>)(body => Call("BuildPack", body)), true);
+            Call("OpenModal", "pack", "ship", UiText.Get("nav.backpack"), UiKit.Amber,
+                (Action<VisualElement>)(body => Call("BuildShip", body)), true);
             next = EditorApplication.timeSinceStartup + 0.6;
         }
 
@@ -102,6 +102,12 @@ namespace Frontier.EditorTools
             {
                 var panel = canvas.panel;
                 if (panel == null) throw new InvalidOperationException("Editor panel is not attached.");
+                // This gate measures static geometry. PlayMode lifecycle tests cover entrance motion.
+                foreach (var surface in canvas.Query<VisualElement>(className: "fr-surface-enter").ToList())
+                {
+                    surface.RemoveFromClassList("fr-surface-enter");
+                    surface.RemoveFromClassList("fr-surface-enter-start");
+                }
                 ValidateLayout();
                 int phase = step % 5;
                 if (phase <= 1)

@@ -15,17 +15,19 @@ MonoBehaviour:
   enableRewardedAds: 1
   iosAppKey: 28e95b2f5
   iosRewardedAdUnitId: eurexbly1unznz2g
-  iosSetupVerified: 0
+  enableIosGameplayAds: 1
   enableIosDevelopmentTests: 1
   placements:
   - id: double-yield
-    dailyCap: 8
+    unlimitedDaily: 1
+    dailyCap: 0
     cooldownSeconds: 180
   - id: emergency-fuel
     dailyCap: 3
     cooldownSeconds: 600
   - id: timer-skip
-    dailyCap: 5
+    unlimitedDaily: 1
+    dailyCap: 0
     cooldownSeconds: 300
   - id: revive
     dailyCap: 3

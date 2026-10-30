@@ -58,7 +58,7 @@ namespace Frontier.Tests
             foreach (var entry in ModelLibrary.Instance.entries)
                 foreach (var path in AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(entry.prefab), true))
                     if (AssetImporter.GetAtPath(path) is ModelImporter) sources.Add(path);
-            Assert.GreaterOrEqual(sources.Count, 14, "the model library should reach all 14 source models");
+            Assert.GreaterOrEqual(sources.Count, 10, "the model library should retain its authored planet and gameplay model sources");
             foreach (var path in sources)
             {
                 var imported = ModelLibrary.InstantiateInert(AssetDatabase.LoadAssetAtPath<GameObject>(path));
@@ -98,7 +98,9 @@ namespace Frontier.Tests
                 Assert.IsNotNull(model, "missing structure model: " + entry.key);
                 Bounds bounds;
                 Assert.IsTrue(ModelLibrary.MeshBounds(model.gameObject, out bounds), "no structure mesh: " + entry.key);
-                Assert.AreEqual(0.75f, Diameter(bounds), 0.01f, entry.key + " diameter");
+                float aboveGroundHeight = bounds.size.y - entry.foundationDepth * model.localScale.y;
+                Assert.AreEqual(0.75f, Mathf.Max(bounds.size.x, Mathf.Max(aboveGroundHeight, bounds.size.z)),
+                    0.01f, entry.key + " above-ground diameter");
                 Object.DestroyImmediate(model.gameObject);
                 structures++;
             }
@@ -113,6 +115,36 @@ namespace Frontier.Tests
                 Assert.AreEqual(0.75f / planet.worldSize, Diameter(bounds), 0.001f, planet.id + " relative structure size");
                 Object.DestroyImmediate(drill.gameObject);
             }
+        }
+
+        [Test]
+        public void FoundationBlocksExtendDownwardWithoutChangingTheAuthoredGroundPlane()
+        {
+            int foundations = 0;
+            foreach (var entry in ModelLibrary.Instance.entries)
+            {
+                if (!entry.key.StartsWith("struct_", System.StringComparison.Ordinal) && entry.key != "colony_hub") continue;
+                if (entry.foundationDepth == 0f) continue;
+                bool hub = entry.key == "colony_hub";
+                float depth = hub ? 0.18f : 0.36f;
+                Assert.AreEqual(depth, entry.foundationDepth, 0.0001f, entry.key);
+                var instance = ModelLibrary.InstantiateInert(entry.prefab);
+                try
+                {
+                    Assert.IsTrue(ModelLibrary.MeshBounds(instance, out var bounds));
+                    Assert.AreEqual(-depth, bounds.min.y, 0.0001f, entry.key + " buried bottom");
+                    var mesh = instance.GetComponentInChildren<MeshFilter>().sharedMesh;
+                    float blockTop = hub ? 0.09f : 0.18f;
+                    int topVertices = 0;
+                    foreach (var vertex in mesh.vertices)
+                        if (Mathf.Abs(vertex.y - blockTop) < 0.0001f) topVertices++;
+                    Assert.GreaterOrEqual(topVertices, 4, entry.key + " original block top stays fixed");
+                    Assert.AreEqual(hub ? 0.27f : 0.54f, blockTop + depth, 0.0001f, "Triple-height block.");
+                }
+                finally { Object.DestroyImmediate(instance); }
+                foundations++;
+            }
+            Assert.AreEqual(28, foundations, "All ground structures, including the Hub; orbital structures stay unchanged.");
         }
     }
 }

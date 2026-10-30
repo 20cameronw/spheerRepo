@@ -47,8 +47,12 @@ namespace Frontier
                     shown++;
                 }
                 if (remaining > 3)
-                    page.Add(IconBtn(UiText.Get(showAllObjectives ? "goals.show-three" : "goals.show-all", remaining),
-                        "star", UiKit.Amber, () => { showAllObjectives = !showAllObjectives; RefreshModal(); }));
+                {
+                    var expand = IconBtn(UiText.Get(showAllObjectives ? "goals.show-three" : "goals.show-all", remaining),
+                        "star", UiKit.Amber, () => { showAllObjectives = !showAllObjectives; RefreshModal(); });
+                    expand.name = "goals-toggle-all";
+                    page.Add(expand);
+                }
             }
             if (completed > 0)
             {
@@ -93,6 +97,7 @@ namespace Frontier
                 string label = UiText.Get(objective.route == ObjectiveRoute.Gather ? "guide.action.gather-shop"
                     : objective.route == ObjectiveRoute.Build ? "guide.action.build-shop"
                     : objective.route == ObjectiveRoute.Map ? "guide.action.map"
+                    : objective.route == ObjectiveRoute.Ship ? "goals.action.ship"
                     : objective.route == ObjectiveRoute.Command ? "goals.action.command" : "goals.action.recipe");
                 action = IconBtn(label, objective.route == ObjectiveRoute.Map ? "map" : "play", accent, () => OpenObjectiveRoute(objective.route));
                 action.name = "objective-action-" + objective.id;
@@ -105,10 +110,11 @@ namespace Frontier
         {
             switch (route)
             {
-                case ObjectiveRoute.Gather: OpenGatherShop(); break;
+                case ObjectiveRoute.Gather: RunEmptyPackAction(); break;
                 case ObjectiveRoute.Build: shopTab = 0; OpenShop(); break;
                 case ObjectiveRoute.Map: OpenMap(); break;
-                case ObjectiveRoute.Command: researchTab = 2; progressionTab = 0; OpenResearch(); break;
+                case ObjectiveRoute.Command: OpenResearch(); break;
+                case ObjectiveRoute.Ship: OpenShip(ShipPage.Systems); break;
                 case ObjectiveRoute.Atlas: atlasTab = 1; OpenGuideAtlas(); break;
             }
         }

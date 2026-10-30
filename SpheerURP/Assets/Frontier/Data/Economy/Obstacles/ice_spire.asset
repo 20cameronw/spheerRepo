@@ -176,4 +176,4 @@ MonoBehaviour:
       reward:
         resourceId: ice
         amount: 144
-  modelKey: 
+  modelKey: world_obstacle_ice_spire

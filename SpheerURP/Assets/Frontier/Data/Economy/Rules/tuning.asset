@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Frontier.Data::Frontier.EconomyTuningSO
   lockedFields: []
   schemaVersion: 1
-  digest: f7b3888e49b20760
+  digest: 1c0c735faed632a4
   values:
   - key: value.premium.refinery
     value: 0.1
@@ -168,6 +168,8 @@ MonoBehaviour:
     value: 1
   - key: cost.scale.ship
     value: 1
+  - key: cost.bootstrap.pack3_mult
+    value: 0.8
   - key: cost.scale.defense
     value: 1
   - key: cost.scale.research
@@ -807,7 +809,7 @@ MonoBehaviour:
   - key: cost.v.fuel_logistics
     value: 550
   - key: cost.v.cargo_logistics
-    value: 700
+    value: 650
   - key: cost.v.ballistics
     value: 600
   - key: cost.v.shield_tech

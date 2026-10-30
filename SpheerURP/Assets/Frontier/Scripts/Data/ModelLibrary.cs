@@ -18,6 +18,8 @@ namespace Frontier
             [Tooltip("Where structures sit, as a fraction of the standard ground radius (0 = not baked, treated as 1). Round models have 1; models with " +
                      "spikes or a smaller core have less, so buildings touch the visible body instead of floating. Baked by Frontier/Bake Model Ground Radii.")]
             public float groundScale;
+            [Tooltip("Authored foundation depth below the original ground plane. Placement must leave this portion buried.")]
+            public float foundationDepth;
         }
 
         public Entry[] entries;
@@ -41,6 +43,15 @@ namespace Frontier
             if (lib == null || lib.entries == null) return 1f;
             foreach (var e in lib.entries) if (e.key == key) return e.groundScale > 0.01f ? Mathf.Min(1f, e.groundScale) : 1f;
             return 1f;
+        }
+
+        public static float FoundationDepth(string key)
+        {
+            var lib = Instance;
+            if (lib != null && lib.entries != null)
+                foreach (var entry in lib.entries)
+                    if (entry.key == key) return entry.foundationDepth;
+            return 0f;
         }
 
         /// <summary>Instantiates an inert model using its baked scale correction and the requested diameter.</summary>

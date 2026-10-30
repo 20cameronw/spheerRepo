@@ -19,7 +19,7 @@ MonoBehaviour:
     extends jump range.'
   kind: 29
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_warp_gate
   buildCost:
   - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
     amount: 7300

@@ -24,23 +24,42 @@ namespace Frontier
         public int Swings { get; private set; }
         public int WeakSpotHits { get; private set; }
         public int Perfects { get; private set; }
+        public float Elapsed { get; private set; }
+        public float Marker { get { return 0.5f + 0.48f * (float)Math.Sin(Elapsed * timingSpeed); } }
+        public float SweetHalfWidth { get; }
+        readonly float timingSpeed;
         public bool Completed { get { return CompletedStages == StageCount; } }
         public float Quality { get { return 0.3f + 0.7f * (Swings > 0 ? (float)WeakSpotHits / Swings : 0f); } }
 
-        public NodeHarvestRun(float toolDamage, float difficulty)
+        public NodeHarvestRun(float toolDamage, float difficulty, float tolerance = 1f)
         {
             if (!Finite(toolDamage) || toolDamage <= 0f) throw new ArgumentOutOfRangeException(nameof(toolDamage));
             if (!Finite(difficulty)) throw new ArgumentOutOfRangeException(nameof(difficulty));
+            if (!Finite(tolerance) || tolerance <= 0f) throw new ArgumentOutOfRangeException(nameof(tolerance));
             this.toolDamage = toolDamage;
             StageHealth = 2.6f + 2f * Math.Max(0f, Math.Min(1f, difficulty));
             Health = StageHealth;
             SwingSeconds = 0.55f / (float)Math.Sqrt(Math.Max(1f, toolDamage));
+            SweetHalfWidth = Math.Max(0.07f, Math.Min(0.26f,
+                0.14f * tolerance + Math.Min(0.04f, Math.Max(0f, toolDamage - 1f) * 0.008f)));
+            timingSpeed = 1.8f + Math.Max(0f, Math.Min(1f, difficulty)) * 1.2f;
         }
 
         public void Advance(float seconds)
         {
             if (!Finite(seconds) || seconds < 0f) throw new ArgumentOutOfRangeException(nameof(seconds));
             Cooldown = Math.Max(0f, Cooldown - seconds);
+            if (!Completed) Elapsed += seconds;
+        }
+
+        public HarvestStrike TimingStrike
+        {
+            get
+            {
+                float distance = Math.Abs(Marker - 0.5f);
+                return distance <= SweetHalfWidth * 0.4f ? HarvestStrike.Perfect :
+                    distance <= SweetHalfWidth ? HarvestStrike.WeakSpot : HarvestStrike.Miss;
+            }
         }
 
         public bool TryStrike(HarvestStrike strike)

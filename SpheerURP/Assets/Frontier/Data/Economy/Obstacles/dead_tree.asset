@@ -194,4 +194,4 @@ MonoBehaviour:
       reward:
         resourceId: wood
         amount: 120
-  modelKey: 
+  modelKey: world_dead_tree

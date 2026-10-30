@@ -1,5 +1,37 @@
 # Testing
 
+## Side-on lander and scanner-limited project map
+
+- Ship presentation uses the screen-top terrain silhouette and a horizontal profile. Downward air boosters
+  pulse during braking and shut off on contact; flight thrust, costs, saved positions and settlement are unchanged.
+- The arrival/skip regression checks side-on alignment, top-of-world placement, downward thrust, cutoff, cleanup,
+  camera restoration and unchanged fuel. ShipRig tests cover owned resources and independent landing/flight states.
+- MapQuery hides unknown systems even without a resource filter and removes the authored-world visibility exception.
+  Galaxy zoom returns remembered systems only, without enumerating distant sectors or painting unscanned star density.
+- Discovery, name/ID search, tracked-material highlights, Radar Tower coverage updates and reopening the map have
+  targeted coverage. New discoveries and old saved knowledge remain usable beyond current scanner range.
+- Final focused run: 32 EditMode and 10 PlayMode tests passed. Ten confirmation captures across two phone sizes
+  showed no overflow, sub-12dp text or sub-48dp targets. Native device motion/performance still needs human playtesting.
+
+## Destination footer and card layout
+
+- Pilot / Autopilot / Route Unavailable stays below the destination details, outside the ScrollView.
+  Route status, mode, price, next stop and world information scroll above it without moving the footer.
+- Prerequisite actions use one wrapping icon row, with only relevant research/lab/station/XP actions.
+  Shared cost rows constrain and wrap resource chips within their card, including large exact quantities.
+- Four targeted PlayMode tests passed, including scroll-invariant footer geometry and cost containment at
+  360/700 logical pixels. Eight captures across two phone sizes had no overflow, small-text or small-touch warnings.
+
+## Project icons and full-loop tutorial follow-up
+
+- Lab shortcut selects Utility and scrolls the Research Lab card into view; tracked Utility projects use the same route.
+- Track stars toggle saved state and selected styling, including the persistent shortage-overlay header.
+- Resume is icon-only in the safe-area HUD corner below the top bar, with first-session guidance beside it.
+- The live guide now ends with research and an upgrade, preserving its original six objective identities and skip state.
+  How to Play explains the full harvesting/storage/crafting/XP/research/upgrading/exploration/expansion loop.
+- Targeted validation: 63 EditMode and 5 PlayMode tests passed. Two-phone captures cover the lab, shop route,
+  project corner and tutorial; native touch playtesting remains a human-device check.
+
 Everything that can run without Unity does. Five layers, fastest first:
 
 | Layer | Covers | Needs | Run it | CI |
@@ -43,6 +75,72 @@ Manifest inspection found Internet/network/vibration/post-notification permissio
 advertising-ID permission. No physical-device installation or store signing was performed.
 
 Script execution is usually disabled by policy, so prefix scripts with `powershell -NoProfile -ExecutionPolicy Bypass -File`.
+
+Release A navigation uses `DebugResearch()` / `DebugResearch(1)` for Tech / Improvements and
+`DebugShip(0..2)` for Cargo / Tools / Systems. `DebugPack` remains a Cargo entry for inventory captures.
+The updated screenshot names are `research-tech`, `research-improvements`, `ship-tools`, `ship-systems`
+and `construction-crews`; inventory captures retain `pack*`. The 24 purchase-pool cases in
+`ProgressionContentTests` cover research, tools, ship and defense with connected, disconnected,
+remote, under-construction storage/depot and insufficient resources, including save/load.
+The live `ResearchShipNavigationAndDockCapacityUseThePlayerFlow` check covers Cargo-first access,
+the gauge, fuel-upgrade and objective routes, network access without a gate, Build jobs and Atlas.
+Screenshot `-Only` filters are substring matches: `hud` also selects wave HUDs. For a bounded navigation
+capture use the explicit panel names above, `pack`, `map-selected`, `network-tanks` and `network-project`
+instead; partial combat sequences can leave combat active for subsequent shots/devices.
+The static layout gate removes entrance-motion classes in its isolated EditorWindow fixture before
+measuring bounds. Editor-only transition timing was intermittent; actual motion remains covered by
+PlayMode lifecycle checks rather than changing the runtime animation or weakening geometry assertions.
+
+Release A verification (2026-10-28): 139 targeted EditMode and 14 affected PlayMode tests passed.
+The panel gate passed at 900x1600 and 1600x900. The bounded phone capture produced 24 screenshots
+at 1080x1920 and 1080x2340 with zero harness errors, overflow, sub-12dp text or sub-48dp touch targets;
+outputs are under the ignored `SpheerURP\Screens\release-a-confirm` folder. The broader
+`Bootstrap_BuildsTheWholeSession` probe separately failed its existing `ranks.enable` availability
+expectation in this configured-service environment. Capture startup/shutdown also logged Unity Search
+index and uninitialized Analytics exceptions, outside the navigation path. These service/editor issues
+remain open; the successful targeted results are not a full-suite or native-device sign-off.
+
+### Player-flow follow-through verification (2026-10-28)
+
+The subsequent user-directed removal of harvest/construction daily caps passed **107 targeted EditMode**
+and **16 PlayMode** tests. Policy and fake native-provider cases cover explicit unlimited mode, retained
+cooldowns, persisted counter saturation, restart and unchanged finite/zero-cap semantics. Gameplay and
+platform gates remain disabled; no live ad requests were used for validation.
+
+The final targeted run passed **189 EditMode** tests across progression projects, resource sources,
+storage/save round-trips, builder jobs, planetary network, objectives/first session, clock history,
+service lifecycle and rewarded policy. **27 PlayMode** tests passed across bootstrap, navigation,
+shortage return paths, return-summary dismissal, construction no-fill, minigames and service lifecycle.
+After visual inspection, two affected PlayMode cases passed again with resolved text-wrapping assertions.
+These counts are targeted runs, not a full-suite or physical-device certification.
+
+The pending-reward cloud-restore regression exposed mutable references in exported cloud snapshots.
+`TryCreateCloudSaveSnapshot` now returns a detached copy; later reward cancellation cannot alter a
+previously exported pending ticket and defeat incoming-save validation. Save-failure tests verify no
+partial base/bonus publication and successful retry; restart/capacity/exact-job tests cover settlement.
+Same-process resume tests cover actual stored Auto-Harvester/Dyson output and no repeated accrual.
+Obstacle help explicitly tests carried-only availability despite an operational connected warehouse.
+
+The bounded confirmation produced **28 captures** at 1080x1920 and 1080x2340 under ignored
+`SpheerURP\Screens\player-plan-confirm`, with zero setup errors, lint overflow, sub-12dp text or
+sub-48dp touch targets. Initial return captures exposed missing `common.close`; a canonical
+`project.dismiss-summary` key and live dismissal regression fix it. Visual inspection also caught
+clipped explanatory text despite clean lint; project/shortage text now has scoped wrapping, checked
+by the two follow-up PlayMode cases. Captures precede that final wrapping change; they are not proof
+that lint detects text truncation or that larger native accessibility text has been certified.
+Static layout passed at 900x1600 and 1600x900.
+
+Bootstrap and capture services now use isolated in-memory consent whenever saves are redirected;
+they neither inherit nor write the real player's consent. The previously failing bootstrap expectation
+passes, and the final capture did not reproduce the Analytics/Search exceptions recorded in Release A.
+This does not certify Unity package internals or production SDK lifecycle.
+
+`player-shortage`, `player-project`, `player-return` and `player-reward-recovery` are isolated harness
+fixtures. Gameplay reward flags and the iOS provider are enabled; Editor/desktop still never request native ads.
+Transient fake services exercise offers, explicit consent acceptance/cancellation and no-fill without live ads.
+Approval, child-inclusive policy/legal/SDK/platform setup, approved telemetry schemas, real-device
+touch/accessibility/background/termination/ad tests and observed new-player journeys remain release
+gates, detailed with unactivated tuning proposals in [SYSTEMS.md](SYSTEMS.md).
 
 ```powershell
 # Core tests, no Unity (needs the .NET 8 SDK; ~5 s)
@@ -116,19 +214,60 @@ No new screenshot sweep or on-device/IL2CPP run was performed for this bounded m
 
 ### Harvest rule and bot regressions
 
-`NodeHarvestRun`, `DrillHarvestRun`, `SiphonHarvestRun`, `ExcavationHarvestRun` and `SalvageHarvestRun` live in `Frontier.Core`
+`NodeHarvestRun`, `VeinHarvestRun`, `DrillHarvestRun`, `SiphonHarvestRun`, `ExcavationHarvestRun` and `SalvageHarvestRun` live in `Frontier.Core`
 and drive all six actual harvest games, not separate test-only simulations. Their tests are linked into the .NET test project
 and also run under Unity Mono. They cover the
 existing damage/yield rules, rejected cooldown spam, stage overkill, tool scaling, bounded bot completion, deterministic
 replays, pressure/contact and invalid inputs. `MinigameFlowTests` also drives the rendered games through completion,
 verifies paused input is ignored, and waits for explicit collection before the exactly-once result callback.
 The common harvest input gate also rejects input before scene readiness, after completion and after stage cleanup.
+The improvement pass additionally measures 2.2x productive boost rate and real bit descent, heat lockout/recovery,
+timing-zone/tool/difficulty effects, actual braking speed and bounded chain repairs, vent recovery and pump exclusion,
+direction clues across seeds, and early/ready/late/cancelled tethers. Synthetic real UI Toolkit events cover independently
+owned pressure/boost fingers, unrelated releases, cancel/capture loss, keyboard rearming, pause/focus loss and finish resets.
+Salvage releases settle once; cancellation and pause cannot consume a cast. The Editor cannot certify native multi-touch,
+haptics or subjective fun: these still need human phone playtesting.
+
+Harvest improvement verification: **58 EditMode passed**, with two runtime-unsupported allocation counters skipped;
+**21 PlayMode passed**. A two-second controlled drill sample measured progress **0.0950 normal / 0.2090 boosted**
+and bit height **0.932 / 0.880**. Eighteen phone confirmation captures (1080x1920 and 1080x2340) cover all six games,
+boost/overheat and a result; no setup errors, overflow, sub-12dp text or sub-48dp touch targets were reported.
+The confirmation exposed an almost invisible billboard tether; it is now volumetric geometry, with a rendered-game
+regression checking its width, length and mesh volume. No further polish loop was run.
+The broader `AuthoredTablePreservesShellCopyAndFormatting` test has a pre-existing stale defense-copy assertion
+(`guide.defend.help` expects "planets cannot be attacked"; HEAD already says "Call a wave from an Alarm").
+That unrelated assertion is left unchanged. The standalone .NET runner was unavailable on this host; the same linked
+mechanics ran successfully under Unity Mono.
+
+Initial harvest access follow-up (the Build-list entry was superseded by the simplification below):
+**58 EditMode** source/progression/localization checks and **10 PlayMode** routing checks passed.
+Build > Harvest is exercised through real buttons for missing, ready and upgrading harvesters; both the list's Scrap run
+and a structure's Wood run collect through the normal exactly-once result flow. Surface-scrap yield/difficulty and Mine
+requirements are checked explicitly. Surface tests reject resource models/labels/tap targets and compare saved slot-direction
+prefixes at 12, 18 and 30 slots, including travel to high-pad worlds. Existing shortage-return, first-session cues, empty cargo,
+world actions and world-label checks remain covered. Sixteen two-phone captures cover Build, ready/missing/pending lists,
+the structure popup and debris/clearance; all had zero setup or UI-lint issues.
+Representative surface, list, popup and debris images were visually inspected; native touch still needs device testing.
+
+UI simplification follow-up: **58 EditMode** and **10 PlayMode** checks passed. The updated cases verify that Build no
+longer exposes jobs/harvest rows; real building taps retain harvesting, Scrap settlement, pending jobs and crew access.
+Map's network footer is disabled without a completed local Warp Gate and enabled once complete; pin controls share one
+header row beneath location status and keep full-sized touch targets. Shortage chips open a smaller icon-action overlay
+over the original panel; Back, close and backdrop dismiss only that overlay, while build/producer icons open their actual
+destinations without granting resources. Exact quantities, explicit tracking and How to Play copy remain covered.
+Twenty confirmation captures across the two phone sizes had zero setup, overflow, sub-12dp text or sub-48dp target issues.
+Representative overlay and Map/header/locked/unlocked footer images were visually inspected. Native touch remains a human
+device check. The initial capture's wrapping pin and persistent Map help were corrected in one batch before confirmation.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "harvest-access,obstacle-surface,obstacle-clearance"
+```
 
 ```powershell
 dotnet test .\tests\Frontier.Core.Tests\Frontier.Core.Tests.csproj --filter "FullyQualifiedName~HarvestRun"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform EditMode -TestFilter "NodeHarvestRunTests;DrillHarvestRunTests;HarvestRunsTests"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-tests.ps1 -Platform PlayMode -TestFilter MinigameFlowTests
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "game-chop,game-mine,game-drill,minigame-result,minigame-drill-result"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\capture-screens.ps1 -Devices phone-1080x1920,phone-1080x2340 -Only "game-chop,game-mine,game-drill,game-siphon,game-excavate,game-salvage,harvest-boost,harvest-overheat,minigame-drill-result"
 ```
 
 The drill screenshot cases locate a real generated drilling deposit. A missing deposit or failed game start is an error,

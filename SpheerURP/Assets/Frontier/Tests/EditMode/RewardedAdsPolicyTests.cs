@@ -70,6 +70,49 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public async Task UnlimitedDailyPlacementsKeepCooldownAndSaturatePersistedCounts()
+        {
+            var provider = new Provider();
+            var store = new Store();
+            var clock = new Clock();
+            var row = new RewardedAdPlacement { id = "double-yield", unlimitedDaily = true, dailyCap = 0, cooldownSeconds = 60 };
+            var policy = new RewardedAdsPolicyService(provider, store, clock, true, new[] { row });
+            row.unlimitedDaily = false;
+            Assert.IsTrue((await policy.ShowRewardedAsync("double-yield")).succeeded,
+                "The service copies authored flags and permits unlimited placements with a zero numeric cap.");
+            Assert.IsFalse(policy.RewardedAvailability("double-yield").succeeded, "Unlimited is not a cooldown bypass.");
+            clock.now = clock.now.AddSeconds(60);
+            store.rows["double-yield"].rewards = int.MaxValue;
+            Assert.IsTrue(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.IsTrue((await policy.ShowRewardedAsync("double-yield")).succeeded);
+            Assert.AreEqual(int.MaxValue, store.rows["double-yield"].rewards, "No overflow to negative/corrupt usage.");
+            clock.now = clock.now.AddSeconds(60);
+            var restarted = new RewardedAdsPolicyService(provider, store, clock, true,
+                new[] { new RewardedAdPlacement { id = "double-yield", unlimitedDaily = true, cooldownSeconds = 60 } });
+            Assert.IsTrue((await restarted.ShowRewardedAsync("double-yield")).succeeded);
+            Assert.AreEqual(3, provider.shows);
+        }
+
+        [Test]
+        public async Task AvailabilityUsesTheSameLimitsWithoutShowingAdsOrWritingUsage()
+        {
+            var provider = new Provider();
+            var store = new Store();
+            var clock = new Clock();
+            var policy = Policy(provider, store, clock, cap: 1);
+            Assert.IsTrue(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.IsFalse(policy.RewardedAvailability("unknown").succeeded);
+            Assert.IsEmpty(store.rows);
+            Assert.AreEqual(0, provider.shows);
+            Assert.IsTrue((await policy.ShowRewardedAsync("double-yield")).succeeded);
+            Assert.IsFalse(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.AreEqual(1, provider.shows);
+            clock.now = clock.now.AddDays(1);
+            Assert.IsTrue(policy.RewardedAvailability("double-yield").succeeded);
+            Assert.AreEqual(1, store.rows["double-yield"].rewards);
+        }
+
+        [Test]
         public async Task DisabledUnknownAndZeroCapPlacementsNeverReachTheProvider()
         {
             var provider = new Provider();
@@ -255,18 +298,24 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void AuthoredPolicyHasCappedPlacementsButIosRemainsGated()
+        public void AuthoredIosAdsAreEnabledAndHarvestAndConstructionKeepTheirCooldowns()
         {
             var policy = Resources.Load<RewardedAdsPolicy>("Frontier/RewardedAdsPolicy");
             Assert.IsNotNull(policy);
             Assert.IsTrue(policy.enableRewardedAds);
-            Assert.IsFalse(policy.iosSetupVerified);
+            Assert.IsTrue(policy.enableIosGameplayAds);
             Assert.AreEqual("28e95b2f5", policy.iosAppKey);
             Assert.AreEqual("eurexbly1unznz2g", policy.iosRewardedAdUnitId);
             CollectionAssert.AreEquivalent(new[] { "double-yield", "emergency-fuel", "timer-skip", "revive", "daily-supply", "free-shards" },
                 Array.ConvertAll(policy.placements, row => row.id));
-            foreach (var placement in policy.placements) Assert.Greater(placement.dailyCap, 0);
-            Assert.IsFalse(policy.CanUseIos(Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig")));
+            foreach (var placement in policy.placements)
+                if (placement.id == "double-yield" || placement.id == "timer-skip")
+                {
+                    Assert.IsTrue(placement.unlimitedDaily);
+                    Assert.AreEqual(0, placement.dailyCap);
+                }
+                else Assert.Greater(placement.dailyCap, 0, "Other staged placements retain their existing policy.");
+            Assert.IsTrue(policy.CanUseIos(Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig")));
         }
 
         [Test]

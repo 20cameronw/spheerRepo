@@ -11,9 +11,174 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 280c923ac2aa4657ad932739024adaf2, type: 3}
   m_Name: UiStrings
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   locale: en
   entries:
+  - key: project.capacity
+    text: MAKE ROOM OR UPGRADE CARGO
+  - key: project.dismiss-summary
+    text: DISMISS SUMMARY
+  - key: project.connect
+    text: CONNECT LOCAL STORAGE
+  - key: common.close
+    text: Close
+  - key: project.hull
+    text: IMPROVE HULL PROTECTION
+  - key: project.landing-blocked
+    text: Hull protection is required to land here.
+  - key: project.travel-cost
+    text: 'Trip quote: {0} gal. Review the route on the map before departure.'
+  - key: reward.confirm-discard
+    text: Tap discard again to permanently give up this saved bonus.
+  - key: reward.harvest
+    text: 'WATCH AD: +{0} {1}'
+  - key: reward.construction
+    text: 'WATCH AD: SAVE {0}'
+  - key: reward.saved
+    text: Ad bonus saved.
+  - key: reward.not-earned
+    text: No bonus earned. Your normal progress is unchanged.
+  - key: reward.changed
+    text: This reward is no longer available. Continue normally or check your project.
+  - key: reward.restore-busy
+    text: Finish or dismiss the pending ad reward before restoring. Saves with an
+      unresolved reward cannot be restored.
+  - key: reward.space
+    text: Make room in cargo, then retry your saved ad bonus.
+  - key: reward.save-failed
+    text: Reward could not be saved. Do not close the game; retry from your project.
+      {0}
+  - key: reward.job-changed
+    text: That construction job has changed or finished. No other job was boosted.
+  - key: reward.timeout
+    text: The ad did not finish in time. Continue normally; no bonus was granted.
+  - key: reward.failed
+    text: The ad was unavailable. Your normal action is still available.
+  - key: reward.platform
+    text: Videos play on iPhone. No ad or bonus is simulated in this build.
+  - key: reward.harvest-space
+    text: Make room for the full double harvest to use this offer.
+  - key: reward.recovery-earned
+    text: An earned ad bonus is saved and waiting. Retry to claim it.
+  - key: reward.recovery-pending
+    text: An interrupted ad could not be verified. No bonus is assumed; any collected
+      base harvest is safe.
+  - key: reward.retry
+    text: CLAIM SAVED BONUS
+  - key: reward.dismiss
+    text: DISMISS INTERRUPTED REQUEST
+  - key: reward.discard
+    text: DISCARD THIS UNCLAIMED BONUS
+  - key: shards.title
+    text: NOVA SHARDS
+  - key: shards.balance
+    text: 'AVAILABLE: {0}'
+  - key: shards.uses-help
+    text: Spend shards on instant builds, timer finishes, extra crews, debris clearance
+      or a Hyperspace revive.
+  - key: shards.open
+    text: Nova Shards and optional ad rewards
+  - key: shards.ad.title
+    text: OPTIONAL REWARDED VIDEO
+  - key: shards.ad.help
+    text: An optional video earns {0} shards. No automatic ads.
+  - key: shards.ad.unavailable
+    text: No rewarded video is available right now.
+  - key: shards.ad.consent
+    text: Optional videos require your advertising choice in Privacy Settings.
+  - key: shards.ad.settings
+    text: REVIEW AD SETTINGS
+  - key: shards.ad.read-only
+    text: This save is read-only, so shards cannot be granted.
+  - key: shards.ad.wallet-full
+    text: Your shard wallet is full. Spend shards before claiming another reward.
+  - key: shards.ad.watch
+    text: 'WATCH VIDEO: +{0} SHARDS'
+  - key: shards.ad.loading
+    text: Opening rewarded video...
+  - key: shards.ad.claimed
+    text: Received {0} shards.
+  - key: project.prerequisite
+    text: OPEN REQUIRED RESEARCH
+  - key: project.lab
+    text: PREPARE A LOCAL LAB
+  - key: project.xp
+    text: EARN XP FROM WAVES
+  - key: project.upgrade-station
+    text: UPGRADE THIS STATION
+  - key: project.title
+    text: TRACKED PROJECT
+  - key: project.track
+    text: TRACK THIS PROJECT
+  - key: map.filter.project
+    text: Tracked needs
+  - key: map.project-material
+    text: Needed for your tracked project
+  - key: map.scanner.legend
+    text: 'Dashed: scanner coverage'
+  - key: map.scanner.help
+    text: Ship scanners and Radar Towers extend survey coverage around visited worlds.
+      Previously discovered worlds stay known.
+  - key: map.unscanned
+    text: Outside scanner coverage. Explore closer or extend your scanners.
+  - key: project.tracked
+    text: Tracking {0}. One project stays with you between sessions.
+  - key: project.resume
+    text: RESUME PROJECT
+  - key: project.open
+    text: OPEN
+  - key: project.clear
+    text: STOP TRACKING
+  - key: project.empty
+    text: Track an upgrade, recipe or construction from its cost card.
+  - key: project.complete
+    text: Project complete.
+  - key: project.remaining
+    text: Gather the remaining materials, then return to finish.
+  - key: project.missing
+    text: This project is no longer available. Stop tracking it and choose another.
+  - key: project.read-only
+    text: Tracking cannot be saved while this save is read-only.
+  - key: project.save-failed
+    text: Project changed, but could not be saved. Keep the game open and retry.
+  - key: project.return-world
+    text: Return to the project's world. Remote stock is not automatically spendable.
+  - key: project.anchor-missing
+    text: This structure is no longer here. Open the project or choose another source.
+  - key: project.previous
+    text: PREVIOUS STEP
+  - key: project.return
+    text: RETURN TO {0}
+  - key: project.depth
+    text: Too many ingredient steps. Return to your project or choose another source.
+  - key: project.shortfall
+    text: 'Need {0} {1}. Usable here: {2}. Still missing: {3}.'
+  - key: project.stock-ready
+    text: You have enough in cargo and connected local storage.
+  - key: project.stored
+    text: '{0} {1} stored on {2}, not aboard.'
+  - key: project.withdraw
+    text: OPEN LOCAL STORAGE
+  - key: project.transfer-cost
+    text: 'Relay quote: {0} fuel energy. Space and fuel are checked when you transfer.'
+  - key: project.open-relay
+    text: OPEN RELAY
+  - key: project.view-world
+    text: CHECK TRAVEL TO THIS WORLD
+  - key: project.produce
+    text: OPEN LOCAL PRODUCER
+  - key: project.build-producer
+    text: FIND A LOCAL PRODUCER
+  - key: project.find-world
+    text: FIND A SUPPLYING WORLD
+  - key: project.manual
+    text: BROWSE RESOURCE ATLAS
+  - key: project.while-away
+    text: WHILE YOU WERE AWAY
+  - key: project.job-ready
+    text: Construction ready on {0}.
+  - key: project.output-ready
+    text: '{0} {1} produced on {2}. Output remains in local storage.'
   - key: fuel.title
     text: SHIP FUEL TANKS
   - key: fuel.open
@@ -29,9 +194,9 @@ MonoBehaviour:
   - key: fuel.summary
     text: '{0} / {1} tank racks occupied'
   - key: fuel.help
-    text: Fuel uses ship tanks, not backpack space. Amounts are shown in equivalent
-      gallons; plasma and antimatter carry more energy per rack. Craft fuel to refill,
-      or transfer reserves at a Fuel Depot.
+    text: Ship fuel is measured in equivalent gallons. Plasma and antimatter hold
+      more energy per rack. Refill by crafting fuel or withdrawing from a local Fuel
+      Depot.
   - key: fuel.stored
     text: Stored {0:N0} gal in the Fuel Depot.
   - key: fuel.withdrew
@@ -52,6 +217,8 @@ MonoBehaviour:
     text: Build a Warp Gate on each visited world, then permanently link them. Connected
       worlds cost no fuel and have no flight mini-game. Hull protection still applies.
       Solid green map lines show your links.
+  - key: network.map.lock
+    text: Complete a Warp Gate on this world to use the planet network.
   - key: network.lock.busy
     text: Finish the current journey or resolve the read-only save before changing
       the network.
@@ -154,7 +321,12 @@ MonoBehaviour:
   - key: harvest.vein.title
     text: FOLLOW THE VEIN
   - key: harvest.vein.hint
-    text: Steer the cutter through bright ore. Dark unstable rock damages the rig.
+    text: Steer through gold crystal seams. Hold SPEED (Space) to drill twice as
+      fast. Three rich seams in a row repair the rig.
+  - key: harvest.vein.speed
+    text: HOLD SPEED
+  - key: harvest.vein.chain
+    text: Rich chain {0} - every 3 repairs the rig
   - key: harvest.vein.metric
     text: RICH SEAMS
   - key: harvest.vein.left
@@ -170,7 +342,7 @@ MonoBehaviour:
   - key: world.view.orbit
     text: ORBIT VIEW
   - key: world.view.help
-    text: Get closer, rotate the planet and tap a resource or building.
+    text: Rotate to tap buildings or debris.
   - key: world.site.tool
     text: Ready with {0}
   - key: world.site.gather
@@ -414,11 +586,11 @@ MonoBehaviour:
   - key: debug.size.colossal
     text: COLOSSAL
   - key: nav.command
-    text: COMMAND
+    text: RESEARCH
   - key: nav.map
     text: MAP
   - key: nav.pack
-    text: PACK
+    text: SHIP
   - key: nav.build
     text: BUILD
   - key: nav.menu
@@ -555,12 +727,31 @@ MonoBehaviour:
   - key: harvest.drill.title
     text: BORE
   - key: harvest.drill.hint
-    text: Press to drive the drill into the ore. Keep the pressure needle inside
-      the green band
+    text: Hold PRESSURE (Space) in the green band. Hold BOOST (Shift) to drill faster.
+      Release BOOST to cool; overheating briefly stops cutting.
+  - key: harvest.drill.boost
+    text: HOLD BOOST
+  - key: harvest.drill.heat
+    text: HEAT {0}% - release BOOST before 100%
+  - key: harvest.drill.cooling
+    text: COOLING - cutting resumes at 35% heat
+  - key: harvest.drill.overheated
+    text: OVERHEATED
+  - key: harvest.chop.timing-hint
+    text: Tap SWING (Space) as the marker crosses the middle. Green is good; the
+      very center is perfect. Wait for the axe to recover.
+  - key: harvest.chop.swing
+    text: SWING
+  - key: harvest.chop.result.perfect
+    text: PERFECT - axe recovering
+  - key: harvest.chop.result.good
+    text: GOOD - axe recovering
+  - key: harvest.chop.result.miss
+    text: MISS - wait for the middle
   - key: harvest.drill.metric
     text: Seconds on target
   - key: harvest.drill.hold-control
-    text: HOLD
+    text: HOLD PRESSURE
   - key: harvest.drill.hold
     text: HOLD TO DRILL
   - key: harvest.drill.adjust
@@ -572,8 +763,14 @@ MonoBehaviour:
   - key: harvest.siphon.metric
     text: Perfect pumps
   - key: harvest.siphon.hint
-    text: Tap PUMP when the needle crosses the capture window. Clean pulses keep
-      the gas flowing
+    text: PUMP (Space) in the green window. Pressure narrows it; hold VENT (Shift)
+      to recover. Clean pump chains steady the window.
+  - key: harvest.siphon.vent
+    text: HOLD VENT
+  - key: harvest.siphon.venting
+    text: VENTING - pressure recovering
+  - key: harvest.siphon.pressure
+    text: PRESSURE {0}% - clean chain {1}
   - key: harvest.siphon.pump
     text: PUMP
   - key: harvest.siphon.watch
@@ -593,7 +790,28 @@ MonoBehaviour:
   - key: harvest.excavate.metric
     text: Seams uncovered
   - key: harvest.excavate.hint
-    text: Ping the grid to read echoes. Brighter returns mark the buried seam
+    text: Ping a cell, then follow its direction and distance clue to the seam. Each
+      step is one grid cell.
+  - key: harvest.excavate.direction
+    text: '{0} - {1} steps from your last ping'
+  - key: harvest.excavate.direction.up.left
+    text: UP + LEFT
+  - key: harvest.excavate.direction.up.right
+    text: UP + RIGHT
+  - key: harvest.excavate.direction.up.same
+    text: UP
+  - key: harvest.excavate.direction.down.left
+    text: DOWN + LEFT
+  - key: harvest.excavate.direction.down.right
+    text: DOWN + RIGHT
+  - key: harvest.excavate.direction.down.same
+    text: DOWN
+  - key: harvest.excavate.direction.same.left
+    text: LEFT
+  - key: harvest.excavate.direction.same.right
+    text: RIGHT
+  - key: harvest.excavate.direction.same.same
+    text: HERE
   - key: harvest.excavate.ping
     text: PING
   - key: harvest.excavate.progress
@@ -625,7 +843,18 @@ MonoBehaviour:
   - key: harvest.salvage.metric
     text: Caches recovered
   - key: harvest.salvage.hint
-    text: Tap tumbling wreckage to catch it with your claw. Misses cost a cast
+    text: Tap wreckage (or use arrow keys) to select. Hold TETHER (Space), then release
+      when it says RELEASE. Early or late releases cost a cast.
+  - key: harvest.salvage.tether
+    text: HOLD TETHER
+  - key: harvest.salvage.selected
+    text: Target {0} selected - hold TETHER
+  - key: harvest.salvage.charging
+    text: TETHERING - keep holding
+  - key: harvest.salvage.release
+    text: RELEASE NOW
+  - key: harvest.salvage.slipping
+    text: TETHER SLIPPING - release and try again
   - key: harvest.salvage.help
     text: "RECOVER {0} FRAGMENTS  \xB7  TAP A TARGET"
   - key: harvest.salvage.locked
@@ -703,11 +932,17 @@ MonoBehaviour:
   - key: travel.legacy-leg-title
     text: "{0} \xB7 LEG {1} / {2}"
   - key: nav.backpack
-    text: BACKPACK
+    text: SHIP
   - key: common.back
     text: BACK
   - key: menu.ranks
     text: RANKS
+  - key: menu.records
+    text: STATS
+  - key: menu.leaderboard
+    text: LEADERBOARD
+  - key: menu.shards
+    text: NOVA SHARDS
   - key: menu.goals
     text: GOALS
   - key: menu.ascension
@@ -731,50 +966,95 @@ MonoBehaviour:
   - key: shop.utility
     text: UTILITY
   - key: shop.summary
-    text: "Build on {0}  -  {1} / {2} free slots  \xB7  CREWS {3}/{4} busy. Tap a
-      structure on the planet to use it."
+    text: "{0} \xB7 {1}/{2} free slots \xB7 crews {3}/{4} busy"
   - key: shop.empty
     text: Nothing here yet.
   - key: shop.built
-    text: BUILT - tap it on the planet
+    text: BUILT
   - key: shop.no-harvest
     text: Nothing to harvest on this planet
   - key: shop.place
     text: PLACE
+  - key: shop.shards.price
+    text: '{0}'
+  - key: shop.shards.help
+    text: Buy ready to use for {0} shards. No materials or builder needed. Choose
+      a pad to confirm.
+  - key: shop.shards.pad-help
+    text: 'CHOOSE A PAD: SPEND {0} SHARDS'
+  - key: shop.shards.unavailable
+    text: This structure cannot be purchased here. Check requirements and choose
+      a free pad.
+  - key: shop.shards.pending-save
+    text: 'Structure purchased, but saving failed: {0}. Keep the game open while
+      saving retries.'
+  - key: reward.consent.title
+    text: OPTIONAL REWARDED ADS
+  - key: reward.consent.help
+    text: Allow contextual rewarded ads on this device? The ad provider receives
+      connection and ad-delivery data. Ads are never automatic. You can turn this
+      off in Settings. Analytics and online services stay unchanged.
+  - key: reward.consent.allow
+    text: ALLOW & WATCH
+  - key: reward.consent.cancel
+    text: NOT NOW
   - key: tutorial.build.title
     text: 1. Build
   - key: tutorial.build.body
-    text: Open Build on the bottom dock and place a Lumber Camp, then a Refinery
-      and a Warehouse.
+    text: Place buildings from Build; tap them to use or upgrade. The hard-hat button
+      opens jobs and crews. Timers continue while you are away.
   - key: tutorial.storage.title
-    text: 2. Storage
+    text: 3. Store
   - key: tutorial.storage.body
-    text: Your starter backpack has only 9 slots. Build a Warehouse early to store
-      extra resources and drag stacks between grids.
+    text: Warehouses hold local stock, not ship cargo. A Cargo Depot connects local
+      storage for costs. Retrieve or transfer resources from other worlds.
   - key: tutorial.gather.title
-    text: 3. Gather
+    text: 2. Harvest
   - key: tutorial.gather.body
-    text: Tap a Lumber Camp, Mine or Drill on the planet to start its mini-game and
-      collect resources.
+    text: Tap a Lumber Camp, Mining Rig or another harvester, then HARVEST a resource.
+      Collect brings the result aboard; better timing earns more.
   - key: tutorial.refine.title
-    text: 4. Refine
+    text: 4. Craft and fuel up
   - key: tutorial.refine.body
-    text: Tap the Refinery to turn raw resources into fuel.
+    text: Refineries and crafting stations turn raw resources into fuel and parts.
+      Keep fuel for flights and waves. Locked recipes show their requirements.
   - key: tutorial.defend.title
-    text: 5. Defend
+    text: 5. Defend and earn XP
   - key: tutorial.defend.body
-    text: Tap the Alarm and spend fuel to call a wave. More fuel means a longer fight
-      and bigger rewards. Gunners and Lasers defend automatically.
+    text: Build defenses, then call waves from an Alarm to earn XP. More fuel means
+      longer, tougher fights and bigger rewards. XP unlocks research and equipment.
+  - key: tutorial.research.title
+    text: 6. Research technology
+  - key: tutorial.research.body
+    text: Tap a Research Lab for technology and tools. Each card shows its XP, lab
+      and material requirements. Global defense and logistics are in Research > Improvements.
   - key: tutorial.travel.title
-    text: 6. Travel
+    text: 8. Explore
   - key: tutorial.travel.body
-    text: Open Map on the bottom dock and spend fuel to visit new planets. Your bases
-      stay where you built them.
+    text: Use Map to visit new planets. Check fuel, deposits and landing hazards
+      before leaving. Your bases stay on their worlds.
+  - key: tutorial.map.title
+    text: Reading the map
+  - key: tutorial.map.body
+    text: Drag or pinch to explore; tap a world for details and Pin to save it. Dashed
+      rings show scanner coverage; green diamonds mark tracked materials. Autopilot
+      skips piloting for extra fuel, with no refund.
   - key: tutorial.upgrade.title
     text: 7. Upgrade
   - key: tutorial.upgrade.body
-    text: Open Command on the bottom dock to manage your bases and unlock upgrades,
-      including more backpack space.
+    text: Ship holds cargo, tools and flight upgrades. Research holds global improvements.
+      Tap buildings to upgrade their output or services.
+  - key: tutorial.expand.title
+    text: 9. Expand and repeat
+  - key: tutorial.expand.body
+    text: Build on new worlds for rarer materials. Tap a missing cost to find supplies.
+      Toggle a card's star to track it; the HUD star reopens your project.
+  - key: tutorial.ads.title
+    text: Optional boosts
+  - key: tutorial.ads.body
+    text: Watch an ad after harvesting for double resources, on a construction timer
+      to save time, or in Nova Shards for free shards. All progression is playable
+      without ads.
   - key: about.title
     text: FRONTIER
   - key: about.body
@@ -883,21 +1163,33 @@ MonoBehaviour:
     text: Clear an alien wave
   - key: guide.travel.title
     text: Land on a new world
-  - key: guide.build.help
-    text: Open BUILD > GATHER and place a Lumber Camp on this resource-rich home
+  - key: guide.research.title
+    text: Research your first technology
+  - key: guide.research.help
+    text: Tap your local Research Lab to unlock new technology and upgrade tools.
+  - key: guide.upgrade.title
+    text: Buy your first upgrade
+  - key: guide.upgrade.help
+    text: Upgrade cargo, tools or flight systems in Ship to prepare for your next
       world.
+  - key: guide.action.research
+    text: OPEN RESEARCH
+  - key: guide.action.upgrade
+    text: OPEN SHIP UPGRADES
+  - key: guide.build.help
+    text: Prepare for your first departure. A Lumber Camp supplies wood for your
+      first base.
   - key: guide.gather.help
-    text: Tap the Lumber Camp and complete its wood mini-game. Better runs fill your
-      pack faster.
+    text: Tap your Lumber Camp, then HARVEST wood. Better timing brings back more
+      cargo.
   - key: guide.store.help
-    text: Your backpack is small by design. Store extra resources in a Warehouse
-      before expanding your haul.
+    text: Store extra cargo in a Warehouse on this world to make room for your next
+      haul.
   - key: guide.craft.help
-    text: Build a Refinery, tap it, and craft a recipe from gathered materials. Each
-      recipe is recorded in the Atlas.
+    text: Turn gathered materials into supplies at a Refinery.
   - key: guide.defend.help
-    text: Build an Alarm if needed, tap it, and call a wave when you are ready. Defend
-      your base; planets cannot be attacked.
+    text: Call a wave from an Alarm when your defenses are ready. Victories earn
+      XP for better equipment.
   - key: guide.travel.help
     text: Open the map, choose a reachable world, and spend fuel to land there.
   - key: guide.skip
@@ -907,8 +1199,8 @@ MonoBehaviour:
   - key: guide.complete.title
     text: Your frontier is open
   - key: guide.complete.help
-    text: You have built, gathered, crafted, defended, and traveled. Follow the Atlas
-      and grow outward at your own pace.
+    text: You have built, gathered, crafted, defended, traveled, researched and upgraded.
+      Find your next milestone in Menu > How to Play.
   - key: guide.action.atlas
     text: OPEN ATLAS
   - key: guide.action.gather-shop
@@ -934,7 +1226,7 @@ MonoBehaviour:
   - key: pack.capacity.rearrange
     text: '{0} / {1} slots used  -  drag to rearrange'
   - key: pack.empty.title
-    text: Your backpack is empty
+    text: Your cargo is empty
   - key: pack.empty.help
     text: Resources from harvest runs go here. Use a gatherer on this world, then
       collect the result to bring materials back.
@@ -947,7 +1239,7 @@ MonoBehaviour:
   - key: pack.select-help
     text: Tap an item to see its details.
   - key: pack.salvage.title
-    text: RECOVERED SURFACE SALVAGE
+    text: ON THE SURFACE - NOT ABOARD
   - key: pack.salvage.waiting
     text: '{0} waiting on {1}'
   - key: pack.salvage.claim
@@ -957,7 +1249,21 @@ MonoBehaviour:
   - key: pack.salvage.full
     text: Make room in your backpack to claim salvage
   - key: pack.upgrade-help
-    text: Upgrade the backpack in Command > Research for more slots.
+    text: Cargo capacity upgrades are below.
+  - key: ship.tab.cargo
+    text: CARGO
+  - key: ship.tab.systems
+    text: SYSTEMS
+  - key: ship.cargo.help
+    text: Carried cargo only. Warehouses and unclaimed salvage stay on their world.
+  - key: map.open-ship
+    text: SHIP READINESS
+  - key: progression.resources.connected
+    text: Costs use cargo and connected local storage. Retrieve or transfer remote
+      stock first.
+  - key: progression.resources.cargo
+    text: Costs use cargo. A local Cargo Depot connects operational storage; remote
+      stock needs retrieval or transfer.
   - key: relay.summary
     text: "{0} \xB7 LV {1} \xB7 {2}"
   - key: relay.beam.range
@@ -966,8 +1272,8 @@ MonoBehaviour:
     text: system beam
   - key: relay.help
     text: Pull stacks from operational storage on other visited worlds. Each pull
-      costs energy based on stack size and distance; only fuel in your backpack can
-      pay. Fuel Depot reserves stay isolated.
+      uses ship fuel based on stack size and distance. Fuel Depot reserves stay on
+      their world until transferred.
   - key: relay.empty
     text: No remote warehouses are in range. Build storage on another visited world,
       or upgrade the relay to extend its beam.
@@ -991,14 +1297,14 @@ MonoBehaviour:
       fuel stacks; reserves stay on this planet and never pay travel costs.
   - key: storage.help.harvester
     text: This hopper stores the Auto-Harvester's offline output. A local Cargo Depot
-      connects its materials to this planet's shared build and craft pool.
+      connects its materials to this planet's shared resource pool.
   - key: storage.help.cargo
     text: This shared buffer joins operational Warehouses and Auto-Harvester hoppers
-      on this planet. Build and craft costs draw from the pool automatically; travel
-      still uses your backpack.
+      on this planet. Building, crafting, research and upgrades draw from the pool.
+      Travel uses ship fuel; remote storage stays separate.
   - key: storage.help.connected
-    text: Connected to this planet's Cargo Depot. Build and craft costs can draw
-      from this storage automatically.
+    text: Connected to this planet's Cargo Depot. Building, crafting, research and
+      upgrades can draw from this storage automatically.
   - key: storage.help.warehouse
     text: Drag a stack between the grids. Resources stay on this planet. Costs use
       the backpack until a Cargo Depot connects its storage.
@@ -1119,11 +1425,17 @@ MonoBehaviour:
   - key: goals.collect
     text: COLLECT {0} SHARDS
   - key: goals.action.command
-    text: OPEN COMMAND
+    text: OPEN RESEARCH
+  - key: goals.action.ship
+    text: OPEN SHIP SYSTEMS
   - key: goals.action.recipe
     text: FIND RECIPE IN ATLAS
   - key: research.tab.tech
     text: TECH
+  - key: research.tab.improvements
+    text: IMPROVEMENTS
+  - key: research.completed-count
+    text: Completed research ({0})
   - key: research.tab.ship
     text: SHIP
   - key: research.tab.defense
@@ -1138,6 +1450,8 @@ MonoBehaviour:
     text: COMPLETE
   - key: research.tier
     text: XP LV {0}
+  - key: research.xp-lock
+    text: REQUIRES XP LEVEL {0}
   - key: research.lab
     text: "{0}  \xB7  LAB {1}"
   - key: research.prerequisites
@@ -1153,10 +1467,9 @@ MonoBehaviour:
   - key: research.progression
     text: Progression
   - key: tools.title
-    text: CATALOG TOOL TIERS
+    text: HARVEST TOOLS
   - key: tools.help
-    text: Better tools improve harvest yield. XP level, research and materials determine
-      when upgrades unlock.
+    text: Better tools bring back more from each harvest.
   - key: tools.max
     text: MAX TIER
   - key: tools.tier
@@ -1263,7 +1576,7 @@ MonoBehaviour:
   - key: effect.plating
     text: Protection level {0}
   - key: effect.stack-multiplier
-    text: x{0:0.00} stacks (coming later)
+    text: x{0:0.00} stack size
   - key: effect.percent
     text: +{0}%
   - key: wave.tap-help
@@ -1332,6 +1645,18 @@ MonoBehaviour:
     text: 'Tool: {0}  (LV {1}, damage x{2:0.0})'
   - key: gather.title
     text: GATHER ON THIS PLANET
+  - key: gather.list.title
+    text: HARVEST
+  - key: gather.list.help
+    text: '{0}: choose a resource.'
+  - key: gather.list.requires
+    text: Uses {0}
+  - key: gather.list.build
+    text: BUILD {0}
+  - key: gather.list.view
+    text: VIEW HARVESTER
+  - key: gather.list.not-ready
+    text: Harvester unavailable. Choose a ready one.
   - key: gather.empty
     text: NOTHING TO GATHER HERE
   - key: gather.harvest
@@ -1441,8 +1766,12 @@ MonoBehaviour:
   - key: structure.lab.subtitle
     text: Research and tool upgrades
   - key: structure.lab.help
-    text: Unlocks research and tool tiers in COMMAND. Higher lab levels open advanced
-      research.
+    text: Research technology and improve tools here. Upgrade this lab for advanced
+      technology.
+  - key: lab.tab.upgrade
+    text: LAB
+  - key: gate.upgrade.legacy-tool
+    text: Upgrade this tool from Tools. Existing equipment bonuses are kept.
   - key: structure.hub.subtitle
     text: Builder crew capacity
   - key: structure.hub.capacity
@@ -1505,9 +1834,8 @@ MonoBehaviour:
   - key: builders.tab
     text: CREWS
   - key: builders.help
-    text: Construction, upgrades and clearance use your shared builder crews. Timers
-      use local device time. Finish a structure job with Nova Shards or for free
-      near completion; review and confirm before spending.
+    text: Crews build, upgrade and clear debris. Wait, finish with shards, or watch
+      an optional ad to save time. Short structure timers finish free.
   - key: builders.summary
     text: "{0} / {1} crews busy  \xB7  {2} Nova Shards"
   - key: builders.structure
@@ -1593,7 +1921,7 @@ MonoBehaviour:
     text: A local recovery copy retains the previous universe. This replaces any
       earlier recovery copy; it is not a cloud backup.
   - key: ascension.open-command
-    text: OPEN COMMAND
+    text: OPEN RESEARCH
   - key: ascension.open-build
     text: OPEN BUILD SHOP
   - key: ascension.review
@@ -1614,7 +1942,7 @@ MonoBehaviour:
   - key: ascension.lock.maximum
     text: Maximum Legacy progression reached.
   - key: ascension.lock.research
-    text: Research Ascension Protocol in Command.
+    text: Research Ascension Protocol in Research.
   - key: ascension.lock.project
     text: Complete stage {0} of a megaproject in this universe.
   - key: ascension.save-retry
@@ -1632,15 +1960,23 @@ MonoBehaviour:
   - key: map.filter.all
     text: All deposits
   - key: map.help
-    text: Tap a planet to choose it. Drag or pinch to explore.
+    text: Pinch to move between the surface and orbit. Keep zooming out to enter
+      the map. Info opens search, routes and travel. Drag or pinch to explore known
+      space.
   - key: map.mode.universe
     text: Universe Map
   - key: map.mode.orbits
     text: Planet Orbits
+  - key: map.mode.neighbors
+    text: Nearby
+  - key: map.mode.overview
+    text: Overview
   - key: map.search.empty
     text: Enter a world name or x,y
   - key: map.search.coordinates
-    text: "Coordinates in light-years \xB7 zoom out to explore"
+    text: Coordinates in light-years
+  - key: map.search.outside
+    text: Outside known space. Showing the nearest scanned region.
   - key: map.search.not-found
     text: "Not found \xB7 search an exact surveyed world/system name or x,y"
   - key: map.unavailable
@@ -1648,13 +1984,27 @@ MonoBehaviour:
   - key: map.view.galaxy
     text: "Galaxy \xB7 zoom in for stars"
   - key: map.view.system
-    text: "System \xB7 orbits schematic"
+    text: System
+  - key: map.view.neighbors
+    text: Neighboring systems
   - key: map.view.sector
     text: "Sector \xB7 {0} stars"
   - key: map.view.truncated
     text: "{0} \xB7 zoom in for more"
   - key: map.here
     text: YOU ARE HERE
+  - key: map.controls
+    text: Info
+  - key: map.hide-controls
+    text: Hide map info
+  - key: map.return-world
+    text: Return to {0}
+  - key: map.location.planet
+    text: '{0} / {1}'
+  - key: map.location.system
+    text: '{0} / Nearby systems'
+  - key: map.location.sector
+    text: '{0} / Sector {1}, {2}'
   - key: map.tier
     text: TIER {0}
   - key: map.world.subtitle
@@ -1700,7 +2050,7 @@ MonoBehaviour:
   - key: map.hazards.disabled
     text: Landing protection is disabled in development settings
   - key: map.resources
-    text: "RESOURCES \xB7 HOW TO HARVEST"
+    text: RESOURCES
   - key: map.unsurveyed
     text: UNSURVEYED
   - key: map.survey.help
@@ -2021,14 +2371,21 @@ MonoBehaviour:
       HTTPS privacy policy are configured and approved. Your local record remains
       available above.
   - key: ranks.enable
-    text: Anyone can rank. Enabling online ranks connects to Unity using an anonymous
-      player ID and posts your Frontier Score. No public name, email or birthday
-      is needed. Unity also receives connection data such as your IP address. You
-      can turn online services off in Privacy Settings.
+    text: Online rankings are optional. Enabling them connects through an anonymous
+      player ID; opening the leaderboard uploads your Frontier Score. No public name,
+      email or birthday is needed. Unity receives connection data such as your IP
+      address. You can turn online services off in Privacy Settings.
   - key: ranks.online.help
-    text: Post your current Frontier Score and load the top 20. Your own rank is
-      shown even outside the top 20. All players use anonymous pilot labels. These
-      are casual, client-reported scores, not cheat-proof competitive rankings.
+    text: Opening this page uploads your current Frontier Score and loads the top
+      20. Pilot labels are anonymous; scores are client-reported.
+  - key: ranks.era-label
+    text: ERA
+  - key: ranks.podium.title
+    text: TOP PILOTS
+  - key: ranks.podium.place
+    text: '#{0}'
+  - key: ranks.top20
+    text: TOP 20
   - key: ranks.entry
     text: '#{0}  {1}'
   - key: ranks.empty
@@ -2036,7 +2393,9 @@ MonoBehaviour:
   - key: ranks.loading
     text: LOADING RANKS
   - key: ranks.load
-    text: POST SCORE & LOAD RANKS
+    text: LEADERBOARD UPDATES WHEN OPENED
+  - key: ranks.retry
+    text: RETRY LEADERBOARD
   - key: ranks.era
     text: 'YOUR FRONTIER: {0}'
   - key: ranks.era.help
@@ -2048,7 +2407,7 @@ MonoBehaviour:
   - key: ranks.era.next
     text: 'NEXT: {0}'
   - key: ranks.era.command
-    text: OPEN COMMAND
+    text: OPEN RESEARCH
   - key: ranks.connecting
     text: Connecting to online services...
   - key: ranks.connected
@@ -2160,7 +2519,7 @@ MonoBehaviour:
   - key: progression.xp-status
     text: XP LEVEL {0}  -  {1:N0} XP to level {2}
   - key: progression.xp-help
-    text: Clear alien waves to level up. Unlocks use your XP level, not planet tier.
+    text: Clear alien waves to earn XP and unlock new upgrades.
   - key: progression.waves
     text: FIND WAVES TO EARN XP
   - key: progression.required-level
@@ -3048,8 +3407,7 @@ MonoBehaviour:
   - key: content.upgrade.fuel_tank.name
     text: Fuel Tank
   - key: content.upgrade.fuel_tank.description
-    text: Dedicated slots for fuel cells, plasma and antimatter, so fuel stops eating
-      backpack space.
+    text: More ship fuel racks for longer expeditions. Fuel stays separate from cargo.
   - key: content.upgrade.fuel_tank.level-1
     text: Auxiliary Cell
   - key: content.upgrade.fuel_tank.level-2
@@ -3115,7 +3473,7 @@ MonoBehaviour:
   - key: content.upgrade.turret.name
     text: Turret Actuators
   - key: content.upgrade.turret.description
-    text: +15% firing speed for placed turrets. Does not spawn turrets.
+    text: All placed turrets fire 15% faster per level.
   - key: content.upgrade.turret.level-1
     text: Turret Actuators
   - key: content.upgrade.turret.level-2
@@ -3888,8 +4246,7 @@ MonoBehaviour:
   - key: content.objective.jump_range_1.title
     text: A longer reach
   - key: content.objective.jump_range_1.description
-    text: Purchase the first Jump Range upgrade. Temporary debug settings do not
-      count.
+    text: Purchase the first Jump Range upgrade to reach more distant worlds.
   - key: content.objective.first_steel.title
     text: Stronger foundations
   - key: content.objective.first_steel.description

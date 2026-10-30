@@ -19,15 +19,18 @@ namespace Frontier
         {
             if (mapQuery != null && mapQuery.IsCompleted)
             {
-                if (mapQuery.IsFaulted) { Debug.LogException(mapQuery.Exception); mapNotice.text = UiText.Get("map.unavailable"); }
+                if (mapQuery.IsFaulted) { Debug.LogException(mapQuery.Exception); SetMapNotice(UiText.Get("map.unavailable")); }
                 else if (queryVersion == mapVersion)
                 {
                     mapSnapshot = mapQuery.Result;
                     gs.RecordMapDiscoveries(mapSnapshot.surveyedSystems);
+                    foreach (var star in mapSnapshot.surveyedSystems) mapRememberedSystems.Add(star.Id);
+                    RefreshMapProjectMatches();
                     if (mapNameIndex != null) mapNameIndex.AddSystems(gs.universe.Universe, mapSnapshot.surveyedSystems);
-                    PositionMapLabels();
+                    BuildMapNodes();
                     mapWorld.MarkDirtyRepaint();
                     string readout = SystemMapView ? UiText.Get("map.view.system")
+                        : NeighborMapView ? UiText.Get("map.view.neighbors")
                         : mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
                         : UiText.Get("map.view.sector", mapSnapshot.systems.Length);
                     mapReadout.text = mapSnapshot.truncated ? UiText.Get("map.view.truncated", readout) : readout;
@@ -37,12 +40,16 @@ namespace Frontier
             if (mapQuery == null && queryVersion != mapVersion && Time.unscaledTime >= mapQueryAt && viewport.Width > 0 && viewport.Height > 0)
             {
                 queryVersion = mapVersion;
-                MapPoint a = viewport.Unproject(0, viewport.Height), b = viewport.Unproject(viewport.Width, 0);
+                mapQueryBounds = new MapQueryBounds(viewport);
+                mapQueryScale = viewport.Scale;
+                mapQueryBoundsKnown = true;
+                MapPoint a = mapQueryBounds.min, b = mapQueryBounds.max;
                 var universe = gs.universe.Universe;
                 var points = SurveyPoints();
-                var discovered = gs.MapDiscoveryIds();
-                string resource = mapResource;
-                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, discovered));
+                var discovered = KnownMapSystems();
+                string resource = mapResource == ProjectMapFilter ? "" : mapResource;
+                double visibleSpan = System.Math.Max(viewport.Width, viewport.Height) / viewport.Scale;
+                mapQuery = Task.Run(() => MapQuery.Build(universe, a.x, a.y, b.x, b.y, resource, points, discovered, visibleSpan));
             }
             if (mapPreviewTask != null && mapPreviewTask.IsCompleted)
             {
@@ -95,17 +102,5 @@ namespace Frontier
             }
         }
 
-        void DrawMapDensity(Painter2D p)
-        {
-            int index = 0;
-            foreach (var cell in mapSnapshot.density)
-            {
-                if (index++ % 7 != 0) continue;
-                if (cell.density < 0.02f) continue;
-                Vector2 a = Project(cell.x, cell.y), b = Project(cell.x + cell.width, cell.y + cell.height);
-                MapDisc(p, (a + b) * 0.5f, Mathf.Lerp(1, 2.5f, cell.density),
-                    new Color(0.4f, 0.56f, 0.8f, Mathf.Min(0.4f, cell.density)));
-            }
-        }
     }
 }

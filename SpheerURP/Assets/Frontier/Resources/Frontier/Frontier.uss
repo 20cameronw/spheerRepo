@@ -28,6 +28,10 @@
     font-size: var(--fr-fs-body);
     -unity-font-definition: url("/Assets/Frontier/Art/Fonts/Barlow-SemiBold-SDF.asset");
 }
+.fr-project-body .fr-small {
+    white-space: normal;
+    flex-shrink: 0;
+}
 .fr-tiny, .fr-t-caption { font-size: var(--fr-fs-caption); color: var(--fr-text-lo); white-space: normal; }
 
 .fr-surface-enter {
@@ -105,6 +109,12 @@
 .fr-topbar .fr-chip-text { font-size: var(--fr-fs-caption); }
 .fr-chip { flex-direction: row; align-items: center; margin-left: var(--fr-sp-16); flex-shrink: 0; }
 .fr-chip .fr-icon { margin-right: var(--fr-sp-8); }
+.fr-chip-action {
+    background-color: transparent; border-width: 0; border-radius: var(--fr-sp-12);
+    padding: 0; margin-top: 0; margin-bottom: 0; margin-right: 0;
+    min-height: var(--fr-touch); min-width: var(--fr-touch);
+}
+.fr-chip-action:hover, .fr-chip-action:focus { background-color: var(--fr-surface-2); }
 .fr-chip-col { flex-direction: column; justify-content: center; }
 .fr-chip-text {
     font-size: var(--fr-fs-body);
@@ -172,7 +182,7 @@
     background-color: var(--fr-surface-1);
 }
 .fr-guide-heading { flex-direction: row; align-items: center; }
-.fr-guide-title { flex-grow: 1; flex-shrink: 1; min-width: 0; }
+.fr-guide-title { flex-grow: 1; flex-shrink: 1; min-width: 0; white-space: normal; }
 .fr-guide-progress { flex-shrink: 0; margin-right: var(--fr-sp-8); }
 .fr-guide-close { background-color: var(--fr-surface-2); border-color: var(--fr-outline-strong); }
 .fr-guide-description { margin-top: var(--fr-sp-8); }
@@ -228,6 +238,20 @@
 .fr-iconbtn-icon { width: 52px; height: 52px; margin: 0; }
 .fr-round { border-radius: 52px; }
 .fr-iconbtn-small { width: 88px; height: 88px; min-height: 88px; }
+.fr-star-action, .fr-star-action:hover, .fr-star-action:active,
+.fr-shortage .fr-modal-head .fr-star-action {
+    background-color: rgba(0, 0, 0, 0); border-color: rgba(0, 0, 0, 0); border-radius: 52px;
+}
+.fr-star-action:focus { border-color: var(--fr-cyan); }
+.fr-star-action:hover .fr-icon { opacity: 0.8; }
+.fr-research-xp-lock {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    background-color: rgba(40, 45, 54, 0.9); border-radius: var(--fr-r-md);
+    align-items: center; justify-content: center;
+    padding: var(--fr-sp-16);
+}
+.fr-research-xp-lock .fr-h2 { white-space: normal; -unity-text-align: middle-center; }
+.fr-research-xp-lock .fr-icon { margin-bottom: var(--fr-sp-8); }
 
 /* ---------- Modals ---------- */
 .fr-scrim {
@@ -262,6 +286,15 @@
     -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-Bold-SDF.asset");
 }
 .fr-modal-scroll { flex-shrink: 1; flex-grow: 0; min-height: 0; min-width: 0; }
+.fr-shortage { width: 660px; max-width: 90%; max-height: 65%; }
+.fr-shortage .fr-modal-title { min-width: 0; flex-shrink: 1; white-space: normal; letter-spacing: 0; }
+.fr-shortage .fr-modal-head .fr-iconbtn { margin-left: var(--fr-sp-8); }
+.fr-shortage-source { margin-top: var(--fr-sp-12); }
+.fr-shortage-actions {
+    flex-direction: row; flex-wrap: wrap; align-items: center;
+    flex-shrink: 0; min-width: 0; margin-top: var(--fr-sp-12);
+}
+.fr-shortage-actions .fr-iconbtn { margin-right: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
 
 .fr-tabs { flex-direction: row; margin-bottom: var(--fr-sp-12); flex-shrink: 0; }
 .fr-tab {
@@ -296,6 +329,10 @@
 .fr-card-dim { opacity: 0.6; }
 .fr-card-head { flex-direction: row; align-items: center; }
 .fr-card-text { flex-grow: 1; flex-shrink: 1; min-width: 0; margin-left: var(--fr-sp-12); }
+.fr-structure-preview { width: 160px; height: 144px; flex-shrink: 0; }
+.fr-structure-preview-small { width: 88px; height: 80px; margin-right: var(--fr-sp-8); }
+.fr-unlock-previews { flex-direction: row; flex-wrap: wrap; align-items: center; margin-top: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
+.fr-unlock-icon { margin-right: var(--fr-sp-12); }
 .fr-card-note { color: var(--fr-text-lo); margin-top: var(--fr-sp-8); }
 
 .fr-itemchip {
@@ -306,6 +343,15 @@
 }
 .fr-itemchip .fr-icon { width: var(--fr-icon-md); height: var(--fr-icon-md); margin-right: var(--fr-sp-8); }
 .fr-itemchip-low { border-color: rgb(135, 50, 70); }
+.fr-costs { align-self: stretch; min-width: 0; max-width: 100%; }
+.fr-costs .fr-itemchip { max-width: 100%; flex-shrink: 1; min-width: 0; min-height: 0; }
+.fr-costs .fr-itemchip Label { flex-shrink: 1; min-width: 0; white-space: normal; }
+.fr-costs .fr-itemchip .fr-icon { flex-shrink: 0; }
+.fr-project-gates { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: center; margin-top: var(--fr-sp-8); }
+.fr-project-gates .fr-iconbtn { margin-left: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
+.fr-project-gates-inline { margin-top: 0; flex-shrink: 0; }
+.fr-project-gates-inline .fr-iconbtn { margin-bottom: 0; }
+.fr-project-resource { border-color: var(--fr-lime); }
 .fr-dot { width: 18px; height: 18px; border-radius: 9px; }
 
 /* ---------- Backpack ---------- */
@@ -424,6 +470,13 @@
 
 /* ---------- Map ---------- */
 .fr-map { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgb(12, 20, 43); overflow: hidden; }
+.fr-map-location {
+    position: absolute; flex-direction: row; align-items: center;
+    background-color: var(--fr-surface-1); border-radius: var(--fr-r-md);
+    padding: var(--fr-sp-8); border-width: 2px; border-color: var(--fr-outline);
+}
+.fr-map-location > Label { flex-grow: 1; flex-shrink: 1; min-width: 0; white-space: normal; margin: 0 var(--fr-sp-12); }
+.fr-map-location .fr-btn { flex-shrink: 0; }
 .fr-map-planet {
     position: absolute; width: 104px; height: 104px; margin: 0; padding: 0;
     background-color: transparent; border-width: 0; border-radius: 52px;
@@ -441,6 +494,11 @@
 .fr-map-card Toggle { margin-top: 8px; margin-bottom: 8px; color: var(--fr-text-hi); font-size: var(--fr-fs-caption); flex-shrink: 0; }
 .fr-map-card .unity-toggle__input { min-height: 56px; }
 .fr-map-card .unity-toggle__checkmark { width: 44px; height: 44px; margin-right: 12px; background-color: var(--fr-surface-2); }
+.fr-map-card-actions { align-items: flex-end; flex-shrink: 0; margin-left: var(--fr-sp-12); }
+.fr-map-card-actions Toggle { min-height: var(--fr-touch); margin: 0; flex-direction: row; align-items: center; justify-content: flex-end; }
+.fr-map-card-actions .unity-toggle__label { min-width: 0; margin-right: var(--fr-sp-8); flex-grow: 0; }
+.fr-map-card-actions .unity-toggle__input { width: 56px; flex-grow: 0; }
+.fr-map-card-actions .unity-toggle__checkmark { margin-right: 0; }
 .fr-consent-choice {
     width: 100%; min-height: var(--fr-touch); flex-direction: row; align-items: center;
     margin-top: 4px; margin-bottom: 4px; padding: 0 20px;
@@ -526,6 +584,15 @@
 }
 .fr-overlay.fr-overlay-clear { background-color: rgba(0, 0, 0, 0); }
 .fr-overlay > Label, .fr-overlay > .fr-row { flex-shrink: 0; max-width: 100%; white-space: normal; -unity-text-align: middle-center; }
+.fr-wave-result {
+    width: 100%; max-width: 640px; align-items: center;
+    padding: var(--fr-sp-24); border-radius: var(--fr-r-lg);
+    background-color: rgba(4, 8, 24, 0.92);
+}
+.fr-wave-result > Label { max-width: 100%; white-space: normal; -unity-text-align: middle-center; margin-bottom: var(--fr-sp-8); }
+.fr-wave-result > .fr-costs { justify-content: center; margin-bottom: var(--fr-sp-12); }
+.fr-wave-result > .fr-chip { margin-left: 0; align-self: center; }
+.fr-wave-result > Button { align-self: stretch; }
 .fr-arena {
     width: 100%; flex-grow: 1; flex-basis: 0; min-height: 120px; margin: var(--fr-sp-16) 0;
     border-radius: var(--fr-r-lg);
@@ -558,4 +625,25 @@
     padding: var(--fr-sp-12) var(--fr-sp-24); margin-bottom: var(--fr-sp-8); border-radius: var(--fr-r-lg);
     border-width: 2px;
     background-color: var(--fr-surface-1);
+}
+.fr-harvest-track {
+    height: 36px;
+    min-height: 36px;
+    margin-bottom: 12px;
+    background-color: rgba(0, 0, 0, 0.65);
+    border-radius: 6px;
+}
+.fr-harvest-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(65, 225, 160, 0.65);
+}
+.fr-harvest-needle {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 5px;
+    background-color: rgb(255, 245, 215);
+    translate: -50% 0;
 }

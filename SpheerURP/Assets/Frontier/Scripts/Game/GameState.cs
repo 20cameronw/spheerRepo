@@ -63,7 +63,26 @@ namespace Frontier
         int StackSizeOf(string id)
         {
             ResourceSO r;
-            return id != null && resourceById.TryGetValue(id, out r) ? Mathf.Max(1, r.stackSize) : 0;
+            return id != null && resourceById.TryGetValue(id, out r) ? StackSize(r) : 0;
+        }
+
+        public float StackMultiplier
+        {
+            get
+            {
+                float best = 1f;
+                foreach (var u in db.upgrades)
+                    if (u != null && u.effect == UpgradeEffect.StackMultiplier) best = Mathf.Max(best, u.ValueAt(Level(u), 1f));
+                return best;
+            }
+        }
+
+        /// <summary>Items per stack after Cargo Compression, matching the economy simulation's rounding.</summary>
+        public int StackSize(ResourceSO r)
+        {
+            if (r == null) return 0;
+            int baseSize = Mathf.Max(1, r.stackSize);
+            return Mathf.Max(baseSize, (int)Math.Floor(baseSize * (double)StackMultiplier + 1e-6));
         }
 
         // ---------- Inventory ----------
@@ -297,7 +316,7 @@ namespace Frontier
         {
             if (!CanBuy(u)) return false;
             int lvl = Level(u);
-            if (!SpendQuietly(u.CostAt(lvl))) return false;
+            if (!SpendPlanetResourcesQuietly(ToIds(u.CostAt(lvl)))) return false;
             progression.SetUpgradeLevel(u.id, lvl + 1, u.MaxLevel);
             Notify();
             return true;

@@ -51,8 +51,11 @@ namespace Frontier
 
         struct Shot
         {
-            public string name; public Action setup; public float wait;
-            public Shot(string name, Action setup, float wait = 0.15f) { this.name = name; this.setup = setup; this.wait = wait; }
+            public string name; public Action setup; public float wait; public Action afterCapture;
+            public Shot(string name, Action setup, float wait = 0.15f, Action afterCapture = null)
+            {
+                this.name = name; this.setup = setup; this.wait = wait; this.afterCapture = afterCapture;
+            }
         }
 
         static readonly Device[] AllDevices =
@@ -63,6 +66,7 @@ namespace Frontier
             new Device("tablet-1536x2048", 1536, 2048, 2.0f, new Rect(0, 0, 1536, 2048)),
             // 360 dp wide: the narrowest common phone class (many Samsung/Pixel-A devices).
             new Device("phone-1080x2340", 1080, 2340, 3.0f, new Rect(0, 0, 1080, 2340 - 80), true),
+            new Device("asset-preview-1600x1200", 1600, 1200, 1.0f, new Rect(0, 0, 1600, 1200), true),
         };
 
         public static string OutputDir { get; private set; }
@@ -231,6 +235,7 @@ namespace Frontier
                 entry.lint = UiLint.Run(rt.Ui.DebugRoot, rt.Ui.DebugPanelScale, dev.density, new Rect(0, 0, dev.w, dev.h));
                 report.entries.Add(entry);
                 Debug.Log("Frontier harness: captured " + entry.file + (entry.error != null ? " (with error)" : ""));
+                if (shot.afterCapture != null) shot.afterCapture();
             }
 
             rt.Ui.DebugReset();
@@ -264,13 +269,79 @@ namespace Frontier
             if (rt.Planet.Spin != null) rt.Planet.Spin.localRotation = Quaternion.Euler(0f, 25f, 0f);
         }
 
+        IEnumerator CenterStructureForCapture(PlacedStructure structure, Vector2 viewport)
+        {
+            yield return new WaitForSecondsRealtime(0.75f);
+            if (structure == null || rt.Planet == null || rt.Planet.Spin == null)
+                throw new InvalidOperationException("Structure showcase lost its planet or structure.");
+
+            Ray ray = rt.Camera.ViewportPointToRay(new Vector3(viewport.x, viewport.y, 0f));
+            Vector3 offset = ray.origin - rt.Planet.Spin.position;
+            float along = Vector3.Dot(offset, ray.direction);
+            float discriminant = along * along - (offset.sqrMagnitude -
+                rt.Planet.SurfaceRadius() * rt.Planet.SurfaceRadius());
+            if (discriminant < 0f)
+                throw new InvalidOperationException("Structure showcase camera ray does not intersect the planet.");
+
+            Vector3 target = ray.origin + ray.direction * (-along - Mathf.Sqrt(discriminant));
+            Vector3 targetDirection = (target - rt.Planet.Spin.position).normalized;
+            Vector3[] directions = WorldSurface.SlotDirections(Mathf.Max(rt.Planet.Current.BuildingSlots, structure.slot + 1));
+            Vector3 currentDirection = rt.Planet.Spin.TransformDirection(directions[structure.slot]).normalized;
+            rt.Planet.Spin.rotation = Quaternion.FromToRotation(currentDirection, targetDirection) * rt.Planet.Spin.rotation;
+            rt.Planet.Frozen = true;
+            rt.Planet.IdleSpin = false;
+        }
+
+        IEnumerator CenterObstacleForCapture(int pad, Vector2 viewport)
+        {
+            yield return new WaitForSecondsRealtime(0.75f);
+            if (pad < 0 || rt.Planet == null || rt.Planet.Spin == null)
+                throw new InvalidOperationException("Obstacle showcase lost its planet or pad.");
+
+            Ray ray = rt.Camera.ViewportPointToRay(new Vector3(viewport.x, viewport.y, 0f));
+            Vector3 offset = ray.origin - rt.Planet.Spin.position;
+            float along = Vector3.Dot(offset, ray.direction);
+            float discriminant = along * along - (offset.sqrMagnitude -
+                rt.Planet.SurfaceRadius() * rt.Planet.SurfaceRadius());
+            if (discriminant < 0f)
+                throw new InvalidOperationException("Obstacle showcase camera ray does not intersect the planet.");
+
+            Vector3 target = ray.origin + ray.direction * (-along - Mathf.Sqrt(discriminant));
+            Vector3 targetDirection = (target - rt.Planet.Spin.position).normalized;
+            Vector3[] directions = WorldSurface.SlotDirections(Mathf.Max(rt.Planet.Current.BuildingSlots, pad + 1));
+            Vector3 currentDirection = rt.Planet.Spin.TransformDirection(directions[pad]).normalized;
+            rt.Planet.Spin.rotation = Quaternion.FromToRotation(currentDirection, targetDirection) * rt.Planet.Spin.rotation;
+            rt.Planet.Frozen = true;
+            rt.Planet.IdleSpin = false;
+        }
+
+        void SetHarnessChromeVisible(bool visible)
+        {
+            VisualElement root = rt.Document.rootVisualElement;
+            foreach (VisualElement child in root.Children())
+                if (child.name != "harness-bg")
+                    child.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
         IEnumerable<Shot> BuildShots()
         {
             var db = rt.Db; var gs = rt.State; var ui = rt.Ui;
             string showcaseWorld = null;
+            string harvestAccessWorld = gs.planet.Id;
+            PlacedStructure harvestAccessPending = null;
             PlanetData obstacleShowcase = null;
             int obstacleShowcasePad = -1;
             PlacedStructure At(StructureKind k) { return gs.StructureOfKind(gs.planet, k); }
+            void ShowMapFooter()
+            {
+                ui.DebugMap(null);
+                ui.DebugRoot.schedule.Execute(() =>
+                {
+                    var network = ui.DebugRoot.Q<Button>("map-open-network");
+                    if (network == null) throw new InvalidOperationException("Map network footer is missing.");
+                    network.GetFirstAncestorOfType<ScrollView>().ScrollTo(network);
+                }).StartingIn(200);
+            }
             void DrillShot(bool result)
             {
                 var world = gs.universe.FindGenerated(d =>
@@ -286,6 +357,13 @@ namespace Frontier
             }
 
             yield return new Shot("hud", ResetView);
+            yield return new Shot("ship-landing-orbit", () =>
+            {
+                ResetView();
+                ui.StartCoroutine(ui.PlayArrivalIntro(false));
+            }, 0.7f);
+            yield return new Shot("ship-landing-boost", () => { }, 2.7f);
+            yield return new Shot("ship-landing-settled", () => { }, 1.6f);
             yield return new Shot("surface-view", () =>
             {
                 ResetView();
@@ -333,6 +411,8 @@ namespace Frontier
             yield return new Shot("first-session-guide", () => ui.DebugFirstSessionGuide(0));
             yield return new Shot("first-session-guide-defense", () => ui.DebugFirstSessionGuide(4));
             yield return new Shot("first-session-guide-travel", () => ui.DebugFirstSessionGuide(5));
+            yield return new Shot("first-session-guide-research", () => ui.DebugFirstSessionGuide(6));
+            yield return new Shot("first-session-guide-upgrade", () => ui.DebugFirstSessionGuide(7));
             yield return new Shot("guide-cue-harvest", () =>
             {
                 ResetView();
@@ -349,13 +429,123 @@ namespace Frontier
             });
             yield return new Shot("build-mode", () => { ResetView(); ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery)); });
             for (int tab = 0; tab < 4; tab++) { int t = tab; yield return new Shot("shop-tab" + t, () => { ResetView(); ui.DebugShop(t); }); }
+            yield return new Shot("harvest-access-surface", () =>
+            {
+                GoTo(harvestAccessWorld); ResetView(); rt.Planet.CloseView = true;
+            }, 0.8f);
+            yield return new Shot("harvest-access-build", () => { GoTo(harvestAccessWorld); ResetView(); ui.DebugShop(1); });
+            yield return new Shot("harvest-access-structure", () =>
+            {
+                GoTo(harvestAccessWorld); ResetView(); ui.DebugTapStructure(At(StructureKind.Lumber));
+            });
+            yield return new Shot("harvest-access-pending", () =>
+            {
+                GoTo(harvestAccessWorld); ResetView();
+                var mine = At(StructureKind.Mine);
+                if (mine == null) throw new InvalidOperationException("No Mine for pending harvesting fixture.");
+                harvestAccessPending = mine;
+                gs.DebugSetBuilderJob(mine, 600, mine.level + 1);
+                ui.DebugTapStructure(mine);
+            });
+            if (harvestAccessPending != null) gs.DebugSetBuilderJob(harvestAccessPending, 0);
             yield return new Shot("construction-jobs", ui.DebugBuilders);
-            yield return new Shot("command-tools-axe", () => ui.DebugResearch(1, 0));
-            yield return new Shot("command-tools-pick", () => ui.DebugResearch(1, 1));
-            yield return new Shot("command-tools-drill", () => ui.DebugResearch(1, 2));
-            yield return new Shot("command-tech", () => ui.DebugResearch(2));
-            yield return new Shot("command-ship", () => ui.DebugResearch(2, 0, 1));
-            yield return new Shot("command-defense", () => ui.DebugResearch(2, 0, 2));
+            SaveV2 playerFlowBaseline = null;
+            void PreparePlayerFlowFixture()
+            {
+                ui.DebugReset();
+                if (playerFlowBaseline == null)
+                {
+                    if (!gs.TryCreateCloudSaveSnapshot(out playerFlowBaseline, out var error))
+                        throw new InvalidOperationException(error);
+                }
+                else if (!gs.TryRestoreCloudSave(playerFlowBaseline, out var restoreError))
+                    throw new InvalidOperationException(restoreError);
+            }
+            try
+            {
+                yield return new Shot("player-shortage", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    var wood = db.FindResource("wood");
+                    ui.DebugShip(0);
+                    ui.DebugShortage(wood, gs.PlanetCount(wood) + 100);
+                });
+                yield return new Shot("player-project", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    var pack = db.FindUpgrade("pack");
+                    if (!gs.TrackProject(new PlayerProject { kind = "upgrade", id = pack.id,
+                        target = gs.Level(pack) + 1, planetId = gs.planet.Id }, out var error))
+                        throw new InvalidOperationException(error);
+                    ui.DebugProject();
+                });
+                yield return new Shot("player-project-corner", () => { ui.DebugReset(); });
+                yield return new Shot("player-project-research", () => ui.DebugResearch());
+                yield return new Shot("player-project-requirements", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetLevel(1);
+                    ui.DebugResearch();
+                    var overlay = ui.DebugRoot.Q("research-xp-lock");
+                    if (overlay == null) throw new InvalidOperationException("No XP-locked research in layout fixture.");
+                    var card = overlay.parent;
+                    var scroll = card.GetFirstAncestorOfType<ScrollView>();
+                    scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                });
+                yield return new Shot("player-shop-research-lock", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetLevel(1);
+                    ui.DebugShop(1);
+                    var overlay = ui.DebugRoot.Q("shop-research-lock");
+                    if (overlay == null) throw new InvalidOperationException("No research-locked structure in layout fixture.");
+                    var card = overlay.parent;
+                    var scroll = card.GetFirstAncestorOfType<ScrollView>();
+                    scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                });
+                void PrepareTrackedMap(float zoom)
+                {
+                    PreparePlayerFlowFixture();
+                    var pack = db.FindUpgrade("pack");
+                    gs.DebugSetUpgrade(pack, 0);
+                    gs.backpack.Set("wood", 0);
+                    if (!gs.TrackProject(new PlayerProject { kind = "upgrade", id = pack.id,
+                        target = 1, planetId = gs.planet.Id }, out var error))
+                        throw new InvalidOperationException(error);
+                    ui.DebugMap(null, zoom);
+                }
+                yield return new Shot("player-project-map-scanner", () => PrepareTrackedMap(1f), 1f);
+                yield return new Shot("player-project-map-neighbors", () => PrepareTrackedMap(4f), 1f);
+                yield return new Shot("player-project-map-orbits", () => PrepareTrackedMap(12f), 1f);
+                yield return new Shot("player-return", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.ReturnItems.Add(new SessionReturnItem { planetId = gs.planet.Id, slot = 0 });
+                    gs.ReturnItems.Add(new SessionReturnItem { planetId = gs.planet.Id, slot = 11,
+                        resourceId = "wood", amount = 24 });
+                    ui.DebugProject();
+                });
+                yield return new Shot("player-reward-recovery", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.backpack.Clear();
+                    if (!gs.PrepareGameplayReward("double-yield", db.FindResource("wood"), 3, null, out _, out var error))
+                        throw new InvalidOperationException(error);
+                    ui.DebugProject();
+                });
+            }
+            finally
+            {
+                var ticket = gs.GameplayReward;
+                if (ticket != null && ticket.state == "pending" && !gs.CancelUnverifiedGameplayReward(out var cancelError))
+                    throw new InvalidOperationException(cancelError);
+                if (playerFlowBaseline != null && !gs.TryRestoreCloudSave(playerFlowBaseline, out var error))
+                    throw new InvalidOperationException(error);
+            }
+            yield return new Shot("ship-tools", () => ui.DebugShip(1));
+            yield return new Shot("research-tech", () => ui.DebugResearch());
+            yield return new Shot("ship-systems", () => ui.DebugShip(2));
+            yield return new Shot("research-improvements", () => ui.DebugResearch(1));
             yield return new Shot("pack", () => ui.DebugPack(-1));
             yield return new Shot("pack-selected", () => ui.DebugPack(0));
             var carriedBeforeEmptyShot = new Dictionary<ResourceSO, int>();
@@ -376,11 +566,135 @@ namespace Frontier
                 gs.Notify();
             }
             yield return new Shot("menu", () => ui.DebugMenu(""));
-            foreach (var page in new[] { "ranks", "goals", "ascension", "tutorial", "about", "settings", "debug" })
+            yield return new Shot("rewarded-consent", () => ui.DebugRewardedConsent());
+            SaveV2 flowReviewBaseline = null;
+            void PrepareFlowReview()
+            {
+                ui.DebugReset();
+                if (flowReviewBaseline == null)
+                {
+                    if (!gs.TryCreateCloudSaveSnapshot(out flowReviewBaseline, out var error))
+                        throw new InvalidOperationException(error);
+                }
+                else if (!gs.TryRestoreCloudSave(flowReviewBaseline, out var restoreError))
+                    throw new InvalidOperationException(restoreError);
+                GoTo("sylva");
+                gs.DismissFirstSessionGuide();
+            }
+            void PrepareFlowLab()
+            {
+                PrepareFlowReview();
+                if (!gs.TryCreateCloudSaveSnapshot(out var candidate, out var error))
+                    throw new InvalidOperationException(error);
+                var home = candidate.worlds.Find(delta => delta.planetId == gs.planet.Id);
+                if (home == null) throw new InvalidOperationException("Lab fixture requires a visited world.");
+                home.structures.RemoveAll(s => s.slot == 1);
+                home.structures.Add(new StructureRecord
+                    { defId = db.StructureOfKind(StructureKind.ResearchLab).id, slot = 1, level = 3 });
+                if (!gs.TryRestoreCloudSave(candidate, out error)) throw new InvalidOperationException(error);
+                ui.DebugTapStructure(At(StructureKind.ResearchLab));
+            }
+            try
+            {
+                yield return new Shot("zoom-flow-minimal-orbits", () => { PrepareFlowReview(); ui.DebugMinimalMap(); });
+                yield return new Shot("zoom-flow-entry", () =>
+                {
+                    PrepareFlowReview();
+                    rt.Planet.Zoom01 = 0f;
+                    ui.DebugWorldZoom(-0.25f);
+                }, 0.3f);
+                yield return new Shot("zoom-flow-minimal-neighbors", () => { PrepareFlowReview(); ui.DebugMinimalMap(4f); });
+                yield return new Shot("zoom-flow-minimal-sector", () => { PrepareFlowReview(); ui.DebugMinimalMap(1f); });
+                yield return new Shot("zoom-flow-full-controls", () => { PrepareFlowReview(); ui.DebugMap(gs.planet); });
+                yield return new Shot("world-refine-overview", () => { PrepareFlowReview(); rt.Planet.Zoom01 = 0f; });
+                yield return new Shot("world-refine-lumber", () =>
+                {
+                    PrepareFlowReview();
+                    var lumber = At(StructureKind.Lumber);
+                    if (lumber == null) throw new InvalidOperationException("Wood review requires the seeded Lumber Camp.");
+                    rt.Planet.CloseView = true;
+                    StartCoroutine(CenterStructureForCapture(lumber, new Vector2(0.5f, 0.4f)));
+                }, 1.0f);
+                yield return new Shot("world-refine-level-accent", () =>
+                {
+                    PrepareFlowReview();
+                    var lumber = At(StructureKind.Lumber);
+                    gs.DebugSetStructureLevel(lumber, 8);
+                    rt.Planet.CloseView = true;
+                    StartCoroutine(CenterStructureForCapture(lumber, new Vector2(0.5f, 0.4f)));
+                }, 1.0f);
+                yield return new Shot("flow-review-world", PrepareFlowReview);
+                yield return new Shot("flow-review-guide", () => { PrepareFlowReview(); ui.DebugFirstSessionGuide(0); });
+                yield return new Shot("flow-review-lab-tech", () =>
+                {
+                    PrepareFlowLab();
+                });
+                yield return new Shot("flow-review-lab-tools", () =>
+                {
+                    PrepareFlowLab();
+                    var tab = ui.DebugRoot.Q("lab-navigation").Query<FrontierTab>().ToList()[1];
+                    using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = tab; tab.SendEvent(submit); }
+                });
+                yield return new Shot("flow-review-construction-ad", () =>
+                {
+                    PrepareFlowReview();
+                    var job = At(StructureKind.Refinery);
+                    gs.DebugSetBuilderJob(job, 3600);
+                    ui.DebugTapStructure(job);
+                });
+                yield return new Shot("flow-review-harvest-ad", () =>
+                {
+                    PrepareFlowReview();
+                    gs.backpack.Clear();
+                    if (!ui.DebugGatherResult(MinigameKind.Chop))
+                        throw new InvalidOperationException("Missing harvest for player-flow review.");
+                }, 1.6f);
+                yield return new Shot("flow-review-shards-ad", () => { PrepareFlowReview(); ui.DebugMenu("shards"); });
+                yield return new Shot("flow-review-how-to-play", () => { PrepareFlowReview(); ui.DebugMenu("tutorial"); });
+            }
+            finally
+            {
+                ui.DebugReset();
+                if (flowReviewBaseline != null && !gs.TryRestoreCloudSave(flowReviewBaseline, out var error))
+                    throw new InvalidOperationException(error);
+            }
+            SaveV2 shardShopBaseline = null;
+            try
+            {
+                yield return new Shot("shop-shard-purchase", () =>
+                {
+                    if (!gs.TryCreateCloudSaveSnapshot(out shardShopBaseline, out var error))
+                        throw new InvalidOperationException(error);
+                    var candidate = JsonUtility.FromJson<SaveV2>(JsonUtility.ToJson(shardShopBaseline)).Normalize();
+                    foreach (var world in candidate.worlds)
+                        if (world.planetId == gs.planet.Id) world.structures.Clear();
+                    candidate.wallet.Clear();
+                    candidate.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+                    if (!gs.TryRestoreCloudSave(candidate, out error)) throw new InvalidOperationException(error);
+                    ui.DebugShop(0);
+                    if (ui.DebugRoot.Q("shop-shards-refinery") == null)
+                        throw new InvalidOperationException("The shard purchase action was not rendered.");
+                });
+            }
+            finally
+            {
+                if (shardShopBaseline != null && !gs.TryRestoreCloudSave(shardShopBaseline, out var error))
+                    throw new InvalidOperationException(error);
+            }
+            foreach (var page in new[] { "ranks", "leaderboard", "shards", "goals", "ascension", "tutorial", "about", "settings", "debug" })
             {
                 string pg = page;
                 yield return new Shot("menu-" + pg, () => ui.DebugMenu(pg));
             }
+            yield return new Shot("menu-tutorial-research", () =>
+            {
+                ui.DebugMenu("tutorial");
+                var heading = ui.DebugRoot.Query<Label>().ToList()
+                    .Find(label => label.text == UiText.Get("tutorial.research.title"));
+                var card = heading.GetFirstAncestorOfType<VisualElement>().parent.parent;
+                var scroll = heading.GetFirstAncestorOfType<ScrollView>();
+                scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+            });
             SaveV2 ascensionBaseline = null;
             var ascensionRules = Resources.Load<AscensionRulesSO>("Frontier/AscensionRules");
             bool ascensionWasEnabled = ascensionRules != null && ascensionRules.enableAscension;
@@ -458,6 +772,7 @@ namespace Frontier
             }
             yield return new Shot("map", () => ui.DebugMap(null), 0.8f);
             yield return new Shot("orbital-chart-home", () => ui.DebugMap(null), 0.8f);
+            yield return new Shot("map-network-locked", ShowMapFooter, 0.8f);
             yield return new Shot("orbital-chart-selected", () => ui.DebugMap(gs.universe.Get("glacia")), 0.8f);
             yield return new Shot("orbital-chart-sector", () => ui.DebugMap(null, 2f), 0.8f);
             yield return new Shot("map-selected", () => ui.DebugMap(gs.universe.Get("nyx"), 1f), 0.8f);
@@ -506,6 +821,7 @@ namespace Frontier
                 yield return new Shot("network-tanks", () => { PrepareNetworkFixture(); ui.DebugFuelTanks(); });
                 yield return new Shot("network-project", () => { PrepareNetworkFixture(); ui.DebugNetwork(); });
                 yield return new Shot("network-links", () => { PrepareNetworkFixture(); ui.DebugMap(gs.universe.Get("glacia"), 12); }, 0.8f);
+                yield return new Shot("network-map-footer", () => { PrepareNetworkFixture(); ShowMapFooter(); }, 0.8f);
                 yield return new Shot("network-finale", () => { PrepareNetworkFixture(true); ui.DebugNetworkFinale(); }, 14.2f);
             }
             finally
@@ -523,6 +839,234 @@ namespace Frontier
             {
                 var k = kind;
                 yield return new Shot("popup-" + k.ToString().ToLower(), () => { ResetView(); ui.DebugTapStructure(At(k)); });
+            }
+            SaveV2 colonyHubBaseline = null;
+            Quaternion colonyHubSpin = Quaternion.identity;
+            bool colonyHubWasFrozen = false, colonyHubWasSpinning = false, colonyHubWasClose = false;
+            yield return new Shot("colony-hub-in-game", () =>
+            {
+                ResetView();
+                if (colonyHubBaseline == null &&
+                    !gs.TryCreateCloudSaveSnapshot(out colonyHubBaseline, out string snapshotError))
+                    throw new InvalidOperationException(snapshotError);
+                colonyHubSpin = rt.Planet.Spin.rotation;
+                colonyHubWasFrozen = rt.Planet.Frozen;
+                colonyHubWasSpinning = rt.Planet.IdleSpin;
+                colonyHubWasClose = rt.Planet.CloseView;
+                var hub = gs.StructureOfKind(gs.planet, StructureKind.ColonyHub);
+                if (hub == null)
+                {
+                    Vector3 towardCamera = rt.Planet.Spin.InverseTransformDirection(
+                        (rt.Camera.transform.position - rt.Planet.Spin.position).normalized);
+                    Vector3[] directions = WorldSurface.SlotDirections(gs.planet.BuildingSlots);
+                    int slot = 0;
+                    float nearest = float.NegativeInfinity;
+                    for (int i = 0; i < gs.planet.BuildingSlots; i++)
+                    {
+                        float score = Vector3.Dot(directions[i], towardCamera);
+                        if (score > nearest) { nearest = score; slot = i; }
+                    }
+                    foreach (StructureRecord record in new List<StructureRecord>(gs.world.StructuresOn(gs.planet.Id)))
+                        if (record.slot == slot) gs.world.Remove(gs.planet.Id, record);
+                    hub = gs.DebugPlace(db.FindStructure("colony_hub"), slot);
+                    if (hub == null) throw new InvalidOperationException("Could not place Colony Hub in the showcase slot.");
+                    gs.Notify();
+                }
+                rt.Planet.CloseView = true;
+                gs.DismissFirstSessionGuide();
+                gs.Notify();
+                StartCoroutine(CenterStructureForCapture(hub, new Vector2(0.5f, 0.3f)));
+            }, 1.0f, () =>
+            {
+                rt.Document.rootVisualElement.style.display = DisplayStyle.Flex;
+                if (colonyHubBaseline != null &&
+                    !gs.TryRestoreCloudSave(colonyHubBaseline, out string restoreError))
+                    throw new InvalidOperationException("Colony Hub screenshot fixture restoration failed: " + restoreError);
+                rt.Planet.Spin.rotation = colonyHubSpin;
+                rt.Planet.Frozen = colonyHubWasFrozen;
+                rt.Planet.IdleSpin = colonyHubWasSpinning;
+                rt.Planet.CloseView = colonyHubWasClose;
+                ResetView();
+            });
+            SaveV2 structureWorldBaseline = null;
+            Quaternion structureWorldSpin = Quaternion.identity;
+            bool structureWorldWasFrozen = false, structureWorldWasSpinning = false, structureWorldWasClose = false;
+            yield return new Shot("sylva-terrain-overview", () =>
+            {
+                GoTo("sylva");
+                ResetView();
+            }, 1f);
+            yield return new Shot("structures-in-game", () =>
+            {
+                ResetView();
+                if (!gs.TryCreateCloudSaveSnapshot(out structureWorldBaseline, out string snapshotError))
+                    throw new InvalidOperationException(snapshotError);
+                structureWorldSpin = rt.Planet.Spin.rotation;
+                structureWorldWasFrozen = rt.Planet.Frozen;
+                structureWorldWasSpinning = rt.Planet.IdleSpin;
+                structureWorldWasClose = rt.Planet.CloseView;
+                var mine = gs.StructureOfKind(gs.planet, StructureKind.Mine);
+                if (mine == null) throw new InvalidOperationException("The in-game structure showcase requires the seeded Mining Rig.");
+                rt.Planet.CloseView = true;
+                gs.DismissFirstSessionGuide();
+                gs.Notify();
+                StartCoroutine(CenterStructureForCapture(mine, new Vector2(0.5f, 0.3f)));
+            }, 1.0f, () =>
+            {
+                rt.Document.rootVisualElement.style.display = DisplayStyle.Flex;
+                if (structureWorldBaseline != null &&
+                    !gs.TryRestoreCloudSave(structureWorldBaseline, out string restoreError))
+                    throw new InvalidOperationException("Structure screenshot fixture restoration failed: " + restoreError);
+                rt.Planet.Spin.rotation = structureWorldSpin;
+                rt.Planet.Frozen = structureWorldWasFrozen;
+                rt.Planet.IdleSpin = structureWorldWasSpinning;
+                rt.Planet.CloseView = structureWorldWasClose;
+                ResetView();
+            });
+            Transform colonyHubPreview = null;
+            CameraClearFlags previewClearFlags = CameraClearFlags.Skybox;
+            Color previewBackground = Color.black;
+            bool previewBackdropWasActive = false;
+            yield return new Shot("colony-hub-three-quarter", () =>
+            {
+                ResetView();
+                previewClearFlags = rt.Camera.clearFlags;
+                previewBackground = rt.Camera.backgroundColor;
+                previewBackdropWasActive = rt.Backdrop.gameObject.activeSelf;
+                rt.Backdrop.gameObject.SetActive(false);
+                rt.Camera.clearFlags = CameraClearFlags.SolidColor;
+                rt.Camera.backgroundColor = new Color(0.24f, 0.26f, 0.28f, 1f);
+                rt.Planet.gameObject.SetActive(false);
+                colonyHubPreview = ModelLibrary.Spawn("colony_hub", rt.Camera.transform, 1.8f);
+                if (colonyHubPreview == null) throw new InvalidOperationException("The Colony Hub model is not registered.");
+                colonyHubPreview.localPosition = new Vector3(0f, -0.55f, 3.3f);
+                colonyHubPreview.localRotation = Quaternion.Euler(-28f, -32f, 0f);
+                SetHarnessChromeVisible(false);
+            }, 0.25f, () =>
+            {
+                if (colonyHubPreview != null) Destroy(colonyHubPreview.gameObject);
+                colonyHubPreview = null;
+                rt.Planet.gameObject.SetActive(true);
+                rt.Camera.clearFlags = previewClearFlags;
+                rt.Camera.backgroundColor = previewBackground;
+                rt.Backdrop.gameObject.SetActive(previewBackdropWasActive);
+                SetHarnessChromeVisible(true);
+            });
+            var structureContactModels = new List<GameObject>();
+            VisualElement structureContactLabels = null;
+            Vector3 structureContactCameraPosition = Vector3.zero;
+            Quaternion structureContactCameraRotation = Quaternion.identity;
+            CameraClearFlags structureContactClearFlags = CameraClearFlags.Skybox;
+            Color structureContactBackground = Color.black;
+            bool structureContactOrthographic = false, structureContactPlanetActive = true, structureContactBackdropActive = true;
+            bool structureContactPostProcessing = true;
+            Component structureContactCameraData = null;
+            System.Reflection.PropertyInfo structureContactPostProcessingProperty = null;
+            int structureContactCullingMask = 0;
+            float structureContactFov = 60f, structureContactOrthoSize = 5f;
+            for (int batch = 0; batch < 3; batch++)
+            {
+                int batchStart = batch * 10;
+                yield return new Shot("structure-contact-sheet-batch-" + (batch + 1), () =>
+                {
+                    ResetView();
+                    Camera camera = rt.Camera;
+                    structureContactCameraPosition = camera.transform.position;
+                    structureContactCameraRotation = camera.transform.rotation;
+                    structureContactCullingMask = camera.cullingMask;
+                    structureContactClearFlags = camera.clearFlags;
+                    structureContactBackground = camera.backgroundColor;
+                    structureContactOrthographic = camera.orthographic;
+                    structureContactFov = camera.fieldOfView;
+                    structureContactOrthoSize = camera.orthographicSize;
+                    structureContactCameraData = camera.GetComponent("UniversalAdditionalCameraData");
+                    structureContactPostProcessingProperty = structureContactCameraData == null ? null :
+                        structureContactCameraData.GetType().GetProperty("renderPostProcessing");
+                    if (structureContactPostProcessingProperty != null &&
+                        structureContactPostProcessingProperty.PropertyType == typeof(bool))
+                    {
+                        structureContactPostProcessing = (bool)structureContactPostProcessingProperty.GetValue(structureContactCameraData);
+                        structureContactPostProcessingProperty.SetValue(structureContactCameraData, false);
+                    }
+                    structureContactPlanetActive = rt.Planet.gameObject.activeSelf;
+                    structureContactBackdropActive = rt.Backdrop.gameObject.activeSelf;
+
+                    rt.Planet.gameObject.SetActive(false);
+                    rt.Backdrop.gameObject.SetActive(false);
+                    camera.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    camera.cullingMask = 1 << 31;
+                    camera.clearFlags = CameraClearFlags.SolidColor;
+                    camera.backgroundColor = new Color(0.38f, 0.40f, 0.42f, 1f);
+                    camera.orthographic = true;
+                    camera.orthographicSize = 3f;
+                    SetHarnessChromeVisible(false);
+
+                    string[] modelIds =
+                    {
+                        "lumber", "mine", "refinery", "warehouse", "gunner",
+                        "driller", "biodome", "siphon_rig", "excavator", "salvage_yard", "fabricator", "foundry",
+                        "chem_reactor", "quantum_lab", "fuel_depot", "cargo_depot", "orbital_relay", "research_lab",
+                        "radar_tower", "hangar", "auto_harvester", "alarm", "laser", "shield_pylon", "missile_silo",
+                        "tesla_coil", "repair_bay", "terraformer", "warp_gate", "dyson_collector"
+                    };
+                    const int columns = 2;
+                    const float columnStep = 2.3f, rowStep = 1.05f, modelDiameter = 0.90f, depth = 5.2f;
+                    for (int i = batchStart; i < Mathf.Min(batchStart + 10, modelIds.Length); i++)
+                    {
+                        int localIndex = i - batchStart;
+                        int row = localIndex / columns, column = localIndex % columns;
+                        string key = "struct_" + modelIds[i];
+                        Transform model = ModelLibrary.Spawn(key, camera.transform, modelDiameter);
+                        if (model == null) throw new InvalidOperationException("Structure contact sheet could not spawn " + key);
+                        model.gameObject.layer = 31;
+                        model.localPosition = new Vector3((column - (columns - 1) * 0.5f) * columnStep,
+                            2.1f - row * rowStep, depth);
+                        model.localRotation = Quaternion.Euler(-28f, -28f, 0f);
+                        structureContactModels.Add(model.gameObject);
+
+                        if (structureContactLabels == null)
+                        {
+                            structureContactLabels = new VisualElement { name = "structure-contact-labels", pickingMode = PickingMode.Ignore };
+                            structureContactLabels.style.position = Position.Absolute;
+                            structureContactLabels.style.left = 0;
+                            structureContactLabels.style.top = 0;
+                            structureContactLabels.style.right = 0;
+                            structureContactLabels.style.bottom = 0;
+                            rt.Document.rootVisualElement.Add(structureContactLabels);
+                        }
+                        var label = new Label(modelIds[i].Replace('_', ' ').ToUpperInvariant());
+                        label.style.position = Position.Absolute;
+                        label.style.left = Length.Percent(column * 50f);
+                        label.style.top = Length.Percent(4f + row * 17.5f);
+                        label.style.width = Length.Percent(50f);
+                        label.style.height = 24f;
+                        label.style.unityTextAlign = TextAnchor.MiddleCenter;
+                        label.style.fontSize = 16f;
+                        label.style.color = new Color(0.9f, 0.92f, 0.94f);
+                        structureContactLabels.Add(label);
+                    }
+                }, 0.35f, () =>
+                {
+                    foreach (GameObject model in structureContactModels)
+                        if (model != null) Destroy(model);
+                    structureContactModels.Clear();
+                    if (structureContactLabels != null) structureContactLabels.RemoveFromHierarchy();
+                    structureContactLabels = null;
+                    Camera camera = rt.Camera;
+                    camera.transform.SetPositionAndRotation(structureContactCameraPosition, structureContactCameraRotation);
+                    camera.cullingMask = structureContactCullingMask;
+                    camera.clearFlags = structureContactClearFlags;
+                    camera.backgroundColor = structureContactBackground;
+                    camera.orthographic = structureContactOrthographic;
+                    camera.fieldOfView = structureContactFov;
+                    camera.orthographicSize = structureContactOrthoSize;
+                    if (structureContactPostProcessingProperty != null &&
+                        structureContactPostProcessingProperty.PropertyType == typeof(bool))
+                        structureContactPostProcessingProperty.SetValue(structureContactCameraData, structureContactPostProcessing);
+                    rt.Planet.gameObject.SetActive(structureContactPlanetActive);
+                    rt.Backdrop.gameObject.SetActive(structureContactBackdropActive);
+                    SetHarnessChromeVisible(true);
+                });
             }
             yield return new Shot("toast", () => { ResetView(); ui.DebugToast("+14 Wood", UiKit.Lime); ui.DebugToast("Backpack full!", UiKit.Red); }, 0.3f);
 
@@ -563,10 +1107,10 @@ namespace Frontier
                     PrepareConstructionFixture();
                     ui.DebugTapStructure(constructionFixture);
                 }, 0.3f);
-                yield return new Shot("command-crews", () =>
+                yield return new Shot("construction-crews", () =>
                 {
                     PrepareConstructionFixture();
-                    ui.DebugResearch(3);
+                    ui.DebugBuilders();
                 }, 0.3f);
             }
             finally
@@ -593,6 +1137,8 @@ namespace Frontier
                 session.DebugAdvance(Mathf.CeilToInt((session.Run.Route.bossStart + 5) * 60), true, true);
             });
             yield return new Shot("game-drill", () => DrillShot(false), 1.8f);
+            yield return new Shot("harvest-boost", () => { DrillShot(false); ui.DebugDrillPreview(false); }, 1.8f);
+            yield return new Shot("harvest-overheat", () => { DrillShot(false); ui.DebugDrillPreview(true); }, 1.8f);
             yield return new Shot("minigame-drill-result", () => DrillShot(true), 1.2f);
             yield return new Shot("glacia-hud", () => { ResetView(); }, 0.3f);
             yield return new Shot("wave-hud", () => { GoTo("sylva"); ResetView(); rt.Defense.StartWave(3); }, 4.0f);
@@ -703,6 +1249,7 @@ namespace Frontier
                 if (world == null) throw new InvalidOperationException("no generated world with siphon deposits");
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Siphon)) throw new InvalidOperationException("world has no siphon gather spot");
+                ui.DebugHarvestPreview(MinigameKind.Siphon);
             }, 1.8f);
             yield return new Shot("game-excavate", () =>
             {
@@ -715,6 +1262,7 @@ namespace Frontier
                 if (world == null) throw new InvalidOperationException("no generated world with excavation deposits");
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Excavate)) throw new InvalidOperationException("world has no excavation gather spot");
+                ui.DebugHarvestPreview(MinigameKind.Excavate);
             }, 1.8f);
             yield return new Shot("game-salvage", () =>
             {
@@ -727,18 +1275,57 @@ namespace Frontier
                 if (world == null) throw new InvalidOperationException("no generated world with salvage deposits");
                 GoTo(world);
                 if (!ui.DebugGather(MinigameKind.Salvage)) throw new InvalidOperationException("world has no salvage gather spot");
+                ui.DebugHarvestPreview(MinigameKind.Salvage);
             }, 1.8f);
+            yield return new Shot("obstacle-fungal-surface", () =>
+            {
+                var world = gs.universe.FindGenerated(d =>
+                {
+                    if (d.Biome != UBiome.Fungal) return false;
+                    foreach (var obstacle in gs.ObstaclesOn(gs.universe.Get(d)))
+                        if (obstacle.seconds > 0 && obstacle.kind >= 0 && obstacle.kind < db.obstacleKinds.Length &&
+                            db.obstacleKinds[obstacle.kind].data.id == "fungal_growth") return true;
+                    return false;
+                }, 1, 0, 10000);
+                if (world == null) throw new InvalidOperationException("no generated fungal world has a fungal-growth obstruction");
+                var obstacles = gs.ObstaclesOn(world);
+                int index = obstacles.FindIndex(o => o.seconds > 0 && o.kind >= 0 && o.kind < db.obstacleKinds.Length &&
+                    db.obstacleKinds[o.kind].data.id == "fungal_growth");
+                if (index < 0) throw new InvalidOperationException("fungal obstacle showcase has no obstruction instance");
+                GoTo(world);
+                ResetView();
+                rt.Planet.CloseView = true;
+                gs.DismissFirstSessionGuide();
+                gs.Notify();
+                StartCoroutine(CenterObstacleForCapture(obstacles[index].pad, new Vector2(0.5f, 0.3f)));
+            }, 1.0f);
             yield return new Shot("obstacle-surface", () =>
             {
-                obstacleShowcase = gs.universe.FindGenerated(d => d.Tier > 0 &&
-                    gs.ObstaclesOn(gs.universe.Get(d)).Exists(o => o.seconds > 0), 1, 0, 10000);
-                if (obstacleShowcase == null) throw new InvalidOperationException("no generated world with timed surface obstructions");
+                obstacleShowcase = gs.universe.FindGenerated(d =>
+                {
+                    if (d.Tier <= 0) return false;
+                    foreach (var obstacle in gs.ObstaclesOn(gs.universe.Get(d)))
+                        if (obstacle.seconds > 0 && obstacle.kind >= 0 && obstacle.kind < db.obstacleKinds.Length &&
+                            (db.obstacleKinds[obstacle.kind].data.id == "dead_tree" ||
+                             db.obstacleKinds[obstacle.kind].data.id == "wreckage")) return true;
+                    return false;
+                }, 1, 0, 10000);
+                if (obstacleShowcase == null) throw new InvalidOperationException("no generated world with a timed dead-tree or wreckage obstruction");
                 GoTo(obstacleShowcase);
-                var obstacle = gs.ObstaclesOn(obstacleShowcase).Find(o => o.seconds > 0);
+                var obstacles = gs.ObstaclesOn(obstacleShowcase);
+                int obstacleIndex = obstacles.FindIndex(o => o.seconds > 0 && o.kind >= 0 && o.kind < db.obstacleKinds.Length &&
+                    db.obstacleKinds[o.kind].data.id == "dead_tree");
+                if (obstacleIndex < 0) obstacleIndex = obstacles.FindIndex(o => o.seconds > 0 && o.kind >= 0 &&
+                    o.kind < db.obstacleKinds.Length && db.obstacleKinds[o.kind].data.id == "wreckage");
+                if (obstacleIndex < 0) throw new InvalidOperationException("world obstacle showcase has no timed dead-tree or wreckage instance");
+                var obstacle = obstacles[obstacleIndex];
                 obstacleShowcasePad = obstacle.pad;
                 ResetView();
-                ui.DebugBuild(db.StructureOfKind(StructureKind.Refinery));
-            }, 0.3f);
+                rt.Planet.CloseView = true;
+                gs.DismissFirstSessionGuide();
+                gs.Notify();
+                StartCoroutine(CenterObstacleForCapture(obstacleShowcasePad, new Vector2(0.5f, 0.3f)));
+            }, 1.0f);
             yield return new Shot("obstacle-clearance", () =>
             {
                 if (obstacleShowcase == null || obstacleShowcasePad < 0)

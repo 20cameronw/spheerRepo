@@ -19,7 +19,7 @@ MonoBehaviour:
     upgrades extend its beam and reduce transfer energy.
   kind: 7
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_orbital_relay
   buildCost:
   - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
     amount: 920

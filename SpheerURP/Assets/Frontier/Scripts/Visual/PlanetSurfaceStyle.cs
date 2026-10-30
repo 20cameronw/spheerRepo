@@ -8,13 +8,30 @@ namespace Frontier
         public static void ApplyClimate(Material material, PlanetData planet, Color primary)
         {
             material.SetFloat("_Biome", (int)planet.Biome);
-            material.SetColor("_CloudColor", Color.Lerp(Color.white, primary, 0.22f));
+            material.SetFloat("_LandMix", 0f);
+            material.SetColor("_OceanColor", new Color(0.035f, 0.27f, 0.68f));
+            material.SetColor("_LandColor", new Color(0.13f, 0.48f, 0.2f));
+            material.SetColor("_CloudColor", CloudColor(planet, primary));
             material.SetFloat("_CloudCoverage", CloudCoverage(planet));
             material.SetFloat("_PolarCaps", PolarCapCoverage(planet));
         }
 
+        public static Color CloudColor(PlanetData planet, Color primary)
+        {
+            return planet.ModelKey == "sylva" && planet.Biome == Biome.Lush
+                ? Color.white : Color.Lerp(Color.white, primary, 0.22f);
+        }
+
+        public static Color AtmosphereColor(PlanetData planet, Color rim)
+        {
+            return planet.ModelKey == "sylva" && planet.Biome == Biome.Lush
+                ? Color.white
+                : rim;
+        }
+
         public static float CloudCoverage(PlanetData planet)
         {
+            if (planet.AuthoredId == "sylva") return 0f;
             float coverage;
             switch (planet.Weather)
             {

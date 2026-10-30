@@ -11,6 +11,18 @@ namespace Frontier
         public VisualElement DebugRoot { get { return root; } }
         public float DebugPanelScale { get { return panelSettings != null ? panelSettings.scale : 1f; } }
         public bool DebugBusy { get { return busy; } }
+        public void DebugWorldZoom(float delta) { ApplyWorldZoom(delta); }
+        public void DebugPollWorldWheel(float delta, Vector2 position) { PollWorldWheel(delta, position); }
+        public bool DebugMapMinimal { get { return mapOpen && mapMinimal; } }
+        public bool DebugMapOpen { get { return mapOpen; } }
+        public void DebugMapZoomStep(bool inward) { StepMapZoom(inward); }
+        public Vector2 DebugMapOrbitAxes(PlanetData planet) { return PlanetOrbitAxes(planet); }
+        public void DebugMinimalMap(float zoom = SystemZoom)
+        {
+            DebugMap(gs.planet, zoom);
+            SetMapMinimal(true);
+        }
+        public Minigame DebugActiveGather { get { return activeGatherMinigame; } }
         public void DebugSetServices(Frontier.Services.FrontierServices serviceSet) { services = serviceSet; }
 
         public void DebugRelayout() { ApplyLayout(true); }
@@ -29,7 +41,7 @@ namespace Frontier
             activeTravelMinigame = null;
             debugToolsOverride = null;
             debugFirstSessionGuideOverride = false;
-            menuPage = ""; shopTab = 0; researchTab = 1; packSel = -1; confirmReset = false;
+            menuPage = ""; shopTab = 0; researchPage = ResearchPage.Tech; shipPage = ShipPage.Cargo; packSel = -1; confirmReset = false;
             selected = gs.planet;
             RefreshFirstSessionGuide();
         }
@@ -45,7 +57,7 @@ namespace Frontier
         public void DebugFirstSessionGuideShop(int step)
         {
             DebugFirstSessionGuide(step);
-            shopTab = step == 0 ? 1 : 0;
+            shopTab = step == 0 ? 1 : step == 6 ? 3 : 0;
             OpenShop();
         }
 
@@ -57,6 +69,12 @@ namespace Frontier
 
         public void DebugShop(int tab) { DebugReset(); shopTab = tab; OpenShop(); }
         public void DebugResourceSource(ResourceSO resource) { DebugReset(); OpenResourceSource(resource); }
+        public void DebugProject() { DebugReset(); OpenProjectPanel(); }
+        public void DebugGameplayRewardRules(GameplayRewardRules rules) { gameplayRewardRules = rules; }
+        public void DebugShortage(ResourceSO resource, int required)
+        {
+            OpenShortage(Project("upgrade", "pack", gs.Level(gs.db.FindUpgrade("pack")) + 1), resource, required);
+        }
         public void DebugAtlas(int tab)
         {
             DebugReset();
@@ -65,15 +83,15 @@ namespace Frontier
             menuPage = "atlas";
             RefreshModal();
         }
-        public void DebugResearch(int tab, int tool = 0, int progression = 0)
+        public void DebugResearch(int tab = 0)
         {
             DebugReset();
-            researchTab = tab == 1 ? 1 : 2;
-            progressionTab = progression;
             researchBranch = "";
-            OpenResearch();
+            OpenResearch(tab == 0 ? ResearchPage.Tech : ResearchPage.Improvements);
         }
+        public void DebugShip(int tab) { DebugReset(); OpenShip((ShipPage)Mathf.Clamp(tab, 0, 2)); }
         public void DebugBuilders() { DebugReset(); OpenBuilders(); }
+        public void DebugRewardedConsent() { DebugReset(); _ = RequestRewardedConsent(); }
         public void DebugNetwork() { DebugReset(); OpenNetwork(); }
         public void DebugFuelTanks() { DebugReset(); OpenFuelTanks(); }
         public void DebugNetworkFinale() { DebugReset(); PlayNetworkFinale(); }
@@ -116,7 +134,7 @@ namespace Frontier
             DebugReset();
             OpenMap();
             if (pick != null) selected = pick;
-            mapZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
+            mapZoom = zoom >= SystemZoomThreshold ? SystemZoom : zoom >= NeighborZoom ? NeighborZoom : MinZoom;
             if (mapView == null) return;
             BuildMapNodes();
             InvalidateMapPreview();
@@ -129,7 +147,16 @@ namespace Frontier
         public int DebugMapSystemCount { get { return mapSnapshot == null ? 0 : mapSnapshot.systems.Length; } }
         public double DebugMapCenterX { get { return viewport.CenterX; } }
         public bool DebugMapInSystem { get { return SystemMapView; } }
+        public bool DebugMapInNeighbors { get { return NeighborMapView; } }
+        public void DebugMapPan(float x, float y) { viewport.Pan(x, y); ApplyMapTransform(); }
         public string DebugMapSelectedId { get { return selected == null ? null : selected.Id; } }
+        public bool DebugMapProjectMatch(PlanetData planet) { return mapProjectWorlds.Contains(planet.Id); }
+        public bool DebugMapSurveyed(PlanetData planet) { return Surveyed(planet.Star); }
+        public double DebugMapSurveyRadius(PlanetData planet)
+        {
+            int index = surveyCenters.FindIndex(star => star.Id == planet.Star.Id);
+            return index < 0 ? 0 : surveyRadii[index];
+        }
         public float DebugMapOrbitRadius(PlanetData planet)
         {
             return PlanetOrbitAxes(planet).y;
@@ -146,6 +173,7 @@ namespace Frontier
         }
 
         public void DebugBuild(StructureSO def) { DebugReset(); EnterBuild(def); }
+        public void DebugTapBuildSlot(int slot) { OnSlotTapped(slot, planetView.transform); }
 
         public void DebugToast(string text, Color color) { Toast(text, color); }
 
@@ -171,6 +199,50 @@ namespace Frontier
             if (!DebugGather(kind) || activeGatherMinigame == null) return false;
             activeGatherMinigame.DebugComplete(0.82f, 7, 10);
             return true;
+        }
+
+        public void DebugDrillPreview(bool overheated)
+        {
+            overlayLayer.schedule.Execute(() =>
+            {
+                var game = activeGatherMinigame as DrillGame;
+                if (game == null || game.DebugRun == null)
+                    throw new InvalidOperationException("Drill preview was not ready.");
+                var control = overlayLayer.Q("drill-boost");
+                foreach (var key in new[] { KeyCode.Space, KeyCode.LeftShift })
+                    using (var e = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = key }))
+                    { e.target = control; control.SendEvent(e); }
+                game.DebugAdvance(overheated ? 3.65f : 0.8f, true, true);
+            }).StartingIn(1500);
+        }
+
+        public void DebugHarvestPreview(MinigameKind kind)
+        {
+            overlayLayer.schedule.Execute(() =>
+            {
+                if (kind == MinigameKind.Excavate)
+                {
+                    var game = activeGatherMinigame as ExcavationGame;
+                    if (game == null || game.DebugRun == null) throw new InvalidOperationException("Excavation preview was not ready.");
+                    game.DebugPing((game.DebugRun.Target + 1) % ExcavationHarvestRun.CellCount);
+                }
+                else if (kind == MinigameKind.Salvage)
+                {
+                    var game = activeGatherMinigame as SalvageGame;
+                    if (game == null) throw new InvalidOperationException("Salvage preview was not ready.");
+                    game.DebugSelect(0);
+                    var control = overlayLayer.Q("salvage-tether");
+                    using (var e = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = KeyCode.Space }))
+                    { e.target = control; control.SendEvent(e); }
+                    game.DebugAdvance(0.7f);
+                }
+                else if (kind == MinigameKind.Siphon)
+                {
+                    var game = activeGatherMinigame as SiphonGame;
+                    if (game == null || game.DebugRun == null) throw new InvalidOperationException("Siphon preview was not ready.");
+                    game.DebugPump(); game.DebugAdvance(0.3f); game.DebugPump();
+                }
+            }).StartingIn(1500);
         }
 
         public void DebugTravelGame()

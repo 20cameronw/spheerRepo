@@ -16,26 +16,130 @@ Declare `xmlns:frontier="Frontier"` in UXML and use tags such as `<frontier:Fron
 Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to load tokens/fonts.
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
-The top bar includes fuel, live Nova Shards and player level; backpack capacity stays on the Pack dock.
-Progression requirements use **player XP level**, not the highest planet tier visited. Command shows
-the current XP level, XP remaining to the next level, and a wave shortcut that selects the local
-Alarm or its Build entry. Research badges say `XP LV`; locks name the required and current levels
-and explain that clearing alien waves earns XP. Actual tool tiers still describe equipment quality.
+The top bar includes fuel, live Nova Shards and player level; carried capacity stays inside Cargo, not on the dock.
+The startup arrival makes a full, unskippable orbital loop before its side-on descent at the screen-top silhouette.
+First-launch flight lasts 5.2 seconds and repeat-startup flight 4.6 seconds, plus touchdown/reveal;
+ordinary travel arrivals/departures retain their shorter presentation.
+Two pale air boosters pulse downward to brake descent, cut out at contact, and finish with a small gear settle and
+surface dust. This is presentation only; landing slots, travel costs and progression remain unchanged.
+Ground structure foundation blocks are three times their original height, extended downward with their top surfaces
+and structure transforms unchanged. Model-library foundation depth is excluded from scale fitting and surface lift,
+so terrain absorbs the added depth instead of pushing the structure upward; orbital models remain untouched.
+The dock retains its four positions: Research / Map / Ship / Build. Ship always opens Cargo in one tap,
+with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
+and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
+Cargo Compression (Vacuum Packing through Quantum Compression) multiplies every resource stack in cargo,
+warehouses and harvester hoppers by 1.15 to 1.75, rounded down, matching the economy simulation.
+Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
+XP-locked research has a gray overlay with a lock and required XP level. Its tracking star remains interactive;
+research cards omit prerequisite-navigation buttons and retain their written requirements.
+Pinch or mouse-wheel zoom interpolates between the original surface and orbit camera endpoints; neither boundary moves.
+The world and map poll the project's active legacy mouse input as well as native UI Toolkit wheel events,
+deduplicated per frame: wheel up zooms in, wheel down zooms out, including map entry/return.
+Unity's Device Simulator does not forward wheel input to the player. An Editor-only Simulator plugin forwards
+wheel events over the rendered device screen into the runtime panel, preserving menu scrolling and UI hit testing.
+Its isolated preview-coordinate adapter accounts for device rotation, bezel, insets and rendering scale.
+Scrolling over shop panels or HUD controls does not zoom the world; zooming the exposed world dismisses a structure popup.
+Continuing outward by a small deliberate amount beyond orbit pulls the camera back while the orbital chart scales/fades in
+over 600 ms. There is no camera toggle. Pinching must start on the world, not a popup/HUD, and suppresses taps/rotation.
+The tutorial retains the full HUD width and overlays the crew button. Covered crew input and the corner project
+resume stay unavailable until the tutorial is dismissed or opens another screen.
+Debris is embedded slightly into the local rendered terrain at spawn, not placed on the approximate ground sphere.
+Sylva uses the authored split land/ocean meshes: raised land is green, the ocean sphere blue, with a white atmosphere.
+Painted white cloud patches are disabled on this starting world only. Lumber Camp logs have a separate brown,
+nonmetallic wood material. Each placed structure recolors only `Structure_Accent` from its current instance level:
+orange, amber, lime, green, teal, cyan, blue, violet, magenta and gold at levels 1-10 (clamped beyond 10).
+Foundations, armor, wood, glass and lights retain their materials; shared prefabs and level-one shop pictures do not change.
+Its atmosphere retains the standard authored diameter (5 units), including after terraforming; the terrain palette does not shrink the shell.
+Build cards show static pictures baked from the actual ModelLibrary structure prefabs. Research uses smaller
+structure pictures alongside the resource/equipment glyphs it unlocks, including in the Research Lab popup.
+After model revisions, regenerate these textures with `Frontier/Models/Bake Structure Thumbnails`
+(`Frontier.EditorTools.StructureThumbnails.Bake` in the Unity runner); no live preview cameras run during gameplay.
+Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
+systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
+World overzoom enters a minimal map: only a safe-area location bar, return arrow and Info action remain.
+The location broadens from current planet/system to nearby systems to the current system's sector coordinates.
+Info reveals the existing search/filter/destination/travel interface without changing zoom or selection;
+the eye action hides it again. The Map dock still opens the full controls directly. Further inward zoom at the
+current planet's local-system level returns smoothly to orbit; another world's selection opens its controls, never teleports.
+Local orbits retain a fixed 0.65 height/width ratio, fitting both viewport bounds with one radius;
+hiding info reveals more chart space without stretching orbits vertically.
+Panning stays near scanner coverage or remembered systems; coordinates outside that space clamp to its nearest edge.
+Map focuses on destinations, resources and travel. Pin location sits under the destination status at top right.
+The route action stays in the destination card footer outside its scrolling details. Prerequisite actions share a
+right-aligned icon row (research, local lab, station upgrade or XP only when needed). Material costs use a bounded,
+undecorated wrapping container inside cards, never a nested scroller; exact quantities remain readable.
+The planetary-network action is last in the details and disabled until a local Warp Gate is completed. Ship systems remain on
+the Ship dock rather than a duplicate readiness action. Build lists structures without jobs/harvest shortcut rows.
+Tap a harvester for resources. One hard-hat button at top left opens construction jobs and crew recruitment;
+building headers no longer repeat that shortcut. The HUD shard balance opens the wallet and optional ad offer.
+General map/network instructions live in How to Play, not above the operational controls.
+Progression requirements use **player XP level**, not the highest planet tier visited. Research and Ship > Tools show
+the current XP level and XP remaining to the next level, without repeated XP lessons or a full-row wave shortcut.
+Research badges say `XP LV`; locks name the required and current levels. How to Play explains wave XP.
+Actual tool tiers still describe equipment quality.
 Planet tier remains a world difficulty/resource property, not a purchase requirement.
 Missing-material cost and network chips are a single native button containing the existing icon and
 quantity/name, using the chip's existing boundary. Do not overlay another icon-sized button or add a
 FIND caption/hover box. Pointer interaction keeps the chip's original styling; keyboard focus uses
-its existing border. Shortages route to an existing local producer and matching recipe, otherwise
-its Build entry, otherwise a supplying planet selected in the map. Locked/in-progress producers
-retain their real upgrade/research/job status; planet guidance never silently teleports or starts a job.
+its existing border. Cost chips use the same compact content-fitted height whether owned or missing, not the action-button minimum.
+Build cards keep tracking stars top right (including locked/built cards), and their built/limit counts right-aligned
+just above the Place/shard purchase row. Warehouse and Fabricator previews use a 180-degree model turn for a clearer face;
+in-world model orientation is unchanged.
+Every Build card keeps Place and shard-purchase actions visible on the same row; locked, built-at-limit and active-job
+cards disable those actions without bypassing research, planet, capacity or purchase rules.
+Unlocked structures sort before locked ones within every category, preserving their existing order within each group.
+Research-gated Build cards use a gray lock overlay with a compact shortcut to their required research;
+their tracking star remains interactive above the overlay.
+Contextual shortages first compare usable, locally stored and explicitly remote
+stock, then production and reachable discovered worlds. A shortfall names its actual quantity.
+Shortage panels do not inject previous-step or return-to controls into other panels.
+Missing-resource chips open a smaller dimmed overlay without discarding the originating screen.
+Keep exact quantities, source names and travel/storage warnings visible; source actions use icon buttons
+with localized tooltips. Back, close and backdrop dismiss only that overlay; choosing a source opens its real destination.
+All shortage source, capacity and manual actions share one compact horizontal strip below the explanations,
+wrapping only when needed; source-specific tooltips identify their destination.
+Project tracking is explicit; card headings use a small star action instead of an extra full-width button.
+Stars are borderless glyphs with full touch targets: outlined when off, filled cyan when tracked, with an action tooltip.
+Resume is a star in the top-right
+corner below the HUD bar when full-width first-session guidance is not covering the world controls. Lab requirements use a lab icon that opens
+and scrolls to Build > Utility > Research Lab. All build-project routes share the same category-aware destination.
+Outside research, prerequisite icons sit in card headings beside the tracking star, without a separate empty action row.
+Map opens in Tracked needs mode when that project has missing costs. Green diamond markers identify known
+systems/planets with those raw deposits; matching resource chips are outlined. Filled costs and completed or
+untracked projects clear their highlights. The normal material filter remains available.
+Dashed cyan rings show actual scanner/Radar Tower survey coverage, distinct from the solid jump-range ring.
+Unscanned systems (including authored destinations) are hidden in all map zoom levels and cannot be revealed
+by resource filters, names or canonical IDs. Coordinates only move the viewport. Visited, scanned and previously
+pinned destinations remain known across saves; legacy discoveries are retained rather than reset.
+How to Play walks through harvesting, storage, crafting/fuel, XP waves, local-lab research, upgrades, exploration and expansion.
+The skippable live first-session guide also requires first research and an upgrade after travel; existing completed
+actions count immediately and dismissed guides stay dismissed. Research guidance opens the local lab shop card if
+missing, otherwise the lab popup's Tech tab. That popup includes working Tech, Tools and Lab-upgrade tabs;
+branch filters and purchase refreshes stay inside the popup. No XP, cost or prerequisite gates are bypassed.
+Locked/in-progress producers retain their real upgrade/research/job status; guidance never spends,
+teleports or starts a job. One explicitly tracked project provides live requirements and a resume action.
+The return summary links completed jobs and stored offline output to their real location, not ship cargo.
+Reward offers use explicit ad labels and exact bonuses beside the normal action. iOS gameplay ads are enabled;
+watching remains player-initiated, with a contextual advertising-only consent prompt before the first request.
+Offers remain visible with a disabled button and explicit playback/cooldown reason when unavailable;
+Editor/desktop does not simulate ads or rewards. Construction's offer sits beside its timer, and harvest's
+exact bonus is visible from the first successful result. Ordinary collection/waiting remains available.
+Available Place buttons share one row with a compact crystal/price action. That action buys an unlocked
+structure instantly without materials or a builder, at twice its timer-skip price (minimum 10 shards).
+The pad-selection banner repeats the price; choosing a pad confirms the spend, while cancellation is free.
+Map sampling includes an offscreen preload margin and refills before that margin reaches the viewport.
 The Atlas resource header retains its separate icon control to reveal raw-resource deposits.
 
 Online ranks are available to all ages after explicit online opt-in, without name or birthday entry.
-Put the online section first on Ranks, followed by the existing local era/score/record breakdown.
-The first action explains anonymous Unity authentication and score/connection-data sharing; subsequent
-actions explicitly post the current Frontier Score and load the top 20. Show the player's returned rank
-outside that list too. Display anonymous Pilot labels rather than UGS profile names. Keep real network
-errors visible and retryable; never substitute local sample scores for a failed server response.
+Keep local score/record details on Stats and put online ranks on their own Leaderboard page.
+How to Play owns era requirements and the next-step action; the live tutorial links to it directly.
+Opening that page after opt-in explicitly submits the current Frontier Score and loads the top 20; it
+never uploads at launch or during normal play. Before opt-in, explain anonymous Unity authentication
+and score/connection-data sharing and require a deliberate enable action. Show the player's returned rank
+outside the list too, with a distinct top-three podium. Display anonymous Pilot labels rather than UGS
+profile names. Keep real network errors visible and retryable; never substitute local sample scores for a
+failed server response.
 These client-reported casual ranks are not a claim of server-validated anti-cheat.
 
 Modal, popup and toast shells enter with a 160 ms ease-out translation (16 px, 6 px and -8 px respectively);
@@ -64,9 +168,9 @@ changes update the emitters. Offscreen Hyperspace uses camera-scoped mesh draws 
 of globally visible particle renderers. The stage reserves layer 31, also excluded from the world camera.
 Cached procedural ignition/touchdown cues route through the existing SFX bus and respect mute.
 Brief travel ship beats are skippable by the visible Skip button or Back, without skipping fuel payment or a run.
-Startup shares the same arrival: first launch holds the wordmark over the starfield for 0.65s, descends for 1.4s,
-then reveals the top bar/dock with a 220 ms transform-only slide. Later launches omit the logo and use a 0.7s
-arrival. Intro completion or skipping records only a local presentation preference, not progression. World/input
+Startup holds the wordmark over the starfield for 0.65s on first launch, flies a complete orbit and then descends,
+revealing the top bar/dock with a 220 ms transform-only slide. Later launches omit the logo, not the loop.
+Neither the loop nor its descent has a skip control or Back bypass. Intro completion records only a local presentation preference, not progression. World/input
 and transforms are restored before publishing runtime readiness. Arrival uses a pooled amber heat glow, dust
 burst and touchdown ripple, then a brief damped camera impulse that restores the exact camera origin on
 completion or skip; effects use the existing ownership paths.
@@ -148,9 +252,8 @@ local bundles, with no remote content host required. `Build Local Tables` synchr
 The local Android-target bundle build passed; that is not an APK/native-device sign-off. Only English is authored:
 language selection/live switching, translations, remaining generated text, locale fonts and RTL are still open.
 
-Command has Bases, Tools, Tech and Crews tabs; the short Tech caption avoids truncating the four-tab phone row.
-Crews lists active structure construction/upgrades and obstacle-clearance jobs across visited worlds. A Build
-shortcut opens the same panel. Timers and finish prices update once per second without replacing touch controls.
+Build > Construction Jobs lists active structure construction/upgrades and obstacle-clearance jobs across visited worlds.
+Timers and finish prices update once per second without replacing touch controls.
 Structure finish uses the authored shard curve, including its free-finish window, and requires a second press.
 The game revalidates the job, assignment, quoted maximum price, wallet and read-only state, then uses the normal
 completion/reward path and saves job/currency changes together. A failed write explicitly reports the completed
@@ -201,7 +304,7 @@ Frontier Score breakdown. Era progress is a persistent achievement of this save,
 
 Goals live in Menu and are linked from Ranks. Ready rewards lead, followed by three concrete next objectives;
 players can expand the remaining list and collected history. Actions open the live build/gather shop, map,
-Command or recipe Atlas, rather than a second tutorial. The authored 26-entry ScriptableObject catalogue uses
+Research or recipe Atlas, rather than a second tutorial. The authored 26-entry ScriptableObject catalogue uses
 only one-time milestones already represented in the simulator (12 small, nine reach tiers, five era entries).
 At current tuning the complete catalogue awards at most 275 Nova Shards per save, in addition to the separate
 existing Atlas rewards. Calling a wave alone is insufficient: the live defense achievement requires clearing it.
@@ -339,7 +442,7 @@ milestone adds 47 glyphs without replacing the existing visual family.
 
 | Group | Icons |
 |-------|-------|
-| Dock and controls | `research` (flask, **COMMAND**), `map` (planet with orbit), `pack` (backpack), `build` (**hammer crossed with a toothed hand saw**), `menu` (hamburger), `close`, `plus`, `minus`, `up`, `back`, `check`, `lock`, `play` |
+| Dock and controls | `research` (flask, **RESEARCH**), `map` (planet with orbit), `ship` (**SHIP**, cargo-first), `pack` (cargo/backpack within panels), `build` (**hammer crossed with a toothed hand saw**), `menu` (hamburger), `close`, `plus`, `minus`, `up`, `back`, `check`, `lock`, `play` |
 | HUD and glyphs | `fuel`, `star`, `bolt`, `skull`, `sound`, `mute`, `gear`, `ranks`, `tutorial`, `about`, `alien`, `shield`, `tools`, `base`, `warp`, `ship` |
 | Resources | `wood` (log end), `stone` (faceted rock), `iron` (ore chunks with a shine), `crystal` (gem), `fuel` (drop), `core` (orb with slit pupil), `scrap` (broken gear), `alloy` (ingot), `plasma` (energy cell), `cube` (generic fallback) |
 | Structures | `refinery`, `fabricator` (anvil), `alarm` (beacon), `lumber` (axe), `mine` (pick), `drill`, `gunner`, `laser`, `satellite`, `warehouse` (crates) |

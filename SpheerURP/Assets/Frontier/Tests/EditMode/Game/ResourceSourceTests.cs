@@ -58,6 +58,9 @@ namespace Frontier.Tests
                     state.planet.SpotsFor(game).Any(spot => spot.resource == resource)) &&
                 state.universe.AuthoredPlanets.Any(planet => planet.Resources.Contains(resource)));
             var source = state.FindResourceSource(offWorld);
+            Assert.AreNotEqual(ResourceSourceKind.Planet, source.kind, "Unsurveyed deposits must not be revealed.");
+            state.RecordMapDiscoveries(state.universe.AuthoredPlanets.Select(p => p.Star));
+            source = state.FindResourceSource(offWorld);
             Assert.AreEqual(ResourceSourceKind.Planet, source.kind, offWorld.id);
             Assert.AreNotEqual(state.planet.Id, source.planet.Id);
             Assert.IsTrue(source.planet.Resources.Contains(offWorld));
@@ -73,6 +76,20 @@ namespace Frontier.Tests
             state.DebugPlace(lumber, 0);
             state.DebugTeleport(home);
             Assert.AreEqual(ResourceSourceKind.Build, state.FindResourceSource(db.FindResource("wood")).kind);
+        }
+
+        [Test]
+        public void SurfaceScrapRemainsMineableWithItsExistingYieldAndGate()
+        {
+            var spot = state.SpotsFor(state.planet, StructureKind.Mine).FirstOrDefault(s =>
+                s.resource == db.scrap && s.baseYield == 6 && Math.Abs(s.difficulty - 0.2f) < 0.0001f);
+            Assert.IsNotNull(spot, "The Harvest list must retain the authored surface-scrap opportunity.");
+            Assert.AreEqual(MinigameKind.Mine, spot.game);
+            var source = state.FindResourceSource(db.scrap);
+            Assert.AreEqual(ResourceSourceKind.Build, source.kind);
+            Assert.AreEqual(StructureKind.Mine, source.build.kind);
+            state.DebugPlace(source.build, 0);
+            Assert.AreEqual(ResourceSourceKind.Structure, state.FindResourceSource(db.scrap).kind);
         }
     }
 }

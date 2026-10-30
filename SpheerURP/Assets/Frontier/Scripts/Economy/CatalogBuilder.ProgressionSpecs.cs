@@ -166,7 +166,7 @@ namespace Frontier.Economy
             Rs("geo_survey", "Geo-Survey", "Harvest", 2, "deep_drilling", 650, "silica:0.8", "structure:excavator;tool:scanner:2", "Sonar and trowel work for buried deposits."),
             Rs("salvage_ops", "Salvage Operations", "Harvest", 2, "fabrication", 550, "scrap:1", "structure:salvage_yard", "A yard to sort the wreckage of the galaxy."),
             Rs("fuel_logistics", "Fuel Logistics", "Logistics", 2, "smelting", 550, "fuel:1", "structure:fuel_depot", "Dense racks for fuel cells."),
-            Rs("cargo_logistics", "Cargo Logistics", "Logistics", 2, "steelmaking", 700, "planks:1.5", "structure:cargo_depot", "One pool for every warehouse on a world."),
+            Rs("cargo_logistics", "Cargo Logistics", "Logistics", 2, "steelmaking", 650, "planks:1.5", "structure:cargo_depot", "One pool for every warehouse on a world."),
             Rs("ballistics", "Ballistics", "Defense", 2, "steelmaking", 600, "crystal:0.8", "structure:laser", "Focused beams for long range."),
             Rs("shield_tech", "Shield Tech", "Defense", 2, "circuitry", 600, "crystal:0.8", "structure:shield_pylon", "Fields that blunt incoming fire."),
             Rs("hazmat_toxic", "Hazmat: Toxic", "Navigation", 2, "composites", 800, "biocomposite:0.5", "upgrade:hull_toxic:1", "Seal the hull against toxic air."),

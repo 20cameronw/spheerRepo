@@ -28,14 +28,7 @@ namespace Frontier
             intro.style.justifyContent = Justify.Center;
             intro.style.alignItems = Align.Center;
             root.Add(intro);
-            bool skip = false;
-            skipShipMoment = () => skip = true;
-            var skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
-            skipButton.name = "intro-skip";
-            skipButton.style.position = Position.Absolute;
-            skipButton.style.right = inset.z + UiKit.Space.S16;
-            skipButton.style.top = inset.y + UiKit.Space.S16;
-            intro.Add(skipButton);
+            skipShipMoment = null;
             try
             {
                 if (firstLaunch)
@@ -46,7 +39,7 @@ namespace Frontier
                     logo.name = "intro-logo";
                     intro.Add(logo);
                     float elapsed = 0f;
-                    while (elapsed < 0.65f && !skip)
+                    while (elapsed < 0.65f)
                     {
                         elapsed += Time.unscaledDeltaTime;
                         yield return null;
@@ -56,8 +49,7 @@ namespace Frontier
                 world.gameObject.SetActive(surfaceVisible);
                 intro.RemoveFromHierarchy();
                 skipShipMoment = null;
-                if (skip) yield break;
-                yield return ShipMoment(true, firstLaunch ? 1.4f : 0.7f);
+                yield return ShipMoment(true, firstLaunch ? 5.2f : 4.6f, true);
                 introActive = false;
                 float reveal = 0f;
                 while (reveal < 0.22f)
@@ -258,7 +250,7 @@ namespace Frontier
             root.Add(overlay);
         }
 
-        IEnumerator ShipMoment(bool arriving, float duration = 0.7f)
+        IEnumerator ShipMoment(bool arriving, float duration = 0.7f, bool orbitalApproach = false)
         {
             var cameraTransform = cam != null ? cam.transform : null;
             Vector3 cameraOrigin = cameraTransform != null ? cameraTransform.position : Vector3.zero;
@@ -266,19 +258,26 @@ namespace Frontier
             ship.transform.localScale = Vector3.one * 0.48f;
             Vector3 center = planetView.Spin.position;
             Vector3 radial = (cam.transform.position - center).normalized;
-            Vector3 ground = center + radial * (planetView.SurfaceRadius() + 0.3f) + cam.transform.up * 0.2f;
-            Vector3 sky = ground + cam.transform.up * 2f + radial * 1.2f;
-            ship.transform.rotation = Quaternion.LookRotation(cam.transform.up, radial);
-            var heat = arriving ? Fx.GlowQuad(ship.transform, UiKit.Tint(UiKit.Amber, 0.45f), 1.3f,
-                Vector3.forward * 0.45f) : null;
+            Vector3 up = Vector3.ProjectOnPlane(cam.transform.up, radial).normalized;
+            float radius = planetView.SurfaceRadius();
+            float tangentDepth = cam.orthographic ? 0f : Mathf.Clamp01(radius / Vector3.Distance(cam.transform.position, center));
+            Vector3 contact = center + (up * Mathf.Sqrt(1f - tangentDepth * tangentDepth) + radial * tangentDepth) * radius;
+            Vector3 ground = contact + up * 0.2f;
+            Vector3 sky = ground + up * (orbitalApproach ? 0.85f : 2f);
+            ship.transform.rotation = Quaternion.LookRotation(cam.transform.right, up);
             bool skip = false;
-            skipShipMoment = () => skip = true;
-            var skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
-            skipButton.name = "travel-skip-cinematic";
-            skipButton.style.position = Position.Absolute;
-            skipButton.style.right = UiKit.Space.S16;
-            skipButton.style.top = UiKit.Space.S16;
-            overlayLayer.Add(skipButton);
+            Button skipButton = null;
+            skipShipMoment = null;
+            if (!orbitalApproach)
+            {
+                skipShipMoment = () => skip = true;
+                skipButton = UiKit.Btn(UiText.Get("travel.skip-cinematic"), UiKit.Cyan, () => skip = true);
+                skipButton.name = "travel-skip-cinematic";
+                skipButton.style.position = Position.Absolute;
+                skipButton.style.right = UiKit.Space.S16;
+                skipButton.style.top = UiKit.Space.S16;
+                overlayLayer.Add(skipButton);
+            }
             try
             {
                 Sfx.ShipIgnition();
@@ -286,14 +285,32 @@ namespace Frontier
                 while (elapsed < duration && !skip)
                 {
                     float t = Mathf.Clamp01(elapsed / duration);
-                    float height = arriving ? Mathf.Pow(1f - t, 3f) : t * t;
-                    ship.transform.position = Vector3.Lerp(ground, sky, height);
-                    ship.SetFlight(arriving ? 0.3f + height * 0.7f : 0.3f + t * 0.7f,
-                        arriving ? Mathf.Clamp01(t * 2f) : Mathf.Clamp01(1f - t * 3f), 0f);
-                    if (heat != null)
+                    if (orbitalApproach && t < 0.68f)
                     {
-                        heat.SetActive(t < 0.75f);
-                        FxTransientPool.SetGlowQuadSize(heat.transform, 0.3f + height);
+                        float orbit = t / 0.68f;
+                        float angle = -Mathf.PI * 2f * Mathf.Pow(1f - orbit, 1.2f);
+                        Vector3 orbitUp = (sky - center).normalized;
+                        Vector3 outward = orbitUp * Mathf.Cos(angle) + cam.transform.right * Mathf.Sin(angle);
+                        Vector3 tangent = cam.transform.right * Mathf.Cos(angle) - orbitUp * Mathf.Sin(angle);
+                        ship.transform.position = center + outward * Vector3.Distance(sky, center);
+                        ship.transform.rotation = Quaternion.LookRotation(tangent, outward);
+                        float braking = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.76f, 1f, orbit));
+                        ship.SetFlight(0.65f * (1f - braking), braking, 0f);
+                        ship.SetLandingThrust(braking * 0.7f, elapsed);
+                    }
+                    else
+                    {
+                        float descent = orbitalApproach ? Mathf.InverseLerp(0.68f, 1f, t) : t;
+                        float height = arriving ? Mathf.Pow(1f - descent, 3f) : descent * descent;
+                        ship.transform.position = Vector3.Lerp(ground, sky, height);
+                        ship.transform.rotation = Quaternion.LookRotation(cam.transform.right, up);
+                        ship.SetFlight(0f,
+                            arriving ? Mathf.Clamp01(descent * 2f + (orbitalApproach ? 1f : 0f)) :
+                            Mathf.Clamp01(1f - descent * 3f), 0f);
+                        float thrust = arriving ? (0.7f + Mathf.Sin(descent * Mathf.PI) * 0.3f) *
+                            (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.8f, 1f, descent))) :
+                            0.35f + descent * 0.65f;
+                        ship.SetLandingThrust(thrust, elapsed);
                     }
                     elapsed += Time.unscaledDeltaTime;
                     yield return null;
@@ -302,14 +319,16 @@ namespace Frontier
                 {
                     ship.transform.position = ground;
                     ship.SetFlight(0f, 1f, 0f);
+                    ship.SetLandingThrust(0f, 0f);
                     Sfx.ShipTouchdown();
-                    Fx.Ripple(ground - radial * 0.2f, UiKit.Cyan, 1.2f, 0.4f);
-                    Fx.Burst(ground - radial * 0.2f, UiKit.Tint(gs.planet.Primary, 0.6f), 12, 0.7f, 0.08f);
+                    Fx.Ripple(contact, UiKit.Cyan, 1.2f, 0.4f);
+                    Fx.Burst(contact, UiKit.Tint(gs.planet.Primary, 0.6f), 12, 0.7f, 0.08f);
                     float settleElapsed = 0f;
                     while (cameraTransform != null && settleElapsed < TouchdownSettleDuration && !skip)
                     {
                         float t = Mathf.Clamp01(settleElapsed / TouchdownSettleDuration);
                         float offset = Mathf.Sin(t * Mathf.PI * 4f) * (1f - t) * TouchdownCameraImpulse;
+                        ship.transform.position = ground - up * (Mathf.Sin(t * Mathf.PI) * 0.025f);
                         cameraTransform.position = cameraOrigin + cameraTransform.up * offset;
                         settleElapsed += Time.unscaledDeltaTime;
                         yield return null;
@@ -320,8 +339,7 @@ namespace Frontier
             {
                 if (cameraTransform != null) cameraTransform.position = cameraOrigin;
                 skipShipMoment = null;
-                skipButton.RemoveFromHierarchy();
-                if (heat != null) FxTransientPool.ReleaseGlowQuad(heat, true);
+                skipButton?.RemoveFromHierarchy();
                 if (ship != null) Destroy(ship.gameObject);
             }
         }

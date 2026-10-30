@@ -4,6 +4,25 @@ namespace Frontier.Tests
 {
     public class MapGeometryTests
     {
+        [TestCase(1)]
+        [TestCase(4)]
+        [TestCase(12)]
+        public void QueryBoundsPreloadOutsideScreenAndRefreshBeforeTheVisibleEdgeIsExhausted(double scale)
+        {
+            var viewport = new MapViewport();
+            viewport.Resize(800, 600);
+            viewport.ZoomAt(400, 300, scale / viewport.Scale);
+            var bounds = new MapQueryBounds(viewport);
+            Assert.AreEqual(-200, viewport.Project(bounds.min.x, bounds.min.y).x, 0.001);
+            Assert.AreEqual(1000, viewport.Project(bounds.max.x, bounds.max.y).x, 0.001);
+            Assert.IsTrue(bounds.Covers(viewport));
+            viewport.Pan(80, 0);
+            Assert.IsTrue(bounds.Covers(viewport), "Small pans reuse already prepared systems.");
+            viewport.Pan(40, 0);
+            Assert.IsFalse(bounds.Covers(viewport), "Refill starts while 80 pixels of loaded margin remain.");
+            Assert.Less(viewport.Project(bounds.min.x, bounds.min.y).x, 0);
+        }
+
         [Test]
         public void Viewport_RoundTripsFarCoordinates_AndKeepsZoomAnchor()
         {
