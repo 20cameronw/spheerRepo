@@ -140,6 +140,29 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CargoCompression_MultipliesCargoAndWarehouseStacks()
+        {
+            var state = new GameState(db, false);
+            state.backpack.Clear();
+            var wood = db.FindResource("wood");
+            var compression = db.FindUpgrade("compression");
+            Assert.NotNull(compression);
+            int baseStack = state.StackSize(wood);
+            Assert.AreEqual(Mathf.Max(1, wood.stackSize), baseStack);
+            int baseRoom = state.FreeSpace(wood);
+
+            state.DebugSetUpgrade(compression, compression.MaxLevel);
+            int compressed = state.StackSize(wood);
+            Assert.AreEqual(Mathf.FloorToInt(baseStack * compression.ValueAt(compression.MaxLevel) + 1e-4f), compressed);
+            Assert.Greater(compressed, baseStack);
+            Assert.AreEqual(baseRoom / baseStack * compressed, state.FreeSpace(wood));
+
+            var warehouse = state.DebugPlace(db.FindStructure("warehouse"), 1);
+            state.backpack.Set(wood.id, compressed);
+            Assert.AreEqual(compressed, state.Deposit(warehouse, 0, wood, compressed), "a warehouse slot holds a compressed stack");
+        }
+
+        [Test]
         public void Terraformer_AppliesGlobalHarvestBonusOnlyWhileOperational()
         {
             var state = new GameState(db, false);

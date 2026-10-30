@@ -119,7 +119,7 @@ namespace Frontier
             var heading = UiKit.Div("fr-card-text");
             heading.Add(UiKit.Text(resource.LocalizedName.ToUpper(), "fr-h2"));
             heading.Add(UiKit.Text(UiText.Get("atlas.resource.summary",
-                UiText.Get("resource.category." + resource.category.ToString().ToLowerInvariant()), resource.tier, resource.stackSize), "fr-tiny"));
+                UiText.Get("resource.category." + resource.category.ToString().ToLowerInvariant()), resource.tier, gs.StackSize(resource)), "fr-tiny"));
             header.Add(heading);
             card.Add(header);
             card.Add(UiKit.Text(

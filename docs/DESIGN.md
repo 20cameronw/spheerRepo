@@ -28,8 +28,8 @@ so terrain absorbs the added depth instead of pushing the structure upward; orbi
 The dock retains its four positions: Research / Map / Ship / Build. Ship always opens Cargo in one tap,
 with Tools and Systems beside it. Cargo owns its capacity upgrade; Systems places tank upgrades beside ship fuel
 and lists engine, range, scanner and hull protection. Surface salvage is explicitly not aboard.
-Cargo Compression, including its Quantum Compression tier, is authored future content: it does not yet change
-resource stack sizes, and purchases remain blocked rather than charging for a nonfunctional effect.
+Cargo Compression (Vacuum Packing through Quantum Compression) multiplies every resource stack in cargo,
+warehouses and harvester hoppers by 1.15 to 1.75, rounded down, matching the economy simulation.
 Research has Tech and Improvements (global defense/logistics); completed research is collapsible and available nodes sort first.
 XP-locked research has a gray overlay with a lock and required XP level. Its tracking star remains interactive;
 research cards omit prerequisite-navigation buttons and retain their written requirements.

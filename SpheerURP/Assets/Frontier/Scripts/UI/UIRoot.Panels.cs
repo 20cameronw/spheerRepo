@@ -183,7 +183,6 @@ namespace Frontier
                     card.Add(Note(gs.BuilderJobStatus(activeJob), UiKit.Cyan));
                     BuildBuilderFinishAction(card, activeJob, RefreshModal);
                 }
-                else if (gs.AtLimit(gs.planet, def)) card.Add(Note(UiText.Get("shop.built"), UiKit.Lime));
                 else if (gs.BuildLockReason(def) != null) card.Add(Note(gs.BuildLockReason(def), UiKit.Amber));
                 else if (!gs.CanBuildHere(def)) card.Add(Note(UiText.Get("shop.no-harvest"), UiKit.Amber));
                 card.Add(ProjectCosts(def.buildCost, Project("build", def.id)));
@@ -1811,7 +1810,7 @@ namespace Frontier
                 row.Add(Icons.Make(Icons.ForResource(r), c, UiKit.Size.IconXl));
                 var col = UiKit.Div("fr-card-text"); col.pickingMode = PickingMode.Ignore;
                 col.Add(UiKit.Text(r.LocalizedName.ToUpper(), "fr-h2"));
-                col.Add(UiKit.Text(UiText.Get("pack.slot-count", packCnt[packSel], r.stackSize), "fr-small"));
+                col.Add(UiKit.Text(UiText.Get("pack.slot-count", packCnt[packSel], gs.StackSize(r)), "fr-small"));
                 col.Add(UiKit.Text(UiText.Get("pack.total-count", gs.Count(r)), "fr-small"));
                 row.Add(col);
                 detail.Add(row);
@@ -1875,7 +1874,7 @@ namespace Frontier
             }
             foreach (var r in gs.db.resources)
             {
-                int total = gs.IsTankFuel(r.id) ? 0 : gs.Count(r), sum = 0;
+                int total = gs.IsTankFuel(r.id) ? 0 : gs.Count(r), sum = 0, stack = gs.StackSize(r);
                 for (int i = 0; i < n; i++) if (packRes[i] == r) sum += packCnt[i];
                 for (int i = n - 1; i >= 0 && sum > total; i--)
                 {
@@ -1886,14 +1885,14 @@ namespace Frontier
                 }
                 for (int i = 0; i < n && sum < total; i++)
                 {
-                    if (packRes[i] != r || packCnt[i] >= r.stackSize) continue;
-                    int add = Mathf.Min(r.stackSize - packCnt[i], total - sum);
+                    if (packRes[i] != r || packCnt[i] >= stack) continue;
+                    int add = Mathf.Min(stack - packCnt[i], total - sum);
                     packCnt[i] += add; sum += add;
                 }
                 for (int i = 0; i < n && sum < total; i++)
                 {
                     if (packRes[i] != null) continue;
-                    int add = Mathf.Min(r.stackSize, total - sum);
+                    int add = Mathf.Min(stack, total - sum);
                     packRes[i] = r; packCnt[i] = add; sum += add;
                 }
             }
@@ -1930,7 +1929,7 @@ namespace Frontier
         {
             if (packRes[to] == packRes[from] && packRes[to] != null)
             {
-                int room = packRes[to].stackSize - packCnt[to];
+                int room = gs.StackSize(packRes[to]) - packCnt[to];
                 int move = Mathf.Min(room, packCnt[from]);
                 packCnt[to] += move; packCnt[from] -= move;
                 if (packCnt[from] <= 0) { packRes[from] = null; packCnt[from] = 0; }

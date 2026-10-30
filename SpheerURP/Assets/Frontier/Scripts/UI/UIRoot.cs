@@ -588,23 +588,27 @@ namespace Frontier
             if (scrimLayer != null) scrimLayer.style.display = DisplayStyle.Flex;
             Color c = r.victory ? UiKit.Lime : UiKit.Red;
             UiKit.SetAccent(panel, c);
-            panel.Add(UiKit.Text(UiText.Get(r.victory ? "wave.victory" : "wave.defeat"), "fr-title", c));
+            var card = UiKit.Div("fr-wave-result");
+            UiKit.Border(card, c, 2f);
+            card.style.backgroundColor = new Color(0.016f, 0.03f, 0.094f, 0.94f);
+            panel.Add(card);
+            card.Add(UiKit.Text(UiText.Get(r.victory ? "wave.victory" : "wave.defeat"), "fr-title", c));
             if (r.victory)
             {
-                panel.Add(UiKit.Text(UiText.Get("wave.salvage"), "fr-muted"));
-                panel.Add(UiKit.CostRow(r.granted, gs, false));
-                if (defense.Current != null) panel.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("wave.xp", defense.Current.xp)));
+                card.Add(UiKit.Text(UiText.Get("wave.salvage"), "fr-muted"));
+                card.Add(UiKit.CostRow(r.granted, gs, false));
+                if (defense.Current != null) card.Add(UiKit.Chip("star", UiKit.Magenta, UiText.Get("wave.xp", defense.Current.xp)));
                 if (r.lost.Count > 0)
                 {
-                    panel.Add(UiKit.Text(UiText.Get("wave.overflow"), "fr-muted", UiKit.Amber));
-                    panel.Add(UiKit.CostRow(r.lost, gs, false));
+                    card.Add(UiKit.Text(UiText.Get("wave.overflow"), "fr-muted", UiKit.Amber));
+                    card.Add(UiKit.CostRow(r.lost, gs, false));
                 }
             }
-            else panel.Add(UiKit.Text(UiText.Get("wave.defeat.help"), "fr-muted"));
+            else card.Add(UiKit.Text(UiText.Get("wave.defeat.help"), "fr-muted"));
             var b = UiKit.Btn(UiText.Get("common.continue"), c, null, true, true);
             b.clicked += CloseWaveResult;
-            b.style.marginTop = UiKit.Space.S32;
-            panel.Add(b);
+            b.style.marginTop = UiKit.Space.S24;
+            card.Add(b);
             overlayLayer.Add(panel);
             OnStateChanged();
         }

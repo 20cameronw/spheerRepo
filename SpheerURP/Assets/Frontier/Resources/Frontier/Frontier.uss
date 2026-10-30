@@ -584,6 +584,15 @@
 }
 .fr-overlay.fr-overlay-clear { background-color: rgba(0, 0, 0, 0); }
 .fr-overlay > Label, .fr-overlay > .fr-row { flex-shrink: 0; max-width: 100%; white-space: normal; -unity-text-align: middle-center; }
+.fr-wave-result {
+    width: 100%; max-width: 640px; align-items: center;
+    padding: var(--fr-sp-24); border-radius: var(--fr-r-lg);
+    background-color: rgba(4, 8, 24, 0.92);
+}
+.fr-wave-result > Label { max-width: 100%; white-space: normal; -unity-text-align: middle-center; margin-bottom: var(--fr-sp-8); }
+.fr-wave-result > .fr-costs { justify-content: center; margin-bottom: var(--fr-sp-12); }
+.fr-wave-result > .fr-chip { margin-left: 0; align-self: center; }
+.fr-wave-result > Button { align-self: stretch; }
 .fr-arena {
     width: 100%; flex-grow: 1; flex-basis: 0; min-height: 120px; margin: var(--fr-sp-16) 0;
     border-radius: var(--fr-r-lg);

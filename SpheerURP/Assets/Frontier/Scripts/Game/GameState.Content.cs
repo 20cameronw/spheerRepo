@@ -59,8 +59,6 @@ namespace Frontier
             if (db.UsesImportedEconomy && upgrade.effect == UpgradeEffect.ToolPower)
                 return UiText.Get("gate.upgrade.legacy-tool");
             if (!db.UsesImportedEconomy || !upgrade.HasLevelRows) return null;
-            if (upgrade.effect == UpgradeEffect.StackMultiplier)
-                return UiText.Get("gate.upgrade.future");
             var row = upgrade.NextRow(level);
             return GateReason(row.researchPrereq, row.requiresReachTier);
         }

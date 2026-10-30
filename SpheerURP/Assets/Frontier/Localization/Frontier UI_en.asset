@@ -1342,7 +1342,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336253
-    m_Localized: x{0:0.00} stacks (coming later)
+    m_Localized: x{0:0.00} stack size
     m_Metadata:
       m_Items: []
   - m_Id: 1991336254

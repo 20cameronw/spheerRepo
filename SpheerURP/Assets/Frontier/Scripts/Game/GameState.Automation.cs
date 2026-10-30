@@ -207,7 +207,7 @@ namespace Frontier
         {
             if (resource == null || amount <= 0) return 0;
             var storage = StorageFor(harvester);
-            int stackSize = Math.Max(1, resource.stackSize);
+            int stackSize = StackSize(resource);
             int remaining = amount;
             foreach (var slot in storage.slots)
             {

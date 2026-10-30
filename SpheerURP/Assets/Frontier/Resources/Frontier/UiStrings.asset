@@ -1576,7 +1576,7 @@ MonoBehaviour:
   - key: effect.plating
     text: Protection level {0}
   - key: effect.stack-multiplier
-    text: x{0:0.00} stacks (coming later)
+    text: x{0:0.00} stack size
   - key: effect.percent
     text: +{0}%
   - key: wave.tap-help
