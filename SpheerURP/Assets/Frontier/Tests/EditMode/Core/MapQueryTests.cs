@@ -44,6 +44,18 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void OffscreenPreloadDoesNotSwitchAWideDetailedViewportToDensityOnly()
+        {
+            var snapshot = MapQuery.Build(universe, -1300, -1300, 1300, 1300, "",
+                new[] { new MapSurveyPoint(0, 0, 40) }, new string[0], 1800);
+            Assert.IsFalse(snapshot.densityOnly, "Only the visible span chooses the detail level, not the preload margin.");
+            Assert.IsNotEmpty(snapshot.systems);
+            Assert.LessOrEqual(snapshot.systems.Length, MapQuery.MaxSystems);
+            foreach (var system in snapshot.systems)
+                Assert.IsTrue(MapQuery.Surveyed(system, new[] { new MapPoint(0, 0) }, 40));
+        }
+
+        [Test]
         public void SurveyRadius_RevealsWorldsFromEveryVisitedSystem()
         {
             var star = universe.SystemsInRect(-200, -200, 200, 200)[0];
@@ -65,9 +77,8 @@ namespace Frontier.Tests
         [Test]
         public void PreviouslyDiscoveredSystemsRemainSurveyedAndResourceFilterable()
         {
-            var snapshot = MapQuery.Build(universe, -600, -600, 600, 600, "", new MapSurveyPoint[0]);
             StarSystem target = null;
-            foreach (var star in snapshot.systems)
+            foreach (var star in universe.SystemsInRect(-600, -600, 600, 600))
             {
                 if (star.IsAuthored) continue;
                 foreach (var planet in universe.PlanetsOf(star))
@@ -84,7 +95,7 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void MapNameIndex_FindsAuthoredAndDiscoveredNamesWithoutRevealingUnknownSystems()
+        public void MapNameIndex_FindsOnlyDiscoveredAndPinnedNamesWithoutRevealingAuthoredSystems()
         {
             var candidates = universe.SystemsInRect(-600, -600, 600, 600);
             StarSystem target = null;
@@ -97,7 +108,7 @@ namespace Frontier.Tests
             string planetId;
             Assert.IsFalse(hidden.TryFind(target.Id, out planetId));
             if (universe.AuthoredSystems.Count > 0)
-                Assert.IsTrue(hidden.TryFind(universe.AuthoredSystems[0].Name, out planetId));
+                Assert.IsFalse(hidden.TryFind(universe.AuthoredSystems[0].Name, out planetId));
 
             var known = MapNameIndex.Build(universe, new[] { target.Id });
             Assert.IsTrue(known.TryFind(target.Id, out planetId));
@@ -116,6 +127,29 @@ namespace Frontier.Tests
                 Assert.IsFalse(pinned.TryFind(other.Id, out planetId), "pinning a planet must not reveal unrelated systems");
                 break;
             }
+        }
+
+        [Test]
+        public void UnknownSystemsAreHiddenEvenWithoutResourceFiltersAndAuthoredWorldsNeedScanning()
+        {
+            var empty = MapQuery.Build(universe, -600, -600, 600, 600, "", new MapSurveyPoint[0]);
+            Assert.AreEqual(0, empty.systems.Length);
+            Assert.AreEqual(0, empty.surveyedSystems.Length);
+            var config = new UniverseConfig();
+            var catalog = new Uni(config, Frontier.Universe.Tests.FakeAuthored.Create(config));
+            var target = catalog.AuthoredSystems[0];
+            Assert.IsFalse(MapQuery.Surveyed(target, new MapSurveyPoint[0]));
+            Assert.IsFalse(MapQuery.Surveyed(target, new MapPoint[0], 40));
+            var centers = new[] { new MapSurveyPoint(target.X, target.Y, 40) };
+            var scanned = MapQuery.Build(catalog, target.X - 100, target.Y - 100, target.X + 100, target.Y + 100, "", centers);
+            CollectionAssert.Contains(SystemIds(scanned.systems), target.Id);
+            foreach (var star in scanned.systems) Assert.IsTrue(MapQuery.Surveyed(star, centers));
+            var remembered = MapQuery.Build(catalog, -50000, -50000, 50000, 50000, "", new MapSurveyPoint[0], new[] { target.Id });
+            CollectionAssert.Contains(SystemIds(remembered.systems), target.Id);
+            Assert.AreEqual(1, remembered.systems.Length);
+            Assert.AreEqual(0, MapQuery.Build(catalog, -50000, -50000, 50000, 50000, "", new MapSurveyPoint[0]).systems.Length);
+            Assert.IsFalse(MapNameIndex.Build(catalog, new string[0]).TryFind(target.Name, out _));
+            Assert.IsTrue(MapNameIndex.Build(catalog, new[] { target.Id }).TryFind(target.Name, out _));
         }
 
         [Test]

@@ -26,39 +26,38 @@ namespace Frontier
         VisualElement banner;
         int alarmFuel = 3;
 
-        void OnGatherTapped(GatherSpot spot, Transform anchor)
+        bool StructureCanGather(PlacedStructure structure, GatherSpot spot)
+        {
+            if (structure == null || structure.planetId != gs.planet.Id || !structure.def.kind.IsGather()) return false;
+            foreach (var candidate in gs.SpotsFor(gs.planet, structure.def.kind))
+                if (candidate.resource == spot.resource && candidate.game == spot.game) return true;
+            return false;
+        }
+
+        bool ReadyToHarvest(PlacedStructure structure)
+        {
+            return gs.IsOperational(structure) && !gs.IsBuilderBusy(structure);
+        }
+
+        void BeginHarvest(GatherSpot spot, PlacedStructure owner)
         {
             if (busy || defense.Active) return;
-            CloseModal();
-            if (popup != null && popupAnchor == anchor) { ClosePopup(); return; }
-            PlacedStructure gatherer = null;
-            foreach (var structure in gs.structures)
+            owner = owner != null && owner.planetId == gs.planet.Id ? gs.StructureAt(gs.planet, owner.slot) : null;
+            if (!StructureCanGather(owner, spot) || !ReadyToHarvest(owner))
             {
-                if (structure.planetId != gs.planet.Id || !structure.def.kind.IsGather() || !gs.IsOperational(structure)) continue;
-                foreach (var candidate in gs.SpotsFor(gs.planet, structure.def.kind))
-                    if (candidate.resource == spot.resource && candidate.game == spot.game &&
-                        (gatherer == null || gs.StructureBonus(structure) > gs.StructureBonus(gatherer))) gatherer = structure;
+                Toast(UiText.Get("gather.list.not-ready"), UiKit.Amber);
+                RefreshModal(); RefreshPopup();
+                return;
             }
-            var owner = gatherer;
-            OpenPopup("resource-" + spot.resource.id, anchor, UiKit.Ui(spot.resource.color), body =>
+            var anchor = world.AnchorFor(owner);
+            if (anchor == null)
             {
-                body.Add(UiKit.Text(spot.resource.LocalizedName, "fr-h2"));
-                body.Add(UiKit.Text(spot.resource.LocalizedDescription, "fr-small"));
-                if (owner != null)
-                {
-                    body.Add(UiKit.Text(UiText.Get("world.site.tool", gs.ToolName(spot.game)), "fr-small"));
-                    body.Add(IconBtn(UiText.Get("world.site.gather"), Icons.ForTool(spot.game), UiKit.Lime, () =>
-                    {
-                        ClosePopup();
-                        StartGather(spot, anchor, gs.StructureBonus(owner));
-                    }));
-                }
-                else
-                {
-                    body.Add(UiKit.Text(UiText.Get("world.site.build"), "fr-small"));
-                    body.Add(IconBtn(UiText.Get("nav.build"), "build", UiKit.Lime, OpenShop));
-                }
-            }, true);
+                Debug.LogError("Frontier: harvester has no world anchor: " + owner.def.id);
+                Toast(UiText.Get("guide.gatherer-appearing"), UiKit.Amber);
+                return;
+            }
+            CloseAll();
+            StartGather(spot, anchor, gs.StructureBonus(owner));
         }
 
         // ------------------------------------------------------------ popup core
@@ -76,6 +75,7 @@ namespace Frontier
             // Selecting a structure holds the world still until it's tapped again (or closed).
             planetView.Frozen = true;
             world.Selected = anchor;
+            UpdateFirstSessionGuideVisibility();
             Sfx.Click();
         }
 
@@ -96,6 +96,7 @@ namespace Frontier
 
         void ClosePopup()
         {
+            confirmBuilderFinish = null;
             if (popup != null) popup.RemoveFromHierarchy();
             popup = null; popupAnchor = null; popupBuild = null; popupKey = null;
             popupScroll = null;
@@ -182,6 +183,12 @@ namespace Frontier
                     StructureHeader(body, s, jobColor, UiText.Get("structure.builder"));
                     jobStatusLabel = UiKit.Text(gs.BuilderJobStatus(s), "fr-small", UiKit.Cyan);
                     body.Add(jobStatusLabel);
+                    BuildBuilderFinishAction(body, s, () =>
+                    {
+                        if (gs.IsBuilderBusy(s)) RefreshPopup();
+                        else ClosePopup();
+                    });
+                    BuildConstructionOffer(body, s);
                     if (s.def.kind == StructureKind.Terraformer)
                     {
                         int stage = s.record.pendingUpgradeLevel > s.level ? s.record.pendingUpgradeLevel : s.level;
@@ -195,7 +202,6 @@ namespace Frontier
                         body.Add(UiKit.Text(UiText.Get(s.def.kind == StructureKind.WarpGate
                             ? "structure.warp.pending" : "structure.dyson.pending"), "fr-tiny"));
                     }
-                    body.Add(UiKit.Text(UiText.Get("structure.offline-time"), "fr-tiny"));
                 });
                 jobPopupStructure = s;
                 return;
@@ -235,7 +241,8 @@ namespace Frontier
                     body.Add(UiKit.Text(ContentText.Get("obstacle", kind.id, "description", kind.description), "fr-tiny"));
                 body.Add(SectionLabel(UiText.Get("obstacle.cost")));
                 var cost = gs.ObstacleClearCost(gs.planet, pad);
-                body.Add(cost.Count == 0 ? UiKit.Text(UiText.Get("obstacle.free"), "fr-small") : UiKit.CostRow(cost, gs, true, OpenResourceSource));
+                var project = Project("obstacle", "clear", slot: pad);
+                body.Add(cost.Count == 0 ? UiKit.Text(UiText.Get("obstacle.free"), "fr-small") : ProjectCosts(cost, project));
 
                 body.Add(SectionLabel(UiText.Get("obstacle.salvage")));
                 ResourceSO salvage = gs.db.FindResource(obstacle.Value.reward.resourceId);
@@ -323,7 +330,8 @@ namespace Frontier
             if (s.level >= s.def.maxLevel) { body.Add(Note(UiText.Get("structure.max"), UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
             body.Add(SectionLabel(UiText.Get("structure.upgrade-preview", s.level + 1, StructureEffect(s.def, s.level + 1))));
-            body.Add(UiKit.CostRow(cost, gs, true, OpenResourceSource));
+            body.Add(ProjectCosts(cost, Project("structure", s.def.id, s.level + 1, s.slot)));
+            AddProjectAction(body, Project("structure", s.def.id, s.level + 1, s.slot));
             var up = IconBtn(UiText.Get("command.upgrade"), "up", c, () =>
             {
                 if (gs.UpgradeStructure(s))
@@ -418,14 +426,31 @@ namespace Frontier
             });
         }
 
+        int labPage;
+
         void OpenResearchLab(PlacedStructure s, Transform t)
         {
+            labPage = 0;
             Color c = UiKit.Ui(s.def.color);
             OpenPopup("researchlab" + s.slot, t, c, body =>
             {
                 StructureHeader(body, s, c, UiText.Get("structure.lab.subtitle"));
-                body.Add(UiKit.Text(UiText.Get("structure.lab.help"), "fr-tiny"));
-                UpgradeButton(body, s, c);
+                var tabs = UiKit.Div("fr-tabs");
+                tabs.name = "lab-navigation";
+                tabs.Add(TabButton("research", UiText.Get("research.tab.tech"), labPage == 0, c,
+                    () => labPage = 0, RefreshPopup));
+                tabs.Add(TabButton("tools", UiText.Get("command.tools"), labPage == 1, c,
+                    () => labPage = 1, RefreshPopup));
+                tabs.Add(TabButton("up", UiText.Get("lab.tab.upgrade"), labPage == 2, c,
+                    () => labPage = 2, RefreshPopup));
+                body.Add(tabs);
+                if (labPage == 2) UpgradeButton(body, s, c);
+                else
+                {
+                    BuildXpProgress(body);
+                    if (labPage == 0) BuildTech(body);
+                    else BuildTools(body);
+                }
             });
         }
 
@@ -516,10 +541,6 @@ namespace Frontier
                 float bonus = gs.StructureBonus(s);
                 var spots = gs.SpotsFor(gs.planet, s.def.kind);
                 body.Add(SectionLabel(UiText.Get(spots.Count > 0 ? "gather.title" : "gather.empty")));
-                string verb = UiText.Get(s.def.kind == StructureKind.Biodome ? "gather.harvest" :
-                    game == MinigameKind.Drill ? "gather.drill" : game == MinigameKind.Siphon ? "gather.siphon" :
-                    game == MinigameKind.Excavate ? "gather.excavate" : game == MinigameKind.Salvage ? "gather.salvage" :
-                    game == MinigameKind.Chop ? "gather.chop" : "gather.mine");
                 bool guideMarked = false;
                 foreach (var spot in spots)
                 {
@@ -534,7 +555,8 @@ namespace Frontier
                     txt.Add(UiKit.Text(sp.resource.LocalizedName, "fr-small"));
                     txt.Add(UiKit.Text(UiText.Get("gather.estimate", est), "fr-tiny"));
                     row.Add(txt);
-                    var go = IconBtn(verb, "play", c, () => { ClosePopup(); StartGather(sp, t, bonus); });
+                    var go = IconBtn(UiText.Get("gather.harvest"), "play", c, () => BeginHarvest(sp, s));
+                    go.name = "harvest-start-" + sp.resource.id + "-" + sp.game;
                     go.style.marginTop = 0;
                     row.Add(go);
                     if (!guideMarked && s.def.kind == StructureKind.Lumber)
@@ -595,7 +617,11 @@ namespace Frontier
                         if (i.resource != null)
                         {
                             int required = (int)Math.Min(int.MaxValue, (long)i.amount * batchSize);
-                            inputs.Add(RecipeResource(i.resource, required, gs.PlanetCount(i.resource) < required));
+                            var chip = RecipeResource(i.resource, required);
+                            if (gs.PlanetCount(i.resource) < required)
+                                chip = UiKit.BindResourceFind(chip, i.resource, resource =>
+                                    OpenShortage(Project("recipe", r.id, slot: s.slot, quantity: batchSize), resource, required));
+                            inputs.Add(chip);
                         }
                     line.Add(inputs);
                     var arrow = UiKit.Text(">", "fr-h2");
@@ -643,6 +669,7 @@ namespace Frontier
                         guideMarked = true;
                     }
                     card.Add(btns);
+                    AddProjectAction(card, Project("recipe", r.id, slot: s.slot, quantity: batchSize));
                     body.Add(card);
                 }
             });
@@ -687,7 +714,7 @@ namespace Frontier
                 int have = gs.Count(gs.db.fuel);
                 alarmFuel = Mathf.Clamp(alarmFuel, 1, Mathf.Max(1, Mathf.Min(have, 40)));
                 StructureHeader(body, s, c, UiText.Get("wave.call-help"));
-                BuildXpProgress(body, false);
+                BuildXpProgress(body);
 
                 var stepper = UiKit.Div("fr-stepper");
                 var minus = Icons.IconButton("minus", UiKit.Amber, () => { alarmFuel = Mathf.Max(1, alarmFuel - 1); RefreshPopup(); });
@@ -754,10 +781,13 @@ namespace Frontier
         }
 
         // ------------------------------------------------------------ build mode
-        void EnterBuild(StructureSO def)
+        int buildShardQuote = -1;
+
+        void EnterBuild(StructureSO def, int shardQuote = -1)
         {
             ExitBuild();
             buildDef = def;
+            buildShardQuote = shardQuote;
             world.BuildMode = true;
             Color c = UiKit.Ui(def.color);
             banner = UiKit.Div("fr-banner"); banner.pickingMode = PickingMode.Ignore;
@@ -765,7 +795,10 @@ namespace Frontier
             UiKit.SetAccent(box, c);
             UiKit.Halo(box, c, 26f, 0.14f);
             box.Add(Icons.Make(StructureIcon(def.kind), c, UiKit.Size.IconLg));
-            box.Add(UiKit.Text(UiText.Get("build.pad-help"), "fr-h2", c));
+            var prompt = UiKit.Text(UiText.Get(shardQuote >= 0 ? "shop.shards.pad-help" : "build.pad-help", shardQuote), "fr-h2", c);
+            prompt.style.whiteSpace = WhiteSpace.Normal;
+            prompt.style.flexShrink = 1;
+            box.Add(prompt);
             var cancel = Icons.IconButton("close", UiKit.Muted, ExitBuild, 0f, true);
             cancel.style.marginLeft = UiKit.Space.S16;
             box.Add(cancel);
@@ -776,6 +809,7 @@ namespace Frontier
         void ExitBuild()
         {
             buildDef = null;
+            buildShardQuote = -1;
             if (world != null) world.BuildMode = false;
             if (banner != null) banner.RemoveFromHierarchy();
             banner = null;
@@ -785,21 +819,29 @@ namespace Frontier
         {
             if (buildDef == null) return;
             var def = buildDef;
-            if (!gs.Place(def, slot)) { }
-            else
+            string purchaseMessage = null;
+            StructurePurchaseResult purchase = StructurePurchaseResult.Rejected;
+            bool placedSuccessfully;
+            if (buildShardQuote >= 0)
+            {
+                purchase = gs.PurchaseStructure(def, slot, buildShardQuote, out purchaseMessage);
+                placedSuccessfully = purchase != StructurePurchaseResult.Rejected;
+            }
+            else placedSuccessfully = gs.Place(def, slot);
+            if (placedSuccessfully)
             {
                 var placed = gs.StructureAt(gs.planet, slot);
                 Sfx.Good();
                 Fx.Burst(t.position, def.color, 50, 5f, 0.25f);
                 planetView.Punch();
-                Toast(UiText.Get(gs.IsUnderConstruction(placed) ? "build.started" : "build.completed",
-                    def.LocalizedName), UiKit.Ui(def.color));
+                Toast(purchaseMessage ?? UiText.Get(gs.IsUnderConstruction(placed) ? "build.started" : "build.completed",
+                    def.LocalizedName), purchase == StructurePurchaseResult.PendingSave ? UiKit.Amber : UiKit.Ui(def.color));
                 ExitBuild();
                 return;
             }
             Sfx.Bad();
-            Toast(gs.AvailableBuilderCount <= 0 && gs.StructureJobSeconds(def, 1) > 0
-                ? gs.BuilderAvailabilityReason() : UiText.Get("build.resources-missing"), UiKit.Red);
+            Toast(purchaseMessage ?? (gs.AvailableBuilderCount <= 0 && gs.StructureJobSeconds(def, 1) > 0
+                ? gs.BuilderAvailabilityReason() : UiText.Get("build.resources-missing")), UiKit.Red);
         }
     }
 }

@@ -13,6 +13,26 @@ namespace Frontier
         public double Length { get { return Math.Sqrt(x * x + y * y); } }
     }
 
+    public readonly struct MapQueryBounds
+    {
+        public readonly MapPoint min, max;
+
+        public MapQueryBounds(MapViewport viewport)
+        {
+            double padding = Math.Max(192, Math.Max(viewport.Width, viewport.Height) * 0.25);
+            min = viewport.Unproject(-padding, viewport.Height + padding);
+            max = viewport.Unproject(viewport.Width + padding, -padding);
+        }
+
+        public bool Covers(MapViewport viewport)
+        {
+            double guard = Math.Max(96, Math.Max(viewport.Width, viewport.Height) * 0.125);
+            MapPoint a = viewport.Unproject(-guard, viewport.Height + guard);
+            MapPoint b = viewport.Unproject(viewport.Width + guard, -guard);
+            return a.x >= min.x && a.y >= min.y && b.x <= max.x && b.y <= max.y;
+        }
+    }
+
     /// <summary>A viewport, not a giant canvas. Pan is unbounded; zoom preserves the world under the pointer.</summary>
     public sealed class MapViewport
     {

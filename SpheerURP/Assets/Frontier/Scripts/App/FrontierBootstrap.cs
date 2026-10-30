@@ -28,12 +28,17 @@ namespace Frontier
             yield return UiText.InitializeLocalization();
 
             var db = GameDatabase.ForRuntime(database);
-            var consent = new ConsentService(new PlayerPrefsConsentStore());
-            var serviceConfig = Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
-            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HarnessRunner.PrepareFromCommandLine();
 #endif
+            IConsentStore consentStore = new PlayerPrefsConsentStore();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // Save-isolated tools must not inherit or change the player's online/analytics choices.
+            if (!string.IsNullOrEmpty(GameState.SaveDirectoryOverride)) consentStore = new IsolatedConsentStore();
+#endif
+            var consent = new ConsentService(consentStore);
+            var serviceConfig = Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
+            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig);
             var bundledDb = db;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (!HarnessRunner.Requested)
@@ -155,6 +160,15 @@ namespace Frontier
             if (HarnessRunner.Requested) new GameObject("Harness").AddComponent<HarnessRunner>().Begin(FrontierRuntime.Current);
 #endif
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        sealed class IsolatedConsentStore : IConsentStore
+        {
+            ConsentPreferences preferences;
+            public ConsentPreferences Load() { return preferences; }
+            public void Save(ConsentPreferences value) { preferences = value; }
+        }
+#endif
     }
 
     /// <summary>Keeps the centered planet fully visible whatever the aspect ratio of the device.</summary>
@@ -162,10 +176,11 @@ namespace Frontier
     {
         Camera cam;
         float lastAspect;
-        bool lastCloseView;
+        float lastZoom, lastMapBlend;
         bool initialized, transitioning;
         float transitionTime;
-        Vector3 transitionStart, transitionEnd;
+        Vector3 transitionEnd;
+        Vector3 velocity;
         const float ViewTransitionSeconds = 0.6f;
         public PlanetView Planet;
 
@@ -175,20 +190,22 @@ namespace Frontier
         {
             if (cam == null) return;
             float aspect = ScreenMetrics.Aspect;
-            bool close = Planet != null && Planet.CloseView;
-            if (!initialized || !Mathf.Approximately(aspect, lastAspect) || close != lastCloseView)
+            float zoom = Planet != null ? Planet.Zoom01 : 0f;
+            float mapBlend = Planet != null ? Mathf.Clamp01(Planet.MapZoomBlend) : 0f;
+            if (!initialized || !Mathf.Approximately(aspect, lastAspect) ||
+                !Mathf.Approximately(zoom, lastZoom) || !Mathf.Approximately(mapBlend, lastMapBlend))
             {
-                bool animate = initialized && close != lastCloseView;
+                bool animate = initialized;
                 lastAspect = aspect;
-                lastCloseView = close;
+                lastZoom = zoom;
+                lastMapBlend = mapBlend;
                 const float need = 3.5f;
                 float t = Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
                 float d = Mathf.Max(need / (t * aspect), need / t);
                 float distance = Mathf.Clamp(d, 8f, 16f);
-                transitionStart = transform.position;
-                transitionEnd = close
-                    ? new Vector3(0f, 1.6f, -distance * 0.34f)
-                    : new Vector3(0f, 0f, -distance);
+                transitionEnd = Vector3.Lerp(new Vector3(0f, 0f, -distance),
+                    new Vector3(0f, 1.6f, -distance * 0.34f), zoom);
+                transitionEnd = Vector3.Lerp(transitionEnd, new Vector3(0f, 0f, -distance * 3f), mapBlend);
                 transitionTime = 0;
                 transitioning = animate;
                 initialized = true;
@@ -197,10 +214,12 @@ namespace Frontier
             if (!transitioning) return;
             transitionTime += Time.unscaledDeltaTime;
             float progress = Mathf.Clamp01(transitionTime / ViewTransitionSeconds);
-            // Quintic easing gives the camera a soft departure and arrival without overshooting the surface.
-            float eased = progress * progress * progress * (progress * (progress * 6 - 15) + 10);
-            transform.position = Vector3.LerpUnclamped(transitionStart, transitionEnd, eased);
-            if (progress >= 1) transitioning = false;
+            // Gesture targets move every frame; follow those promptly rather than restarting a long ease.
+            transform.position = progress < 1f
+                ? Vector3.SmoothDamp(transform.position, transitionEnd, ref velocity, 0.16f,
+                    Mathf.Infinity, Time.unscaledDeltaTime)
+                : transitionEnd;
+            if (progress >= 1) { transitioning = false; velocity = Vector3.zero; }
         }
     }
 }

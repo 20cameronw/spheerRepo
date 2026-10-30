@@ -29,6 +29,285 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void CloudRestoreCannotReplayAnUnsettledReward()
+        {
+            var state = new GameState(db, false, clock);
+            Assert.IsTrue(state.TryCreateCloudSaveSnapshot(out var clean, out var error), error);
+            state.backpack.Clear();
+            Assert.IsTrue(state.PrepareGameplayReward("double-yield", db.FindResource("wood"), 3, null, out _, out error), error);
+            Assert.IsTrue(state.TryCreateCloudSaveSnapshot(out var pending, out error), error);
+            Assert.IsFalse(state.TryRestoreCloudSave(clean, out error));
+            Assert.AreEqual(UiText.Get("reward.restore-busy"), error);
+            Assert.IsTrue(state.CancelUnverifiedGameplayReward(out error), error);
+            Assert.IsFalse(state.TryRestoreCloudSave(pending, out error));
+            Assert.AreEqual(UiText.Get("reward.restore-busy"), error);
+            Assert.IsTrue(state.TryRestoreCloudSave(clean, out error), error);
+        }
+
+        [Test]
+        public void GameplayAdsAreEnabledWithBoundedTimerReduction()
+        {
+            var rules = Resources.Load<GameplayRewardRules>("Frontier/GameplayRewardRules");
+            Assert.IsNotNull(rules);
+            Assert.IsTrue(rules.harvestEnabled);
+            Assert.IsTrue(rules.constructionEnabled);
+            Assert.IsTrue(rules.shardsEnabled);
+            Assert.AreEqual(300, rules.constructionSeconds);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void OptionalShardAdRewardUsesTheSaveJournalAndCannotBeReplayed(bool earned)
+        {
+            var state = new GameState(db, false, clock);
+            int amount = db.shardRules.data.adReward;
+            int startingBalance = state.ShardBalance;
+            Assert.IsFalse(state.PrepareGameplayReward("free-shards", null, amount + 1, null, out _, out _),
+                "The grant must match the authored shard reward.");
+            Assert.IsFalse(state.SaveIsReadOnly);
+            Assert.IsNull(state.PendingTravel);
+            Assert.AreEqual(amount, state.db.shardRules.data.adReward);
+            Assert.IsTrue(state.PrepareGameplayReward("free-shards", null, amount, null, out var ticket, out var error),
+                error);
+            Assert.AreEqual(startingBalance, state.ShardBalance, "No shards are granted before the ad is verified.");
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            Assert.AreEqual(startingBalance + (earned ? amount : 0), state.ShardBalance);
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            if (!earned)
+                Assert.IsFalse(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out error),
+                    "A late earned callback cannot revive a cancelled reward.");
+            Assert.AreEqual(startingBalance + (earned ? amount : 0), state.ShardBalance,
+                "Repeating the callback cannot grant a second reward.");
+            Assert.AreEqual(startingBalance + (earned ? amount : 0), new GameState(db, true, clock).ShardBalance);
+        }
+
+        [Test]
+        public void OptionalShardAdRewardCannotOverflowTheWallet()
+        {
+            var state = new GameState(db, false, clock);
+            Assert.IsTrue(state.TryCreateCloudSaveSnapshot(out var save, out var error), error);
+            save.wallet.Clear();
+            save.wallet.Add(new WalletEntry { currency = "shards", amount = int.MaxValue });
+            Assert.IsTrue(state.TryRestoreCloudSave(save, out error), error);
+            Assert.IsFalse(state.PrepareGameplayReward("free-shards", null, db.shardRules.data.adReward,
+                null, out _, out _));
+            Assert.AreEqual(int.MaxValue, state.ShardBalance);
+        }
+
+        [Test]
+        public void FailedGameplayRewardWritesDoNotPublishProgressAndCanRetry()
+        {
+            var state = new GameState(db, false, clock);
+            var wood = db.FindResource("wood");
+            state.backpack.Clear();
+            Directory.CreateDirectory(sandbox.SaveFile);
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Warning,
+                new System.Text.RegularExpressions.Regex("Frontier save failed:"));
+            Assert.IsFalse(state.PrepareGameplayReward("double-yield", wood, 3, null, out _, out var error));
+            Assert.IsNotEmpty(error);
+            Assert.AreEqual(0, state.Count(wood));
+            Assert.IsNull(state.GameplayReward);
+            Directory.Delete(sandbox.SaveFile);
+            Assert.IsTrue(state.PrepareGameplayReward("double-yield", wood, 3, null, out var ticket, out error), error);
+            string backup = sandbox.SaveFile + ".blocked";
+            File.Move(sandbox.SaveFile, backup);
+            Directory.CreateDirectory(sandbox.SaveFile);
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Warning,
+                new System.Text.RegularExpressions.Regex("Frontier save failed:"));
+            Assert.IsFalse(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out error));
+            Assert.IsNotEmpty(error);
+            Assert.AreEqual(3, state.Count(wood));
+            Assert.AreEqual("pending", state.GameplayReward.state);
+            Directory.Delete(sandbox.SaveFile);
+            File.Move(backup, sandbox.SaveFile);
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out error), error);
+            Assert.AreEqual(6, state.Count(wood));
+            Assert.AreEqual(6, new GameState(db, true, clock).Count(wood));
+        }
+
+        [Test]
+        public void ResumeCompletesJobsAndDoesNotRepeatTheReturnSummary()
+        {
+            var state = new GameState(db, false, clock);
+            var job = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            state.DebugSetBuilderJob(job, 30);
+            Assert.IsTrue(state.Save());
+            clock.Advance(60);
+            state.ResumeOfflineProgress();
+            Assert.IsTrue(state.ReturnItems.Any(i => i.slot == job.slot && i.resourceId == null));
+            Assert.IsFalse(state.IsUnderConstruction(job));
+            int version = state.ReturnSummaryVersion;
+            state.ResumeOfflineProgress();
+            Assert.IsEmpty(state.ReturnItems);
+            Assert.AreEqual(version, state.ReturnSummaryVersion);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void GameplayHarvestJournalPreservesBaseAndSettlesAtMostOnce(bool earned)
+        {
+            var state = new GameState(db, false, clock);
+            var wood = db.FindResource("wood");
+            state.backpack.Clear();
+            Assert.IsTrue(state.PrepareGameplayReward("double-yield", wood, 3, null, out var ticket, out var error), error);
+            Assert.AreEqual(3, state.Count(wood), "Base harvest is secured before the ad.");
+            Assert.IsFalse(state.PrepareGameplayReward("double-yield", wood, 3, null, out _, out _), "No overlapping requests.");
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(3, loaded.Count(wood));
+            Assert.AreEqual("pending", loaded.GameplayReward.state);
+            Assert.IsFalse(loaded.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out _),
+                "A callback from a replaced session is invalid.");
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            Assert.AreEqual(earned ? 6 : 3, state.Count(wood));
+            state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out _);
+            Assert.AreEqual(earned ? 6 : 3, state.Count(wood));
+            Assert.AreEqual(earned ? 6 : 3, new GameState(db, true, clock).Count(wood));
+        }
+
+        [Test]
+        public void EarnedHarvestBonusWaitsForCapacityAndSurvivesRestart()
+        {
+            var state = new GameState(db, false, clock);
+            var wood = db.FindResource("wood");
+            state.backpack.Clear();
+            Assert.IsTrue(state.PrepareGameplayReward("double-yield", wood, 3, null, out var ticket, out var error), error);
+            state.backpack.Add(wood.id, int.MaxValue);
+            Assert.IsFalse(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out error));
+            Assert.IsNotEmpty(error);
+            Assert.AreEqual("earned", state.GameplayReward.state);
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual("earned", loaded.GameplayReward.state);
+            loaded.backpack.Clear();
+            Assert.IsTrue(loaded.SettleGameplayReward(out error), error);
+            Assert.AreEqual(3, loaded.Count(wood));
+            Assert.IsFalse(loaded.SettleGameplayReward(out _));
+            Assert.AreEqual(3, new GameState(db, true, clock).Count(wood));
+        }
+
+        [Test]
+        public void ConstructionRewardChangesOnlyTheQuotedJobAndRetainsNormalCompletionRules()
+        {
+            var state = new GameState(db, false, clock);
+            var job = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            state.DebugSetBuilderJob(job, 120);
+            Assert.IsTrue(state.PrepareGameplayReward("timer-skip", null, 60, job, out var ticket, out var error), error);
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out error), error);
+            Assert.AreEqual(60, state.BuilderJobSecondsRemaining(job));
+            var loaded = new GameState(db, true, clock);
+            var loadedJob = loaded.structures.First(s => s.slot == 0);
+            Assert.AreEqual(60, loaded.BuilderJobSecondsRemaining(loadedJob));
+            clock.Advance(61);
+            loaded.Tick();
+            Assert.IsFalse(loaded.IsUnderConstruction(loadedJob));
+            Assert.AreEqual(loaded.BuilderCount, loaded.AvailableBuilderCount);
+        }
+
+        [Test]
+        public void ConstructionRewardCannotBoostAReplacementJob()
+        {
+            var state = new GameState(db, false, clock);
+            var job = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            state.DebugSetBuilderJob(job, 120);
+            Assert.IsTrue(state.PrepareGameplayReward("timer-skip", null, 60, job, out var ticket, out _));
+            state.DebugSetBuilderJob(job, 240);
+            Assert.IsFalse(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, true, out var error));
+            Assert.IsNotEmpty(error);
+            Assert.AreEqual(240, state.BuilderJobSecondsRemaining(job));
+            Assert.IsTrue(state.CancelUnverifiedGameplayReward(out error), error);
+        }
+
+        [Test]
+        public void TrackedProjectSurvivesRestartAndRevalidatesWithoutSpending()
+        {
+            var state = new GameState(db, false, clock);
+            var upgrade = db.FindUpgrade("pack");
+            var project = new PlayerProject { kind = "upgrade", id = upgrade.id, target = 1, planetId = state.planet.Id };
+            int before = state.Count(db.FindResource("wood"));
+            Assert.IsTrue(state.TrackProject(project, out var error), error);
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(project.id, loaded.TrackedProject.id);
+            Assert.IsFalse(loaded.ProjectState(loaded.TrackedProject).complete);
+            CollectionAssert.AreEquivalent(upgrade.CostAt(0).Select(c => c.amount),
+                loaded.ProjectState(loaded.TrackedProject).costs.Select(c => c.amount));
+            Assert.AreEqual(before, loaded.Count(db.FindResource("wood")));
+            loaded.DebugSetUpgrade(upgrade, 1);
+            Assert.IsTrue(loaded.ProjectState(loaded.TrackedProject).complete);
+            Assert.IsTrue(loaded.TrackProject(null, out error), error);
+            Assert.IsNull(new GameState(db, true, clock).TrackedProject);
+        }
+
+        [Test]
+        public void CarriedOnlyProjectsDoNotMistakeConnectedStockForSpendableCargo()
+        {
+            var state = new GameState(db, false, clock);
+            var wood = db.FindResource("wood");
+            state.backpack.Clear();
+            var warehouse = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            var storage = state.StorageFor(warehouse);
+            storage.slots[0].resourceId = wood.id; storage.slots[0].count = 12;
+            state.DebugPlace(db.StructureOfKind(StructureKind.CargoDepot), 1);
+            var obstacle = new PlayerProject { kind = "obstacle", id = "clear", slot = 2, planetId = state.planet.Id };
+            Assert.AreEqual(0, state.ProjectResourceCount(obstacle, wood));
+            Assert.AreEqual(12, state.ProjectResourceCount(new PlayerProject { kind = "upgrade" }, wood));
+            var options = state.ResourceOptions(wood, 5, carriedOnly: true);
+            Assert.IsFalse(options.Any(s => s.kind == ResourceSourceKind.Usable));
+            Assert.IsTrue(options.Any(s => s.kind == ResourceSourceKind.LocalStock && s.amount == 12));
+            Assert.AreEqual(12, WarehouseOps.Held(storage, wood.id));
+        }
+
+        [Test]
+        public void TrackedPlanetLinkKeepsItsDestinationAndLiveCosts()
+        {
+            var state = new GameState(db, false, clock);
+            var destination = state.universe.Get(db.planets[1].id);
+            var project = new PlayerProject { kind = "link", id = destination.Id, planetId = state.planet.Id };
+            Assert.IsTrue(state.TrackProject(project, out var error), error);
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(destination.Id, loaded.TrackedProject.id);
+            Assert.AreEqual(UiText.Get("network.link", destination.Name), loaded.ProjectState(loaded.TrackedProject).name);
+            CollectionAssert.AreEquivalent(state.NetworkCosts(false).Select(c => c.amount),
+                loaded.ProjectState(loaded.TrackedProject).costs.Select(c => c.amount));
+            Assert.IsFalse(loaded.ProjectState(loaded.TrackedProject).complete);
+        }
+
+        [Test]
+        public void ResourceOptionsPreferUsableAndLocalStockAndKeepRemoteRetrievalExplicit()
+        {
+            var state = new GameState(db, false, clock);
+            var wood = db.FindResource("wood");
+            state.backpack.Clear();
+            var warehouse = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            var storage = state.StorageFor(warehouse);
+            storage.slots[0].resourceId = wood.id; storage.slots[0].count = 12;
+            var options = state.ResourceOptions(wood, 5);
+            Assert.AreEqual(ResourceSourceKind.LocalStock, options[0].kind);
+            Assert.AreEqual(12, options[0].amount);
+            state.DebugPlace(db.StructureOfKind(StructureKind.CargoDepot), 1);
+            Assert.AreEqual(ResourceSourceKind.Usable, state.ResourceOptions(wood, 5)[0].kind);
+            state.DebugTeleport(state.universe.Get(db.planets[1].id));
+            options = state.ResourceOptions(wood, 5);
+            Assert.IsTrue(options.Any(s => s.kind == ResourceSourceKind.RemoteStock && s.amount == 12));
+            Assert.IsFalse(options.Any(s => s.kind == ResourceSourceKind.Usable));
+            Assert.AreEqual(0, state.Count(wood));
+            Assert.AreEqual(12, WarehouseOps.Held(storage, wood.id));
+        }
+
+        [Test]
+        public void ReturnSummaryReportsCompletedJobsOnlyOnceWithoutChangingCargo()
+        {
+            var state = new GameState(db, false, clock);
+            var structure = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 0);
+            state.DebugSetBuilderJob(structure, 30);
+            Assert.IsTrue(state.Save());
+            clock.Advance(60);
+            var loaded = new GameState(db, true, clock);
+            Assert.IsTrue(loaded.ReturnItems.Any(i => i.slot == 0 && i.resourceId == null));
+            Assert.AreEqual(state.Count(db.FindResource("wood")), loaded.Count(db.FindResource("wood")));
+            Assert.AreEqual(0, new GameState(db, true, clock).ReturnItems.Count);
+        }
+
+        [Test]
         [TestCase("building")]
         [TestCase("structure-upgrade")]
         [TestCase("ship-upgrade")]
@@ -139,6 +418,96 @@ namespace Frontier.Tests
             copies.Add(copy);
             entries[Array.IndexOf(entries, source)] = copy;
             return copy;
+        }
+
+        [Test]
+        public void ProgressionPurchasesUseOnlyTheConnectedOperationalLocalPool(
+            [Values("research", "tool", "ship", "defense")] string purchase,
+            [Values("connected", "disconnected", "remote", "building-storage", "building-depot", "short")] string scope)
+        {
+            var isolated = GameDatabase.Select(db.ContentSource, GameDatabase.LoadLegacy(), out string error);
+            Assert.IsNull(error);
+            var copies = new List<UnityEngine.Object>();
+            try
+            {
+                isolated.research = (ResearchNodeSO[])isolated.research.Clone();
+                isolated.toolLadders = (ToolLadderSO[])isolated.toolLadders.Clone();
+                isolated.upgrades = (UpgradeSO[])isolated.upgrades.Clone();
+                var state = new GameState(isolated, false, clock);
+                var wood = isolated.FindResource("wood");
+                var stone = isolated.FindResource("stone");
+                var cost = new[] { new Economy.ItemAmount("wood", 12), new Economy.ItemAmount("stone", 5) };
+                Func<bool> eligible, buy;
+                Func<GameState, bool> purchased;
+                if (purchase == "research")
+                {
+                    var node = CloneForGate(isolated.research[0], isolated.research, copies);
+                    node.data.cost = cost;
+                    node.data.tier = 1;
+                    node.data.labLevel = 0;
+                    node.data.prereqs = new string[0];
+                    eligible = () => state.CanResearch(node);
+                    buy = () => state.Research(node);
+                    purchased = loaded => loaded.IsResearched(node.data.id);
+                }
+                else if (purchase == "tool")
+                {
+                    var ladder = CloneForGate(isolated.toolLadders.First(t => t.data.kind == Economy.ToolKind.Axe),
+                        isolated.toolLadders, copies);
+                    var next = ladder.data.tiers.First(t => t.tier == 2);
+                    next.cost = cost;
+                    next.requiresReachTier = 1;
+                    next.requiresLabLevel = 0;
+                    next.researchPrereq = "";
+                    eligible = () => state.ToolTierLockReason(ladder) == null;
+                    buy = () => state.BuyToolTier(ladder);
+                    purchased = loaded => loaded.ToolTier(ladder) == 2;
+                }
+                else
+                {
+                    var category = purchase == "ship" ? UpgradeCategory.Ship : UpgradeCategory.Defense;
+                    var upgrade = CloneForGate(isolated.upgrades.First(u => u.category == category && u.HasLevelRows),
+                        isolated.upgrades, copies);
+                    var next = upgrade.NextRow(0);
+                    next.cost = new List<ItemAmount> { new ItemAmount(wood, 12), new ItemAmount(stone, 5) };
+                    next.requiresReachTier = 1;
+                    next.researchPrereq = "";
+                    eligible = () => state.CanBuy(upgrade);
+                    buy = () => state.Buy(upgrade);
+                    purchased = loaded => loaded.Level(upgrade) == 1;
+                }
+
+                var warehouse = state.DebugPlace(isolated.StructureOfKind(StructureKind.Warehouse), 0);
+                var depot = scope == "disconnected" ? null :
+                    state.DebugPlace(isolated.StructureOfKind(StructureKind.CargoDepot), 1);
+                var storage = state.StorageFor(warehouse);
+                storage.slots[0].resourceId = wood.id;
+                storage.slots[0].count = 8;
+                storage.slots[1].resourceId = stone.id;
+                storage.slots[1].count = scope == "short" ? 4 : 5;
+                state.backpack.Clear();
+                state.backpack.Set(wood.id, 4);
+                if (scope == "building-storage") state.DebugSetBuilderJob(warehouse, 60);
+                if (scope == "building-depot") state.DebugSetBuilderJob(depot, 60);
+                if (scope == "remote") state.DebugTeleport(state.universe.Get(isolated.planets[1].id));
+                bool connected = scope == "connected";
+                Assert.AreEqual(connected, eligible(), "Eligibility must use the same resource scope as spending.");
+                Assert.AreEqual(connected, buy());
+                Assert.AreEqual(connected ? 0 : 4, state.Count(wood), "Rejected purchases must not partially spend cargo.");
+                Assert.AreEqual(connected ? 0 : 8, WarehouseOps.Held(storage, wood.id));
+                Assert.AreEqual(connected ? 0 : scope == "short" ? 4 : 5, WarehouseOps.Held(storage, stone.id));
+                Assert.AreEqual(connected, purchased(state));
+                Assert.IsTrue(state.Save());
+                var loaded = new GameState(isolated, true, clock);
+                Assert.AreEqual(connected, purchased(loaded), "Stable progression IDs survive save/load.");
+                var loadedWarehouse = loaded.structures.First(s => s.planetId == warehouse.planetId && s.slot == warehouse.slot);
+                Assert.AreEqual(connected ? 0 : 8, WarehouseOps.Held(loaded.StorageFor(loadedWarehouse), wood.id));
+            }
+            finally
+            {
+                foreach (var copy in copies) UnityEngine.Object.DestroyImmediate(copy);
+                UnityEngine.Object.DestroyImmediate(isolated);
+            }
         }
 
         [Test]

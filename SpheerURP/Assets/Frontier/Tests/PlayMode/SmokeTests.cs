@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Frontier.Services;
 using NUnit.Framework;
@@ -82,7 +83,37 @@ namespace Frontier.Tests
             var chip = rt.Ui.DebugRoot.Q<Button>("find-resource-" + wood.id);
             Assert.IsNotNull(chip, "Economy shop costs should expose the real missing-resource control.");
             Assert.IsNotNull(chip.Q<Label>());
+            var origin = chip.GetFirstAncestorOfType<FrontierModal>();
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
+            yield return null;
+            var overlay = rt.Ui.DebugRoot.Q("shortage-overlay");
+            Assert.IsNotNull(overlay);
+            Assert.AreSame(origin, rt.Ui.DebugRoot.Q<FrontierModal>(), "The originating panel stays underneath the overlay.");
+            var sheet = overlay.Q(className: "fr-shortage");
+            Assert.Less(sheet.resolvedStyle.width, origin.resolvedStyle.width, "Resource help is narrower than a normal panel.");
+            var actions = overlay.Q("shortage-actions");
+            Assert.AreEqual(1, overlay.Query(className: "fr-shortage-actions").ToList().Count,
+                "Source and manual actions share a single horizontal strip.");
+            Assert.AreEqual(FlexDirection.Row, actions.resolvedStyle.flexDirection);
+            var sourceAction = actions.Q<Button>("shortage-build-producer");
+            var manualAction = actions.Q<Button>("shortage-manual");
+            Assert.IsNotNull(sourceAction);
+            Assert.IsNotNull(manualAction);
+            Assert.That(manualAction.layout.y, Is.EqualTo(sourceAction.layout.y).Within(1f));
+            Assert.Greater(manualAction.layout.x, sourceAction.layout.x);
+            foreach (var button in overlay.Query<Button>().ToList())
+            {
+                Assert.AreEqual(0, button.Query<Label>().ToList().Count, "Shortage actions use icons, not full text rows.");
+                Assert.IsFalse(string.IsNullOrEmpty(button.tooltip), "Every icon keeps a localized action label.");
+            }
+            Assert.IsTrue(rt.Ui.HandleBack());
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            Assert.AreSame(origin, rt.Ui.DebugRoot.Q<FrontierModal>(), "Back dismisses only the resource overlay.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
+            yield return null;
+            var produce = rt.Ui.DebugRoot.Q<Button>("shortage-build-producer");
+            Assert.IsNotNull(produce);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = produce; produce.SendEvent(submit); }
             yield return null;
             var source = rt.State.FindResourceSource(wood);
             Assert.AreEqual(ResourceSourceKind.Build, source.kind);
@@ -116,6 +147,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("recipe-" + processed.recipe.id));
 
             ResourceSource remote = null;
+            rt.State.RecordMapDiscoveries(new List<PlanetData>(rt.State.universe.AuthoredPlanets).ConvertAll(p => p.Star));
             foreach (var resource in rt.Db.resources)
             {
                 var candidate = rt.State.FindResourceSource(resource);
@@ -138,9 +170,9 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
                 label.text == UiText.Get("service.ads.test-editor")));
             rt.Ui.DebugReset();
-            rt.Ui.DebugMenu("ranks");
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable") ?? rt.Ui.DebugRoot.Q("leaderboard-publish"),
-                "Ranks must offer opt-in or publishing according to the existing online preference.");
+            rt.Ui.DebugMenu("leaderboard");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("leaderboard-enable"),
+                "The dedicated leaderboard page must preserve explicit online-services opt-in.");
         }
 
         static int ActiveRippleCount()
@@ -165,7 +197,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator SurfaceViewAndResourceObjectsUseLiveActionsWithoutChangingBuildingSlots()
+        public IEnumerator SurfaceViewShowsStructuresAndDebrisWithoutResourceObjectsOrMovingSlots()
         {
             new GameObject("SurfaceInteractionBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -185,12 +217,18 @@ namespace Frontier.Tests
             var structureAnchor = rt.Planet.Spin.Find("Struct_" + lumber.def.id);
             Assert.IsNotNull(structureAnchor);
             Vector3 anchor = structureAnchor.localPosition;
+            var visualRoot = structureAnchor.Find("StructureVisualRoot");
+            Assert.AreEqual(-0.045f, visualRoot.localPosition.y, 0.0001f, "Do not move the building.");
+            var model = visualRoot.GetChild(0);
+            Assert.AreEqual(0f, model.localPosition.y, 0.001f, "Foundation depth must not lift the model.");
+            var mesh = model.GetComponent<MeshFilter>().sharedMesh;
+            Assert.AreEqual(-0.36f, mesh.bounds.min.y, 0.0001f, "The extra foundation extends below its original origin.");
             Vector3 overview = rt.Camera.transform.position;
-            var toggle = rt.Ui.DebugRoot.Q<Button>("world-view-toggle");
-            Assert.IsEmpty(toggle.text, "The world view switch should be an icon, not a text button.");
-            Assert.IsNotNull(toggle.Q(className: "fr-icon"));
-            Assert.AreEqual(UiText.Get("world.view.close"), toggle.tooltip);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            rt.State.DismissFirstSessionGuide();
+            rt.State.Notify();
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("world-view-toggle"), "Zoom gestures replace the camera toggle.");
+            rt.Ui.DebugWorldZoom(1f);
             yield return null;
             yield return null;
             Assert.IsTrue(rt.Planet.CloseView);
@@ -198,29 +236,32 @@ namespace Frontier.Tests
                 "Entering surface view must animate instead of snapping to the destination.");
             yield return new WaitForSecondsRealtime(0.7f);
             Assert.Less(Mathf.Abs(rt.Camera.transform.position.z), Mathf.Abs(overview.z) * 0.5f);
-            Assert.AreEqual(UiText.Get("world.view.orbit"), toggle.tooltip);
-            Assert.AreEqual(anchor, structureAnchor.localPosition, "saved building slots must not move when gathering sites are added");
+            Assert.AreEqual(anchor, structureAnchor.localPosition, "Saved building slots must not move when resource visuals are removed.");
+            foreach (var t in rt.Planet.Spin.GetComponentsInChildren<Transform>(true))
+            {
+                Assert.IsFalse(t.name.StartsWith("Gather_", StringComparison.Ordinal));
+                Assert.AreNotEqual("ResourceSeam", t.name);
+            }
             var resource = rt.State.planet.SpotsFor(MinigameKind.Chop)[0].resource;
-            Assert.IsTrue(rt.Surface.SelectGatherSite(resource));
+            Assert.IsTrue(rt.Surface.SimulateTap(lumber));
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == resource.LocalizedName));
-            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("world.site.gather")));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + resource.id + "-" + MinigameKind.Chop));
             rt.Ui.DebugReset();
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            rt.Ui.DebugWorldZoom(-1f);
             yield return null;
             yield return null;
             Assert.IsFalse(rt.Planet.CloseView);
-            yield return new WaitForSecondsRealtime(0.7f);
-            Assert.AreEqual(overview, rt.Camera.transform.position);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            yield return WaitForCamera(rt.Camera, overview);
+            rt.Ui.DebugWorldZoom(1f);
             yield return new WaitForSecondsRealtime(0.15f);
             Vector3 midTransition = rt.Camera.transform.position;
             Assert.AreNotEqual(overview, midTransition);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            rt.Ui.DebugWorldZoom(-1f);
             yield return null;
-            Assert.Less(Vector3.Distance(midTransition, rt.Camera.transform.position), 0.5f,
+            Assert.Less(Vector3.Distance(midTransition, rt.Camera.transform.position),
+                Vector3.Distance(midTransition, overview) * 0.5f,
                 "Reversing the camera mid-flight must start from its current position.");
-            yield return new WaitForSecondsRealtime(0.7f);
-            Assert.AreEqual(overview, rt.Camera.transform.position);
+            yield return WaitForCamera(rt.Camera, overview);
 
             rt.State.backpack.Set(resource.id, 0);
             bool found = false;
@@ -244,9 +285,10 @@ namespace Frontier.Tests
             Assert.AreEqual(1, costs.Query<Button>().ToList().Count);
             Assert.AreSame(find, find.panel.Pick(find.Q<Label>().worldBound.center),
                 "Tapping the balance must hit the same button as the resource icon.");
-            Assert.AreEqual(UiKit.Size.Touch, find.resolvedStyle.minHeight.value);
-            Assert.That(find.resolvedStyle.height, Is.EqualTo(UiKit.Size.Touch).Within(1f / rt.Ui.DebugPanelScale),
-                "Touch targets may round by at most one rendered pixel at the current panel scale.");
+            Assert.AreEqual(0f, find.resolvedStyle.minHeight.value);
+            float compactHeight = find.resolvedStyle.height;
+            Assert.Greater(compactHeight, 0f);
+            Assert.Less(compactHeight, UiKit.Size.Touch, "Costs retain their tighter chip size.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = find; find.SendEvent(submit); }
             Assert.IsTrue(found, "native keyboard activation must still find the resource");
             costs.RemoveFromHierarchy();
@@ -254,7 +296,15 @@ namespace Frontier.Tests
             var affordable = UiKit.CostRow(new List<ItemAmount> { new ItemAmount(resource, 1) },
                 rt.State, true, _ => Assert.Fail("Owned resources must not expose a missing-item action."));
             Assert.IsNull(affordable.Q<Button>());
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = toggle; toggle.SendEvent(submit); }
+            affordable.style.position = Position.Absolute;
+            affordable.style.left = 200;
+            affordable.style.top = 300;
+            rt.Ui.DebugRoot.Add(affordable);
+            yield return null;
+            Assert.That(affordable[0].resolvedStyle.height, Is.EqualTo(compactHeight).Within(1f / rt.Ui.DebugPanelScale),
+                "Owned and missing resource chips must use the same height.");
+            affordable.RemoveFromHierarchy();
+            rt.Ui.DebugWorldZoom(1f);
             yield return null;
             Assert.IsTrue(rt.Planet.CloseView);
             Assert.IsTrue(rt.Defense.StartWave(1));
@@ -263,6 +313,101 @@ namespace Frontier.Tests
             Assert.IsFalse(rt.Planet.CloseView, "called waves need the full planet visible");
             yield return new WaitForSecondsRealtime(0.7f);
             Assert.AreEqual(overview, rt.Camera.transform.position);
+        }
+
+        [Test]
+        public void RemovingResourceDirectionsPreservesEveryExistingSlotPrefix()
+        {
+            foreach (int count in new[] { 12, 18, 30 })
+            {
+                var existing = WorldSurface.SlotDirections(count + 9);
+                var current = WorldSurface.SlotDirections(count);
+                for (int slot = 0; slot < count; slot++) Assert.AreEqual(existing[slot], current[slot], "slot " + slot);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator BuildingHarvestAccessCollectsSurfaceScrapOnceAndRoutesPendingJobs()
+        {
+            new GameObject("HarvestListBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("intro-skip");
+            if (skip != null)
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            for (int i = 0; i < 240 && rt.Ui.DebugBusy; i++) yield return null;
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            var wood = rt.Db.FindResource("wood");
+            var scrap = rt.Db.scrap;
+            rt.State.backpack.Clear();
+            rt.Ui.DebugShop(1);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-harvest"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-jobs"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + wood.id + "-Chop"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id));
+            var lumber = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            var mine = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Mine), 1);
+            Assert.IsNotNull(lumber); Assert.IsNotNull(mine);
+            yield return null;
+            rt.Ui.DebugReset();
+            Assert.IsTrue(rt.Surface.SelectStructure(mine));
+            var start = rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine");
+            Assert.IsNotNull(start, "Surface scrap remains harvestable by tapping the Mining Rig.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
+            Assert.IsTrue(rt.Ui.DebugBusy);
+            Assert.IsInstanceOf<VeinGame>(rt.Ui.DebugActiveGather);
+            rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
+            deadline = Time.realtimeSinceStartup + 5;
+            while (rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources") == null && Time.realtimeSinceStartup < deadline)
+                yield return null;
+            var collect = rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources");
+            Assert.IsNotNull(collect);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = collect; collect.SendEvent(submit); }
+            int earned = rt.State.Count(scrap);
+            Assert.Greater(earned, 0);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = collect; collect.SendEvent(submit); }
+            Assert.AreEqual(earned, rt.State.Count(scrap));
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            yield return null;
+
+            Assert.IsTrue(rt.Surface.SimulateTap(lumber));
+            start = rt.Ui.DebugRoot.Q<Button>("harvest-start-" + wood.id + "-Chop");
+            Assert.IsNotNull(start);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
+            Assert.IsInstanceOf<NodeGame>(rt.Ui.DebugActiveGather);
+            rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
+            deadline = Time.realtimeSinceStartup + 5;
+            while (rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources") == null && Time.realtimeSinceStartup < deadline)
+                yield return null;
+            collect = rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources");
+            Assert.IsNotNull(collect);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = collect; collect.SendEvent(submit); }
+            Assert.Greater(rt.State.Count(wood), 0);
+
+            mine = rt.State.StructureOfKind(rt.State.planet, StructureKind.Mine);
+            rt.State.DebugSetBuilderJob(mine, 600, 2);
+            yield return null;
+            rt.Ui.DebugReset();
+            Assert.IsTrue(rt.Surface.SelectStructure(mine));
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("harvest-start-" + scrap.id + "-Mine"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("structure-open-jobs"));
+            var pending = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.IsNotNull(pending, "Crews are available from the single HUD construction shortcut.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pending; pending.SendEvent(submit); }
+            Assert.IsFalse(rt.Ui.DebugBusy);
+            Assert.AreEqual(earned, rt.State.Count(scrap));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-finish-" + mine.planetId + "-" + mine.slot));
+        }
+
+        static IEnumerator WaitForCamera(Camera camera, Vector3 target)
+        {
+            float deadline = Time.realtimeSinceStartup + 3f;
+            while (!camera.transform.position.Equals(target) && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.AreEqual(target, camera.transform.position);
         }
 
         [UnityTest]
@@ -339,40 +484,34 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator CommandExplainsXpLevelsAndRoutesToWaveCaller()
+        public IEnumerator ResearchAndShipShowConciseXpAndKeepLearningInHowToPlay()
         {
             new GameObject("XpProgressionBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
             while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
-            rt.Ui.DebugResearch(2);
+            rt.Ui.DebugResearch();
             yield return null;
             var progress = rt.Ui.DebugRoot.Q("player-xp-progression");
             Assert.IsNotNull(progress);
             Assert.IsTrue(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-status",
                 rt.State.PlayerLevel, rt.State.XpToNextLevel, rt.State.PlayerLevel + 1)));
-            Assert.IsTrue(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-help")));
+            Assert.IsFalse(progress.Query<Label>().ToList().Exists(l => l.text == UiText.Get("progression.xp-help")));
             var waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
-            Assert.IsNotNull(waves);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
-            yield return null;
-            var alarm = rt.State.StructureOfKind(rt.State.planet, StructureKind.Alarm);
-            if (alarm == null)
-            {
-                var def = rt.Db.StructureOfKind(StructureKind.Alarm);
-                Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + def.id),
-                    "Players without an Alarm must be sent to its Build entry.");
-                alarm = rt.State.DebugPlace(def, 0);
-                Assert.IsNotNull(alarm);
-                yield return null;
-            }
-            rt.Ui.DebugResearch(1);
-            waves = rt.Ui.DebugRoot.Q<Button>("progression-open-waves");
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = waves; waves.SendEvent(submit); }
-            yield return null;
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q("player-xp-progression"), "The Alarm preview should also explain XP.");
-            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("wave.call-help")));
+            Assert.IsNull(waves, "Research should not repeat a full-row XP tutorial action.");
+            rt.Ui.DebugShip(1);
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("progression-open-waves"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("player-xp-progression"));
+            rt.Ui.DebugMenu("ranks");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("era-progress"));
+            rt.Ui.DebugMenu("tutorial");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("era-progress"));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tutorial.defend.body")));
+            rt.Ui.DebugFirstSessionGuide(0);
+            var help = rt.Ui.DebugRoot.Q<Button>("first-session-guide-help");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = help; help.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("era-progress"));
         }
 
         [Test]
@@ -498,6 +637,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(anchor);
             yield return null;
             Assert.Less(anchor.Find("StructureVisualRoot").localScale.x, 1f);
+            Assert.AreEqual(Vector3.down * 0.045f, anchor.Find("StructureVisualRoot").localPosition);
             state.DebugPlace(state.db.FindStructure("gunner"), 1);
             Assert.AreSame(anchor, rt.Planet.Spin.Find("Struct_warehouse"), "Unrelated builds must not recreate or reanimate existing models.");
             first.record.buildEndUtc = UtcText.Format(DateTime.UtcNow.AddHours(1));
@@ -516,7 +656,8 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
                 .Exists(label => label.text == UiText.Get("structure.builder")));
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
-                .Exists(label => label.text == UiText.Get("structure.offline-time")));
+                .Exists(label => label.text == state.BuilderJobStatus(first)),
+                "The tapped structure keeps its live job status.");
             rt.Ui.DebugReset();
             first.record.buildEndUtc = "";
             state.Notify();
@@ -524,12 +665,16 @@ namespace Frontier.Tests
             anchor = rt.Planet.Spin.Find("Struct_warehouse");
             Assert.IsNull(anchor.Find("ConstructionScan"));
             Assert.Greater(anchor.Find("StructureVisualRoot").localScale.x, 1f, "Completion should pulse, not replay the small build-in.");
-            yield return new WaitForSecondsRealtime(0.7f);
-            Assert.AreEqual(Vector3.one, anchor.Find("StructureVisualRoot").localScale);
+            yield return new WaitForSecondsRealtime(0.8f);
+            Assert.Less(Vector3.Distance(Vector3.one, anchor.Find("StructureVisualRoot").localScale), 0.01f);
             var home = state.planet;
             rt.Planet.Show(home, false, state.TerraformerStageOn(home));
             yield return null;
-            Assert.AreEqual(Vector3.one, rt.Planet.Spin.Find("Struct_warehouse/StructureVisualRoot").localScale,
+            Assert.AreEqual(Vector3.down * 0.045f,
+                rt.Planet.Spin.Find("Struct_warehouse/StructureVisualRoot").localPosition,
+                "Returning to the world keeps the small placement offset.");
+            Assert.Less(Vector3.Distance(Vector3.one,
+                rt.Planet.Spin.Find("Struct_warehouse/StructureVisualRoot").localScale), 0.01f,
                 "Loading or revisiting a world must not replay construction effects.");
         }
 
@@ -627,7 +772,7 @@ namespace Frontier.Tests
                     || entry.key.StartsWith("planet.blurb.belt.", StringComparison.Ordinal))
                     complete.GetEntry(entry.key).Value = "LOCALIZED TERRAIN";
             complete.GetEntry("planet.enum.biome.lush").Value = "LOCALIZED BIOME";
-            complete.GetEntry("nav.command").Value = "LOCALIZED COMMAND";
+            complete.GetEntry("nav.command").Value = "LOCALIZED RESEARCH";
             complete.GetEntry("nav.menu").Value = "LOCALIZED MENU";
             complete.GetEntry("settings.language").Value = "LOCALIZED LANGUAGE";
             complete.GetEntry("guide.skip").Value = "LOCALIZED SKIP";
@@ -675,7 +820,7 @@ namespace Frontier.Tests
                 yield return null;
                 Assert.AreEqual("fr", UiText.LocaleCode);
                 Assert.AreEqual("fr", PlayerPrefs.GetString(UiText.LocalePreferenceKey));
-                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED COMMAND"));
+                Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED RESEARCH"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED MENU"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == "LOCALIZED LANGUAGE"));
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
@@ -703,15 +848,15 @@ namespace Frontier.Tests
                 var captions = runtime.Planet.Spin.GetComponentsInChildren<UIDocument>();
                 Assert.IsTrue(Array.Exists(captions, caption => caption.rootVisualElement.Query<Label>().ToList()
                     .Exists(label => label.text != null && label.text.Contains(existingStructure.LocalizedName.ToUpper()))));
-                runtime.Ui.DebugResearch(2);
+                runtime.Ui.DebugResearch();
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
                     .Exists(label => label.text == research.LocalizedName.ToUpper()));
-                runtime.Ui.DebugResearch(1);
+                runtime.Ui.DebugShip(1);
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
                     .Exists(label => label.text == ladder.LocalizedName.ToUpper()));
                 runtime.Ui.DebugMenu("goals");
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == objective.LocalizedTitle));
-                runtime.Ui.DebugMenu("ranks");
+                runtime.Ui.DebugMenu("tutorial");
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text ==
                     "YOUR FRONTIER: LOCALIZED CONTENT.ERA." + runtime.State.Era.ToString().ToUpperInvariant() + ".NAME"));
                 foreach (var requirement in Frontier.Economy.EraRules.NextRequirements(runtime.State.Era, runtime.State.EraProgress))
@@ -850,7 +995,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(runtime, "FrontierBootstrap did not publish a FrontierRuntime within 30 s");
             Assert.IsNotNull(runtime.Db);
             Assert.IsTrue(UiText.UsesUnityLocalization, "Bootstrap must await the packaged Unity string table before building UI.");
-            Assert.AreEqual("COMMAND", UiText.Get("nav.command"));
+            Assert.AreEqual("RESEARCH", UiText.Get("nav.command"));
             Assert.IsTrue(runtime.Db.UsesImportedEconomy);
             Assert.IsNotNull(runtime.State);
             Assert.IsInstanceOf<SessionClock>(runtime.State.clock,
@@ -875,10 +1020,27 @@ namespace Frontier.Tests
             Assert.IsFalse(haptics.enabledSelf, "The editor must not claim native vibration support.");
             runtime.Ui.DebugReset();
             runtime.Ui.DebugMenu("ranks");
-            Assert.IsNotNull(runtime.Ui.DebugRoot.Q("era-progress"));
+            Assert.IsNull(runtime.Ui.DebugRoot.Q("era-progress"));
             Assert.AreEqual(Frontier.Economy.FrontierEra.Landfall, runtime.State.Era);
-            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era.help", "ranks.enable" })
+            foreach (var key in new[] { "ranks.score", "ranks.record", "ranks.era-label" })
                 Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get(key)), key);
+            Assert.IsFalse(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                .Exists(label => label.text == UiText.Get("ranks.enable")),
+                "Local Records must not contain online leaderboard controls.");
+            runtime.Ui.DebugMenu("leaderboard");
+            Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                .Exists(label => label.text == UiText.Get("ranks.enable")),
+                "Online consent belongs on the separate Leaderboard page.");
+            runtime.Ui.DebugMenu("shards");
+            Assert.IsTrue(runtime.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("shards.balance", runtime.State.ShardBalance.ToString("N0"))));
+            Assert.IsNotNull(runtime.Ui.DebugRoot.Query<Label>().ToList()
+                .Find(label => label.text == UiText.Get("shards.ad.title")));
+            Assert.IsNotNull(runtime.Ui.DebugRoot.Q<Button>("shards-watch-ad"),
+                "Offers remain visible even when native playback is unavailable.");
+            Assert.IsFalse(runtime.Ui.DebugRoot.Q<Button>("shards-watch-ad").enabledInHierarchy);
+            runtime.Ui.DebugMenu("ranks");
+            runtime.Ui.DebugMenu("ranks");
             var score = runtime.State.FrontierScore;
             foreach (var pair in new Dictionary<string, string>
             {
@@ -893,6 +1055,7 @@ namespace Frontier.Tests
                 Assert.IsNotNull(row, pair.Key);
                 Assert.AreEqual(pair.Value, row.Value, pair.Key);
             }
+            runtime.Ui.DebugMenu("tutorial");
             var eraAction = runtime.Ui.DebugRoot.Q<Button>("era-next-action");
             Assert.IsNotNull(eraAction);
             Assert.IsTrue(eraAction.Query<Label>().ToList().Exists(label => label.text == UiText.Get("guide.action.map")));
@@ -1023,9 +1186,9 @@ namespace Frontier.Tests
             }
             var assist = rt.Ui.DebugRoot.Q<Button>("assist-toggle");
             Assert.IsNull(assist, "travel settings must not expose an easy mode");
-            rt.Ui.DebugResearch(2);
+            rt.Ui.DebugResearch();
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.branch")));
-            rt.Ui.DebugResearch(1);
+            rt.Ui.DebugShip(1);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("tools.title")));
             Assert.AreEqual(1, rt.Ui.DebugRoot.Query<Label>().ToList().FindAll(label => label.text == UiText.Get("tools.mining")).Count);
             Assert.IsFalse(rt.Ui.DebugRoot.Query<Button>().ToList().Exists(button =>
@@ -1086,7 +1249,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator OnlineRanksOptInPostsTheActualScoreShowsOwnRankAndAllowsRetry()
+        public IEnumerator OnlineLeaderboardOptInAndPageOpeningUploadTheActualScore()
         {
             new GameObject("RanksBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -1100,7 +1263,7 @@ namespace Frontier.Tests
             var services = new FrontierServices(consent, unavailable, unavailable, provider, provider,
                 unavailable, unavailable, unavailable, new LocalTimeService(), unavailable, "Lifetime_Earnings_Leaderboard");
             rt.Ui.DebugSetServices(services);
-            rt.Ui.DebugMenu("ranks");
+            rt.Ui.DebugMenu("");
             void Press(string name)
             {
                 var button = rt.Ui.DebugRoot.Q<Button>(name);
@@ -1108,6 +1271,9 @@ namespace Frontier.Tests
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = button; button.SendEvent(submit); }
             }
             Assert.AreEqual(0, provider.signIns + provider.submissions + provider.reads);
+            Press("menu-leaderboard");
+            Assert.AreEqual(0, provider.signIns + provider.submissions + provider.reads,
+                "Opening the page does not bypass online-services opt-in.");
             Press("leaderboard-enable");
             yield return null;
             Assert.IsTrue(consent.Current.onlineServicesAllowed);
@@ -1119,24 +1285,30 @@ namespace Frontier.Tests
             Assert.AreEqual(1, provider.reads);
             Assert.AreEqual(UiText.Get("ranks.your-rank", 27, provider.score.ToString("N0")),
                 rt.Ui.DebugRoot.Q<Label>("leaderboard-player-rank").text);
-            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l =>
-                l.text == UiText.Get("ranks.entry", 1, UiText.Get("service.leaderboard.unknown-pilot"))));
+            var podium = rt.Ui.DebugRoot.Q("leaderboard-podium");
+            Assert.IsNotNull(podium, "The top three have a distinct podium.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("leaderboard-publish"), "Opening the page replaces manual posting.");
+            Assert.IsTrue(podium.Query<Label>().ToList().Exists(l =>
+                l.text == UiText.Get("service.leaderboard.unknown-pilot")));
 
             provider.pending = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
-            Press("leaderboard-publish");
-            Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>("leaderboard-publish").enabledSelf);
+            rt.Ui.DebugMenu("");
+            Press("menu-leaderboard");
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("leaderboard-retry"), "Loading starts automatically and exposes no extra upload action.");
             Assert.AreEqual(2, provider.submissions);
             provider.pending.SetResult(ServiceResult<LeaderboardEntry>.Failed("Network unavailable"));
             yield return null;
-            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("leaderboard-publish").enabledSelf);
+            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("leaderboard-retry").enabledSelf);
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text.Contains("Network unavailable")));
             Assert.AreEqual(1, provider.reads, "A failed submission cannot claim a successful refresh.");
             provider.pending = null;
-            Press("leaderboard-publish");
+            Press("leaderboard-retry");
             yield return null;
             Assert.AreEqual(2, provider.reads);
+
             provider.pending = new TaskCompletionSource<ServiceResult<LeaderboardEntry>>();
-            Press("leaderboard-publish");
+            rt.Ui.DebugMenu("");
+            Press("menu-leaderboard");
             consent.SavePreferences(false, false, false);
             consent.SavePreferences(false, false, true);
             provider.pending.SetResult(ServiceResult<LeaderboardEntry>.Success(
@@ -1559,8 +1731,381 @@ namespace Frontier.Tests
             runtime.Ui.DebugReset();
         }
 
+#if UNITY_EDITOR
         [UnityTest]
-        public IEnumerator StartupIntroSkipsWithoutProgressionAndRepeatArrivalOmitsTheLogo()
+        public IEnumerator DeviceSimulatorPreviewWheelReachesWorldAndMapWithoutLegacyMouseInput()
+        {
+            var simulatorType = typeof(UnityEditor.DeviceSimulation.DeviceSimulatorPlugin).Assembly
+                .GetType("UnityEditor.DeviceSimulation.SimulatorWindow", true);
+            var window = UnityEditor.EditorWindow.GetWindow(simulatorType);
+            window.Show();
+            window.Focus();
+            try
+            {
+                new GameObject("SimulatorWheelBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                deadline = Time.realtimeSinceStartup + 20;
+                while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+                rt.State.DismissFirstSessionGuide();
+                rt.Ui.DebugReset();
+                rt.Planet.Zoom01 = 0f;
+                yield return new WaitForSecondsRealtime(1f);
+                var view = window.rootVisualElement.Query<VisualElement>().ToList()
+                    .FirstOrDefault(element => element.GetType().FullName == "UnityEditor.DeviceSimulation.DeviceView");
+                Assert.IsNotNull(view, "Exercise Unity's actual Simulator preview, not a stand-in panel.");
+                Assert.Greater(view.worldBound.width, 0f);
+                string lastTarget = "";
+                Assert.IsTrue(window.rootVisualElement.Query<Label>().ToList()
+                    .Any(label => label.text.StartsWith("Scroll over the simulated screen")),
+                    "Unity must discover and attach the Frontier Simulator plugin.");
+                rt.Ui.DebugRoot.RegisterCallback<WheelEvent>(evt =>
+                {
+                    var target = evt.target as VisualElement;
+                    lastTarget = target == null ? "(none)" : target.name + " at " + evt.mousePosition;
+                }, TrickleDown.TrickleDown);
+                void Wheel(float delta)
+                {
+                    using (var evt = WheelEvent.GetPooled(new Event { type = EventType.ScrollWheel,
+                        mousePosition = view.worldBound.center, delta = new Vector2(0f, delta) }))
+                    {
+                        evt.target = view;
+                        view.SendEvent(evt);
+                    }
+                }
+                Wheel(-3f);
+                yield return null;
+                Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f,
+                    "The actual Simulator preview tree must forward wheel events to the runtime panel.");
+                Wheel(3f);
+                yield return null;
+                Assert.AreEqual(0f, rt.Planet.Zoom01, 0.001f);
+                Wheel(3f);
+                yield return null;
+                Wheel(3f);
+                Assert.IsTrue(rt.Ui.DebugMapMinimal, "Outward Simulator scrolling must enter the minimal map.");
+                yield return new WaitForSecondsRealtime(0.8f);
+                Wheel(-3f);
+                yield return new WaitForSecondsRealtime(1.4f);
+                Assert.IsFalse(rt.Ui.DebugMapOpen, "Simulator scrolling must also reach the map's return gesture. Last target: " + lastTarget);
+                rt.Ui.DebugShop(0);
+                yield return null;
+                var shopScroll = rt.Ui.DebugRoot.Q<FrontierModal>().Q<ScrollView>();
+                Assert.IsNotNull(shopScroll);
+                float scrollBefore = shopScroll.scrollOffset.y;
+                Wheel(30f);
+                yield return null;
+                Assert.Greater(shopScroll.scrollOffset.y, scrollBefore,
+                    "Simulator wheel input over a shop must scroll its real content, not only be ignored by zoom.");
+                Assert.IsFalse(rt.Ui.DebugMapOpen, "Wheel events over the shop must not leak into world zoom.");
+            }
+            finally { window.Close(); }
+        }
+#endif
+
+        [UnityTest]
+        public IEnumerator WorldOverzoomTransitionsToMinimalMapAndControlsStayOptional()
+        {
+            new GameObject("WorldZoomBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            yield return null;
+            var skip = rt.Ui.DebugRoot.Q<Button>("intro-skip");
+            if (skip != null)
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = skip; skip.SendEvent(submit); }
+            deadline = Time.realtimeSinceStartup + 15;
+            while (rt.Ui.DebugBusy && Time.realtimeSinceStartup < deadline) yield return null;
+            rt.State.DismissFirstSessionGuide();
+            rt.Ui.DebugReset();
+            rt.Planet.Zoom01 = 0f;
+            yield return new WaitForSecondsRealtime(0.7f);
+            Vector3 orbit = rt.Camera.transform.position;
+            var wheelTarget = rt.Ui.DebugRoot.Q("world-zoom-input");
+            Assert.IsNotNull(wheelTarget);
+            Assert.AreSame(wheelTarget, rt.Ui.DebugRoot.panel.Pick(rt.Ui.DebugRoot.worldBound.center),
+                "The world background must receive real pointer wheel events, not only direct debug calls.");
+            void Wheel(float delta, VisualElement target)
+            {
+                using (var evt = WheelEvent.GetPooled(new Event { type = EventType.ScrollWheel, delta = new Vector2(0, delta) }))
+                { evt.target = target; target.SendEvent(evt); }
+            }
+            Wheel(-3f, wheelTarget);
+            Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f, "Scroll up zooms toward the surface.");
+            rt.Ui.DebugPollWorldWheel(1f, new Vector2(ScreenMetrics.Width / 2f, ScreenMetrics.Height / 2f));
+            Assert.AreEqual(0.12f, rt.Planet.Zoom01, 0.001f, "Native and polled input must not double-count a frame.");
+            yield return null;
+            rt.Ui.DebugPollWorldWheel(1f, new Vector2(ScreenMetrics.Width / 2f, ScreenMetrics.Height / 2f));
+            Assert.AreEqual(0.24f, rt.Planet.Zoom01, 0.001f,
+                "The active legacy mouse-input path works without any UI Toolkit wheel event.");
+            yield return null;
+            rt.Ui.DebugPollWorldWheel(-1f, new Vector2(ScreenMetrics.Width / 2f, ScreenMetrics.Height / 2f));
+            yield return null;
+            Wheel(3f, wheelTarget);
+            Assert.AreEqual(0f, rt.Planet.Zoom01, 0.001f, "Scroll down zooms toward orbit.");
+            yield return null;
+            Wheel(3f, wheelTarget);
+            Assert.IsFalse(rt.Ui.DebugMapOpen);
+            yield return null;
+            Wheel(3f, wheelTarget);
+            Assert.IsTrue(rt.Ui.DebugMapMinimal, "Continuing to scroll out opens the same minimal map as touch.");
+            yield return new WaitForSecondsRealtime(0.8f);
+            Wheel(-3f, rt.Ui.DebugRoot.Q("map-viewport"));
+            yield return new WaitForSecondsRealtime(1.4f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Scroll up at the closest minimal map level returns to the world.");
+            rt.Ui.DebugReset();
+            var placed = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            yield return null;
+            rt.Ui.DebugTapStructure(placed);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            rt.Ui.DebugWorldZoom(0.1f);
+            Assert.AreEqual(0.1f, rt.Planet.Zoom01, 0.001f, "A selected structure must not block world zoom.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q(className: "fr-popup"), "Zooming the world dismisses its anchored popup.");
+            rt.Ui.DebugWorldZoom(4f);
+            Assert.AreEqual(1f, rt.Planet.Zoom01, "The old surface endpoint is the closest boundary.");
+            rt.Ui.DebugWorldZoom(-1f);
+            Assert.AreEqual(0f, rt.Planet.Zoom01);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Reaching the orbit boundary alone does not open the map.");
+            rt.Ui.DebugWorldZoom(-0.1f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Allow a little intentional overzoom.");
+            rt.Ui.DebugWorldZoom(0.01f);
+            rt.Ui.DebugWorldZoom(-0.25f);
+            Assert.IsTrue(rt.Ui.DebugMapMinimal);
+            var map = rt.Ui.DebugRoot.Q(className: "fr-map");
+            Assert.Less(map.resolvedStyle.opacity, 1f, "Do not snap straight to a fully opaque map.");
+            yield return new WaitForSecondsRealtime(0.8f);
+            Assert.AreEqual(1f, rt.Planet.MapZoomBlend);
+            Assert.AreEqual(0f, rt.Planet.Zoom01, "Map transition never changes the stored zoom endpoints.");
+            Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-map-card").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.None, rt.Ui.DebugRoot.Q(className: "fr-map-search").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q("map-location-bar").resolvedStyle.display);
+            var minimalAxes = rt.Ui.DebugMapOrbitAxes(rt.State.planet);
+            Assert.AreEqual(0.65f, minimalAxes.y / minimalAxes.x, 0.0001f);
+            var info = rt.Ui.DebugRoot.Q<Button>("map-show-controls");
+            Assert.IsTrue(info.Query<Label>().ToList().Any(label => label.text == "Info"));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = info; info.SendEvent(submit); }
+            yield return null;
+            var fullAxes = rt.Ui.DebugMapOrbitAxes(rt.State.planet);
+            Assert.AreEqual(minimalAxes.y / minimalAxes.x, fullAxes.y / fullAxes.x, 0.0001f,
+                "Showing or hiding map info may resize the chart uniformly, never stretch its orbits vertically.");
+            var hideInfo = rt.Ui.DebugRoot.Q<Button>("map-hide-controls");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = hideInfo; hideInfo.SendEvent(submit); }
+            yield return null;
+            var location = rt.Ui.DebugRoot.Q<Label>("map-location");
+            Assert.AreEqual(UiText.Get("map.location.planet", rt.State.planet.Name, rt.State.planet.Star.Name), location.text);
+            rt.Ui.DebugMapZoomStep(false);
+            Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
+            Assert.AreEqual(UiText.Get("map.location.system", rt.State.planet.Star.Name), location.text);
+            rt.Ui.DebugMapZoomStep(false);
+            Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
+            StringAssert.Contains("Sector", location.text);
+            var controls = rt.Ui.DebugRoot.Q<Button>("map-show-controls");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = controls; controls.SendEvent(submit); }
+            yield return null;
+            Assert.IsFalse(rt.Ui.DebugMapMinimal);
+            Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q(className: "fr-map-card").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.Flex, rt.Ui.DebugRoot.Q(className: "fr-map-search").resolvedStyle.display);
+            var hide = rt.Ui.DebugRoot.Q<Button>("map-hide-controls");
+            Assert.IsFalse(hide.worldBound.Overlaps(rt.Ui.DebugRoot.Q("map-switch-view").worldBound),
+                "The clean-map action must not cover the map mode switch.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = hide; hide.SendEvent(submit); }
+            Assert.IsTrue(rt.Ui.DebugMapMinimal);
+            rt.Ui.DebugMapZoomStep(true);
+            rt.Ui.DebugMapZoomStep(true);
+            rt.Ui.DebugMapZoomStep(true);
+            yield return new WaitForSecondsRealtime(1.4f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Further inward zoom on the current system returns to the planet.");
+            Assert.AreEqual(0f, rt.Planet.MapZoomBlend);
+            Assert.AreEqual(orbit, rt.Camera.transform.position);
+            rt.Ui.DebugShop(0);
+            Wheel(30f, wheelTarget);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Shop scrolling must not trigger the wheel-to-map transition.");
+            rt.Ui.DebugWorldZoom(-1f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen, "Scrolling a shop cannot trigger world zoom.");
+            rt.Ui.DebugReset();
+            rt.Ui.DebugWorldZoom(-1f);
+            Assert.IsTrue(rt.Ui.DebugMapOpen);
+            rt.Ui.DebugReset();
+            yield return new WaitForSecondsRealtime(0.8f);
+            Assert.IsFalse(rt.Ui.DebugMapOpen);
+            Assert.AreEqual(0f, rt.Planet.MapZoomBlend, "Interrupting an entry restores the world camera.");
+        }
+
+        [UnityTest]
+        public IEnumerator StructureLevelAccentsArePerInstanceAndDoNotRecolorWoodOrFoundations()
+        {
+            new GameObject("StructureAccentBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            var lumber = rt.Db.StructureOfKind(StructureKind.Lumber);
+            var mine = rt.Db.StructureOfKind(StructureKind.Mine);
+            var first = rt.State.DebugPlace(lumber, 0, 1);
+            var second = rt.State.DebugPlace(mine, 1, 5);
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            yield return null;
+            void Check(StructureSO definition, int level)
+            {
+                var anchor = rt.Planet.Spin.Find("Struct_" + definition.id);
+                var materials = anchor.GetComponentsInChildren<MeshRenderer>()
+                    .SelectMany(renderer => renderer.sharedMaterials).Where(material => material != null).ToList();
+                var accent = materials.First(material => material.name == "Structure_Accent");
+                Assert.Less(Vector4.Distance(StructureAppearance.AccentForLevel(level), accent.GetColor("_BaseColor")), 0.0001f);
+                var foundation = materials.First(material => material.name == "Structure_Base");
+                Assert.Less(Vector4.Distance((Color)new Color32(18, 21, 24, 255), foundation.GetColor("_BaseColor")), 0.0001f);
+                if (definition == lumber)
+                {
+                    var wood = materials.First(material => material.name == "Structure_Wood").GetColor("_BaseColor");
+                    Assert.Greater(wood.r, wood.g);
+                    Assert.Greater(wood.g, wood.b);
+                }
+            }
+            Check(lumber, 1);
+            Check(mine, 5);
+            rt.State.DebugSetStructureLevel(first, 9);
+            yield return null;
+            yield return null;
+            Check(lumber, 9);
+            Check(mine, 5);
+            var source = ModelLibrary.Prefab(lumber.modelKey).GetComponent<MeshRenderer>().sharedMaterials
+                .First(material => material.name == "Structure_Accent");
+            Assert.Less(Vector4.Distance(StructureAppearance.AccentForLevel(1), source.GetColor("_BaseColor")), 0.0001f,
+                "Instance upgrades must not edit the shared model or its level-one shop picture.");
+        }
+
+        [UnityTest]
+        public IEnumerator ResearchXpOverlaysKeepTrackingInteractiveAndDisappearAtTheRequiredLevel()
+        {
+            new GameObject("ResearchLocksBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.DebugSetLevel(1);
+            rt.Ui.DebugResearch();
+            yield return null;
+            ResearchNodeSO locked = null;
+            foreach (var node in rt.Db.research)
+            {
+                if (node.data.tier <= 1 || rt.State.IsResearched(node.data.id)) continue;
+                var card = rt.Ui.DebugRoot.Q("research-" + node.data.id);
+                var overlay = card.Q("research-xp-lock");
+                Assert.IsNotNull(overlay, node.data.id);
+                Assert.IsTrue(overlay.Query<Label>().ToList().Exists(label =>
+                    label.text == UiText.Get("research.xp-lock", node.data.tier)));
+                var track = card.Q<Button>("track-research-" + node.data.id);
+                Assert.IsTrue(track.enabledInHierarchy, "XP gates must not disable explicit tracking.");
+                Assert.AreEqual(card, track.parent);
+                Assert.IsTrue(track.ClassListContains("fr-star-action"));
+                Assert.AreEqual(0, card.Query(className: "fr-project-gates").ToList().Count);
+                if (locked == null) locked = node;
+            }
+            Assert.IsNotNull(locked);
+            var star = rt.Ui.DebugRoot.Q<Button>("track-research-" + locked.data.id);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = star; star.SendEvent(submit); }
+            yield return null;
+            star = rt.Ui.DebugRoot.Q<Button>("track-research-" + locked.data.id);
+            Assert.IsTrue(star.ClassListContains("fr-project-track-on"));
+            Assert.AreEqual(Resources.Load<VectorImage>("Frontier/Icons/star-filled"),
+                star.Q(className: "fr-icon").resolvedStyle.backgroundImage.vectorImage);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = star; star.SendEvent(submit); }
+            Assert.IsFalse(rt.State.HasTrackedProject);
+            rt.State.DebugSetLevel(locked.data.tier);
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q("research-" + locked.data.id).Q("research-xp-lock"));
+            Assert.IsFalse(rt.State.CanResearch(locked), "Removing an XP overlay does not bypass the lab, prerequisites or costs.");
+        }
+
+        [UnityTest]
+        public IEnumerator SylvaUsesAuthoredOceanAndLandAndDebrisEmbedsInTheRenderedTerrain()
+        {
+            new GameObject("TerrainContactBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Planet.Frozen = true;
+            yield return null;
+            MeshRenderer land = null, ocean = null;
+            foreach (var renderer in rt.Planet.Spin.GetComponentsInChildren<MeshRenderer>())
+            {
+                if (renderer.name == "Icosphere") land = renderer;
+                if (renderer.name == "Icosphere.001") ocean = renderer;
+            }
+            Assert.IsNotNull(land);
+            Assert.IsNotNull(ocean);
+            Assert.AreNotSame(land.sharedMaterial, ocean.sharedMaterial);
+            void CheckPalette()
+            {
+                Color water = ocean.sharedMaterial.GetColor("_BaseColor");
+                Color ground = land.sharedMaterial.GetColor("_BaseColor");
+                Assert.Greater(water.b, water.g * 2f);
+                Assert.Greater(ground.g, ground.b * 2f);
+                foreach (var material in new[] { land.sharedMaterial, ocean.sharedMaterial })
+                {
+                    Assert.AreEqual(0f, material.GetFloat("_LandMix"), "Geometry, not a painted pattern, defines continents.");
+                    Assert.AreEqual(material.GetColor("_BaseColor"), material.GetColor("_AltColor"));
+                    Assert.AreEqual(0f, material.GetFloat("_CloudCoverage"), "No painted white patches on Earth.");
+                }
+                var shell = rt.Planet.Root.Find("Atmosphere");
+                Assert.AreEqual(Vector3.one * rt.Planet.Current.AtmosphereScale, shell.localScale,
+                    "Earth keeps the same authored atmosphere diameter as the other planets.");
+                Assert.AreEqual(PlanetData.StandardAtmosphereScale, shell.localScale.x, 0.001f);
+                var atmosphere = shell.GetComponent<MeshRenderer>().sharedMaterial.GetColor("_Color");
+                Assert.AreEqual(atmosphere.r, atmosphere.g, 0.001f);
+                Assert.AreEqual(atmosphere.g, atmosphere.b, 0.001f);
+            }
+            CheckPalette();
+            rt.Planet.SetTerraformingStage(3);
+            CheckPalette();
+            int debris = 0;
+            foreach (Transform anchor in rt.Planet.Spin)
+            {
+                if (!anchor.name.StartsWith("Obstacle_", StringComparison.Ordinal)) continue;
+                debris++;
+                Vector3 direction = anchor.localPosition.normalized;
+                Vector3 terrain = rt.Planet.TerrainPoint(direction);
+                Assert.AreEqual(0.05f, Vector3.Dot(terrain - anchor.localPosition, direction), 0.003f,
+                    anchor.name + " should be slightly embedded in the actual mesh surface.");
+            }
+            Assert.Greater(debris, 0);
+            float min = float.MaxValue, max = 0;
+            for (int i = 0; i < 80; i++)
+            {
+                float y = 1f - 2f * (i + 0.5f) / 80f;
+                float angle = i * 2.399963f;
+                var direction = new Vector3(Mathf.Cos(angle) * Mathf.Sqrt(1f - y * y), y,
+                    Mathf.Sin(angle) * Mathf.Sqrt(1f - y * y));
+                float radius = rt.Planet.TerrainPoint(direction).magnitude;
+                min = Mathf.Min(min, radius); max = Mathf.Max(max, radius);
+            }
+            Assert.Greater(max - min, 0.005f, "Local terrain sampling must see raised land, not only the approximation sphere.");
+            foreach (string id in new[] { "arbor", "mire", "kaos" })
+            {
+                var planet = rt.State.universe.Get(id);
+                rt.State.DebugTeleport(planet);
+                rt.Planet.Show(planet, false);
+                yield return null;
+                int count = 0;
+                foreach (Transform anchor in rt.Planet.Spin)
+                {
+                    if (!anchor.name.StartsWith("Obstacle_", StringComparison.Ordinal)) continue;
+                    count++;
+                    Vector3 direction = anchor.localPosition.normalized;
+                    Assert.AreEqual(0.05f,
+                        Vector3.Dot(rt.Planet.TerrainPoint(direction) - anchor.localPosition, direction), 0.003f,
+                        id + ": spawn placement must survive the planet's first-frame scale update.");
+                }
+                Assert.AreEqual(rt.State.ObstaclesOn(planet).Count, count, id);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator StartupIntroCannotSkipOrbitAndRepeatArrivalOmitsTheLogoWithoutProgression()
         {
             Assert.IsFalse(TravelPrefs.IntroSeen);
             new GameObject("IntroTestBootstrap").AddComponent<FrontierBootstrap>();
@@ -1579,7 +2124,9 @@ namespace Frontier.Tests
             var state = GameState.I;
             string planet = state.planet.Id;
             int fuel = state.Count(state.db.fuel), level = state.PlayerLevel, slots = state.SlotsUsed;
-            Assert.IsTrue(ui.HandleBack(), "Back skips the first-launch logo.");
+            Assert.IsNull(ui.DebugRoot.Q("intro-skip"));
+            Assert.IsTrue(ui.HandleBack(), "Back is consumed without skipping the first-launch presentation.");
+            Assert.IsNull(FrontierRuntime.Current);
             while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
             var runtime = FrontierRuntime.Current;
             Assert.IsNotNull(runtime);
@@ -1598,16 +2145,10 @@ namespace Frontier.Tests
             ui.StartCoroutine(RepeatArrival());
             yield return null;
             Assert.IsNull(ui.DebugRoot.Q("intro-logo"), "Repeat launches use the short arrival, not the logo sequence.");
-            var skip = ui.DebugRoot.Q<Button>("travel-skip-cinematic");
-            Assert.IsNotNull(skip);
-            using (var submit = NavigationSubmitEvent.GetPooled())
-            {
-                submit.target = skip;
-                skip.SendEvent(submit);
-            }
-            while (ui.DebugRoot.Q("travel-skip-cinematic") != null && Time.realtimeSinceStartup < deadline)
-                yield return null;
-            float revealDeadline = Time.realtimeSinceStartup + 2f;
+            Assert.IsNull(ui.DebugRoot.Q<Button>("travel-skip-cinematic"));
+            Assert.IsTrue(ui.HandleBack(), "Back cannot skip the orbital approach.");
+            Assert.IsFalse(repeatComplete);
+            float revealDeadline = Time.realtimeSinceStartup + 7f;
             do
             {
                 yield return null;
@@ -1616,35 +2157,67 @@ namespace Frontier.Tests
                 Mathf.Abs(ui.DebugRoot.Q<VisualElement>(className: "fr-topbar").resolvedStyle.translate.y) > 0.01f ||
                 Mathf.Abs(ui.DebugRoot.Q<VisualElement>(className: "fr-dock").resolvedStyle.translate.y) > 0.01f) &&
                 Time.realtimeSinceStartup < revealDeadline);
-            Assert.IsTrue(repeatComplete, "The short arrival must finish and release input.");
+            Assert.IsTrue(repeatComplete, "The full repeat arrival must finish and release input.");
             Assert.AreEqual(planet, state.planet.Id);
             Assert.AreEqual(fuel, state.Count(state.db.fuel));
             Assert.AreEqual(level, state.PlayerLevel);
             Assert.AreEqual(slots, state.SlotsUsed);
             Assert.AreEqual(cameraOrigin, runtime.Camera.transform.position,
-                "Skipping an arrival cinematic must restore the camera after any touchdown settle.");
+                "The unskippable arrival must restore the camera after touchdown.");
             Assert.IsNull(ui.DebugRoot.Q("arrival-intro"));
             Assert.IsNull(ui.DebugRoot.Q("travel-skip-cinematic"));
             Assert.IsNull(Object.FindFirstObjectByType<ShipRig>());
             Assert.AreEqual(0f, ui.DebugRoot.Q<VisualElement>(className: "fr-topbar").resolvedStyle.translate.y, 0.01f);
             Assert.AreEqual(0f, ui.DebugRoot.Q<VisualElement>(className: "fr-dock").resolvedStyle.translate.y, 0.01f);
             Vector3 naturalCameraOrigin = runtime.Camera.transform.position;
-            bool naturalArrivalComplete = false, observedTouchdownImpulse = false;
+            bool naturalArrivalComplete = false, observedTouchdownImpulse = false, observedLandingBoost = false, observedBoostCutoff = false;
             IEnumerator NaturalArrival()
             {
                 yield return ui.PlayArrivalIntro(false);
                 naturalArrivalComplete = true;
             }
             ui.StartCoroutine(NaturalArrival());
-            float naturalDeadline = Time.realtimeSinceStartup + 3f;
+            bool flewLeft = false, flewRight = false, flewBelow = false, observedCruise = false;
+            float arrivalStarted = Time.realtimeSinceStartup;
+            float naturalDeadline = arrivalStarted + 7f;
             while (!naturalArrivalComplete && Time.realtimeSinceStartup < naturalDeadline)
             {
                 if (Vector3.Distance(naturalCameraOrigin, runtime.Camera.transform.position) > 0.0001f)
                     observedTouchdownImpulse = true;
+                var lander = Object.FindFirstObjectByType<ShipRig>();
+                if (lander != null)
+                {
+                    Assert.IsNull(ui.DebugRoot.Q("travel-skip-cinematic"));
+                    Assert.IsTrue(ui.HandleBack(), "Repeated Back presses must never end the flight.");
+                    observedLandingBoost |= lander.LandingThrust > 0.4f;
+                    observedBoostCutoff |= observedLandingBoost && lander.LandingThrust == 0f;
+                    var center = runtime.Planet.Spin.position;
+                    var shipScreen = runtime.Camera.WorldToViewportPoint(lander.transform.position);
+                    var centerScreen = runtime.Camera.WorldToViewportPoint(center);
+                    flewLeft |= shipScreen.x < centerScreen.x - 0.1f;
+                    flewRight |= shipScreen.x > centerScreen.x + 0.1f;
+                    flewBelow |= shipScreen.y < centerScreen.y - 0.1f;
+                    observedCruise |= lander.Throttle > 0.4f && lander.Gear < 0.1f;
+                    var air = lander.transform.Find("Hull/LandingAir_1");
+                    if (air != null && lander.LandingThrust > 0f)
+                        Assert.Greater(Vector3.Dot(-air.forward, -lander.transform.up), 0.99f);
+                    if (lander.Gear == 1f && lander.Throttle == 0f)
+                    {
+                        Assert.Greater(shipScreen.y, centerScreen.y);
+                        Assert.Greater(Vector3.Dot(lander.transform.forward, runtime.Camera.transform.right), 0.99f);
+                    }
+                }
                 yield return null;
             }
             Assert.IsTrue(naturalArrivalComplete, "The natural arrival must finish and release input.");
+            Assert.Greater(Time.realtimeSinceStartup - arrivalStarted, 4.6f);
+            Assert.IsTrue(flewLeft && flewRight && flewBelow, "The ship makes a full loop, not just a vertical drop.");
+            Assert.IsTrue(observedCruise, "The orbital approach flies with retracted gear and rear engines.");
             Assert.IsTrue(observedTouchdownImpulse, "Touchdown should produce a visible, bounded camera settle.");
+            Assert.IsTrue(observedLandingBoost);
+            Assert.IsTrue(observedBoostCutoff, "Air boosters shut off at touchdown.");
+            Assert.AreEqual(planet, state.planet.Id);
+            Assert.AreEqual(fuel, state.Count(state.db.fuel));
             Assert.AreEqual(naturalCameraOrigin, runtime.Camera.transform.position,
                 "The camera must settle back to its exact origin.");
             var menu = ui.DebugRoot.Q<Button>("menu-button");
@@ -1751,6 +2324,17 @@ namespace Frontier.Tests
             var rt = FrontierRuntime.Current;
             Assert.IsNotNull(rt);
             for (int i = 0; i < 10; i++) yield return null;
+            yield return null;
+            var guide = rt.Ui.DebugRoot.Q(className: "fr-guide-card");
+            var cameraButton = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.AreEqual(UiKit.Space.S16, guide.resolvedStyle.left, 1);
+            Assert.AreEqual(UiKit.Space.S16, guide.resolvedStyle.right, 1);
+            Assert.IsTrue(guide.worldBound.Overlaps(cameraButton.worldBound), "The full-width tutorial covers the crew button.");
+            Assert.Greater(guide.parent.IndexOf(guide), cameraButton.parent.IndexOf(cameraButton));
+            Assert.IsFalse(cameraButton.enabledInHierarchy, "A covered crew control must not accept keyboard input.");
+            var guideSkip = rt.Ui.DebugRoot.Q<Button>("first-session-guide-skip");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = guideSkip; guideSkip.SendEvent(submit); }
+            Assert.IsTrue(cameraButton.enabledInHierarchy);
             var lumber = rt.Db.StructureOfKind(StructureKind.Lumber);
             foreach (var cost in lumber.buildCost) rt.State.backpack.Set(cost.resource.id, cost.amount);
             rt.Ui.DebugFirstSessionGuideShop(0);
@@ -1781,6 +2365,16 @@ namespace Frontier.Tests
             rt.State.backpack.Set(rt.Db.fuel.id, 0);
             rt.State.Notify();
             Assert.IsNull(rt.Ui.DebugRoot.Q("first-session-cue-4"), "Do not point at the disabled wave button.");
+
+            rt.Ui.DebugFirstSessionGuideAction(6);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.ResearchLab).id));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("first-session-cue-6"));
+            rt.Ui.DebugReset();
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.ResearchLab), 3);
+            rt.Ui.DebugFirstSessionGuideAction(6);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"), "An existing lab opens technology in its popup.");
+            rt.Ui.DebugFirstSessionGuideAction(7);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("ship-navigation"));
 
             rt.Ui.DebugReset();
             rt.State.DismissFirstSessionGuide();
@@ -1902,6 +2496,86 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator ConstructionAndUpgradeTimersCanBeFinishedFromStructureAndBuildCards()
+        {
+            new GameObject("DirectTimerFinishBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            Assert.IsTrue(rt.State.TryCreateCloudSaveSnapshot(out var snapshot, out var error), error);
+            snapshot.wallet.RemoveAll(entry => entry.currency == "shards");
+            snapshot.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+            Assert.IsTrue(rt.State.TryRestoreCloudSave(snapshot, out error), error);
+            var structure = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Refinery), 0);
+            for (int surface = 0; surface < 2; surface++)
+            {
+                rt.State.DebugSetBuilderJob(structure, 600, surface == 0 ? 0 : 2);
+                yield return null;
+                if (surface == 0) rt.Ui.DebugTapStructure(structure);
+                else rt.Ui.DebugShop(0);
+                yield return null;
+                string buttonName = "builder-finish-" + structure.planetId + "-" + structure.slot;
+                var finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+                Assert.IsNotNull(finish, "Finish must be available without navigating to Construction Jobs.");
+                Assert.IsTrue(finish.enabledInHierarchy);
+                int before = rt.State.ShardBalance;
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = finish; finish.SendEvent(submit); }
+                Assert.AreEqual(before, rt.State.ShardBalance, "First tap only confirms.");
+                Assert.IsTrue(rt.State.IsBuilderBusy(structure));
+                Assert.IsTrue(rt.Ui.HandleBack(), "Closing cancels the confirmation.");
+                if (surface == 0) rt.Ui.DebugTapStructure(structure);
+                else rt.Ui.DebugShop(0);
+                finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+                Assert.IsTrue(finish.Query<Label>().ToList().Exists(label =>
+                    label.text == UiText.Get("builders.finish-paid", rt.State.BuilderSkipCost(structure))));
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = finish; finish.SendEvent(submit); }
+                finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+                yield return new WaitForSecondsRealtime(1.1f);
+                Assert.AreSame(finish, rt.Ui.DebugRoot.Q<Button>(buttonName), "Countdowns retain the live control.");
+                int cost = rt.State.BuilderSkipCost(structure);
+                Assert.Greater(cost, 0, "This fixture must exercise a paid finish.");
+                bool discovered = rt.State.IsAtlasDiscovered("structure", structure.def.kind.ToString());
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = finish; finish.SendEvent(submit); }
+                Assert.IsFalse(rt.State.IsBuilderBusy(structure));
+                Assert.IsTrue(rt.State.IsOperational(structure));
+                Assert.AreEqual(0, rt.State.BusyBuilderCount);
+                Assert.AreEqual(before - cost + (discovered ? 0 : rt.Db.shardRules.data.atlasStructureShards),
+                    rt.State.ShardBalance);
+                Assert.IsNull(rt.Ui.DebugRoot.Q<Button>(buttonName));
+                Assert.AreEqual(surface == 0 ? 1 : 2, structure.level);
+                var persisted = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(Path.Combine(saveDir, "frontier_save.json")));
+                Assert.AreEqual(rt.State.ShardBalance, persisted.wallet.Find(w => w.currency == "shards").amount);
+                rt.Ui.DebugReset();
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator StructureTimerFinishDisablesWithoutShardsAndAfterNaturalCompletion()
+        {
+            new GameObject("UnavailableTimerFinishBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var structure = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Refinery), 0);
+            rt.State.DebugSetBuilderJob(structure, 86400, 2);
+            yield return null;
+            rt.Ui.DebugTapStructure(structure);
+            string buttonName = "builder-finish-" + structure.planetId + "-" + structure.slot;
+            var finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+            Assert.IsNotNull(finish, "Upgrading structures also expose their timer action.");
+            Assert.Greater(rt.State.BuilderSkipCost(structure), rt.State.ShardBalance);
+            Assert.IsFalse(finish.enabledInHierarchy);
+            int before = rt.State.ShardBalance;
+            rt.State.DebugSetBuilderJob(structure, 0);
+            yield return new WaitForSecondsRealtime(1.1f);
+            finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
+            Assert.IsTrue(finish == null || !finish.enabledInHierarchy);
+            Assert.AreEqual(before, rt.State.ShardBalance);
+        }
+
+        [UnityTest]
         public IEnumerator CrewPanelConfirmsFreeFinishAndKeepsTimerControlsStable()
         {
             new GameObject("CrewPanelBootstrap").AddComponent<FrontierBootstrap>();
@@ -1919,6 +2593,8 @@ namespace Frontier.Tests
                 var structure = rt.State.StructureAt(rt.State.planet, 0);
                 Assert.IsTrue(rt.State.IsBuilderBusy(structure));
                 rt.Ui.DebugBuilders();
+                Assert.IsNull(rt.Ui.DebugRoot.Q("construction-reward"),
+                    "Do not offer an ad for a timer the player can already finish free.");
                 string buttonName = "builder-finish-" + structure.planetId + "-" + structure.slot;
                 var finish = rt.Ui.DebugRoot.Q<Button>(buttonName);
                 Assert.IsNotNull(finish);
@@ -2011,7 +2687,8 @@ namespace Frontier.Tests
             Assert.IsTrue(empty.enabledSelf);
             Assert.AreEqual(0, rt.State.SlotsUsed);
             rt.Ui.DebugEmptyPackAction();
-            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-tabs"), "No gatherer should lead to the build shop.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id),
+                "No gatherer should lead to its building shop.");
             Assert.AreEqual(0, rt.State.SlotsUsed);
 
             rt.Ui.DebugReset();
@@ -2126,6 +2803,17 @@ namespace Frontier.Tests
                 .Exists(label => label.text == UiText.Get("map.price.manual",
                     (long)preview.totalFuel * GameState.GallonsPerEnergy, originalFuel * GameState.GallonsPerEnergy, preview.totalSeconds)));
             Assert.AreEqual(UiText.Get("map.pin"), rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle").label);
+            yield return null;
+            var travel = rt.Ui.DebugRoot.Q<Button>("map-travel-action");
+            var details = travel.parent.Q<ScrollView>(className: "fr-map-details");
+            Assert.AreSame(travel, travel.parent.ElementAt(travel.parent.childCount - 1), "Travel is the card footer.");
+            Assert.IsNull(travel.GetFirstAncestorOfType<ScrollView>(), "Travel must not scroll with the details.");
+            Assert.LessOrEqual(details.worldBound.yMax, travel.worldBound.yMin + 1);
+            Assert.Greater(details.contentViewport.resolvedStyle.height, 0);
+            float footerY = travel.worldBound.y;
+            details.scrollOffset = new Vector2(0, 10000);
+            yield return null;
+            Assert.AreEqual(footerY, travel.worldBound.y, 1, "Scrolling leaves the route action pinned.");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Toggle>().ToList()
                 .Exists(toggle => toggle.label == UiText.Get("map.autopilot.help")));
             int manualPrice = preview.totalFuel;
@@ -2150,13 +2838,14 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
                 .Exists(label => label.text == UiText.Get("map.search.empty")));
             rt.Ui.DebugMapSearch("12000,-3000");
-            Assert.AreEqual(12000, rt.Ui.DebugMapCenterX, 0.001);
+            Assert.AreNotEqual(12000, rt.Ui.DebugMapCenterX, "Coordinates outside scanned space must be clamped.");
+            double clampedCenter = rt.Ui.DebugMapCenterX;
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
-                .Exists(label => label.text == UiText.Get("map.search.coordinates")));
+                .Exists(label => label.text == UiText.Get("map.search.outside")));
             rt.Ui.DebugMapSearch("not-a-known-system-or-world");
             Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList()
                 .Exists(label => label.text == UiText.Get("map.search.not-found")));
-            Assert.AreEqual(12000, rt.Ui.DebugMapCenterX, 0.001, "Failed searches cannot move the map.");
+            Assert.AreEqual(clampedCenter, rt.Ui.DebugMapCenterX, 0.001, "Failed searches cannot move the map.");
             rt.Ui.DebugReset();
             yield return null;
         }
@@ -2222,7 +2911,718 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator CommandNavigationAndDockCapacityUseTheNewLocalFlow()
+        public IEnumerator ReturnSummaryRendersAndDismissesWithoutChangingStoredOutput()
+        {
+            new GameObject("ReturnSummaryBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            int before = rt.State.Count(rt.Db.FindResource("wood"));
+            rt.State.ReturnItems.Add(new SessionReturnItem { planetId = rt.State.planet.Id, slot = 0 });
+            rt.State.ReturnItems.Add(new SessionReturnItem { planetId = rt.State.planet.Id, slot = 1,
+                resourceId = "wood", amount = 24 });
+            rt.Ui.DebugProject();
+            yield return null;
+            var dismiss = rt.Ui.DebugRoot.Q<Button>("project-dismiss-summary");
+            Assert.IsNotNull(dismiss);
+            Assert.AreEqual(UiText.Get("project.dismiss-summary"), dismiss.Q<Label>(className: "fr-btn-label").text);
+            foreach (var label in rt.Ui.DebugRoot.Q(className: "fr-project-body").Query<Label>(className: "fr-small").ToList())
+                Assert.AreEqual(WhiteSpace.Normal, label.resolvedStyle.whiteSpace, "Return text must wrap rather than clip.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = dismiss; dismiss.SendEvent(submit); }
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q("project-dismiss-summary"));
+            Assert.AreEqual(before, rt.State.Count(rt.Db.FindResource("wood")));
+            Assert.AreEqual(2, rt.State.ReturnItems.Count, "Dismissal hides the report; it never grants or consumes stored output.");
+        }
+
+        [UnityTest]
+        public IEnumerator ConstructionAdsRequireFlagsAndPreserveTheNormalActionOnNoFill()
+        {
+            new GameObject("RewardBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var consent = new ConsentService(new DeletionConsentStore());
+            consent.SavePreferences(false, true, false);
+            var ads = new GameplayAdsFixture();
+            var unavailable = new UnavailableFrontierProvider();
+            rt.Ui.DebugSetServices(new FrontierServices(consent, ads, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable));
+            var rules = ScriptableObject.CreateInstance<GameplayRewardRules>();
+            try
+            {
+                var job = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Warehouse), 0);
+                rt.State.DebugSetBuilderJob(job, 120);
+                rt.Ui.DebugGameplayRewardRules(rules);
+                rt.Ui.DebugBuilders();
+                Assert.IsNull(rt.Ui.DebugRoot.Q("construction-reward"));
+                rules.constructionEnabled = true; rules.constructionSeconds = 60;
+                rt.Ui.DebugBuilders();
+                var watch = rt.Ui.DebugRoot.Q<Button>("construction-reward");
+                Assert.IsNotNull(watch);
+                Assert.IsTrue(watch.Query<Label>().ToList().Exists(label => label.text ==
+                    UiText.Get("reward.construction", UiText.Get("duration.minutes-seconds", 1, 0))));
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = watch; watch.SendEvent(submit); }
+                Assert.AreEqual(1, ads.calls);
+                Assert.IsFalse(watch.enabledSelf);
+                ads.pending.SetResult(ServiceResult<RewardedAdResult>.Failed("No fill"));
+                yield return null;
+                Assert.AreEqual("cancelled", rt.State.GameplayReward.state);
+                Assert.Greater(rt.State.BuilderJobSecondsRemaining(job), 100);
+                Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-finish-" + job.planetId + "-" + job.slot));
+            }
+            finally { Object.Destroy(rules); }
+        }
+
+        [UnityTest]
+        public IEnumerator RewardedOffersStayVisibleWithoutNativeAdsAndNeverSimulateRewards()
+        {
+            new GameObject("VisibleRewardOffersBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            Assert.IsTrue(Resources.Load<GameplayRewardRules>("Frontier/GameplayRewardRules").harvestEnabled);
+            rt.State.DismissFirstSessionGuide();
+            rt.Ui.DebugReset();
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("world-view-toggle"));
+            var jobs = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.AreEqual(UIRoot.HudTopInset + UiKit.Space.S16, jobs.resolvedStyle.top, 1);
+            Assert.AreEqual(Resources.Load<VectorImage>("Frontier/Icons/builders"),
+                jobs.Q(className: "fr-icon").resolvedStyle.backgroundImage.vectorImage);
+            var wallet = rt.Ui.DebugRoot.Q<Button>("hud-open-shards");
+            Assert.IsNotNull(wallet);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = wallet; wallet.SendEvent(submit); }
+            var watch = rt.Ui.DebugRoot.Q<Button>("shards-watch-ad");
+            Assert.IsNotNull(watch, "Unavailable playback must not hide the offer.");
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.AreEqual(UiText.Get("reward.platform"), rt.Ui.DebugRoot.Q<Label>("free-shards-ad-status").text);
+            int shards = rt.State.ShardBalance;
+            Assert.IsNull(rt.State.GameplayReward);
+
+            var refinery = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Refinery), 0);
+            rt.State.DebugSetBuilderJob(refinery, 600);
+            yield return null;
+            rt.Ui.DebugTapStructure(refinery);
+            watch = rt.Ui.DebugRoot.Q<Button>("construction-reward");
+            Assert.IsNotNull(watch, "Construction ads belong beside the timer, not only in the crew page.");
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("builder-finish-" + refinery.planetId + "-" + refinery.slot));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("structure-open-jobs"));
+            int remaining = rt.State.BuilderJobSecondsRemaining(refinery);
+            Assert.Greater(remaining, 590);
+            Assert.AreEqual(shards, rt.State.ShardBalance);
+            rt.Ui.DebugGather(MinigameKind.Chop);
+            rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
+            deadline = Time.realtimeSinceStartup + 5;
+            while (rt.Ui.DebugRoot.Q("minigame-result") == null && Time.realtimeSinceStartup < deadline) yield return null;
+            watch = rt.Ui.DebugRoot.Q<Button>("minigame-double-yield");
+            Assert.IsNotNull(watch, "The first harvest should expose the optional bonus, including in Editor.");
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources"));
+            Assert.IsNull(rt.State.GameplayReward);
+            Assert.AreEqual(shards, rt.State.ShardBalance);
+        }
+
+        [UnityTest]
+        public IEnumerator BuildAndResearchCardsShowActualModelsWithSmallerUnlockPreviews()
+        {
+            new GameObject("StructurePreviewsBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            foreach (var definition in rt.Db.structures.Where(item => item != null))
+            {
+                var texture = Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + definition.id);
+                Assert.IsNotNull(texture, definition.id + " must have an actual model picture.");
+                Assert.AreEqual(256, texture.width);
+                Assert.AreEqual(256, texture.height);
+            }
+            float buildWidth = 0f;
+            for (int tab = 0; tab < 4; tab++)
+            {
+                rt.Ui.DebugShop(tab);
+                yield return null;
+                var cards = rt.Ui.DebugRoot.Query<VisualElement>().ToList()
+                    .Where(element => element.name != null && element.name.StartsWith("shop-structure-")).ToList();
+                Assert.Greater(cards.Count, 0);
+                foreach (var card in cards)
+                {
+                    string id = card.name.Substring("shop-structure-".Length);
+                    var image = card.Q<Image>("structure-preview-" + id);
+                    Assert.IsNotNull(image, id);
+                    Assert.AreSame(Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + id), image.image);
+                    Assert.AreEqual(PickingMode.Ignore, image.pickingMode);
+                    Assert.Greater(image.resolvedStyle.width, 0f);
+                    var track = card.Q<Button>("track-build-" + id);
+                    var count = card.Q<Label>("shop-count-" + id);
+                    Assert.IsNotNull(track, "Every Build card keeps its tracking star at top right.");
+                    var lockOverlay = card.Q("shop-research-lock");
+                    Assert.AreEqual(lockOverlay == null ? card[0] : card, track.parent);
+                    var content = lockOverlay == null ? card : card[0];
+                    Assert.AreEqual(content[content.childCount - 2], count, "Build count sits just above the purchase row.");
+                    Assert.AreEqual(Align.FlexEnd, count.resolvedStyle.alignSelf);
+                    Assert.Less(track.worldBound.yMin, count.worldBound.yMin);
+                    var place = card.Q<Button>("shop-place-" + id);
+                    var shardBuy = card.Q<Button>("shop-shards-" + id);
+                    Assert.IsNotNull(place, "All Build cards expose their normal purchase action.");
+                    Assert.IsNotNull(shardBuy, "All Build cards expose their shard purchase action.");
+                    Assert.AreSame(place.parent, shardBuy.parent, "Both purchase options stay on the same row.");
+                    Assert.LessOrEqual(count.worldBound.yMax, place.worldBound.yMin + 1f,
+                        "The right-aligned count belongs above Place/shards, not below them.");
+                    var definition = rt.Db.FindStructure(id);
+                    if (rt.State.AtLimit(rt.State.planet, definition) || !rt.State.CanBuildHere(definition))
+                    {
+                        Assert.IsFalse(place.enabledInHierarchy, "Visible actions cannot bypass a build gate.");
+                        Assert.IsFalse(shardBuy.enabledInHierarchy, "Shards cannot bypass a build gate.");
+                    }
+                    buildWidth = image.resolvedStyle.width;
+                }
+            }
+            rt.State.DebugSetLevel(10);
+            rt.Ui.DebugResearch();
+            yield return null;
+            int structureUnlocks = 0, recipeUnlocks = 0;
+            foreach (var node in rt.Db.research.Where(item => item != null && !rt.State.IsResearched(item.data.id)))
+            {
+                var card = rt.Ui.DebugRoot.Q("research-" + node.data.id);
+                Assert.IsNotNull(card);
+                foreach (string unlock in node.data.unlocks)
+                {
+                    if (unlock.StartsWith("structure:"))
+                    {
+                        string id = unlock.Substring("structure:".Length);
+                        var image = card.Q<Image>("structure-preview-" + id);
+                        Assert.IsNotNull(image, node.data.id + " previews " + id);
+                        Assert.AreSame(Resources.Load<Texture2D>("Frontier/StructureThumbnails/" + id), image.image);
+                        Assert.Less(image.resolvedStyle.width, buildWidth, "Research previews must be smaller than Build.");
+                        structureUnlocks++;
+                    }
+                    if (unlock.StartsWith("recipe:"))
+                    {
+                        Assert.IsNotNull(card.Q(className: "fr-unlock-icon"), "Recipe unlocks show their output glyphs.");
+                        recipeUnlocks++;
+                    }
+                }
+            }
+            Assert.Greater(structureUnlocks, 0);
+            Assert.Greater(recipeUnlocks, 0);
+        }
+
+        [UnityTest]
+        public IEnumerator BuildShopSortsUnlockedCardsFirstAndResearchLocksLinkToTheRequiredNode()
+        {
+            new GameObject("ShopResearchLocksBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.DebugSetLevel(1);
+            Button shortcut = null;
+            string prerequisite = null;
+            int overlays = 0;
+            for (int tab = 0; tab < 4; tab++)
+            {
+                rt.Ui.DebugShop(tab);
+                yield return null;
+                bool sawLocked = false;
+                foreach (var card in rt.Ui.DebugRoot.Query<VisualElement>().ToList()
+                    .Where(element => element.name != null && element.name.StartsWith("shop-structure-")))
+                {
+                    string id = card.name.Substring("shop-structure-".Length);
+                    var definition = rt.Db.FindStructure(id);
+                    bool locked = rt.State.BuildLockReason(definition) != null;
+                    if (locked) sawLocked = true;
+                    else Assert.IsFalse(sawLocked, "Unlocked structures must precede locked structures in every category.");
+                    var overlay = card.Q("shop-research-lock");
+                    bool needsResearch = !string.IsNullOrEmpty(definition.unlockResearch) &&
+                        !rt.State.IsResearched(definition.unlockResearch);
+                    Assert.AreEqual(needsResearch, overlay != null, id);
+                    if (!needsResearch) continue;
+                    overlays++;
+                    Assert.IsNotNull(overlay.Q(className: "fr-icon"));
+                    Assert.IsFalse(card.Q<Button>("shop-place-" + id).enabledInHierarchy);
+                    Assert.IsFalse(card.Q<Button>("shop-shards-" + id).enabledInHierarchy);
+                    Assert.IsTrue(card.Q<Button>("track-build-" + id).enabledInHierarchy);
+                    shortcut = overlay.Q<Button>("shop-required-research-" + id);
+                    prerequisite = definition.unlockResearch;
+                    Assert.IsTrue(shortcut.enabledInHierarchy);
+                }
+            }
+            Assert.Greater(overlays, 0);
+            Assert.IsNotNull(shortcut);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shortcut; shortcut.SendEvent(submit); }
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("research-" + prerequisite), "The shortcut opens the actual required research.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shop-research-lock"));
+        }
+
+        [UnityTest]
+        public IEnumerator ResearchLabContainsWorkingTechToolsAndLabTabs()
+        {
+            new GameObject("InlineLabBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var lab = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.ResearchLab), 0);
+            rt.State.DebugSetStructureLevel(lab, 10);
+            rt.State.DebugSetLevel(10);
+            foreach (var resource in rt.Db.resources) rt.State.backpack.Set(resource.id, 100000);
+            yield return null;
+            rt.Ui.DebugTapStructure(lab);
+            var nav = rt.Ui.DebugRoot.Q("lab-navigation");
+            Assert.IsNotNull(nav);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q(className: "fr-popup"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Image>(className: "fr-structure-preview-small"),
+                "The local lab uses the same compact unlock pictures as the Research dock.");
+            var filter = rt.Ui.DebugRoot.Q<DropdownField>();
+            Assert.IsNotNull(filter);
+            if (filter.choices.Count > 1)
+            {
+                filter.index = 1;
+                Assert.AreEqual(1, rt.Ui.DebugRoot.Q<DropdownField>().index, "Branch filters refresh the lab popup.");
+                rt.Ui.DebugRoot.Q<DropdownField>().index = 0;
+            }
+            var node = rt.Db.research.First(n => n != null && rt.State.CanResearch(n));
+            var card = rt.Ui.DebugRoot.Q("research-" + node.data.id);
+            Assert.IsFalse(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text != null && label.text.Contains("Structure:")), "Unlock copy must not expose catalog identifiers.");
+            var research = card.Query<Button>().ToList().First(b =>
+                b.Query<Label>().ToList().Exists(l => l.text == UiText.Get("research.buy")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = research; research.SendEvent(submit); }
+            Assert.IsTrue(rt.State.IsResearched(node.data.id));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"));
+            nav = rt.Ui.DebugRoot.Q("lab-navigation");
+            var tools = nav.Query<FrontierTab>().ToList()[1];
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = tools; tools.SendEvent(submit); }
+            var ladder = rt.Db.toolLadders.First(l => rt.State.ToolTierLockReason(l) == null);
+            int tier = rt.State.ToolTier(ladder);
+            var toolCard = rt.Ui.DebugRoot.Q("tool-" + ladder.data.id);
+            var upgrade = toolCard.Query<Button>().ToList().First(b =>
+                b.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tools.upgrade")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = upgrade; upgrade.SendEvent(submit); }
+            Assert.AreEqual(tier + 1, rt.State.ToolTier(ladder));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"));
+            nav = rt.Ui.DebugRoot.Q("lab-navigation");
+            var labTab = nav.Query<FrontierTab>().ToList()[2];
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = labTab; labTab.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q<DropdownField>());
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("lab-navigation"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("ship-navigation"));
+        }
+
+        sealed class GameplayAdsFixture : IAdsService, IRewardedAdAvailability
+        {
+            public bool IsConfigured { get { return true; } }
+            public int calls;
+            public string unavailable;
+            public ServiceResult RewardedAvailability(string placement)
+            {
+                return unavailable == null ? ServiceResult.Success() : ServiceResult.InvalidRequest(unavailable);
+            }
+            public TaskCompletionSource<ServiceResult<RewardedAdResult>> pending = new TaskCompletionSource<ServiceResult<RewardedAdResult>>();
+            public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
+            public Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placement) { calls++; return pending.Task; }
+        }
+
+        [UnityTest]
+        public IEnumerator CooldownOffersRemainVisibleAndReenableWithoutReopening()
+        {
+            new GameObject("AdCooldownVisibilityBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var consent = new ConsentService(new DeletionConsentStore());
+            consent.SavePreferences(false, true, false);
+            var ads = new GameplayAdsFixture { unavailable = "Cooldown fixture" };
+            var unavailable = new UnavailableFrontierProvider();
+            rt.Ui.DebugSetServices(new FrontierServices(consent, ads, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable));
+            rt.Ui.DebugMenu("shards");
+            var watch = rt.Ui.DebugRoot.Q<Button>("shards-watch-ad");
+            Assert.IsNotNull(watch);
+            Assert.IsFalse(watch.enabledInHierarchy);
+            Assert.AreEqual("Cooldown fixture", rt.Ui.DebugRoot.Q<Label>("free-shards-ad-status").text);
+            ads.unavailable = null;
+            yield return new WaitForSecondsRealtime(1.1f);
+            Assert.AreSame(watch, rt.Ui.DebugRoot.Q<Button>("shards-watch-ad"));
+            Assert.IsTrue(watch.enabledInHierarchy);
+            Assert.AreEqual(0, ads.calls);
+            Assert.IsNull(rt.State.GameplayReward);
+        }
+
+        [UnityTest]
+        public IEnumerator RewardedOffersAskForConsentAndNeverRequestAdsOnDismissal()
+        {
+            new GameObject("RewardConsentBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var consent = new ConsentService(new DeletionConsentStore());
+            var ads = new GameplayAdsFixture();
+            var unavailable = new UnavailableFrontierProvider();
+            rt.Ui.DebugSetServices(new FrontierServices(consent, ads, unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable));
+            rt.Ui.DebugMenu("shards");
+            yield return null;
+            var watch = rt.Ui.DebugRoot.Q<Button>("shards-watch-ad");
+            Assert.IsNotNull(watch, "An optional offer must be discoverable before advertising opt-in.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = watch; watch.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("rewarded-consent"));
+            Assert.AreEqual(0, ads.calls);
+            Assert.IsTrue(rt.Ui.HandleBack());
+            Assert.IsFalse(consent.Current.adsAllowed);
+            Assert.AreEqual(0, ads.calls);
+            Assert.IsNull(rt.State.GameplayReward);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = watch; watch.SendEvent(submit); }
+            var allow = rt.Ui.DebugRoot.Q<Button>("rewarded-consent-allow");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = allow; allow.SendEvent(submit); }
+            Assert.IsTrue(consent.Current.adsAllowed);
+            Assert.IsFalse(consent.Current.analyticsAllowed);
+            Assert.IsFalse(consent.Current.onlineServicesAllowed);
+            Assert.AreEqual(1, ads.calls);
+            ads.pending.SetResult(ServiceResult<RewardedAdResult>.Failed("No fill"));
+            yield return null;
+            Assert.AreEqual("cancelled", rt.State.GameplayReward.state);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("shards-watch-ad"));
+        }
+
+        [UnityTest]
+        public IEnumerator PlaceAndShardPurchaseShareOneRowAndSelectingShardsDoesNotSpendBeforePlacement()
+        {
+            var seed = new GameState(GameDatabase.Load(), false);
+            Assert.IsTrue(seed.Save());
+            string savePath = Path.Combine(saveDir, "frontier_save.json");
+            var save = SaveSerializer.Instance.DeserializeV2(File.ReadAllText(savePath)).Normalize();
+            save.wallet.Add(new WalletEntry { currency = "shards", amount = 10000 });
+            File.WriteAllText(savePath, SaveSerializer.Instance.Serialize(save));
+            new GameObject("ShardBuildBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Ui.DebugShop(0);
+            yield return null;
+            var card = rt.Ui.DebugRoot.Q("shop-structure-refinery");
+            var place = card.Q<Button>("shop-place-refinery");
+            var buy = card.Q<Button>("shop-shards-refinery");
+            Assert.IsNotNull(place);
+            Assert.IsNotNull(buy);
+            Assert.AreSame(place.parent, buy.parent);
+            Assert.AreEqual(FlexDirection.Row, place.parent.resolvedStyle.flexDirection);
+            Assert.AreEqual(place.worldBound.y, buy.worldBound.y, 1);
+            Assert.LessOrEqual(buy.worldBound.xMax, card.worldBound.xMax);
+            Assert.GreaterOrEqual(buy.worldBound.height, UiKit.Size.Touch - 1, "Allow panel-scale pixel rounding.");
+            int before = rt.State.ShardBalance, count = rt.State.structures.Count;
+            Assert.IsTrue(buy.enabledInHierarchy);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = buy; buy.SendEvent(submit); }
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            Assert.AreEqual(count, rt.State.structures.Count);
+            Assert.IsTrue(rt.Ui.HandleBack());
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            rt.Ui.DebugShop(0);
+            buy = rt.Ui.DebugRoot.Q<Button>("shop-shards-refinery");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = buy; buy.SendEvent(submit); }
+            int cost = rt.State.StructureShardCost(rt.Db.FindStructure("refinery"));
+            rt.Ui.DebugTapBuildSlot(0);
+            Assert.IsTrue(rt.State.IsOperational(rt.State.StructureAt(rt.State.planet, 0)));
+            Assert.AreEqual(before - cost + rt.Db.shardRules.data.atlasStructureShards, rt.State.ShardBalance);
+            rt.Ui.DebugTapBuildSlot(0);
+            Assert.AreEqual(before - cost + rt.Db.shardRules.data.atlasStructureShards, rt.State.ShardBalance);
+        }
+
+        [UnityTest]
+        public IEnumerator ShortagesKeepQuantitiesAndTrackedProjectsWithoutHistoryButtons()
+        {
+            new GameObject("ShortageBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            Assert.IsFalse(rt.Services.Consent.Current.hasDecision, "Isolated saves must not inherit player consent.");
+            rt.State.backpack.Clear();
+            rt.Ui.DebugShip(0);
+            yield return null;
+            var upgrade = rt.Ui.DebugRoot.Q("upgrade-pack");
+            var chip = upgrade.Q<Button>(className: "fr-itemchip-find");
+            Assert.IsNotNull(chip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = chip; chip.SendEvent(submit); }
+            yield return null;
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-previous"));
+            foreach (var label in rt.Ui.DebugRoot.Q(className: "fr-project-body").Query<Label>(className: "fr-small").ToList())
+                Assert.AreEqual(WhiteSpace.Normal, label.resolvedStyle.whiteSpace, "Exact shortfalls must stay readable.");
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Still missing:")));
+            var track = rt.Ui.DebugRoot.Q("shortage-overlay").Q<Button>("shortage-track");
+            Assert.IsTrue(track.parent.ClassListContains("fr-modal-head"), "Tracking uses the header, not another action row.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.AreEqual("pack", rt.State.TrackedProject.id);
+            Assert.IsTrue(track.ClassListContains("fr-project-track-on"), "The overlay header refreshes without being rebuilt.");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.IsFalse(rt.State.HasTrackedProject);
+            Assert.AreEqual(UiText.Get("project.track"), track.tooltip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            rt.Ui.DebugShortage(rt.Db.FindResource("stone"), 17);
+            yield return null;
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text.Contains("Need 17")));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-previous"));
+            Assert.AreEqual(0, rt.State.Count(rt.Db.FindResource("wood")));
+            var close = rt.Ui.DebugRoot.Q<Button>("shortage-close");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = close; close.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            rt.Ui.DebugShortage(rt.Db.FindResource("wood"), 17);
+            var buildSource = rt.Ui.DebugRoot.Q<Button>("shortage-build-producer");
+            Assert.IsNotNull(buildSource);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = buildSource; buildSource.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + rt.Db.StructureOfKind(StructureKind.Lumber).id));
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Lumber), 0);
+            yield return null;
+            rt.Ui.DebugShortage(rt.Db.FindResource("wood"), 17);
+            var produce = rt.Ui.DebugRoot.Q<Button>("shortage-produce");
+            Assert.IsNotNull(produce);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = produce; produce.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("harvest-start-wood-Chop"), "The producer icon opens the real building.");
+            Assert.AreEqual(0, rt.State.Count(rt.Db.FindResource("wood")), "Finding a source never grants resources.");
+            rt.Ui.DebugShortage(rt.Db.FindResource("wood"), 17);
+            var overlay = rt.Ui.DebugRoot.Q("shortage-overlay");
+            using (var down = PointerDownEvent.GetPooled()) { down.target = overlay; overlay.SendEvent(down); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-overlay"), "Tapping the backdrop dismisses only the shortage.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("harvest-start-wood-Chop"));
+            rt.Ui.DebugProject();
+            yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("project-open"));
+            var open = rt.Ui.DebugRoot.Q<Button>("project-open");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = open; open.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-pack"), "Explicitly tracked projects still open their target.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-return"));
+            rt.Ui.DebugMap(null);
+            Assert.IsNull(rt.Ui.DebugRoot.Q("shortage-previous"));
+            rt.Ui.DebugMenu("tutorial");
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("tutorial.map.body")));
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(l => l.text == UiText.Get("network.help")));
+        }
+
+        [UnityTest]
+        public IEnumerator ShortageActionsWrapTogetherOnNarrowPanelsWithoutShrinkingTouchTargets()
+        {
+            new GameObject("ShortageLayoutBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.backpack.Clear();
+            var wood = rt.Db.FindResource("wood");
+            var warehouse = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Warehouse), 0);
+            var storage = rt.State.StorageFor(warehouse);
+            storage.slots[0].resourceId = wood.id;
+            storage.slots[0].count = 12;
+            rt.Ui.DebugShortage(wood, 17);
+            var overlay = rt.Ui.DebugRoot.Q("shortage-overlay");
+            Assert.IsNotNull(overlay);
+            overlay.Q(className: "fr-shortage").style.width = 440;
+            yield return null;
+            yield return null;
+            var actions = overlay.Q("shortage-actions");
+            var buttons = actions.Query<Button>().ToList();
+            Assert.GreaterOrEqual(buttons.Count, 5, "Exercise storage, production and manual actions together.");
+            Assert.AreEqual(Wrap.Wrap, actions.resolvedStyle.flexWrap);
+            Assert.That(buttons[1].layout.y, Is.EqualTo(buttons[0].layout.y).Within(1f),
+                "Actions must fill the row before wrapping, not stack individually.");
+            Assert.Greater(buttons[1].layout.x, buttons[0].layout.x);
+            Assert.Greater(buttons[buttons.Count - 1].layout.y, buttons[0].layout.y,
+                "Extra actions wrap rather than overflow the narrow panel.");
+            foreach (var button in buttons)
+            {
+                Assert.That(button.layout.width, Is.EqualTo(UiKit.Size.Touch).Within(1f));
+                Assert.That(button.layout.height, Is.EqualTo(UiKit.Size.Touch).Within(1f));
+                Assert.GreaterOrEqual(button.layout.x, 0);
+                Assert.LessOrEqual(button.layout.xMax, actions.layout.width + 1);
+            }
+            StringAssert.Contains(rt.State.planet.Name, actions.Q<Button>("shortage-withdraw").tooltip);
+            Assert.AreEqual(12, WarehouseOps.Held(storage, wood.id), "Changing layout never spends stored resources.");
+        }
+
+        [UnityTest]
+        public IEnumerator ResearchOmitsGateShortcutsAndTrackingStarsResumeLiveDestinations()
+        {
+            new GameObject("ProjectControlsBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Ui.DebugResearch();
+            yield return null;
+            var lab = rt.Ui.DebugRoot.Q<Button>("project-local-lab");
+            Assert.IsNull(lab);
+            Assert.AreEqual(0, rt.Ui.DebugRoot.Query(className: "fr-project-gates").ToList().Count,
+                "Research cards retain written requirements and stars, not wrapping shortcut buttons.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>(className: "fr-project-track"));
+            rt.Ui.DebugShop(3);
+            yield return null;
+            yield return null;
+            var definition = rt.Db.StructureOfKind(StructureKind.ResearchLab);
+            var card = rt.Ui.DebugRoot.Q("shop-structure-" + definition.id);
+            Assert.IsNotNull(card, "The Research Lab remains available in Build > Utility.");
+            yield return null;
+
+            var track = card.Q<Button>("track-build-" + definition.id);
+            Assert.IsNotNull(track);
+            Assert.IsTrue(track.ClassListContains("fr-star-action"));
+            Assert.AreEqual(0f, track.resolvedStyle.backgroundColor.a, 0.001);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.AreEqual(definition.id, rt.State.TrackedProject.id);
+            track = rt.Ui.DebugRoot.Q<Button>("track-build-" + definition.id);
+            Assert.IsTrue(track.ClassListContains("fr-project-track-on"));
+            Assert.AreEqual(UiText.Get("project.clear"), track.tooltip);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            Assert.IsFalse(rt.State.HasTrackedProject);
+            track = rt.Ui.DebugRoot.Q<Button>("track-build-" + definition.id);
+            Assert.IsFalse(track.ClassListContains("fr-project-track-on"));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = track; track.SendEvent(submit); }
+            rt.Ui.DebugReset();
+            rt.State.DismissFirstSessionGuide();
+            rt.State.Notify();
+            yield return null;
+            yield return null;
+            var resume = rt.Ui.DebugRoot.Q<Button>("project-resume");
+            Assert.AreEqual(0, resume.Query<Label>().ToList().Count);
+            Assert.AreEqual(DisplayStyle.Flex, resume.resolvedStyle.display);
+            Assert.AreEqual(UIRoot.HudTopInset + UiKit.Space.S16, resume.resolvedStyle.top, 1);
+            Assert.AreEqual(UiKit.Space.S16, resume.style.right.value.value, 1);
+            Assert.AreEqual(UiKit.Space.S16, resume.parent.worldBound.xMax - resume.worldBound.xMax, 1);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = resume; resume.SendEvent(submit); }
+            var open = rt.Ui.DebugRoot.Q<Button>("project-open");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = open; open.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shop-structure-" + definition.id), "Resuming a Utility project uses the same shop destination.");
+            rt.Ui.DebugMenu("tutorial");
+            var text = rt.Ui.DebugRoot.Query<Label>().ToList();
+            foreach (var key in new[] { "build", "gather", "storage", "refine", "defend", "research", "upgrade", "travel", "expand" })
+                Assert.IsTrue(text.Exists(label => label.text == UiText.Get("tutorial." + key + ".body")), key);
+        }
+
+        [UnityTest]
+        public IEnumerator TrackedMaterialsUseScannerCoverageAndRememberDiscoveriesWithoutSearchLeaks()
+        {
+            new GameObject("TrackedMapBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.State.backpack.Clear();
+            var pack = rt.Db.FindUpgrade("pack");
+            var project = new PlayerProject { kind = "upgrade", id = pack.id,
+                target = rt.State.Level(pack) + 1, planetId = rt.State.planet.Id };
+            Assert.IsTrue(rt.State.TrackProject(project, out var error), error);
+            rt.Ui.DebugMap(null);
+            yield return null;
+            Assert.IsTrue(rt.Ui.DebugMapProjectMatch(rt.State.planet));
+            Assert.IsTrue(rt.Ui.DebugRoot.Q<Button>("map-planet-" + rt.State.planet.Id).ClassListContains("fr-map-project-world"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("map-project-resource-wood"));
+            Assert.AreEqual(UiText.Get("map.filter.project"), rt.Ui.DebugRoot.Q<DropdownField>(className: "fr-map-filter").value);
+            Assert.AreEqual(rt.State.ScannerRangeLy, rt.Ui.DebugMapSurveyRadius(rt.State.planet), 0.001);
+            rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.RadarTower), 0, 3);
+            rt.State.Notify();
+            Assert.Greater(rt.Ui.DebugMapSurveyRadius(rt.State.planet), rt.State.ScannerRangeLy);
+            Assert.AreEqual(rt.State.ScannerRangeLy + rt.State.RadarRangeBonus(rt.State.planet),
+                rt.Ui.DebugMapSurveyRadius(rt.State.planet), 0.001);
+
+            var distant = rt.State.universe.FindGenerated(d => d.HasResource("wood"), 8, 0, 1000);
+            Assert.IsNotNull(distant);
+            Assert.IsFalse(rt.Ui.DebugMapSurveyed(distant));
+            string origin = rt.Ui.DebugMapSelectedId;
+            rt.Ui.DebugMapSearch(distant.Id);
+            Assert.AreEqual(origin, rt.Ui.DebugMapSelectedId, "A canonical id cannot bypass scanners.");
+            rt.Ui.DebugMapSearch(distant.Name);
+            Assert.AreEqual(origin, rt.Ui.DebugMapSelectedId, "A name cannot bypass scanners.");
+            rt.Ui.DebugMapSearch(distant.Star.Id);
+            Assert.AreEqual(origin, rt.Ui.DebugMapSelectedId, "A system id cannot bypass scanners.");
+            rt.Ui.DebugMapSearch(distant.Star.X.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," +
+                distant.Star.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            yield return null;
+            Assert.IsFalse(rt.Ui.DebugMapSurveyed(distant), "Panning to coordinates is not discovery.");
+            Assert.IsFalse(rt.Ui.DebugMapProjectMatch(distant));
+            rt.State.RecordMapDiscoveries(new[] { distant.Star });
+            rt.State.Notify();
+            rt.Ui.DebugMapSearch(distant.Name);
+            Assert.AreEqual(distant.Id, rt.Ui.DebugMapSelectedId);
+            Assert.IsTrue(rt.Ui.DebugMapProjectMatch(distant), "Previously scanned materials stay marked outside current coverage.");
+            rt.State.Save();
+            rt.Ui.DebugMap(null);
+            rt.Ui.DebugMapSearch(distant.Id);
+            Assert.AreEqual(distant.Id, rt.Ui.DebugMapSelectedId, "Reopening preserves discovered destinations.");
+            foreach (var cost in rt.State.ProjectState(project).costs)
+                rt.State.backpack.Set(cost.resource.id, cost.amount);
+            rt.State.Notify();
+            Assert.IsFalse(rt.Ui.DebugMapProjectMatch(distant), "Materials already available no longer need a source highlight.");
+            rt.State.backpack.Clear();
+            rt.State.Notify();
+            Assert.IsTrue(rt.Ui.DebugMapProjectMatch(distant));
+            Assert.IsTrue(rt.State.TrackProject(null, out error), error);
+            Assert.IsFalse(rt.Ui.DebugMapProjectMatch(distant), "Untracking clears the map highlights.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("map-project-resource-wood"));
+        }
+
+        [UnityTest]
+        public IEnumerator ResourceCostsWrapInsideTheirContainerWithoutNestedScrolling()
+        {
+            new GameObject("CostLayoutBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var costs = new List<ItemAmount>();
+            foreach (var id in new[] { "wood", "stone", "fuel", "planks" })
+            {
+                var resource = rt.Db.FindResource(id);
+                if (resource != null) costs.Add(new ItemAmount(resource, 1234567));
+            }
+            var container = new VisualElement();
+            container.style.position = Position.Absolute;
+            container.style.width = 360;
+            var row = UiKit.CostRow(costs, rt.State, true, resource => { }, resource => 123456);
+            container.Add(row);
+            rt.Ui.DebugRoot.Add(container);
+            foreach (float width in new[] { 360f, 700f })
+            {
+                container.style.width = width;
+                for (int i = 0; i < 3; i++) yield return null;
+                Assert.IsNull(row.Q<ScrollView>());
+                Assert.AreEqual(Wrap.Wrap, row.resolvedStyle.flexWrap);
+                foreach (var chip in row.Children())
+                {
+                    Assert.GreaterOrEqual(chip.worldBound.xMin, row.worldBound.xMin - 1);
+                    Assert.LessOrEqual(chip.worldBound.xMax, row.worldBound.xMax + 1);
+                }
+                Assert.Greater(row.resolvedStyle.height, row.ElementAt(0).resolvedStyle.height, "Costs should form multiple lines.");
+            }
+            container.Clear();
+            container.style.flexDirection = FlexDirection.Row;
+            var simpleCost = new List<ItemAmount> { new ItemAmount(costs[0].resource, 10) };
+            var missing = UiKit.CostRow(simpleCost, rt.State, true, resource => { }, resource => 0);
+            var owned = UiKit.CostRow(simpleCost, rt.State, true, resource => { }, resource => 20);
+            container.Add(missing);
+            container.Add(owned);
+            for (int i = 0; i < 3; i++) yield return null;
+            Assert.AreEqual(owned[0].resolvedStyle.height, missing[0].resolvedStyle.height, 0.1f,
+                "Missing-resource buttons and owned-resource chips keep the same height.");
+            Assert.Less(missing[0].resolvedStyle.height, UiKit.Size.Touch,
+                "Costs use the tighter chip height, not a full-size action button.");
+            container.RemoveFromHierarchy();
+        }
+
+        [UnityTest]
+        public IEnumerator ResearchShipNavigationAndDockCapacityUseThePlayerFlow()
         {
             new GameObject("CommandDockBootstrap").AddComponent<FrontierBootstrap>();
             float deadline = Time.realtimeSinceStartup + 30;
@@ -2241,37 +3641,86 @@ namespace Frontier.Tests
             Assert.IsTrue(rt.State.TryRestoreCloudSave(shardSave, out shardError), shardError);
             Assert.AreEqual(1234.ToString("N0"), shards.text, "The HUD reflects wallet changes without reopening a panel.");
             Assert.AreEqual(UiText.Get("hyperspace.revive.balance", 1234), shards.tooltip);
-            var pack = rt.Ui.DebugRoot.Q<Button>("dock-pack");
-            var gauge = pack.Q("pack-capacity-gauge");
-            Assert.AreEqual(8, gauge.childCount);
+            var dockLabels = rt.Ui.DebugRoot.Q(className: "fr-dock").Query<Label>(className: "fr-dock-label").ToList();
+            CollectionAssert.AreEqual(new[] { "RESEARCH", "MAP", "SHIP", "BUILD" }, dockLabels.ConvertAll(label => label.text));
+            var pack = rt.Ui.DebugRoot.Q<Button>("dock-ship");
+            Assert.IsNull(pack.Q("pack-capacity-gauge"));
+            Assert.IsNull(pack.Q<Label>("pack-capacity-text"));
             rt.Ui.DebugEmptyPack();
-            Assert.AreEqual("0/" + rt.State.Slots, pack.Q<Label>("pack-capacity-text").text);
-            Assert.AreEqual(0, gauge.Query(className: "fr-pack-segment-filled").ToList().Count);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("pack.capacity", 0, rt.State.Slots)),
+                "Cargo retains its capacity information.");
             string resourceId = rt.Db.resources[0].id;
             rt.State.backpack.Set(resourceId, rt.State.backpack.StackSizeOf(resourceId) * rt.State.Slots);
             rt.State.Notify();
-            Assert.AreEqual(rt.State.Slots + "/" + rt.State.Slots, pack.Q<Label>("pack-capacity-text").text);
-            Assert.AreEqual(8, gauge.Query(className: "fr-pack-segment-filled").ToList().Count);
-            Assert.AreEqual(UiText.Get("pack.capacity", rt.State.SlotsUsed, rt.State.Slots), pack.tooltip);
+            Assert.IsTrue(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label =>
+                label.text == UiText.Get("pack.capacity.rearrange", rt.State.SlotsUsed, rt.State.Slots)),
+                "Cargo still reports a full hold after it changes.");
 
-            rt.Ui.DebugResearch(1);
-            var navigation = rt.Ui.DebugRoot.Q("command-navigation");
-            Assert.AreEqual(4, navigation.childCount, "Command has one flat Tools / Tech / Ship / Defense navigation.");
+            rt.Ui.DebugResearch();
+            var navigation = rt.Ui.DebugRoot.Q("research-navigation");
+            Assert.AreEqual(2, navigation.childCount, "Research owns technology and global improvements.");
             var labels = navigation.Query<Label>().ToList();
             Assert.IsFalse(labels.Exists(label => label.text == UiText.Get("command.bases") || label.text == UiText.Get("builders.tab")));
-            foreach (string key in new[] { "command.tools", "research.tab.tech", "research.tab.ship", "research.tab.defense" })
+            foreach (string key in new[] { "research.tab.tech", "research.tab.improvements" })
                 Assert.IsTrue(labels.Exists(label => label.text == UiText.Get(key)), key);
-            var shipTab = navigation.Query<Button>().ToList().Find(button =>
-                button.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.tab.ship")));
-            Assert.IsNotNull(shipTab);
-            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shipTab; shipTab.SendEvent(submit); }
+            rt.Ui.DebugResearch(1);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-turret"), "Global defense upgrades belong to Research.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("upgrade-pack"));
+            rt.Ui.DebugShip(2);
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("upgrade-turret"));
             Assert.IsFalse(rt.Ui.DebugRoot.Query<Label>().ToList().Exists(label => label.text == UiText.Get("research.branch")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pack; pack.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("ship-navigation"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-pack"), "The Ship dock always opens Cargo, including its capacity upgrade.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"));
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("pack-open-tanks"));
+            rt.Ui.DebugFuelTanks();
+            var fuelUpgrade = rt.Ui.DebugRoot.Q<Button>("fuel-open-upgrades");
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = fuelUpgrade; fuelUpgrade.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-fuel_tank"), "Fuel upgrades route to Ship systems, not Research.");
+            rt.Ui.DebugMap(null);
+            var network = rt.Ui.DebugRoot.Q<Button>("map-open-network");
+            Assert.IsNotNull(network);
+            Assert.IsFalse(network.enabledSelf, "The network is disabled until a local Warp Gate is completed.");
+            Assert.AreEqual(network, network.parent.ElementAt(network.parent.childCount - 1), "Network is the last Map detail.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("map-open-ship"));
+            var pin = rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle");
+            Assert.IsTrue(pin.parent.ClassListContains("fr-map-card-actions"));
+            Assert.IsTrue(pin.parent.ElementAt(0) is Label);
+            var gate = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.WarpGate), 0);
+            rt.State.DebugSetBuilderJob(gate, 600);
+            rt.Ui.DebugMap(null);
+            Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>("map-open-network").enabledSelf,
+                "An unfinished gate must not enable the network.");
+            rt.State.DebugSetBuilderJob(gate, 0);
+            rt.Ui.DebugMap(null);
+            network = rt.Ui.DebugRoot.Q<Button>("map-open-network");
+            Assert.IsTrue(network.enabledSelf);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = network; network.SendEvent(submit); }
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("network-open-map"), "The Map dock already provides this route.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q<Button>("network-complete"));
+            rt.Ui.DebugMenu("goals");
+            var expand = rt.Ui.DebugRoot.Q<Button>("goals-toggle-all");
+            Assert.IsNotNull(expand);
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = expand; expand.SendEvent(submit); }
+            var shipObjective = rt.Ui.DebugRoot.Q<Button>("objective-action-jump_range_1");
+            Assert.IsNotNull(shipObjective);
+            Assert.IsTrue(shipObjective.Query<Label>().ToList().Exists(label => label.text == UiText.Get("goals.action.ship")));
+            using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = shipObjective; shipObjective.SendEvent(submit); }
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("upgrade-jump"), "Jump-range objectives route to Ship systems.");
             rt.Ui.DebugShop(0);
-            var jobs = rt.Ui.DebugRoot.Q<Button>("build-jobs");
-            Assert.IsNotNull(jobs, "Construction jobs remain available from Build, outside Command.");
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-jobs"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("build-harvest"));
+            rt.Ui.DebugReset();
+            Assert.IsTrue(rt.Surface.SelectStructure(gate));
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("structure-open-jobs"));
+            var jobs = rt.Ui.DebugRoot.Q<Button>("world-open-jobs");
+            Assert.IsNotNull(jobs, "Construction jobs and recruitment remain accessible below the camera.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = jobs; jobs.SendEvent(submit); }
             Assert.IsNotNull(rt.Ui.DebugRoot.Q("builder-jobs"));
-            Assert.IsNull(rt.Ui.DebugRoot.Q("command-navigation"));
+            Assert.IsNull(rt.Ui.DebugRoot.Q("research-navigation"));
             rt.Ui.DebugAtlas(0);
             var atlasFind = rt.Ui.DebugRoot.Q<Button>(className: "fr-resource-find-icon");
             Assert.IsNotNull(atlasFind);
@@ -2304,7 +3753,12 @@ namespace Frontier.Tests
                 Assert.IsNotNull(chart);
                 var pin = rt.Ui.DebugRoot.Q<Toggle>("map-pin-toggle");
                 Assert.IsNotNull(pin);
-                Assert.Less(pin.layout.height, UiKit.Size.Touch, "Pinning should use a compact checkbox, not a full action button.");
+                Assert.GreaterOrEqual(pin.layout.height, UiKit.Size.Touch - 1, "The compact header checkbox keeps a phone-sized hit target.");
+                Assert.Less(pin.layout.width, pin.parent.parent.layout.width * 0.5f,
+                    "Pinning belongs under the status at the right, not across the whole card.");
+                Assert.Less(Mathf.Abs(pin.Q<Label>(className: "unity-toggle__label").worldBound.center.y -
+                    pin.Q(className: "unity-toggle__input").worldBound.center.y), 2f,
+                    "Pin text and checkbox share one compact row under the status.");
                 Assert.IsFalse(pin.value);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = pin; pin.SendEvent(submit); }
                 Assert.IsTrue(rt.State.IsMapPinned(rt.State.planet.Id));
@@ -2332,17 +3786,46 @@ namespace Frontier.Tests
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = destinationButton; destinationButton.SendEvent(submit); }
                 Assert.AreEqual(destination.Id, rt.Ui.DebugMapSelectedId);
                 var mode = rt.Ui.DebugRoot.Q<Button>("map-switch-view");
-                Assert.AreEqual(UiText.Get("map.mode.universe"), mode.text);
+                Assert.AreEqual(UiText.Get("map.mode.neighbors"), mode.text);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
                 yield return null;
                 Assert.IsFalse(rt.Ui.DebugMapInSystem);
-                Assert.AreEqual(UiText.Get("map.mode.orbits"), mode.text);
+                Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
+                Assert.AreEqual(UiText.Get("map.mode.overview"), mode.text);
                 Assert.AreEqual(DisplayStyle.None, chart.Q<Button>("map-planet-" + destination.Id).resolvedStyle.display);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
+                Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
+                Assert.AreEqual(UiText.Get("map.mode.orbits"), mode.text);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
                 Assert.IsTrue(rt.Ui.DebugMapInSystem);
                 Assert.AreEqual(destination.Id, rt.Ui.DebugMapSelectedId, "Changing chart scale cannot change the destination.");
+                var zoomOut = rt.Ui.DebugRoot.Q<Button>("map-zoom-out");
+                var zoomIn = rt.Ui.DebugRoot.Q<Button>("map-zoom-in");
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomOut; zoomOut.SendEvent(submit); }
+                Assert.IsTrue(rt.Ui.DebugMapInNeighbors, "One minus press moves straight to expanded neighbors.");
+                deadline = Time.realtimeSinceStartup + 8;
+                while (chart.Q<Button>("map-system-" + rt.State.planet.Star.Id) == null &&
+                    Time.realtimeSinceStartup < deadline) yield return null;
+                Assert.IsNotNull(chart.Q<Button>("map-system-" + rt.State.planet.Star.Id));
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomOut; zoomOut.SendEvent(submit); }
+                Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
+                Assert.IsFalse(rt.Ui.DebugMapInSystem);
+                Assert.IsFalse(zoomOut.enabledSelf, "Overview is the final zoom level.");
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomIn; zoomIn.SendEvent(submit); }
+                Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomIn; zoomIn.SendEvent(submit); }
+                Assert.IsTrue(rt.Ui.DebugMapInSystem);
+                Assert.IsFalse(zoomIn.enabledSelf);
+                rt.Ui.DebugMapPan(100000, -100000);
+                Assert.AreEqual(destination.Star.X, rt.Ui.DebugMapCenterX, 0.001,
+                    "The local chart cannot pan away from its own orbits.");
                 rt.Ui.DebugMapSearch("12000,-3000");
                 Assert.IsFalse(rt.Ui.DebugMapInSystem, "Coordinates should reveal the universe, not leave a detached orbital chart.");
+                double boundedX = rt.Ui.DebugMapCenterX;
+                rt.Ui.DebugMapPan(-1000000, 1000000);
+                Assert.Less(Math.Abs(rt.Ui.DebugMapCenterX - rt.State.planet.Star.X), 500,
+                    "A huge drag must remain near surveyed or remembered systems.");
+                Assert.Less(Math.Abs(boundedX - rt.State.planet.Star.X), 500);
                 rt.Ui.DebugMapSearch("glacia");
                 Assert.IsTrue(rt.Ui.DebugMapInSystem, "Finding a planet should reveal its orbits.");
                 Assert.AreEqual(rt.State.universe.Get("glacia").Id, rt.Ui.DebugMapSelectedId);

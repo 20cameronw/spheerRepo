@@ -8,13 +8,15 @@ namespace Frontier
         static readonly string[] FirstSessionTitleKeys =
         {
             "guide.build.title", "guide.gather.title", "guide.store.title",
-            "guide.craft.title", "guide.defend.title", "guide.travel.title"
+            "guide.craft.title", "guide.defend.title", "guide.travel.title",
+            "guide.research.title", "guide.upgrade.title"
         };
 
         static readonly string[] FirstSessionDescriptionKeys =
         {
             "guide.build.help", "guide.gather.help", "guide.store.help",
-            "guide.craft.help", "guide.defend.help", "guide.travel.help"
+            "guide.craft.help", "guide.defend.help", "guide.travel.help",
+            "guide.research.help", "guide.upgrade.help"
         };
 
         VisualElement firstSessionGuideCard;
@@ -38,6 +40,13 @@ namespace Frontier
             heading.Add(firstSessionGuideTitle);
             firstSessionGuideProgress = UiKit.Text("", "fr-guide-progress fr-tiny", UiKit.Cyan);
             heading.Add(firstSessionGuideProgress);
+
+            var help = Icons.IconButton("tutorial", UiKit.Cyan, OpenHowToPlay, 0f, true);
+            help.name = "first-session-guide-help";
+            help.tooltip = UiText.Get("menu.tutorial");
+            help.style.marginLeft = UiKit.Space.S12;
+            help.style.marginRight = UiKit.Space.S8;
+            heading.Add(help);
 
             var skip = Icons.IconButton("close", UiKit.Muted, DismissFirstSessionGuide, 0f, true);
             skip.name = "first-session-guide-skip";
@@ -82,6 +91,7 @@ namespace Frontier
                 case 2: return kind == StructureKind.Warehouse;
                 case 3: return kind == StructureKind.Refinery;
                 case 4: return kind == StructureKind.Alarm;
+                case 6: return kind == StructureKind.ResearchLab;
                 default: return false;
             }
         }
@@ -124,7 +134,7 @@ namespace Frontier
             firstSessionGuideDescription.text = complete
                 ? UiText.Get("guide.complete.help")
                 : UiText.Get(FirstSessionDescriptionKeys[step]);
-            firstSessionGuideAction.text = complete ? UiText.Get("guide.action.atlas") : GuideActionLabel(step);
+            firstSessionGuideAction.text = complete ? UiText.Get("menu.tutorial") : GuideActionLabel(step);
             UpdateFirstSessionGuideVisibility();
         }
 
@@ -140,6 +150,9 @@ namespace Frontier
                     ? "guide.action.refinery" : "guide.action.build-shop");
                 case 4: return UiText.Get(gs.StructureOfKind(gs.planet, StructureKind.Alarm) != null
                     ? "guide.action.alarm" : "guide.action.alarm-shop");
+                case 6: return UiText.Get(gs.StructureOfKind(gs.planet, StructureKind.ResearchLab) != null
+                    ? "guide.action.research" : "project.lab");
+                case 7: return UiText.Get("guide.action.upgrade");
                 default: return UiText.Get("guide.action.map");
             }
         }
@@ -154,6 +167,9 @@ namespace Frontier
                 firstSessionGuideVisibilityKnown = true;
                 firstSessionGuideVisible = visible;
                 firstSessionGuideCard.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+                constructionButton?.SetEnabled(!visible);
+                if (visible) firstSessionGuideCard.BringToFront();
+                RefreshProjectResume();
             }
         }
 
@@ -181,8 +197,7 @@ namespace Frontier
             if (step == 4 && OpenFirstSessionStructure(StructureKind.Alarm)) return;
             if (step == 0 || step == 1)
             {
-                shopTab = 1;
-                OpenShop();
+                OpenGatherShop();
             }
             else if (step == 2 || step == 3 || step == 4)
             {
@@ -191,8 +206,24 @@ namespace Frontier
             }
             else if (step == 5)
                 OpenMap();
+            else if (step == 6)
+            {
+                if (gs.StructureOfKind(gs.planet, StructureKind.ResearchLab) == null)
+                    OpenBuildDefinition(gs.db.StructureOfKind(StructureKind.ResearchLab));
+                else OpenFirstSessionStructure(StructureKind.ResearchLab);
+            }
+            else if (step == 7)
+                OpenShip(ShipPage.Systems);
             else if (step >= FirstSessionObjectives.Count)
-                OpenGuideAtlas();
+                OpenHowToPlay();
+        }
+
+        void OpenHowToPlay()
+        {
+            if (defense.Active || busy) return;
+            if (modalKey != "menu") OpenMenu();
+            menuPage = "tutorial";
+            RefreshModal();
         }
 
         void OpenGuideAtlas()
@@ -221,7 +252,7 @@ namespace Frontier
         PlacedStructure AvailableLocalGatherer()
         {
             foreach (var structure in gs.StructuresOn(gs.planet))
-                if (structure.def.kind.IsGather() && gs.IsOperational(structure) &&
+                if (structure.def.kind.IsGather() && ReadyToHarvest(structure) &&
                     gs.SpotsFor(gs.planet, structure.def.kind).Count > 0) return structure;
             return null;
         }

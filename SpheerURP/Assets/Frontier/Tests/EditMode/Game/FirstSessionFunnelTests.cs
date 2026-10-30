@@ -58,14 +58,14 @@ namespace Frontier.Tests
             funnel.Observe("private-save", true, 3);
             funnel.Observe("private-save", true, FirstSessionObjectives.Count);
             funnel.Observe("private-save", true, FirstSessionObjectives.Count);
-            Assert.AreEqual(8, analytics.names.Count);
+            Assert.AreEqual(FirstSessionObjectives.Count + 2, analytics.names.Count);
             Assert.AreEqual("onboarding_progress_observed", analytics.names[0]);
             for (int step = 0; step < FirstSessionObjectives.Count; step++)
             {
                 Assert.AreEqual("onboarding_step_completed", analytics.names[step + 1]);
                 Assert.AreEqual(step.ToString(), analytics.payloads[step + 1]["step"]);
             }
-            Assert.AreEqual("onboarding_completed", analytics.names[7]);
+            Assert.AreEqual("onboarding_completed", analytics.names[FirstSessionObjectives.Count + 1]);
             foreach (var payload in analytics.payloads)
             {
                 Assert.AreEqual(2, payload.Count);
@@ -173,9 +173,9 @@ namespace Frontier.Tests
         public void InvalidInput_IsExplicitAndCannotSendEvents()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => funnel.Observe("save", true, -1));
-            Assert.Throws<ArgumentOutOfRangeException>(() => funnel.Observe("save", true, 7));
+            Assert.Throws<ArgumentOutOfRangeException>(() => funnel.Observe("save", true, FirstSessionObjectives.Count + 1));
             Assert.Throws<ArgumentException>(() => funnel.Observe("", true, 0));
-            Assert.Throws<ArgumentOutOfRangeException>(() => funnel.Action(7));
+            Assert.Throws<ArgumentOutOfRangeException>(() => funnel.Action(FirstSessionObjectives.Count + 1));
             Assert.Throws<ArgumentOutOfRangeException>(() => funnel.Dismiss(-1));
             Assert.IsEmpty(analytics.names);
         }

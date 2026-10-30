@@ -8479,6 +8479,686 @@ MonoBehaviour:
     m_Key: progression.required-level
     m_Metadata:
       m_Items: []
+  - m_Id: 4486758615048192
+    m_Key: ship.tab.cargo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545664
+    m_Key: ship.tab.systems
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545665
+    m_Key: ship.cargo.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545666
+    m_Key: map.open-ship
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545667
+    m_Key: progression.resources.connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545668
+    m_Key: progression.resources.cargo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545669
+    m_Key: research.tab.improvements
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4486758690545670
+    m_Key: research.completed-count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4487544858304512
+    m_Key: goals.action.ship
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703457959936
+    m_Key: project.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514368
+    m_Key: project.track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514369
+    m_Key: project.tracked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514370
+    m_Key: project.resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514371
+    m_Key: project.open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514372
+    m_Key: project.clear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514373
+    m_Key: project.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514374
+    m_Key: project.complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514375
+    m_Key: project.remaining
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514376
+    m_Key: project.missing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514377
+    m_Key: project.read-only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514378
+    m_Key: project.save-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514379
+    m_Key: project.return-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514380
+    m_Key: project.anchor-missing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514381
+    m_Key: project.previous
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514382
+    m_Key: project.return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514383
+    m_Key: project.depth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514384
+    m_Key: project.shortfall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514385
+    m_Key: project.stock-ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514386
+    m_Key: project.stored
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514387
+    m_Key: project.withdraw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514388
+    m_Key: project.transfer-cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514389
+    m_Key: project.open-relay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514390
+    m_Key: project.view-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514391
+    m_Key: project.produce
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514392
+    m_Key: project.build-producer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514393
+    m_Key: project.find-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514394
+    m_Key: project.manual
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514395
+    m_Key: project.while-away
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514396
+    m_Key: project.job-ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4492703491514397
+    m_Key: project.output-ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814260654080
+    m_Key: reward.harvest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208512
+    m_Key: reward.construction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208513
+    m_Key: reward.saved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208514
+    m_Key: reward.not-earned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208515
+    m_Key: reward.changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208516
+    m_Key: reward.space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208517
+    m_Key: reward.save-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208518
+    m_Key: reward.job-changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208519
+    m_Key: reward.timeout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208520
+    m_Key: reward.failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208521
+    m_Key: reward.recovery-earned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208522
+    m_Key: reward.recovery-pending
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208523
+    m_Key: reward.retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208524
+    m_Key: reward.dismiss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208525
+    m_Key: reward.discard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208526
+    m_Key: project.prerequisite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208527
+    m_Key: project.lab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208528
+    m_Key: project.xp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4493814294208529
+    m_Key: project.upgrade-station
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435363344384
+    m_Key: project.capacity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870336
+    m_Key: project.connect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870337
+    m_Key: project.hull
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870338
+    m_Key: project.travel-cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4495435417870339
+    m_Key: reward.confirm-discard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4496640378494976
+    m_Key: reward.restore-busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4497463032504320
+    m_Key: project.dismiss-summary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510293311488
+    m_Key: harvest.vein.brake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060224
+    m_Key: harvest.vein.chain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060225
+    m_Key: harvest.drill.boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060226
+    m_Key: harvest.drill.heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060227
+    m_Key: harvest.drill.cooling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060228
+    m_Key: harvest.chop.timing-hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060229
+    m_Key: harvest.chop.swing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060230
+    m_Key: harvest.siphon.vent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060231
+    m_Key: harvest.siphon.pressure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060232
+    m_Key: harvest.excavate.direction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060233
+    m_Key: harvest.excavate.direction.up.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060234
+    m_Key: harvest.excavate.direction.up.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060235
+    m_Key: harvest.excavate.direction.up.same
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060236
+    m_Key: harvest.excavate.direction.down.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060237
+    m_Key: harvest.excavate.direction.down.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060238
+    m_Key: harvest.excavate.direction.down.same
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060239
+    m_Key: harvest.excavate.direction.same.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060240
+    m_Key: harvest.excavate.direction.same.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060241
+    m_Key: harvest.excavate.direction.same.same
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060242
+    m_Key: harvest.salvage.tether
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060243
+    m_Key: harvest.salvage.selected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060244
+    m_Key: harvest.salvage.charging
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060245
+    m_Key: harvest.salvage.release
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4758510331060246
+    m_Key: harvest.salvage.slipping
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622022946816
+    m_Key: harvest.chop.result.perfect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084160
+    m_Key: harvest.chop.result.good
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084161
+    m_Key: harvest.chop.result.miss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4759622069084162
+    m_Key: harvest.siphon.venting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4760616387567616
+    m_Key: harvest.drill.overheated
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015407820800
+    m_Key: gather.list.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901184
+    m_Key: gather.list.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901185
+    m_Key: gather.list.requires
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901186
+    m_Key: gather.list.build
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901187
+    m_Key: gather.list.view
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4763015495901188
+    m_Key: gather.list.not-ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4798174022688768
+    m_Key: network.map.lock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4798174068826112
+    m_Key: tutorial.map.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4798174068826113
+    m_Key: tutorial.map.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4800388132855808
+    m_Key: common.close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4801657140502528
+    m_Key: project.landing-blocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056911536128
+    m_Key: tutorial.research.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284864
+    m_Key: tutorial.research.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284865
+    m_Key: tutorial.expand.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804056949284866
+    m_Key: tutorial.expand.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934317989888
+    m_Key: guide.research.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932928
+    m_Key: guide.research.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932929
+    m_Key: guide.upgrade.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932930
+    m_Key: guide.upgrade.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932931
+    m_Key: guide.action.research
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4804934359932932
+    m_Key: guide.action.upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4809562103308288
+    m_Key: map.filter.project
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4809562157834240
+    m_Key: map.project-material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459193630720
+    m_Key: map.scanner.legend
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459235573760
+    m_Key: map.scanner.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4810459235573761
+    m_Key: map.unscanned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970231775232
+    m_Key: shards.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523968
+    m_Key: shards.balance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523969
+    m_Key: shards.uses-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523970
+    m_Key: shards.ad.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523971
+    m_Key: shards.ad.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523972
+    m_Key: shards.ad.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523973
+    m_Key: shards.ad.consent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523974
+    m_Key: shards.ad.settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523975
+    m_Key: shards.ad.read-only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523976
+    m_Key: shards.ad.wallet-full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523977
+    m_Key: shards.ad.watch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523978
+    m_Key: shards.ad.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523979
+    m_Key: shards.ad.claimed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523980
+    m_Key: menu.records
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523981
+    m_Key: menu.leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970269523982
+    m_Key: menu.shards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718272
+    m_Key: ranks.podium.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718273
+    m_Key: ranks.podium.place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718274
+    m_Key: ranks.top20
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4886970273718275
+    m_Key: ranks.retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5026773145313280
+    m_Key: harvest.vein.speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578470436864
+    m_Key: research.xp-lock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379904
+    m_Key: map.mode.neighbors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379905
+    m_Key: map.mode.overview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379906
+    m_Key: map.search.outside
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5040578512379907
+    m_Key: map.view.neighbors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134947065856
+    m_Key: shop.shards.price
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814592
+    m_Key: shop.shards.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814593
+    m_Key: shop.shards.pad-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814594
+    m_Key: shop.shards.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814595
+    m_Key: shop.shards.pending-save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814596
+    m_Key: reward.consent.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814597
+    m_Key: reward.consent.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814598
+    m_Key: reward.consent.allow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5049134984814599
+    m_Key: reward.consent.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113704230912
+    m_Key: reward.platform
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785344
+    m_Key: reward.harvest-space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785345
+    m_Key: shards.open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785346
+    m_Key: tutorial.ads.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785347
+    m_Key: tutorial.ads.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785348
+    m_Key: lab.tab.upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5064113737785349
+    m_Key: ranks.era-label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5067001465757696
+    m_Key: gate.upgrade.legacy-tool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920542597120
+    m_Key: map.controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345856
+    m_Key: map.hide-controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345857
+    m_Key: map.return-world
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345858
+    m_Key: map.location.planet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345859
+    m_Key: map.location.system
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5105920580345860
+    m_Key: map.location.sector
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

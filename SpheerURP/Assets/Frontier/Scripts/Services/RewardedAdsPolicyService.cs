@@ -8,6 +8,7 @@ namespace Frontier.Services
     public sealed class RewardedAdPlacement
     {
         public string id;
+        public bool unlimitedDaily;
         public int dailyCap;
         public int cooldownSeconds;
     }
@@ -29,7 +30,7 @@ namespace Frontier.Services
     }
 
     /// <summary>Local placement limits, not authoritative cross-device ad or currency verification.</summary>
-    public sealed class RewardedAdsPolicyService : IAdsService
+    public sealed class RewardedAdsPolicyService : IAdsService, IRewardedAdAvailability
     {
         readonly IAdsService inner;
         readonly IRewardedAdUsageStore store;
@@ -54,7 +55,8 @@ namespace Frontier.Services
                     throw new ArgumentException("Ad placements require unique IDs and non-negative limits.", nameof(placements));
                 this.placements.Add(row.id, new RewardedAdPlacement
                 {
-                    id = row.id, dailyCap = row.dailyCap, cooldownSeconds = row.cooldownSeconds
+                    id = row.id, unlimitedDaily = row.unlimitedDaily, dailyCap = row.dailyCap,
+                    cooldownSeconds = row.cooldownSeconds
                 });
             }
         }
@@ -69,37 +71,28 @@ namespace Frontier.Services
 
         public async Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId)
         {
-            if (!IsConfigured) return ServiceResult<RewardedAdResult>.NotConfigured("Rewarded ads");
-            if (placementId == null || !placements.TryGetValue(placementId, out var placement))
-                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.unknown"));
-            if (showing)
-                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.busy"));
-            if (placement.dailyCap == 0)
-                return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.disabled"));
-
+            var available = CheckAvailability(placementId);
+            if (!available.succeeded)
+            {
+                if (available.status == ServiceStatus.NotConfigured)
+                    return ServiceResult<RewardedAdResult>.NotConfigured("Rewarded ads");
+                return available.status == ServiceStatus.Failed ? ServiceResult<RewardedAdResult>.Failed(available.text) :
+                    ServiceResult<RewardedAdResult>.InvalidRequest(available.text);
+            }
             showing = true;
             try
             {
-                if (!store.TryLoad(placementId, out var usage, out string error))
-                    return ServiceResult<RewardedAdResult>.Failed(error);
+                var usage = available.value;
                 long now = time.UtcNow.UtcDateTime.Ticks;
-                if (!ValidUsage(usage) || now < usage.lastObservedUtcTicks)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest(
-                        ServiceMessage.Get("service.ads.invalid-time"));
                 long day = new DateTime(now, DateTimeKind.Utc).Date.Ticks;
                 int rewards = day == usage.dayUtcTicks ? usage.rewards : 0;
-                if (rewards >= placement.dailyCap)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.limit"));
-                if (usage.lastRewardUtcTicks > 0 &&
-                    now - usage.lastRewardUtcTicks < (long)placement.cooldownSeconds * TimeSpan.TicksPerSecond)
-                    return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.cooldown"));
 
                 var observed = new RewardedAdUsage
                 {
                     dayUtcTicks = day, lastObservedUtcTicks = now,
                     lastRewardUtcTicks = usage.lastRewardUtcTicks, rewards = rewards
                 };
-                if (!store.TrySave(placementId, observed, out error))
+                if (!store.TrySave(placementId, observed, out string error))
                     return ServiceResult<RewardedAdResult>.Failed(error);
 
                 var result = await inner.ShowRewardedAsync(placementId);
@@ -114,13 +107,44 @@ namespace Frontier.Services
                 var earned = new RewardedAdUsage
                 {
                     dayUtcTicks = completedDay, lastObservedUtcTicks = completed,
-                    lastRewardUtcTicks = completed, rewards = completedDay == day ? rewards + 1 : 1
+                    lastRewardUtcTicks = completed,
+                    rewards = completedDay == day ? (int)Math.Min(int.MaxValue, (long)rewards + 1) : 1
                 };
                 if (!store.TrySave(placementId, earned, out error))
                     return ServiceResult<RewardedAdResult>.Failed(error);
                 return result;
             }
             finally { showing = false; }
+        }
+
+        public ServiceResult RewardedAvailability(string placementId)
+        {
+            var result = CheckAvailability(placementId);
+            if (result.succeeded) return ServiceResult.Success();
+            if (result.status == ServiceStatus.NotConfigured) return ServiceResult.NotConfigured("Rewarded ads");
+            return result.status == ServiceStatus.Failed ? ServiceResult.Failed(result.text) :
+                ServiceResult.InvalidRequest(result.text);
+        }
+
+        ServiceResult<RewardedAdUsage> CheckAvailability(string placementId)
+        {
+            if (!IsConfigured) return ServiceResult<RewardedAdUsage>.NotConfigured("Rewarded ads");
+            if (placementId == null || !placements.TryGetValue(placementId, out var placement))
+                return ServiceResult<RewardedAdUsage>.InvalidRequest(ServiceMessage.Get("service.ads.unknown"));
+            if (showing) return ServiceResult<RewardedAdUsage>.InvalidRequest(ServiceMessage.Get("service.ads.busy"));
+            if (!placement.unlimitedDaily && placement.dailyCap == 0)
+                return ServiceResult<RewardedAdUsage>.InvalidRequest(ServiceMessage.Get("service.ads.disabled"));
+            if (!store.TryLoad(placementId, out var usage, out string error)) return ServiceResult<RewardedAdUsage>.Failed(error);
+            long now = time.UtcNow.UtcDateTime.Ticks;
+            if (!ValidUsage(usage) || now < usage.lastObservedUtcTicks)
+                return ServiceResult<RewardedAdUsage>.InvalidRequest(ServiceMessage.Get("service.ads.invalid-time"));
+            long day = new DateTime(now, DateTimeKind.Utc).Date.Ticks;
+            if (!placement.unlimitedDaily && day == usage.dayUtcTicks && usage.rewards >= placement.dailyCap)
+                return ServiceResult<RewardedAdUsage>.InvalidRequest(ServiceMessage.Get("service.ads.limit"));
+            if (usage.lastRewardUtcTicks > 0 &&
+                now - usage.lastRewardUtcTicks < (long)placement.cooldownSeconds * TimeSpan.TicksPerSecond)
+                return ServiceResult<RewardedAdUsage>.InvalidRequest(ServiceMessage.Get("service.ads.cooldown"));
+            return ServiceResult<RewardedAdUsage>.Success(usage);
         }
 
         static bool ValidUsage(RewardedAdUsage usage)

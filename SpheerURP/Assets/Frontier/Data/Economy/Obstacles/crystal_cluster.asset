@@ -172,4 +172,4 @@ MonoBehaviour:
       reward:
         resourceId: crystal
         amount: 288
-  modelKey: 
+  modelKey: world_obstacle_crystal_cluster

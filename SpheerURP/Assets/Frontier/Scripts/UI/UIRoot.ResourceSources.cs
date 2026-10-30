@@ -26,11 +26,7 @@ namespace Frontier
             }
             if (source.kind == ResourceSourceKind.Build)
             {
-                shopTab = source.build.kind.IsGather() ? 1 : 0;
-                OpenShop();
-                var scroll = modalScroll;
-                var card = scroll.Q("shop-structure-" + source.build.id);
-                if (card != null) scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                OpenBuildDefinition(source.build);
                 return;
             }
             if (source.kind == ResourceSourceKind.Planet)
@@ -43,6 +39,31 @@ namespace Frontier
             }
             OpenAtlasResource(resource);
             Toast(UiText.Get("resource.source.unavailable", resource.LocalizedName), UiKit.Amber);
+        }
+
+        void OpenBuildDefinition(StructureSO definition)
+        {
+            CloseAll();
+            switch (definition.kind)
+            {
+                case StructureKind.ResearchLab:
+                case StructureKind.RadarTower:
+                case StructureKind.ColonyHub:
+                case StructureKind.Satellite:
+                case StructureKind.Terraformer:
+                case StructureKind.WarpGate:
+                case StructureKind.DysonCollector: shopTab = 3; break;
+                case StructureKind.Gunner:
+                case StructureKind.Laser: shopTab = 2; break;
+                default: shopTab = definition.kind.IsGather() ? 1 : 0; break;
+            }
+            OpenShop();
+            var scroll = modalScroll;
+            scroll.schedule.Execute(() =>
+            {
+                var card = scroll.Q("shop-structure-" + definition.id);
+                if (card != null) scroll.ScrollTo(card);
+            }).StartingIn(1);
         }
     }
 }

@@ -18,7 +18,7 @@ MonoBehaviour:
   description: Projects a field that raises reactor health.
   kind: 19
   color: {r: 0.4, g: 1.6, b: 2, a: 1}
-  modelKey: 
+  modelKey: struct_shield_pylon
   buildCost:
   - resource: {fileID: 11400000, guid: 548b6dd251135ad429727407f6d5d4d7, type: 2}
     amount: 100

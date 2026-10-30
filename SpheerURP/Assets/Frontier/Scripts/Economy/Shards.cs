@@ -5,10 +5,9 @@ using Frontier.Universe;
 namespace Frontier.Economy
 {
     /// <summary>
-    /// What Nova Shards can be spent on (decision D3). There is deliberately no resource and no combat-power entry, and nothing in the
-    /// ledger API converts shards into <see cref="ItemAmount"/>s: shards buy time, convenience and cosmetics only (a test inspects both).
+    /// Shards buy time, convenience, cosmetics and unlocked structures. They never convert into inventory resources.
     /// </summary>
-    public enum ShardSpendKind { SkipTimer, BuilderSlot, Revive, Cosmetic }
+    public enum ShardSpendKind { SkipTimer, BuilderSlot, Revive, Cosmetic, Structure }
 
     /// <summary>Where shards come from. Everything except Purchase is capped for a free player.</summary>
     public enum ShardEarnKind { LevelUp, AtlasFirst, Achievement, DailyStreak, RewardedAd, ObstaclePod, WeeklyBoard, Purchase }
@@ -129,6 +128,11 @@ namespace Frontier.Economy
     /// <summary>The price of skipping a wait: a pure function of the seconds left (never of the resources the job cost).</summary>
     public static class ShardCurve
     {
+        public static int StructureCost(ShardRulesDef rules, double buildSeconds)
+        {
+            return (int)Math.Min(int.MaxValue, Math.Max(10L, 2L * SkipCost(rules, buildSeconds)));
+        }
+
         /// <summary>Shards to finish a job that still has <paramref name="secondsLeft"/> to run; 0 when it is within the free-finish window.</summary>
         public static int SkipCost(ShardRulesDef r, double secondsLeft)
         {

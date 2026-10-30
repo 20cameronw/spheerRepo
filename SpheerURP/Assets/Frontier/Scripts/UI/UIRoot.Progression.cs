@@ -10,44 +10,15 @@ namespace Frontier
     public partial class UIRoot
     {
         string researchBranch = "";
-        int progressionTab;
+        bool showCompletedResearch;
 
-        void BuildXpProgress(VisualElement body, bool showWaveAction)
+        void BuildXpProgress(VisualElement body)
         {
             var progress = UiKit.Div();
             progress.name = "player-xp-progression";
             progress.Add(UiKit.Text(UiText.Get("progression.xp-status", gs.PlayerLevel, gs.XpToNextLevel,
                 gs.PlayerLevel + 1), "fr-muted"));
-            progress.Add(UiKit.Text(UiText.Get("progression.xp-help"), "fr-tiny"));
             body.Add(progress);
-            if (showWaveAction)
-            {
-                var waves = IconBtn(UiText.Get("progression.waves"), "alien", UiKit.Magenta, OpenProgressionWaves);
-                waves.name = "progression-open-waves";
-                body.Add(waves);
-            }
-        }
-
-        void OpenProgressionWaves()
-        {
-            if (busy || defense.Active) return;
-            CloseAll();
-            var alarm = gs.StructureOfKind(gs.planet, StructureKind.Alarm);
-            if (alarm != null)
-            {
-                if (world.SelectStructure(alarm)) return;
-                Debug.LogError("Frontier: Alarm has no world anchor: " + alarm.def.id);
-                return;
-            }
-            shopTab = 0;
-            OpenShop();
-            var def = gs.db.StructureOfKind(StructureKind.Alarm);
-            var scroll = modalScroll;
-            var card = def != null ? scroll.Q("shop-structure-" + def.id) : null;
-            if (card != null) scroll.schedule.Execute(() =>
-            {
-                if (scroll.contentContainer.Contains(card)) scroll.ScrollTo(card);
-            }).StartingIn(1);
         }
 
         void BuildTech(VisualElement body)
@@ -96,16 +67,27 @@ namespace Frontier
                 if (index < 0) return;
                 researchBranch = index == 0 ? "" : branches[index];
                 RefreshModal();
+                RefreshPopup();
             });
             body.Add(UiKit.Text(UiText.Get("research.branch"), "fr-tiny"));
             body.Add(filter);
 
             var nodes = gs.db.research.Where(node => node != null && node.data != null &&
                 (string.IsNullOrEmpty(researchBranch) || node.data.branch == researchBranch))
-                .OrderBy(node => node.data.tier)
+                .OrderBy(node => gs.IsResearched(node.data.id) ? 2 : gs.CanResearch(node) ? 0 : 1)
+                .ThenBy(node => node.data.tier)
                 .ThenBy(node => node.data.branch, StringComparer.Ordinal)
                 .ThenBy(node => node.LocalizedName, StringComparer.Ordinal);
-            foreach (var node in nodes) BuildResearchCard(body, node);
+            foreach (var node in nodes.Where(node => !gs.IsResearched(node.data.id))) BuildResearchCard(body, node);
+            var completed = nodes.Where(node => gs.IsResearched(node.data.id)).ToList();
+            if (completed.Count > 0)
+            {
+                var foldout = new Foldout { text = UiText.Get("research.completed-count", completed.Count), value = showCompletedResearch };
+                foldout.Q<Toggle>().style.minHeight = UiKit.Size.Touch;
+                foldout.RegisterValueChangedCallback(e => showCompletedResearch = e.newValue);
+                foreach (var node in completed) BuildResearchCard(foldout, node);
+                body.Add(foldout);
+            }
         }
 
         void BuildResearchCard(VisualElement body, ResearchNodeSO node)
@@ -113,17 +95,25 @@ namespace Frontier
             bool complete = gs.IsResearched(node.data.id);
             string lockReason = complete ? null : gs.ResearchLockReason(node);
             var card = Card(UiKit.Magenta, complete);
+            card.name = "research-" + node.data.id;
             var head = UiKit.Div("fr-row");
             head.Add(UiKit.Text(node.LocalizedName.ToUpper(), "fr-h2"));
             head.Add(UiKit.Div("fr-spacer"));
-            head.Add(new FrontierBadge { text = UiText.Get(complete ? "research.complete" : "research.tier", Math.Max(1, node.data.tier)),
-                Tint = complete ? UiKit.Lime : UiKit.Muted });
+            var badge = new FrontierBadge { text = UiText.Get(complete ? "research.complete" : "research.tier", Math.Max(1, node.data.tier)),
+                Tint = complete ? UiKit.Lime : UiKit.Muted };
+            badge.style.marginLeft = UiKit.Space.S8;
+            head.Add(badge);
             card.Add(head);
             card.Add(UiKit.Text(UiText.Get("research.lab", PrettyName(node.data.branch), node.data.labLevel), "fr-tiny"));
             card.Add(UiKit.Text(node.LocalizedDescription, "fr-muted"));
+            BuildResearchPreviews(card, node);
             if (node.data.prereqs != null && node.data.prereqs.Length > 0)
                 card.Add(UiKit.Text(UiText.Get("research.prerequisites", string.Join(", ", node.data.prereqs.Select(PrettyName))), "fr-small"));
-            if (!complete) card.Add(UiKit.CostRow(CatalogCost(node.data.cost), gs, true, OpenResourceSource));
+            if (!complete)
+            {
+                card.Add(ProjectCosts(CatalogCost(node.data.cost), Project("research", node.data.id)));
+                AddProjectAction(card, Project("research", node.data.id), false);
+            }
             if (complete)
                 card.Add(Note(UiText.Get("research.complete-help", UnlockSummary(node.data.unlocks)), UiKit.Lime));
             else if (lockReason == null)
@@ -139,6 +129,24 @@ namespace Frontier
                     card.Add(UiKit.Text(UiText.Get("research.unlocks", UnlockSummary(node.data.unlocks)), "fr-tiny"));
             }
             else card.Add(Note(lockReason, UiKit.Amber));
+            if (!complete && node.data.tier > gs.PlayerLevel)
+            {
+                var track = card.Q<Button>(className: "fr-project-track");
+                track.RemoveFromHierarchy();
+                var content = UiKit.Div();
+                foreach (var child in card.Children().ToList()) content.Add(child);
+                content.SetEnabled(false);
+                card.Add(content);
+                var overlay = UiKit.Div("fr-research-xp-lock");
+                overlay.name = "research-xp-lock";
+                overlay.Add(Icons.Make("lock", Color.white));
+                overlay.Add(UiKit.Text(UiText.Get("research.xp-lock", node.data.tier), "fr-h2", Color.white));
+                card.Add(overlay);
+                track.style.position = Position.Absolute;
+                track.style.top = UiKit.Space.S8;
+                track.style.right = UiKit.Space.S8;
+                card.Add(track);
+            }
             body.Add(card);
         }
 
@@ -146,7 +154,6 @@ namespace Frontier
         {
             if (!gs.db.UsesImportedEconomy || gs.db.toolLadders == null) return;
             body.Add(SectionLabel(UiText.Get("tools.title")));
-            body.Add(UiKit.Text(UiText.Get("tools.help"), "fr-muted"));
             foreach (var ladder in gs.db.toolLadders)
             {
                 if (ladder == null || ladder.data == null || ladder.data.tiers == null || ladder.data.tiers.Length == 0) continue;
@@ -157,6 +164,7 @@ namespace Frontier
                 string lockReason = gs.ToolTierLockReason(ladder);
                 var color = ladder.color == default(Color) ? UiKit.Magenta : UiKit.Ui(ladder.color);
                 var card = Card(color, nextRow == null);
+                card.name = "tool-" + ladder.data.id;
                 var head = UiKit.Div("fr-row");
                 head.Add(UiKit.Text(ladder.data.kind == ToolKind.Pick ? UiText.Get("tools.mining") : ladder.LocalizedName.ToUpper(), "fr-h2"));
                 head.Add(UiKit.Div("fr-spacer"));
@@ -175,7 +183,8 @@ namespace Frontier
                 {
                     card.Add(UiKit.Text(UiText.Get("tools.next", ladder.TierName(nextRow), nextRow.yieldMult), "fr-small"));
                     card.Add(UiKit.Text(UiText.Get("progression.required-level", Math.Max(1, nextRow.requiresReachTier)), "fr-tiny"));
-                    card.Add(UiKit.CostRow(CatalogCost(nextRow.cost), gs, true, OpenResourceSource));
+                    card.Add(ProjectCosts(CatalogCost(nextRow.cost), Project("tool", ladder.data.id, current + 1)));
+                    AddProjectAction(card, Project("tool", ladder.data.id, current + 1));
                     if (lockReason != null) card.Add(Note(lockReason, UiKit.Amber));
                     else
                     {
@@ -205,10 +214,26 @@ namespace Frontier
             return ItemAmounts.FromIds(cost, gs.db.ResolveResource);
         }
 
-        static string UnlockSummary(string[] unlocks)
+        string UnlockSummary(string[] unlocks)
         {
             if (unlocks == null || unlocks.Length == 0) return UiText.Get("research.progression");
-            return string.Join(", ", unlocks.Select(PrettyName));
+            return string.Join(", ", unlocks.Select(unlock =>
+            {
+                int separator = unlock.IndexOf(':');
+                if (separator < 0) return PrettyName(unlock);
+                string kind = unlock.Substring(0, separator), id = unlock.Substring(separator + 1);
+                if (kind == "structure")
+                {
+                    var definition = gs.db.FindStructure(id);
+                    if (definition != null) return definition.LocalizedName;
+                }
+                if (kind == "recipe")
+                {
+                    var recipe = gs.db.recipes.FirstOrDefault(item => item != null && item.id == id);
+                    if (recipe != null) return recipe.LocalizedName;
+                }
+                return PrettyName(id.Replace(':', ' '));
+            }));
         }
     }
 }

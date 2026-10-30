@@ -86,6 +86,9 @@ namespace Frontier.Tests
         [Test]
         public void PlanetSurfaceStyle_MapsWeatherBiomeAndGasAtmosphereToShaderCoverage()
         {
+            var home = service.Get("sylva");
+            Assert.AreEqual(0f, PlanetSurfaceStyle.CloudCoverage(home));
+            Assert.AreEqual(Color.white, PlanetSurfaceStyle.AtmosphereColor(home, home.Rim));
             var glacial = service.Get("glacia");
             Assert.AreEqual(1f, PlanetSurfaceStyle.PolarCapCoverage(glacial));
             Assert.Greater(PlanetSurfaceStyle.CloudCoverage(glacial), 0f);
@@ -94,6 +97,47 @@ namespace Frontier.Tests
             Assert.IsNotNull(gasGiant);
             Assert.GreaterOrEqual(PlanetSurfaceStyle.CloudCoverage(gasGiant),
                 0.72f * Mathf.Clamp01(gasGiant.AtmosphereIntensity));
+        }
+
+        [Test]
+        public void StructureLevelPaletteKeepsFirstLevelOrangeAndClampsFutureLevels()
+        {
+            Assert.AreEqual((Color)new Color32(224, 91, 20, 255), StructureAppearance.AccentForLevel(1));
+            var colors = new HashSet<Color>();
+            for (int level = 1; level <= 10; level++) colors.Add(StructureAppearance.AccentForLevel(level));
+            Assert.AreEqual(10, colors.Count);
+            Assert.AreEqual(StructureAppearance.AccentForLevel(1), StructureAppearance.AccentForLevel(0));
+            Assert.AreEqual(StructureAppearance.AccentForLevel(10), StructureAppearance.AccentForLevel(100));
+            var model = ModelLibrary.Prefab(db.StructureOfKind(StructureKind.Lumber).modelKey);
+            var renderer = model.GetComponent<MeshRenderer>();
+            var mesh = model.GetComponent<MeshFilter>().sharedMesh;
+            int wood = Array.FindIndex(renderer.sharedMaterials, material => material.name == "Structure_Wood");
+            Assert.GreaterOrEqual(wood, 0);
+            Assert.Greater(mesh.GetIndexCount(wood), 0);
+            Assert.AreEqual(0f, renderer.sharedMaterials[wood].GetFloat("_Metallic"));
+        }
+
+        [Test]
+        public void LumberThumbnailShowsBrownLogsAndOrangeTrim()
+        {
+            var texture = new Texture2D(2, 2);
+            try
+            {
+                var path = System.IO.Path.Combine(Application.dataPath, "Frontier", "Resources",
+                    "Frontier", "StructureThumbnails", "lumber.png");
+                Assert.IsTrue(texture.LoadImage(System.IO.File.ReadAllBytes(path)));
+                int brown = 0, orange = 0;
+                foreach (var pixel in texture.GetPixels32())
+                {
+                    if (pixel.a < 128) continue;
+                    if (pixel.r > 60 && pixel.r < 190 && pixel.g > 30 &&
+                        pixel.r > pixel.g * 1.3f && pixel.g > pixel.b * 1.2f) brown++;
+                    if (pixel.r > 190 && pixel.r > pixel.g * 1.5f && pixel.g > pixel.b * 1.3f) orange++;
+                }
+                Assert.Greater(brown, 100, "The baked logs must retain their wood color.");
+                Assert.Greater(orange, 100, "The first thumbnail must not use a blank/default shader pass.");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(texture); }
         }
 
         [Test]
@@ -349,8 +393,10 @@ namespace Frontier.Tests
                 Assert.AreEqual(1f, ModelLibrary.GroundScale(round), round);
             foreach (string core in new[] { "ferrum", "cinder", "nyx", "obsidian", "vesper" })
                 Assert.AreEqual(0.70f, ModelLibrary.GroundScale(core), 0.011f, core + " is a 1.05 body with spikes out to 1.3");
-            foreach (string lens in new[] { "arbor", "mire", "kaos" })
-                Assert.AreEqual(0.87f, ModelLibrary.GroundScale(lens), 0.011f, lens + " is a flattened body");
+            foreach (string terrain in new[] { "arbor", "mire" })
+                Assert.AreEqual(1f, ModelLibrary.GroundScale(terrain), terrain + " uses its full procedural terrain mesh as the body");
+            Assert.AreEqual(0.92f, ModelLibrary.GroundScale("kaos"), 0.011f,
+                "kaos's protruding shards narrow the measured body radius");
             Assert.AreEqual(1f, ModelLibrary.GroundScale("no-such-model"));
             Assert.AreEqual(1f, ModelLibrary.GroundScale("struct_drill"));
         }

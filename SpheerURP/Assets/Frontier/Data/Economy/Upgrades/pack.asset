@@ -57,13 +57,13 @@ MonoBehaviour:
     displayName: Field Pack
     cost:
     - resource: {fileID: 11400000, guid: 0b9d8041f2857ee4e93a54b2abc073ed, type: 2}
-      amount: 240
+      amount: 190
     - resource: {fileID: 11400000, guid: b112040063a33d54c944b7b2b891546a, type: 2}
-      amount: 240
+      amount: 190
     - resource: {fileID: 11400000, guid: 38d45bbcb8f3f72478db5efe579536ad, type: 2}
-      amount: 110
+      amount: 90
     - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
-      amount: 40
+      amount: 30
     value: 36
     researchPrereq: 
     requiresReachTier: 1

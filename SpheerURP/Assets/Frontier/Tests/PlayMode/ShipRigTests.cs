@@ -75,6 +75,32 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator LandingBoostersPulseDownwardAndDoNotAlterFlightGear()
+        {
+            var host = new GameObject("Landing booster test");
+            var rig = ShipRig.Create(host.transform);
+            try
+            {
+                rig.SetLandingThrust(0.8f, 0.1f);
+                var jet = rig.transform.Find("Hull/LandingAir_1");
+                Assert.IsNotNull(jet);
+                Assert.Greater(Vector3.Dot(-jet.forward, Vector3.down), 0.99f);
+                var scale = jet.localScale;
+                rig.SetLandingThrust(0.8f, 0.15f);
+                Assert.AreNotEqual(scale, jet.localScale);
+                Assert.AreEqual(1f, rig.Gear);
+                Assert.AreEqual(0f, rig.Throttle);
+                Assert.AreEqual(2, Array.FindAll(rig.GetComponentsInChildren<Transform>(true),
+                    t => t.name.StartsWith("LandingAir_", StringComparison.Ordinal)).Length);
+                rig.SetLandingThrust(0f, 1f);
+                Assert.IsFalse(jet.gameObject.activeSelf);
+                Assert.Throws<ArgumentOutOfRangeException>(() => rig.SetLandingThrust(float.NaN, 0f));
+                yield return null;
+            }
+            finally { Object.Destroy(host); }
+        }
+
+        [UnityTest]
         public IEnumerator SharedRigRetractsGearDrivesEnginesAndOwnsItsResources()
         {
             var host = new GameObject("Ship rig test");

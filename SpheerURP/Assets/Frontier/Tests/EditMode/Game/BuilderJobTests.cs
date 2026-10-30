@@ -106,6 +106,102 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void ShardStructurePurchaseReplacesMaterialsAndCrewAndPersistsOnlyOneCharge()
+        {
+            var state = CreateCrewPurchaseState(10000, false);
+            state.backpack.Clear();
+            var other = state.DebugPlace(db.StructureOfKind(StructureKind.Warehouse), 1);
+            state.DebugSetBuilderJob(other, 600);
+            Assert.AreEqual(0, state.AvailableBuilderCount);
+            var definition = db.StructureOfKind(StructureKind.Refinery);
+            int cost = state.StructureShardCost(definition);
+            Assert.AreEqual(Math.Max(10, 2 * Economy.ShardCurve.SkipCost(db.shardRules.data,
+                state.StructureJobSeconds(definition, 1))), cost);
+            int before = state.ShardBalance;
+            bool discovered = state.IsAtlasDiscovered("structure", definition.kind.ToString());
+            Assert.AreEqual(StructurePurchaseResult.Saved,
+                state.PurchaseStructure(definition, 0, cost, out var message), message);
+            Assert.IsTrue(state.IsOperational(state.StructureAt(state.planet, 0)));
+            Assert.IsFalse(state.IsUnderConstruction(state.StructureAt(state.planet, 0)));
+            Assert.AreEqual(1, state.BusyBuilderCount, "Buying does not steal or add a crew.");
+            foreach (var resource in db.resources) Assert.AreEqual(0, state.Count(resource));
+            int expected = before - cost + (discovered ? 0 : db.shardRules.data.atlasStructureShards);
+            Assert.AreEqual(expected, state.ShardBalance);
+            Assert.AreEqual(StructurePurchaseResult.Rejected,
+                state.PurchaseStructure(definition, 0, cost, out _));
+            Assert.AreEqual(expected, state.ShardBalance);
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(expected, loaded.ShardBalance);
+            Assert.IsTrue(loaded.IsOperational(loaded.StructureAt(loaded.planet, 0)));
+        }
+
+        [TestCase("balance")]
+        [TestCase("quote")]
+        [TestCase("level")]
+        [TestCase("research")]
+        [TestCase("lab")]
+        [TestCase("slot")]
+        [TestCase("planet")]
+        [TestCase("limit")]
+        [TestCase("read-only")]
+        public void ShardStructurePurchaseRechecksGatesBeforeSpending(string reason)
+        {
+            var state = CreateCrewPurchaseState(reason == "balance" ? 0 : 10000, false);
+            state.backpack.Clear();
+            var definition = UnityEngine.Object.Instantiate(db.StructureOfKind(StructureKind.Refinery));
+            var original = db.structures;
+            db.structures = original.Select(d => d.id == definition.id ? definition : d).ToArray();
+            try
+            {
+                if (reason == "level") definition.unlockTier = state.PlayerLevel + 1;
+                if (reason == "research") definition.unlockResearch = "not_researched";
+                if (reason == "lab") definition.Row(1).requiresLabLevel = 20;
+                if (reason == "planet") definition.kind = StructureKind.SiphonRig;
+                if (reason == "limit")
+                {
+                    definition.maxPerPlanet = 1;
+                    state.DebugPlace(definition, 1);
+                }
+                if (reason == "read-only") state.saves.Store.MarkReadOnly("test");
+                int cost = state.StructureShardCost(definition), before = state.ShardBalance;
+                Assert.AreEqual(StructurePurchaseResult.Rejected,
+                    state.PurchaseStructure(definition, reason == "slot" ? -1 : 0,
+                        reason == "quote" ? cost - 1 : cost, out var message));
+                Assert.IsNotEmpty(message);
+                Assert.AreEqual(before, state.ShardBalance);
+                Assert.IsNull(state.StructureAt(state.planet, 0));
+            }
+            finally
+            {
+                db.structures = original;
+                UnityEngine.Object.DestroyImmediate(definition);
+            }
+        }
+
+        [Test]
+        public void ShardStructureSaveFailureIsExplicitAndCanRetrySavingWithoutRepurchasing()
+        {
+            var state = CreateCrewPurchaseState(10000, false);
+            var definition = db.StructureOfKind(StructureKind.Refinery);
+            int cost = state.StructureShardCost(definition);
+            File.Delete(sandbox.SaveFile);
+            Directory.CreateDirectory(sandbox.SaveFile);
+            LogAssert.Expect(LogType.Warning, new Regex("Frontier save failed:"));
+            Assert.AreEqual(StructurePurchaseResult.PendingSave,
+                state.PurchaseStructure(definition, 0, cost, out var message));
+            StringAssert.Contains("saving failed", message);
+            int balance = state.ShardBalance;
+            Assert.AreEqual(StructurePurchaseResult.Rejected,
+                state.PurchaseStructure(definition, 0, cost, out _));
+            Assert.AreEqual(balance, state.ShardBalance);
+            Directory.Delete(sandbox.SaveFile);
+            Assert.IsTrue(state.Save());
+            var loaded = new GameState(db, true, clock);
+            Assert.AreEqual(balance, loaded.ShardBalance);
+            Assert.IsTrue(loaded.IsOperational(loaded.StructureAt(loaded.planet, 0)));
+        }
+
+        [Test]
         public void AtlasStructureDiscovery_IsRewardedOnlyWhenConstructionCompletes()
         {
             if (!db.UsesImportedEconomy) Assert.Ignore("Imported build-time content is unavailable");

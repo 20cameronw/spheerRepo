@@ -240,7 +240,7 @@ namespace Frontier
                     {
                         Toast(UiText.Get("storage.drop-help"), UiKit.Red); return;
                     }
-                    int room = Mathf.Max(0, resource.stackSize - packCnt[target]);
+                    int room = Mathf.Max(0, gs.StackSize(resource) - packCnt[target]);
                     int moved = gs.Withdraw(warehouse, index, room, false);
                     if (moved == 0) { Toast(UiText.Get("storage.pack-slot-full"), UiKit.Red); return; }
                     if (!gs.IsTankFuel(resource.id)) { packRes[target] = resource; packCnt[target] += moved; }

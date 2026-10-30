@@ -16,6 +16,7 @@ namespace Frontier.EditorTools
         const int Height = 1200;
         const float CellSize = 1.2f;
         const string OutputPath = "Assets/Frontier/Art/Validation/PlanetContactSheet.png";
+        const string OutputPathArg = "-frontierPlanetContactSheetPath";
 
         public static PlanetData[] BuildSample(UniverseService service)
         {
@@ -45,7 +46,19 @@ namespace Frontier.EditorTools
         [MenuItem("Frontier/Planets/Render 200 Planet Contact Sheet")]
         public static void Render()
         {
-            RenderSample(BuildSample(UniverseService.For(GameDatabase.Load())), OutputPath);
+            string outputPath = OutputPath;
+            string[] args = Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length - 1; i++)
+                if (args[i] == OutputPathArg) outputPath = args[i + 1];
+            RenderSample(BuildSample(UniverseService.For(GameDatabase.Load())), outputPath);
+        }
+
+        [MenuItem("Frontier/Planets/Render Model Review Sheet")]
+        public static void RenderReview()
+        {
+            string path = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Screens",
+                "planet-assets-review", "planet-contact-sheet.png"));
+            RenderSample(BuildSample(UniverseService.For(GameDatabase.Load())), path);
         }
 
         public static void RenderSample(PlanetData[] planets, string outputPath)

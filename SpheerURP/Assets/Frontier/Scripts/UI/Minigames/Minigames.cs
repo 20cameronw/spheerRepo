@@ -7,6 +7,68 @@ using UnityEngine.UIElements;
 
 namespace Frontier
 {
+    sealed class HarvestHoldInput
+    {
+        readonly Func<bool> enabled;
+        readonly KeyCode key;
+        VisualElement owner;
+        int pointer = -1;
+        bool keyboard, blockedKey;
+        public Action Cancelled;
+        public bool Held { get { return pointer >= 0 || keyboard; } }
+
+        public HarvestHoldInput(VisualElement keyboardRoot, KeyCode key, Func<bool> enabled)
+        {
+            this.key = key; this.enabled = enabled;
+            keyboardRoot.focusable = true;
+            keyboardRoot.RegisterCallback<KeyDownEvent>(e =>
+            {
+                if (e.keyCode != this.key) return;
+                if (enabled() && !blockedKey) keyboard = true;
+                e.StopPropagation();
+            }, TrickleDown.TrickleDown);
+            keyboardRoot.RegisterCallback<KeyUpEvent>(e =>
+            {
+                if (e.keyCode != this.key) return;
+                keyboard = false; blockedKey = false; e.StopPropagation();
+            }, TrickleDown.TrickleDown);
+        }
+
+        public void Bind(VisualElement element)
+        {
+            element.RegisterCallback<PointerDownEvent>(e =>
+            {
+                if (!enabled() || pointer >= 0) return;
+                pointer = e.pointerId; owner = element;
+                element.CapturePointer(pointer);
+                e.StopPropagation();
+            }, TrickleDown.TrickleDown);
+            element.RegisterCallback<PointerUpEvent>(e => Release(e.pointerId), TrickleDown.TrickleDown);
+            element.RegisterCallback<PointerCancelEvent>(e => Cancel(e.pointerId), TrickleDown.TrickleDown);
+            element.RegisterCallback<PointerCaptureOutEvent>(e => Cancel(e.pointerId));
+        }
+
+        void Cancel(int id)
+        {
+            if (id != pointer) return;
+            Release(id); Cancelled?.Invoke();
+        }
+
+        void Release(int id)
+        {
+            if (id != pointer) return;
+            var old = owner; pointer = -1; owner = null;
+            if (old != null && old.HasPointerCapture(id)) old.ReleasePointer(id);
+        }
+
+        public void Reset()
+        {
+            blockedKey |= keyboard;
+            keyboard = false;
+            Release(pointer);
+        }
+    }
+
     public struct MinigameResult
     {
         public float quality;
@@ -38,6 +100,9 @@ namespace Frontier
         Action<MinigameResult> onDone;
         Func<Task<ServiceResult<RewardedAdResult>>> doubleYieldOffer;
         Func<MinigameResult, bool> canOfferDoubleYield;
+        Func<MinigameResult, string> doubleYieldQuote;
+        Func<string> doubleYieldUnavailable;
+        string doubleYieldLabel;
         Button doubleYieldButton, collectButton;
         Label doubleYieldStatus;
         VisualElement pauseLayer;
@@ -63,13 +128,17 @@ namespace Frontier
 
         public void Run(VisualElement host, Color accent, float tol, float diff, Action<MinigameResult> done,
             Func<Task<ServiceResult<RewardedAdResult>>> offerDoubleYield = null,
-            Func<MinigameResult, bool> canOfferDoubleYield = null)
+            Func<MinigameResult, bool> canOfferDoubleYield = null,
+            Func<MinigameResult, string> doubleYieldQuote = null,
+            Func<string> doubleYieldUnavailable = null)
         {
             HarvestFeedback.Warmup();
             rawColor = accent;
             color = UiKit.Ui(accent); tolerance = tol; difficulty = diff; onDone = done;
             doubleYieldOffer = offerDoubleYield;
             this.canOfferDoubleYield = canOfferDoubleYield;
+            this.doubleYieldQuote = doubleYieldQuote;
+            this.doubleYieldUnavailable = doubleYieldUnavailable;
 
             overlay = UiKit.Div("fr-overlay");
             titleLabel = UiKit.Text(Title, "fr-title", color);
@@ -139,6 +208,7 @@ namespace Frontier
         {
             if (cleaned) return;
             cleaned = true;
+            ResetInput();
             resultAwaitingConfirmation = false;
             if (loop != null) loop.Pause();
             if (stage != null) stage.FocusLost = null;
@@ -238,6 +308,7 @@ namespace Frontier
         {
             if (finished) return;
             finished = true;
+            ResetInput();
             if (!r.abandoned) HarvestFeedback.Play(HarvestCue.Complete, FeedbackKind);
             overlay.schedule.Execute(() =>
             {
@@ -267,15 +338,19 @@ namespace Frontier
                 "fr-minigame-result-detail", UiKit.Muted));
             pendingResult = result;
             resultAwaitingConfirmation = true;
-            if (doubleYieldOffer != null && result.quality > 0.05f &&
-                (canOfferDoubleYield == null || canOfferDoubleYield(result)))
+            if (doubleYieldOffer != null && result.quality > 0.05f)
             {
-                doubleYieldButton = PauseAction(UiText.Get("harvest.ad.double-yield"), UiKit.Magenta,
+                doubleYieldLabel = doubleYieldQuote != null ? doubleYieldQuote(result) : UiText.Get("harvest.ad.double-yield");
+                doubleYieldButton = PauseAction(doubleYieldLabel, UiKit.Magenta,
                     RequestDoubleYield, "minigame-double-yield", false);
                 panel.Add(doubleYieldButton);
                 doubleYieldStatus = UiKit.Text("", "fr-tiny");
                 doubleYieldStatus.name = "minigame-double-yield-status";
                 panel.Add(doubleYieldStatus);
+                string unavailable = canOfferDoubleYield != null && !canOfferDoubleYield(result)
+                    ? UiText.Get("reward.harvest-space") : doubleYieldUnavailable?.Invoke();
+                doubleYieldStatus.text = unavailable ?? "";
+                doubleYieldButton.SetEnabled(unavailable == null);
             }
             collectButton = PauseAction(UiText.Get("harvest.collect"), UiKit.Cyan, ContinueResult,
                 "minigame-collect-resources", true);
@@ -301,7 +376,7 @@ namespace Frontier
                 {
                     doubleYieldStatus.text = result.status == ServiceStatus.ConsentRequired
                         ? UiText.Get("harvest.ad.consent-required")
-                        : UiText.Get("harvest.ad.failed");
+                        : result.text.Resolve(UiText.Get);
                     return;
                 }
                 if (!result.value.rewardEarned || result.value.placementId != "double-yield")
@@ -327,8 +402,8 @@ namespace Frontier
                     if (collectButton != null) collectButton.SetEnabled(true);
                     if (!pendingResult.rewardedDoubleYield && doubleYieldButton != null)
                     {
-                        doubleYieldButton.text = UiText.Get("harvest.ad.double-yield");
-                        doubleYieldButton.SetEnabled(true);
+                        doubleYieldButton.text = doubleYieldLabel;
+                        doubleYieldButton.SetEnabled(false);
                     }
                 }
             }
@@ -400,7 +475,7 @@ namespace Frontier
         readonly Transform[] blobs = new Transform[3];
         GameObject rockGo;
         Material rockMat, gemMat;
-        Mesh chunkMesh, gemMesh;
+        Mesh chunkMesh, woodChunkMesh, gemMesh;
         readonly List<Vector3> surf = new List<Vector3>();
         ToolRig tool;
         Vector3 spotLocal;
@@ -411,13 +486,15 @@ namespace Frontier
         int step { get { return run.CompletedStages; } }
         VisualElement[] pipFill;
         VisualElement swingFill;
+        VisualElement timingNeedle;
+        bool swingKey;
 
         public NodeGame(bool tree) { this.tree = tree; }
 
         protected override string Title { get { return UiText.Get(tree ? "harvest.node.title.tree" : "harvest.node.title.rock"); } }
         protected override string DefaultToolName { get { return UiText.Get(tree ? "harvest.tool.axe" : "harvest.tool.pick"); } }
         protected override MinigameKind FeedbackKind { get { return tree ? MinigameKind.Chop : MinigameKind.Mine; } }
-        protected override string Hint { get { return UiText.Get("harvest.node.hint"); } }
+        protected override string Hint { get { return UiText.Get(tree ? "harvest.chop.timing-hint" : "harvest.node.hint"); } }
         protected override Color StageBg { get { return new Color(color.r * 0.05f + 0.01f, color.g * 0.05f + 0.015f, color.b * 0.06f + 0.03f); } }
 
         // ------------------------------------------------------------ UI
@@ -464,12 +541,49 @@ namespace Frontier
             arena.Add(swBar);
 
             arena.RegisterCallback<PointerDownEvent>(OnTap);
+            if (tree)
+            {
+                var timing = UiKit.Div("fr-harvest-track");
+                timing.name = "chop-timing";
+                var zone = UiKit.Div("fr-harvest-zone");
+                // The model's tool/tolerance-sized zone is applied once the scene is ready.
+                zone.name = "chop-zone";
+                timing.Add(zone);
+                var center = UiKit.Div("fr-harvest-needle");
+                center.style.left = Length.Percent(50f);
+                center.style.width = 3;
+                center.style.backgroundColor = UiKit.Cyan;
+                timing.Add(center);
+                timingNeedle = UiKit.Div("fr-harvest-needle");
+                timing.Add(timingNeedle);
+                controls.style.flexDirection = FlexDirection.Column;
+                controls.style.alignItems = Align.Stretch;
+                controls.style.width = Length.Percent(100);
+                controls.Add(timing);
+                var swing = UiKit.Btn(UiText.Get("harvest.chop.swing"), color, () => TimedSwing(), true);
+                swing.name = "chop-swing";
+                controls.Add(swing);
+                overlay.focusable = true;
+                overlay.RegisterCallback<KeyDownEvent>(e =>
+                {
+                    if (e.keyCode == KeyCode.Space)
+                    { if (!swingKey) TimedSwing(); swingKey = true; e.StopPropagation(); }
+                }, TrickleDown.TrickleDown);
+                overlay.RegisterCallback<KeyUpEvent>(e => { if (e.keyCode == KeyCode.Space) swingKey = false; });
+                overlay.Focus();
+            }
         }
 
         // ------------------------------------------------------------ 3D scene
         protected override void BuildScene()
         {
-            run = new NodeHarvestRun(toolDamage, difficulty);
+            run = new NodeHarvestRun(toolDamage, difficulty, tolerance);
+            if (tree)
+            {
+                var zone = controls.Q("chop-zone");
+                zone.style.left = Length.Percent((0.5f - run.SweetHalfWidth) * 100f);
+                zone.style.width = Length.Percent(run.SweetHalfWidth * 200f);
+            }
             spotR = Mathf.Clamp(0.36f * tolerance * (1.1f - 0.35f * difficulty), 0.24f, 0.5f);
             rockSeed = UnityEngine.Random.Range(1, 999);
             var st = stage;
@@ -481,7 +595,8 @@ namespace Frontier
             nodeRoot = new GameObject("Node").transform;
             nodeRoot.SetParent(st.root, false);
 
-            chunkMesh = st.Own(MeshKit.Ico(0, d => 0.5f));
+            chunkMesh = st.Own(MeshKit.Shard(rockSeed));
+            woodChunkMesh = st.Own(MeshKit.Cyl(0.16f, 0.12f, 0.56f, 6));
             gemMesh = st.Own(MeshKit.Ico(1, d => 0.5f));
             gemMat = st.Lit(color * 0.5f, rim * 1.8f, 4f, 3f, 0f);
 
@@ -528,17 +643,39 @@ namespace Frontier
 
         void BuildTree(MinigameStage st, Color rim)
         {
-            var barkM = st.Lit(new Color(0.42f, 0.26f, 0.13f), new Color(0.35f, 0.18f, 0.05f), 0f, 10f, 0f);
-            var leafM = st.Lit(new Color(color.r * 0.5f + 0.1f, color.g * 0.5f + 0.1f, color.b * 0.5f + 0.1f), rim * 0.9f, 4f, 3f, 0f, rockSeed);
+            var barkM = st.Lit(new Color(0.30f, 0.17f, 0.09f), new Color(0.24f, 0.12f, 0.04f), 0f, 10f, 0f);
+            var woodM = st.Lit(new Color(0.56f, 0.34f, 0.16f), new Color(0.42f, 0.20f, 0.05f), 0f, 10f, 0f);
+            var leafM = st.Lit(new Color(color.r * 0.28f + 0.04f, color.g * 0.44f + 0.08f, color.b * 0.24f + 0.03f), rim * 0.55f, 4f, 3f, 0f, rockSeed);
+            var leafLightM = st.Lit(new Color(color.r * 0.34f + 0.08f, color.g * 0.54f + 0.12f, color.b * 0.30f + 0.04f), rim * 0.75f, 4f, 3f, 0f, rockSeed + 17);
             rockMat = barkM;
-            trunk = st.AddMesh(MeshKit.Cyl(0.5f, 0.34f, 3.2f, 9), barkM, nodeRoot, new Vector3(0f, -1.6f, 0f)).transform;
-            float[] ys = { 1.5f, 2.35f, 3.05f }, rs = { 1.25f, 0.98f, 0.7f };
+            trunk = st.AddMesh(MeshKit.Cyl(0.34f, 0.20f, 3.2f, 9), barkM, nodeRoot, new Vector3(0f, -1.6f, 0f)).transform;
+            AddTreeBranch(st, barkM, new Vector3(0f, -1.35f, 0f), new Vector3(-0.43f, -1.58f, 0.18f), 0.15f, 0.045f);
+            AddTreeBranch(st, barkM, new Vector3(0f, -1.38f, 0f), new Vector3(0.38f, -1.57f, -0.22f), 0.13f, 0.04f);
+            AddTreeBranch(st, barkM, new Vector3(-0.02f, -0.2f, 0f), new Vector3(-0.58f, 0.65f, -0.02f), 0.17f, 0.07f);
+            AddTreeBranch(st, barkM, new Vector3(-0.58f, 0.65f, -0.02f), new Vector3(-0.72f, 1.18f, -0.04f), 0.075f, 0.035f);
+            AddTreeBranch(st, woodM, new Vector3(0.02f, 0.25f, 0f), new Vector3(0.54f, 0.94f, 0.03f), 0.15f, 0.06f);
+            AddTreeBranch(st, woodM, new Vector3(0.54f, 0.94f, 0.03f), new Vector3(0.66f, 1.42f, 0.05f), 0.065f, 0.03f);
+            AddTreeBranch(st, barkM, new Vector3(0f, 0.72f, 0f), new Vector3(-0.18f, 1.55f, 0.05f), 0.12f, 0.045f);
+            float[] ys = { 1.55f, 2.38f, 3.05f }, rs = { 0.92f, 0.76f, 0.57f };
+            Vector3[] centers = { new Vector3(-0.08f, ys[0], 0f), new Vector3(-0.19f, ys[1], 0.09f), new Vector3(0.07f, ys[2], -0.03f) };
             for (int i = 0; i < 3; i++)
             {
                 int seed = rockSeed + i * 13;
                 float r = rs[i];
-                blobs[i] = st.AddMesh(MeshKit.Ico(1, d => r * (0.8f + 0.35f * Mathf.PerlinNoise(d.x * 2f + seed, d.y * 2f + d.z))), leafM, nodeRoot, new Vector3(0f, ys[i], 0f)).transform;
+                Material leaf = i == 1 ? leafLightM : leafM;
+                blobs[i] = st.AddMesh(MeshKit.Ico(1, d => r * (0.84f + 0.22f * Mathf.PerlinNoise(d.x * 2f + seed, d.y * 2f + d.z))), leaf, nodeRoot, centers[i]).transform;
             }
+            st.AddMesh(MeshKit.Ico(1, d => 0.46f * (0.86f + 0.18f * Mathf.PerlinNoise(d.x * 2f + rockSeed + 9, d.y * 2f + d.z))),
+                leafLightM, nodeRoot, new Vector3(-0.62f, 1.95f, 0.02f));
+            st.AddMesh(MeshKit.Ico(1, d => 0.42f * (0.86f + 0.18f * Mathf.PerlinNoise(d.x * 2f + rockSeed + 21, d.y * 2f + d.z))),
+                leafM, nodeRoot, new Vector3(0.60f, 1.84f, -0.03f));
+        }
+
+        void AddTreeBranch(MinigameStage st, Material material, Vector3 start, Vector3 end, float baseRadius, float tipRadius)
+        {
+            Vector3 delta = end - start;
+            Transform branch = st.AddMesh(MeshKit.Cyl(baseRadius, tipRadius, delta.magnitude, 6), material, nodeRoot, start).transform;
+            branch.localRotation = Quaternion.FromToRotation(Vector3.up, delta.normalized);
         }
 
         float TrunkR(float y) { return Mathf.Lerp(0.5f, 0.34f, Mathf.Clamp01((y + 1.6f) / 3.2f)); }
@@ -577,6 +714,7 @@ namespace Frontier
         // ------------------------------------------------------------ input
         void OnTap(PointerDownEvent e)
         {
+            if (tree) { TimedSwing(); return; }
             if (!CanInteract || tool == null) return;
             if (run.Cooldown > 0f) { HarvestFeedback.Play(HarvestCue.Recovering, FeedbackKind); return; }
 
@@ -597,6 +735,7 @@ namespace Frontier
                     Vector3 l = nodeRoot.InverseTransformPoint(hitW);
                     glance = Mathf.Abs(l.x) < 0.55f && l.y > -1.7f && l.y < (step >= 3 ? 0.6f : 3.6f);
                 }
+
                 else
                 {
                     Vector3 h;
@@ -614,11 +753,18 @@ namespace Frontier
             Strike(kind, hitW);
         }
 
+        void TimedSwing()
+        {
+            if (CanInteract && spot != null) Strike((int)run.TimingStrike, spot.position);
+        }
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public void DebugStrike(HarvestStrike strike)
         {
             if (spot != null) Strike((int)strike, spot.position);
         }
+        public NodeHarvestRun DebugRun { get { return run; } }
+        public void DebugTimedSwing() { TimedSwing(); }
 #endif
 
         void Strike(int kind, Vector3 hitW)
@@ -626,7 +772,8 @@ namespace Frontier
             if (!CanInteract || run == null || tool == null) return;
             int previousStep = step;
             if (!run.TryStrike((HarvestStrike)kind)) return;
-            SetToolState(UiText.Get("harvest.state.recovering"), false);
+            SetToolState(UiText.Get(tree ? "harvest.chop.result." +
+                (kind == 2 ? "perfect" : kind == 1 ? "good" : "miss") : "harvest.state.recovering"), false);
             tool.Strike(stage.root.InverseTransformPoint(hitW), run.SwingSeconds);
             if (kind == 2)
             {
@@ -696,7 +843,7 @@ namespace Frontier
         {
             Vector3 c = nodeRoot.position + (tree ? Vector3.up * 0.3f : Vector3.zero);
             for (int i = 0; i < n; i++)
-                stage.Chunk(chunkMesh, rockMat, c + UnityEngine.Random.insideUnitSphere * 0.5f, size * UnityEngine.Random.Range(0.6f, 1.4f),
+                stage.Chunk(tree ? woodChunkMesh : chunkMesh, rockMat, c + UnityEngine.Random.insideUnitSphere * 0.5f, size * UnityEngine.Random.Range(0.6f, 1.4f),
                     new Vector3(UnityEngine.Random.Range(-1f, 1f) * speed, UnityEngine.Random.Range(0.4f, 1f) * speed, UnityEngine.Random.Range(-1f, 0.2f) * speed), 12f, UnityEngine.Random.Range(0.9f, 1.4f));
         }
 
@@ -713,8 +860,8 @@ namespace Frontier
         {
             float t = Time.time;
             run.Advance(dt);
-            SetToolState(UiText.Get(run.Cooldown > 0f ? "harvest.state.recovering" : "harvest.ready"),
-                run.Cooldown <= 0f);
+            if (tree) timingNeedle.style.left = Length.Percent(run.Marker * 100f);
+            if (run.Cooldown <= 0f) SetToolState(UiText.Get("harvest.ready"));
             pulse += dt * 5f;
             pop = Mathf.MoveTowards(pop, 0f, dt * 3.2f);
             nodeShake = Mathf.MoveTowards(nodeShake, 0f, dt * 3f);
@@ -768,7 +915,9 @@ namespace Frontier
         float progress { get { return run.Progress; } }
         bool inside { get { return run.Inside; } }
         bool contact { get { return run.Contact; } }
-        bool holding;
+        HarvestHoldInput pressureInput, boostInput;
+        VisualElement heatFill;
+        Label heatLabel;
         Transform rig, spin, ore, oreGlow, dust;
         Material oreMat;
         Mesh chunkMesh;
@@ -831,24 +980,31 @@ namespace Frontier
             arena.Add(prog);
 
             var btn = UiKit.Btn(UiText.Get("harvest.drill.hold-control"), color, null, true);
-            btn.style.minWidth = 420;
-            // TrickleDown: the Button's own clickable stops pointer events before normal callbacks run.
-            HoldArea(btn);
-            HoldArea(arena);
+            btn.name = "drill-pressure";
+            btn.style.flexGrow = 1; btn.style.minWidth = 0;
+            pressureInput = new HarvestHoldInput(overlay, KeyCode.Space, () => CanInteract);
+            boostInput = new HarvestHoldInput(overlay, KeyCode.LeftShift, () => CanInteract);
+            pressureInput.Bind(btn);
+            pressureInput.Bind(arena);
             controls.Add(btn);
+            var boost = UiKit.Btn(UiText.Get("harvest.drill.boost"), UiKit.Amber, null, true);
+            boost.name = "drill-boost";
+            boost.style.flexGrow = 1; boost.style.minWidth = 0;
+            boostInput.Bind(boost); controls.Add(boost);
+            var heat = UiKit.Bar(UiKit.Amber, out heatFill);
+            heat.name = "drill-heat";
+            heat.style.width = Length.Percent(100);
+            heat.style.height = 16; heat.style.minHeight = 16; heat.style.flexShrink = 0;
+            heat.style.marginTop = 6; heat.style.marginBottom = 6;
+            overlay.Insert(overlay.IndexOf(controls), heat);
+            heatLabel = UiKit.Text("", "fr-tiny"); heatLabel.name = "drill-heat-label";
+            overlay.Insert(overlay.IndexOf(controls), heatLabel);
+            overlay.Focus();
         }
 
-        void HoldArea(VisualElement el)
+        protected override void ResetInput()
         {
-            el.RegisterCallback<PointerDownEvent>(e =>
-            {
-                if (!CanInteract) return;
-                holding = true;
-                el.CapturePointer(e.pointerId);
-            }, TrickleDown.TrickleDown);
-            el.RegisterCallback<PointerUpEvent>(e => { holding = false; if (el.HasPointerCapture(e.pointerId)) el.ReleasePointer(e.pointerId); }, TrickleDown.TrickleDown);
-            el.RegisterCallback<PointerCancelEvent>(e => holding = false, TrickleDown.TrickleDown);
-            el.RegisterCallback<PointerCaptureOutEvent>(e => holding = false);
+            pressureInput?.Reset(); boostInput?.Reset();
         }
 
         protected override void BuildScene()
@@ -941,25 +1097,30 @@ namespace Frontier
 
         protected override void Tick(float dt)
         {
-            // Safety net in case a pointer-up is swallowed elsewhere; Space also works as hold.
-            if (holding && !Input.GetMouseButton(0) && Input.touchCount == 0) holding = false;
-            bool press = holding || Input.GetKey(KeyCode.Space);
-            Advance(dt, press);
+            Advance(dt, pressureInput.Held, boostInput.Held);
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public DrillHarvestRun DebugRun { get { return run; } }
-        public void DebugAdvance(float seconds, bool press)
+        public bool DebugPressureHeld { get { return pressureInput.Held; } }
+        public bool DebugBoostHeld { get { return boostInput.Held; } }
+        public float DebugTipY { get { return rig.localPosition.y; } }
+        public void DebugAdvanceInput(float seconds) { if (CanInteract) Tick(seconds); }
+        public void DebugAdvance(float seconds, bool press, bool boost = false)
         {
-            if (CanInteract && rig != null) Advance(seconds, press);
+            if (CanInteract && rig != null) Advance(seconds, press, boost);
         }
 #endif
 
-        void Advance(float dt, bool press)
+        void Advance(float dt, bool press, bool boost)
         {
             bool wasContact = contact;
-            run.Advance(dt, press);
-            string stateKey = !contact ? "harvest.drill.hold" :
+            run.Advance(dt, press, boost);
+            heatFill.style.width = Length.Percent(run.Heat * 100f);
+            heatFill.style.backgroundColor = run.Overheated ? UiKit.Red : UiKit.Amber;
+            heatLabel.text = UiText.Get(run.Overheated ? "harvest.drill.cooling" : "harvest.drill.heat",
+                Mathf.RoundToInt(run.Heat * 100f));
+            string stateKey = run.Overheated ? "harvest.drill.overheated" : !contact ? "harvest.drill.hold" :
                 inside ? "harvest.drill.locked" : "harvest.drill.adjust";
             SetToolState(UiText.Get(stateKey), contact && inside);
             float center = run.BandCenter;
@@ -1013,7 +1174,7 @@ namespace Frontier
                 chunkT = 0.22f;
             }
 
-            if (progress >= 1f)
+            if (run.Completed)
             {
                 stage.Shake(0.6f);
                 Chunks(16, 0.2f, 5f);
@@ -1037,6 +1198,9 @@ namespace Frontier
         const int Pulses = SiphonHarvestRun.PulseCount;
         VisualElement track, catchBand, needle;
         SiphonHarvestRun run;
+        HarvestHoldInput ventInput;
+        Label pressureReadout;
+        bool pumpKey;
         float elapsed { get { return run.Elapsed; } }
         int pulses { get { return run.Pulses; } }
         Transform reservoir, vent, stream;
@@ -1084,7 +1248,23 @@ namespace Frontier
 
             var pump = UiKit.Btn(UiText.Get("harvest.siphon.pump"), color, null, true);
             pump.clicked += Pump;
+            pump.name = "siphon-pump"; pump.style.flexGrow = 1; pump.style.minWidth = 0;
             controls.Add(pump);
+            ventInput = new HarvestHoldInput(overlay, KeyCode.LeftShift, () => CanInteract);
+            var ventButton = UiKit.Btn(UiText.Get("harvest.siphon.vent"), UiKit.Amber, null, true);
+            ventButton.name = "siphon-vent";
+            ventButton.style.flexGrow = 1; ventButton.style.minWidth = 0;
+            ventInput.Bind(ventButton); controls.Add(ventButton);
+            pressureReadout = UiKit.Text("", "fr-tiny"); pressureReadout.name = "siphon-pressure";
+            overlay.Insert(overlay.IndexOf(controls), pressureReadout);
+            overlay.focusable = true;
+            overlay.RegisterCallback<KeyDownEvent>(e =>
+            {
+                if (e.keyCode == KeyCode.Space)
+                { if (!pumpKey) Pump(); pumpKey = true; e.StopPropagation(); }
+            }, TrickleDown.TrickleDown);
+            overlay.RegisterCallback<KeyUpEvent>(e => { if (e.keyCode == KeyCode.Space) pumpKey = false; });
+            overlay.Focus();
             UpdateStatus(UiText.Get("harvest.siphon.watch"));
         }
 
@@ -1116,12 +1296,13 @@ namespace Frontier
 
         protected override void Tick(float dt)
         {
-            run.Advance(dt);
-            SetToolState(UiText.Get(run.Cooldown > 0f
+            run.Advance(dt, ventInput.Held);
+            pressureReadout.text = UiText.Get("harvest.siphon.pressure", Mathf.RoundToInt(run.Pressure * 100f), run.Chain);
+            SetToolState(UiText.Get(ventInput.Held ? "harvest.siphon.venting" : run.Cooldown > 0f
                     ? "harvest.state.recovering" : "harvest.siphon.ready"),
-                run.Cooldown <= 0f);
-            catchBand.style.left = Length.Percent(Mathf.Clamp01(run.Target - run.BandWidth) * 100f);
-            catchBand.style.width = Length.Percent(run.BandWidth * 200f);
+            !ventInput.Held && run.Cooldown <= 0f);
+            catchBand.style.left = Length.Percent(Mathf.Clamp01(run.Target - run.EffectiveBand) * 100f);
+            catchBand.style.width = Length.Percent(run.EffectiveBand * 200f);
             needle.style.left = Length.Percent(run.Needle * 100f);
 
             float pulse = 1f + 0.08f * Mathf.Sin(elapsed * 5f);
@@ -1137,6 +1318,7 @@ namespace Frontier
 
         void Pump()
         {
+            if (ventInput.Held) return;
             if (!CanInteract || !run.TryPump(out float hit)) return;
             SetToolState(UiText.Get("harvest.state.recovering"), false);
             string resultKey = hit >= 0.78f ? "harvest.siphon.clean" :
@@ -1149,10 +1331,13 @@ namespace Frontier
                 stage.Shake(hit >= 0.78f ? 0.28f : 0.12f);
                 HarvestFeedback.Play(hit >= 0.78f ? HarvestCue.Perfect : HarvestCue.Impact, FeedbackKind);
             }
+
             else HarvestFeedback.Play(HarvestCue.Miss, FeedbackKind);
             if (pulses >= Pulses)
                 Finish(new MinigameResult { quality = run.Quality, perfects = run.Perfects, total = Pulses });
         }
+
+        protected override void ResetInput() { ventInput?.Reset(); }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public SiphonHarvestRun DebugRun { get { return run; } }
@@ -1278,8 +1463,10 @@ namespace Frontier
                 distance == 2 ? "harvest.excavate.warm" : "harvest.excavate.faint");
             cells[cell].style.backgroundColor = new Color(echoColor.r * 0.22f, echoColor.g * 0.22f, echoColor.b * 0.22f);
             cells[cell].style.color = echoColor;
-            SetToolState(UiText.Get(distance == 1
-                ? "harvest.excavate.near-seam" : "harvest.excavate.follow-echo"));
+            string direction = UiText.Get("harvest.excavate.direction." +
+                (run.HintY < 0 ? "up" : run.HintY > 0 ? "down" : "same") + "." +
+                (run.HintX < 0 ? "left" : run.HintX > 0 ? "right" : "same"));
+            SetToolState(UiText.Get("harvest.excavate.direction", direction, distance));
             pulseRing.localScale = Vector3.one * 1.1f;
             HarvestFeedback.Play(distance == 1 ? HarvestCue.ScanNear : HarvestCue.ScanFar, FeedbackKind);
             string echoKey = distance == 1 ? "harvest.excavate.strong-echo" :
@@ -1327,6 +1514,9 @@ namespace Frontier
         int captured { get { return run.Captured; } }
         float elapsed;
         Transform claw, tether;
+        HarvestHoldInput tetherInput;
+        bool tetherWasHeld;
+        int keyboardTarget;
         const float frameW = 8f, frameH = 7.2f;
 
         protected override string Title { get { return UiText.Get("harvest.salvage.title"); } }
@@ -1340,6 +1530,24 @@ namespace Frontier
         {
             status.style.display = DisplayStyle.Flex;
             arena.RegisterCallback<PointerDownEvent>(OnCast);
+            tetherInput = new HarvestHoldInput(overlay, KeyCode.Space, () => CanInteract);
+            tetherInput.Cancelled = () => { run.CancelTether(); tetherWasHeld = false; };
+            var hold = UiKit.Btn(UiText.Get("harvest.salvage.tether"), color, null, true);
+            hold.name = "salvage-tether";
+            hold.style.flexGrow = 1; hold.style.minWidth = 0;
+            tetherInput.Bind(hold); controls.Add(hold);
+            overlay.RegisterCallback<KeyDownEvent>(e =>
+            {
+                if (!CanInteract || (e.keyCode != KeyCode.LeftArrow && e.keyCode != KeyCode.RightArrow)) return;
+                keyboardTarget = (keyboardTarget + (e.keyCode == KeyCode.LeftArrow ? Targets - 1 : 1)) % Targets;
+                if (!run.IsCaptured(keyboardTarget) && !tetherInput.Held)
+                {
+                    run.CancelTether(); run.Select(keyboardTarget);
+                    SetToolState(UiText.Get("harvest.salvage.selected", keyboardTarget + 1));
+                }
+                e.StopPropagation();
+            });
+            overlay.Focus();
             UpdateStatus(UiText.Get("harvest.salvage.help", Targets));
         }
 
@@ -1352,7 +1560,9 @@ namespace Frontier
             var alloy = st.Lit(new Color(0.32f, 0.38f, 0.48f), accent * 1.3f, 0f, 9f, 0f);
             var glowing = st.Lit(new Color(0.12f, 0.35f, 0.42f), accent * 2f, 0f, 4f, 0f);
             st.AddMesh(MeshKit.Cyl(4.6f, 4.6f, 0.06f, 32), field, st.root, new Vector3(0f, -2.45f, 1.3f));
-            tether = st.GlowQuad(st.root, new Color(color.r, color.g, color.b, 0.72f), 0.18f, new Vector3(0f, -1.8f, -0.7f));
+            tether = st.Prim(PrimitiveType.Cylinder, st.root, new Vector3(0f, -1.8f, -0.7f),
+                Vector3.zero, Vector3.zero, glowing).transform;
+            tether.name = "SalvageTether";
             tether.localScale = new Vector3(0.06f, 0f, 0.06f);
 
             for (int i = 0; i < Targets; i++)
@@ -1408,12 +1618,21 @@ namespace Frontier
                 if (distance < nearest) { nearest = distance; hit = i; }
             }
 
-            Cast(hit);
+            if (hit >= 0 && !tetherInput.Held)
+            {
+                run.CancelTether(); run.Select(hit);
+                SetToolState(UiText.Get("harvest.salvage.selected", hit + 1));
+            }
         }
 
         void Cast(int hit)
         {
             if (!CanInteract || !run.TryCast(hit)) return;
+            CastFeedback(hit);
+        }
+
+        void CastFeedback(int hit)
+        {
             if (hit >= 0)
             {
                 Vector3 point = debris[hit].position;
@@ -1446,13 +1665,37 @@ namespace Frontier
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public SalvageHarvestRun DebugRun { get { return run; } }
         public void DebugCast(int target) { Cast(target); }
+        public void DebugSelect(int target) { if (CanInteract) { run.CancelTether(); run.Select(target); } }
+        public void DebugAdvance(float seconds) { if (CanInteract) Tick(seconds); }
+        public float DebugTetherLength { get { return tether.localScale.y * 2f; } }
+        public float DebugTetherWidth { get { return tether.localScale.x; } }
+        public bool DebugTetherIsVolume { get { return tether.GetComponent<MeshFilter>().sharedMesh.bounds.size.z > 0.5f; } }
 #endif
 
         void UpdateStatus(string message) { status.text = UiText.Get("harvest.salvage.status", casts, MaxCasts, message); }
 
+        protected override void ResetInput()
+        {
+            tetherInput?.Reset(); tetherWasHeld = false; run?.CancelTether();
+            SetToolState(UiText.Get("harvest.salvage.aim"), false);
+        }
+
         protected override void Tick(float dt)
         {
             elapsed += dt;
+            bool held = tetherInput.Held;
+            if (held && run.Selected >= 0)
+            {
+                run.Advance(dt);
+                SetToolState(UiText.Get(run.TetherSeconds > 1.4f ? "harvest.salvage.slipping" :
+                    run.TetherReady ? "harvest.salvage.release" : "harvest.salvage.charging"), run.TetherReady);
+            }
+            if (!held && tetherWasHeld && run.Selected >= 0)
+            {
+                int hit = run.TetherReady ? run.Selected : -1;
+                if (run.Release()) CastFeedback(hit);
+            }
+            tetherWasHeld = held;
             for (int i = 0; i < debris.Length; i++)
             {
                 if (!debris[i].gameObject.activeSelf) continue;
@@ -1460,7 +1703,17 @@ namespace Frontier
                 debris[i].localPosition = new Vector3(Mathf.Sin(phase) * 3.15f, -0.85f + Mathf.Sin(phase * 1.7f + i) * 0.85f,
                     (i % 2) * 0.45f + Mathf.Cos(phase * 1.3f) * 0.18f);
                 debris[i].localRotation = Quaternion.Euler(phase * 37f, phase * 63f, Mathf.Sin(phase) * 25f);
+                debris[i].localScale = Vector3.one * (run.Selected == i ? 1.25f : 1f);
             }
+            if (run.Selected >= 0)
+            {
+                Vector3 from = claw.localPosition, to = debris[run.Selected].localPosition;
+                tether.localPosition = (from + to) * 0.5f;
+                tether.localRotation = Quaternion.FromToRotation(Vector3.up, to - from);
+                tether.localScale = new Vector3(run.TetherReady ? 0.15f : 0.06f,
+                    Vector3.Distance(from, to) * 0.5f, 0.06f);
+            }
+            else tether.localScale = Vector3.zero;
             claw.localRotation = Quaternion.Euler(0f, Mathf.Sin(elapsed * 1.4f) * 18f, Mathf.Sin(elapsed * 1.8f) * 7f);
         }
     }

@@ -5,6 +5,9 @@ Shader "Frontier/NeonPlanet"
         _BaseColor ("Base", Color) = (0.2,0.8,0.4,1)
         _AltColor ("Alt", Color) = (0.02,0.2,0.1,1)
         _CloudColor ("Clouds and ice", Color) = (0.85,0.94,1,1)
+        _OceanColor ("Ocean", Color) = (0.035,0.27,0.68,1)
+        _LandColor ("Land", Color) = (0.13,0.48,0.2,1)
+        _LandMix ("Continents", Range(0,1)) = 0
         [HDR] _RimColor ("Rim", Color) = (0.4,1.5,1,1)
         _Bands ("Bands", Float) = 6
         _Biome ("Biome", Float) = 0
@@ -33,6 +36,8 @@ Shader "Frontier/NeonPlanet"
                 half4 _BaseColor;
                 half4 _AltColor;
                 half4 _CloudColor;
+                half4 _OceanColor;
+                half4 _LandColor;
                 half4 _RimColor;
                 float _Bands;
                 float _Biome;
@@ -44,7 +49,25 @@ Shader "Frontier/NeonPlanet"
                 float _Style;
                 float _Lines;
                 float _CraterSoft;
+                float _LandMix;
             CBUFFER_END
+
+            float hash31(float3 p)
+            {
+                return frac(sin(dot(p, float3(127.1, 311.7, 74.7))) * 43758.5453);
+            }
+
+            float valueNoise3D(float3 p)
+            {
+                float3 cell = floor(p);
+                float3 f = frac(p);
+                f = f * f * (3.0 - 2.0 * f);
+                float x00 = lerp(hash31(cell), hash31(cell + float3(1, 0, 0)), f.x);
+                float x10 = lerp(hash31(cell + float3(0, 1, 0)), hash31(cell + float3(1, 1, 0)), f.x);
+                float x01 = lerp(hash31(cell + float3(0, 0, 1)), hash31(cell + float3(1, 0, 1)), f.x);
+                float x11 = lerp(hash31(cell + float3(0, 1, 1)), hash31(cell + float3(1, 1, 1)), f.x);
+                return lerp(lerp(x00, x10, f.y), lerp(x01, x11, f.y), f.z);
+            }
 
             struct Attributes
             {
@@ -112,6 +135,15 @@ Shader "Frontier/NeonPlanet"
                 }
                 float band = pat;
                 float3 col = lerp(_AltColor.rgb, _BaseColor.rgb, band);
+                if (_LandMix > 0.001)
+                {
+                    float3 terrain = i.posOS * 5.2 + _Seed;
+                    float landField = valueNoise3D(terrain) * 0.62
+                        + valueNoise3D(terrain * 2.1) * 0.25
+                        + valueNoise3D(terrain * 4.2) * 0.13;
+                    float land = smoothstep(0.49, 0.59, landField);
+                    col = lerp(col, lerp(_OceanColor.rgb, _LandColor.rgb, land), _LandMix);
+                }
                 col *= 0.25 + 0.9 * ndl * ndl;
                 if (_Style > 2.5 && _Style < 3.5) col += _RimColor.rgb * pat * 0.6;
                 if (_Style > 3.5) col += _RimColor.rgb * band * 0.12;

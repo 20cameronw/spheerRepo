@@ -11,13 +11,15 @@ namespace Frontier
 {
     public partial class UIRoot
     {
-        const float MinZoom = 0.015f, MaxZoom = 64f;
+        const float MinZoom = 1f, NeighborZoom = 4f;
         const float SystemZoom = 12f, SystemZoomThreshold = 8f;
         PlanetData selected;
-        bool mapOpen, mapAutopilot;
+        bool mapOpen, mapAutopilot, mapMinimal;
         VisualElement mapView, mapWorld, mapCard, mapTools;
+        VisualElement mapLocationBar, mapSearchBar;
+        Label mapLocation;
         Label mapReadout, mapNotice;
-        Button mapViewMode;
+        Button mapViewMode, mapZoomIn, mapZoomOut, mapHideControls;
         TextField mapSearch;
         DropdownField mapFilter;
         readonly MapViewport viewport = new MapViewport();
@@ -28,6 +30,9 @@ namespace Frontier
         float lastPinch, mapQueryAt;
         int mapVersion, queryVersion, previewVersion, runningPreviewVersion;
         MapSnapshot mapSnapshot;
+        MapQueryBounds mapQueryBounds;
+        double mapQueryScale;
+        bool mapQueryBoundsKnown;
         MapNameIndex mapNameIndex;
         string mapNextStopPlanetId;
         Task<MapSnapshot> mapQuery;
@@ -39,10 +44,18 @@ namespace Frontier
         readonly List<PlanetData> mapPinPlanets = new List<PlanetData>();
         readonly List<Label> mapLabels = new List<Label>();
         readonly List<Button> mapPlanetButtons = new List<Button>();
+        readonly List<Button> mapSystemButtons = new List<Button>();
+        readonly List<StarSystem> mapNodeSystems = new List<StarSystem>();
+        readonly Dictionary<string, float> mapOrbitRadii = new Dictionary<string, float>();
         readonly List<Rect> mapLabelBounds = new List<Rect>();
         string mapResource = "";
         double mapJumpRange;
         readonly List<string> mapResourceIds = new List<string>();
+        const string ProjectMapFilter = "@project";
+        readonly HashSet<string> mapProjectResources = new HashSet<string>(StringComparer.Ordinal);
+        readonly HashSet<string> mapProjectWorlds = new HashSet<string>(StringComparer.Ordinal);
+        readonly HashSet<string> mapProjectSystems = new HashSet<string>(StringComparer.Ordinal);
+        readonly HashSet<string> mapRememberedSystems = new HashSet<string>(StringComparer.Ordinal);
 
         struct MapPreviewResult
         {
@@ -52,38 +65,20 @@ namespace Frontier
 
         void OpenMap()
         {
+            OpenMap(false);
+        }
+
+        void OpenMap(bool minimal)
+        {
             if (defense.Active || busy) return;
             if (mapOpen) { CloseMap(); return; }
             ClosePopup(); CloseModal(); ExitBuild();
-            mapOpen = true; selected = gs.planet; mapAutopilot = false; mapResource = ""; mapZoom = SystemZoom;
-            mapNameIndex = MapNameIndex.Build(gs.universe.Universe, gs.MapDiscoveryIds(), gs.MapPins);
-            surveyCenters.Clear();
-            surveyRadii.Clear();
-            var centerIndices = new Dictionary<SystemKey, int>();
-            foreach (var record in gs.world.All)
-            {
-                PlanetKey key;
-                StarSystem star;
-                if (record.visits <= 0 || !PlanetKey.TryParse(record.planetId, out key) ||
-                    !gs.universe.Universe.TryGetSystem(key.System, out star)) continue;
-                PlanetData visited = gs.universe.Get(record.planetId);
-                double radius = gs.ScannerRangeLy + gs.RadarRangeBonus(visited);
-                int index;
-                if (!centerIndices.TryGetValue(key.System, out index))
-                {
-                    centerIndices.Add(key.System, surveyCenters.Count);
-                    surveyCenters.Add(star);
-                    surveyRadii.Add(radius);
-                }
-                else surveyRadii[index] = Math.Max(surveyRadii[index], radius);
-            }
-            int currentIndex;
-            if (!centerIndices.TryGetValue(gs.planet.Star.Key, out currentIndex))
-            {
-                surveyCenters.Add(gs.planet.Star);
-                surveyRadii.Add(gs.ScannerRangeLy + gs.RadarRangeBonus(gs.planet));
-            }
-            else surveyRadii[currentIndex] = Math.Max(surveyRadii[currentIndex], gs.ScannerRangeLy + gs.RadarRangeBonus(gs.planet));
+            mapOpen = true; mapMinimal = minimal;
+            selected = gs.planet; mapAutopilot = false; mapResource = ""; mapZoom = SystemZoom;
+            planetView.Zoom01 = 0f;
+            planetView.MapZoomBlend = minimal ? 0f : 1f;
+            RefreshMapSurvey();
+            mapNameIndex = MapNameIndex.Build(gs.universe.Universe, KnownMapSystems(), gs.MapPins);
             mapView = UiKit.Div("fr-map");
             mapLayer.Add(mapView);
             mapWorld = UiKit.Div("fr-map-viewport");
@@ -97,18 +92,29 @@ namespace Frontier
             mapWorld.RegisterCallback<PointerCancelEvent>(e => ResetMapPointer());
             mapWorld.RegisterCallback<PointerCaptureOutEvent>(e => { dragPointer = -1; mapDragging = false; });
             mapWorld.RegisterCallback<ClickEvent>(e => PickMap(e.localPosition));
-            mapWorld.RegisterCallback<WheelEvent>(e => { ZoomAt(e.localMousePosition, Mathf.Exp(-e.delta.y * 0.08f)); e.StopPropagation(); });
+            mapWorld.RegisterCallback<WheelEvent>(e => { HandleMapWheel(-e.delta.y); e.StopPropagation(); });
 
             mapTools = UiKit.Div("fr-map-tools");
-            mapTools.Add(Icons.IconButton("close", UiKit.Muted, CloseMap));
-            mapTools.Add(Icons.IconButton("plus", UiKit.Muted, () => ZoomAt(ViewCenter(), 1.4f)));
-            mapTools.Add(Icons.IconButton("minus", UiKit.Muted, () => ZoomAt(ViewCenter(), 1f / 1.4f)));
+            mapTools.Add(Icons.IconButton("close", UiKit.Muted, ReturnFromMap));
+            mapZoomIn = Icons.IconButton("plus", UiKit.Muted, () => StepMapZoom(true));
+            mapZoomIn.name = "map-zoom-in";
+            mapZoomOut = Icons.IconButton("minus", UiKit.Muted, () => StepMapZoom(false));
+            mapZoomOut.name = "map-zoom-out";
+            mapTools.Add(mapZoomIn);
+            mapTools.Add(mapZoomOut);
             var home = Icons.IconButton("map", UiKit.Cyan, () => { mapZoom = SystemZoom; SelectMapWorld(gs.planet); CenterOn(gs.planet); });
             home.tooltip = UiText.Get("map.recenter"); mapTools.Add(home);
             mapView.Add(mapTools);
+            mapHideControls = Icons.IconButton("eye", UiKit.Cyan, () => SetMapMinimal(true));
+            mapHideControls.name = "map-hide-controls";
+            mapHideControls.tooltip = UiText.Get("map.hide-controls");
+            mapHideControls.style.position = Position.Absolute;
+            mapHideControls.style.right = UiKit.Space.S16 + inset.z;
+            mapHideControls.style.top = 260 + inset.y;
+            mapView.Add(mapHideControls);
             mapViewMode = UiKit.Btn("", UiKit.Cyan, () =>
             {
-                mapZoom = SystemMapView ? 2f : SystemZoom;
+                mapZoom = SystemMapView ? NeighborZoom : NeighborMapView ? MinZoom : SystemZoom;
                 CenterOn(selected);
             });
             mapViewMode.name = "map-switch-view";
@@ -117,7 +123,29 @@ namespace Frontier
             mapViewMode.style.top = 16 + inset.y;
             mapViewMode.style.width = 200;
             mapView.Add(mapViewMode);
+            mapLocationBar = UiKit.Div("fr-map-location");
+            mapLocationBar.name = "map-location-bar";
+            var back = Icons.IconButton("back", UiKit.Muted, ReturnFromMap);
+            back.name = "map-return-world";
+            back.tooltip = UiText.Get("map.return-world", gs.planet.Name);
+            mapLocationBar.Add(back);
+            mapLocation = UiKit.Text("", "fr-small");
+            mapLocation.name = "map-location";
+            mapLocationBar.Add(mapLocation);
+            var controls = IconBtn(UiText.Get("map.controls"), "about", UiKit.Cyan, () => SetMapMinimal(false));
+            controls.name = "map-show-controls";
+            mapLocationBar.Add(controls);
+            mapView.Add(mapLocationBar);
+            RefreshMapProjectResources();
             BuildMapSearch();
+            var scanLegend = UiKit.Text(UiText.Get("map.scanner.legend"), "fr-tiny", UiKit.Cyan);
+            scanLegend.name = "map-scanner-legend";
+            scanLegend.tooltip = UiText.Get("map.scanner.help");
+            scanLegend.pickingMode = PickingMode.Ignore;
+            scanLegend.style.position = Position.Absolute;
+            scanLegend.style.left = UiKit.Space.S16;
+            scanLegend.style.top = UiKit.Space.S8;
+            mapWorld.Add(scanLegend);
             RefreshMapPinPlanets();
             BuildMapNodes();
             InvalidateMapPreview();
@@ -141,16 +169,24 @@ namespace Frontier
 
         void CloseMap()
         {
+            if (mapZoomTransition != null) StopCoroutine(mapZoomTransition);
+            mapZoomTransition = null;
+            if (planetView != null) planetView.MapZoomBlend = 0f;
             ResetMapPointer();
             if (mapView != null) mapView.RemoveFromHierarchy();
             mapView = null; mapWorld = null; mapCard = null; mapTools = null;
             mapOpen = false; lastPinch = 0f; mapSnapshot = null;
+            mapQueryBoundsKnown = false;
             mapNameIndex = null;
-            mapViewMode = null;
+            mapViewMode = null; mapHideControls = null;
+            mapLocationBar = null; mapLocation = null; mapSearchBar = null;
+            mapGestureHeld = false;
             mapFilter = null;
             mapVersion++; previewVersion++;
             mapLabels.Clear(); mapPlanets.Clear();
             mapPlanetButtons.Clear();
+            mapSystemButtons.Clear(); mapNodeSystems.Clear();
+            mapOrbitRadii.Clear();
             mapPinPlanets.Clear();
             // Workers never touch UI/GameObjects. Keep their handles until completion so reopening cannot fan out new workers.
         }
@@ -158,20 +194,40 @@ namespace Frontier
         void LayoutMapChrome()
         {
             if (mapTools == null) return;
+            foreach (var element in new VisualElement[] { mapTools, mapViewMode, mapHideControls, mapSearchBar, mapFilter, mapReadout, mapCard })
+                if (element != null) element.style.display = mapMinimal ? DisplayStyle.None : DisplayStyle.Flex;
+            if (mapLocationBar != null)
+            {
+                mapLocationBar.style.display = mapMinimal ? DisplayStyle.Flex : DisplayStyle.None;
+                mapLocationBar.style.top = UiKit.Space.S16 + inset.y;
+                mapLocationBar.style.left = UiKit.Space.S16 + inset.x;
+                mapLocationBar.style.right = UiKit.Space.S16 + inset.z;
+            }
             mapTools.style.right = UiKit.Space.S16 + inset.z;
             mapTools.style.top = UiKit.Space.S16 + inset.y;
             mapTools.style.left = UiKit.Space.S16 + inset.x;
             if (mapCard != null) mapCard.style.marginBottom = UiKit.Space.S16 + inset.w;
             if (mapWorld != null)
             {
-                mapWorld.style.top = 390 + inset.y;
+                mapWorld.style.top = (mapMinimal ? UiKit.Size.Touch + UiKit.Space.S32 :
+                    mapNotice != null && !string.IsNullOrEmpty(mapNotice.text) ? 434 : 380) + inset.y;
                 float cardHeight = mapCard != null ? mapCard.layout.height : 0;
-                mapWorld.style.bottom = (float.IsNaN(cardHeight) ? 0 : cardHeight) + 32 + inset.w;
+                mapWorld.style.bottom = (mapMinimal ? UiKit.Space.S16 :
+                    (float.IsNaN(cardHeight) ? 0 : cardHeight) + 32) + inset.w;
             }
+            if (mapNotice != null) mapNotice.style.top = (mapMinimal ? UiKit.Size.Touch + UiKit.Space.S24 : 380) + inset.y;
         }
 
-        Vector2 ViewCenter() { return new Vector2((float)viewport.Width * 0.5f, (float)viewport.Height * 0.5f); }
+        void SetMapMinimal(bool minimal)
+        {
+            mapMinimal = minimal;
+            LayoutMapChrome();
+            ApplyMapTransform();
+        }
+
         bool SystemMapView { get { return viewport.Scale >= SystemZoomThreshold; } }
+        bool NeighborMapView { get { return !SystemMapView && viewport.Scale >= NeighborZoom; } }
+        bool ExpandedMapView { get { return SystemMapView || NeighborMapView; } }
         Vector2 Project(double x, double y) { MapPoint p = viewport.Project(x, y); return new Vector2((float)p.x, (float)p.y); }
 
         void CenterOn(PlanetData p)
@@ -181,10 +237,16 @@ namespace Frontier
             ApplyMapTransform();
         }
 
-        void ZoomAt(Vector2 at, float factor)
+        void StepMapZoom(bool inward)
         {
-            viewport.ZoomAt(at.x, at.y, factor);
-            mapZoom = (float)viewport.Scale;
+            if (inward && SystemMapView && mapMinimal)
+            {
+                if (selected != null && selected.Id == gs.planet.Id) ReturnFromMap();
+                else SetMapMinimal(false);
+                return;
+            }
+            mapZoom = inward ? (NeighborMapView || SystemMapView ? SystemZoom : NeighborZoom)
+                : (SystemMapView ? NeighborZoom : MinZoom);
             ApplyMapTransform();
         }
 
@@ -194,11 +256,28 @@ namespace Frontier
             float w = mapWorld.layout.width, h = mapWorld.layout.height;
             if (float.IsNaN(w) || float.IsNaN(h) || w <= 0 || h <= 0) return;
             viewport.Resize(w, h);
+            double previousScale = viewport.Scale;
             viewport.ZoomAt(w * 0.5, h * 0.5, mapZoom / viewport.Scale);
-            mapVersion++;
-            mapQueryAt = Time.unscaledTime + 0.12f;
+            if (previousScale != viewport.Scale) mapOrbitRadii.Clear();
+            ClampMapCenter();
+            if ((!mapQueryBoundsKnown || mapQueryScale != viewport.Scale || !mapQueryBounds.Covers(viewport)) &&
+                queryVersion == mapVersion)
+            {
+                mapVersion++;
+                mapQueryAt = Time.unscaledTime + 0.04f;
+            }
             if (mapViewMode != null)
-                mapViewMode.text = UiText.Get(SystemMapView ? "map.mode.universe" : "map.mode.orbits");
+                mapViewMode.text = UiText.Get(SystemMapView ? "map.mode.neighbors" :
+                    NeighborMapView ? "map.mode.overview" : "map.mode.orbits");
+            mapZoomIn.SetEnabled(!SystemMapView);
+            mapZoomOut.SetEnabled(SystemMapView || NeighborMapView);
+            mapWorld.Q("map-scanner-legend").style.display = SystemMapView || mapMinimal ? DisplayStyle.None : DisplayStyle.Flex;
+            if (mapLocation != null)
+                mapLocation.text = SystemMapView ? UiText.Get("map.location.planet", gs.planet.Name, gs.planet.Star.Name) :
+                    NeighborMapView ? UiText.Get("map.location.system", gs.planet.Star.Name) :
+                    UiText.Get("map.location.sector", gs.planet.Star.Name,
+                        gs.planet.Star.X.ToString("0.#", CultureInfo.InvariantCulture),
+                        gs.planet.Star.Y.ToString("0.#", CultureInfo.InvariantCulture));
             PositionMapLabels();
             mapWorld.MarkDirtyRepaint();
         }
@@ -234,26 +313,123 @@ namespace Frontier
         {
             if (!mapOpen || mapWorld == null) return;
             PollMapWorkers();
+            if (mapZoomTransition != null) return;
+            if (mapGestureHeld)
+            {
+                if (Input.touchCount == 0) mapGestureHeld = false;
+                lastPinch = 0f;
+                return;
+            }
+            if (Input.mouseScrollDelta.y != 0f && ScreenPointInMap(Input.mousePosition))
+                HandleMapWheel(Input.mouseScrollDelta.y);
             if (mapPreview != null && selected != null && selected.Id != gs.planet.Id) mapWorld.MarkDirtyRepaint();
             if (Input.touchCount == 2)
             {
                 var a = Input.GetTouch(0).position; var b = Input.GetTouch(1).position;
                 float d = Vector2.Distance(a, b);
+                if (lastPinch <= 1f && (!ScreenPointInMap(a) || !ScreenPointInMap(b))) return;
                 suppressMapClick = true;
                 if (lastPinch > 1 && d > 1)
                 {
-                    Vector2 mid = (a + b) * 0.5f;
-                    Vector2 pp = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(mid.x, ScreenMetrics.Height - mid.y));
-                    ZoomAt(mapWorld.WorldToLocal(pp), d / lastPinch);
+                    if (d / lastPinch > 1.18f || d / lastPinch < 1f / 1.18f)
+                    {
+                        StepMapZoom(d > lastPinch);
+                        lastPinch = d;
+                    }
                 }
-                lastPinch = d;
+                if (lastPinch <= 1) lastPinch = d;
             }
             else lastPinch = 0;
         }
 
+        bool ScreenPointInMap(Vector2 screen)
+        {
+            var point = RuntimePanelUtils.ScreenToPanel(root.panel, new Vector2(screen.x, ScreenMetrics.Height - screen.y));
+            var element = root.panel.Pick(point);
+            return element == mapWorld || (element != null && mapWorld.Contains(element));
+        }
+
+        int lastMapWheelFrame = -1;
+        void HandleMapWheel(float delta)
+        {
+            if (!mapOpen || mapZoomTransition != null || delta == 0f ||
+                lastMapWheelFrame == Time.frameCount || lastWorldWheelFrame == Time.frameCount) return;
+            lastMapWheelFrame = Time.frameCount;
+            StepMapZoom(delta > 0f);
+        }
+
+        void RefreshMapSurvey()
+        {
+            surveyCenters.Clear();
+            surveyRadii.Clear();
+            mapRememberedSystems.Clear();
+            mapRememberedSystems.UnionWith(gs.MapDiscoveryIds());
+            foreach (var id in gs.MapPins)
+            {
+                var pinned = gs.universe.Get(id);
+                if (pinned != null) mapRememberedSystems.Add(pinned.Star.Id);
+            }
+            var centerIndices = new Dictionary<SystemKey, int>();
+            foreach (var record in gs.world.All)
+            {
+                if (record.visits <= 0 || !PlanetKey.TryParse(record.planetId, out var key) ||
+                    !gs.universe.Universe.TryGetSystem(key.System, out var star)) continue;
+                var visited = gs.universe.Get(record.planetId);
+                mapRememberedSystems.Add(star.Id);
+                double radius = gs.ScannerRangeLy + gs.RadarRangeBonus(visited);
+                if (!centerIndices.TryGetValue(key.System, out int index))
+                {
+                    centerIndices.Add(key.System, surveyCenters.Count);
+                    surveyCenters.Add(star);
+                    surveyRadii.Add(radius);
+                }
+                else surveyRadii[index] = Math.Max(surveyRadii[index], radius);
+            }
+            if (!centerIndices.TryGetValue(gs.planet.Star.Key, out int currentIndex))
+            {
+                surveyCenters.Add(gs.planet.Star);
+                surveyRadii.Add(gs.ScannerRangeLy + gs.RadarRangeBonus(gs.planet));
+            }
+            else surveyRadii[currentIndex] = Math.Max(surveyRadii[currentIndex], gs.ScannerRangeLy + gs.RadarRangeBonus(gs.planet));
+            mapRememberedSystems.Add(gs.planet.Star.Id);
+        }
+
+        string[] KnownMapSystems()
+        {
+            var ids = new string[mapRememberedSystems.Count];
+            mapRememberedSystems.CopyTo(ids);
+            return ids;
+        }
+
+        void ClampMapCenter()
+        {
+            if (SystemMapView && selected != null)
+            {
+                viewport.Center(selected.Star.X, selected.Star.Y);
+                return;
+            }
+            double x = viewport.CenterX, y = viewport.CenterY;
+            double closest = double.PositiveInfinity, targetX = x, targetY = y;
+            double margin = Math.Min(20, Math.Min(viewport.Width, viewport.Height) * 0.08 / viewport.Scale);
+            void Include(double cx, double cy, double radius)
+            {
+                double dx = x - cx, dy = y - cy, distance = Math.Sqrt(dx * dx + dy * dy);
+                double outside = Math.Max(0, distance - radius - margin);
+                if (outside >= closest) return;
+                closest = outside;
+                double fraction = distance > 0 ? Math.Min(1, (radius + margin) / distance) : 0;
+                targetX = cx + dx * fraction; targetY = cy + dy * fraction;
+            }
+            for (int i = 0; i < surveyCenters.Count; i++)
+                Include(surveyCenters[i].X, surveyCenters[i].Y, surveyRadii[i]);
+            foreach (var id in mapRememberedSystems)
+                if (gs.universe.Universe.TryGetSystemById(id, out var star)) Include(star.X, star.Y, 0);
+            viewport.Center(targetX, targetY);
+        }
+
         bool Surveyed(StarSystem star)
         {
-            if (star.IsAuthored || gs.IsMapDiscovered(star.Id)) return true;
+            if (mapRememberedSystems.Contains(star.Id)) return true;
             for (int i = 0; i < surveyCenters.Count; i++)
             {
                 var center = surveyCenters[i];
@@ -296,6 +472,11 @@ namespace Frontier
 
         void SelectMapWorld(PlanetData planet)
         {
+            if (planet == null || !Surveyed(planet.Star))
+            {
+                SetMapNotice(UiText.Get("map.unscanned"));
+                return;
+            }
             bool otherSystem = selected == null || selected.Star.Key != planet.Star.Key;
             selected = planet;
             BuildMapNodes(); InvalidateMapPreview(); BuildMapCard();
@@ -313,9 +494,12 @@ namespace Frontier
         void BuildMapNodes()
         {
             foreach (var button in mapPlanetButtons) button.RemoveFromHierarchy();
+            foreach (var button in mapSystemButtons) button.RemoveFromHierarchy();
             mapPlanetButtons.Clear();
+            mapSystemButtons.Clear(); mapNodeSystems.Clear();
+            mapOrbitRadii.Clear();
             mapPlanets.Clear();
-            if (selected != null) mapPlanets.AddRange(gs.universe.PlanetsOf(selected.Star));
+            if (selected != null && Surveyed(selected.Star)) mapPlanets.AddRange(gs.universe.PlanetsOf(selected.Star));
             foreach (var planet in mapPlanets)
             {
                 var captured = planet;
@@ -327,7 +511,69 @@ namespace Frontier
                 mapPlanetButtons.Add(button);
                 mapWorld.Add(button);
             }
+            if (mapSnapshot != null)
+                foreach (var star in mapSnapshot.systems)
+                {
+                    if (!Surveyed(star)) continue;
+                    var planets = gs.universe.PlanetsOf(star);
+                    if (planets.Count == 0) continue;
+                    var captured = planets[0];
+                    var button = new Button(() => { SelectMapWorld(captured); CenterOn(captured); });
+                    button.name = "map-system-" + star.Id;
+                    button.tooltip = star.Name;
+                    button.AddToClassList("fr-map-planet");
+                    button.RegisterCallback<ClickEvent>(e => e.StopPropagation());
+                    mapSystemButtons.Add(button); mapNodeSystems.Add(star);
+                    mapWorld.Add(button);
+                }
+            RefreshMapProjectMatches();
             PositionMapLabels();
+        }
+
+        void RefreshMapProjectResources()
+        {
+            mapProjectResources.Clear();
+            var project = gs.TrackedProject;
+            if (project != null)
+            {
+                var status = gs.ProjectState(project);
+                var totals = new Dictionary<ResourceSO, long>();
+                foreach (var cost in status.costs)
+                {
+                    if (cost.resource == null) continue;
+                    totals.TryGetValue(cost.resource, out long amount);
+                    totals[cost.resource] = amount + cost.amount;
+                }
+                foreach (var cost in totals)
+                    if (gs.ProjectResourceCount(project, cost.Key) < cost.Value)
+                        mapProjectResources.Add(cost.Key.id);
+            }
+            RefreshMapProjectMatches();
+        }
+
+        void RefreshMapProjectMatches()
+        {
+            mapProjectWorlds.Clear();
+            mapProjectSystems.Clear();
+            void MatchWorld(PlanetData planet)
+            {
+                if (!Surveyed(planet.Star)) return;
+                foreach (var deposit in planet.Descriptor.Deposits)
+                    if (mapProjectResources.Contains(deposit.ResourceId))
+                    {
+                        mapProjectWorlds.Add(planet.Id);
+                        mapProjectSystems.Add(planet.Star.Id);
+                        break;
+                    }
+            }
+            foreach (var planet in mapPlanets) MatchWorld(planet);
+            if (mapSnapshot != null)
+                foreach (var star in mapSnapshot.systems)
+                    if (Surveyed(star))
+                        foreach (var planet in gs.universe.PlanetsOf(star)) MatchWorld(planet);
+            for (int i = 0; i < mapPlanetButtons.Count; i++)
+                mapPlanetButtons[i].EnableInClassList("fr-map-project-world",
+                    mapResource == ProjectMapFilter && mapProjectWorlds.Contains(mapPlanets[i].Id));
         }
 
         void RefreshMapPinPlanets()
@@ -349,12 +595,38 @@ namespace Frontier
 
         Vector2 PlanetOrbitAxes(PlanetData planet)
         {
+            if (NeighborMapView)
+            {
+                var planets = gs.universe.PlanetsOf(planet.Star);
+                int orbit = 0;
+                for (int i = 0; i < planets.Count; i++) if (planets[i].Id == planet.Id) { orbit = i; break; }
+                float radius = NeighborOrbitRadius(planet.Star);
+                float lane = (orbit + 1f) / Mathf.Max(1, planets.Count);
+                return new Vector2(Mathf.Lerp(14f, radius, lane), Mathf.Lerp(10f, radius * 0.65f, lane));
+            }
             int index = mapPlanets.FindIndex(p => p.Id == planet.Id);
             // The chart is deliberately schematic: evenly spaced lanes keep inner planets readable.
             float fraction = (index + 1f) / Mathf.Max(1, mapPlanets.Count);
-            float outerX = Mathf.Max(80, (float)viewport.Width * 0.5f - 100);
-            float outerY = Mathf.Max(64, (float)viewport.Height * 0.5f - 72);
-            return new Vector2(Mathf.Lerp(64, outerX, fraction), Mathf.Lerp(48, outerY, fraction));
+            const float orbitAspect = 0.65f;
+            float outerX = Mathf.Max(80, Mathf.Min((float)viewport.Width * 0.5f - 100,
+                ((float)viewport.Height * 0.5f - 72) / orbitAspect));
+            float radiusX = Mathf.Lerp(64, outerX, fraction);
+            return new Vector2(radiusX, radiusX * orbitAspect);
+        }
+
+        float NeighborOrbitRadius(StarSystem star)
+        {
+            if (mapOrbitRadii.TryGetValue(star.Id, out float cached)) return cached;
+            float radius = 112f;
+            if (mapSnapshot != null)
+                foreach (var other in mapSnapshot.systems)
+                {
+                    if (other.Key == star.Key) continue;
+                    radius = Mathf.Min(radius, Vector2.Distance(Project(star.X, star.Y), Project(other.X, other.Y)) * 0.4f);
+                }
+            radius = Mathf.Max(22f, radius);
+            mapOrbitRadii[star.Id] = radius;
+            return radius;
         }
 
         void PositionMapLabels()
@@ -367,6 +639,15 @@ namespace Frontier
                 var button = mapPlanetButtons[i];
                 Vector2 at = PlanetPoint(mapPlanets[i]);
                 button.style.display = SystemMapView ? DisplayStyle.Flex : DisplayStyle.None;
+                button.style.left = at.x - 52;
+                button.style.top = at.y - 52;
+            }
+            for (int i = 0; i < mapSystemButtons.Count; i++)
+            {
+                var star = mapNodeSystems[i];
+                Vector2 at = Project(star.X, star.Y);
+                var button = mapSystemButtons[i];
+                button.style.display = !SystemMapView ? DisplayStyle.Flex : DisplayStyle.None;
                 button.style.left = at.x - 52;
                 button.style.top = at.y - 52;
             }
@@ -397,7 +678,9 @@ namespace Frontier
                     Vector2 p = Project(star.X, star.Y);
                     if (p.x < 0 || p.y < 0 || p.x > viewport.Width || p.y > viewport.Height) continue;
                     if (!Surveyed(star) && star.Key != selected.Star.Key) continue;
-                    PlaceMapLabel(ref used, star.Name, p + new Vector2(10, 6), 180, star.Key == gs.planet.Star.Key ? UiKit.Cyan : UiKit.Muted);
+                    PlaceMapLabel(ref used, star.Name, p + (NeighborMapView ?
+                        new Vector2(-90, NeighborOrbitRadius(star) * 0.65f + 12) : new Vector2(10, 6)),
+                        180, star.Key == gs.planet.Star.Key ? UiKit.Cyan : UiKit.Muted);
                 }
             }
             for (int i = used; i < mapLabels.Count; i++) mapLabels[i].style.display = DisplayStyle.None;
@@ -433,19 +716,22 @@ namespace Frontier
         void DrawMapBackground(MeshGenerationContext ctx)
         {
             var p = ctx.painter2D;
+            if (!SystemMapView) DrawScannerCoverage(p);
             DrawPlanetLinks(p);
             if (mapSnapshot != null && !SystemMapView)
             {
-                if (mapSnapshot.densityOnly) DrawMapDensity(p);
                 foreach (var star in mapSnapshot.systems)
                 {
                     Vector2 at = Project(star.X, star.Y);
                     if (at.x < -10 || at.y < -10 || at.x > viewport.Width + 10 || at.y > viewport.Height + 10) continue;
+                    if (NeighborMapView) { DrawNeighborSystem(p, star); continue; }
                     bool surveyed = Surveyed(star), current = star.Key == gs.planet.Star.Key;
                     Color color = current ? UiKit.Cyan : surveyed ? UiKit.Amber : new Color(0.35f, 0.45f, 0.62f);
                     MapDisc(p, at, current ? 12 : star.IsAuthored ? 9 : 6, color);
                     p.strokeColor = new Color(0.5f, 0.65f, 0.85f, 0.45f); p.lineWidth = 2;
                     p.BeginPath(); p.Arc(at, current ? 18 : star.IsAuthored ? 15 : 11, Angle.Degrees(0), Angle.Degrees(360)); p.Stroke();
+                    if (mapResource == ProjectMapFilter && mapProjectSystems.Contains(star.Id))
+                        DrawProjectMarker(p, at, current ? 25 : 21);
                 }
             }
             Vector2 here = Project(gs.planet.Star.X, gs.planet.Star.Y);
@@ -480,11 +766,11 @@ namespace Frontier
             foreach (var pinned in mapPinPlanets)
             {
                 if (SystemMapView && pinned.Star.Key != selected.Star.Key) continue;
-                Vector2 at = SystemMapView ? PlanetPoint(pinned) : Project(pinned.Star.X, pinned.Star.Y);
+                Vector2 at = ExpandedMapView ? PlanetPoint(pinned) : Project(pinned.Star.X, pinned.Star.Y);
                 if (at.x < -12 || at.y < -12 || at.x > viewport.Width + 12 || at.y > viewport.Height + 12) continue;
                 p.strokeColor = UiKit.Magenta;
                 p.lineWidth = 2f;
-                p.BeginPath(); p.Arc(at, SystemMapView ? 35f : 22f, Angle.Degrees(0), Angle.Degrees(360)); p.Stroke();
+                p.BeginPath(); p.Arc(at, SystemMapView ? 35f : NeighborMapView ? 10f : 22f, Angle.Degrees(0), Angle.Degrees(360)); p.Stroke();
             }
             DrawMapRoute(p);
         }
@@ -493,6 +779,60 @@ namespace Frontier
         {
             p.fillColor = color;
             p.BeginPath(); p.Arc(at, radius, Angle.Degrees(0), Angle.Degrees(360)); p.Fill();
+        }
+
+        void DrawNeighborSystem(Painter2D p, StarSystem star)
+        {
+            Vector2 center = Project(star.X, star.Y);
+            foreach (var planet in gs.universe.PlanetsOf(star))
+            {
+                Vector2 axes = PlanetOrbitAxes(planet);
+                p.strokeColor = planet.Id == selected.Id ? UiKit.Cyan : new Color(0.4f, 0.56f, 0.78f, 0.65f);
+                p.lineWidth = planet.Id == selected.Id ? 2f : 1f;
+                p.BeginPath();
+                for (int i = 0; i <= 48; i++)
+                {
+                    float angle = i * Mathf.PI * 2f / 48;
+                    Vector2 at = center + new Vector2(Mathf.Cos(angle) * axes.x, Mathf.Sin(angle) * axes.y);
+                    if (i == 0) p.MoveTo(at); else p.LineTo(at);
+                }
+                p.ClosePath(); p.Stroke();
+                MapDisc(p, PlanetPoint(planet), 4f, UiKit.Ui(planet.Primary));
+            }
+            MapDisc(p, center, 9f, star.Key == gs.planet.Star.Key ? UiKit.Cyan : UiKit.Amber);
+            if (mapResource == ProjectMapFilter && mapProjectSystems.Contains(star.Id))
+                DrawProjectMarker(p, center, NeighborOrbitRadius(star) + 10);
+        }
+
+        static void DrawProjectMarker(Painter2D p, Vector2 at, float radius)
+        {
+            p.strokeColor = UiKit.Lime;
+            p.lineWidth = 3;
+            p.BeginPath();
+            p.MoveTo(at + Vector2.up * radius);
+            p.LineTo(at + Vector2.right * radius);
+            p.LineTo(at + Vector2.down * radius);
+            p.LineTo(at + Vector2.left * radius);
+            p.ClosePath(); p.Stroke();
+        }
+
+        void DrawScannerCoverage(Painter2D p)
+        {
+            p.strokeColor = new Color(0.15f, 0.9f, 1f, 0.8f);
+            p.lineWidth = 2;
+            for (int i = 0; i < surveyCenters.Count; i++)
+            {
+                var center = Project(surveyCenters[i].X, surveyCenters[i].Y);
+                float radius = (float)(surveyRadii[i] * viewport.Scale);
+                if (radius <= 0 || radius > 12000 || center.x + radius < 0 || center.y + radius < 0 ||
+                    center.x - radius > viewport.Width || center.y - radius > viewport.Height) continue;
+                for (int angle = 0; angle < 360; angle += 12)
+                {
+                    p.BeginPath();
+                    p.Arc(center, radius, Angle.Degrees(angle), Angle.Degrees(angle + 7));
+                    p.Stroke();
+                }
+            }
         }
 
         void DrawPlanetLinks(Painter2D p)
@@ -523,6 +863,8 @@ namespace Frontier
         {
             Vector2 at = PlanetPoint(planet);
             float radius = planet.Id == selected.Id ? 24 : 19;
+            if (mapResource == ProjectMapFilter && mapProjectWorlds.Contains(planet.Id))
+                DrawProjectMarker(p, at, radius + 16);
             if (planet.Id == selected.Id || planet.Id == gs.planet.Id)
             {
                 p.strokeColor = planet.Id == gs.planet.Id ? UiKit.Cyan : Color.white; p.lineWidth = 3;
@@ -550,7 +892,7 @@ namespace Frontier
             {
                 RouteLeg leg = legs[i];
                 Vector2 a = Project(leg.x0, leg.y0), b = Project(leg.x1, leg.y1);
-                if (leg.intraSystem && SystemMapView) { a = PlanetPoint(gs.planet); b = PlanetPoint(selected); }
+                if (leg.intraSystem && ExpandedMapView) { a = PlanetPoint(gs.planet); b = PlanetPoint(selected); }
                 if (SystemMapView && !leg.intraSystem) continue;
                 Vector2 ac = Project(leg.x0, leg.y0), bc = Project(leg.x1, leg.y1);
                 if (!leg.intraSystem)
@@ -582,6 +924,7 @@ namespace Frontier
         void BuildMapSearch()
         {
             var bar = UiKit.Div("fr-map-search");
+            mapSearchBar = bar;
             bar.style.top = 140 + inset.y; bar.style.left = 16 + inset.x; bar.style.right = 16 + inset.z;
             mapSearch = new TextField { tooltip = UiText.Get("map.search.tooltip") };
             mapSearch.textEdition.placeholder = UiText.Get("map.search.placeholder");
@@ -593,46 +936,63 @@ namespace Frontier
             mapFilter = filter;
             filter.AddToClassList("fr-map-filter");
             filter.tooltip = UiText.Get("map.filter.tooltip");
-            filter.choices = new List<string> { UiText.Get("map.filter.all") }; mapResourceIds.Clear(); mapResourceIds.Add("");
+            filter.choices = new List<string> { UiText.Get("map.filter.all"), UiText.Get("map.filter.project") };
+            mapResourceIds.Clear(); mapResourceIds.Add(""); mapResourceIds.Add(ProjectMapFilter);
             foreach (var r in gs.db.resources) { filter.choices.Add(r.LocalizedName); mapResourceIds.Add(r.id); }
-            filter.index = 0;
-            filter.RegisterValueChangedCallback(e => { mapResource = mapResourceIds[filter.index]; mapVersion++; mapQueryAt = 0; });
+            filter.index = mapProjectResources.Count > 0 ? 1 : 0;
+            mapResource = mapResourceIds[filter.index];
+            filter.RegisterValueChangedCallback(e =>
+            {
+                mapResource = mapResourceIds[filter.index]; mapVersion++; mapQueryAt = 0;
+                RefreshMapProjectMatches();
+                BuildMapCard();
+                mapWorld.MarkDirtyRepaint();
+            });
             filter.style.position = Position.Absolute; filter.style.left = 16 + inset.x; filter.style.top = 260 + inset.y; filter.style.width = 260;
             mapView.Add(filter);
             mapReadout = UiKit.Text("", "fr-tiny", UiKit.Muted);
-            mapReadout.style.position = Position.Absolute; mapReadout.style.left = 296 + inset.x; mapReadout.style.right = 16 + inset.z; mapReadout.style.top = 266 + inset.y;
+            mapReadout.style.position = Position.Absolute; mapReadout.style.left = 296 + inset.x; mapReadout.style.right = UiKit.Size.Touch + UiKit.Space.S32 + inset.z; mapReadout.style.top = 266 + inset.y;
             mapView.Add(mapReadout);
-            mapNotice = UiKit.Text(UiText.Get("map.help"), "fr-tiny", UiKit.Muted);
+            mapNotice = UiKit.Text("", "fr-tiny", UiKit.Muted);
             mapNotice.style.position = Position.Absolute; mapNotice.style.left = 16 + inset.x;
             mapNotice.style.top = 336 + inset.y; mapNotice.style.right = 16 + inset.z;
             mapView.Add(mapNotice);
         }
 
+        void SetMapNotice(string message)
+        {
+            mapNotice.text = message;
+            LayoutMapChrome();
+        }
+
         void SearchMap()
         {
             string text = mapSearch.value.Trim();
-            if (text.Length == 0) { mapNotice.text = UiText.Get("map.search.empty"); return; }
+            SetMapNotice("");
+            if (text.Length == 0) { SetMapNotice(UiText.Get("map.search.empty")); return; }
             string[] xy = text.Split(',');
             double x, y;
             if (xy.Length == 2 && double.TryParse(xy[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) && double.TryParse(xy[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y)
                 && !double.IsNaN(x) && !double.IsNaN(y) && Math.Abs(x) <= 1e7 && Math.Abs(y) <= 1e7)
             {
-                mapZoom = 2f;
-                viewport.Center(x, y); ApplyMapTransform(); mapNotice.text = UiText.Get("map.search.coordinates"); return;
+                mapZoom = MinZoom;
+                viewport.Center(x, y); ApplyMapTransform();
+                bool clamped = Math.Abs(viewport.CenterX - x) > 0.01 || Math.Abs(viewport.CenterY - y) > 0.01;
+                SetMapNotice(UiText.Get(clamped ? "map.search.outside" : "map.search.coordinates")); return;
             }
             var byPlanetId = gs.universe.Get(text);
-            if (byPlanetId != null) { SelectMapWorld(byPlanetId); CenterOn(byPlanetId); return; }
+            if (byPlanetId != null && Surveyed(byPlanetId.Star)) { SelectMapWorld(byPlanetId); CenterOn(byPlanetId); return; }
             foreach (var world in gs.universe.AuthoredPlanets)
-                if (string.Equals(world.Name, text, StringComparison.OrdinalIgnoreCase) || world.Id == text || world.Authored.id == text)
+                if (Surveyed(world.Star) && (string.Equals(world.Name, text, StringComparison.OrdinalIgnoreCase) || world.Id == text || world.Authored.id == text))
                 { SelectMapWorld(world); CenterOn(world); return; }
             foreach (var record in gs.world.All)
             {
                 var world = gs.universe.Get(record.planetId);
-                if (world != null && (string.Equals(world.Name, text, StringComparison.OrdinalIgnoreCase) || world.Id == text))
+                if (world != null && Surveyed(world.Star) && (string.Equals(world.Name, text, StringComparison.OrdinalIgnoreCase) || world.Id == text))
                 { SelectMapWorld(world); CenterOn(world); return; }
             }
             StarSystem byId;
-            if (gs.universe.Universe.TryGetSystemById(text, out byId))
+            if (gs.universe.Universe.TryGetSystemById(text, out byId) && Surveyed(byId))
             {
                 var worlds = gs.universe.PlanetsOf(byId);
                 if (worlds.Count > 0) { SelectMapWorld(worlds[0]); CenterOn(selected); return; }
@@ -645,9 +1005,9 @@ namespace Frontier
             if (mapNameIndex != null && mapNameIndex.TryFind(text, out knownPlanetId))
             {
                 var knownWorld = gs.universe.Get(knownPlanetId);
-                if (knownWorld != null) { SelectMapWorld(knownWorld); CenterOn(knownWorld); return; }
+                if (knownWorld != null && Surveyed(knownWorld.Star)) { SelectMapWorld(knownWorld); CenterOn(knownWorld); return; }
             }
-            mapNotice.text = UiText.Get("map.search.not-found");
+            SetMapNotice(UiText.Get("map.search.not-found"));
         }
     }
 }

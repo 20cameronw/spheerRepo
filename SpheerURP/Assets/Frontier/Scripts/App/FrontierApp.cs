@@ -14,6 +14,7 @@ namespace Frontier
         FrontierServices services;
         bool analyticsInitializing;
         bool analyticsInitialized;
+        bool resumePending;
 
         public void Init(GameState gs, FrontierServices serviceSet = null)
         {
@@ -50,12 +51,23 @@ namespace Frontier
 
         void Update() { if (state != null) state.Tick(); }
 
-        void OnApplicationPause(bool paused) { if (paused && state != null) state.Flush(); }
+        void OnApplicationPause(bool paused)
+        {
+            if (paused) { resumePending = true; if (state != null) state.Save(); }
+            else ResumeProgress();
+        }
+
+        void ResumeProgress()
+        {
+            if (!resumePending) return;
+            resumePending = false;
+            state?.ResumeOfflineProgress();
+        }
 
         void OnApplicationFocus(bool focused)
         {
-            if (!focused && state != null) state.Flush();
-            if (focused) InitializeAnalytics();
+            if (!focused) { resumePending = true; if (state != null) state.Save(); }
+            if (focused) { ResumeProgress(); InitializeAnalytics(); }
         }
 
         void OnApplicationQuit() { if (state != null) state.Flush(); }

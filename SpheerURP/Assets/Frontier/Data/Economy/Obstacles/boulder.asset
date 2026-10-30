@@ -178,4 +178,4 @@ MonoBehaviour:
       reward:
         resourceId: stone
         amount: 120
-  modelKey: 
+  modelKey: world_obstacle_boulder

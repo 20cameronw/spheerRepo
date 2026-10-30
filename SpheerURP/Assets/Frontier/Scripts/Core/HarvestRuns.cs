@@ -15,6 +15,10 @@ namespace Frontier
         public float BandWidth { get; }
         public int Pulses { get; private set; }
         public int Perfects { get; private set; }
+        public int Chain { get; private set; }
+        public float Pressure { get; private set; }
+        public float EffectiveBand { get { return BandWidth * (1f - Pressure * 0.35f + Math.Min(2, Chain) * 0.08f); } }
+        public bool Venting { get; private set; }
         public bool Completed { get { return Pulses == PulseCount; } }
         public float Quality { get { return qualitySum / PulseCount; } }
 
@@ -29,21 +33,30 @@ namespace Frontier
 
         public void Advance(float seconds)
         {
+            Advance(seconds, false);
+        }
+
+        public void Advance(float seconds, bool vent)
+        {
             HarvestInput.Seconds(seconds);
             if (Completed) return;
             Elapsed += seconds;
             Cooldown = Math.Max(0f, Cooldown - seconds);
+            Venting = vent;
+            Pressure = Math.Max(0f, Pressure - seconds * (vent ? 0.5f : 0.055f));
             UpdatePositions();
         }
 
         public bool TryPump(out float hit)
         {
             hit = 0f;
-            if (Completed || Cooldown > 0f) return false;
+            if (Completed || Cooldown > 0f || Venting) return false;
             Cooldown = 0.22f;
-            hit = Math.Max(0f, Math.Min(1f, 1f - Math.Abs(Needle - Target) / Math.Max(0.01f, BandWidth * 2.2f)));
+            hit = Math.Max(0f, Math.Min(1f, 1f - Math.Abs(Needle - Target) / Math.Max(0.01f, EffectiveBand * 2.2f)));
             qualitySum += hit;
             if (hit >= 0.78f) Perfects++;
+            Chain = hit >= 0.78f ? Chain + 1 : 0;
+            Pressure = Math.Min(1f, Pressure + 0.28f);
             Pulses++;
             return true;
         }
@@ -63,6 +76,8 @@ namespace Frontier
         public int Target { get; private set; }
         public int Pings { get; private set; }
         public int SeamsFound { get; private set; }
+        public int HintX { get; private set; }
+        public int HintY { get; private set; }
         public bool Completed { get { return SeamsFound == SeamCount || Pings == MaxPings; } }
         public float Quality { get { return SeamsFound == 0 ? 0f : 0.2f + 0.8f * SeamsFound / SeamCount; } }
 
@@ -86,6 +101,8 @@ namespace Frontier
             revealed[cell] = true;
             Pings++;
             distance = Math.Abs(cell / GridSide - Target / GridSide) + Math.Abs(cell % GridSide - Target % GridSide);
+            HintX = Math.Sign(Target % GridSide - cell % GridSide);
+            HintY = Math.Sign(Target / GridSide - cell / GridSide);
             if (distance == 0)
             {
                 SeamsFound++;
@@ -110,6 +127,9 @@ namespace Frontier
         readonly bool[] captured = new bool[TargetCount];
         public int Casts { get; private set; }
         public int Captured { get; private set; }
+        public int Selected { get; private set; } = -1;
+        public float TetherSeconds { get; private set; }
+        public bool TetherReady { get { return TetherSeconds >= 0.55f && TetherSeconds <= 1.4f; } }
         public bool Completed { get { return Captured == TargetCount || Casts == MaxCasts; } }
         public float Quality { get { return Captured == 0 ? 0f : 0.2f + 0.8f * Captured / TargetCount; } }
 
@@ -118,6 +138,30 @@ namespace Frontier
             ValidateTarget(target);
             return captured[target];
         }
+
+        public bool Select(int target)
+        {
+            ValidateTarget(target);
+            if (Completed || captured[target] || Selected >= 0) return false;
+            Selected = target; TetherSeconds = 0f;
+            return true;
+        }
+
+        public void Advance(float seconds)
+        {
+            HarvestInput.Seconds(seconds);
+            if (Selected >= 0 && !Completed) TetherSeconds = Math.Min(2f, TetherSeconds + seconds);
+        }
+
+        public bool Release()
+        {
+            if (Selected < 0 || Completed) return false;
+            int hit = TetherReady ? Selected : -1;
+            Selected = -1; TetherSeconds = 0f;
+            return TryCast(hit);
+        }
+
+        public void CancelTether() { Selected = -1; TetherSeconds = 0f; }
 
         // -1 is a cast that missed all targets; already collected targets cannot be collected twice.
         public bool TryCast(int target)

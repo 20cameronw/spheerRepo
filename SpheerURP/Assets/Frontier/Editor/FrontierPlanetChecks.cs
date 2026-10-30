@@ -68,7 +68,8 @@ namespace Frontier.EditorTools
                     Bounds bounds;
                     if (model == null || !ModelLibrary.MeshBounds(model.gameObject, out bounds))
                         throw new InvalidOperationException("Missing structure mesh: " + entry.key);
-                    float diameter = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+                    float diameter = Mathf.Max(bounds.size.x,
+                        Mathf.Max(bounds.size.y - entry.foundationDepth * model.localScale.y, bounds.size.z));
                     if (Mathf.Abs(diameter - 0.75f) > 0.01f)
                         throw new InvalidOperationException(entry.key + " structure diameter is " + diameter);
                     UnityEngine.Object.DestroyImmediate(model.gameObject);

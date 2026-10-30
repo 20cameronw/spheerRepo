@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Frontier
 {
-    public enum ResourceSourceKind { Structure, Build, Planet, Unavailable }
+    public enum ResourceSourceKind { Structure, Build, Planet, Unavailable, Usable, LocalStock, RemoteStock }
 
     public sealed class ResourceSource
     {
@@ -14,6 +14,8 @@ namespace Frontier
         public RecipeSO recipe;
         public PlanetData planet;
         public string reason;
+        public int amount, energy;
+        public PlacedStructure relay;
     }
 
     public partial class GameState
@@ -82,7 +84,7 @@ namespace Frontier
                     }
                 foreach (var candidate in worlds)
                 {
-                    if (candidate.Id == planet.Id) continue;
+                    if (candidate.Id == planet.Id || !IsMapDiscovered(candidate.Star.Id) && world.Visits(candidate.Id) <= 0) continue;
                     bool supplies = false;
                     foreach (var def in db.structures)
                         if (def != null && def.Implemented && def.kind.IsGather() &&
@@ -90,6 +92,8 @@ namespace Frontier
                     if (!supplies) continue;
                     double dx = candidate.Star.X - planet.Star.X, dy = candidate.Star.Y - planet.Star.Y;
                     double distance = dx * dx + dy * dy;
+                    // A reachable supplier outranks a nearer world that cannot be landed on.
+                    if (!PlanRoute(candidate).reachable) distance += 1e20;
                     if (distance < nearestDistance) { nearest = candidate; nearestDistance = distance; }
                 }
                 if (nearest != null) return new ResourceSource { kind = ResourceSourceKind.Planet, resource = resource, planet = nearest };

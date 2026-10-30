@@ -44,6 +44,8 @@ namespace Frontier
                 int stored = AddToHarvesterHopper(structure, spot.resource, requested);
                 if (stored > 0)
                 {
+                    ReturnItems.Add(new SessionReturnItem { planetId = structure.planetId, slot = structure.slot,
+                        resourceId = spot.resource.id, amount = stored });
                     RecordAtlasResourceAcquired(spot.resource.id);
                     saves.MarkDirty();
                 }
@@ -80,6 +82,11 @@ namespace Frontier
                     if (nextReserve == record.offlineFuelEnergy) continue;
 
                     record.offlineFuelEnergy = nextReserve;
+                    int produced = db.fuel == null || db.fuel.fuelEnergy <= 0 ? 0 :
+                        (int)Math.Min(int.MaxValue, Math.Floor(nextReserve / db.fuel.fuelEnergy) -
+                        Math.Floor(reserve / db.fuel.fuelEnergy));
+                    if (produced > 0) ReturnItems.Add(new SessionReturnItem { planetId = delta.planetId, slot = record.slot,
+                        resourceId = db.fuel.id, amount = produced });
                     changed = true;
                 }
             }
@@ -200,7 +207,7 @@ namespace Frontier
         {
             if (resource == null || amount <= 0) return 0;
             var storage = StorageFor(harvester);
-            int stackSize = Math.Max(1, resource.stackSize);
+            int stackSize = StackSize(resource);
             int remaining = amount;
             foreach (var slot in storage.slots)
             {

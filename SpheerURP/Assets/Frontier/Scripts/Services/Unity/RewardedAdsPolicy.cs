@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Frontier.Services.Unity
 {
@@ -9,15 +10,16 @@ namespace Frontier.Services.Unity
         public bool enableRewardedAds;
         public string iosAppKey;
         public string iosRewardedAdUnitId;
-        [Tooltip("Enable only after audience/privacy review and physical iOS test-device verification. Requires a public HTTPS privacy policy.")]
-        public bool iosSetupVerified;
+        [FormerlySerializedAs("iosSetupVerified")]
+        [Tooltip("Enable iOS gameplay rewarded ads. Requires player opt-in and a public HTTPS privacy policy; this flag does not certify device testing or compliance.")]
+        public bool enableIosGameplayAds;
         [Tooltip("Expose the LevelPlay test suite in iOS development builds only. Does not enable gameplay ads.")]
         public bool enableIosDevelopmentTests;
         public RewardedAdPlacement[] placements = Array.Empty<RewardedAdPlacement>();
 
         public bool CanUseIos(FrontierUnityServicesConfig config)
         {
-            return enableRewardedAds && iosSetupVerified && config != null && config.HasValidPrivacyPolicy &&
+            return enableRewardedAds && enableIosGameplayAds && config != null && config.HasValidPrivacyPolicy &&
                 !string.IsNullOrWhiteSpace(iosAppKey) && !string.IsNullOrWhiteSpace(iosRewardedAdUnitId);
         }
 

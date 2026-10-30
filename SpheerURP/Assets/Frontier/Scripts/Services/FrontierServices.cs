@@ -172,6 +172,11 @@ namespace Frontier.Services
         Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId);
     }
 
+    public interface IRewardedAdAvailability
+    {
+        ServiceResult RewardedAvailability(string placementId);
+    }
+
     public interface IAdDiagnostics
     {
         bool CanOpenTestSuite { get; }
@@ -310,7 +315,7 @@ namespace Frontier.Services
         }
     }
 
-    sealed class ConsentGatedAdsService : IAdsService
+    sealed class ConsentGatedAdsService : IAdsService, IRewardedAdAvailability
     {
         readonly IAdsService inner;
         readonly IConsentService consent;
@@ -322,6 +327,16 @@ namespace Frontier.Services
         }
 
         public bool IsConfigured { get { return inner.IsConfigured; } }
+
+        public ServiceResult RewardedAvailability(string placementId)
+        {
+            if (!consent.Current.hasDecision || !consent.Current.adsAllowed)
+                return ServiceResult.ConsentRequired("advertising");
+            if (string.IsNullOrWhiteSpace(placementId))
+                return ServiceResult.InvalidRequest(ServiceMessage.Get("service.ads.placement"));
+            if (inner is IRewardedAdAvailability availability) return availability.RewardedAvailability(placementId);
+            return IsConfigured ? ServiceResult.Success() : ServiceResult.NotConfigured("Rewarded ads");
+        }
 
         public Task<ServiceResult> InitializeAsync()
         {

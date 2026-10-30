@@ -162,30 +162,31 @@ namespace Frontier.EditorTools
             string F(string name) { return SourceDir + name + ".fbx"; }
             var map = new (string key, string path, float scale)[]
             {
-                ("sylva", P("lerth"), 1f),
-                ("ferrum", F("planet_2"), 1f),
-                ("glacia", P("purp"), 1f),
-                ("cinder", F("planet_2"), 1f),
-                ("arbor", F("planet_3"), 1f),
-                ("nyx", P("domny"), 1f),
-                ("aurum", F("planet_1"), 1f),
-                ("tide", P("lerth"), 1f),
-                ("zephyr", F("tiny world"), 1f),
-                ("pyre", F("tiny world"), 1f),
-                ("halcyon", P("purp"), 1f),
-                ("mire", F("planet_3"), 1f),
-                ("obsidian", P("domny"), 1f),
-                ("vesper", F("planet_2"), 1f),
-                ("prism", F("planet_1"), 1f),
-                ("kaos", F("planet_3"), 1f),
-                ("tundra", F("tiny world"), 1f),
-                ("coral", P("lerth"), 1f),
+                ("sylva", P("sylva"), 1f),
+                ("ferrum", P("ferrum"), 1f),
+                ("glacia", P("glacia"), 1f),
+                ("cinder", P("cinder"), 1f),
+                ("arbor", P("arbor"), 1f),
+                ("nyx", P("nyx"), 1f),
+                ("aurum", P("aurum"), 1f),
+                ("tide", P("tide"), 1f),
+                ("zephyr", P("zephyr"), 1f),
+                ("pyre", P("pyre"), 1f),
+                ("halcyon", P("halcyon"), 1f),
+                ("mire", P("mire"), 1f),
+                ("obsidian", P("obsidian"), 1f),
+                ("vesper", P("vesper"), 1f),
+                ("prism", P("prism"), 1f),
+                ("kaos", P("kaos"), 1f),
+                ("tundra", P("tundra"), 1f),
+                ("coral", P("coral"), 1f),
                 ("scout", F("ufo (2)"), 1f),
                 ("swarmer", F("space_trash"), 1f),
                 ("raider", F("spaceship"), 1f),
                 ("brute", F("ufo (2)"), 1f),
                 ("titan", F("ufo (2)"), 1f),
                 ("turret", F("gunner"), 1f),
+                ("colony_hub", P("colony_hub"), 1f),
                 ("struct_refinery", P("silo_with_missil"), 1f),
                 ("struct_alarm", P("sat_dish"), 1f),
                 ("struct_mine", F("space_trash"), 1f),
@@ -193,6 +194,8 @@ namespace Frontier.EditorTools
                 ("struct_gunner", F("gunner"), 1f),
                 ("struct_laser", P("lazer"), 1f),
                 ("struct_satellite", P("satellite"), 1f),
+                ("world_dead_tree", P("world_dead_tree"), 1f),
+                ("world_wreckage", P("world_wreckage"), 1f),
             };
             var list = new System.Collections.Generic.List<ModelLibrary.Entry>();
             foreach (var m in map)
@@ -201,6 +204,7 @@ namespace Frontier.EditorTools
                 if (prefab == null) { Debug.LogWarning("Frontier: missing model " + m.path); continue; }
                 list.Add(new ModelLibrary.Entry { key = m.key, prefab = prefab, scale = m.scale });
             }
+            StructureModelBuilder.UpsertLibraryEntries(list);
             Directory.CreateDirectory(Dir);
             string path = Dir + "/ModelLibrary.asset";
             var lib = AssetDatabase.LoadAssetAtPath<ModelLibrary>(path);

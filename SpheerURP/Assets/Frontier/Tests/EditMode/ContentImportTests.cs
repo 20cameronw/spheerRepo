@@ -34,7 +34,7 @@ namespace Frontier.Tests
             Assert.AreEqual(16, db.upgrades.Length);
             Assert.AreEqual(60, db.research.Length);
             Assert.AreEqual(8, db.obstacleKinds.Length);
-            Assert.AreEqual(606, db.tuning.Build().Count);
+            Assert.AreEqual(Tuning.CreateDefault().Count, db.tuning.Build().Count);
             Assert.AreEqual("sylva", db.startPlanet.id);
             Assert.AreEqual(1, db.builders);
             Assert.AreSame(db, GameDatabase.Load().ContentSource);
