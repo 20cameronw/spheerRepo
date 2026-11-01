@@ -200,7 +200,12 @@ namespace Frontier
         public bool DebugGatherResult(MinigameKind kind)
         {
             if (!DebugGather(kind) || activeGatherMinigame == null) return false;
-            activeGatherMinigame.DebugComplete(0.82f, 7, 10);
+            int total = kind == MinigameKind.Chop ? DirectionalCutRun.CutCount
+                : kind == MinigameKind.Mine ? ConnectedOreRun.MaxStrikes
+                : kind == MinigameKind.Drill ? SteeredDrillRun.Layers
+                : kind == MinigameKind.Excavate ? BuriedFindRun.FindCount
+                : kind == MinigameKind.Salvage ? SortingSalvageRun.PartCount : 10;
+            activeGatherMinigame.DebugComplete(0.82f, Mathf.RoundToInt(total * 0.82f), total);
             return true;
         }
 
@@ -208,14 +213,20 @@ namespace Frontier
         {
             overlayLayer.schedule.Execute(() =>
             {
-                var game = activeGatherMinigame as DrillGame;
-                if (game == null || game.DebugRun == null)
+                var game = activeGatherMinigame as LayerDrillGame;
+                if (game == null || !game.DebugReady)
                     throw new InvalidOperationException("Drill preview was not ready.");
+                game.DebugStart();
                 var control = overlayLayer.Q("drill-boost");
                 foreach (var key in new[] { KeyCode.Space, KeyCode.LeftShift })
                     using (var e = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = key }))
                     { e.target = control; control.SendEvent(e); }
-                game.DebugAdvance(overheated ? 3.65f : 0.8f, true, true);
+                if (overheated)
+                {
+                    for (int layer = 0; layer < SteeredDrillRun.Columns; layer++)
+                        if (game.DebugRun.Cell(game.DebugRun.Depth, layer) < 0) { game.DebugAim(layer); break; }
+                }
+                game.DebugAdvance(overheated ? 3.65f : 0.8f);
             }).StartingIn(1500);
         }
 
@@ -223,27 +234,38 @@ namespace Frontier
         {
             overlayLayer.schedule.Execute(() =>
             {
+                var harvest = activeGatherMinigame as HarvestBoardGame;
+                if (harvest == null || !harvest.DebugReady)
+                    throw new InvalidOperationException("Harvest preview was not ready.");
+                harvest.DebugStart();
                 if (kind == MinigameKind.Excavate)
                 {
-                    var game = activeGatherMinigame as ExcavationGame;
-                    if (game == null || game.DebugRun == null) throw new InvalidOperationException("Excavation preview was not ready.");
-                    game.DebugPing((game.DebugRun.Target + 1) % ExcavationHarvestRun.CellCount);
+                    var game = (BuriedExcavationGame)harvest;
+                    game.DebugSelect(0); game.DebugScan(); game.DebugClear(true);
                 }
                 else if (kind == MinigameKind.Salvage)
                 {
-                    var game = activeGatherMinigame as SalvageGame;
-                    if (game == null) throw new InvalidOperationException("Salvage preview was not ready.");
-                    game.DebugSelect(0);
-                    var control = overlayLayer.Q("salvage-tether");
-                    using (var e = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = KeyCode.Space }))
-                    { e.target = control; control.SendEvent(e); }
+                    var game = (SortingSalvageGame)harvest;
+                    var current = game.DebugRun.Current;
+                    game.DebugSort(current == SalvagePart.Metal ? SalvageBin.Metal
+                        : current == SalvagePart.Circuit ? SalvageBin.Circuit : SalvageBin.Reject);
                     game.DebugAdvance(0.7f);
                 }
                 else if (kind == MinigameKind.Siphon)
                 {
-                    var game = activeGatherMinigame as SiphonGame;
-                    if (game == null || game.DebugRun == null) throw new InvalidOperationException("Siphon preview was not ready.");
-                    game.DebugPump(); game.DebugAdvance(0.3f); game.DebugPump();
+                    var game = (PipeSiphonGame)harvest;
+                    game.DebugConnect();
+                    game.DebugValve(game.DebugRun.Demand); game.DebugAdvance(0.8f);
+                }
+                else if (kind == MinigameKind.Chop)
+                {
+                    var game = (DirectionalLumberGame)harvest;
+                    game.DebugCut(game.DebugRun.Direction);
+                }
+                else if (kind == MinigameKind.Mine)
+                {
+                    var game = (ConnectedMiningGame)harvest;
+                    game.DebugAim(0); game.DebugBreak(); game.DebugBreak(); game.DebugBreak();
                 }
             }).StartingIn(1500);
         }

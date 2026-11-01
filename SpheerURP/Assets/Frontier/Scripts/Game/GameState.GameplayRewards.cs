@@ -37,7 +37,8 @@ namespace Frontier
                 bool final = ticket != null && (ticket.state == "settled" || ticket.state == "cancelled");
                 if (ticket != null && !string.IsNullOrEmpty(ticket.id) && (final ||
                     (ticket.state == "pending" || ticket.state == "earned") && ticket.amount > 0 &&
-                    (ticket.placement == "double-yield" && !string.IsNullOrEmpty(ticket.resourceId) ||
+                    ((ticket.placement == "double-yield" || ticket.placement == "resource-supply") &&
+                    !string.IsNullOrEmpty(ticket.resourceId) ||
                     ticket.placement == "free-shards" && string.IsNullOrEmpty(ticket.resourceId) &&
                     string.IsNullOrEmpty(ticket.planetId) ||
                     ticket.placement == "timer-skip" && !string.IsNullOrEmpty(ticket.planetId) && ticket.slot >= 0 &&
@@ -96,6 +97,11 @@ namespace Frontier
                     (long)FreeSpace(resource) < (long)amount * 2) return false;
                 quote.resourceId = resource.id;
             }
+            else if (placement == "resource-supply")
+            {
+                if (job != null || amount <= 0 || amount > ShortageSupplyQuote(resource, amount)) return false;
+                quote.resourceId = resource.id;
+            }
             else if (placement == "timer-skip")
             {
                 if (!IsBuilderBusy(job) || amount <= 0 || amount > BuilderJobSecondsRemaining(job)) return false;
@@ -145,6 +151,16 @@ namespace Frontier
             walletEntry.amount = (int)Math.Min(int.MaxValue, (long)Math.Max(0, walletEntry.amount) + shards);
         }
 
+        public int ShortageSupplyQuote(ResourceSO resource, int missing)
+        {
+            if (resource == null || db.FindResource(resource.id) != resource ||
+                IsTankFuel(resource.id) || !IsAtlasDiscovered(AtlasResourceType, resource.id) || missing <= 0)
+                return 0;
+            // Only familiar materials, in small quantities, so videos cannot unlock later progression.
+            int supply = Math.Max(1, resource.stackSize / 4);
+            return Math.Min(missing, Math.Min(supply, FreeSpace(resource)));
+        }
+
         public bool ResolveGameplayReward(string context, string id, bool earned, out string error)
         {
             error = UiText.Get("reward.changed");
@@ -166,11 +182,13 @@ namespace Frontier
             if (SaveIsReadOnly || ticket == null || ticket.state != "earned") return false;
             var candidate = SaveSerializer.Instance.DeserializeV2(SaveSerializer.Instance.Serialize(BuildSave())).Normalize();
             PlacedStructure job = null;
-            if (ticket.placement == "double-yield")
+            if (ticket.placement == "double-yield" || ticket.placement == "resource-supply")
             {
                 var resource = db.FindResource(ticket.resourceId);
                 if (resource == null || ticket.amount <= 0 || IsTankFuel(resource.id) || FreeSpace(resource) < ticket.amount)
                 { error = UiText.Get("reward.space"); return false; }
+                if (ticket.placement == "resource-supply" && ticket.amount > ShortageSupplyQuote(resource, ticket.amount))
+                    return false;
                 AddRewardInventory(candidate, resource.id, ticket.amount);
             }
             else if (ticket.placement == "free-shards")
@@ -203,7 +221,7 @@ namespace Frontier
                 world.Touch();
                 CompleteBuilderJobs();
             }
-            else if (ticket.placement == "double-yield")
+            else if (ticket.placement == "double-yield" || ticket.placement == "resource-supply")
             {
                 int granted = backpack.Add(ticket.resourceId, ticket.amount);
                 if (granted != ticket.amount) throw new InvalidOperationException("Persisted ad reward no longer fits.");

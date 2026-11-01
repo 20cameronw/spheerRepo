@@ -24,6 +24,15 @@ namespace Frontier
         public float Zoom01 { get { return zoom01; } set { zoom01 = Mathf.Clamp01(value); } }
         public bool CloseView { get { return zoom01 >= 0.5f; } set { Zoom01 = value ? 1f : 0f; } }
         public float MapZoomBlend { get; set; }
+        public int ViewResetVersion { get; private set; }
+
+        public void ResetSurfaceView()
+        {
+            Zoom01 = 1f;
+            MapZoomBlend = 0f;
+            ViewResetVersion = unchecked(ViewResetVersion + 1);
+        }
+
         /// <summary>Holds the planet completely still (used while a structure is selected).</summary>
         public bool Frozen;
         float appear = 1f;
@@ -363,16 +372,18 @@ namespace Frontier
             Show(planet, false, terraformingLevel);
             Frozen = true;
             float time = 0f;
-            while (time < 1.1f)
+            const float approachSeconds = 0.45f;
+            while (time < approachSeconds)
             {
                 time += Time.deltaTime;
-                float k = 1f - Mathf.Pow(1f - Mathf.Clamp01(time / 1.1f), 3f);
+                float k = 1f - Mathf.Pow(1f - Mathf.Clamp01(time / approachSeconds), 3f);
                 root.localPosition = new Vector3(2.5f, 0.4f, 12f) * (1f - k);
                 root.localScale = Vector3.one * Mathf.Lerp(0.02f, 1f, k);
                 yield return null;
             }
             root.localPosition = Vector3.zero;
             root.localScale = Vector3.one;
+            appear = 1f;
             Frozen = false;
         }
 

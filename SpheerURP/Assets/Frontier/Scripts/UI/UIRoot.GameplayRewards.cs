@@ -156,6 +156,61 @@ namespace Frontier
             body.Add(card);
         }
 
+        void BuildShortageAdOffer(VisualElement body, PlayerProject project, ResourceSO resource)
+        {
+            if (gameplayRewardRules == null || !gameplayRewardRules.shortageEnabled ||
+                !gs.IsAtlasDiscovered("resource", resource.id)) return;
+            int Quote() => gs.ShortageSupplyQuote(resource,
+                Math.Max(0, shortageRequired - gs.ProjectResourceCount(project, resource)));
+            int amount = Quote();
+            BuildRewardRecovery(body);
+            if (amount <= 0) return;
+            var offer = UiKit.Div();
+            offer.name = "shortage-ad-offer";
+            offer.Add(UiKit.Text(UiText.Get("reward.supply-help"), "fr-small"));
+            Button watch = null;
+            watch = IconBtn(UiText.Get("reward.supply-watch", amount, resource.LocalizedName),
+                "play", UiKit.Cyan, async () =>
+                {
+                    UiKit.SetEnabledLook(watch, false);
+                    var state = gs;
+                    string context = state.RewardRequestContext;
+                    bool allowed = await RequestRewardedConsent();
+                    if (this == null) return;
+                    if (!allowed)
+                    {
+                        RefreshShortage();
+                        return;
+                    }
+                    if (state != gs || context != gs.RewardRequestContext ||
+                        shortageProject != project || shortageResource != resource) return;
+                    if (!GameplayOfferAllowed(gameplayRewardRules.shortageEnabled, "resource-supply") || Quote() != amount)
+                    {
+                        Toast(UiText.Get("reward.changed"), UiKit.Amber);
+                        RefreshShortage();
+                        return;
+                    }
+                    if (!gs.PrepareGameplayReward("resource-supply", resource, amount, null, out var ticket, out var error))
+                    {
+                        Toast(error, UiKit.Amber);
+                        RefreshShortage();
+                        return;
+                    }
+                    var result = await ShowGameplayReward(ticket);
+                    if (this == null || gs != state || context != gs.RewardRequestContext) return;
+                    bool earned = result.succeeded && result.value.rewardEarned;
+                    Toast(earned ? UiText.Get("reward.supply-claimed", amount, resource.LocalizedName) :
+                        result.succeeded ? UiText.Get("reward.not-earned") : result.text.Resolve(UiText.Get),
+                        earned ? UiKit.Lime : UiKit.Amber);
+                    RefreshShortage();
+                });
+            watch.name = "shortage-watch-ad";
+            offer.Add(watch);
+            BuildAdAvailability(offer, watch, "resource-supply", () => Quote() == amount &&
+                shortageProject == project && shortageResource == resource);
+            body.Add(offer);
+        }
+
         async Task<ServiceResult<RewardedAdResult>> ShowGameplayReward(GameplayRewardTicket ticket)
         {
             var serviceSet = services;
@@ -249,6 +304,7 @@ namespace Frontier
                 Toast(result.succeeded && result.value.rewardEarned ? UiText.Get("reward.saved") :
                     result.succeeded ? UiText.Get("reward.not-earned") : result.text.Resolve(UiText.Get), UiKit.Cyan);
                 RefreshModal();
+                RefreshShortage();
                 RefreshPopup();
             });
             watch.name = "construction-reward";
@@ -274,6 +330,7 @@ namespace Frontier
                 {
                     if (!gs.SettleGameplayReward(out var error)) Toast(error, UiKit.Amber);
                     RefreshModal();
+                    RefreshShortage();
                 }));
             body.Add(IconBtn(UiText.Get(ticket.state == "earned" ? "reward.discard" : "reward.dismiss"), "close", UiKit.Muted, () =>
             {
@@ -285,6 +342,7 @@ namespace Frontier
                 }
                 if (!gs.CancelUnverifiedGameplayReward(out var error)) Toast(error, UiKit.Amber);
                 RefreshModal();
+                RefreshShortage();
             }));
         }
     }

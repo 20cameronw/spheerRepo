@@ -226,6 +226,7 @@ namespace Frontier
             int have = gs.ProjectResourceCount(project, resource);
             body.Add(UiKit.Text(UiText.Get("project.shortfall", shortageRequired, resource.LocalizedName,
                 have, Math.Max(0, shortageRequired - have)), "fr-small"));
+            BuildShortageAdOffer(body, project, resource);
             foreach (var source in gs.ResourceOptions(resource, shortageRequired, project.kind == "obstacle")
                 .OrderBy(source => source.kind == ResourceSourceKind.Structure && source.structure.def.kind.IsGather() &&
                     ReadyToHarvest(source.structure) ? 0 : 1))

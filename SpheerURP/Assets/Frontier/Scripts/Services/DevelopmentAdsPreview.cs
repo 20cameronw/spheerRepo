@@ -12,7 +12,8 @@ namespace Frontier.Services
         public Task<ServiceResult> InitializeAsync() { return Task.FromResult(ServiceResult.Success()); }
         public async Task<ServiceResult<RewardedAdResult>> ShowRewardedAsync(string placementId)
         {
-            if (placementId != "double-yield" && placementId != "timer-skip" && placementId != "free-shards")
+            if (placementId != "double-yield" && placementId != "timer-skip" && placementId != "free-shards" &&
+                placementId != "resource-supply")
                 return ServiceResult<RewardedAdResult>.InvalidRequest(ServiceMessage.Get("service.ads.unknown"));
             await Task.Delay(TimeSpan.FromSeconds(DurationSeconds));
             return ServiceResult<RewardedAdResult>.Success(new RewardedAdResult(true, placementId));

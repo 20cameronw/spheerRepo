@@ -183,7 +183,7 @@ namespace Frontier
                 lastMs = now;
                 if (finished || IsPaused || ArenaW <= 1f || stage == null) return;
                 bool changed = SyncStage();
-                if (!sceneReady) { sceneReady = true; BuildScene(); SetToolState(UiText.Get("harvest.ready")); changed = true; }
+                if (!sceneReady) { BuildScene(); sceneReady = true; SetToolState(UiText.Get("harvest.ready")); changed = true; }
                 if (changed) Frame(stage.cam.aspect);
                 Tick(dt);
             }).Every(16);

@@ -29,11 +29,7 @@ namespace Frontier
                     if (mapNameIndex != null) mapNameIndex.AddSystems(gs.universe.Universe, mapSnapshot.surveyedSystems);
                     BuildMapNodes();
                     mapWorld.MarkDirtyRepaint();
-                    string readout = SystemMapView ? UiText.Get("map.view.system")
-                        : NeighborMapView ? UiText.Get("map.view.neighbors")
-                        : mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
-                        : UiText.Get("map.view.sector", mapSnapshot.systems.Length);
-                    mapReadout.text = mapSnapshot.truncated ? UiText.Get("map.view.truncated", readout) : readout;
+                    RefreshMapReadout();
                 }
                 mapQuery = null;
             }
@@ -100,6 +96,16 @@ namespace Frontier
                     return new MapPreviewResult { plan = plan, nextStopPlanetId = nextStopPlanetId };
                 });
             }
+        }
+
+        void RefreshMapReadout()
+        {
+            if (mapReadout == null || mapSnapshot == null) return;
+            string readout = SystemMapView ? UiText.Get("map.view.system")
+                : NeighborMapView ? UiText.Get("map.view.neighbors")
+                : mapSnapshot.densityOnly ? UiText.Get("map.view.galaxy")
+                : UiText.Get("map.view.sector", mapSnapshot.systems.Length);
+            mapReadout.text = mapSnapshot.truncated ? UiText.Get("map.view.truncated", readout) : readout;
         }
 
     }

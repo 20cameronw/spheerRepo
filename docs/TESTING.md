@@ -2,6 +2,21 @@
 
 ## Player-experience controls and cosmetic progression
 
+- `HarvestRedesignTests` verifies six distinct action/scoring models; `HarvestRedesignFlowTests`
+  exercises actual controls, onboarding, pause, retry and scene/input cleanup through the replacement factory.
+- Resupply regressions verify quoted quantities, cargo space, prior discovery, opt-in, no pre-ad grant,
+  journal settlement and duplicate callbacks. Upgrade comparison checks render visible, different model
+  pixels at current/next levels and the equipped Galaxy theme.
+- Map regressions measure continuous positions around both old zoom thresholds, proportional anchored
+  wheel/pinch input, interruption, bounded pan and selection after gestures. Arrival checks restore the
+  close camera after a map-distance departure, and empty-outro checks complete within two rendered frames
+  without skipping remaining loot, enemies or incoming shots.
+- Follow-up evidence: full PlayMode regression run passed 140 tests with one unsupported allocation probe
+  skipped. After the final layout/status and retained-equipment-name fixes, the affected 13 PlayMode cases
+  passed and the full EditMode suite passed 1005 tests with four unsupported allocation probes skipped.
+  Phone/tablet harvest captures measured no overflow, no text under 12dp and no targets under 48dp;
+  the final board/status separation was verified by the measured layout regression. This is Editor/harness
+  evidence, not physical-device playtesting or proof that the new games are enjoyable.
 - In Editor/development builds, Menu > Debug can set exact XP, shards and inventory, toggle research,
   set shared mining/tool tiers and individual upgrades, place test buildings, and edit construction,
   upgrade and active clearance timers. Finishing jobs also releases their assigned builders.

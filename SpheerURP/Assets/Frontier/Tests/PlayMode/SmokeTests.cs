@@ -353,7 +353,7 @@ namespace Frontier.Tests
             Assert.IsNotNull(start, "Surface scrap remains harvestable by tapping the Mining Rig.");
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
             Assert.IsTrue(rt.Ui.DebugBusy);
-            Assert.IsInstanceOf<VeinGame>(rt.Ui.DebugActiveGather);
+            Assert.IsInstanceOf<ConnectedMiningGame>(rt.Ui.DebugActiveGather);
             rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
             deadline = Time.realtimeSinceStartup + 5;
             while (rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources") == null && Time.realtimeSinceStartup < deadline)
@@ -372,7 +372,7 @@ namespace Frontier.Tests
             start = rt.Ui.DebugRoot.Q<Button>("harvest-start-" + wood.id + "-Chop");
             Assert.IsNotNull(start);
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = start; start.SendEvent(submit); }
-            Assert.IsInstanceOf<NodeGame>(rt.Ui.DebugActiveGather);
+            Assert.IsInstanceOf<DirectionalLumberGame>(rt.Ui.DebugActiveGather);
             rt.Ui.DebugActiveGather.DebugComplete(0.8f, 1, 1);
             deadline = Time.realtimeSinceStartup + 5;
             while (rt.Ui.DebugRoot.Q<Button>("minigame-collect-resources") == null && Time.realtimeSinceStartup < deadline)
@@ -1905,9 +1905,11 @@ namespace Frontier.Tests
             var location = rt.Ui.DebugRoot.Q<Label>("map-location");
             Assert.AreEqual(UiText.Get("map.location.planet", rt.State.planet.Name, rt.State.planet.Star.Name), location.text);
             rt.Ui.DebugMapZoomStep(false);
+            yield return new WaitForSecondsRealtime(0.65f);
             Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
             Assert.AreEqual(UiText.Get("map.location.system", rt.State.planet.Star.Name), location.text);
             rt.Ui.DebugMapZoomStep(false);
+            yield return new WaitForSecondsRealtime(0.65f);
             Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
             StringAssert.Contains("Sector", location.text);
             var controls = rt.Ui.DebugRoot.Q<Button>("map-show-controls");
@@ -1922,7 +1924,9 @@ namespace Frontier.Tests
             using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = hide; hide.SendEvent(submit); }
             Assert.IsTrue(rt.Ui.DebugMapMinimal);
             rt.Ui.DebugMapZoomStep(true);
+            yield return new WaitForSecondsRealtime(0.65f);
             rt.Ui.DebugMapZoomStep(true);
+            yield return new WaitForSecondsRealtime(0.65f);
             rt.Ui.DebugMapZoomStep(true);
             yield return new WaitForSecondsRealtime(1.4f);
             Assert.IsFalse(rt.Ui.DebugMapOpen, "Further inward zoom on the current system returns to the planet.");
@@ -2018,6 +2022,94 @@ namespace Frontier.Tests
             rt.Ui.DebugMenu("shards");
             yield return null;
             Assert.AreEqual(after, rt.State.ShardBalance, "Refreshing an offer never grants a second reward.");
+        }
+
+        [UnityTest]
+        public IEnumerator ShortageAdShowsAnExactOptInResupplyBeforeGrantingAnything()
+        {
+            new GameObject("ShortageAdBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var unavailable = new UnavailableFrontierProvider();
+            var services = new FrontierServices(new ConsentService(new DeletionConsentStore()),
+                new DevelopmentAdsPreview(), unavailable, unavailable, unavailable,
+                unavailable, unavailable, unavailable, new LocalTimeService(), unavailable);
+            rt.Ui.DebugSetServices(services);
+            var wood = rt.Db.FindResource("wood");
+            rt.State.Add(wood, 1, false);
+            rt.State.backpack.Clear();
+            int needed = Math.Min(7, Math.Max(1, wood.stackSize / 4));
+            rt.Ui.DebugShortage(wood, needed);
+            yield return null;
+            void Press(string name)
+            {
+                var button = rt.Ui.DebugRoot.Q<Button>(name);
+                Assert.IsNotNull(button, name);
+                Assert.IsTrue(button.enabledInHierarchy, name);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = button; button.SendEvent(submit); }
+            }
+            var watch = rt.Ui.DebugRoot.Q<Button>("shortage-watch-ad");
+            Assert.IsNotNull(watch);
+            Assert.AreEqual(UiText.Get("reward.supply-watch", needed, wood.LocalizedName),
+                watch.Q<Label>(className: "fr-btn-label").text);
+            Press("shortage-watch-ad");
+            Press("rewarded-consent-cancel");
+            yield return null;
+            Assert.AreEqual(0, rt.State.Count(wood));
+            Assert.IsNull(rt.State.GameplayReward);
+            yield return new WaitForSecondsRealtime(1.1f);
+            Press("shortage-watch-ad");
+            Press("rewarded-consent-allow");
+            deadline = Time.realtimeSinceStartup + 3;
+            while (rt.Ui.DebugRoot.Q("development-ad-preview") == null && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("development-ad-preview"));
+            Assert.AreEqual(0, rt.State.Count(wood));
+            deadline = Time.realtimeSinceStartup + 8;
+            while (rt.State.Count(wood) == 0 && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.AreEqual(needed, rt.State.Count(wood));
+            Assert.AreEqual("settled", rt.State.GameplayReward.state);
+            Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("shortage-watch-ad"), "The offer disappears once the shortfall is filled.");
+            Assert.IsNotNull(rt.Ui.DebugRoot.Q("shortage-overlay"), "Resupply should return to the same resource help.");
+        }
+
+        [UnityTest]
+        public IEnumerator UpgradePopupShowsActualCurrentAndNextAppearanceIncludingTheEquippedTheme()
+        {
+            new GameObject("UpgradePreviewBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            var gun = rt.State.DebugPlace(rt.Db.StructureOfKind(StructureKind.Gunner), 0, 1);
+            rt.Ui.DebugTapStructure(gun);
+            yield return null;
+            var row = rt.Ui.DebugRoot.Q("structure-upgrade-appearance");
+            Assert.IsNotNull(row);
+            var current = row.Q<Image>("structure-upgrade-preview-1");
+            var next = row.Q<Image>("structure-upgrade-preview-2");
+            Assert.IsNotNull(current.image);
+            Assert.IsNotNull(next.image);
+            Assert.AreNotSame(current.image, next.image);
+            var firstPixels = ((Texture2D)current.image).GetPixels32();
+            var secondPixels = ((Texture2D)next.image).GetPixels32();
+            Assert.IsTrue(firstPixels.Any(pixel => pixel.a > 32), "Current model must render, not an empty icon.");
+            Assert.IsTrue(secondPixels.Any(pixel => pixel.a > 32), "Next model must render.");
+            Assert.IsFalse(firstPixels.SequenceEqual(secondPixels), "A newly added barrel must change the actual picture.");
+            Assert.IsTrue(row.Query<Label>().ToList().Any(label => label.text == "->"));
+            rt.State.DebugSetShards(10000);
+            Assert.IsTrue(rt.State.PurchaseBuildingTheme("galaxy", rt.State.BuildingThemePrice("galaxy"), out _));
+            yield return null;
+            rt.Ui.DebugTapStructure(gun);
+            yield return null;
+            row = rt.Ui.DebugRoot.Q("structure-upgrade-appearance");
+            Assert.IsNotNull(row);
+            var themed = ((Texture2D)row.Q<Image>("structure-upgrade-preview-1").image).GetPixels32();
+            Assert.IsFalse(firstPixels.SequenceEqual(themed), "Preview includes the equipped paint and star details.");
+            rt.Ui.DebugReset();
+            yield return null;
+            Assert.IsNull(GameObject.Find("UpgradeSnapshot"), "Snapshot models and cameras must be released immediately.");
         }
 
         [UnityTest]
@@ -3877,32 +3969,43 @@ namespace Frontier.Tests
                 var mode = rt.Ui.DebugRoot.Q<Button>("map-switch-view");
                 Assert.AreEqual(UiText.Get("map.mode.neighbors"), mode.text);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
-                yield return null;
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsFalse(rt.Ui.DebugMapInSystem);
                 Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
                 Assert.AreEqual(UiText.Get("map.mode.overview"), mode.text);
+                var readout = rt.Ui.DebugRoot.Q<Label>("map-scale-readout");
+                var hideControls = rt.Ui.DebugRoot.Q<Button>("map-hide-controls");
+                Assert.IsFalse(readout.worldBound.Overlaps(hideControls.worldBound),
+                    "The scale readout must reserve the measured Hide button width on phones.");
                 Assert.AreEqual(DisplayStyle.None, chart.Q<Button>("map-planet-" + destination.Id).resolvedStyle.display);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
                 Assert.AreEqual(UiText.Get("map.mode.orbits"), mode.text);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = mode; mode.SendEvent(submit); }
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsTrue(rt.Ui.DebugMapInSystem);
                 Assert.AreEqual(destination.Id, rt.Ui.DebugMapSelectedId, "Changing chart scale cannot change the destination.");
                 var zoomOut = rt.Ui.DebugRoot.Q<Button>("map-zoom-out");
                 var zoomIn = rt.Ui.DebugRoot.Q<Button>("map-zoom-in");
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomOut; zoomOut.SendEvent(submit); }
-                Assert.IsTrue(rt.Ui.DebugMapInNeighbors, "One minus press moves straight to expanded neighbors.");
+                Assert.IsTrue(rt.Ui.DebugMapInSystem, "Preset zoom begins from the visible scale rather than snapping.");
+                yield return new WaitForSecondsRealtime(0.65f);
+                Assert.IsTrue(rt.Ui.DebugMapInNeighbors, "One minus press eases to expanded neighbors.");
                 deadline = Time.realtimeSinceStartup + 8;
                 while (chart.Q<Button>("map-system-" + rt.State.planet.Star.Id) == null &&
                     Time.realtimeSinceStartup < deadline) yield return null;
                 Assert.IsNotNull(chart.Q<Button>("map-system-" + rt.State.planet.Star.Id));
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomOut; zoomOut.SendEvent(submit); }
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsFalse(rt.Ui.DebugMapInNeighbors);
                 Assert.IsFalse(rt.Ui.DebugMapInSystem);
                 Assert.IsFalse(zoomOut.enabledSelf, "Overview is the final zoom level.");
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomIn; zoomIn.SendEvent(submit); }
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsTrue(rt.Ui.DebugMapInNeighbors);
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = zoomIn; zoomIn.SendEvent(submit); }
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsTrue(rt.Ui.DebugMapInSystem);
                 Assert.IsFalse(zoomIn.enabledSelf);
                 rt.Ui.DebugMapPan(100000, -100000);
@@ -3910,7 +4013,7 @@ namespace Frontier.Tests
                 Assert.Greater(Math.Abs(panned), 0.001, "The local chart can be panned to look around its orbits.");
                 rt.Ui.DebugMapPan(100000, -100000);
                 Assert.AreEqual(panned, rt.Ui.DebugMapCenterX - destination.Star.X, 0.001,
-                    "Panning the local chart is clamped so the star never leaves the view.");
+                    "Panning the local chart is bounded by the same surveyed-content envelope as other scales.");
                 rt.Ui.DebugMapSearch("12000,-3000");
                 Assert.IsFalse(rt.Ui.DebugMapInSystem, "Coordinates should reveal the universe, not leave a detached orbital chart.");
                 double boundedX = rt.Ui.DebugMapCenterX;
@@ -3919,6 +4022,7 @@ namespace Frontier.Tests
                     "A huge drag must remain near surveyed or remembered systems.");
                 Assert.Less(Math.Abs(boundedX - rt.State.planet.Star.X), 500);
                 rt.Ui.DebugMapSearch("glacia");
+                yield return new WaitForSecondsRealtime(0.65f);
                 Assert.IsTrue(rt.Ui.DebugMapInSystem, "Finding a planet should reveal its orbits.");
                 Assert.AreEqual(rt.State.universe.Get("glacia").Id, rt.Ui.DebugMapSelectedId);
                 rt.Ui.DebugReset();
@@ -3929,6 +4033,139 @@ namespace Frontier.Tests
                 ScreenMetrics.ClearVirtual();
                 targetTexture.Release();
                 Object.Destroy(targetTexture);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Map_ContinuousZoom_KeepsPlanetPositionsAcrossThresholds_AndBoundsPanAtEveryScale()
+        {
+            ScreenMetrics.SetVirtual(1080, 1920);
+            var texture = new RenderTexture(1080, 1920, 0);
+            texture.Create();
+            try
+            {
+                new GameObject("ContinuousMapBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                rt.Document.panelSettings.targetTexture = texture;
+                rt.Ui.DebugMap(null);
+                for (int i = 0; i < 10; i++) yield return null;
+                var chart = rt.Ui.DebugRoot.Q("map-viewport");
+                var worlds = rt.State.universe.PlanetsOf(rt.State.planet.Star);
+                string selection = rt.Ui.DebugMapSelectedId;
+                rt.Ui.DebugMapPan(20f, 10f);
+                double center = rt.Ui.DebugMapCenterX;
+                foreach (float threshold in new[] { 4f, 8f })
+                {
+                    rt.Ui.DebugMapContinuousZoom(threshold - 0.001f);
+                    var before = worlds.Select(planet => rt.Ui.DebugMapPlanetPoint(planet)).ToArray();
+                    rt.Ui.DebugMapContinuousZoom(threshold + 0.001f);
+                    for (int i = 0; i < worlds.Count; i++)
+                        Assert.Less(Vector2.Distance(before[i], rt.Ui.DebugMapPlanetPoint(worlds[i])), 0.5f,
+                            "Actual planet geometry, not just opacity, must be continuous across " + threshold);
+                    Assert.AreEqual(center, rt.Ui.DebugMapCenterX, 0.0001, "Detail thresholds cannot re-clamp the center.");
+                }
+                rt.Ui.DebugMapContinuousZoom(6.25f);
+                var anchor = new Vector2(chart.layout.width * 0.55f, chart.layout.height * 0.55f);
+                Vector2 starBefore = rt.Ui.DebugMapStarPoint(rt.State.planet);
+                rt.Ui.DebugMapPinchRatio(1.01f, anchor);
+                Assert.AreEqual(6.3125f, rt.Ui.DebugMapContinuousScale, 0.0001f, "Even a one-percent pinch updates immediately.");
+                Assert.Less(Vector2.Distance(anchor + (starBefore - anchor) * 1.01f,
+                    rt.Ui.DebugMapStarPoint(rt.State.planet)), 0.01f, "Pinch anchors the world under the fingers.");
+                rt.Ui.DebugMapPinchRatio(1f / 1.01f, anchor);
+                Assert.AreEqual(6.25f, rt.Ui.DebugMapContinuousScale, 0.0001f, "Reversing a pinch never snaps to a preset.");
+                rt.Ui.DebugMapPinchRatio(float.NaN, anchor);
+                Assert.AreEqual(6.25f, rt.Ui.DebugMapContinuousScale);
+                foreach (float scale in new[] { 1f, 2.5f, 4f, 7.9f, 8.1f, 12f })
+                {
+                    rt.Ui.DebugMapContinuousZoom(scale);
+                    rt.Ui.DebugMapPan(100000f, -100000f);
+                    double edge = rt.Ui.DebugMapCenterX;
+                    rt.Ui.DebugMapPan(100000f, -100000f);
+                    Assert.AreEqual(edge, rt.Ui.DebugMapCenterX, 0.0001, "Huge pans are bounded at " + scale);
+                    rt.Ui.DebugMapPan(-20f, 0f);
+                    Assert.Greater(rt.Ui.DebugMapCenterX, edge, "Panning remains meaningful at " + scale);
+                }
+                Assert.AreEqual(selection, rt.Ui.DebugMapSelectedId);
+                rt.Ui.DebugReset();
+            }
+            finally
+            {
+                if (FrontierRuntime.Current != null) FrontierRuntime.Current.Document.panelSettings.targetTexture = null;
+                ScreenMetrics.ClearVirtual();
+                texture.Release();
+                Object.Destroy(texture);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Map_WheelZoom_IsProportionalAnchoredAndInterruptible_WithoutPresetSnaps()
+        {
+            ScreenMetrics.SetVirtual(1080, 1920);
+            var texture = new RenderTexture(1080, 1920, 0);
+            texture.Create();
+            try
+            {
+                new GameObject("MapWheelBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                rt.Document.panelSettings.targetTexture = texture;
+                rt.Ui.DebugMap(null);
+                for (int i = 0; i < 10; i++) yield return null;
+                var chart = rt.Ui.DebugRoot.Q("map-viewport");
+                var anchor = new Vector2(chart.layout.width * 0.55f, chart.layout.height * 0.55f);
+                void Wheel(float delta)
+                {
+                    using (var evt = WheelEvent.GetPooled(new Event { type = EventType.ScrollWheel,
+                        mousePosition = chart.LocalToWorld(anchor), delta = new Vector2(0f, delta) }))
+                    { evt.target = chart; chart.SendEvent(evt); }
+                }
+                rt.Ui.DebugMapContinuousZoom(6.25f);
+                Vector2 starBefore = rt.Ui.DebugMapStarPoint(rt.State.planet);
+                Wheel(0.6f);
+                Wheel(0.6f);
+                Assert.AreEqual(6.25f, rt.Ui.DebugMapContinuousScale, "A wheel event sets a target, not a new view.");
+                yield return new WaitForSecondsRealtime(0.65f);
+                float smallRatio = rt.Ui.DebugMapContinuousScale / 6.25f;
+                Assert.AreEqual(Mathf.Exp(-0.024f), smallRatio, 0.0001f, "Fractional wheels are proportional and deduplicated.");
+                Assert.Less(Vector2.Distance(anchor + (starBefore - anchor) * smallRatio,
+                    rt.Ui.DebugMapStarPoint(rt.State.planet)), 0.02f, "Wheel anchors the projected world.");
+                rt.Ui.DebugMapContinuousZoom(6.25f);
+                Wheel(1.2f);
+                yield return new WaitForSecondsRealtime(0.65f);
+                Assert.AreEqual(smallRatio * smallRatio, rt.Ui.DebugMapContinuousScale / 6.25f, 0.0001f,
+                    "Doubling wheel magnitude doubles logarithmic zoom distance.");
+                rt.Ui.DebugMapContinuousZoom(6.25f);
+                Wheel(12f);
+                yield return null;
+                Assert.Greater(rt.Ui.DebugMapContinuousScale, 6.25f * Mathf.Exp(-0.48f),
+                    "Wheel zoom advances toward its proportional target instead of snapping to it.");
+                float interrupted = rt.Ui.DebugMapContinuousScale;
+                rt.Ui.DebugMapPinchRatio(1.01f, anchor);
+                yield return new WaitForSecondsRealtime(0.65f);
+                Assert.AreEqual(interrupted * 1.01f, rt.Ui.DebugMapContinuousScale, 0.0001f,
+                    "A direct pinch cancels outstanding wheel momentum.");
+                rt.Ui.DebugMapContinuousZoom(7.6f);
+                rt.Ui.DebugMapPinchRatio(1.01f, anchor);
+                yield return null;
+                var selectedButton = chart.Q<Button>("map-planet-" + rt.State.planet.Id);
+                Assert.AreEqual(DisplayStyle.Flex, selectedButton.resolvedStyle.display);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = selectedButton; selectedButton.SendEvent(submit); }
+                yield return new WaitForSecondsRealtime(0.65f);
+                Assert.AreEqual(12f, rt.Ui.DebugMapContinuousScale, 0.0001f,
+                    "An explicit keyboard submit remains usable after pinch; it is not a pointer-gesture release.");
+                rt.Ui.DebugReset();
+            }
+            finally
+            {
+                if (FrontierRuntime.Current != null) FrontierRuntime.Current.Document.panelSettings.targetTexture = null;
+                ScreenMetrics.ClearVirtual();
+                texture.Release();
+                Object.Destroy(texture);
             }
         }
 
@@ -4073,6 +4310,9 @@ namespace Frontier.Tests
             try
             {
                 TravelMinigames.Create = () => flight;
+                rt.Planet.Zoom01 = 0;
+                rt.Planet.MapZoomBlend = 1;
+                rt.Camera.GetComponent<CameraFit>().SnapToView();
                 rt.Ui.DebugStartTravel(target);
                 Assert.IsTrue(rt.Ui.IsTravelling);
                 var skipDeparture = rt.Ui.DebugRoot.Q<Button>("travel-skip-cinematic");
@@ -4097,9 +4337,14 @@ namespace Frontier.Tests
                 }
                 Assert.IsFalse(rt.Ui.DebugBusy, "travel did not finish");
                 Assert.IsFalse(rt.Ui.IsTravelling);
+                Assert.AreEqual(1f, rt.Planet.Zoom01, "Every completed journey restores the normal surface view.");
+                Assert.AreEqual(0f, rt.Planet.MapZoomBlend, "Map camera pullback cannot leak through an arrival.");
+                Vector3 arrivalCamera = rt.Camera.transform.position;
+                Assert.Greater(arrivalCamera.z, -8f, "Arrival must not leave the camera at the super-zoomed-out map distance.");
                 Assert.AreEqual(1, arrivalSkips);
                 Assert.IsNull(rt.Ui.DebugRoot.Q<Button>("travel-skip-cinematic"));
                 yield return null;
+                Assert.AreEqual(arrivalCamera, rt.Camera.transform.position, "No manual zoom is needed to repair arrival framing.");
                 Assert.IsNull(rt.Ui.GetComponentInChildren<ShipRig>());
                 Assert.AreEqual(plan.LegCount, flight.requests.Count);
                 Assert.AreEqual(target.Id, rt.State.planet.Id);

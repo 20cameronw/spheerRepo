@@ -467,9 +467,21 @@ namespace Frontier
                 {
                     PreparePlayerFlowFixture();
                     var wood = db.FindResource("wood");
+                    gs.backpack.Clear();
                     ui.DebugShip(0);
                     ui.DebugShortage(wood, gs.PlanetCount(wood) + 100);
                 });
+                yield return new Shot("player-upgrade-comparison", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetShards(10000);
+                    if (!gs.PurchaseBuildingTheme("galaxy", gs.BuildingThemePrice("galaxy"), out var error))
+                        throw new InvalidOperationException(error);
+                    var gun = At(StructureKind.Gunner) ?? gs.DebugPlace(db.StructureOfKind(StructureKind.Gunner), 11, 1);
+                    if (gun == null) throw new InvalidOperationException("Cannot prepare upgrade comparison.");
+                    gs.DebugSetStructureLevel(gun, 1);
+                    ui.DebugTapStructure(gun);
+                }, 0.5f);
                 yield return new Shot("player-theme-shop", () =>
                 {
                     PreparePlayerFlowFixture();
@@ -1152,8 +1164,8 @@ namespace Frontier
                 }
             }
 
-            yield return new Shot("game-chop", () => ui.DebugGather(MinigameKind.Chop), 1.8f);
-            yield return new Shot("game-mine", () => ui.DebugGather(MinigameKind.Mine), 1.8f);
+            yield return new Shot("game-chop", () => { ui.DebugGather(MinigameKind.Chop); ui.DebugHarvestPreview(MinigameKind.Chop); }, 1.8f);
+            yield return new Shot("game-mine", () => { ui.DebugGather(MinigameKind.Mine); ui.DebugHarvestPreview(MinigameKind.Mine); }, 1.8f);
             yield return new Shot("game-travel", () => ui.DebugTravelGame(), 2.5f);
             yield return new Shot("hyperspace-intro", () => HyperspaceShot(0, 0));
             yield return new Shot("hyperspace-combat", () => HyperspaceShot(3, 900));

@@ -14,6 +14,190 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   locale: en
   entries:
+  - key: harvest.redesign.ready
+    text: Read the field, then start. The clock waits for you.
+  - key: harvest.redesign.start
+    text: START RUN
+  - key: harvest.redesign.retry
+    text: RETRY
+  - key: harvest.redesign.retried
+    text: Field reset. Same layout, fresh attempt. No progress was spent.
+  - key: harvest.redesign.lumber.title
+    text: DIRECTIONAL CUTS
+  - key: harvest.redesign.lumber.hint
+    text: Follow the grain. Swipe in the shown direction; straight cuts earn more.
+      Use arrow buttons or arrow keys.
+  - key: harvest.redesign.lumber.metric
+    text: clean cuts
+  - key: harvest.redesign.lumber.direction.left
+    text: LEFT
+  - key: harvest.redesign.lumber.direction.up
+    text: UP
+  - key: harvest.redesign.lumber.direction.right
+    text: RIGHT
+  - key: harvest.redesign.lumber.direction.down
+    text: DOWN
+  - key: harvest.redesign.lumber.status
+    text: "{0}/{1} cuts \xB7 {2} swings left \xB7 {3}s"
+  - key: harvest.redesign.lumber.clean
+    text: Clean cut! Follow the next grain.
+  - key: harvest.redesign.lumber.cut
+    text: Cut through. Keep your next swipe straight.
+  - key: harvest.redesign.lumber.wrong
+    text: Against the grain. Follow the shown direction.
+  - key: harvest.redesign.mining.title
+    text: CONNECTED ORE
+  - key: harvest.redesign.mining.hint
+    text: Tap to aim, then BREAK. Matching ore touching edge-to-edge breaks together.
+      Avoid red faults. Arrows aim; Space breaks.
+  - key: harvest.redesign.mining.metric
+    text: connected breaks
+  - key: harvest.redesign.mining.break
+    text: BREAK
+  - key: harvest.redesign.mining.ore
+    text: ORE
+  - key: harvest.redesign.mining.gem
+    text: GEM
+  - key: harvest.redesign.mining.stone
+    text: STONE
+  - key: harvest.redesign.mining.fault
+    text: FAULT
+  - key: harvest.redesign.mining.aim
+    text: "Aimed cluster: {0} \xB7 hardness {1}"
+  - key: harvest.redesign.mining.status
+    text: "{0} ore freed \xB7 {1} strikes left \xB7 {2}s"
+  - key: harvest.redesign.mining.chain
+    text: '{0} connected ore freed!'
+  - key: harvest.redesign.mining.crack
+    text: Fracture deepened. Strike again or choose a softer cluster.
+  - key: harvest.redesign.mining.waste
+    text: No ore here. Faults cost two extra strikes.
+  - key: harvest.redesign.drill.title
+    text: DEEP DRILLING
+  - key: harvest.redesign.drill.hint
+    text: Steer toward gold layers and around red rock. Hold THRUST to descend; release
+      to cool. BOOST is faster but hotter. Arrows steer, Space thrusts, Shift boosts.
+  - key: harvest.redesign.drill.metric
+    text: rich layers
+  - key: harvest.redesign.drill.left
+    text: LEFT
+  - key: harvest.redesign.drill.right
+    text: RIGHT
+  - key: harvest.redesign.drill.thrust
+    text: THRUST
+  - key: harvest.redesign.drill.boost
+    text: BOOST
+  - key: harvest.redesign.drill.layer
+    text: SOFT
+  - key: harvest.redesign.drill.rich
+    text: GOLD
+  - key: harvest.redesign.drill.rock
+    text: ROCK
+  - key: harvest.redesign.drill.position
+    text: "Drill lane {0} \xB7 layer {1}%"
+  - key: harvest.redesign.drill.status
+    text: "Depth {0}/{1} \xB7 heat {2}% \xB7 {3}s"
+  - key: harvest.redesign.drill.hot
+    text: Overheated. Release thrust until heat falls to 30%.
+  - key: harvest.redesign.drill.cooled
+    text: Cooled. Thrust is ready again.
+  - key: harvest.redesign.drill.collision
+    text: Rock collision. Steer around the next red layer.
+  - key: harvest.redesign.drill.rich-hit
+    text: Gold layer recovered!
+  - key: harvest.redesign.drill.through
+    text: Layer cleared. Read the next route.
+  - key: harvest.redesign.siphon.title
+    text: CONNECT & BALANCE
+  - key: harvest.redesign.siphon.hint
+    text: Tap pipes to rotate a sealed route from left inlet to right outlet. Then
+      adjust the valve to match pressure to demand. Arrows select, Space rotates,
+      minus/equals adjust flow.
+  - key: harvest.redesign.siphon.metric
+    text: balanced seconds
+  - key: harvest.redesign.siphon.route
+    text: "INLET left middle \xB7 OUTLET right middle"
+  - key: harvest.redesign.siphon.blocked
+    text: BLOCKED
+  - key: harvest.redesign.siphon.close
+    text: "VALVE \u2212"
+  - key: harvest.redesign.siphon.open
+    text: VALVE +
+  - key: harvest.redesign.siphon.connected
+    text: Route sealed! Match pressure to demand to collect flow.
+  - key: harvest.redesign.siphon.leaks
+    text: "Route unfinished \xB7 {0} open connections"
+  - key: harvest.redesign.siphon.status
+    text: "{0}/6 flow \xB7 valve {1}% \xB7 demand {2}% \xB7 pressure {3}%"
+  - key: harvest.redesign.excavation.title
+    text: BURIED FINDS
+  - key: harvest.redesign.excavation.hint
+    text: Select soil. SCAN gives distance to a find. DIG removes two layers; BRUSH
+      removes one safely. Digging a last layer damages finds. Arrows select; 1 scans,
+      2 digs, 3 brushes.
+  - key: harvest.redesign.excavation.metric
+    text: intact finds
+  - key: harvest.redesign.excavation.scan
+    text: SCAN
+  - key: harvest.redesign.excavation.dig
+    text: DIG
+  - key: harvest.redesign.excavation.brush
+    text: BRUSH
+  - key: harvest.redesign.excavation.find
+    text: FIND
+  - key: harvest.redesign.excavation.empty
+    text: EMPTY
+  - key: harvest.redesign.excavation.soil
+    text: 'Selected soil: {0} layers'
+  - key: harvest.redesign.excavation.status
+    text: "{0}/{1} intact finds \xB7 {2} actions \xB7 {3} scans left"
+  - key: harvest.redesign.excavation.signal
+    text: 'Nearest buried find: {0} tile steps away.'
+  - key: harvest.redesign.excavation.no-scans
+    text: No scans left. Read the exposed soil and brush carefully.
+  - key: harvest.redesign.excavation.damaged
+    text: Find damaged! Brush the final layer next time.
+  - key: harvest.redesign.excavation.found
+    text: Intact find uncovered!
+  - key: harvest.redesign.excavation.cleared
+    text: Soil removed. Check the remaining layer count.
+  - key: harvest.redesign.salvage.title
+    text: SORT THE SALVAGE
+  - key: harvest.redesign.salvage.hint
+    text: Sort each incoming part before its bar empties. Metal left, circuits right;
+      reject scrap and hazards. Tap bins, swipe, or use 1/2/3. Correct streaks earn
+      cleaner salvage.
+  - key: harvest.redesign.salvage.metric
+    text: best sorting streak
+  - key: harvest.redesign.salvage.metal
+    text: "1 \xB7 METAL"
+  - key: harvest.redesign.salvage.circuit
+    text: "2 \xB7 CIRCUITS"
+  - key: harvest.redesign.salvage.reject
+    text: "3 \xB7 REJECT"
+  - key: harvest.redesign.salvage.part.metal
+    text: METAL PART
+  - key: harvest.redesign.salvage.part.circuit
+    text: CIRCUIT BOARD
+  - key: harvest.redesign.salvage.part.scrap
+    text: BROKEN SCRAP
+  - key: harvest.redesign.salvage.part.hazard
+    text: HAZARDOUS CELL
+  - key: harvest.redesign.salvage.next
+    text: 'Next: {0}'
+  - key: harvest.redesign.salvage.last
+    text: last part
+  - key: harvest.redesign.salvage.status
+    text: "{0}/{1} sorted \xB7 {2} useful parts \xB7 streak {3}"
+  - key: harvest.redesign.salvage.sorted
+    text: Correct bin! Streak {0}.
+  - key: harvest.redesign.salvage.wrong
+    text: Wrong bin. Save useful parts; reject scrap and hazards.
+  - key: harvest.redesign.salvage.missed
+    text: Part slipped away. Watch the next item and its deadline.
+  - key: tools.harvest-effects
+    text: 'Mining: {0} break strength. Deep drilling: {1}% cooling per second, with
+      improved heat resistance.'
   - key: project.capacity
     text: MAKE ROOM OR UPGRADE CARGO
   - key: project.dismiss-summary
@@ -90,6 +274,13 @@ MonoBehaviour:
       before collecting.
   - key: reward.before-collect
     text: Your haul is ready, not yet collected. Choose below.
+  - key: reward.supply-help
+    text: Need a little extra? An optional video can send a small resupply to your
+      cargo.
+  - key: reward.supply-watch
+    text: 'Watch ad: +{0} {1}'
+  - key: reward.supply-claimed
+    text: 'Resupply delivered: +{0} {1}'
   - key: reward.preview-title
     text: Test ad preview
   - key: reward.preview-help
@@ -428,9 +619,12 @@ MonoBehaviour:
   - key: tools.mining
     text: MINING
   - key: tools.mining.help
-    text: 'One equipment upgrade powers two jobs. Mining follows exposed veins with
-      precision. Deep drilling reaches buried deposits: balance pressure and let
-      the drill cool.'
+    text: One saved equipment ladder, two distinct effects. Mining upgrades strengthen
+      connected-ore breaks. Deep-drilling upgrades improve cooling and heat resistance
+      while you steer through buried layers. Existing tiers and yield bonuses are
+      retained.
+  - key: gather.drill-tool
+    text: 'Tool: {0} (LV {1}, cooling {2}% per second)'
   - key: harvest.vein.title
     text: FOLLOW THE VEIN
   - key: harvest.vein.hint

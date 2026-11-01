@@ -8337,9 +8337,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205697
-    m_Localized: 'One equipment upgrade powers two jobs. Mining follows exposed veins
-      with precision. Deep drilling reaches buried deposits: balance pressure and
-      let the drill cool.'
+    m_Localized: One saved equipment ladder, two distinct effects. Mining upgrades
+      strengthen connected-ore breaks. Deep-drilling upgrades improve cooling and
+      heat resistance while you steer through buried layers. Existing tiers and yield
+      bonuses are retained.
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205698
@@ -9724,6 +9725,382 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 6150274560385027
     m_Localized: Builder 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562034876416
+    m_Localized: Read the field, then start. The clock waits for you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430848
+    m_Localized: START RUN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430849
+    m_Localized: RETRY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430850
+    m_Localized: Field reset. Same layout, fresh attempt. No progress was spent.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430851
+    m_Localized: DIRECTIONAL CUTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430852
+    m_Localized: Follow the grain. Swipe in the shown direction; straight cuts earn
+      more. Use arrow buttons or arrow keys.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430853
+    m_Localized: clean cuts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430854
+    m_Localized: LEFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430855
+    m_Localized: UP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430856
+    m_Localized: RIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430857
+    m_Localized: DOWN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430858
+    m_Localized: "{0}/{1} cuts \xB7 {2} swings left \xB7 {3}s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430859
+    m_Localized: Clean cut! Follow the next grain.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430860
+    m_Localized: Cut through. Keep your next swipe straight.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430861
+    m_Localized: Against the grain. Follow the shown direction.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430862
+    m_Localized: CONNECTED ORE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430863
+    m_Localized: Tap to aim, then BREAK. Matching ore touching edge-to-edge breaks
+      together. Avoid red faults. Arrows aim; Space breaks.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430864
+    m_Localized: connected breaks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430865
+    m_Localized: BREAK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430866
+    m_Localized: ORE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430867
+    m_Localized: GEM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430868
+    m_Localized: STONE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430869
+    m_Localized: FAULT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430870
+    m_Localized: "Aimed cluster: {0} \xB7 hardness {1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430871
+    m_Localized: "{0} ore freed \xB7 {1} strikes left \xB7 {2}s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430872
+    m_Localized: '{0} connected ore freed!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430873
+    m_Localized: Fracture deepened. Strike again or choose a softer cluster.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430874
+    m_Localized: No ore here. Faults cost two extra strikes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430875
+    m_Localized: DEEP DRILLING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430876
+    m_Localized: Steer toward gold layers and around red rock. Hold THRUST to descend;
+      release to cool. BOOST is faster but hotter. Arrows steer, Space thrusts, Shift
+      boosts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430877
+    m_Localized: rich layers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430878
+    m_Localized: LEFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430879
+    m_Localized: RIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430880
+    m_Localized: THRUST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430881
+    m_Localized: BOOST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430882
+    m_Localized: SOFT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430883
+    m_Localized: GOLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430884
+    m_Localized: ROCK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430885
+    m_Localized: "Drill lane {0} \xB7 layer {1}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430886
+    m_Localized: "Depth {0}/{1} \xB7 heat {2}% \xB7 {3}s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430887
+    m_Localized: Overheated. Release thrust until heat falls to 30%.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430888
+    m_Localized: Cooled. Thrust is ready again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430889
+    m_Localized: Rock collision. Steer around the next red layer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430890
+    m_Localized: Gold layer recovered!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430891
+    m_Localized: Layer cleared. Read the next route.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430892
+    m_Localized: CONNECT & BALANCE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430893
+    m_Localized: Tap pipes to rotate a sealed route from left inlet to right outlet.
+      Then adjust the valve to match pressure to demand. Arrows select, Space rotates,
+      minus/equals adjust flow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430894
+    m_Localized: balanced seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430895
+    m_Localized: "INLET left middle \xB7 OUTLET right middle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430896
+    m_Localized: BLOCKED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430897
+    m_Localized: "VALVE \u2212"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430898
+    m_Localized: VALVE +
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430899
+    m_Localized: Route sealed! Match pressure to demand to collect flow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430900
+    m_Localized: "Route unfinished \xB7 {0} open connections"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430901
+    m_Localized: "{0}/6 flow \xB7 valve {1}% \xB7 demand {2}% \xB7 pressure {3}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430902
+    m_Localized: BURIED FINDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430903
+    m_Localized: Select soil. SCAN gives distance to a find. DIG removes two layers;
+      BRUSH removes one safely. Digging a last layer damages finds. Arrows select;
+      1 scans, 2 digs, 3 brushes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430904
+    m_Localized: intact finds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430905
+    m_Localized: SCAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430906
+    m_Localized: DIG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430907
+    m_Localized: BRUSH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430908
+    m_Localized: FIND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430909
+    m_Localized: EMPTY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430910
+    m_Localized: 'Selected soil: {0} layers'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430911
+    m_Localized: "{0}/{1} intact finds \xB7 {2} actions \xB7 {3} scans left"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430912
+    m_Localized: 'Nearest buried find: {0} tile steps away.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430913
+    m_Localized: No scans left. Read the exposed soil and brush carefully.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430914
+    m_Localized: Find damaged! Brush the final layer next time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430915
+    m_Localized: Intact find uncovered!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430916
+    m_Localized: Soil removed. Check the remaining layer count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430917
+    m_Localized: SORT THE SALVAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430918
+    m_Localized: Sort each incoming part before its bar empties. Metal left, circuits
+      right; reject scrap and hazards. Tap bins, swipe, or use 1/2/3. Correct streaks
+      earn cleaner salvage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430919
+    m_Localized: best sorting streak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430920
+    m_Localized: "1 \xB7 METAL"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430921
+    m_Localized: "2 \xB7 CIRCUITS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430922
+    m_Localized: "3 \xB7 REJECT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430923
+    m_Localized: METAL PART
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430924
+    m_Localized: CIRCUIT BOARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430925
+    m_Localized: BROKEN SCRAP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430926
+    m_Localized: HAZARDOUS CELL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430927
+    m_Localized: 'Next: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430928
+    m_Localized: last part
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430929
+    m_Localized: "{0}/{1} sorted \xB7 {2} useful parts \xB7 streak {3}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430930
+    m_Localized: Correct bin! Streak {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430931
+    m_Localized: Wrong bin. Save useful parts; reject scrap and hazards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430932
+    m_Localized: Part slipped away. Watch the next item and its deadline.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430933
+    m_Localized: 'Mining: {0} break strength. Deep drilling: {1}% cooling per second,
+      with improved heat resistance.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430934
+    m_Localized: Need a little extra? An optional video can send a small resupply
+      to your cargo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430935
+    m_Localized: 'Watch ad: +{0} {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430936
+    m_Localized: 'Resupply delivered: +{0} {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430937
+    m_Localized: 'Tool: {0} (LV {1}, cooling {2}% per second)'
     m_Metadata:
       m_Items: []
   references:

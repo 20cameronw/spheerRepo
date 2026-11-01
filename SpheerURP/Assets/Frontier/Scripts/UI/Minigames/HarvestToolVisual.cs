@@ -16,7 +16,7 @@ namespace Frontier
 
         public static Transform Build(MinigameStage stage, MinigameKind kind, int level, Color accent, Vector3 position)
         {
-            if (kind != MinigameKind.Mine && kind != MinigameKind.Siphon && kind != MinigameKind.Excavate && kind != MinigameKind.Salvage)
+            if (kind != MinigameKind.Mine && kind != MinigameKind.Drill && kind != MinigameKind.Siphon && kind != MinigameKind.Excavate && kind != MinigameKind.Salvage)
                 throw new ArgumentOutOfRangeException(nameof(kind), "Use the existing striking or drill rig for this tool.");
             var rig = new GameObject(kind + "ToolRig").transform;
             rig.SetParent(stage.root, false);
@@ -32,6 +32,22 @@ namespace Frontier
                 for (int side = -1; side <= 1; side += 2)
                     stage.Prim(PrimitiveType.Cylinder, rig, new Vector3(side * 0.32f, -0.25f, 0),
                         new Vector3(0.14f, 0.3f, 0.14f), Vector3.zero, casing);
+            }
+            else if (kind == MinigameKind.Drill)
+            {
+                var spin = new GameObject("Spin").transform;
+                spin.SetParent(rig, false);
+                var bit = stage.AddMesh(MeshKit.Cyl(0.02f, 0.42f, 1.4f, 8), casing, spin, Vector3.zero);
+                bit.name = "DeepDrillBit";
+                for (int i = 0; i < 3; i++)
+                {
+                    var flute = stage.Prim(PrimitiveType.Cube, spin, new Vector3(0f, 0.4f + i * 0.32f, 0f),
+                        new Vector3(0.4f + i * 0.18f, 0.07f, 0.07f), new Vector3(0f, i * 60f, 0f), active);
+                    flute.name = "DrillFlute" + i;
+                }
+                var shaft = stage.Prim(PrimitiveType.Cylinder, spin, new Vector3(0f, 1.8f, 0f),
+                    new Vector3(0.2f, 0.8f, 0.2f), Vector3.zero, casing);
+                shaft.name = "DrillShaft";
             }
             else if (kind == MinigameKind.Siphon)
             {

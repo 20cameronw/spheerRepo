@@ -100,8 +100,9 @@ namespace Frontier
             try
             {
                 IsTravelling = true;
+                RestoreArrivalView();
                 yield return backdrop.DoWarp(() => planetView.Show(gs.planet, true, gs.TerraformerStageOn(gs.planet)));
-                yield return ShipMoment(true, 0.45f);
+                yield return ShipMoment(true, 0.35f);
                 Toast(UiText.Get("travel.arrived", gs.planet.Name), UiKit.Cyan);
             }
             finally
@@ -181,14 +182,22 @@ namespace Frontier
             }
             backdrop.Apply(target);
             selected = target;
+            RestoreArrivalView();
             yield return planetView.Approach(target, gs.TerraformerStageOn(target));
-            yield return ShipMoment(true);
+            yield return ShipMoment(true, 0.35f);
             busy = false;
             IsTravelling = false;
             Toast(string.IsNullOrEmpty(message)
                 ? UiText.Get(refund > 0 ? "travel.arrived.refund" : "travel.arrived",
                     target.Name, (long)refund * GameState.GallonsPerEnergy) : message,
                 string.IsNullOrEmpty(message) ? UiKit.Cyan : UiKit.Amber);
+        }
+
+        void RestoreArrivalView()
+        {
+            planetView.ResetSurfaceView();
+            worldOverzoom = 0f;
+            worldPinchDistance = 0f;
         }
 
         public void ResumeInterruptedTravel()

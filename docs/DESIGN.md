@@ -17,9 +17,16 @@ Apply `UiKit.ApplyStyles(root)` and the `fr-root` class at the document root to 
 `Tests/EditMode/Game/FrontierControlsFixture.uxml` demonstrates nested controls and authored attributes.
 
 The top bar includes fuel, live Nova Shards and player level; carried capacity stays inside Cargo, not on the dock.
+Resource-shortage help offers a labelled optional resupply video for materials already recorded in the Atlas.
+The quote is the smaller of the shortfall, free cargo space and a quarter of the resource's base stack (minimum one).
+It never grants before consent and completed video verification, does not count as a harvest, and reuses the durable
+reward journal. The resource-supply placement allows five rewards per UTC day with a three-minute cooldown.
 The startup arrival makes a full, unskippable orbital loop before its side-on descent at the screen-top silhouette.
 First-launch flight lasts 5.2 seconds and repeat-startup flight 4.6 seconds, plus touchdown/reveal;
-ordinary travel arrivals/departures retain their shorter presentation.
+ordinary arrivals use a 450 ms planet approach and 350 ms landing, plus the 240 ms touchdown.
+Arrival explicitly restores the close surface camera and clears any map pullback before revealing the planet.
+Empty Hyperspace outro time is advanced through its normal fixed simulation/replay steps immediately;
+active enemies, incoming bolts, pending encounters or remaining pickups prevent skipping.
 Two pale air boosters pulse downward to brake descent, cut out at contact, and finish with a small gear settle and
 surface dust. This is presentation only; landing slots, travel costs and progression remain unchanged.
 Ground structure foundation blocks are three times their original height, extended downward with their top surfaces
@@ -54,10 +61,14 @@ Foundations, armor, wood, glass and lights retain their materials; shared prefab
 Its atmosphere retains the standard authored diameter (5 units), including after terraforming; the terrain palette does not shrink the shell.
 Build cards show static pictures baked from the actual ModelLibrary structure prefabs. Research uses smaller
 structure pictures alongside the resource/equipment glyphs it unlocks, including in the Research Lab popup.
+Structure upgrades additionally show current appearance -> next appearance in the structure popup and builder jobs.
+These are small, one-shot rendered snapshots of the actual model, level hardware and equipped theme.
+The temporary scene/camera/materials are released after capture, and each texture when its UI is detached.
 After model revisions, regenerate these textures with `Frontier/Models/Bake Structure Thumbnails`
 (`Frontier.EditorTools.StructureThumbnails.Bake` in the Unity runner); no live preview cameras run during gameplay.
-Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
-systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
+Map zoom is continuous from 1x overview to 12x local orbits. Pinch ratios are immediate; wheel and plus/minus
+ease proportionally around the gesture anchor. Overview/nearby/system presets remain shortcuts, not separate
+views or input thresholds; system centers and pan bounds stay continuous while detail blends in.
 World overzoom enters a pannable minimal map: the safe-area location bar, return arrow, Show action and +/- remain.
 The location broadens from current planet/system to nearby systems to the current system's sector coordinates.
 Show or selecting a planet reveals search/filter/destination/travel without changing zoom;
@@ -106,7 +117,7 @@ Resume is a star in the top-right
 corner below the HUD bar when full-width first-session guidance is not covering the world controls. Lab requirements use a lab icon that opens
 and scrolls to Build > Utility > Research Lab. All build-project routes share the same category-aware destination.
 Outside research, prerequisite icons sit in card headings beside the tracking star, without a separate empty action row.
-Map opens in Tracked needs mode when that project has missing costs. Green diamond markers identify known
+Map opens in Tracked needs mode when that project has missing costs. Compact green flags identify known
 systems/planets with those raw deposits; matching resource chips are outlined. Filled costs and completed or
 untracked projects clear their highlights. The normal material filter remains available.
 Dashed cyan rings show actual scanner/Radar Tower survey coverage, distinct from the solid jump-range ring.

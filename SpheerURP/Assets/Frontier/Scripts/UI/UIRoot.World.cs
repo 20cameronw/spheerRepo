@@ -181,6 +181,7 @@ namespace Frontier
                 OpenPopup("builder" + s.slot, t, jobColor, body =>
                 {
                     StructureHeader(body, s, jobColor, UiText.Get("structure.builder"));
+                    if (gs.IsUpgradeInProgress(s)) BuildUpgradeAppearance(body, s);
                     jobStatusLabel = UiKit.Text(gs.BuilderJobStatus(s), "fr-small", UiKit.Cyan);
                     body.Add(jobStatusLabel);
                     BuildBuilderFinishAction(body, s, () =>
@@ -329,6 +330,7 @@ namespace Frontier
             }
             if (s.level >= s.def.maxLevel) { body.Add(Note(UiText.Get("structure.max"), UiKit.Lime)); return; }
             var cost = s.def.UpgradeCost(s.level);
+            BuildUpgradeAppearance(body, s);
             body.Add(SectionLabel(UiText.Get("structure.upgrade-preview", s.level + 1, StructureEffect(s.def, s.level + 1))));
             body.Add(ProjectCosts(cost, Project("structure", s.def.id, s.level + 1, s.slot)));
             AddProjectAction(body, Project("structure", s.def.id, s.level + 1, s.slot));
@@ -537,7 +539,9 @@ namespace Frontier
             var game = s.def.kind.Game();
             OpenPopup("gather" + s.slot, t, c, body =>
             {
-                StructureHeader(body, s, c, UiText.Get("gather.tool", gs.ToolName(game), gs.ToolLevel(game), gs.ToolDamage(game)));
+                StructureHeader(body, s, c, game == MinigameKind.Drill
+                    ? UiText.Get("gather.drill-tool", gs.ToolName(game), gs.ToolLevel(game), Mathf.RoundToInt(gs.DrillCoolingPerSecond * 100))
+                    : UiText.Get("gather.tool", gs.ToolName(game), gs.ToolLevel(game), gs.ToolDamage(game)));
                 float bonus = gs.StructureBonus(s);
                 var spots = gs.SpotsFor(gs.planet, s.def.kind);
                 body.Add(SectionLabel(UiText.Get(spots.Count > 0 ? "gather.title" : "gather.empty")));

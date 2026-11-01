@@ -18,6 +18,9 @@ MonoBehaviour:
   enableIosGameplayAds: 1
   enableIosDevelopmentTests: 1
   placements:
+  - id: resource-supply
+    dailyCap: 5
+    cooldownSeconds: 180
   - id: double-yield
     unlimitedDaily: 1
     dailyCap: 0

@@ -9,6 +9,7 @@ namespace Frontier
         public bool harvestEnabled;
         public bool constructionEnabled;
         public bool shardsEnabled;
+        public bool shortageEnabled;
         [Min(0)] public int constructionSeconds;
     }
 }

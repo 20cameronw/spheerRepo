@@ -15,4 +15,5 @@ MonoBehaviour:
   harvestEnabled: 1
   constructionEnabled: 1
   shardsEnabled: 1
+  shortageEnabled: 1
   constructionSeconds: 300

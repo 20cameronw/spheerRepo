@@ -177,6 +177,7 @@ namespace Frontier
         Camera cam;
         float lastAspect;
         float lastZoom, lastMapBlend;
+        int lastViewResetVersion;
         bool initialized, transitioning;
         float transitionTime;
         Vector3 transitionEnd;
@@ -186,9 +187,24 @@ namespace Frontier
 
         void Awake() { cam = GetComponent<Camera>(); }
 
+        public void SnapToView()
+        {
+            initialized = false;
+            transitioning = false;
+            velocity = Vector3.zero;
+            LateUpdate();
+        }
+
         void LateUpdate()
         {
             if (cam == null) return;
+            if (Planet != null && lastViewResetVersion != Planet.ViewResetVersion)
+            {
+                lastViewResetVersion = Planet.ViewResetVersion;
+                initialized = false;
+                transitioning = false;
+                velocity = Vector3.zero;
+            }
             float aspect = ScreenMetrics.Aspect;
             float zoom = Planet != null ? Planet.Zoom01 : 0f;
             float mapBlend = Planet != null ? Mathf.Clamp01(Planet.MapZoomBlend) : 0f;

@@ -373,6 +373,8 @@ namespace Frontier
 
         public float ToolTolerance(MinigameKind k) { return Mathf.Min(1.6f, 1f + 0.08f * ToolLevel(k)); }
         public float ToolDamage(MinigameKind k) { return 1f + FrontierSettings.I.toolDamagePerLevel * ToolLevel(k); }
+        public float MiningBreakStrength { get { return ToolDamage(MinigameKind.Mine); } }
+        public float DrillCoolingPerSecond { get { return HarvestEquipmentEffects.DrillCooling(ToolLevel(MinigameKind.Drill)); } }
 
         public string ToolName(MinigameKind k)
         {
@@ -383,10 +385,13 @@ namespace Frontier
                 {
                     if (ladder == null || ladder.data == null || ladder.data.games == null ||
                         Array.IndexOf(ladder.data.games, method) < 0) continue;
-                    int tier = ToolTier(ladder);
+                    // Retained legacy upgrades can equip a higher visual tier than the catalog purchase record.
+                    int tier = Math.Max(ToolTier(ladder), ToolLevel(k) + 1);
                     if (ladder.data.tiers == null) break;
+                    ToolTierDef equipped = null;
                     foreach (var row in ladder.data.tiers)
-                        if (row != null && row.tier == tier) return ladder.TierName(row);
+                        if (row != null && row.tier <= tier && (equipped == null || row.tier > equipped.tier)) equipped = row;
+                    if (equipped != null) return ladder.TierName(equipped);
                 }
             }
             foreach (var u in db.upgrades)

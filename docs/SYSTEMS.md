@@ -40,6 +40,22 @@ its Build catalogue card or Construction Jobs. All three show the live remaining
 confirmation, and share the same persisted finish action; the final short free-finish window still applies.
 Map queries preload at least 192 UI pixels beyond each edge (25% of the larger viewport dimension), refreshing
 at half that margin so small pans reuse already loaded systems. Scanner, discovery and resource filters still apply.
+Wheel and two-finger pinch zoom continuously from the overview (1×) through neighbors (4×) to local orbits (12×).
+Wheel input is proportional to its magnitude and settles with a short interruptible exponential ease; pinch follows
+every distance ratio and supports simultaneous two-finger panning. Zoom anchors the projected world beneath the
+pointer or pinch center. Planet lanes scale with the viewport and collapse continuously into their system markers
+below neighbor scale; detail, names, pins and links blend without changing coordinates at the old view thresholds.
+The +/− controls and view switch remain eased scale presets, not mandatory navigation steps.
+Panning uses one zoom-independent bounding envelope of surveyed and remembered systems, with a 20 ly margin;
+crossing gaps within that envelope does not reveal unscanned deposits or unlock destinations.
+Minimal-map controls remain optional; zooming inward again at the closest scale on the current world returns to
+the planet. On another selected world it reveals the controls instead. Search/recenter intentionally reposition
+the chart, while ordinary zoom never recenters on the selected system.
+Pointer-gesture release suppression belongs only to the open chart; closing/reopening clears it, and explicit
+keyboard submission still selects a destination after a pan or pinch.
+Tracked-material matches use compact lime flags beside system/planet markers, never orbit-sized outlines.
+System labels have dark backplates above subdued neighbor orbits; the scale readout reserves the measured
+Hide-control width and wraps within its own column.
 
 ## Shortage journeys, projects and returning sessions
 
@@ -87,7 +103,33 @@ New games receive 20 starter shards once; loading existing saves does not award 
 Lab takes 60 seconds and includes an optional speed-up explanation, while essential starting buildings remain
 instant. Construction anchors are 0, 5, 20, 60, 180, 600, 1800, 4500, 12600, 28800, 57600 and 86400 seconds,
 with existing structure scaling, builder discounts and caps. Fuel, yield and damage formulas are unchanged.
-Mining and deep drilling share a compatible tool ladder but retain distinct precision and heat/pressure games.
+Mining and deep drilling retain their compatible saved equipment ladder and yield bonuses, but apply different active
+effects: mining tiers strengthen connected-ore breaks; drilling tiers improve cooling and heat resistance, not descent
+damage or speed. Existing pick/drill tiers are never reset.
+
+### Distinct harvest field games
+
+`HarvestGameFactory` routes both real harvesting and Debug to six replacement games. The previous visual prototypes
+remain only for compatibility tests; neither real harvesting nor capture previews launch them.
+
+* **Lumber:** directional swipes follow changing grain; alignment determines clean-cut quality. Arrow buttons/keys
+  provide the same cuts without a drag gesture. Short taps are ignored; wrong directions consume a swing.
+* **Mining:** aim at a tile, inspect its highlighted edge-connected material cluster, then break. Hardness takes
+  repeated strikes; a completed fracture frees only matching connected ore. Faults waste strikes.
+* **Deep drilling:** steer across upcoming layers, thrust through soft material/gold, boost at a heat cost, and lift
+  to cool. Rock is slower/hotter and damages quality. Changing lanes discards that layer's partial fracture.
+* **Siphoning:** rotate pipes into a sealed inlet-to-outlet route, then adjust the valve to follow changing downstream
+  demand. Leaks or an imbalanced pressure stop collection.
+* **Excavation:** scan for distance to buried paired finds, remove bulk soil with a dig, and brush the final layer.
+  Overdigging damages finds; scans and actions are limited.
+* **Salvage:** classify incoming metal, circuits, scrap and hazardous cells into useful bins or rejection before each
+  deadline. Next-part preview supports planning; misses/wrong bins lower quality and break sorting streaks.
+
+Each field waits for START before advancing its clock. RETRY reuses the layout with fresh attempt state and does not
+publish a result, alter inventory, or consume persistent progress. Pause/focus loss/detach clears held actions and
+pointer capture; unreleased keyboard actions must receive key-up before resuming. The incumbent result/Collect,
+abandon confirmation and exactly-once reward handoff remain unchanged. All new instructions, readouts and feedback
+use `UiStrings`; run English localization sync after editing that source catalog.
 Building paint ownership, selection and shard spending commit in one saved snapshot; reequipping owned paint
 is free and cannot change gameplay stats.
 

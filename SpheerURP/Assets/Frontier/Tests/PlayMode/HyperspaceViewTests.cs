@@ -84,6 +84,37 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
+        public IEnumerator EmptyArrivalCoastEndsImmediatelyButNeverSkipsThreatsOrLoot()
+        {
+            var session = Begin();
+            Assert.IsFalse(session.Run.ArrivalCoastIsEmpty, "Do not skip the opening or future scheduled encounters.");
+            session.Run.Ghost = true;
+            while (session.Run.State == RunState.Running && !session.Run.ArrivalCoastIsEmpty)
+                session.DebugAdvance(1, true, true);
+            Assert.IsTrue(session.Run.ArrivalCoastIsEmpty);
+            Assert.Greater(session.Run.EndStep - session.Run.StepIndex, 1, "This must exercise the empty coast, not an already-ended trip.");
+            session.Run.EnemyCount = 1;
+            Assert.IsFalse(session.Run.ArrivalCoastIsEmpty);
+            session.Run.EnemyCount = 0;
+            session.Run.PickupHigh = Mathf.Max(1, session.Run.PickupHigh);
+            session.Run.Pickups[0].active = true;
+            Assert.IsFalse(session.Run.ArrivalCoastIsEmpty, "Keep the player's chance to collect the last pickup.");
+            session.Run.Pickups[0].active = false;
+            session.Run.BoltHigh = Mathf.Max(1, session.Run.BoltHigh);
+            session.Run.Bolts[0].active = true;
+            Assert.IsFalse(session.Run.ArrivalCoastIsEmpty, "Incoming shots still count as gameplay.");
+            session.Run.Bolts[0].active = false;
+            int startedFrame = Time.frameCount;
+            session.DebugFrozen = false;
+            yield return null;
+            yield return null;
+            Assert.AreEqual(RunState.Ended, session.Run.State);
+            Assert.LessOrEqual(Time.frameCount - startedFrame, 2, "No timed outro wait remains, even on a slow test renderer.");
+            Assert.IsNotNull(root.Q<Button>("hyperspace-continue"));
+            Assert.AreEqual(0, callbacks, "Arrival acceleration must still let the player read and collect the result.");
+        }
+
+        [UnityTest]
         public IEnumerator NewJourneyIgnoresPreviouslySavedAssistPreference()
         {
             TravelPrefs.AssistMode = true;

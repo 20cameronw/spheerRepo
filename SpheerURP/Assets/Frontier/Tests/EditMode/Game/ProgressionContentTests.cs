@@ -57,6 +57,47 @@ namespace Frontier.Tests
 
         [TestCase(true)]
         [TestCase(false)]
+        public void ShortageResupplyIsBoundedOptInAndCannotReplay(bool earned)
+        {
+            var state = new GameState(db, false, clock);
+            var resource = db.FindResource("wood");
+            state.backpack.Clear();
+            state.Add(resource, 1, false);
+            state.backpack.Clear();
+            int amount = state.ShortageSupplyQuote(resource, int.MaxValue);
+            Assert.AreEqual(Math.Max(1, resource.stackSize / 4), amount);
+            Assert.AreEqual(1, state.ShortageSupplyQuote(resource, 1));
+            Assert.AreEqual(0, state.ShortageSupplyQuote(resource, 0));
+            Assert.IsFalse(state.PrepareGameplayReward("resource-supply", resource, amount + 1, null, out _, out _));
+            int runs = state.stats.harvestRunsCompleted;
+            Assert.IsTrue(state.PrepareGameplayReward("resource-supply", resource, amount, null, out var ticket, out var error), error);
+            Assert.AreEqual(0, state.Count(resource), "No resources before a completed video.");
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            Assert.AreEqual(earned ? amount : 0, state.Count(resource));
+            Assert.IsTrue(state.ResolveGameplayReward(state.RewardRequestContext, ticket.id, earned, out error), error);
+            Assert.AreEqual(earned ? amount : 0, state.Count(resource), "Duplicate callbacks cannot deliver twice.");
+            Assert.AreEqual(runs, state.stats.harvestRunsCompleted, "A resupply is not a completed harvest game.");
+        }
+
+        [Test]
+        public void ShortageResupplyPreservesDiscoveryAndCapacityGatesForRawAndCraftedMaterials()
+        {
+            var state = new GameState(db, false, clock);
+            state.backpack.Clear();
+            var advanced = db.resources.First(r => r.IsRaw && !state.IsAtlasDiscovered("resource", r.id));
+            Assert.AreEqual(0, state.ShortageSupplyQuote(advanced, 10));
+            var crafted = db.resources.First(r => !r.IsRaw && r != db.fuel);
+            state.Add(crafted, 1, false);
+            state.backpack.Clear();
+            Assert.Greater(state.ShortageSupplyQuote(crafted, 10), 0, "Known crafted components can also receive a small supply.");
+            var wood = db.FindResource("wood");
+            state.Add(wood, 1, false);
+            state.backpack.Add(wood.id, int.MaxValue);
+            Assert.AreEqual(0, state.ShortageSupplyQuote(wood, 10));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
         public void OptionalShardAdRewardUsesTheSaveJournalAndCannotBeReplayed(bool earned)
         {
             var state = new GameState(db, false, clock);
@@ -677,6 +718,32 @@ namespace Frontier.Tests
         }
 
         [Test]
+        public void RetainedLegacyEquipmentNamesMatchRenderedLevelsWithoutChangingPurchasedTiers()
+        {
+            var state = new GameState(db, false);
+            if (!db.UsesImportedEconomy || db.toolLadders == null || db.toolLadders.Length == 0)
+                Assert.Ignore("Imported tool ladders are unavailable");
+            foreach (var game in new[] { MinigameKind.Chop, MinigameKind.Mine })
+            {
+                var upgrade = db.upgrades.First(u => u.effect == UpgradeEffect.ToolPower && u.tool == game);
+                var kind = game == MinigameKind.Chop ? Economy.ToolKind.Axe : Economy.ToolKind.Pick;
+                var ladder = db.toolLadders.First(l => l.data.kind == kind);
+                state.DebugSetUpgrade(upgrade, 2);
+                Assert.AreEqual(1, state.ToolTier(ladder), "Cosmetic naming must not mutate purchases.");
+                Assert.AreEqual(2, state.ToolLevel(game));
+                Assert.AreEqual(ladder.TierName(ladder.data.tiers.First(row => row.tier == 3)), state.ToolName(game),
+                    "The header name must identify the same active level used to build the striking rig.");
+            }
+            Assert.IsTrue(state.Save());
+            var loaded = new GameState(db, true);
+            foreach (var game in new[] { MinigameKind.Chop, MinigameKind.Mine })
+            {
+                Assert.AreEqual(state.ToolName(game), loaded.ToolName(game));
+                Assert.AreEqual(2, loaded.ToolLevel(game));
+            }
+        }
+
+        [Test]
         public void MiningPurchaseUpgradesBothGamesAndKeepsTheBestLegacyTier()
         {
             var state = new GameState(db, false);
@@ -715,6 +782,11 @@ namespace Frontier.Tests
             Assert.AreEqual(4, loaded.ToolTier(drill));
             Assert.AreEqual(3, loaded.ToolLevel(MinigameKind.Mine));
             Assert.AreEqual(3, loaded.ToolLevel(MinigameKind.Drill));
+            Assert.AreEqual(loaded.ToolDamage(MinigameKind.Mine), loaded.MiningBreakStrength,
+                "Existing mining tiers retain break strength without a save migration.");
+            Assert.AreEqual(HarvestEquipmentEffects.DrillCooling(3), loaded.DrillCoolingPerSecond,
+                "The retained drill tier now supplies cooling, rather than mining damage.");
+            Assert.Greater(loaded.DrillCoolingPerSecond, HarvestEquipmentEffects.DrillCooling(0));
             Assert.IsTrue(loaded.Save());
             Assert.AreEqual(4, new GameState(db, true).ToolTier(pick));
         }

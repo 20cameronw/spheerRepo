@@ -181,7 +181,11 @@ namespace Frontier
                     : UiText.Get("tools.tier", current, ladder.data.tiers.Where(row => row != null).Max(row => row.tier)), "fr-tiny"));
                 card.Add(head);
                 if (ladder.data.kind == ToolKind.Pick)
+                {
                     card.Add(UiKit.Text(UiText.Get("tools.mining.help"), "fr-muted"));
+                    card.Add(UiKit.Text(UiText.Get("tools.harvest-effects", gs.MiningBreakStrength.ToString("0.0"),
+                        Mathf.RoundToInt(gs.DrillCoolingPerSecond * 100)), "fr-small"));
+                }
                 if (currentRow != null)
                     card.Add(UiKit.Text(UiText.Get("tools.yield", ladder.TierName(currentRow), currentRow.yieldMult), "fr-small"));
                 if (nextRow == null)

@@ -306,8 +306,12 @@ namespace Frontier.Tests
             Assert.IsTrue(policy.enableIosGameplayAds);
             Assert.AreEqual("28e95b2f5", policy.iosAppKey);
             Assert.AreEqual("eurexbly1unznz2g", policy.iosRewardedAdUnitId);
-            CollectionAssert.AreEquivalent(new[] { "double-yield", "emergency-fuel", "timer-skip", "revive", "daily-supply", "free-shards" },
+            CollectionAssert.AreEquivalent(new[] { "resource-supply", "double-yield", "emergency-fuel", "timer-skip", "revive", "daily-supply", "free-shards" },
                 Array.ConvertAll(policy.placements, row => row.id));
+            var resupply = Array.Find(policy.placements, row => row.id == "resource-supply");
+            Assert.IsFalse(resupply.unlimitedDaily);
+            Assert.AreEqual(5, resupply.dailyCap);
+            Assert.AreEqual(180, resupply.cooldownSeconds);
             foreach (var placement in policy.placements)
                 if (placement.id == "double-yield" || placement.id == "timer-skip")
                 {

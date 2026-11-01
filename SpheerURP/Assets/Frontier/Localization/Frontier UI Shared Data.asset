@@ -9371,6 +9371,370 @@ MonoBehaviour:
     m_Key: content.label.builder_3.name
     m_Metadata:
       m_Items: []
+  - m_Id: 6172562034876416
+    m_Key: harvest.redesign.ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430848
+    m_Key: harvest.redesign.start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430849
+    m_Key: harvest.redesign.retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430850
+    m_Key: harvest.redesign.retried
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430851
+    m_Key: harvest.redesign.lumber.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430852
+    m_Key: harvest.redesign.lumber.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430853
+    m_Key: harvest.redesign.lumber.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430854
+    m_Key: harvest.redesign.lumber.direction.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430855
+    m_Key: harvest.redesign.lumber.direction.up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430856
+    m_Key: harvest.redesign.lumber.direction.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430857
+    m_Key: harvest.redesign.lumber.direction.down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430858
+    m_Key: harvest.redesign.lumber.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430859
+    m_Key: harvest.redesign.lumber.clean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430860
+    m_Key: harvest.redesign.lumber.cut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430861
+    m_Key: harvest.redesign.lumber.wrong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430862
+    m_Key: harvest.redesign.mining.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430863
+    m_Key: harvest.redesign.mining.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430864
+    m_Key: harvest.redesign.mining.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430865
+    m_Key: harvest.redesign.mining.break
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430866
+    m_Key: harvest.redesign.mining.ore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430867
+    m_Key: harvest.redesign.mining.gem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430868
+    m_Key: harvest.redesign.mining.stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430869
+    m_Key: harvest.redesign.mining.fault
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430870
+    m_Key: harvest.redesign.mining.aim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430871
+    m_Key: harvest.redesign.mining.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430872
+    m_Key: harvest.redesign.mining.chain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430873
+    m_Key: harvest.redesign.mining.crack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430874
+    m_Key: harvest.redesign.mining.waste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430875
+    m_Key: harvest.redesign.drill.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430876
+    m_Key: harvest.redesign.drill.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430877
+    m_Key: harvest.redesign.drill.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430878
+    m_Key: harvest.redesign.drill.left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430879
+    m_Key: harvest.redesign.drill.right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430880
+    m_Key: harvest.redesign.drill.thrust
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430881
+    m_Key: harvest.redesign.drill.boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430882
+    m_Key: harvest.redesign.drill.layer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430883
+    m_Key: harvest.redesign.drill.rich
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430884
+    m_Key: harvest.redesign.drill.rock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430885
+    m_Key: harvest.redesign.drill.position
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430886
+    m_Key: harvest.redesign.drill.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430887
+    m_Key: harvest.redesign.drill.hot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430888
+    m_Key: harvest.redesign.drill.cooled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430889
+    m_Key: harvest.redesign.drill.collision
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430890
+    m_Key: harvest.redesign.drill.rich-hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430891
+    m_Key: harvest.redesign.drill.through
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430892
+    m_Key: harvest.redesign.siphon.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430893
+    m_Key: harvest.redesign.siphon.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430894
+    m_Key: harvest.redesign.siphon.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430895
+    m_Key: harvest.redesign.siphon.route
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430896
+    m_Key: harvest.redesign.siphon.blocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430897
+    m_Key: harvest.redesign.siphon.close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430898
+    m_Key: harvest.redesign.siphon.open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430899
+    m_Key: harvest.redesign.siphon.connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430900
+    m_Key: harvest.redesign.siphon.leaks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430901
+    m_Key: harvest.redesign.siphon.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430902
+    m_Key: harvest.redesign.excavation.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430903
+    m_Key: harvest.redesign.excavation.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430904
+    m_Key: harvest.redesign.excavation.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430905
+    m_Key: harvest.redesign.excavation.scan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430906
+    m_Key: harvest.redesign.excavation.dig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430907
+    m_Key: harvest.redesign.excavation.brush
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430908
+    m_Key: harvest.redesign.excavation.find
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430909
+    m_Key: harvest.redesign.excavation.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430910
+    m_Key: harvest.redesign.excavation.soil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430911
+    m_Key: harvest.redesign.excavation.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430912
+    m_Key: harvest.redesign.excavation.signal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430913
+    m_Key: harvest.redesign.excavation.no-scans
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430914
+    m_Key: harvest.redesign.excavation.damaged
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430915
+    m_Key: harvest.redesign.excavation.found
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430916
+    m_Key: harvest.redesign.excavation.cleared
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430917
+    m_Key: harvest.redesign.salvage.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430918
+    m_Key: harvest.redesign.salvage.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430919
+    m_Key: harvest.redesign.salvage.metric
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430920
+    m_Key: harvest.redesign.salvage.metal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430921
+    m_Key: harvest.redesign.salvage.circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430922
+    m_Key: harvest.redesign.salvage.reject
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430923
+    m_Key: harvest.redesign.salvage.part.metal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430924
+    m_Key: harvest.redesign.salvage.part.circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430925
+    m_Key: harvest.redesign.salvage.part.scrap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430926
+    m_Key: harvest.redesign.salvage.part.hazard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430927
+    m_Key: harvest.redesign.salvage.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430928
+    m_Key: harvest.redesign.salvage.last
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430929
+    m_Key: harvest.redesign.salvage.status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430930
+    m_Key: harvest.redesign.salvage.sorted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430931
+    m_Key: harvest.redesign.salvage.wrong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430932
+    m_Key: harvest.redesign.salvage.missed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430933
+    m_Key: tools.harvest-effects
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430934
+    m_Key: reward.supply-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430935
+    m_Key: reward.supply-watch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430936
+    m_Key: reward.supply-claimed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6172562068430937
+    m_Key: gather.drill-tool
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

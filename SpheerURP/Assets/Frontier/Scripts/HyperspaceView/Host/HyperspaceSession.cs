@@ -76,6 +76,17 @@ namespace Frontier.Hyperspace.View
                         accumulator -= HyperspaceTuning.Dt;
                         Drain();
                     }
+                    if (Run.ArrivalCoastIsEmpty)
+                    {
+                        input.Cancel();
+                        // Keep the replay's fixed steps, but do not make the player wait on an empty outro.
+                        while (Run.ArrivalCoastIsEmpty)
+                        {
+                            Run.Step(default);
+                            Drain();
+                        }
+                        accumulator = 0;
+                    }
                 }
             }
             if (Run.State == RunState.Downed && !downedShown)

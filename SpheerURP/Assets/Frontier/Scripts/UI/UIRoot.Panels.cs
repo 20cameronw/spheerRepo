@@ -1580,6 +1580,7 @@ namespace Frontier
                     }
                     var card = Card(UiKit.Cyan);
                     card.Add(UiKit.Text(UiText.Get("builders.structure", job.def.LocalizedName, planet.Name), "fr-h2"));
+                    if (gs.IsUpgradeInProgress(job)) BuildUpgradeAppearance(card, job);
                     var status = UiKit.Text(gs.BuilderJobStatus(job), "fr-small");
                     card.Add(status);
                     BuildBuilderFinishAction(card, job, RefreshModal, status);
@@ -1752,8 +1753,12 @@ namespace Frontier
                 top.Add(UiKit.Text(UiText.Get(owned ? (l == lvl ? "tools.equipped" : "tools.owned")
                     : next ? "tools.next-state" : "tools.locked"), "fr-tiny", l == lvl ? UiKit.Lime : (Color?)null));
                 card.Add(top);
-                card.Add(UiKit.Text(UiText.Get("tools.level-summary", 1f + FrontierSettings.I.toolDamagePerLevel * l,
-                    (1f + u2.valuePerLevel * l) * gs.CatalogToolYieldMultiplier(u2.tool)), "fr-tiny"));
+                if (u2.tool == MinigameKind.Mine || u2.tool == MinigameKind.Drill)
+                    card.Add(UiKit.Text(UiText.Get("tools.harvest-effects", (1f + FrontierSettings.I.toolDamagePerLevel * l).ToString("0.0"),
+                        Mathf.RoundToInt(HarvestEquipmentEffects.DrillCooling(l) * 100)), "fr-tiny"));
+                else
+                    card.Add(UiKit.Text(UiText.Get("tools.level-summary", 1f + FrontierSettings.I.toolDamagePerLevel * l,
+                        (1f + u2.valuePerLevel * l) * gs.CatalogToolYieldMultiplier(u2.tool)), "fr-tiny"));
                 if (next)
                 {
                     var cost = u2.CostAt(lvl);

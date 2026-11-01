@@ -163,6 +163,18 @@ namespace Frontier.Hyperspace
 
         public bool CanRevive { get { return State == RunState.Downed && RevivesUsed < Tuning.maxRevives; } }
 
+        public bool ArrivalCoastIsEmpty
+        {
+            get
+            {
+                if (State != RunState.Running || Time < Route.waveEnd || cursor < Plan.records.Length ||
+                    EnemyCount > 0 || BombActive) return false;
+                for (int i = 0; i < BoltHigh; i++) if (Bolts[i].active) return false;
+                for (int i = 0; i < PickupHigh; i++) if (Pickups[i].active) return false;
+                return true;
+            }
+        }
+
         void Emit(EventType type, int a, int b, int c, float x, float y, float z, float v)
         {
             Events.Push(type, StepIndex, a, b, c, x, y, z, v);
