@@ -76,11 +76,20 @@ not repeat the elapsed interval. Real native lifecycle timing remains a device-t
 Missing rules still fail closed. Provider/platform configuration, explicit player consent and per-placement
 limits remain required for playback. Offers no longer disappear when the native provider is unsupported,
 unconfigured or cooling down: buttons stay visible with their real unavailable reason and cannot grant a bonus.
-Editor/desktop displays the full flow but explicitly does not simulate a video or reward. Availability refreshes
+Editor and desktop development builds use a five-second, network-free rewarded preview beneath the same
+consent, caps, cooldowns and durable settlement policy. Production desktop builds do not simulate rewards. Availability refreshes
 once per second without replacing the button. The HUD shard balance opens the wallet and its ad offer.
 Tapping an available optional offer without consent opens an Allow & Watch / Not Now prompt;
 no ad request or reward ticket is created before acceptance. Back cancels without changing consent or progress.
 No banners, interstitials, automatic requests or shortage-to-ad shortcuts are added.
+
+New games receive 20 starter shards once; loading existing saves does not award them again. The first Research
+Lab takes 60 seconds and includes an optional speed-up explanation, while essential starting buildings remain
+instant. Construction anchors are 0, 5, 20, 60, 180, 600, 1800, 4500, 12600, 28800, 57600 and 86400 seconds,
+with existing structure scaling, builder discounts and caps. Fuel, yield and damage formulas are unchanged.
+Mining and deep drilling share a compatible tool ladder but retain distinct precision and heat/pressure games.
+Building paint ownership, selection and shard spending commit in one saved snapshot; reequipping owned paint
+is free and cannot change gameplay stats.
 
 The staged placements reuse stable service IDs `double-yield` and `timer-skip`. Harvest quotes the exact
 additional output from the first successful harvest onward and requires space for both base and bonus.

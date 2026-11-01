@@ -97,11 +97,16 @@ namespace Frontier
             var card = Card(UiKit.Magenta, complete);
             card.name = "research-" + node.data.id;
             var head = UiKit.Div("fr-row");
-            head.Add(UiKit.Text(node.LocalizedName.ToUpper(), "fr-h2"));
+            var title = UiKit.Text(node.LocalizedName.ToUpper(), "fr-h2");
+            title.style.flexGrow = 1;
+            title.style.flexShrink = 1;
+            title.style.minWidth = 0;
+            head.Add(title);
             head.Add(UiKit.Div("fr-spacer"));
             var badge = new FrontierBadge { text = UiText.Get(complete ? "research.complete" : "research.tier", Math.Max(1, node.data.tier)),
                 Tint = complete ? UiKit.Lime : UiKit.Muted };
             badge.style.marginLeft = UiKit.Space.S8;
+            badge.style.flexShrink = 0;
             head.Add(badge);
             card.Add(head);
             card.Add(UiKit.Text(UiText.Get("research.lab", PrettyName(node.data.branch), node.data.labLevel), "fr-tiny"));
@@ -166,7 +171,11 @@ namespace Frontier
                 var card = Card(color, nextRow == null);
                 card.name = "tool-" + ladder.data.id;
                 var head = UiKit.Div("fr-row");
-                head.Add(UiKit.Text(ladder.data.kind == ToolKind.Pick ? UiText.Get("tools.mining") : ladder.LocalizedName.ToUpper(), "fr-h2"));
+                var title = UiKit.Text(ladder.data.kind == ToolKind.Pick ? UiText.Get("tools.mining") : ladder.LocalizedName.ToUpper(), "fr-h2");
+                title.style.flexGrow = 1;
+                title.style.flexShrink = 1;
+                title.style.minWidth = 0;
+                head.Add(title);
                 head.Add(UiKit.Div("fr-spacer"));
                 head.Add(UiKit.Text(nextRow == null ? UiText.Get("tools.max")
                     : UiText.Get("tools.tier", current, ladder.data.tiers.Where(row => row != null).Max(row => row.tier)), "fr-tiny"));
@@ -232,6 +241,30 @@ namespace Frontier
                     var recipe = gs.db.recipes.FirstOrDefault(item => item != null && item.id == id);
                     if (recipe != null) return recipe.LocalizedName;
                 }
+                if (kind == "tool")
+                {
+                    int tierSeparator = id.LastIndexOf(':');
+                    if (tierSeparator >= 0 && int.TryParse(id.Substring(tierSeparator + 1), out int tier))
+                    {
+                        string ladderId = id.Substring(0, tierSeparator);
+                        if (ladderId == "*") return UiText.Get("research.all-tools-tier", tier);
+                        var ladder = gs.db.toolLadders.FirstOrDefault(item => item.data.id == ladderId);
+                        var row = ladder != null ? FindToolRow(ladder, tier) : null;
+                        if (row != null) return ladder.TierName(row);
+                    }
+                }
+                if (kind == "upgrade")
+                {
+                    int levelSeparator = id.LastIndexOf(':');
+                    string upgradeId = levelSeparator >= 0 ? id.Substring(0, levelSeparator) : id;
+                    var upgrade = gs.db.FindUpgrade(upgradeId);
+                    if (upgrade != null)
+                        return levelSeparator >= 0 && int.TryParse(id.Substring(levelSeparator + 1), out int level)
+                            ? upgrade.NameAtLevel(level) : upgrade.LocalizedName;
+                }
+                if (kind == "feature" && id.StartsWith("builder_", StringComparison.Ordinal) &&
+                    int.TryParse(id.Substring("builder_".Length), out int crew))
+                    return UiText.Get("research.crew-slot", crew);
                 return PrettyName(id.Replace(':', ' '));
             }));
         }

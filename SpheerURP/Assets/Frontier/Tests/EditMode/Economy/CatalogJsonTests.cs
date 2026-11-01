@@ -91,7 +91,7 @@ namespace Frontier.Economy.Tests
         }
 
         [TestCase("manifest.json", "\"schemaVersion\": 1", "\"schemaVersion\": 2")]
-        [TestCase("recipes.json", "\"contentVersion\": 1", "\"contentVersion\": 2")]
+        [TestCase("recipes.json", "\"contentVersion\": 2", "\"contentVersion\": 999")]
         [TestCase("tools.json", "\"family\": \"tools\"", "\"family\": \"resources\"")]
         [TestCase("manifest.json", "\"tools.json\",", "")]
         public void ReadCatalog_RejectsMixedOrIncompleteExports(string file, string from, string to)

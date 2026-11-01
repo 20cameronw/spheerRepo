@@ -96,7 +96,7 @@ MonoBehaviour:
       amount: 1500
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 1600
-    buildSeconds: 2220
+    buildSeconds: 2370
     requiresReachTier: 5
     requiresLabLevel: 0
     effect: 4
@@ -113,7 +113,7 @@ MonoBehaviour:
       amount: 2600
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 2800
-    buildSeconds: 4500
+    buildSeconds: 5400
     requiresReachTier: 5
     requiresLabLevel: 0
     effect: 8
@@ -132,7 +132,7 @@ MonoBehaviour:
       amount: 3800
     - resource: {fileID: 11400000, guid: a583e8bc1481b6342a159bf76e1e43fb, type: 2}
       amount: 410
-    buildSeconds: 12000
+    buildSeconds: 13800
     requiresReachTier: 6
     requiresLabLevel: 0
     effect: 14

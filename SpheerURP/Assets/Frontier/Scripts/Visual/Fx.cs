@@ -147,7 +147,37 @@ namespace Frontier
             lr.endColor = c;
             var fade = go.GetComponent<FadeOut>();
             if (fade == null) fade = go.AddComponent<FadeOut>();
+            var tracer = go.GetComponent<TracerShot>();
+            if (tracer != null) tracer.enabled = false;
+            fade.enabled = true;
             fade.Init(lr, c, life);
+        }
+
+        public static void Beam(Vector3 a, Vector3 b, Color c, float width = 0.06f, float life = 0.14f)
+        {
+            var go = FxTransientPool.AcquireBolt();
+            var line = go.GetComponent<LineRenderer>();
+            line.useWorldSpace = true;
+            line.positionCount = 2;
+            line.numCapVertices = 4;
+            line.SetPosition(0, a);
+            line.SetPosition(1, b);
+            line.widthMultiplier = width;
+            line.startColor = line.endColor = c;
+            var fade = go.GetComponent<FadeOut>();
+            if (fade == null) fade = go.AddComponent<FadeOut>();
+            var tracer = go.GetComponent<TracerShot>();
+            if (tracer != null) tracer.enabled = false;
+            fade.enabled = true;
+            fade.Init(line, c, life);
+        }
+
+        public static void Bullet(Vector3 a, Vector3 b, Color c, float width = 0.04f)
+        {
+            var go = FxTransientPool.AcquireBolt();
+            var shot = go.GetComponent<TracerShot>();
+            if (shot == null) shot = go.AddComponent<TracerShot>();
+            shot.Init(a, b, c, width);
         }
 
         public static void Ripple(Vector3 pos, Color c, float size = 1.2f, float life = 0.35f)
@@ -157,6 +187,43 @@ namespace Frontier
             var renderer = go.GetComponentInChildren<MeshRenderer>();
             FxTransientPool.SetColor(renderer, c);
             go.GetComponent<RippleAnim>().Init(size, life, c);
+        }
+
+        public sealed class TracerShot : MonoBehaviour
+        {
+            Vector3 from, to;
+            float elapsed;
+            LineRenderer line;
+
+            public void Init(Vector3 a, Vector3 b, Color color, float width)
+            {
+                from = a; to = b; elapsed = 0;
+                line = GetComponent<LineRenderer>();
+                line.useWorldSpace = true;
+                line.positionCount = 2;
+                line.numCapVertices = 4;
+                line.widthMultiplier = width * 2;
+                line.startColor = line.endColor = color;
+                var fade = GetComponent<FadeOut>();
+                if (fade != null) fade.enabled = false;
+                enabled = true;
+                Draw(0);
+            }
+
+            void Draw(float progress)
+            {
+                line.SetPosition(0, Vector3.Lerp(from, to, Mathf.Max(0, progress - 0.12f)));
+                line.SetPosition(1, Vector3.Lerp(from, to, progress));
+            }
+
+            void Update()
+            {
+                elapsed += Time.deltaTime;
+                Draw(Mathf.Clamp01(elapsed / 0.12f));
+                if (elapsed < 0.12f) return;
+                enabled = false;
+                FxTransientPool.Release(gameObject);
+            }
         }
 
         public static void SetupPost(Camera cam)

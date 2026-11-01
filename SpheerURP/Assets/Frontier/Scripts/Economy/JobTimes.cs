@@ -23,7 +23,7 @@ namespace Frontier.Economy
 
         public static void RegisterKeys(Tuning t)
         {
-            double[] def = { 0, 5, 20, 60, 180, 600, 1800, 3600, 10800, 28800, 57600, 86400 };
+            double[] def = { 0, 5, 20, 60, 180, 600, 1800, 4500, 12600, 28800, 57600, 86400 };
             for (int i = 0; i < AnchorCount; i++)
                 t.Register("time", "time.anchor." + i, def[i], 0, 604800, "Seconds of a job at level index " + i + " of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.");
             t.Register("time", "time.cap_seconds", 86400, 3600, 604800, "Hard cap for ordinary build/upgrade jobs (about one day).");

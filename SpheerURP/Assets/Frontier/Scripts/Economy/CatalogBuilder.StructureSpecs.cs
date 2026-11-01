@@ -104,7 +104,7 @@ namespace Frontier.Economy
             S("alarm", "Alarm Beacon", Uti, 0, "Tap it to burn fuel and call a wave. More fuel means a longer fight and bigger rewards.")
                 .Legacy("Alarm").C(12, 1.70, "scrap:1@1,wood:0.4@2,planks:0.5@3,iron_plate:0.5@5,steel:0.6@8").T(0, 0.80).E("waveRewardBonus", 0, 0.15),
             S("research_lab", "Research Lab", Uti, 1, "Unlocks research. Higher levels open deeper research nodes and tool tiers.")
-                .Footprint(2).C(80, 1.80, "planks:2@1,scrap:1.5@1,iron_plate:1@2,glass:1@3,copper_wire:0.8@4,circuit_board:1@6").T(1.0, 0.95).E("labLevel", 1, 1.0).U(1, null),
+                .Footprint(2).C(80, 1.80, "planks:2@1,scrap:1.5@1,iron_plate:1@2,glass:1@3,copper_wire:0.8@4,circuit_board:1@6").T(3.0, 0.65).E("labLevel", 1, 1.0).U(1, null),
             S("radar_tower", "Radar Tower", Uti, 1, "Extends the survey radius: see more worlds around you before you jump.")
                 .C(60, 1.70, "scrap:2@1,planks:1.5@1,iron_plate:1@3,copper_wire:0.8@4,circuit_board:0.8@6").T(1.0, 0.85).E("surveyRadiusBonusLy", 15, 15).U(1, "survey_basics").Levels(8),
             S("colony_hub", "Colony Hub", Uti, 3, "Adds builder crews at levels 3 and 7 and discounts planetary obstacle clearance.")

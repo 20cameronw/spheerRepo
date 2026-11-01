@@ -51,7 +51,7 @@ MonoBehaviour:
       amount: 35
     - resource: {fileID: 11400000, guid: b5c9c46330046f04bb21e21de223fb8c, type: 2}
       amount: 60
-    buildSeconds: 5
+    buildSeconds: 60
     requiresReachTier: 1
     requiresLabLevel: 0
     effect: 1
@@ -64,7 +64,7 @@ MonoBehaviour:
       amount: 85
     - resource: {fileID: 11400000, guid: 0510a12acd7223549ad7ab094d3f6a63, type: 2}
       amount: 9
-    buildSeconds: 19
+    buildSeconds: 125
     requiresReachTier: 1
     requiresLabLevel: 0
     effect: 2
@@ -79,7 +79,7 @@ MonoBehaviour:
       amount: 14
     - resource: {fileID: 11400000, guid: ec9c4ad279275fa4fb166589a3e32534, type: 2}
       amount: 16
-    buildSeconds: 54
+    buildSeconds: 260
     requiresReachTier: 2
     requiresLabLevel: 0
     effect: 3
@@ -96,7 +96,7 @@ MonoBehaviour:
       amount: 25
     - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
       amount: 45
-    buildSeconds: 155
+    buildSeconds: 565
     requiresReachTier: 2
     requiresLabLevel: 0
     effect: 4
@@ -113,7 +113,7 @@ MonoBehaviour:
       amount: 45
     - resource: {fileID: 11400000, guid: 18b893a306ab920499e3b4961ee20dc0, type: 2}
       amount: 75
-    buildSeconds: 470
+    buildSeconds: 1170
     requiresReachTier: 3
     requiresLabLevel: 0
     effect: 5
@@ -132,7 +132,7 @@ MonoBehaviour:
       amount: 120
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 25
-    buildSeconds: 1380
+    buildSeconds: 2250
     requiresReachTier: 3
     requiresLabLevel: 0
     effect: 6
@@ -151,7 +151,7 @@ MonoBehaviour:
       amount: 210
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 45
-    buildSeconds: 2910
+    buildSeconds: 4200
     requiresReachTier: 4
     requiresLabLevel: 0
     effect: 7
@@ -170,7 +170,7 @@ MonoBehaviour:
       amount: 390
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 85
-    buildSeconds: 7500
+    buildSeconds: 7800
     requiresReachTier: 4
     requiresLabLevel: 0
     effect: 8
@@ -189,7 +189,7 @@ MonoBehaviour:
       amount: 830
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 180
-    buildSeconds: 19500
+    buildSeconds: 15000
     requiresReachTier: 5
     requiresLabLevel: 0
     effect: 9
@@ -208,7 +208,7 @@ MonoBehaviour:
       amount: 1900
     - resource: {fileID: 11400000, guid: 5b6cfed766fdf9e418de9a3208cea92d, type: 2}
       amount: 410
-    buildSeconds: 42300
+    buildSeconds: 25500
     requiresReachTier: 5
     requiresLabLevel: 0
     effect: 10

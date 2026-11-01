@@ -11,7 +11,7 @@ namespace Frontier.Economy
         public const int SchemaVersion = 1;
 
         /// <summary>Version of the content numbers (bump after a live balance change).</summary>
-        public const int ContentVersion = 1;
+        public const int ContentVersion = 2;
 
         public const int EraCount = 9;
 

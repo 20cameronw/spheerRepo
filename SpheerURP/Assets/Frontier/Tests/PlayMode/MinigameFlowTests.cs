@@ -499,7 +499,7 @@ namespace Frontier.Tests
         }
 
         [UnityTest]
-        public IEnumerator ResultScreen_HidesDoubleYieldWhenCallerRejectsTheOffer()
+        public IEnumerator ResultScreen_DisablesDoubleYieldWithReasonWhenCallerRejectsTheOffer()
         {
             var game = new PauseProbeMinigame();
             game.Run(root, UiKit.Cyan, 1f, 0.2f, null,
@@ -509,7 +509,11 @@ namespace Frontier.Tests
             yield return null;
             game.Complete(0.8f, 8, 10);
             yield return WaitForResult();
-            Assert.IsNull(root.Q<Button>("minigame-double-yield"));
+            var offer = root.Q<Button>("minigame-double-yield");
+            Assert.IsNotNull(offer, "The offer stays visible so the player learns why it is unavailable.");
+            Assert.IsFalse(offer.enabledSelf);
+            Assert.AreEqual(UiText.Get("reward.harvest-space"), root.Q<Label>("minigame-double-yield-status").text);
+            Assert.IsTrue(root.Q<Button>("minigame-collect-resources").enabledSelf);
         }
 
         [UnityTest]

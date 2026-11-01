@@ -175,7 +175,9 @@ namespace Frontier
                 else if (def.kind == StructureKind.TeslaCoil) FireTeslaChain(from, target, c, def.range, gs.TurretPower(placed[i]));
                 else
                 {
-                    Fx.Bolt(from, target.transform.position, new Color(c.r, c.g, c.b, 1f), def.beamWidth, def.kind == StructureKind.Laser ? 0.28f : 0.1f);
+                    if (def.kind == StructureKind.Laser)
+                        Fx.Beam(from, target.transform.position, new Color(c.r, c.g, c.b, 1f), def.beamWidth, 0.28f);
+                    else Fx.Bullet(from, target.transform.position, new Color(1f, 0.8f, 0.4f), def.beamWidth);
                     Fx.Burst(target.transform.position, c, def.kind == StructureKind.Laser ? 14 : 6, 2.5f, 0.15f);
                     target.Damage(gs.TurretPower(placed[i]));
                 }
@@ -186,7 +188,7 @@ namespace Frontier
         void FireMissile(Vector3 from, AlienActor target, Color color, float damage)
         {
             const float splashRadius = 2.4f;
-            Fx.Bolt(from, target.transform.position, new Color(color.r, color.g, color.b, 1f), 0.16f, 0.22f);
+            Fx.Bullet(from, target.transform.position, new Color(color.r, color.g, color.b, 1f), 0.16f);
             Fx.Burst(target.transform.position, color, 24, 4.5f, 0.32f);
             float radiusSquared = splashRadius * splashRadius;
             foreach (var alien in new List<AlienActor>(AlienActor.All))
@@ -273,8 +275,8 @@ namespace Frontier
             Fx.Ripple(world, col, 0.9f, 0.3f);
             if (best != null)
             {
-                Fx.Bolt(world, best.transform.position, col, 0.09f, 0.18f);
-                Sfx.Zap();
+                Fx.Burst(best.transform.position, new Color(1f, 0.8f, 0.4f), 8, 1.5f, 0.1f);
+                Sfx.Impact();
                 best.Damage(gs.TapDamage);
             }
         }

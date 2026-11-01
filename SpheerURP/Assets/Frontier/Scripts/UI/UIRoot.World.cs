@@ -541,6 +541,8 @@ namespace Frontier
                 float bonus = gs.StructureBonus(s);
                 var spots = gs.SpotsFor(gs.planet, s.def.kind);
                 body.Add(SectionLabel(UiText.Get(spots.Count > 0 ? "gather.title" : "gather.empty")));
+                if (spots.Count > 0 && gameplayRewardRules != null && gameplayRewardRules.harvestEnabled)
+                    body.Add(UiKit.Text(UiText.Get("reward.before-harvest"), "fr-tiny"));
                 bool guideMarked = false;
                 foreach (var spot in spots)
                 {

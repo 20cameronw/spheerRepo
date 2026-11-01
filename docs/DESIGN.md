@@ -47,8 +47,9 @@ resume stay unavailable until the tutorial is dismissed or opens another screen.
 Debris is embedded slightly into the local rendered terrain at spawn, not placed on the approximate ground sphere.
 Sylva uses the authored split land/ocean meshes: raised land is green, the ocean sphere blue, with a white atmosphere.
 Painted white cloud patches are disabled on this starting world only. Lumber Camp logs have a separate brown,
-nonmetallic wood material. Each placed structure recolors only `Structure_Accent` from its current instance level:
-orange, amber, lime, green, teal, cyan, blue, violet, magenta and gold at levels 1-10 (clamped beyond 10).
+nonmetallic wood material. Upgrade levels add visible barrels, antennas or modules instead of changing paint.
+The shard wallet sells permanent, empire-wide Ember, Jade, Cyan, Violet and Galaxy paint; Original is always free.
+Only `Structure_Accent` is repainted; Galaxy additionally has small star details.
 Foundations, armor, wood, glass and lights retain their materials; shared prefabs and level-one shop pictures do not change.
 Its atmosphere retains the standard authored diameter (5 units), including after terraforming; the terrain palette does not shrink the shell.
 Build cards show static pictures baked from the actual ModelLibrary structure prefabs. Research uses smaller
@@ -57,10 +58,10 @@ After model revisions, regenerate these textures with `Frontier/Models/Bake Stru
 (`Frontier.EditorTools.StructureThumbnails.Bake` in the Unity runner); no live preview cameras run during gameplay.
 Map zoom has three discrete levels: local planetary orbits, expanded neighboring systems with their orbits, and collapsed
 systems in a wider overview. Plus/minus change one level per press; pinch and wheel use the same levels.
-World overzoom enters a minimal map: only a safe-area location bar, return arrow and Info action remain.
+World overzoom enters a pannable minimal map: the safe-area location bar, return arrow, Show action and +/- remain.
 The location broadens from current planet/system to nearby systems to the current system's sector coordinates.
-Info reveals the existing search/filter/destination/travel interface without changing zoom or selection;
-the eye action hides it again. The Map dock still opens the full controls directly. Further inward zoom at the
+Show or selecting a planet reveals search/filter/destination/travel without changing zoom;
+Hide returns to the minimal map. The Map dock still opens the full controls directly. Further inward zoom at the
 current planet's local-system level returns smoothly to orbit; another world's selection opens its controls, never teleports.
 Local orbits retain a fixed 0.65 height/width ratio, fitting both viewport bounds with one radius;
 hiding info reveals more chart space without stretching orbits vertically.
@@ -95,10 +96,10 @@ Contextual shortages first compare usable, locally stored and explicitly remote
 stock, then production and reachable discovered worlds. A shortfall names its actual quantity.
 Shortage panels do not inject previous-step or return-to controls into other panels.
 Missing-resource chips open a smaller dimmed overlay without discarding the originating screen.
-Keep exact quantities, source names and travel/storage warnings visible; source actions use icon buttons
-with localized tooltips. Back, close and backdrop dismiss only that overlay; choosing a source opens its real destination.
-All shortage source, capacity and manual actions share one compact horizontal strip below the explanations,
-wrapping only when needed; source-specific tooltips identify their destination.
+Keep exact quantities, source names and travel/storage warnings visible; source actions have visible localized text
+and icons. Back, close and backdrop dismiss only that overlay; choosing a source opens its real destination.
+Actions stack within their source explanations. Ready local gatherers offer Harvest directly; other sources
+open their building, storage, relay or map. Atlas/capacity actions follow the source groups.
 Project tracking is explicit; card headings use a small star action instead of an extra full-width button.
 Stars are borderless glyphs with full touch targets: outlined when off, filled cyan when tracked, with an action tooltip.
 Resume is a star in the top-right
@@ -123,8 +124,10 @@ The return summary links completed jobs and stored offline output to their real 
 Reward offers use explicit ad labels and exact bonuses beside the normal action. iOS gameplay ads are enabled;
 watching remains player-initiated, with a contextual advertising-only consent prompt before the first request.
 Offers remain visible with a disabled button and explicit playback/cooldown reason when unavailable;
-Editor/desktop does not simulate ads or rewards. Construction's offer sits beside its timer, and harvest's
-exact bonus is visible from the first successful result. Ordinary collection/waiting remains available.
+Editor and desktop development builds simulate a five-second rewarded video with a visible countdown;
+release desktop builds do not grant simulated rewards. Native mobile providers retain their normal flow.
+Construction's offer sits beside its timer. Harvest explains the optional boost before play and shows the exact
+bonus on the result, explicitly before Collect. Ordinary collection/waiting remains available.
 Available Place buttons share one row with a compact crystal/price action. That action buys an unlocked
 structure instantly without materials or a builder, at twice its timer-skip price (minimum 10 shards).
 The pad-selection banner repeats the price; choosing a pad confirms the spend, while cancellation is free.
@@ -480,6 +483,9 @@ They are the acceptance test for legibility and consistency.
 The menu's **DEBUG** tile and page exist only when `Debug.isDebugBuild || Application.isEditor` (`UIRoot.DebugToolsAvailable`). The
 harness runs in the editor and still captures them; the `menu-release` shot forces the release behaviour
 (`DebugMenuAsRelease()`) to prove the gate hides the tile.
+State controls set exact shards, XP, resource quantities, tool tiers, research, individual upgrades and building
+levels. Construction/next-level upgrade timers can be edited or completed, and all six harvest minigames can
+be launched on synthetic test deposits without travelling. These controls deliberately mutate the test save.
 
 ## 8. Verifying a change
 

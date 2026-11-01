@@ -181,8 +181,11 @@ namespace Frontier
         {
             DebugReset();
             var spots = gs.SpotsFor(gs.planet, kind);
-            if (spots.Count == 0) return false;
-            StartGather(spots[0], null, 0f);
+            var spot = spots.Count > 0 ? spots[0] : new GatherSpot
+            {
+                game = kind, resource = gs.db.scrap, baseYield = 10, difficulty = 0.5f
+            };
+            StartGather(spot, null, 0f);
             return true;
         }
 

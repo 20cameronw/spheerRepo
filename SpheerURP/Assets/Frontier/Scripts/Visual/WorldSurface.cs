@@ -170,7 +170,7 @@ namespace Frontier
 
         void RebuildStructures()
         {
-            var sb = new StringBuilder(gs.planet.Id);
+            var sb = new StringBuilder(gs.planet.Id).Append(':').Append(gs.BuildingTheme);
             foreach (var s in gs.structures)
                 if (s.planetId == gs.planet.Id)
                     sb.Append('|').Append(s.def.id).Append(s.slot).Append(':').Append(s.level)
@@ -217,10 +217,10 @@ namespace Frontier
             if (buildMode) RebuildPads();
         }
 
-        static string StructureRevision(PlacedStructure s)
+        string StructureRevision(PlacedStructure s)
         {
             return s.def.id + ":" + s.level + ":" + s.record.buildEndUtc + ":" +
-                s.record.upgradeEndUtc + ":" + s.record.pendingUpgradeLevel;
+                s.record.upgradeEndUtc + ":" + s.record.pendingUpgradeLevel + ":" + gs.BuildingTheme;
         }
 
         void RebuildPads()
@@ -320,6 +320,7 @@ namespace Frontier
                     Destroy(visual);
                 }
             }
+            StructureAppearance.AddLevelDetails(it.visual, s.def.kind, s.level, gs.BuildingTheme);
             PrepareStructure(it, c);
             if (it.pending)
             {
@@ -410,7 +411,7 @@ namespace Frontier
                     Color tint = src != null && src.HasProperty("_BaseColor") ? src.GetColor("_BaseColor")
                         : src != null && src.HasProperty("_Color") ? src.GetColor("_Color") : Color.gray;
                     if (src != null && src.name == "Structure_Accent")
-                        tint = StructureAppearance.AccentForLevel(item.level);
+                        tint = StructureAppearance.ThemeAccent(gs.BuildingTheme, tint);
                     bool preserveSurface = src != null &&
                         (src.renderQueue >= (int)UnityEngine.Rendering.RenderQueue.Transparent ||
                          src.IsKeywordEnabled("_EMISSION"));
@@ -665,6 +666,7 @@ namespace Frontier
             go.SetActive(false);
             go.transform.SetParent(parent, false);
             go.transform.localPosition = new Vector3(0f, height, 0f);
+            go.transform.localScale = Vector3.one * 0.45f;
             var document = go.AddComponent<UIDocument>();
             document.panelSettings = labelPanel;
             document.worldSpaceSizeMode = UIDocument.WorldSpaceSizeMode.Dynamic;

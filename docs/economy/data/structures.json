@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1,
+  "contentVersion": 2,
   "generator": "frontier-economy-dev",
   "family": "structures",
   "items": [
@@ -226,7 +226,7 @@
               "amount": 9
             }
           ],
-          "buildSeconds": 2370,
+          "buildSeconds": 2610,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 2,
@@ -256,7 +256,7 @@
               "amount": 15
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 2.25,
@@ -477,7 +477,7 @@
               "amount": 7
             }
           ],
-          "buildSeconds": 2370,
+          "buildSeconds": 2610,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 2,
@@ -507,7 +507,7 @@
               "amount": 11
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 2.25,
@@ -738,7 +738,7 @@
               "amount": 40
             }
           ],
-          "buildSeconds": 2640,
+          "buildSeconds": 2970,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.4,
@@ -768,7 +768,7 @@
               "amount": 65
             }
           ],
-          "buildSeconds": 5700,
+          "buildSeconds": 6900,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.6,
@@ -798,7 +798,7 @@
               "amount": 130
             }
           ],
-          "buildSeconds": 13800,
+          "buildSeconds": 15600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.8,
@@ -1017,7 +1017,7 @@
               "amount": 65
             }
           ],
-          "buildSeconds": 3030,
+          "buildSeconds": 3570,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.4,
@@ -1047,7 +1047,7 @@
               "amount": 110
             }
           ],
-          "buildSeconds": 6900,
+          "buildSeconds": 8400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.6,
@@ -1077,7 +1077,7 @@
               "amount": 240
             }
           ],
-          "buildSeconds": 16800,
+          "buildSeconds": 18300,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.8,
@@ -1256,7 +1256,7 @@
               "amount": 360
             }
           ],
-          "buildSeconds": 2550,
+          "buildSeconds": 2850,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -1286,7 +1286,7 @@
               "amount": 650
             }
           ],
-          "buildSeconds": 5700,
+          "buildSeconds": 6900,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.2,
@@ -1316,7 +1316,7 @@
               "amount": 2600
             }
           ],
-          "buildSeconds": 14400,
+          "buildSeconds": 16200,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.4,
@@ -1551,7 +1551,7 @@
               "amount": 290
             }
           ],
-          "buildSeconds": 2550,
+          "buildSeconds": 2850,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -1581,7 +1581,7 @@
               "amount": 530
             }
           ],
-          "buildSeconds": 5700,
+          "buildSeconds": 6900,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.2,
@@ -1611,7 +1611,7 @@
               "amount": 1400
             }
           ],
-          "buildSeconds": 14400,
+          "buildSeconds": 16200,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.4,
@@ -1838,7 +1838,7 @@
               "amount": 490
             }
           ],
-          "buildSeconds": 2550,
+          "buildSeconds": 2850,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -1868,7 +1868,7 @@
               "amount": 190
             }
           ],
-          "buildSeconds": 5700,
+          "buildSeconds": 6900,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.2,
@@ -1898,7 +1898,7 @@
               "amount": 420
             }
           ],
-          "buildSeconds": 14400,
+          "buildSeconds": 16200,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.4,
@@ -2193,7 +2193,7 @@
               "amount": 30
             }
           ],
-          "buildSeconds": 3120,
+          "buildSeconds": 3600,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 100,
@@ -2223,7 +2223,7 @@
               "amount": 50
             }
           ],
-          "buildSeconds": 7500,
+          "buildSeconds": 8700,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 150,
@@ -2418,7 +2418,7 @@
               "amount": 60
             }
           ],
-          "buildSeconds": 2070,
+          "buildSeconds": 2160,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 40,
@@ -2448,7 +2448,7 @@
               "amount": 110
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 64,
@@ -2478,7 +2478,7 @@
               "amount": 210
             }
           ],
-          "buildSeconds": 10800,
+          "buildSeconds": 12600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 100,
@@ -2508,7 +2508,7 @@
               "amount": 510
             }
           ],
-          "buildSeconds": 26100,
+          "buildSeconds": 26400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 150,
@@ -2711,7 +2711,7 @@
               "amount": 90
             }
           ],
-          "buildSeconds": 2070,
+          "buildSeconds": 2160,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 40,
@@ -2741,7 +2741,7 @@
               "amount": 170
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 64,
@@ -2771,7 +2771,7 @@
               "amount": 380
             }
           ],
-          "buildSeconds": 10800,
+          "buildSeconds": 12600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 100,
@@ -2801,7 +2801,7 @@
               "amount": 1000
             }
           ],
-          "buildSeconds": 26100,
+          "buildSeconds": 26400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 150,
@@ -2934,7 +2934,7 @@
               "amount": 660
             }
           ],
-          "buildSeconds": 2070,
+          "buildSeconds": 2160,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 8,
@@ -2968,7 +2968,7 @@
               "amount": 770
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 14,
@@ -3002,7 +3002,7 @@
               "amount": 1500
             }
           ],
-          "buildSeconds": 10800,
+          "buildSeconds": 12600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 24,
@@ -3036,7 +3036,7 @@
               "amount": 3800
             }
           ],
-          "buildSeconds": 26100,
+          "buildSeconds": 26400,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 40,
@@ -3249,7 +3249,7 @@
               "amount": 1600
             }
           ],
-          "buildSeconds": 2220,
+          "buildSeconds": 2370,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 4,
@@ -3279,7 +3279,7 @@
               "amount": 2800
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 8,
@@ -3313,7 +3313,7 @@
               "amount": 410
             }
           ],
-          "buildSeconds": 12000,
+          "buildSeconds": 13800,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 14,
@@ -3726,7 +3726,7 @@
               "amount": 24
             }
           ],
-          "buildSeconds": 2370,
+          "buildSeconds": 2610,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 0,
@@ -3756,7 +3756,7 @@
               "amount": 40
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 0,
@@ -3937,7 +3937,7 @@
               "amount": 190
             }
           ],
-          "buildSeconds": 2130,
+          "buildSeconds": 2250,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 0.75,
@@ -3967,7 +3967,7 @@
               "amount": 330
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0.9,
@@ -3997,7 +3997,7 @@
               "amount": 610
             }
           ],
-          "buildSeconds": 10200,
+          "buildSeconds": 12000,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.05,
@@ -4144,7 +4144,7 @@
               "amount": 230
             }
           ],
-          "buildSeconds": 1920,
+          "buildSeconds": 1980,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 0,
@@ -4174,7 +4174,7 @@
               "amount": 400
             }
           ],
-          "buildSeconds": 3600,
+          "buildSeconds": 4500,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 0,
@@ -4204,7 +4204,7 @@
               "amount": 680
             }
           ],
-          "buildSeconds": 9600,
+          "buildSeconds": 11400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0,
@@ -4234,7 +4234,7 @@
               "amount": 1600
             }
           ],
-          "buildSeconds": 23700,
+          "buildSeconds": 24300,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0,
@@ -4333,7 +4333,7 @@
               "amount": 1800
             }
           ],
-          "buildSeconds": 2220,
+          "buildSeconds": 2370,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0.86,
@@ -4363,7 +4363,7 @@
               "amount": 200
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0.79,
@@ -4397,7 +4397,7 @@
               "amount": 750
             }
           ],
-          "buildSeconds": 12000,
+          "buildSeconds": 13800,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 0.72,
@@ -4830,7 +4830,7 @@
               "amount": 55
             }
           ],
-          "buildSeconds": 2370,
+          "buildSeconds": 2610,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 3.4,
@@ -4860,7 +4860,7 @@
               "amount": 95
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 3.7,
@@ -5045,7 +5045,7 @@
               "amount": 350
             }
           ],
-          "buildSeconds": 2550,
+          "buildSeconds": 2850,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 2.5,
@@ -5079,7 +5079,7 @@
               "amount": 170
             }
           ],
-          "buildSeconds": 5700,
+          "buildSeconds": 6900,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2.8,
@@ -5113,7 +5113,7 @@
               "amount": 450
             }
           ],
-          "buildSeconds": 14400,
+          "buildSeconds": 16200,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 3.1,
@@ -5374,7 +5374,7 @@
               "amount": 340
             }
           ],
-          "buildSeconds": 2550,
+          "buildSeconds": 2850,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.2,
@@ -5408,7 +5408,7 @@
               "amount": 630
             }
           ],
-          "buildSeconds": 5700,
+          "buildSeconds": 6900,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.4,
@@ -5442,7 +5442,7 @@
               "amount": 1400
             }
           ],
-          "buildSeconds": 14400,
+          "buildSeconds": 16200,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1.6,
@@ -5635,7 +5635,7 @@
               "amount": 350
             }
           ],
-          "buildSeconds": 2070,
+          "buildSeconds": 2160,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.9,
@@ -5665,7 +5665,7 @@
               "amount": 630
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2.2,
@@ -5695,7 +5695,7 @@
               "amount": 1200
             }
           ],
-          "buildSeconds": 10800,
+          "buildSeconds": 12600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2.5,
@@ -5725,7 +5725,7 @@
               "amount": 2400
             }
           ],
-          "buildSeconds": 26100,
+          "buildSeconds": 26400,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 2.8,
@@ -5936,7 +5936,7 @@
               "amount": 670
             }
           ],
-          "buildSeconds": 2070,
+          "buildSeconds": 2160,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.9,
@@ -5966,7 +5966,7 @@
               "amount": 710
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2.2,
@@ -5996,7 +5996,7 @@
               "amount": 1300
             }
           ],
-          "buildSeconds": 10800,
+          "buildSeconds": 12600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2.5,
@@ -6026,7 +6026,7 @@
               "amount": 3072
             }
           ],
-          "buildSeconds": 26100,
+          "buildSeconds": 26400,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 2.8,
@@ -6237,7 +6237,7 @@
               "amount": 670
             }
           ],
-          "buildSeconds": 2070,
+          "buildSeconds": 2160,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.6,
@@ -6267,7 +6267,7 @@
               "amount": 210
             }
           ],
-          "buildSeconds": 3900,
+          "buildSeconds": 5100,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2,
@@ -6297,7 +6297,7 @@
               "amount": 380
             }
           ],
-          "buildSeconds": 10800,
+          "buildSeconds": 12600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 2.4,
@@ -6327,7 +6327,7 @@
               "amount": 1100
             }
           ],
-          "buildSeconds": 26100,
+          "buildSeconds": 26400,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 2.8,
@@ -6652,7 +6652,7 @@
               "amount": 18
             }
           ],
-          "buildSeconds": 2370,
+          "buildSeconds": 2610,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.2,
@@ -6682,7 +6682,7 @@
               "amount": 30
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1.35,
@@ -6721,7 +6721,7 @@
               "amount": 60
             }
           ],
-          "buildSeconds": 5,
+          "buildSeconds": 60,
           "requiresReachTier": 1,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -6743,7 +6743,7 @@
               "amount": 9
             }
           ],
-          "buildSeconds": 19,
+          "buildSeconds": 125,
           "requiresReachTier": 1,
           "requiresLabLevel": 0,
           "effect": 2,
@@ -6769,7 +6769,7 @@
               "amount": 16
             }
           ],
-          "buildSeconds": 54,
+          "buildSeconds": 260,
           "requiresReachTier": 2,
           "requiresLabLevel": 0,
           "effect": 3,
@@ -6799,7 +6799,7 @@
               "amount": 45
             }
           ],
-          "buildSeconds": 155,
+          "buildSeconds": 565,
           "requiresReachTier": 2,
           "requiresLabLevel": 0,
           "effect": 4,
@@ -6829,7 +6829,7 @@
               "amount": 75
             }
           ],
-          "buildSeconds": 470,
+          "buildSeconds": 1170,
           "requiresReachTier": 3,
           "requiresLabLevel": 0,
           "effect": 5,
@@ -6863,7 +6863,7 @@
               "amount": 25
             }
           ],
-          "buildSeconds": 1380,
+          "buildSeconds": 2250,
           "requiresReachTier": 3,
           "requiresLabLevel": 0,
           "effect": 6,
@@ -6897,7 +6897,7 @@
               "amount": 45
             }
           ],
-          "buildSeconds": 2910,
+          "buildSeconds": 4200,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 7,
@@ -6931,7 +6931,7 @@
               "amount": 85
             }
           ],
-          "buildSeconds": 7500,
+          "buildSeconds": 7800,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 8,
@@ -6965,7 +6965,7 @@
               "amount": 180
             }
           ],
-          "buildSeconds": 19500,
+          "buildSeconds": 15000,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 9,
@@ -6999,7 +6999,7 @@
               "amount": 410
             }
           ],
-          "buildSeconds": 42300,
+          "buildSeconds": 25500,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 10,
@@ -7190,7 +7190,7 @@
               "amount": 24
             }
           ],
-          "buildSeconds": 1920,
+          "buildSeconds": 1980,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 105,
@@ -7220,7 +7220,7 @@
               "amount": 40
             }
           ],
-          "buildSeconds": 3480,
+          "buildSeconds": 4200,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 120,
@@ -7353,7 +7353,7 @@
               "amount": 1000
             }
           ],
-          "buildSeconds": 2280,
+          "buildSeconds": 2490,
           "requiresReachTier": 4,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -7383,7 +7383,7 @@
               "amount": 2200
             }
           ],
-          "buildSeconds": 5100,
+          "buildSeconds": 6000,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -7417,7 +7417,7 @@
               "amount": 1400
             }
           ],
-          "buildSeconds": 13800,
+          "buildSeconds": 15600,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 1,
@@ -7648,7 +7648,7 @@
               "amount": 770
             }
           ],
-          "buildSeconds": 2220,
+          "buildSeconds": 2370,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0.105,
@@ -7674,7 +7674,7 @@
               "amount": 1968
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 0.14,
@@ -7704,7 +7704,7 @@
               "amount": 950
             }
           ],
-          "buildSeconds": 12000,
+          "buildSeconds": 13800,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 0.175,
@@ -7953,7 +7953,7 @@
               "amount": 2300
             }
           ],
-          "buildSeconds": 2220,
+          "buildSeconds": 2370,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 10,
@@ -7983,7 +7983,7 @@
               "amount": 2200
             }
           ],
-          "buildSeconds": 4500,
+          "buildSeconds": 5400,
           "requiresReachTier": 5,
           "requiresLabLevel": 0,
           "effect": 12,
@@ -8013,7 +8013,7 @@
               "amount": 3800
             }
           ],
-          "buildSeconds": 12000,
+          "buildSeconds": 13800,
           "requiresReachTier": 6,
           "requiresLabLevel": 0,
           "effect": 14,

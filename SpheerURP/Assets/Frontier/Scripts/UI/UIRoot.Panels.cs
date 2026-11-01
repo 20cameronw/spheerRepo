@@ -58,6 +58,7 @@ namespace Frontier
 
         void CloseModal()
         {
+            themePurchaseArmed = null;
             accountDeletionPlayerId = null;
             confirmAscension = false;
             confirmBuilderFinish = null;
@@ -377,6 +378,7 @@ namespace Frontier
             balance.Add(UiKit.Text(UiText.Get("shards.balance", gs.ShardBalance.ToString("N0")), "fr-h1", UiKit.Magenta));
             balance.Add(UiKit.Text(UiText.Get("shards.uses-help"), "fr-muted"));
             body.Add(balance);
+            BuildBuildingThemeShop(body);
             BuildShardAdOffer(body);
             BuildRewardRecovery(body);
         }
@@ -661,6 +663,50 @@ namespace Frontier
             version.style.marginTop = UiKit.Space.S8;
             card.Add(version);
             body.Add(card);
+            body.Add(SectionLabel(UiText.Get("about.mission")));
+            body.Add(UiKit.Text(UiText.Get("about.story"), "fr-muted"));
+            body.Add(SectionLabel(UiText.Get("about.play")));
+            body.Add(UiKit.Text(UiText.Get("about.promise"), "fr-muted"));
+            body.Add(IconBtn(UiText.Get("menu.tutorial"), "tutorial", UiKit.Cyan, () =>
+            {
+                menuPage = "tutorial";
+                RefreshModal();
+            }));
+        }
+
+        string themePurchaseArmed;
+
+        void BuildBuildingThemeShop(VisualElement body)
+        {
+            body.Add(SectionLabel(UiText.Get("theme.shop")));
+            body.Add(UiKit.Text(UiText.Get("theme.help"), "fr-muted"));
+            foreach (string id in GameState.BuildingThemes)
+            {
+                string theme = id;
+                bool owned = gs.OwnsBuildingTheme(theme);
+                int price = gs.BuildingThemePrice(theme);
+                var color = StructureAppearance.ThemeAccent(theme, UiKit.Amber);
+                var card = Card(color, gs.BuildingTheme == theme);
+                card.name = "theme-" + theme;
+                card.Add(UiKit.Text(UiText.Get("theme." + theme), "fr-h2", color));
+                if (theme == "galaxy") card.Add(UiKit.Text(UiText.Get("theme.galaxy-help"), "fr-muted"));
+                string label = gs.BuildingTheme == theme ? UiText.Get("theme.equipped") :
+                    owned ? UiText.Get("theme.equip") : UiText.Get(themePurchaseArmed == theme ? "theme.confirm" : "theme.buy", price);
+                var buy = IconBtn(label, "star", color, () =>
+                {
+                    if (!owned && themePurchaseArmed != theme) { themePurchaseArmed = theme; RefreshModal(); return; }
+                    bool applied = gs.PurchaseBuildingTheme(theme, price, out var message);
+                    themePurchaseArmed = null;
+                    Toast(message, applied ? UiKit.Lime : UiKit.Amber);
+                    RefreshModal();
+                });
+                buy.name = "theme-buy-" + theme;
+                UiKit.SetEnabledLook(buy, gs.BuildingTheme != theme && price >= 0 && gs.ShardBalance >= price && !gs.SaveIsReadOnly);
+                card.Add(buy);
+                if (price > gs.ShardBalance) card.Add(Note(UiText.Get("crew.purchase.shards-missing"), UiKit.Amber));
+                body.Add(card);
+            }
+            body.Add(IconBtn(UiText.Get("theme.timers"), "builders", UiKit.Cyan, () => { CloseAll(); OpenBuilders(); }));
         }
 
         bool confirmReset;
@@ -1591,6 +1637,8 @@ namespace Frontier
         void BuildBuilderFinishAction(VisualElement body, PlacedStructure job, Action refresh, Label status = null)
         {
             int cost = gs.BuilderSkipCost(job);
+            if (gs.FirstSessionGuideAvailable && cost > 0)
+                body.Add(UiKit.Text(UiText.Get("crew.starter-help", cost), "fr-muted"));
             bool confirming = confirmBuilderFinish == job;
             string key = cost == 0 ? confirming ? "builders.confirm-free" : "builders.finish-free" :
                 confirming ? "builders.confirm-paid" : "builders.finish-paid";
@@ -1945,6 +1993,9 @@ namespace Frontier
         void BuildDebug(VisualElement body)
         {
             body.Add(UiKit.Text(UiText.Get("debug.header"), "fr-muted", UiKit.Red));
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            BuildStateTestControls(body);
+#endif
             BuildServiceDiagnostics(body);
 
             var give = Card(UiKit.Amber);

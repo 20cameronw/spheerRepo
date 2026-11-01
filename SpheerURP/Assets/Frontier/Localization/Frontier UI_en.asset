@@ -410,8 +410,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1991336029
-    m_Localized: Build bases across the stars. Gather, refine, travel, and defend
-      your worlds from alien waves.
+    m_Localized: Frontier is a pocket-sized expedition across the stars. Start with
+      a landing ship and a handful of supplies. Leave behind a connected civilization.
     m_Metadata:
       m_Items: []
   - m_Id: 1991336030
@@ -8337,7 +8337,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205697
-    m_Localized: One upgrade improves both vein mining and pressure drilling.
+    m_Localized: 'One equipment upgrade powers two jobs. Mining follows exposed veins
+      with precision. Deep drilling reaches buried deposits: balance pressure and
+      let the drill cool.'
     m_Metadata:
       m_Items: []
   - m_Id: 2102386658205698
@@ -8929,19 +8931,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514391
-    m_Localized: OPEN LOCAL PRODUCER
+    m_Localized: Open producer
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514392
-    m_Localized: FIND A LOCAL PRODUCER
+    m_Localized: Build producer
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514393
-    m_Localized: FIND A SUPPLYING WORLD
+    m_Localized: Find on map
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514394
-    m_Localized: BROWSE RESOURCE ATLAS
+    m_Localized: Resource Atlas
     m_Metadata:
       m_Items: []
   - m_Id: 4492703491514395
@@ -9476,11 +9478,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5105920542597120
-    m_Localized: Info
+    m_Localized: Show
     m_Metadata:
       m_Items: []
   - m_Id: 5105920580345856
-    m_Localized: Hide map info
+    m_Localized: Hide
     m_Metadata:
       m_Items: []
   - m_Id: 5105920580345857
@@ -9497,6 +9499,231 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5105920580345860
     m_Localized: '{0} / Sector {1}, {2}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886810451968
+    m_Localized: Harvest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395008
+    m_Localized: Our mission
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395009
+    m_Localized: 'Your crew follows fragments of an old interstellar network. Every
+      harvested vein, antenna and outpost brings its silent worlds back into contact.
+      The signal also attracts raiders: build defenses before calling stronger waves.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395010
+    m_Localized: Your expedition, your pace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395011
+    m_Localized: Harvest by hand, turn raw supplies into fuel, and choose your next
+      world. Research opens new equipment; upgraded buildings visibly grow. Nova
+      Shards can shorten construction or change your colony paint. Ads are always
+      optional, and cosmetics never change your strength.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395012
+    m_Localized: Colony paint shop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395013
+    m_Localized: Buy once, equip freely across all your buildings. Paint never changes
+      stats. Upgrades add hardware instead of changing your chosen color.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395014
+    m_Localized: Original paint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395015
+    m_Localized: Ember orange
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395016
+    m_Localized: Jade green
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395017
+    m_Localized: Ion blue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395018
+    m_Localized: Nebula violet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395019
+    m_Localized: Galaxy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395020
+    m_Localized: Deep-space violet paint with a constellation of bright stars.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395021
+    m_Localized: Equipped
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395022
+    m_Localized: Equip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395023
+    m_Localized: 'Buy: {0} shards'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395024
+    m_Localized: 'Confirm purchase: {0} shards'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395025
+    m_Localized: This paint cannot be purchased right now. No shards were spent.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395026
+    m_Localized: Could not save your paint purchase. No shards were spent. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395027
+    m_Localized: '{0} equipped across your colonies.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395028
+    m_Localized: Construction and crews
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395029
+    m_Localized: Your expedition starts with 20 Nova Shards. Try finishing this job
+      for {0} shards, or keep them and let the timer finish naturally.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395030
+    m_Localized: After the run, choose Collect or watch an optional ad for double
+      yield before collecting.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395031
+    m_Localized: Your haul is ready, not yet collected. Choose below.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395032
+    m_Localized: Test ad preview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395033
+    m_Localized: Development preview only. No real ad is requested. Completion tests
+      the normal reward flow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395034
+    m_Localized: Reward in {0}s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395035
+    m_Localized: Test account controls bypass normal costs and gates. Changes are
+      saved. Harvest tests can run anywhere; synthetic deposits use scrap when the
+      world has none.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395036
+    m_Localized: Apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395037
+    m_Localized: Enter a non-negative value.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395038
+    m_Localized: Player level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395039
+    m_Localized: Finish all construction jobs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395040
+    m_Localized: Research unlocks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395041
+    m_Localized: Individual tool tiers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395042
+    m_Localized: Individual upgrades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395043
+    m_Localized: Exact inventory (ignores capacity)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395044
+    m_Localized: Placed buildings and timers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395045
+    m_Localized: Job seconds remaining
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395046
+    m_Localized: Place a test building
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395047
+    m_Localized: No free, unobstructed pad. Choose another test world.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395048
+    m_Localized: Play any harvest minigame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6140886852395049
+    m_Localized: 'Mining: trace veins. Drilling: control heat and pressure. Siphoning:
+      pump rhythm. Excavation: scan buried targets. Salvage: tether wreckage. Normal
+      results and rewards are used; these runs change your test inventory.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6142263557185536
+    m_Localized: Timer upgrades to the next level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6145382752018432
+    m_Localized: Exact XP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6145382814932992
+    m_Localized: Clearance timers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6145382814932993
+    m_Localized: '{0} / pad {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6150274518441984
+    m_Localized: 'All harvesting tools: tier {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6150274556190720
+    m_Localized: Unlock construction crew slot {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6150274560385024
+    m_Localized: Ascension
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6150274560385025
+    m_Localized: Autopilot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6150274560385026
+    m_Localized: Builder 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6150274560385027
+    m_Localized: Builder 3
     m_Metadata:
       m_Items: []
   references:

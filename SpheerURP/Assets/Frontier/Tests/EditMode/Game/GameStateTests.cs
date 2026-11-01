@@ -237,7 +237,7 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void DysonCollector_ClaimIsPlanetLocalAndRetainsBackpackOverflow()
+        public void DysonCollector_ClaimIsPlanetLocalAndRetainsFuelTankOverflow()
         {
             var state = NewState();
             var collector = state.DebugPlace(db.StructureOfKind(StructureKind.DysonCollector), 0);
@@ -245,24 +245,24 @@ namespace Frontier.Tests
             collector.record.offlineFuelEnergy = 2500.0;
             state.backpack.Clear();
             int filledSlots = 0;
-            ResourceSO freedResource = null;
             foreach (var resource in db.resources)
             {
                 if (resource == null || resource == db.fuel || filledSlots >= state.Slots) continue;
                 state.backpack.Set(resource.id, resource.stackSize);
-                if (freedResource == null) freedResource = resource;
                 filledSlots++;
             }
             Assert.AreEqual(state.Slots, state.SlotsUsed);
+            Assert.Greater(state.DysonFuelReady(collector), 0, "Full cargo must not block the separate fuel tank.");
+            state.backpack.Set(db.fuel.id, state.backpack.FreeSpace(db.fuel.id));
             Assert.AreEqual(0, state.DysonFuelReady(collector));
             Assert.AreEqual(0, state.ClaimDysonFuel(collector));
             Assert.AreEqual(2500.0, collector.record.offlineFuelEnergy, 0.001,
-                "full backpack does not discard the stored reserve");
+                "full fuel tank does not discard the stored reserve");
 
             state.DebugTeleport(state.universe.Get("glacia"));
             Assert.AreEqual(0, state.ClaimDysonFuel(collector), "fuel must be collected on the collector's planet");
             state.DebugTeleport(state.universe.Home);
-            state.backpack.Remove(freedResource.id, state.backpack.Count(freedResource.id));
+            state.backpack.Remove(db.fuel.id, db.fuel.stackSize);
             int claimed = state.ClaimDysonFuel(collector);
             Assert.Greater(claimed, 0);
             Assert.AreEqual(2500.0 - claimed * db.fuel.fuelEnergy, collector.record.offlineFuelEnergy, 0.001);

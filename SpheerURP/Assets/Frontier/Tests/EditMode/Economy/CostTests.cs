@@ -160,7 +160,8 @@ namespace Frontier.Economy.Tests
             }
             foreach (string id in new[] { "lumber", "mine", "refinery", "warehouse", "alarm", "gunner" })
                 Assert.AreEqual(0, _c.Structure(id).levels[0].buildSeconds, id + " first build is instant so the first session flows");
-            Assert.LessOrEqual(_c.Structure("research_lab").levels[0].buildSeconds, 10);
+            Assert.AreEqual(60, _c.Structure("research_lab").levels[0].buildSeconds,
+                "The first lab is a short, optional starter-shard demonstration.");
             Assert.GreaterOrEqual(_c.Structure("chem_reactor").levels[9].buildSeconds, 20 * 3600, "late levels climb to about a day");
             int ordinaryMax = 0;
             foreach (StructureDef s in _c.structures) if (s.role != StructureRole.Megaproject) foreach (StructureLevelDef d in s.levels) ordinaryMax = Math.Max(ordinaryMax, d.buildSeconds);

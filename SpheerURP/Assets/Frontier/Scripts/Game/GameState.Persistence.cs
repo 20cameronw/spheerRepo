@@ -336,6 +336,7 @@ namespace Frontier
             universe = UniverseService.For(db);
             objectivesInitialized = true;
             SetSetting(FirstSessionGuideStartedKey, "1");
+            AddShards(20);
             saveId = NewSaveId();
             createdWith = new CreatedWithInfo
             {

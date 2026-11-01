@@ -172,7 +172,7 @@ MonoBehaviour:
   baseBackpackSlots: 9
   baseReactorHealth: 100
   schemaVersion: 1
-  contentVersion: 1
+  contentVersion: 2
   builders: 1
   categoryHex:
   - '#D9A441'

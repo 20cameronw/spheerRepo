@@ -183,9 +183,6 @@ namespace Frontier
             var heading = UiKit.Div("fr-modal-head");
             heading.Add(Icons.Make(Icons.ForResource(resource), UiKit.Ui(resource.color)));
             heading.Add(UiKit.Text(resource.LocalizedName, "fr-modal-title"));
-            var track = ProjectTrackButton(project);
-            track.name = "shortage-track";
-            heading.Add(track);
             var close = Icons.IconButton("close", UiKit.Muted, CloseShortage);
             close.name = "shortage-close";
             close.tooltip = UiText.Get("common.close");
@@ -212,7 +209,7 @@ namespace Frontier
         void ShortageAction(VisualElement row, string labelKey, string icon, Color accent, Action action,
             string source = null)
         {
-            var button = Icons.IconButton(icon, accent, () => { CloseShortage(); action(); });
+            var button = IconBtn(UiText.Get(labelKey), icon, accent, () => { CloseShortage(); action(); });
             button.name = "shortage-" + labelKey.Substring("project.".Length);
             button.tooltip = UiText.Get(labelKey) + (string.IsNullOrEmpty(source) ? "" : "\n" + source);
             row.Add(button);
@@ -229,12 +226,14 @@ namespace Frontier
             int have = gs.ProjectResourceCount(project, resource);
             body.Add(UiKit.Text(UiText.Get("project.shortfall", shortageRequired, resource.LocalizedName,
                 have, Math.Max(0, shortageRequired - have)), "fr-small"));
-            var actions = UiKit.Div("fr-shortage-actions");
-            actions.name = "shortage-actions";
-            foreach (var source in gs.ResourceOptions(resource, shortageRequired, project.kind == "obstacle"))
+            foreach (var source in gs.ResourceOptions(resource, shortageRequired, project.kind == "obstacle")
+                .OrderBy(source => source.kind == ResourceSourceKind.Structure && source.structure.def.kind.IsGather() &&
+                    ReadyToHarvest(source.structure) ? 0 : 1))
             {
                 var section = UiKit.Div("fr-shortage-source");
                 body.Add(section);
+                var actions = UiKit.Div("fr-shortage-actions");
+                section.Add(actions);
                 if (source.kind == ResourceSourceKind.Usable)
                 {
                     section.Add(Note(UiText.Get("project.stock-ready"), UiKit.Lime));
@@ -258,10 +257,6 @@ namespace Frontier
                     {
                         ShortageAction(actions, "project.withdraw", "warehouse", UiKit.Cyan,
                             () => OpenSourceStructure(source.structure), sourceName);
-                        var depot = gs.db.StructureOfKind(StructureKind.CargoDepot);
-                        if (depot != null && project.kind != "obstacle")
-                            ShortageAction(actions, "project.connect", "cargo_depot", UiKit.Cyan,
-                                () => OpenProject(Project("build", depot.id)), sourceName);
                     }
                     else if (source.relay != null)
                     {
@@ -269,10 +264,11 @@ namespace Frontier
                         ShortageAction(actions, "project.open-relay", "satellite", UiKit.Cyan,
                             () => OpenSourceStructure(source.relay), sourceName);
                     }
-                    ShortageAction(actions, "project.view-world", "map", UiKit.Cyan, () =>
-                    {
-                        CloseAll(); OpenMap(); SelectMapWorld(source.planet); CenterOn(source.planet);
-                    }, sourceName);
+                    if (source.kind == ResourceSourceKind.RemoteStock)
+                        ShortageAction(actions, "project.view-world", "map", UiKit.Cyan, () =>
+                        {
+                            CloseAll(); OpenMap(); SelectMapWorld(source.planet); CenterOn(source.planet);
+                        }, sourceName);
                 }
                 else
                 {
@@ -281,28 +277,42 @@ namespace Frontier
                         var route = gs.PlanRoute(source.planet);
                         section.Add(Note(route.Has(RouteReasons.Hazard) ? UiText.Get("project.landing-blocked") :
                             RouteStatus(route), route.reachable ? UiKit.Cyan : UiKit.Amber));
-                        if (route.Has(RouteReasons.Hazard))
-                            ShortageAction(actions, "project.hull", "shield", UiKit.Amber,
-                                () => { CloseAll(); OpenShip(ShipPage.Systems); }, sourceName);
                     }
                     if (definition != null) section.Add(UiKit.Text(definition.LocalizedName, "fr-small"));
                     string label = source.kind == ResourceSourceKind.Structure ? "project.produce" :
                         source.kind == ResourceSourceKind.Build ? "project.build-producer" : "project.find-world";
                     string icon = source.kind == ResourceSourceKind.Build ? "build" :
                         definition != null ? StructureIcon(definition.kind) : "map";
-                    if (source.kind != ResourceSourceKind.Unavailable)
-                        ShortageAction(actions, label, icon, UiKit.Lime, () => OpenResourceSource(resource), sourceName);
+                    var spot = source.kind == ResourceSourceKind.Structure && source.structure.def.kind.IsGather()
+                        ? gs.SpotsFor(gs.planet, source.structure.def.kind).FirstOrDefault(item => item.resource == resource)
+                        : null;
+                    if (source.kind == ResourceSourceKind.Structure && source.structure.def.kind.IsGather() &&
+                        spot != null && ReadyToHarvest(source.structure))
+                    {
+                        ShortageAction(actions, "project.harvest", "play", UiKit.Lime,
+                            () => BeginHarvest(spot, source.structure), sourceName);
+                    }
+                    else if (source.kind != ResourceSourceKind.Unavailable)
+                        ShortageAction(actions, label, icon, UiKit.Lime, () =>
+                        {
+                            if (source.kind == ResourceSourceKind.Structure) OpenSourceStructure(source.structure);
+                            else if (source.kind == ResourceSourceKind.Build) OpenBuildDefinition(source.build);
+                            else { CloseAll(); OpenMapForResource(source.resource.id); SelectMapWorld(source.planet); CenterOn(source.planet); }
+                        }, sourceName);
                     if (source.reason != null) section.Add(Note(source.reason, UiKit.Amber));
                 }
+                actions.BringToFront();
             }
+            var generalActions = UiKit.Div("fr-shortage-actions");
+            generalActions.name = "shortage-actions";
             if (gs.FreeSpace(resource) <= 0)
             {
                 body.Add(Note(UiText.Get("project.capacity"), UiKit.Amber));
-                ShortageAction(actions, "project.capacity", "pack", UiKit.Amber,
+                ShortageAction(generalActions, "project.capacity", "pack", UiKit.Amber,
                     () => { CloseAll(); OpenShip(ShipPage.Cargo); });
             }
-            ShortageAction(actions, "project.manual", "tutorial", UiKit.Muted, () => OpenAtlasResource(resource));
-            body.Add(actions);
+            ShortageAction(generalActions, "project.manual", "tutorial", UiKit.Muted, () => OpenAtlasResource(resource));
+            body.Add(generalActions);
             var scroll = shortageScroll;
             scroll.schedule.Execute(() => scroll.scrollOffset = offset).StartingIn(1);
         }

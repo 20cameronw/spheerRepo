@@ -470,6 +470,24 @@ namespace Frontier
                     ui.DebugShip(0);
                     ui.DebugShortage(wood, gs.PlanetCount(wood) + 100);
                 });
+                yield return new Shot("player-theme-shop", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetShards(10000);
+                    ui.DebugMenu("shards");
+                    var card = ui.DebugRoot.Q("theme-original");
+                    var scroll = card.GetFirstAncestorOfType<ScrollView>();
+                    scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                });
+                yield return new Shot("player-theme-galaxy", () =>
+                {
+                    PreparePlayerFlowFixture();
+                    gs.DebugSetShards(10000);
+                    ui.DebugMenu("shards");
+                    var card = ui.DebugRoot.Q("theme-galaxy");
+                    var scroll = card.GetFirstAncestorOfType<ScrollView>();
+                    scroll.schedule.Execute(() => scroll.ScrollTo(card)).StartingIn(1);
+                });
                 yield return new Shot("player-project", () =>
                 {
                     PreparePlayerFlowFixture();
@@ -606,6 +624,17 @@ namespace Frontier
                 yield return new Shot("zoom-flow-minimal-neighbors", () => { PrepareFlowReview(); ui.DebugMinimalMap(4f); });
                 yield return new Shot("zoom-flow-minimal-sector", () => { PrepareFlowReview(); ui.DebugMinimalMap(1f); });
                 yield return new Shot("zoom-flow-full-controls", () => { PrepareFlowReview(); ui.DebugMap(gs.planet); });
+                yield return new Shot("world-refine-galaxy", () =>
+                {
+                    PrepareFlowReview();
+                    var turret = At(StructureKind.Gunner);
+                    if (turret == null) throw new InvalidOperationException("Galaxy review requires the seeded Gunner.");
+                    gs.DebugSetStructureLevel(turret, 8);
+                    gs.DebugSetShards(10000);
+                    if (!gs.PurchaseBuildingTheme("galaxy", 10000, out var error)) throw new InvalidOperationException(error);
+                    rt.Planet.CloseView = true;
+                    StartCoroutine(CenterStructureForCapture(turret, new Vector2(0.5f, 0.4f)));
+                }, 1f);
                 yield return new Shot("world-refine-overview", () => { PrepareFlowReview(); rt.Planet.Zoom01 = 0f; });
                 yield return new Shot("world-refine-lumber", () =>
                 {

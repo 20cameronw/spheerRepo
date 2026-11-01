@@ -60,6 +60,16 @@
 .fr-world-pad { width: 56px; }
 .fr-world-pad > .unity-label { font-size: 36px; -unity-text-align: middle-center; }
 .fr-row { flex-direction: row; align-items: center; }
+.fr-minigame-controls { width: 100%; }
+.fr-minigame-controls > .fr-btn {
+    flex-basis: 0; flex-grow: 1; flex-shrink: 1; min-width: 0; white-space: normal;
+}
+.fr-debug-state .unity-base-field__input {
+    background-color: var(--fr-surface-1); color: var(--fr-text-hi);
+}
+.fr-row > Label, .fr-card-head > Label {
+    flex-shrink: 1; min-width: 0; white-space: normal;
+}
 .fr-row-wrap { flex-direction: row; flex-wrap: wrap; align-items: center; }
 .fr-spacer { flex-grow: 1; }
 .fr-gap-top { margin-top: var(--fr-sp-12); }
@@ -281,7 +291,7 @@
 .fr-modal-head .fr-iconbtn-icon, .fr-popup-close .fr-iconbtn-icon { width: 44px; height: 44px; }
 .fr-popup-close { background-color: var(--fr-surface-2); border-color: var(--fr-outline-strong); }
 .fr-modal-title {
-    flex-grow: 1; margin-left: var(--fr-sp-16);
+    flex-grow: 1; flex-shrink: 1; min-width: 0; white-space: normal; margin-left: var(--fr-sp-16);
     font-size: var(--fr-fs-title); letter-spacing: 3px; color: var(--fr-text-hi);
     -unity-font-definition: url("/Assets/Frontier/Art/Fonts/ChakraPetch-Bold-SDF.asset");
 }
@@ -291,10 +301,10 @@
 .fr-shortage .fr-modal-head .fr-iconbtn { margin-left: var(--fr-sp-8); }
 .fr-shortage-source { margin-top: var(--fr-sp-12); }
 .fr-shortage-actions {
-    flex-direction: row; flex-wrap: wrap; align-items: center;
+    flex-direction: column; align-items: stretch;
     flex-shrink: 0; min-width: 0; margin-top: var(--fr-sp-12);
 }
-.fr-shortage-actions .fr-iconbtn { margin-right: var(--fr-sp-8); margin-bottom: var(--fr-sp-8); }
+.fr-shortage-actions .fr-btn { margin-left: 0; margin-bottom: var(--fr-sp-8); max-width: 100%; }
 
 .fr-tabs { flex-direction: row; margin-bottom: var(--fr-sp-12); flex-shrink: 0; }
 .fr-tab {

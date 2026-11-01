@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Frontier.Data::Frontier.EconomyTuningSO
   lockedFields: []
   schemaVersion: 1
-  digest: 1c0c735faed632a4
+  digest: cef24abbcdba862c
   values:
   - key: value.premium.refinery
     value: 0.1
@@ -47,9 +47,9 @@ MonoBehaviour:
   - key: time.anchor.6
     value: 1800
   - key: time.anchor.7
-    value: 3600
+    value: 4500
   - key: time.anchor.8
-    value: 10800
+    value: 12600
   - key: time.anchor.9
     value: 28800
   - key: time.anchor.10
@@ -419,9 +419,9 @@ MonoBehaviour:
   - key: cost.g.research_lab
     value: 1.8
   - key: time.start.research_lab
-    value: 1
+    value: 3
   - key: time.step.research_lab
-    value: 0.95
+    value: 0.65
   - key: cost.v.radar_tower
     value: 60
   - key: cost.g.radar_tower

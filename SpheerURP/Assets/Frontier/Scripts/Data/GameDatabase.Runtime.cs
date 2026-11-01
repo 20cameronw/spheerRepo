@@ -138,7 +138,8 @@ namespace Frontier
             try
             {
                 Require(candidate != null, "economy asset is missing");
-                Require(candidate.schemaVersion == 1 && candidate.contentVersion == 1, "unsupported economy version");
+                Require(candidate.schemaVersion == CatalogBuilder.SchemaVersion &&
+                    candidate.contentVersion >= 1 && candidate.contentVersion <= CatalogBuilder.ContentVersion, "unsupported economy version");
                 var catalog = candidate.ToCatalog();
                 // This adapter supports the reviewed v1 catalog, not a partially populated import.
                 Require(catalog.resources.Length == 34 && catalog.recipes.Length == 24 && catalog.structures.Length == 31 &&

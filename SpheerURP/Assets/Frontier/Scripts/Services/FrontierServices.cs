@@ -177,6 +177,11 @@ namespace Frontier.Services
         ServiceResult RewardedAvailability(string placementId);
     }
 
+    public interface IRewardedAdPreview
+    {
+        int PreviewSeconds { get; }
+    }
+
     public interface IAdDiagnostics
     {
         bool CanOpenTestSuite { get; }
@@ -315,7 +320,7 @@ namespace Frontier.Services
         }
     }
 
-    sealed class ConsentGatedAdsService : IAdsService, IRewardedAdAvailability
+    sealed class ConsentGatedAdsService : IAdsService, IRewardedAdAvailability, IRewardedAdPreview
     {
         readonly IAdsService inner;
         readonly IConsentService consent;
@@ -327,6 +332,7 @@ namespace Frontier.Services
         }
 
         public bool IsConfigured { get { return inner.IsConfigured; } }
+        public int PreviewSeconds { get { return inner is IRewardedAdPreview preview ? preview.PreviewSeconds : 0; } }
 
         public ServiceResult RewardedAvailability(string placementId)
         {

@@ -8,9 +8,9 @@ namespace Frontier.Hyperspace.View
         // Verified x64 CoreCLR/Mono baselines. No replay sharing is enabled by this adapter.
         static readonly ulong[] expected =
         {
-            0xEF8CE0688767BECEUL, 0x028F0E874BE49031UL, 0x67F9B6E19D5AAD44UL,
-            0x552FE83D957EBFF6UL, 0xA1CF849613F13291UL, 0xE13DDE9D6F9F8CB4UL,
-            0xAF6249FCE21DA302UL, 0x60F9F4B94E18EC86UL, 0x0A007E8631244178UL
+            0xEF8CE0688767BECEUL, 0x70AEECA16E204073UL, 0xAE61F53B4950E6C3UL,
+            0x552FE83D957EBFF6UL, 0xF6C2864F84672986UL, 0x1CDD824B6AE5441CUL,
+            0xAF6249FCE21DA302UL, 0x665088AB298DE860UL, 0xB6DBA49EF911AB6BUL
         };
         public static string Check()
         {

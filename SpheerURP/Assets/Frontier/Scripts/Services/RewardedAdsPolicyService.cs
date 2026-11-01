@@ -30,7 +30,7 @@ namespace Frontier.Services
     }
 
     /// <summary>Local placement limits, not authoritative cross-device ad or currency verification.</summary>
-    public sealed class RewardedAdsPolicyService : IAdsService, IRewardedAdAvailability
+    public sealed class RewardedAdsPolicyService : IAdsService, IRewardedAdAvailability, IRewardedAdPreview
     {
         readonly IAdsService inner;
         readonly IRewardedAdUsageStore store;
@@ -62,6 +62,7 @@ namespace Frontier.Services
         }
 
         public bool IsConfigured { get { return enabled && inner.IsConfigured; } }
+        public int PreviewSeconds { get { return inner is IRewardedAdPreview preview ? preview.PreviewSeconds : 0; } }
 
         public Task<ServiceResult> InitializeAsync()
         {

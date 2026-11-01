@@ -105,7 +105,7 @@ namespace Frontier
             var home = Icons.IconButton("map", UiKit.Cyan, () => { mapZoom = SystemZoom; SelectMapWorld(gs.planet); CenterOn(gs.planet); });
             home.tooltip = UiText.Get("map.recenter"); mapTools.Add(home);
             mapView.Add(mapTools);
-            mapHideControls = Icons.IconButton("eye", UiKit.Cyan, () => SetMapMinimal(true));
+            mapHideControls = IconBtn(UiText.Get("map.hide-controls"), "eye", UiKit.Cyan, () => SetMapMinimal(true));
             mapHideControls.name = "map-hide-controls";
             mapHideControls.tooltip = UiText.Get("map.hide-controls");
             mapHideControls.style.position = Position.Absolute;
@@ -132,7 +132,7 @@ namespace Frontier
             mapLocation = UiKit.Text("", "fr-small");
             mapLocation.name = "map-location";
             mapLocationBar.Add(mapLocation);
-            var controls = IconBtn(UiText.Get("map.controls"), "about", UiKit.Cyan, () => SetMapMinimal(false));
+            var controls = IconBtn(UiText.Get("map.controls"), "eye", UiKit.Cyan, () => SetMapMinimal(false));
             controls.name = "map-show-controls";
             mapLocationBar.Add(controls);
             mapView.Add(mapLocationBar);
@@ -194,8 +194,12 @@ namespace Frontier
         void LayoutMapChrome()
         {
             if (mapTools == null) return;
-            foreach (var element in new VisualElement[] { mapTools, mapViewMode, mapHideControls, mapSearchBar, mapFilter, mapReadout, mapCard })
+            foreach (var element in new VisualElement[] { mapViewMode, mapHideControls, mapSearchBar, mapFilter, mapReadout, mapCard })
                 if (element != null) element.style.display = mapMinimal ? DisplayStyle.None : DisplayStyle.Flex;
+            mapTools.style.display = DisplayStyle.Flex;
+            for (int i = 0; i < mapTools.childCount; i++)
+                mapTools[i].style.display = mapMinimal && mapTools[i] != mapZoomIn && mapTools[i] != mapZoomOut
+                    ? DisplayStyle.None : DisplayStyle.Flex;
             if (mapLocationBar != null)
             {
                 mapLocationBar.style.display = mapMinimal ? DisplayStyle.Flex : DisplayStyle.None;
@@ -204,7 +208,7 @@ namespace Frontier
                 mapLocationBar.style.right = UiKit.Space.S16 + inset.z;
             }
             mapTools.style.right = UiKit.Space.S16 + inset.z;
-            mapTools.style.top = UiKit.Space.S16 + inset.y;
+            mapTools.style.top = (mapMinimal ? UiKit.Size.Touch + UiKit.Space.S32 : UiKit.Space.S16) + inset.y;
             mapTools.style.left = UiKit.Space.S16 + inset.x;
             if (mapCard != null) mapCard.style.marginBottom = UiKit.Space.S16 + inset.w;
             if (mapWorld != null)
@@ -269,7 +273,7 @@ namespace Frontier
             if (mapViewMode != null)
                 mapViewMode.text = UiText.Get(SystemMapView ? "map.mode.neighbors" :
                     NeighborMapView ? "map.mode.overview" : "map.mode.orbits");
-            mapZoomIn.SetEnabled(!SystemMapView);
+            mapZoomIn.SetEnabled(!SystemMapView || mapMinimal);
             mapZoomOut.SetEnabled(SystemMapView || NeighborMapView);
             mapWorld.Q("map-scanner-legend").style.display = SystemMapView || mapMinimal ? DisplayStyle.None : DisplayStyle.Flex;
             if (mapLocation != null)
@@ -405,7 +409,10 @@ namespace Frontier
         {
             if (SystemMapView && selected != null)
             {
-                viewport.Center(selected.Star.X, selected.Star.Y);
+                double dx = viewport.Width * 0.5 / viewport.Scale;
+                double dy = viewport.Height * 0.5 / viewport.Scale;
+                viewport.Center(Math.Max(selected.Star.X - dx, Math.Min(selected.Star.X + dx, viewport.CenterX)),
+                    Math.Max(selected.Star.Y - dy, Math.Min(selected.Star.Y + dy, viewport.CenterY)));
                 return;
             }
             double x = viewport.CenterX, y = viewport.CenterY;
@@ -480,6 +487,7 @@ namespace Frontier
             bool otherSystem = selected == null || selected.Star.Key != planet.Star.Key;
             selected = planet;
             BuildMapNodes(); InvalidateMapPreview(); BuildMapCard();
+            if (mapMinimal) SetMapMinimal(false);
             if (otherSystem || !SystemMapView) { mapZoom = SystemZoom; CenterOn(planet); }
             mapWorld.MarkDirtyRepaint();
         }

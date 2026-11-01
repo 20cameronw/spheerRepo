@@ -10,6 +10,7 @@ namespace Frontier
     {
         GameplayRewardRules gameplayRewardRules;
         bool gameplayAdShowing;
+        VisualElement developmentAdPreview;
         string rewardDiscardArmed;
         VisualElement adConsentDialog;
         TaskCompletionSource<bool> adConsentDecision;
@@ -163,16 +164,36 @@ namespace Frontier
             gameplayAdShowing = true;
             try
             {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (serviceSet.Ads is IRewardedAdPreview preview && preview.PreviewSeconds > 0)
+                {
+                    developmentAdPreview = UiKit.Div("fr-backdrop fr-scrim");
+                    developmentAdPreview.name = "development-ad-preview";
+                    var panel = new FrontierModal();
+                    panel.Add(UiKit.Text(UiText.Get("reward.preview-title"), "fr-h2"));
+                    panel.Add(UiKit.Text(UiText.Get("reward.preview-help"), "fr-muted"));
+                    var countdown = UiKit.Text("", "fr-h2", UiKit.Cyan);
+                    float started = Time.realtimeSinceStartup;
+                    void UpdateTimer() { countdown.text = UiText.Get("reward.preview-timer",
+                        Mathf.Max(0, Mathf.CeilToInt(preview.PreviewSeconds -
+                            (Time.realtimeSinceStartup - started)))); }
+                    UpdateTimer();
+                    countdown.schedule.Execute(UpdateTimer).Every(100);
+                    panel.Add(countdown);
+                    developmentAdPreview.Add(panel);
+                    overlayLayer.Add(developmentAdPreview);
+                }
+#endif
                 var request = serviceSet.Ads.ShowRewardedAsync(ticket.placement);
                 var winner = await Task.WhenAny(request, Task.Delay(TimeSpan.FromSeconds(90)));
                 if (this == null || gs != state || context != state.RewardRequestContext)
-                    return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.changed"));
+                    return ServiceResult<RewardedAdResult>.Failed(UiText.Get("reward.changed"));
                 bool earned = false;
                 ServiceResult<RewardedAdResult> result;
                 if (winner != request)
                 {
                     ObserveLateAdCompletion(request);
-                    result = ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.timeout"));
+                    result = ServiceResult<RewardedAdResult>.Failed(UiText.Get("reward.timeout"));
                 }
                 else
                 {
@@ -180,7 +201,7 @@ namespace Frontier
                     earned = result.succeeded && result.value.rewardEarned && result.value.placementId == ticket.placement &&
                         serviceSet.Consent.Current.adsAllowed;
                     if (result.succeeded && result.value.rewardEarned && !earned)
-                        result = ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.changed"));
+                        result = ServiceResult<RewardedAdResult>.Failed(UiText.Get("reward.changed"));
                 }
 
                 static async void ObserveLateAdCompletion(Task<ServiceResult<RewardedAdResult>> request)
@@ -197,9 +218,14 @@ namespace Frontier
                 Debug.LogException(error);
                 if (!state.ResolveGameplayReward(context, ticket.id, false, out var saveError))
                     Debug.LogWarning("Frontier: ad request recovery required: " + saveError);
-                return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.failed"));
+                return ServiceResult<RewardedAdResult>.Failed(UiText.Get("reward.failed"));
             }
-            finally { gameplayAdShowing = false; }
+            finally
+            {
+                gameplayAdShowing = false;
+                developmentAdPreview?.RemoveFromHierarchy();
+                developmentAdPreview = null;
+            }
         }
 
         void BuildConstructionOffer(VisualElement body, PlacedStructure job)

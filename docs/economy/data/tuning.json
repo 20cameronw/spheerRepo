@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1,
+  "contentVersion": 2,
   "generator": "frontier-economy-dev",
   "family": "tuning",
   "items": {
     "schemaVersion": 1,
-    "digest": "1c0c735faed632a4",
+    "digest": "cef24abbcdba862c",
     "keys": [
       {
         "key": "value.premium.refinery",
@@ -131,7 +131,7 @@
         "key": "time.anchor.7",
         "group": "time",
         "description": "Seconds of a job at level index 7 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
-        "defaultValue": 3600,
+        "defaultValue": 4500,
         "min": 0,
         "max": 604800
       },
@@ -139,7 +139,7 @@
         "key": "time.anchor.8",
         "group": "time",
         "description": "Seconds of a job at level index 8 of the shared time curve (index 0 is instant, 11 is one day). Intermediate indices interpolate geometrically.",
-        "defaultValue": 10800,
+        "defaultValue": 12600,
         "min": 0,
         "max": 604800
       },
@@ -1619,7 +1619,7 @@
         "key": "time.start.research_lab",
         "group": "time",
         "description": "Level index of Research Lab level 1 on the shared time curve.",
-        "defaultValue": 1,
+        "defaultValue": 3,
         "min": 0,
         "max": 11
       },
@@ -1627,7 +1627,7 @@
         "key": "time.step.research_lab",
         "group": "time",
         "description": "Level index added per level for Research Lab.",
-        "defaultValue": 0.95,
+        "defaultValue": 0.65,
         "min": 0,
         "max": 3
       },

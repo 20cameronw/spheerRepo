@@ -1,5 +1,25 @@
 # Testing
 
+## Player-experience controls and cosmetic progression
+
+- In Editor/development builds, Menu > Debug can set exact XP, shards and inventory, toggle research,
+  set shared mining/tool tiers and individual upgrades, place test buildings, and edit construction,
+  upgrade and active clearance timers. Finishing jobs also releases their assigned builders.
+- All six harvest games can launch from Debug without finding the corresponding deposit first.
+  Mining follows veins; drilling manages pressure and heat. Their saved tool progression remains shared,
+  and debug downgrades also reset legacy drilling tiers so old saves cannot force a higher tier.
+- Cosmetic purchases cover persistence, free reequipping, insufficient funds, stale quotes, save failures,
+  read-only saves and unchanged stats. Runtime checks verify actual repainting and distinct weapon effects.
+- The narrow minigame check constrains the real shell, checks full-width rows, button bounds/touch sizes
+  and measured wrapped-text height. Inspect the rendered phone/tablet captures as well: generic UI lint
+  alone missed the custom drilling buttons.
+- Development ad previews are five-second, opt-in simulations with durable reward settlement.
+  Harvest doubling is offered after play but before Collect. Native ads, multitouch, device performance
+  and long-term hands-on progression still require physical-device playtesting.
+- Full-suite verification: **988 EditMode** and **131 PlayMode** passed (allocation-counter probes skipped).
+  The minimal map now pans within a clamped local chart, a rejected double-yield offer stays visible but
+  disabled with its reason, and the runtime Hyperspace self-check table now matches `Golden.cs`.
+
 ## Side-on lander and scanner-limited project map
 
 - Ship presentation uses the screen-top terrain silhouette and a horizontal profile. Downward air boosters
@@ -25,7 +45,7 @@
 ## Project icons and full-loop tutorial follow-up
 
 - Lab shortcut selects Utility and scrolls the Research Lab card into view; tracked Utility projects use the same route.
-- Track stars toggle saved state and selected styling, including the persistent shortage-overlay header.
+- Track stars toggle saved state and selected styling on originating project cards; shortages do not repeat them.
 - Resume is icon-only in the safe-area HUD corner below the top bar, with first-session guidance beside it.
 - The live guide now ends with research and an upgrade, preserving its original six objective identities and skip state.
   How to Play explains the full harvesting/storage/crafting/XP/research/upgrading/exploration/expansion loop.

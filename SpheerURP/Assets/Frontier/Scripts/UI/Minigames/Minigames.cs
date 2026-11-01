@@ -164,6 +164,7 @@ namespace Frontier
             UiKit.Border(arena, new Color(color.r, color.g, color.b, 0.7f), 3f);
             overlay.Add(arena);
             controls = UiKit.Div("fr-row");
+            controls.AddToClassList("fr-minigame-controls");
             overlay.Add(controls);
             status = UiKit.Text("", "fr-h2", Color.white);
             status.style.display = DisplayStyle.None;
@@ -336,6 +337,7 @@ namespace Frontier
                 "fr-minigame-result-quality", UiKit.Muted));
             panel.Add(UiKit.Text(UiText.Get("harvest.result.metric", ResultMetric, Mathf.Max(0, result.perfects), Mathf.Max(0, result.total)),
                 "fr-minigame-result-detail", UiKit.Muted));
+            panel.Add(UiKit.Text(UiText.Get("reward.before-collect"), "fr-muted"));
             pendingResult = result;
             resultAwaitingConfirmation = true;
             if (doubleYieldOffer != null && result.quality > 0.05f)

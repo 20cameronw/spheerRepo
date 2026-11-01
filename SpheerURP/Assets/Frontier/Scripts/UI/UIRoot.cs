@@ -524,7 +524,7 @@ namespace Frontier
                     ? (Func<Task<ServiceResult<RewardedAdResult>>>) (async () =>
                     {
                         if (!await RequestRewardedConsent() || this == null)
-                            return ServiceResult<RewardedAdResult>.Failed(ServiceMessage.Get("reward.not-earned"));
+                            return ServiceResult<RewardedAdResult>.Failed(UiText.Get("reward.not-earned"));
                         if (baseCommitted || !GameplayOfferAllowed(gameplayRewardRules.harvestEnabled, "double-yield"))
                             return ServiceResult<RewardedAdResult>.Failed(GameplayAdUnavailable("double-yield") ??
                                 UiText.Get("reward.changed"));

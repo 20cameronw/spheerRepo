@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentVersion": 1,
+  "contentVersion": 2,
   "tuningSchemaVersion": 1,
   "generator": "frontier-economy-dev",
   "tuningKeys": 607,
-  "tuningDigest": "1c0c735faed632a4",
+  "tuningDigest": "cef24abbcdba862c",
   "counts": {
     "resources": 34,
     "recipes": 24,

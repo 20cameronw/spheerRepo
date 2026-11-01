@@ -114,7 +114,12 @@ namespace Frontier
                 yield return Entry("research", research.data.id, "description", research.data.description);
                 labels.Add(research.data.branch);
                 foreach (string id in research.data.prereqs ?? Array.Empty<string>()) labels.Add(id);
-                foreach (string id in research.data.unlocks ?? Array.Empty<string>()) labels.Add(id);
+                foreach (string id in research.data.unlocks ?? Array.Empty<string>())
+                {
+                    labels.Add(id);
+                    if (id.StartsWith("feature:", StringComparison.Ordinal))
+                        labels.Add(id.Substring("feature:".Length));
+                }
             }
             foreach (var ladder in db.toolLadders ?? Array.Empty<ToolLadderSO>())
             {

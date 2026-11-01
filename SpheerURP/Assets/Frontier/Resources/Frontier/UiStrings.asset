@@ -32,6 +32,117 @@ MonoBehaviour:
     text: Tap discard again to permanently give up this saved bonus.
   - key: reward.harvest
     text: 'WATCH AD: +{0} {1}'
+  - key: project.harvest
+    text: Harvest
+  - key: about.mission
+    text: Our mission
+  - key: about.story
+    text: 'Your crew follows fragments of an old interstellar network. Every harvested
+      vein, antenna and outpost brings its silent worlds back into contact. The signal
+      also attracts raiders: build defenses before calling stronger waves.'
+  - key: about.play
+    text: Your expedition, your pace
+  - key: about.promise
+    text: Harvest by hand, turn raw supplies into fuel, and choose your next world.
+      Research opens new equipment; upgraded buildings visibly grow. Nova Shards
+      can shorten construction or change your colony paint. Ads are always optional,
+      and cosmetics never change your strength.
+  - key: theme.shop
+    text: Colony paint shop
+  - key: theme.help
+    text: Buy once, equip freely across all your buildings. Paint never changes stats.
+      Upgrades add hardware instead of changing your chosen color.
+  - key: theme.original
+    text: Original paint
+  - key: theme.ember
+    text: Ember orange
+  - key: theme.jade
+    text: Jade green
+  - key: theme.cyan
+    text: Ion blue
+  - key: theme.violet
+    text: Nebula violet
+  - key: theme.galaxy
+    text: Galaxy
+  - key: theme.galaxy-help
+    text: Deep-space violet paint with a constellation of bright stars.
+  - key: theme.equipped
+    text: Equipped
+  - key: theme.equip
+    text: Equip
+  - key: theme.buy
+    text: 'Buy: {0} shards'
+  - key: theme.confirm
+    text: 'Confirm purchase: {0} shards'
+  - key: theme.unavailable
+    text: This paint cannot be purchased right now. No shards were spent.
+  - key: theme.save-failed
+    text: Could not save your paint purchase. No shards were spent. {0}
+  - key: theme.applied
+    text: '{0} equipped across your colonies.'
+  - key: theme.timers
+    text: Construction and crews
+  - key: crew.starter-help
+    text: Your expedition starts with 20 Nova Shards. Try finishing this job for
+      {0} shards, or keep them and let the timer finish naturally.
+  - key: reward.before-harvest
+    text: After the run, choose Collect or watch an optional ad for double yield
+      before collecting.
+  - key: reward.before-collect
+    text: Your haul is ready, not yet collected. Choose below.
+  - key: reward.preview-title
+    text: Test ad preview
+  - key: reward.preview-help
+    text: Development preview only. No real ad is requested. Completion tests the
+      normal reward flow.
+  - key: reward.preview-timer
+    text: Reward in {0}s
+  - key: debug.state-help
+    text: Test account controls bypass normal costs and gates. Changes are saved.
+      Harvest tests can run anywhere; synthetic deposits use scrap when the world
+      has none.
+  - key: debug.apply
+    text: Apply
+  - key: debug.invalid
+    text: Enter a non-negative value.
+  - key: debug.level
+    text: Player level
+  - key: debug.finish-jobs
+    text: Finish all construction jobs
+  - key: debug.research
+    text: Research unlocks
+  - key: debug.tools
+    text: Individual tool tiers
+  - key: debug.individual-upgrades
+    text: Individual upgrades
+  - key: debug.inventory-exact
+    text: Exact inventory (ignores capacity)
+  - key: debug.structures
+    text: Placed buildings and timers
+  - key: debug.timer-seconds
+    text: Job seconds remaining
+  - key: debug.exact-xp
+    text: Exact XP
+  - key: research.all-tools-tier
+    text: 'All harvesting tools: tier {0}'
+  - key: research.crew-slot
+    text: Unlock construction crew slot {0}
+  - key: debug.clearance-jobs
+    text: Clearance timers
+  - key: debug.clearance-pad
+    text: '{0} / pad {1}'
+  - key: debug.upgrade-job
+    text: Timer upgrades to the next level
+  - key: debug.place
+    text: Place a test building
+  - key: debug.no-pad
+    text: No free, unobstructed pad. Choose another test world.
+  - key: debug.minigames
+    text: Play any harvest minigame
+  - key: debug.minigames-help
+    text: 'Mining: trace veins. Drilling: control heat and pressure. Siphoning: pump
+      rhythm. Excavation: scan buried targets. Salvage: tether wreckage. Normal results
+      and rewards are used; these runs change your test inventory.'
   - key: reward.construction
     text: 'WATCH AD: SAVE {0}'
   - key: reward.saved
@@ -166,13 +277,13 @@ MonoBehaviour:
   - key: project.view-world
     text: CHECK TRAVEL TO THIS WORLD
   - key: project.produce
-    text: OPEN LOCAL PRODUCER
+    text: Open producer
   - key: project.build-producer
-    text: FIND A LOCAL PRODUCER
+    text: Build producer
   - key: project.find-world
-    text: FIND A SUPPLYING WORLD
+    text: Find on map
   - key: project.manual
-    text: BROWSE RESOURCE ATLAS
+    text: Resource Atlas
   - key: project.while-away
     text: WHILE YOU WERE AWAY
   - key: project.job-ready
@@ -317,7 +428,9 @@ MonoBehaviour:
   - key: tools.mining
     text: MINING
   - key: tools.mining.help
-    text: One upgrade improves both vein mining and pressure drilling.
+    text: 'One equipment upgrade powers two jobs. Mining follows exposed veins with
+      precision. Deep drilling reaches buried deposits: balance pressure and let
+      the drill cool.'
   - key: harvest.vein.title
     text: FOLLOW THE VEIN
   - key: harvest.vein.hint
@@ -1058,8 +1171,8 @@ MonoBehaviour:
   - key: about.title
     text: FRONTIER
   - key: about.body
-    text: Build bases across the stars. Gather, refine, travel, and defend your worlds
-      from alien waves.
+    text: Frontier is a pocket-sized expedition across the stars. Start with a landing
+      ship and a handful of supplies. Leave behind a connected civilization.
   - key: harvest.reward
     text: +{0} {1}
   - key: harvest.backpack-full
@@ -1994,9 +2107,9 @@ MonoBehaviour:
   - key: map.here
     text: YOU ARE HERE
   - key: map.controls
-    text: Info
+    text: Show
   - key: map.hide-controls
-    text: Hide map info
+    text: Hide
   - key: map.return-world
     text: Return to {0}
   - key: map.location.planet
@@ -4871,3 +4984,11 @@ MonoBehaviour:
   - key: service.ads.test-ready
     text: Register this iPhone as a LevelPlay test device. In the suite choose Unity
       Ads > Test > Rewarded, not Live. Gameplay ads remain disabled.
+  - key: content.label.ascension.name
+    text: Ascension
+  - key: content.label.autopilot.name
+    text: Autopilot
+  - key: content.label.builder_2.name
+    text: Builder 2
+  - key: content.label.builder_3.name
+    text: Builder 3

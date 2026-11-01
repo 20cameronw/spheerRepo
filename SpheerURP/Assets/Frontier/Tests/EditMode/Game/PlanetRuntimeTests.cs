@@ -100,12 +100,12 @@ namespace Frontier.Tests
         }
 
         [Test]
-        public void StructureLevelPaletteKeepsFirstLevelOrangeAndClampsFutureLevels()
+        public void StructurePaintDoesNotChangeWhenUpgrading()
         {
             Assert.AreEqual((Color)new Color32(224, 91, 20, 255), StructureAppearance.AccentForLevel(1));
             var colors = new HashSet<Color>();
             for (int level = 1; level <= 10; level++) colors.Add(StructureAppearance.AccentForLevel(level));
-            Assert.AreEqual(10, colors.Count);
+            Assert.AreEqual(1, colors.Count);
             Assert.AreEqual(StructureAppearance.AccentForLevel(1), StructureAppearance.AccentForLevel(0));
             Assert.AreEqual(StructureAppearance.AccentForLevel(10), StructureAppearance.AccentForLevel(100));
             var model = ModelLibrary.Prefab(db.StructureOfKind(StructureKind.Lumber).modelKey);
