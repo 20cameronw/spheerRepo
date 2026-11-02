@@ -10103,6 +10103,86 @@ MonoBehaviour:
     m_Localized: 'Tool: {0} (LV {1}, cooling {2}% per second)'
     m_Metadata:
       m_Items: []
+  - m_Id: 6203170022842368
+    m_Localized: Shard packs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396800
+    m_Localized: Optional consumable packs. The store handles payment; shards are
+      delivered only after verification. Spent packs cannot be restored by the store.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396801
+    m_Localized: Payments are not enabled in this build. Store products and secure
+      purchase recovery must be configured first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396802
+    m_Localized: Connect to your device store to see local prices and recover any
+      unfinished payments.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396803
+    m_Localized: Connect / recover pending purchases
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396804
+    m_Localized: Waiting for the store...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396805
+    m_Localized: '{0} shards'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396806
+    m_Localized: Buy - {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396807
+    m_Localized: Store unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396808
+    m_Localized: Store connected. Pending purchases checked. Prices below come from
+      your store.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396809
+    m_Localized: Payment verified. Shards saved to your wallet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396810
+    m_Localized: The purchase session closed. Reopen the game to recover pending
+      purchases.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396811
+    m_Localized: The store did not respond. Check your connection and retry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396812
+    m_Localized: The store could not connect. Check your connection and retry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396813
+    m_Localized: The store is still processing. Do not buy again; reopen the game
+      and recover pending purchases.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396814
+    m_Localized: Purchase delivery is not confirmed. Recover pending purchases before
+      buying again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396815
+    m_Localized: Purchase cancelled. No new shards were delivered.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396816
+    m_Localized: The store is waiting for approval. Shards arrive only after payment
+      is approved and verified.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

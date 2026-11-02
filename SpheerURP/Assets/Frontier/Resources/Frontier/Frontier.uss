@@ -314,7 +314,7 @@
     border-radius: var(--fr-r-md); border-width: 2px; border-color: var(--fr-outline);
     background-color: var(--fr-surface-2);
 }
-.fr-tab:last-child { margin-right: 0; }
+.fr-tab-last { margin-right: 0; }
 .fr-tab:hover { background-color: var(--fr-surface-3); }
 .fr-tab:active { background-color: var(--fr-surface-3); }
 .fr-tab:focus { border-color: var(--fr-outline); }

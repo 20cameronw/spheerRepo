@@ -14,6 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   locale: en
   entries:
+  - key: shards.store.title
+    text: Shard packs
+  - key: shards.store.help
+    text: Optional consumable packs. The store handles payment; shards are delivered
+      only after verification. Spent packs cannot be restored by the store.
+  - key: shards.store.setup
+    text: Payments are not enabled in this build. Store products and secure purchase
+      recovery must be configured first.
+  - key: shards.store.connect-help
+    text: Connect to your device store to see local prices and recover any unfinished
+      payments.
+  - key: shards.store.connect
+    text: Connect / recover pending purchases
+  - key: shards.store.busy
+    text: Waiting for the store...
+  - key: shards.store.amount
+    text: '{0} shards'
+  - key: shards.store.buy
+    text: Buy - {0}
+  - key: shards.store.unavailable
+    text: Store unavailable
+  - key: shards.store.ready
+    text: Store connected. Pending purchases checked. Prices below come from your
+      store.
+  - key: shards.store.delivered
+    text: Payment verified. Shards saved to your wallet.
   - key: harvest.redesign.ready
     text: Read the field, then start. The clock waits for you.
   - key: harvest.redesign.start
@@ -5186,3 +5212,20 @@ MonoBehaviour:
     text: Builder 2
   - key: content.label.builder_3.name
     text: Builder 3
+  - key: purchase.closed
+    text: The purchase session closed. Reopen the game to recover pending purchases.
+  - key: purchase.timeout
+    text: The store did not respond. Check your connection and retry.
+  - key: purchase.connect-failed
+    text: The store could not connect. Check your connection and retry.
+  - key: purchase.waiting
+    text: The store is still processing. Do not buy again; reopen the game and recover
+      pending purchases.
+  - key: purchase.unsettled
+    text: Purchase delivery is not confirmed. Recover pending purchases before buying
+      again.
+  - key: purchase.cancelled
+    text: Purchase cancelled. No new shards were delivered.
+  - key: purchase.deferred
+    text: The store is waiting for approval. Shards arrive only after payment is
+      approved and verified.

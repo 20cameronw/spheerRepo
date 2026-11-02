@@ -491,6 +491,7 @@ namespace Frontier.Services.Unity
         readonly UnityServicesInitializer initializer;
         bool dataCollectionAllowed;
         bool initialized;
+        global::Unity.Services.Analytics.IAnalyticsService analytics;
 
         public UnityAnalyticsProvider(FrontierUnityServicesConfig config, UnityServicesInitializer initializer)
         {
@@ -504,11 +505,17 @@ namespace Frontier.Services.Unity
         {
             dataCollectionAllowed = allowed;
             if (!initialized) return;
+            if (UnityServices.State != ServicesInitializationState.Initialized || analytics == null)
+            {
+                initialized = false;
+                analytics = null;
+                return;
+            }
 
             if (allowed)
-                UnityAnalytics.Instance.StartDataCollection();
+                analytics.StartDataCollection();
             else
-                UnityAnalytics.Instance.StopDataCollection();
+                analytics.StopDataCollection();
         }
 
         public async Task<ServiceResult> InitializeAsync()
@@ -520,9 +527,10 @@ namespace Frontier.Services.Unity
             if (!initializedResult.succeeded)
                 return initializedResult;
 
+            analytics = UnityAnalytics.Instance;
             initialized = true;
             if (dataCollectionAllowed)
-                UnityAnalytics.Instance.StartDataCollection();
+                analytics.StartDataCollection();
             return ServiceResult.Success();
         }
 
@@ -530,7 +538,8 @@ namespace Frontier.Services.Unity
         {
             if (!IsConfigured)
                 return ServiceResult.NotConfigured("Unity Analytics");
-            if (!initialized || !dataCollectionAllowed)
+            if (!initialized || analytics == null ||
+                UnityServices.State != ServicesInitializationState.Initialized || !dataCollectionAllowed)
                 return ServiceResult.ConsentRequired("analytics data collection");
             if (string.IsNullOrWhiteSpace(eventName))
                 return ServiceResult.InvalidRequest(ServiceMessage.Get("service.analytics.event"));
@@ -548,7 +557,7 @@ namespace Frontier.Services.Unity
                     }
                 }
 
-                UnityAnalytics.Instance.RecordEvent(analyticsEvent);
+                analytics.RecordEvent(analyticsEvent);
                 return ServiceResult.Success();
             }
             catch (ArgumentException exception)
@@ -616,9 +625,9 @@ namespace Frontier.Services.Unity
 
     public static class FrontierUnityServicesFactory
     {
-        public static FrontierServices Create(IConsentService consent, FrontierUnityServicesConfig config)
+        public static FrontierServices Create(IConsentService consent, FrontierUnityServicesConfig config,
+            ShardRulesSO shardRules = null)
         {
-            var unavailable = new UnavailableFrontierProvider();
             var initializer = new UnityServicesInitializer(config);
             IRecoveryCredentialProvider recoveryCredentials = config != null && config.CanUseAccountRecovery
                 ? UnityRecoveryCredentialProviderRegistry.GetOrCreate()
@@ -639,7 +648,8 @@ namespace Frontier.Services.Unity
 #endif
             var ads = adsPolicy.Wrap(adsProvider,
                 new PlayerPrefsRewardedAdUsageStore(), time);
-            return new FrontierServices(consent, ads, unavailable, authentication, leaderboards,
+            var purchases = new UnityShardPurchaseProvider(config, shardRules);
+            return new FrontierServices(consent, ads, purchases, authentication, leaderboards,
                 cloudSave, analytics, remoteConfig, time, new UnityNotificationProvider(config),
                 config == null ? null : config.leaderboardId,
                 config != null && config.HasValidPrivacyPolicy ? config.privacyPolicyUrl : null,

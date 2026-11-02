@@ -21,6 +21,7 @@ namespace Frontier
             state = gs;
             services = serviceSet;
             if (services == null) return;
+            if (services.Purchases is IPurchaseSessionService purchases) purchases.BindGrantStore(gs);
             services.Consent.PreferencesChanged += OnConsentChanged;
             InitializeAnalytics();
         }
@@ -77,6 +78,7 @@ namespace Frontier
             if (services != null)
             {
                 services.Consent.PreferencesChanged -= OnConsentChanged;
+                if (services.Purchases is IPurchaseSessionService purchases) purchases.Shutdown();
                 services.Analytics.SetDataCollectionAllowed(false);
                 services = null;
             }

@@ -13,6 +13,8 @@ namespace Frontier
     {
         const float MinZoom = 1f, NeighborZoom = 4f;
         const float SystemZoom = 12f, SystemZoomThreshold = 8f;
+        const float MapSystemSpacing = 3f;
+        readonly Dictionary<string, double> mapNearestSystemDistances = new Dictionary<string, double>();
         PlanetData selected;
         bool mapOpen, mapAutopilot, mapMinimal;
         VisualElement mapView, mapWorld, mapCard, mapTools;
@@ -186,6 +188,7 @@ namespace Frontier
             if (mapView != null) mapView.RemoveFromHierarchy();
             mapView = null; mapWorld = null; mapCard = null; mapTools = null;
             mapOpen = false; lastPinch = 0f; mapSnapshot = null;
+            mapNearestSystemDistances.Clear();
             suppressMapClick = false;
             mapScaleAnimating = false;
             mapQueryBoundsKnown = false;
@@ -246,8 +249,8 @@ namespace Frontier
             ApplyMapTransform();
         }
 
-        bool SystemMapView { get { return viewport.Scale >= SystemZoomThreshold; } }
-        bool NeighborMapView { get { return !SystemMapView && viewport.Scale >= NeighborZoom; } }
+        bool SystemMapView { get { return mapZoom >= SystemZoomThreshold; } }
+        bool NeighborMapView { get { return !SystemMapView && mapZoom >= NeighborZoom; } }
         float MapOrbitDetail { get { return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(MinZoom, NeighborZoom, mapZoom)); } }
         float MapLocalDetail { get { return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(NeighborZoom, SystemZoom, mapZoom)); } }
         Vector2 Project(double x, double y) { MapPoint p = viewport.Project(x, y); return new Vector2((float)p.x, (float)p.y); }
@@ -284,7 +287,7 @@ namespace Frontier
         {
             if (float.IsNaN(scale) || float.IsInfinity(scale)) return;
             mapZoom = Mathf.Clamp(scale, MinZoom, SystemZoom);
-            viewport.ZoomAt(anchor.x, anchor.y, mapZoom / viewport.Scale);
+            viewport.ZoomAt(anchor.x, anchor.y, mapZoom * MapSystemSpacing / viewport.Scale);
             ApplyMapTransform();
         }
 
@@ -309,7 +312,7 @@ namespace Frontier
             float w = mapWorld.layout.width, h = mapWorld.layout.height;
             if (float.IsNaN(w) || float.IsNaN(h) || w <= 0 || h <= 0) return;
             viewport.Resize(w, h);
-            viewport.ZoomAt(w * 0.5, h * 0.5, mapZoom / viewport.Scale);
+            viewport.ZoomAt(w * 0.5, h * 0.5, mapZoom * MapSystemSpacing / viewport.Scale);
             ClampMapCenter();
             if ((!mapQueryBoundsKnown || Math.Abs(Math.Log(mapQueryScale / viewport.Scale)) > 0.14 ||
                 !mapQueryBounds.Covers(viewport)) &&
@@ -693,12 +696,35 @@ namespace Frontier
             for (int i = 0; i < planets.Count; i++) if (planets[i].Id == planet.Id) { index = i; break; }
             float fraction = (index + 1f) / Mathf.Max(1, planets.Count);
             const float orbitAspect = 0.65f;
-            float outerX = Mathf.Max(80, Mathf.Min((float)viewport.Width * 0.5f - 100,
-                ((float)viewport.Height * 0.5f - 72) / orbitAspect));
-            // All systems use the same stable schematic lanes, scaled continuously. Neither
-            // detail thresholds nor arriving worker snapshots can relocate a planet.
-            float radiusX = Mathf.Lerp(64, outerX, fraction) * mapZoom / SystemZoom * MapOrbitDetail;
+            float outerX = Mathf.Min(360f, Mathf.Max(80, Mathf.Min((float)viewport.Width * 0.5f - 100,
+                ((float)viewport.Height * 0.5f - 72) / orbitAspect)));
+            float desired = outerX * mapZoom / SystemZoom;
+            float envelope = Mathf.Min(desired, (float)(NearestMapSystemDistance(planet.Star) * viewport.Scale * 0.36));
+            float inner = Mathf.Min(64f * mapZoom / SystemZoom, envelope * 0.4f);
+            float radiusX = Mathf.Lerp(inner, envelope, fraction) * MapOrbitDetail;
             return new Vector2(radiusX, radiusX * orbitAspect);
+        }
+
+        double NearestMapSystemDistance(StarSystem star)
+        {
+            if (mapNearestSystemDistances.TryGetValue(star.Id, out double distance)) return distance;
+            // The largest displayed orbit is at most 10 ly. A fixed 64 ly neighborhood
+            // contains every possible collision, regardless of filter, discovery or viewport.
+            distance = 64;
+            foreach (var other in gs.universe.Universe.SystemsInRect(star.X - 64, star.Y - 64, star.X + 64, star.Y + 64))
+            {
+                if (other.Key == star.Key) continue;
+                double dx = other.X - star.X, dy = other.Y - star.Y;
+                distance = Math.Min(distance, Math.Sqrt(dx * dx + dy * dy));
+            }
+            mapNearestSystemDistances[star.Id] = distance;
+            return distance;
+        }
+
+        float MapPlanetRadius(PlanetData planet, bool detailed)
+        {
+            float desired = detailed ? Mathf.Lerp(4f, planet.Id == selected.Id ? 24 : 19, MapLocalDetail) : 4f;
+            return Mathf.Min(desired, PlanetOrbitAxes(planet).x * 0.2f);
         }
 
         float NeighborOrbitRadius(StarSystem star)
@@ -904,7 +930,7 @@ namespace Frontier
                     if (i == 0) p.MoveTo(at); else p.LineTo(at);
                 }
                 p.ClosePath(); p.Stroke();
-                MapDisc(p, PlanetPoint(planet), 4f, MapTint(UiKit.Ui(planet.Primary), opacity * MapOrbitDetail));
+                MapDisc(p, PlanetPoint(planet), MapPlanetRadius(planet, false), MapTint(UiKit.Ui(planet.Primary), opacity * MapOrbitDetail));
             }
         }
 
@@ -958,7 +984,7 @@ namespace Frontier
         void DrawMapPlanet(Painter2D p, PlanetData planet)
         {
             Vector2 at = PlanetPoint(planet);
-            float radius = Mathf.Lerp(4f, planet.Id == selected.Id ? 24 : 19, MapLocalDetail);
+            float radius = MapPlanetRadius(planet, true);
             float opacity = MapOrbitDetail;
             if (mapResource == ProjectMapFilter && mapProjectWorlds.Contains(planet.Id))
                 DrawProjectMarker(p, at, radius + 10f, opacity);
@@ -980,40 +1006,48 @@ namespace Frontier
             }
         }
 
+        RouteCurve MapRouteCurve(int index)
+        {
+            var legs = mapPreview.legs;
+            Vector2 a, b, ac, bc;
+            if (legs.Length == 0)
+            {
+                a = PlanetPoint(gs.planet); b = PlanetPoint(selected);
+                ac = Project(gs.planet.Star.X, gs.planet.Star.Y);
+                bc = Project(selected.Star.X, selected.Star.Y);
+            }
+            else
+            {
+                var leg = legs[index];
+                ac = Project(leg.x0, leg.y0); bc = Project(leg.x1, leg.y1);
+                a = index == 0 ? PlanetPoint(gs.planet) : ac;
+                b = index == legs.Length - 1 ? PlanetPoint(selected) : bc;
+            }
+            return new RouteCurve(new MapPoint(a.x, a.y), new MapPoint(b.x, b.y),
+                new MapPoint(ac.x, ac.y), new MapPoint(bc.x, bc.y));
+        }
+
         void DrawMapRoute(Painter2D p)
         {
             if (mapPreview == null || selected == null || selected.Id == gs.planet.Id) return;
             p.lineWidth = 2.5f; p.strokeColor = mapPreview.reachable ? UiKit.Magenta : UiKit.Red;
             var legs = mapPreview.legs;
-            for (int i = 0; i < legs.Length; i++)
+            int count = Mathf.Max(1, legs.Length);
+            for (int i = 0; i < count; i++)
             {
-                RouteLeg leg = legs[i];
-                Vector2 a = Project(leg.x0, leg.y0), b = Project(leg.x1, leg.y1);
-                if (leg.intraSystem) { a = PlanetPoint(gs.planet); b = PlanetPoint(selected); }
-                Vector2 ac = Project(leg.x0, leg.y0), bc = Project(leg.x1, leg.y1);
-                if (!leg.intraSystem)
-                {
-                    Vector2 d = b - a;
-                    Vector2 perpendicular = new Vector2(-d.y, d.x);
-                    ac = a - (-perpendicular + d * 0.25f);
-                    bc = b - (-perpendicular - d * 0.25f);
-                }
-                var curve = new RouteCurve(new MapPoint(a.x, a.y), new MapPoint(b.x, b.y), new MapPoint(ac.x, ac.y), new MapPoint(bc.x, bc.y));
+                var curve = MapRouteCurve(i);
+                Vector2 a = new Vector2((float)curve.start.x, (float)curve.start.y);
                 p.BeginPath(); p.MoveTo(a);
                 for (int k = 1; k <= 24; k++) { MapPoint q = curve.At(k / 24.0); p.LineTo(new Vector2((float)q.x, (float)q.y)); }
                 p.Stroke();
                 float time = Mathf.Repeat(Time.unscaledTime * 0.12f, 1);
-                if ((int)(time * legs.Length) == i)
+                if (mapPreview.reachable && (int)(time * count) == i)
                 {
-                    MapPoint q = curve.At(time * legs.Length - i), d = curve.Direction(time * legs.Length - i);
+                    MapPoint q = curve.At(time * count - i), d = curve.Direction(time * count - i);
                     Vector2 ship = new Vector2((float)q.x, (float)q.y), forward = new Vector2((float)d.x, (float)d.y), side = new Vector2(-forward.y, forward.x);
                     p.fillColor = Color.white;
                     p.BeginPath(); p.MoveTo(ship + forward * 10); p.LineTo(ship - forward * 6 + side * 5); p.LineTo(ship - forward * 6 - side * 5); p.ClosePath(); p.Fill();
                 }
-            }
-            if (legs.Length == 0)
-            {
-                p.BeginPath(); p.MoveTo(Project(gs.planet.Star.X, gs.planet.Star.Y)); p.LineTo(Project(selected.Star.X, selected.Star.Y)); p.Stroke();
             }
         }
 
@@ -1115,6 +1149,9 @@ namespace Frontier
         public float DebugMapContinuousScale { get { return mapZoom; } }
         public Vector2 DebugMapPlanetPoint(PlanetData planet) { return PlanetPoint(planet); }
         public Vector2 DebugMapStarPoint(PlanetData planet) { return Project(planet.Star.X, planet.Star.Y); }
+        public float DebugMapSystemSpacing { get { return MapSystemSpacing; } }
+        public RouteCurve DebugMapRouteCurve(int index) { return MapRouteCurve(index); }
+        public float DebugMapSystemEnvelope(PlanetData planet) { return NeighborOrbitRadius(planet.Star); }
         public void DebugMapContinuousZoom(float scale)
         {
             mapScaleAnimating = false;

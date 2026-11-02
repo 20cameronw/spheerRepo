@@ -220,7 +220,18 @@ namespace Frontier
     [UxmlElement]
     public partial class FrontierTabBar : VisualElement
     {
-        public FrontierTabBar() { AddToClassList("fr-tabs"); }
+        public FrontierTabBar()
+        {
+            AddToClassList("fr-tabs");
+            RegisterCallback<GeometryChangedEvent>(_ => RefreshLastTab());
+            RegisterCallback<AttachToPanelEvent>(_ => RefreshLastTab());
+        }
+
+        void RefreshLastTab()
+        {
+            for (int i = 0; i < childCount; i++)
+                this[i].EnableInClassList("fr-tab-last", i == childCount - 1);
+        }
     }
 
     [UxmlElement]

@@ -69,6 +69,9 @@ After model revisions, regenerate these textures with `Frontier/Models/Bake Stru
 Map zoom is continuous from 1x overview to 12x local orbits. Pinch ratios are immediate; wheel and plus/minus
 ease proportionally around the gesture anchor. Overview/nearby/system presets remain shortcuts, not separate
 views or input thresholds; system centers and pan bounds stay continuous while detail blends in.
+Chart spacing is expanded consistently at every scale; orbit envelopes are bounded by nearest-system
+separation so neighboring solar systems do not cross. Route previews and the moving travel marker use
+planet positions at their endpoints rather than the system's sun, including same-system trips.
 World overzoom enters a pannable minimal map: the safe-area location bar, return arrow, Show action and +/- remain.
 The location broadens from current planet/system to nearby systems to the current system's sector coordinates.
 Show or selecting a planet reveals search/filter/destination/travel without changing zoom;

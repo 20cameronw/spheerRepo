@@ -3,6 +3,14 @@ using UnityEngine;
 
 namespace Frontier.Services.Unity
 {
+    [Serializable]
+    public sealed class ShardStoreProduct
+    {
+        public string catalogId;
+        public string googlePlayId;
+        public string appleAppStoreId;
+    }
+
     [CreateAssetMenu(menuName = "Frontier/Services Configuration")]
     public sealed class FrontierUnityServicesConfig : ScriptableObject
     {
@@ -24,6 +32,12 @@ namespace Frontier.Services.Unity
         [Tooltip("Enable Apple Sign-In or Google Play Games recovery after native provider and dashboard setup are complete.")]
         public bool enableAccountRecovery;
 
+        [Tooltip("Leave off until both stores, authoritative receipt verification/purchase recovery, and device sandbox tests are complete.")]
+        public bool enablePurchases;
+
+        [Tooltip("Map each shard catalog pack to its consumable product ID in both store consoles.")]
+        public ShardStoreProduct[] shardProducts = Array.Empty<ShardStoreProduct>();
+
         [Tooltip("UGS leaderboard ID created in the Unity Dashboard.")]
         public string leaderboardId;
 
@@ -38,6 +52,7 @@ namespace Frontier.Services.Unity
                 return Uri.TryCreate(privacyPolicyUrl, UriKind.Absolute, out uri) &&
                     uri.Scheme == Uri.UriSchemeHttps;
             }
+
         }
 
         public bool CanUseAuthentication

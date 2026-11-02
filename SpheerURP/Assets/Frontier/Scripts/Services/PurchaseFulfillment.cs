@@ -3,6 +3,12 @@ using System.Threading.Tasks;
 
 namespace Frontier.Services
 {
+    public interface IPurchaseSessionService
+    {
+        void BindGrantStore(IPurchaseGrantStore store);
+        void Shutdown();
+    }
+
     public readonly struct VerifiedPurchase
     {
         public readonly string store;

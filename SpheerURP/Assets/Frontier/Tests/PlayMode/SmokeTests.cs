@@ -1962,18 +1962,104 @@ namespace Frontier.Tests
                 yield return null;
                 yield return null;
                 Assert.AreEqual(controls.parent.contentRect.width, controls.resolvedStyle.width, 1, kind.ToString());
+                Vector2 panelOrigin = RuntimePanelUtils.ScreenToPanel(controls.panel, Vector2.zero);
+                Vector2 panelOffset = RuntimePanelUtils.ScreenToPanel(controls.panel, new Vector2(100f, 0f));
+                float unitsPerDp = Mathf.Abs(panelOffset.x - panelOrigin.x) * ScreenMetrics.Density / 100f;
+                Assert.Greater(unitsPerDp, 0f);
                 foreach (var button in controls.Query<Button>().ToList())
                 {
                     Assert.LessOrEqual(button.worldBound.xMax, controls.worldBound.xMax + 1, kind.ToString());
                     Assert.GreaterOrEqual(button.worldBound.xMin, controls.worldBound.xMin - 1, kind.ToString());
-                    Assert.GreaterOrEqual(button.worldBound.width, UiKit.Size.Touch - 1, kind.ToString());
-                    Assert.GreaterOrEqual(button.worldBound.height, UiKit.Size.Touch - 1, kind.ToString());
-                    Assert.AreEqual(WhiteSpace.Normal, button.resolvedStyle.whiteSpace);
-                    var textSize = button.MeasureTextSize(button.text, button.contentRect.width,
-                        VisualElement.MeasureMode.Exactly, 0, VisualElement.MeasureMode.Undefined);
+                    Assert.GreaterOrEqual(button.worldBound.yMin, controls.worldBound.yMin - 1, kind.ToString());
+                    Assert.LessOrEqual(button.worldBound.yMax, controls.worldBound.yMax + 1, kind.ToString());
+                    Assert.GreaterOrEqual(button.worldBound.width / unitsPerDp, 48f, button.name + " width in physical dp");
+                    Assert.GreaterOrEqual(button.worldBound.height / unitsPerDp, 48f, button.name + " height in physical dp");
+                    Assert.AreEqual(WhiteSpace.NoWrap, button.resolvedStyle.whiteSpace);
+                    if (string.IsNullOrEmpty(button.text)) continue;
+                    var textSize = button.MeasureTextSize(button.text, 0,
+                        VisualElement.MeasureMode.Undefined, 0, VisualElement.MeasureMode.Undefined);
+                    Assert.LessOrEqual(textSize.x, button.contentRect.width + 1, button.name + " must fit its whole label");
                     Assert.LessOrEqual(textSize.y, button.contentRect.height + 1, button.name);
                 }
             }
+        }
+
+        sealed class PurchaseStoreFixture : IPurchaseService
+        {
+            public bool IsConfigured => true;
+            public int fetches, recoveries, purchases;
+            public TaskCompletionSource<ServiceResult<PurchaseReceipt>> payment;
+            public Task<ServiceResult> InitializeAsync() => Task.FromResult(ServiceResult.Success());
+            public Task<ServiceResult<IReadOnlyList<StoreProduct>>> FetchProductsAsync(IReadOnlyList<string> ids)
+            {
+                fetches++;
+                return Task.FromResult(ServiceResult<IReadOnlyList<StoreProduct>>.Success(
+                    ids.Select(id => new StoreProduct(id, "LOCAL 1.23", "Store pack")).ToArray()));
+            }
+            public Task<ServiceResult<IReadOnlyList<PurchaseReceipt>>> RestoreAsync()
+            {
+                recoveries++;
+                return Task.FromResult(ServiceResult<IReadOnlyList<PurchaseReceipt>>.Success(Array.Empty<PurchaseReceipt>()));
+            }
+            public Task<ServiceResult<PurchaseReceipt>> PurchaseAsync(string id)
+            {
+                purchases++;
+                payment = new TaskCompletionSource<ServiceResult<PurchaseReceipt>>();
+                return payment.Task;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator ShardStoreUsesLocalizedPricesAndNeverGrantsFromButtonPressOrCancellation()
+        {
+            new GameObject("ShardStoreBootstrap").AddComponent<FrontierBootstrap>();
+            float deadline = Time.realtimeSinceStartup + 30;
+            while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+            var rt = FrontierRuntime.Current;
+            Assert.IsNotNull(rt);
+            rt.Ui.DebugMenu("shards");
+            var packs = rt.State.db.shardRules.data.packs;
+            foreach (var pack in packs)
+            {
+                var button = rt.Ui.DebugRoot.Q<Button>("shard-pack-buy-" + pack.id);
+                Assert.IsNotNull(button);
+                Assert.IsFalse(button.enabledSelf, "Unconfigured native payments must not open a fake store.");
+            }
+            Assert.AreEqual(UiText.Get("shards.store.setup"), rt.Ui.DebugRoot.Q<Label>("shard-store-status").text);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(WhiteSpace.Normal, rt.Ui.DebugRoot.Q<Label>("shard-store-status").resolvedStyle.whiteSpace);
+            var unavailable = new UnavailableFrontierProvider();
+            var store = new PurchaseStoreFixture();
+            rt.Ui.DebugSetServices(new FrontierServices(new ConsentService(new DeletionConsentStore()),
+                unavailable, store, unavailable, unavailable, unavailable, unavailable, unavailable,
+                new LocalTimeService(), unavailable));
+            rt.Ui.DebugMenu("shards");
+            int before = rt.State.ShardBalance;
+            void Press(string name)
+            {
+                var button = rt.Ui.DebugRoot.Q<Button>(name);
+                Assert.IsNotNull(button, name);
+                using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = button; button.SendEvent(submit); }
+            }
+            Press("shard-store-connect");
+            yield return null;
+            Assert.AreEqual(1, store.fetches);
+            Assert.AreEqual(1, store.recoveries);
+            var buy = rt.Ui.DebugRoot.Q<Button>("shard-pack-buy-" + packs[0].id);
+            Assert.IsTrue(buy.enabledSelf);
+            StringAssert.Contains("LOCAL 1.23", buy.text);
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            Press(buy.name);
+            Assert.AreEqual(1, store.purchases);
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            foreach (var pack in packs)
+                Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>("shard-pack-buy-" + pack.id).enabledSelf);
+            store.payment.SetResult(ServiceResult<PurchaseReceipt>.Failed("Test payment cancelled"));
+            yield return null;
+            Assert.AreEqual(before, rt.State.ShardBalance);
+            Assert.AreEqual("Test payment cancelled", rt.Ui.DebugRoot.Q<Label>("shard-store-status").text);
+            Assert.IsFalse(rt.Ui.DebugRoot.Q<Button>(buy.name).enabledSelf, "Retry delivery before another payment.");
         }
 
         [UnityTest]
@@ -4158,6 +4244,128 @@ namespace Frontier.Tests
                 yield return new WaitForSecondsRealtime(0.65f);
                 Assert.AreEqual(12f, rt.Ui.DebugMapContinuousScale, 0.0001f,
                     "An explicit keyboard submit remains usable after pinch; it is not a pointer-gesture release.");
+                rt.Ui.DebugReset();
+            }
+            finally
+            {
+                if (FrontierRuntime.Current != null) FrontierRuntime.Current.Document.panelSettings.targetTexture = null;
+                ScreenMetrics.ClearVirtual();
+                texture.Release();
+                Object.Destroy(texture);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Map_OrbitalEnvelopesRemainSeparatedAcrossContinuousScalesAndSelection()
+        {
+            ScreenMetrics.SetVirtual(1080, 2340);
+            var texture = new RenderTexture(1080, 2340, 0);
+            texture.Create();
+            try
+            {
+                new GameObject("MapEnvelopeBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                rt.Document.panelSettings.targetTexture = texture;
+                var systems = rt.State.universe.AuthoredPlanets.GroupBy(p => p.Star.Id).Select(g => g.First()).ToList();
+                Assert.Greater(systems.Count, 1);
+                rt.State.RecordMapDiscoveries(systems.Select(p => p.Star));
+                foreach (var selection in systems.Take(2))
+                {
+                    rt.Ui.DebugMap(selection);
+                    for (int i = 0; i < 10; i++) yield return null;
+                    foreach (float scale in new[] { 1.1f, 2.5f, 3.999f, 4.001f, 7.999f, 8.001f, 12f })
+                    {
+                        rt.Ui.DebugMapContinuousZoom(scale);
+                        for (int a = 0; a < systems.Count; a++)
+                        {
+                            float radiusA = rt.Ui.DebugMapSystemEnvelope(systems[a]);
+                            var centerA = rt.Ui.DebugMapStarPoint(systems[a]);
+                            foreach (var planet in rt.State.universe.PlanetsOf(systems[a].Star))
+                                Assert.LessOrEqual(Vector2.Distance(centerA, rt.Ui.DebugMapPlanetPoint(planet)),
+                                    radiusA + 0.01f, "Every actual orbital point stays inside its allocated envelope.");
+                            for (int b = a + 1; b < systems.Count; b++)
+                            {
+                                float distance = Vector2.Distance(centerA, rt.Ui.DebugMapStarPoint(systems[b]));
+                                float radii = radiusA + rt.Ui.DebugMapSystemEnvelope(systems[b]);
+                                Assert.LessOrEqual(radii, distance * 0.72f + 0.02f,
+                                    "Selected and neighboring orbit envelopes need visible separation at " + scale);
+                                double dx = systems[a].Star.X - systems[b].Star.X;
+                                double dy = systems[a].Star.Y - systems[b].Star.Y;
+                                Assert.AreEqual(Math.Sqrt(dx * dx + dy * dy) * scale * 3f, distance, 0.05,
+                                    "Chart spacing enlarges display distances only, with no center-dependent distortion.");
+                            }
+                        }
+                    }
+                    var planetBefore = rt.Ui.DebugMapPlanetPoint(selection);
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    Assert.Less(Vector2.Distance(planetBefore, rt.Ui.DebugMapPlanetPoint(selection)), 0.01f,
+                        "A new filtered/viewport worker result cannot resize orbital geometry.");
+                }
+                rt.Ui.DebugReset();
+            }
+            finally
+            {
+                if (FrontierRuntime.Current != null) FrontierRuntime.Current.Document.panelSettings.targetTexture = null;
+                ScreenMetrics.ClearVirtual();
+                texture.Release();
+                Object.Destroy(texture);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Map_RenderedRouteAndMovingShipUseActualPlanetEndpointsAcrossScales()
+        {
+            ScreenMetrics.SetVirtual(1080, 2340);
+            var texture = new RenderTexture(1080, 2340, 0);
+            texture.Create();
+            try
+            {
+                new GameObject("MapPlanetRouteBootstrap").AddComponent<FrontierBootstrap>();
+                float deadline = Time.realtimeSinceStartup + 30;
+                while (FrontierRuntime.Current == null && Time.realtimeSinceStartup < deadline) yield return null;
+                var rt = FrontierRuntime.Current;
+                Assert.IsNotNull(rt);
+                rt.Document.panelSettings.targetTexture = texture;
+                var source = rt.State.planet;
+                rt.State.DebugSetShipLevel("jump", 3);
+                GiveFullHazardPlating(rt.State);
+                rt.State.backpack.Set(rt.Db.fuel.id, 10000);
+                var remote = rt.State.universe.AuthoredPlanets.Where(p => p.Star.Key != source.Star.Key)
+                    .OrderBy(p => Math.Pow(p.Star.X - source.Star.X, 2) + Math.Pow(p.Star.Y - source.Star.Y, 2)).First();
+                rt.State.RecordMapDiscoveries(new[] { remote.Star });
+                var local = rt.State.universe.PlanetsOf(source.Star).First(p => p.Id != source.Id);
+                foreach (var destination in new[] { local, remote })
+                {
+                    rt.Ui.DebugMap(destination);
+                    deadline = Time.realtimeSinceStartup + 15;
+                    while (rt.Ui.DebugMapPreview == null && Time.realtimeSinceStartup < deadline) yield return null;
+                    var plan = rt.Ui.DebugMapPreview;
+                    Assert.IsNotNull(plan);
+                    Assert.Greater(plan.legs.Length, 0, "Exercise real planner legs, not an endpoint-only stand-in.");
+                    int fuel = plan.totalFuel, seconds = plan.totalSeconds;
+                    foreach (float scale in new[] { 1f, 1.1f, 2.5f, 4f, 7.999f, 8.001f, 12f })
+                    {
+                        rt.Ui.DebugMapContinuousZoom(scale);
+                        var first = rt.Ui.DebugMapRouteCurve(0);
+                        var last = rt.Ui.DebugMapRouteCurve(plan.legs.Length - 1);
+                        var start = first.At(0); var end = last.At(1);
+                        Assert.Less(Vector2.Distance(new Vector2((float)start.x, (float)start.y),
+                            rt.Ui.DebugMapPlanetPoint(source)), 0.01f, "Rendered route/ship departure is the source planet.");
+                        Assert.Less(Vector2.Distance(new Vector2((float)end.x, (float)end.y),
+                            rt.Ui.DebugMapPlanetPoint(destination)), 0.01f, "Rendered route/ship arrival is the selected planet.");
+                        if (scale > 1f)
+                            Assert.Greater(Vector2.Distance(new Vector2((float)end.x, (float)end.y),
+                                rt.Ui.DebugMapStarPoint(destination)), 0.001f, "Visible orbital detail cannot terminate at the sun.");
+                        for (int leg = 1; leg < plan.legs.Length; leg++)
+                            Assert.Less((rt.Ui.DebugMapRouteCurve(leg - 1).At(1) -
+                                rt.Ui.DebugMapRouteCurve(leg).At(0)).Length, 0.01, "Intermediate legs join without a ship teleport.");
+                        Assert.AreEqual(fuel, plan.totalFuel);
+                        Assert.AreEqual(seconds, plan.totalSeconds);
+                    }
+                }
                 rt.Ui.DebugReset();
             }
             finally

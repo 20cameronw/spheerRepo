@@ -183,9 +183,12 @@ player consent or OS permission.
 The pending-purchase protocol now requires receipt evidence and an injected verifier, checks the returned
 product/transaction/store identity, and requires atomic reward/journal persistence before store confirmation.
 The current-save grant adapter writes the real shard wallet and store/transaction journal atomically before
-publishing its reward. Only test verifier/acknowledger implementations exist; the offline factory still
-exposes unavailable purchases. Never treat product/transaction strings as proof of payment or plug in a
-success-only verifier. Store adapters must validate the native receipt, bundle/app identity, paid state,
+publishing its reward. A Unity IAP 5.4.4 adapter now connects to Google Play and the Apple App Store, fetches
+localized prices, handles pending/deferred/cancelled payments and confirms only after fulfillment succeeds.
+It is **disabled** in the authored build and always unavailable in the Editor/desktop; the offline factory
+still exposes unavailable purchases. No production verifier or authoritative recovery backend is supplied.
+Never treat product/transaction strings as proof of payment or plug in a success-only verifier.
+The backend must validate the native receipt, bundle/app identity, paid state,
 product and quantity before constructing a verified purchase. The current save journal prevents replay only
 within that saved history. Until authoritative purchase recovery exists, gameplay reset refuses a save
 containing any purchase journal entries, and cloud restore/undo refuses when either the current or incoming
@@ -196,6 +199,36 @@ This is a fail-closed safety gate, not purchase reconciliation or a shipped paid
 Rolling-backup recovery and multiple devices can still replace history; authoritative reconciliation across
 those boundaries and a reviewed reset/restore policy remain required before IAP activation.
 Do not log receipt payloads or put them into analytics.
+
+### Shard store setup (payments remain off)
+
+The wallet lists the existing `shards_1` through `shards_5` catalog packs (80, 500, 1100, 2400 and 6500 shards).
+It never displays the economy's guide-dollar tiers as prices. Only fetched store-localized prices enable Buy.
+Connecting also recovers pending transactions before enabling another payment. Recovery checks unfinished
+consumables, not spent packs or an authoritative cross-device wallet. No fake-store payment grants are enabled.
+
+1. Create single-quantity consumable products for those five rewards in both store consoles. Fill
+   `FrontierUnityServicesConfig.shardProducts` with one unique Google and Apple product ID per catalog ID;
+   all five mappings and a real HTTPS privacy policy are required.
+2. Before Bootstrap, register `ShardPurchaseVerification.CreateVerifier`. The factory receives the bound
+   `IPurchaseGrantStore`; return an authenticated, account-bound backend implementation of
+   `IPurchaseReceiptVerifier`. Receipts contain a JSON `ReceiptEvidence` envelope: `store` (`GooglePlay`
+   or `AppleAppStore`), `applicationId`, `unifiedReceipt`, and Apple's StoreKit 2 `appleJws` where supplied.
+   Treat all client fields as untrusted. Validate the native product against its configured catalog mapping,
+   app/bundle identity, signature, quantity exactly one, paid state and transaction/account ownership.
+   Return the canonical catalog product ID and the original transaction ID only after verification.
+   Keep store credentials/secrets on the backend, never in the app or this configuration.
+3. Implement authoritative idempotent transaction history and recoverable wallet/account reconciliation,
+   including lost/rolled-back saves, refunds, reinstall, account changes and cross-device spending.
+   Local save history alone is insufficient; the current paid-history reset/restore safety gates remain.
+4. On physical Android/iOS sandbox accounts, verify localized prices, approved/cancelled/deferred payments,
+   offline fetch/verification/acknowledgement, duplicate/redelivered pending orders, failed local saves,
+   process termination and recovery. Confirm verified rewards are saved before acknowledgement/consumption.
+   Then complete the store/privacy/support review and explicitly enable `enablePurchases`.
+
+The adapter serializes settlement, rejects changed save contexts and stops late verification from granting
+after session teardown. A failed verification/save/acknowledgement stays unconfirmed for explicit recovery.
+These client safeguards and Editor tests are not evidence that native billing or server recovery is ready.
 
 - [ ] Initialize advertising only after the relevant consent/audience choices. Propagate actual GDPR/CCPA/COPPA
   flags to the selected SDK before any load; configure mediation test mode and physical-device validation.

@@ -8,6 +8,26 @@ namespace Frontier.Tests
     public sealed class FrontierControlsTests
     {
         [Test]
+        public void StylesAvoidUnsupportedLastChildAndTabBarMarksItsLastControl()
+        {
+            string source = System.IO.File.ReadAllText("Assets/Frontier/Resources/Frontier/Frontier.uss");
+            StringAssert.DoesNotContain(":last-child", source);
+            var tabs = new FrontierTabBar();
+            var first = new FrontierTab();
+            var second = new FrontierTab();
+            tabs.Add(first);
+            tabs.Add(second);
+            var refresh = typeof(FrontierTabBar).GetMethod("RefreshLastTab",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            refresh.Invoke(tabs, null);
+            Assert.IsFalse(first.ClassListContains("fr-tab-last"));
+            Assert.IsTrue(second.ClassListContains("fr-tab-last"));
+            second.RemoveFromHierarchy();
+            refresh.Invoke(tabs, null);
+            Assert.IsTrue(first.ClassListContains("fr-tab-last"));
+        }
+
+        [Test]
         public void UxmlInstantiatesControlsAndAppliesAuthoredAttributes()
         {
             var template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(

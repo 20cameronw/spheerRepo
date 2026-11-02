@@ -38,7 +38,7 @@ namespace Frontier
 #endif
             var consent = new ConsentService(consentStore);
             var serviceConfig = Resources.Load<FrontierUnityServicesConfig>("Frontier/FrontierUnityServicesConfig");
-            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig);
+            var services = FrontierUnityServicesFactory.Create(consent, serviceConfig, db.shardRules);
             var bundledDb = db;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (!HarnessRunner.Requested)

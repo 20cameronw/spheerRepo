@@ -4,6 +4,7 @@
     "references": [
         "Frontier.Services",
         "Frontier.Data",
+        "Frontier.Economy",
         "Unity.LevelPlay",
         "Unity.Services.Core",
         "Unity.Services.Authentication",
@@ -11,6 +12,7 @@
         "Unity.Services.Leaderboards",
         "Unity.Services.Analytics",
         "Unity.Services.RemoteConfig",
+        "Unity.Purchasing",
         "Unity.Notifications.Unified",
         "Unity.Notifications.Android",
         "Unity.Notifications.iOS"

@@ -4,6 +4,13 @@ Behaviour notes for the systems that exist today. The long-term direction lives 
 
 ## Player navigation and purchase resources
 
+The shard wallet includes consumable packs through Unity IAP, with payments disabled until store mapping
+and an authenticated backend verifier/recovery implementation are supplied. Store-localized prices are
+the only displayed payment prices. `UnityShardPurchaseProvider` handles native pending orders through
+`PurchaseFulfillment` and the existing atomic GameState grant journal, then acknowledges the store.
+See [COMPLIANCE.md](COMPLIANCE.md#shard-store-setup-payments-remain-off) for the activation contract and
+the remaining backend/native-device requirements. Free gameplay and earned-shard cosmetics stay independent.
+
 The dock is **Research / Map / Ship / Build**, in the existing positions. Ship always opens Cargo in one tap,
 with its capacity gauge and used/total count inside Cargo, not on the dock. Cargo contains carried items and its capacity
 upgrade; surface salvage is explicitly unclaimed and not aboard. Tools contains harvest equipment. Systems contains
@@ -56,6 +63,15 @@ keyboard submission still selects a destination after a pan or pinch.
 Tracked-material matches use compact lime flags beside system/planet markers, never orbit-sized outlines.
 System labels have dark backplates above subdued neighbor orbits; the scale readout reserves the measured
 Hide-control width and wraps within its own column.
+The illustrative chart uses a constant 3× system-spacing multiplier, preserving anchored zoom/pan while leaving
+more room between neighboring systems. Every orbit envelope, including the selected system, is capped at 36%
+of its nearest system's projected distance; this leaves at least 28% separation between adjacent orbital envelopes.
+The nearest-neighbor calculation uses a fixed local universe neighborhood and is cached independently of query
+snapshots, discovery/resource filters and selection. Lane sizes and planet glyphs shrink continuously when needed,
+never pushing stars, changing save coordinates or changing travel prices.
+The route line and its moving ship share the same orbital-tangent curves: first departure is the current planet,
+last arrival is the selected planet, and intermediate jump legs join at their common system. Below visible orbital
+detail those endpoints collapse continuously with the planets; blocked-route previews use the same planet endpoints.
 
 ## Shortage journeys, projects and returning sessions
 

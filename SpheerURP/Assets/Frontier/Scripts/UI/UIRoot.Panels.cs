@@ -378,6 +378,7 @@ namespace Frontier
             balance.Add(UiKit.Text(UiText.Get("shards.balance", gs.ShardBalance.ToString("N0")), "fr-h1", UiKit.Magenta));
             balance.Add(UiKit.Text(UiText.Get("shards.uses-help"), "fr-muted"));
             body.Add(balance);
+            BuildShardStore(body);
             BuildBuildingThemeShop(body);
             BuildShardAdOffer(body);
             BuildRewardRecovery(body);

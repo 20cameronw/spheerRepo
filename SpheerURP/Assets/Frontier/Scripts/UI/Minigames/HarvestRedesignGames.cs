@@ -34,6 +34,7 @@ namespace Frontier
         bool started;
         float feedbackPulse;
         float unitsPerDp = 2f;
+        bool layoutPending;
         int boardSide;
         VisualElement boardElement;
         Label boardStatus;
@@ -87,10 +88,18 @@ namespace Frontier
             overlay.Focus();
             NewRun(); RefreshBoard();
             ApplyLayout();
-            overlay.RegisterCallback<GeometryChangedEvent>(e => ApplyLayout());
+            overlay.RegisterCallback<GeometryChangedEvent>(e => ScheduleLayout());
         }
 
         float Dp(float value) { return value * unitsPerDp; }
+
+        void ScheduleLayout()
+        {
+            if (layoutPending) return;
+            layoutPending = true;
+            // Reflow after the panel's geometry pass, not recursively inside it.
+            overlay.schedule.Execute(() => { layoutPending = false; ApplyLayout(); });
+        }
 
         void UpdateDensity()
         {
@@ -219,7 +228,7 @@ namespace Frontier
             boardStatus.style.left = boardStatus.style.right = boardStatus.style.top = StyleKeyword.Auto;
             boardStatus.style.width = Length.Percent(100);
             boardStatus.style.flexShrink = 0;
-            boardStatus.RegisterCallback<GeometryChangedEvent>(e => ApplyLayout());
+            boardStatus.RegisterCallback<GeometryChangedEvent>(e => ScheduleLayout());
             var field = UiKit.Div();
             field.name = "harvest-field";
             field.style.position = Position.Absolute;

@@ -9735,6 +9735,78 @@ MonoBehaviour:
     m_Key: gather.drill-tool
     m_Metadata:
       m_Items: []
+  - m_Id: 6203170022842368
+    m_Key: shards.store.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396800
+    m_Key: shards.store.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396801
+    m_Key: shards.store.setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396802
+    m_Key: shards.store.connect-help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396803
+    m_Key: shards.store.connect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396804
+    m_Key: shards.store.busy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396805
+    m_Key: shards.store.amount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396806
+    m_Key: shards.store.buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396807
+    m_Key: shards.store.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396808
+    m_Key: shards.store.ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396809
+    m_Key: shards.store.delivered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396810
+    m_Key: purchase.closed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396811
+    m_Key: purchase.timeout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396812
+    m_Key: purchase.connect-failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396813
+    m_Key: purchase.waiting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396814
+    m_Key: purchase.unsettled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396815
+    m_Key: purchase.cancelled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6203170056396816
+    m_Key: purchase.deferred
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -2,6 +2,23 @@
 
 ## Player-experience controls and cosmetic progression
 
+- Latest map/store follow-up: full PlayMode passed **144 tests** with one unsupported allocation probe
+  skipped; full EditMode passed **1011 tests** with four unsupported allocation probes skipped.
+  The narrow harvest regression measures physical dp, whole-label fit and containment across all six games.
+  Geometry-triggered harvest reflow is deferred outside the panel's layout pass to prevent recursive layout.
+  Phone/tablet map and store captures confirmed separated systems and a fully wrapped setup status.
+- Map spacing regressions measure nonintersecting neighboring orbital envelopes across zoom and selection.
+  Route regressions measure the actual rendered curve endpoints and moving marker at both ends, including
+  same-system and cross-system planet destinations.
+- Shard-store regressions reject incomplete/duplicate store mappings, unavailable/Editor payment attempts,
+  mismatched duplicate transaction products and grants after shutdown/save replacement. Shop interaction
+  coverage checks store-localized prices, pending-delivery recovery before buying, disabled repeated taps
+  and no wallet mutation from a payment button or cancelled payment. Real-money Android/iOS sandbox billing
+  and production backend verification/recovery are not exercised by these Editor tests.
+- Analytics teardown coverage simulates a previously initialized adapter after the SDK singleton disappears;
+  withdrawal uses the retained SDK handle rather than resolving the torn-down singleton. The stylesheet
+  regression excludes unsupported `:last-child` and verifies explicit final-tab styling.
+
 - `HarvestRedesignTests` verifies six distinct action/scoring models; `HarvestRedesignFlowTests`
   exercises actual controls, onboarding, pause, retry and scene/input cleanup through the replacement factory.
 - Resupply regressions verify quoted quantities, cargo space, prior discovery, opt-in, no pre-ad grant,
@@ -26,7 +43,7 @@
 - Cosmetic purchases cover persistence, free reequipping, insufficient funds, stale quotes, save failures,
   read-only saves and unchanged stats. Runtime checks verify actual repainting and distinct weapon effects.
 - The narrow minigame check constrains the real shell, checks full-width rows, button bounds/touch sizes
-  and measured wrapped-text height. Inspect the rendered phone/tablet captures as well: generic UI lint
+  and measured whole-label fit. Inspect the rendered phone/tablet captures as well: generic UI lint
   alone missed the custom drilling buttons.
 - Development ad previews are five-second, opt-in simulations with durable reward settlement.
   Harvest doubling is offered after play but before Collect. Native ads, multitouch, device performance
